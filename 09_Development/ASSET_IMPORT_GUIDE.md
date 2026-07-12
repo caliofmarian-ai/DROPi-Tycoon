@@ -35,34 +35,19 @@ The priority order is:
 
 # Asset Categories
 
-The project uses the following asset groups:
+The project uses the following physical GDevelop asset folders, as canonically defined in `09_Development/GDEVELOP_PROJECT_STRUCTURE.md`:
 
 ```
 Assets/
 
-Sprites/
+    Sprites
 
-    Characters
-    Buildings
-    Vehicles
-    Objects
+    Audio
 
-UI/
-
-    Buttons
-    Icons
-    Panels
-
-Audio/
-
-    Music
-    Effects
-
-Backgrounds/
-
-    Maps
-    Environment
+    UI
 ```
+
+Subcategories such as Characters, Buildings, Vehicles, Objects, Buttons, Icons, Panels, Music, and Effects are organizational conventions used inside these canonical folders. They are not separate top-level physical folders.
 
 ---
 

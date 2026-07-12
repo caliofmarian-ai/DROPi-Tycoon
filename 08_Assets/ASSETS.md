@@ -160,26 +160,23 @@ Examples:
 
 Assets should follow a clear structure.
 
-Example:
+The physical GDevelop project folder topology is canonically defined in:
+
+`09_Development/GDEVELOP_PROJECT_STRUCTURE.md`
+
+The canonical GDevelop asset folders are:
 
 ```
 Assets/
 
-Visual/
-  Buildings/
-  Vehicles/
-  Characters/
-
-Audio/
-  Music/
-  Effects/
-
-UI/
-  Icons/
-  Interface/
-
-Animations/
+    Sprites
+    Audio
+    UI
 ```
+
+Conceptual asset categories (Visual Assets, World Assets, Vehicle Assets, Character Assets, UI Assets, Audio Assets, Animation Assets) are classifications used for asset planning and communication. They are not additional physical folder hierarchies. All physical assets are placed inside the canonical folders above.
+
+Note: Visual, World, Vehicle, and Character assets are stored under `Assets/Sprites`. UI assets are stored under `Assets/UI`. Audio assets are stored under `Assets/Audio`.
 
 ---
 
