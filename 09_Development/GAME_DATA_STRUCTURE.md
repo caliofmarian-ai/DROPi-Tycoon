@@ -180,6 +180,8 @@ Completed
 Failed
 ```
 
+Ownership note: The exact technical `OrderStatus` values are defined here. Lifecycle semantics and allowed transitions are canonically defined in `03_Logistics/ORDERS.md`. The values listed above are subordinate to and must remain aligned with that lifecycle definition.
+
 ---
 
 # World Data
