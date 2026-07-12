@@ -86,15 +86,18 @@ Each cycle should make the company larger, smarter, and more efficient.
 
 # Early Game
 
-The player begins as an independent courier.
+The player begins as an independent courier on foot.
 
 Starting resources include:
 
 - Small amount of cash
-- One bicycle
 - One smartphone
 - One backpack
 - One delivery account
+
+The player does not start with a vehicle.
+
+The Bicycle is the first purchasable vehicle. It is not starting equipment. For Prototype v0.1 scope, see `09_Development/PROTOTYPE_V0.1.md`.
 
 At this stage, the player performs deliveries personally.
 

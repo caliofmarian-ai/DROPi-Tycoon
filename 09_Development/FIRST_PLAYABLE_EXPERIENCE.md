@@ -128,11 +128,11 @@ The player selects how to complete the delivery.
 
 Prototype options:
 
-- Walk delivery
+- Walk delivery (available from the start)
+- Bicycle (available for purchase after initial on-foot deliveries; see `09_Development/PROTOTYPE_V0.1.md`)
 
 Future options:
 
-- Bicycle
 - Vehicle
 - Drone
 
@@ -164,17 +164,17 @@ The reward explains progression.
 
 # Step 5: First Upgrade
 
-The player receives the first improvement opportunity.
+After completing initial deliveries on foot and earning sufficient money, the player receives the first improvement opportunity.
 
 Example:
 
 Upgrade:
 
-Better delivery efficiency
+Purchase the Bicycle
 
 Effect:
 
-- Faster deliveries
+- Faster deliveries through increased movement speed
 - Higher income potential
 
 ---

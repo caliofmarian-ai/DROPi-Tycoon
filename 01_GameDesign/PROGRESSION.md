@@ -46,13 +46,16 @@ Every company progresses through several development stages.
 
 Independent Courier
 
-The player performs deliveries personally.
+The player performs deliveries personally, starting on foot.
 
-Available assets:
+Starting assets:
 
 - Backpack
 - Smartphone
-- Bicycle
+
+First purchasable vehicle milestone:
+
+- Bicycle (purchased with earned money after initial on-foot deliveries; not starting equipment)
 
 Main objective:
 
