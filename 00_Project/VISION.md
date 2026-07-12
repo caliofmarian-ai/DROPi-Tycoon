@@ -88,15 +88,7 @@ New technologies should create new strategic opportunities instead of replacing 
 
 # Design Philosophy
 
-Every mechanic should answer at least one of the following questions:
-
-- Does it create meaningful decisions?
-- Does it increase strategic depth?
-- Does it improve immersion?
-- Does it support long-term progression?
-- Does it interact with existing systems?
-
-If the answer is "no", the mechanic should be redesigned or removed.
+Gameplay design principles and mechanic evaluation rules are defined canonically in `01_GameDesign/GDD.md`.
 
 ---
 

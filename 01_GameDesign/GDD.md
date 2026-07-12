@@ -140,6 +140,20 @@ Every upgrade, investment, expansion, and technology unlock should feel valuable
 
 ---
 
+## Mechanic Evaluation
+
+Every mechanic should answer at least one of the following questions:
+
+- Does it create meaningful decisions?
+- Does it increase strategic depth?
+- Does it improve immersion?
+- Does it support long-term progression?
+- Does it interact with existing systems?
+
+If the answer is "no", the mechanic should be redesigned or removed.
+
+---
+
 # Player Motivation
 
 Players are motivated by:
@@ -219,6 +233,18 @@ All gameplay systems must be:
 - independently testable
 
 This allows AI agents to implement, balance, extend, and maintain systems with minimal ambiguity.
+
+---
+
+# Vision Traceability
+
+The Core Values defined in `00_Project/VISION.md` — Freedom, Progression, Realism, Accessibility, and Innovation — directly constrain and guide the gameplay design in this document.
+
+- **Freedom** is enforced by the *Multiple Valid Strategies* principle: no single optimal path should exist.
+- **Progression** is enforced by the *Reward Long-Term Thinking* principle and the *Endless Progression* design objective.
+- **Realism** is enforced by the *Operational Management* objective: systems must simulate believable logistics without unnecessary complexity.
+- **Accessibility** is enforced by the *Simple Input* principle: players perform simple actions while complexity emerges from system interactions.
+- **Innovation** is enforced by the *Technology Evolution* objective: new technologies expand gameplay rather than replace existing mechanics.
 
 ---
 
