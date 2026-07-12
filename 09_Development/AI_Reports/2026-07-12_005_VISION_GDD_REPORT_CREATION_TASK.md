@@ -9,8 +9,8 @@
 - Repository: caliofmarian-ai/DROPi-Tycoon
 - Branch: copilot/create-persistent-ai-report
 - Base commit: 793abcdb8636725d10fdd72fa21d343cefc14828
-- Resulting commit: N/A at report authoring time — will be available after commit
-- Pull Request: N/A at report authoring time — will be available after PR creation
+- Resulting commit: f318b2976189f17168899c6be49f0bbd13580a7e
+- Pull Request: https://github.com/caliofmarian-ai/DROPi-Tycoon/pull/6
 - Human approval status: Pending review
 
 ---
@@ -260,8 +260,7 @@ None.
 
 # Unresolved Issues
 
-1. Report 005 `Resulting commit` and `Pull Request` are unavailable at authoring time and are marked N/A until commit/PR creation.
-2. Exact model identity remains unavailable in exposed metadata and is marked N/A.
+1. Exact model identity remains unavailable in exposed metadata and is marked N/A.
 
 ---
 
@@ -275,5 +274,4 @@ This task created the missing historical report for PR #3 and the required self-
 
 # Follow-up Actions
 
-1. Commit and open PR for human review.
-2. After PR is available, reference PR link in task output.
+1. Human review of Pull Request #6.
