@@ -32,7 +32,13 @@ Every system must support this experience.
 
 # Core Gameplay Loop
 
-The main gameplay cycle:
+**Canonical Ownership:** The canonical ordered Prototype v0.1 gameplay loop is defined in and owned by `09_Development/PROTOTYPE_V0.1.md`. This document describes the gameplay systems that participate in that loop; it does not independently define a competing canonical loop.
+
+---
+
+## System Interaction Summary
+
+The following is a high-level summary of how systems interact during a delivery cycle. This is not a second canonical loop definition.
 
 ```
 Create Order
@@ -45,7 +51,7 @@ Deliver Package
       ↓
 Receive Reward
       ↓
-Improve Company
+Improve Company (optional)
       ↓
 Unlock Better Opportunities
       ↓

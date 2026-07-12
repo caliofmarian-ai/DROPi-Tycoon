@@ -52,23 +52,96 @@ Prototype v0.1 contains:
 
 # Core Gameplay Loop
 
-The main gameplay cycle:
+**Canonical Ownership:** This document (PROTOTYPE_V0.1.md) is the single canonical owner of the Prototype v0.1 gameplay loop.
+
+- `09_Development/CORE_GAMEPLAY_SYSTEMS.md` describes the systems that participate in this loop; it does not independently define a competing canonical loop.
+- `09_Development/GAMEPLAY_EVENTS_FLOW.md` describes the technical event representation of this loop; it does not redefine Prototype v0.1 gameplay scope.
+- `09_Development/FIRST_PLAYABLE_EXPERIENCE.md` describes the tutorial and first-session presentation of this loop; it does not replace or redefine it.
+- `01_GameDesign/GAMEPLAY.md` owns the general and long-term gameplay loop; it does not govern Prototype v0.1 scope.
+
+---
+
+## Happy Path
 
 ```
 Receive Order
+[Order is Available and presented to the player]
       ↓
-Choose Delivery Method
+Accept Order
+[Available → Accepted]
       ↓
-Complete Delivery
+Navigate to Pickup Location
+      ↓
+Pick Up Package
+[Accepted → PickedUp]
+      ↓
+Navigate to Destination
+      ↓
+Deliver Package
+[PickedUp → Completed]
       ↓
 Receive Payment
       ↓
-Upgrade Company
-      ↓
-Accept More Opportunities
-      ↓
 Repeat
 ```
+
+Order lifecycle state transitions follow the canonical definition in `03_Logistics/ORDERS.md`.
+
+---
+
+## Failure Branch
+
+```
+PickedUp
+      ↓
+Delivery fails
+[PickedUp → Failed]
+      ↓
+Display existing failure and reputation consequences
+      ↓
+Return to Receive Order
+```
+
+No numeric penalties or failure thresholds are defined here; those are balancing decisions.
+
+---
+
+## Optional Management Branch
+
+After Receive Payment, the player may optionally open Company Management:
+
+```
+Receive Payment
+      ↓
+Optional: Open CompanyManagement
+      ↓
+Optional: Purchase an available upgrade
+      ↓
+Return to Repeat
+```
+
+Company management is not a mandatory step in every delivery cycle.
+
+---
+
+## Bicycle Relationship
+
+The Bicycle is:
+
+- not a mandatory core-loop step;
+- not starting equipment;
+- a one-time progression milestone purchased through the optional management branch after sufficient on-foot delivery income;
+- used to increase movement speed during navigation after purchase.
+
+Price and persistence details are governed by `09_Development/PROTOTYPE_V0.1.md` (Transportation System section) and `09_Development/GAME_BALANCING_RULES.md`.
+
+---
+
+## Save & Load Relationship
+
+Save & Load is background technical behavior and is not a visible mandatory gameplay-loop step.
+
+Autosave occurs according to `06_Technical/SAVE_SYSTEM.md`, including after meaningful completed actions such as delivery completion, upgrade purchase, and progression changes.
 
 ---
 

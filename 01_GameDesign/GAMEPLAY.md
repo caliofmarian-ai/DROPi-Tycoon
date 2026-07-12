@@ -36,6 +36,8 @@ Complexity emerges through interaction between systems rather than difficult con
 
 # Core Gameplay Loop
 
+**Scope Clarification:** This document describes the general and long-term gameplay loop for DROPi Tycoon. Prototype v0.1 uses the reduced canonical loop defined in `09_Development/PROTOTYPE_V0.1.md`; that document is the authoritative owner of the Prototype v0.1 loop.
+
 Every gameplay session follows the same high-level cycle.
 
 Receive Customer Demand
