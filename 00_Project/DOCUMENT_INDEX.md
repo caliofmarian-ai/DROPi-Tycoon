@@ -14,33 +14,51 @@ Last Updated: 2026-07-12
 
 ## Purpose
 
-This document provides a complete map of DROPi Tycoon project documentation.
+This document is the canonical documentation map for DROPi-Tycoon.
 
-Its purpose is to:
+It defines:
 
-- Maintain organization
-- Prevent duplicated information
-- Keep documents connected
-- Support AI-assisted development
+- every stable live Markdown document that must be individually discoverable;
+- every managed root-level directory that must be represented;
+- directory-policy treatment for dynamic, historical, or generated areas.
+
+---
+
+## Indexing Policy
+
+1. Stable live Markdown documents are listed individually.
+2. Managed root-level directories are always represented, even when placeholder-only.
+3. Dynamic/high-churn historical streams are represented at directory-policy level when appropriate.
+4. Generated internals and build artifacts are not individually enumerated here.
+5. Document discoverability in this index does not change canonical ownership of content.
 
 ---
 
 # Project Structure
 
 ```
-DROPi_Tycoon/
+DROPi-Tycoon/
 
-00_Project
-01_GameDesign
-02_Economy
-03_Logistics
-04_World
-05_AI
-06_Technical
-07_UI
-08_Assets
-09_Development
+README.md
+00_Project/
+01_GameDesign/
+02_Economy/
+03_Logistics/
+04_World/
+05_AI/
+06_Technical/
+07_UI/
+08_Assets/
+09_Development/
+Game/
+Builds/
 ```
+
+---
+
+# Root Files
+
+- `README.md` — repository entry point and external-facing project summary.
 
 ---
 
@@ -48,21 +66,18 @@ DROPi_Tycoon/
 
 ## Purpose
 
-Project identity and management documents.
-
-Contains:
-
-- Project definition
-- Current status
-- Documentation control
+Project identity, governance, intake, status, and documentation control.
 
 Documents:
 
-```
-PROJECT_STATUS.md
-
-DOCUMENT_INDEX.md
-```
+- `00_Project/README.md`
+- `00_Project/VISION.md` — canonical project/game vision owner.
+- `00_Project/PROJECT_STATUS.md`
+- `00_Project/ROADMAP.md`
+- `00_Project/PROJECT_INTAKE_PROTOCOL.md`
+- `00_Project/DOCUMENT_INDEX.md`
+- `00_Project/PROJECT_CONSISTENCY_REPORT_TEMPLATE.md` — template document.
+- `00_Project/INITIAL_REPOSITORY_AUDIT.md` — stable historical audit document.
 
 ---
 
@@ -70,29 +85,16 @@ DOCUMENT_INDEX.md
 
 ## Purpose
 
-Defines the high-level game design, gameplay structure, player progression, missions and objectives, and gameplay principles.
-
-Contains:
-
-- High-level game design
-- Gameplay structure
-- Player progression
-- Missions and objectives
-- Gameplay principles
+High-level game design, gameplay structure, progression, and mission definitions.
 
 Documents:
 
-```
-GDD.md
+- `01_GameDesign/GDD.md`
+- `01_GameDesign/GAMEPLAY.md`
+- `01_GameDesign/MISSIONS.md`
+- `01_GameDesign/PROGRESSION.md`
 
-GAMEPLAY.md
-
-MISSIONS.md
-
-PROGRESSION.md
-```
-
-Note: The canonical project vision is owned by 00_Project/VISION.md.
+Note: `00_Project/VISION.md` owns canonical project/game vision. `01_GameDesign/` owns gameplay design specification.
 
 ---
 
@@ -100,14 +102,13 @@ Note: The canonical project vision is owned by 00_Project/VISION.md.
 
 ## Purpose
 
-Defines the in-game economic systems.
+In-game economy systems.
 
-Contains:
+Documents:
 
-- Money
-- Rewards
-- Progression economy
-- Upgrades
+- `02_Economy/ECONOMY.md`
+- `02_Economy/MARKET.md`
+- `02_Economy/PRICING.md`
 
 ---
 
@@ -115,14 +116,16 @@ Contains:
 
 ## Purpose
 
-Defines delivery gameplay systems.
+Delivery and logistics gameplay systems.
 
-Contains:
+Documents:
 
-- Orders
-- Packages
-- Delivery flow
-- Logistics mechanics
+- `03_Logistics/LOGISTICS.md`
+- `03_Logistics/ORDERS.md`
+- `03_Logistics/ROUTING.md`
+- `03_Logistics/VEHICLES.md`
+- `03_Logistics/DRONES.md`
+- `03_Logistics/DRONEPORTS.md`
 
 ---
 
@@ -130,15 +133,15 @@ Contains:
 
 ## Purpose
 
-Defines the game environment.
+World simulation, map, and environment definitions.
 
-Contains:
+Documents:
 
-- Map
-- Buildings
-- NPC
-- Weather
-- World simulation
+- `04_World/WORLD.md`
+- `04_World/MAP.md`
+- `04_World/BUILDINGS.md`
+- `04_World/NPC.md`
+- `04_World/WEATHER.md`
 
 ---
 
@@ -146,18 +149,14 @@ Contains:
 
 ## Purpose
 
-Defines artificial intelligence systems that exist inside the game.
+In-game artificial intelligence systems.
 
-Contains:
+Documents:
 
-- AI Systems
-- AI Agents
-- NPC intelligence
-- World simulation behavior
+- `05_AI/AI_SYSTEM.md`
+- `05_AI/AI_AGENTS.md`
 
-Important:
-
-This folder does not describe AI used for development.
+Important: this folder defines in-game AI, not AI-assisted development workflow.
 
 ---
 
@@ -165,28 +164,16 @@ This folder does not describe AI used for development.
 
 ## Purpose
 
-Defines technical architecture.
+Technical architecture and implementation governance.
 
-Contains:
+Documents:
 
-- Architecture
-- Safety systems
-- Development methodology
+- `06_Technical/ARCHITECTURE.md`
+- `06_Technical/SAVE_SYSTEM.md` — canonical in-game Save & Load specification.
+- `06_Technical/SAFE_SYSTEM.md` — development/project safety and stability governance.
+- `06_Technical/TDD.md`
 
-Key documents:
-
-```
-ARCHITECTURE.md — system architecture and layer definitions
-
-SAVE_SYSTEM.md — canonical in-game Save & Load specification
-                 (owns: save data scope, save triggers, load behavior, corruption handling)
-
-SAFE_SYSTEM.md — development and project-level safety and stability governance
-                 (owns: change management, MVP protection, AI development rules, backup strategy)
-```
-
-Note: SAVE_SYSTEM.md and SAFE_SYSTEM.md have distinct responsibilities.
-SAVE_SYSTEM.md defines in-game persistence. SAFE_SYSTEM.md defines development safety rules.
+Note: `SAVE_SYSTEM.md` and `SAFE_SYSTEM.md` have distinct responsibilities and remain separate.
 
 ---
 
@@ -194,12 +181,12 @@ SAVE_SYSTEM.md defines in-game persistence. SAFE_SYSTEM.md defines development s
 
 ## Purpose
 
-Defines player interface and experience.
+Player interface and user experience definitions.
 
-Contains:
+Documents:
 
-- UI design
-- UX design
+- `07_UI/UI.md`
+- `07_UI/UX.md`
 
 ---
 
@@ -207,13 +194,11 @@ Contains:
 
 ## Purpose
 
-Defines visual and audio resources.
+Asset standards and resource governance.
 
-Contains:
+Documents:
 
-- Asset rules
-- Organization
-- Optimization guidelines
+- `08_Assets/ASSETS.md`
 
 ---
 
@@ -221,94 +206,95 @@ Contains:
 
 ## Purpose
 
-Defines the creation process.
+Development process, workflow, planning, implementation support, and reporting governance.
 
-Contains:
+Stable top-level documents:
 
-- Development planning
-- Testing
-- AI-assisted workflow
-- Build process
+- `09_Development/AI_AGENT_EXECUTION_PROTOCOL.md`
+- `09_Development/AI_DEVELOPMENT_WORKFLOW.md`
+- `09_Development/AI_PROJECT_GENERATION_PLAN.md`
+- `09_Development/AI_REPORTING_PROTOCOL.md`
+- `09_Development/ASSET_IMPORT_GUIDE.md`
+- `09_Development/CHANGELOG.md`
+- `09_Development/CORE_GAMEPLAY_SYSTEMS.md`
+- `09_Development/DEVELOPMENT_WORKFLOW.md`
+- `09_Development/FIRST_MAP_DESIGN.md`
+- `09_Development/FIRST_PLAYABLE_EXPERIENCE.md`
+- `09_Development/GAMEPLAY_EVENTS_FLOW.md`
+- `09_Development/GAME_BALANCING_RULES.md`
+- `09_Development/GAME_DATA_STRUCTURE.md`
+- `09_Development/GDEVELOP_PROJECT_STRUCTURE.md`
+- `09_Development/GITHUB_WORKFLOW.md`
+- `09_Development/IDEAS.md`
+- `09_Development/MOBILE_UI_CONTROLS.md`
+- `09_Development/PROTOTYPE_BUILD_PIPELINE.md`
+- `09_Development/PROTOTYPE_GENERATION_PACKAGE.md`
+- `09_Development/PROTOTYPE_MILESTONES.md`
+- `09_Development/PROTOTYPE_RELEASE_CHECKLIST.md`
+- `09_Development/PROTOTYPE_TECH_STACK.md`
+- `09_Development/PROTOTYPE_TESTING_PLAN.md`
+- `09_Development/PROTOTYPE_V0.1.md`
+- `09_Development/TASKS.md`
 
-Important documents:
+### Managed historical report directory
 
-```
-AI_DEVELOPMENT_WORKFLOW.md
-
-AI_PROJECT_GENERATION_PLAN.md
-
-AI_REPORTING_PROTOCOL.md
-
-PROTOTYPE_GENERATION_PACKAGE.md
-
-PROTOTYPE_BUILD_PIPELINE.md
-
-AI_AGENT_EXECUTION_PROTOCOL.md
-
-AI_Reports/
-```
+- `09_Development/AI_Reports/` — historical AI task report stream.
+- Governance source: `09_Development/AI_REPORTING_PROTOCOL.md`.
+- Individual AI reports are not enumerated in this index.
+- Latest report sequence values are not stored in this index.
 
 ---
 
-# Document Rules
+# Game/
 
-Every document must have:
+## Purpose
 
-- Clear purpose
-- Defined responsibility
-- Version information
-- No duplicated systems
+Managed root directory for live editable game project/source files.
+
+Current state:
+
+- Placeholder-only (`Game/.gitkeep`).
+- Internal/generated game project internals are not individually indexed here.
+
+---
+
+# Builds/
+
+## Purpose
+
+Managed root directory for generated/exported game build outputs.
+
+Current state:
+
+- Placeholder-only (`Builds/.gitkeep`).
+- Generated build artifacts are not individually indexed here.
 
 ---
 
 # Information Ownership Rules
 
-## Gameplay Rules
-
-Stored in:
-
-01_GameDesign
-02_Economy
-03_Logistics
-04_World
-05_AI
+- Strategic project/game vision is owned by `00_Project/VISION.md`.
+- Gameplay design authority is owned by `01_GameDesign/`.
+- Economy, logistics, world, in-game AI, technical, UI, and asset domains are owned by their respective numbered folders.
+- Development process/governance is owned by `09_Development/`.
+- Historical AI reports in `09_Development/AI_Reports/` are non-canonical records unless a canonical document is explicitly updated.
 
 ---
 
-## Technical Rules
+# Maintenance Rule
 
-Stored in:
+When files are added, removed, or moved:
 
-06_Technical
-09_Development
-
----
-
-## Development Process
-
-Stored in:
-
-09_Development
-
----
-
-# Consistency Rule
-
-Before adding a new document:
-
-Check:
-
-1. Does this information already exist?
-2. Which folder owns this information?
-3. Does it affect existing architecture?
+1. Keep this index aligned with the real repository filesystem.
+2. Individually register new stable live Markdown documents in their owning section.
+3. Keep dynamic/generated/historical streams represented via directory-policy rules where applicable.
+4. Do not introduce obsolete paths or folder names.
 
 ---
 
 # Canonical Rule
 
-Every project decision must have one clear home.
-
-The documentation structure must remain simple, searchable, and consistent.
+Every project decision must have one clear canonical home, and this index must remain accurate, searchable, and internally consistent.
 
 ---
 
