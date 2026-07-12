@@ -26,6 +26,14 @@ The player should quickly understand:
 
 ---
 
+## Scope Clarification
+
+This document describes the tutorial and first-session presentation of the canonical Prototype v0.1 gameplay loop.
+
+It does not replace or redefine the canonical loop defined in `09_Development/PROTOTYPE_V0.1.md`.
+
+---
+
 # Player Fantasy
 
 The player starts as a small logistics entrepreneur.

@@ -20,6 +20,16 @@ The goal is to create a clear event-based structure suitable for implementation 
 
 ---
 
+## Scope and Ownership
+
+This document describes the technical event representation of the canonical Prototype v0.1 gameplay loop.
+
+It does not independently redefine Prototype v0.1 gameplay scope.
+
+The canonical ordered Prototype v0.1 loop is defined in and owned by `09_Development/PROTOTYPE_V0.1.md`.
+
+---
+
 # Event System Philosophy
 
 Gameplay systems should communicate through events.
