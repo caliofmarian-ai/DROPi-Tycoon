@@ -14,11 +14,13 @@ Last Updated: 2026-07-12
 
 ## Purpose
 
-This document defines the AI Agent framework concept of DROPi Tycoon.
+This document defines the AI Agent framework for DROPi Tycoon.
 
-AI Agents represent specialized intelligent systems designed to assist with specific tasks inside the game ecosystem and development environment.
+AI Agents represent specialized intelligent systems that exist inside the DROPi Tycoon game world, assisting players and simulating company operations within the game.
 
 The goal is to organize intelligence into clear responsibilities instead of creating one uncontrolled AI system.
+
+> **Scope boundary:** AI agents used to design, build, test, audit, document, or maintain this repository are outside the scope of this document. Those agents are defined in `09_Development/AI_DEVELOPMENT_WORKFLOW.md` and `09_Development/AI_AGENT_EXECUTION_PROTOCOL.md`.
 
 ---
 
@@ -46,7 +48,7 @@ Agents should exchange information through defined interfaces.
 
 AI Agents provide assistance and automation.
 
-Important decisions remain under player or developer control.
+Important decisions remain under player control.
 
 ---
 
@@ -95,21 +97,6 @@ Examples:
 - Financial analysis agent
 - Expansion recommendation agent
 - Contract analysis agent
-
----
-
-# Development Agents
-
-## Purpose
-
-Support project creation and maintenance.
-
-Examples:
-
-- Documentation agent
-- Testing agent
-- Code assistance agent
-- Quality review agent
 
 ---
 
