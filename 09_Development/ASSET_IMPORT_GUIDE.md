@@ -136,13 +136,18 @@ Shows:
 
 # Vehicle Assets
 
-Prototype:
+Prototype v0.1 Required:
 
-Optional.
+## Bicycle
 
-Future:
+Purpose:
 
-- Bicycle
+First purchasable vehicle and first vehicle/progression milestone.
+
+The player starts on foot. The Bicycle is not starting equipment. The Bicycle is purchased with earned money and increases movement speed.
+
+Prototype v0.1 Future:
+
 - Van
 - Drone
 
