@@ -31,7 +31,7 @@ Its purpose is to:
 DROPi_Tycoon/
 
 00_Project
-01_Vision
+01_GameDesign
 02_Economy
 03_Logistics
 04_World
@@ -66,17 +66,33 @@ DOCUMENT_INDEX.md
 
 ---
 
-# 01_Vision
+# 01_GameDesign
 
 ## Purpose
 
-Defines the game identity and long-term direction.
+Defines the high-level game design, gameplay structure, player progression, missions and objectives, and gameplay principles.
 
 Contains:
 
-- Game vision
-- Player experience
-- Design philosophy
+- High-level game design
+- Gameplay structure
+- Player progression
+- Missions and objectives
+- Gameplay principles
+
+Documents:
+
+```
+GDD.md
+
+GAMEPLAY.md
+
+MISSIONS.md
+
+PROGRESSION.md
+```
+
+Note: The canonical project vision is owned by 00_Project/VISION.md.
 
 ---
 
@@ -251,7 +267,7 @@ Every document must have:
 
 Stored in:
 
-01_Vision
+01_GameDesign
 02_Economy
 03_Logistics
 04_World
