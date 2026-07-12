@@ -10,7 +10,7 @@
 - Branch: copilot/analyze-f-10-audit-finding
 - Base commit: 9f2496b2d0c29b30a649700218e655e05588fe69
 - Resulting commit: N/A — self-referential report-only change; use PR commit history
-- Pull Request: Pending creation at time of initial report authoring
+- Pull Request: https://github.com/caliofmarian-ai/DROPi-Tycoon/pull/23
 - Human approval status: Pending review
 
 # Original Task Instruction
@@ -1129,7 +1129,7 @@ This is the safest, smallest, and most maintainable way to make `DOCUMENT_INDEX.
 - F-10 remains open in the repository because `00_Project/DOCUMENT_INDEX.md` has not yet been corrected.
 - F-27 remains a separate governance decision unless explicitly bundled with the future correction.
 - F-25 cannot be fully closed without an additional edit to `00_Project/INITIAL_REPOSITORY_AUDIT.md`.
-- PR link is pending until a report-only pull request is created for this file.
+- ✅ Report-only Pull Request created: https://github.com/caliofmarian-ai/DROPi-Tycoon/pull/23
 
 # Final Result/Status
 
@@ -1139,7 +1139,6 @@ This task established the exact current incompleteness of `00_Project/DOCUMENT_I
 
 # Follow-up Actions
 
-1. Open the required report-only Pull Request for human review.
-2. If approved, execute a separate implementation task that edits only `00_Project/DOCUMENT_INDEX.md` (plus its own required implementation report).
-3. In that future implementation task, bundle F-12, F-21, F-22, and the index-registration portion of F-25.
-4. Leave F-27 for separate approval unless the reviewer explicitly authorizes conflict-hierarchy bundling.
+1. If approved, execute a separate implementation task that edits only `00_Project/DOCUMENT_INDEX.md` (plus its own required implementation report).
+2. In that future implementation task, bundle F-12, F-21, F-22, and the index-registration portion of F-25.
+3. Leave F-27 for separate approval unless the reviewer explicitly authorizes conflict-hierarchy bundling.
