@@ -92,12 +92,18 @@ Accepted
 
 ↓
 
-In Progress
+PickedUp
 
 ↓
 
 Completed
+
+|
+
+Failed
 ```
+
+State names are stored exactly as listed above. See `09_Development/GAME_DATA_STRUCTURE.md` for the complete `OrderStatus` value set. See `03_Logistics/ORDERS.md` for the canonical lifecycle semantic definition.
 
 ---
 

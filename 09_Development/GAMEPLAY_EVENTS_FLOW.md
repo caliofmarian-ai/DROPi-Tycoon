@@ -291,10 +291,31 @@ PackagePickedUp
 
 DeliveryCompleted
 
+DeliveryFailed
+
 MoneyReceived
 
 UpgradePurchased
 ```
+
+---
+
+# Order Lifecycle Event-to-Transition Mapping
+
+The following maps each Order lifecycle event to its canonical state transition.
+
+| Event | Source State | Target State | Notes |
+|---|---|---|---|
+| `OrderCreated` | — | `Created` | Initializes the Order in Created state. |
+| (system-driven) | `Created` | `Available` | The Created → Available transition is system-driven in Prototype v0.1. No separate named event exists. The Order becomes Available immediately after creation. |
+| `OrderAccepted` | `Available` | `Accepted` | Player accepts the order. |
+| `PackagePickedUp` | `Accepted` | `PickedUp` | Player reaches pickup location and collects the package. |
+| `DeliveryCompleted` | `PickedUp` | `Completed` | Player delivers the package to the correct destination. |
+| `DeliveryFailed` | `PickedUp` | `Failed` | Order cannot be completed (time exceeded, wrong destination, or system failure). |
+
+Terminal states: `Completed`, `Failed`. No cancellation events or assignment events exist in Prototype v0.1.
+
+See `03_Logistics/ORDERS.md` for the canonical Order lifecycle definition.
 
 ---
 
