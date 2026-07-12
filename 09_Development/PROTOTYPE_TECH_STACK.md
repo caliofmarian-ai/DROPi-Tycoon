@@ -109,9 +109,9 @@ Systems/
   UI
 
 Assets/
-  Graphics
+  Sprites
   Audio
-  Interface
+  UI
 
 Data/
   Configuration
