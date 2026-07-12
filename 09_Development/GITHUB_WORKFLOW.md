@@ -182,6 +182,18 @@ Review questions:
 
 ---
 
+# Persistent AI Task Report Commit Rule
+
+For significant AI tasks, reports required by:
+
+`09_Development/AI_REPORTING_PROTOCOL.md`
+
+must be committed together with the related work.
+
+For significant analysis-only tasks with no other repository modifications, use a report-only commit and Pull Request.
+
+---
+
 # AI Modification Rules
 
 AI agents must not:

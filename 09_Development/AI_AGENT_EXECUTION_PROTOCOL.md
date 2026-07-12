@@ -170,6 +170,16 @@ Avoid:
 
 ---
 
+# Persistent AI Reporting Requirement
+
+For significant AI tasks, agents must follow:
+
+`09_Development/AI_REPORTING_PROTOCOL.md`
+
+A significant task is not operationally complete until the required persistent report is created or updated according to that protocol.
+
+---
+
 # Task Execution Format
 
 Every task should contain:
