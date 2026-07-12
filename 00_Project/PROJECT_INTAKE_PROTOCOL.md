@@ -161,6 +161,16 @@ Required corrections.
 
 ---
 
+# Intake Audit Persistence Rule
+
+Significant intake audit outputs must be persisted according to:
+
+`09_Development/AI_REPORTING_PROTOCOL.md`
+
+Intake work is not operationally complete until the required persistent report is created or updated under that protocol.
+
+---
+
 # Restrictions Before Audit Completion
 
 The AI agent must not:
