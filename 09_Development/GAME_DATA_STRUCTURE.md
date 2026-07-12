@@ -85,6 +85,8 @@ Required:
 - Current active order
 - Movement speed
 
+Persistence: Position is persisted only if required for the chosen prototype flow. Current active order is not restored on load; it is cancelled and reset. See `06_Technical/SAVE_SYSTEM.md`.
+
 ---
 
 # Company Data
@@ -125,6 +127,8 @@ Required:
 - Money
 - Level
 - Reputation
+
+Persistence: These fields are persisted to the local save. See `06_Technical/SAVE_SYSTEM.md`.
 
 ---
 
@@ -211,6 +215,8 @@ Required:
 - Delivery locations
 - Interactive buildings
 
+Persistence: WorldData is not persisted. It is regenerated on load. See `06_Technical/SAVE_SYSTEM.md`.
+
 ---
 
 # Upgrade Data
@@ -251,6 +257,8 @@ Capacity
 Efficiency
 ```
 
+Persistence: Purchased upgrade levels are persisted to the local save. See `06_Technical/SAVE_SYSTEM.md`.
+
 ---
 
 # Game Settings
@@ -276,6 +284,8 @@ Difficulty
 
 TutorialStatus
 ```
+
+Persistence: TutorialStatus is persisted to the local save. Language, Sound, Music, and Difficulty settings persistence is defined in `06_Technical/SAVE_SYSTEM.md`.
 
 ---
 

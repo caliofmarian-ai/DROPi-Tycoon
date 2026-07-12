@@ -110,7 +110,36 @@ Verify:
 
 ---
 
-# 3. User Experience Testing
+# 3. Persistence Testing
+
+## Purpose
+
+Verify that player progress is correctly saved and restored.
+
+See `06_Technical/SAVE_SYSTEM.md` for the canonical save/load specification.
+
+---
+
+## Test Cases
+
+- Save after delivery completion: close and reopen game; verify money and progression are restored.
+- Save after upgrade purchase: close and reopen game; verify upgrade state is restored.
+- Close game without a save trigger: verify last saved state is restored on next launch.
+- Start new game when no save exists: verify game initializes correctly without error.
+- Start new game when a valid save exists: verify confirmation is required; verify no silent overwrite occurs.
+- Corrupted save file: verify game does not crash; verify player is informed; verify confirmation is required before new game.
+- Missing save file: verify game starts new game without error or crash.
+
+---
+
+## Success Criteria
+
+- Player progress is never lost due to normal game exit.
+- No crash or undefined behavior occurs from missing or invalid save data.
+
+---
+
+# 4. User Experience Testing
 
 ## Purpose
 
@@ -125,7 +154,7 @@ Questions:
 
 ---
 
-# 4. Mobile Testing
+# 5. Mobile Testing
 
 ## Devices
 
@@ -148,7 +177,7 @@ Verify:
 
 ---
 
-# 5. Balance Testing
+# 6. Balance Testing
 
 Verify:
 
@@ -159,7 +188,7 @@ Verify:
 
 ---
 
-# 6. Bug Classification
+# 7. Bug Classification
 
 Bugs are classified as:
 
@@ -238,8 +267,9 @@ Recommended order:
 2. Delivery system
 3. Economy
 4. UI
-5. Mobile performance
-6. Final player experience
+5. Save & Load persistence
+6. Mobile performance
+7. Final player experience
 
 ---
 

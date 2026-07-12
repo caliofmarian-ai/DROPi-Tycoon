@@ -157,7 +157,19 @@ Examples:
 - World state
 - Settings
 
-Future save systems will use this layer.
+## Save System
+
+Game-state persistence is owned by the Save System.
+
+The Save System defines what data is persisted, when saves occur, how the game loads, and how corrupted or missing saves are handled.
+
+See `06_Technical/SAVE_SYSTEM.md` for the canonical Save & Load specification.
+
+## Safe System
+
+Development and project-level safety and stability governance is owned by the Safe System.
+
+See `06_Technical/SAFE_SYSTEM.md` for development safety rules.
 
 ---
 

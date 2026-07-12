@@ -69,7 +69,7 @@ Features:
 - Basic customer system
 - Package generation
 - Simple economy
-- Save & Load
+- Save & Load (local device persistence; see `06_Technical/SAVE_SYSTEM.md`)
 - Basic UI
 
 Success Criteria:

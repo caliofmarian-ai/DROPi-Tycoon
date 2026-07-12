@@ -131,6 +131,10 @@ Required:
 - Money
 - Basic upgrade
 
+## Persistence
+
+- Local Save & Load (required; see `06_Technical/SAVE_SYSTEM.md`)
+
 ---
 
 # Not Included In v0.1
