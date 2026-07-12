@@ -46,6 +46,7 @@ Prototype v0.1 contains:
 - Simple transportation
 - Basic economy
 - Company progression
+- Local Save & Load system (minimal; see `06_Technical/SAVE_SYSTEM.md`)
 
 ---
 

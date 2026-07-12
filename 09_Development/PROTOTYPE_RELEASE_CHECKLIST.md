@@ -126,6 +126,22 @@ Verify:
 
 ---
 
+# 7. Save & Load Checklist
+
+Verify (see `06_Technical/SAVE_SYSTEM.md` for specification):
+
+- [ ] Progress is saved after delivery completion
+- [ ] Progress is saved after upgrade purchase
+- [ ] Game restores correct state on next launch (Continue)
+- [ ] Closing and reopening the game does not lose earned money or upgrades
+- [ ] Start New Game when no save exists works without error
+- [ ] Start New Game when a valid save exists requires confirmation before overwriting
+- [ ] Corrupted or unreadable save does not crash the game
+- [ ] Player is informed when progress cannot be restored
+- [ ] Confirmation is required before replacing an invalid save with a new game
+
+---
+
 # Prototype Completion Criteria
 
 DROPi Tycoon Prototype v0.1 is ready when:

@@ -157,6 +157,21 @@ Contains:
 - Safety systems
 - Development methodology
 
+Key documents:
+
+```
+ARCHITECTURE.md — system architecture and layer definitions
+
+SAVE_SYSTEM.md — canonical in-game Save & Load specification
+                 (owns: save data scope, save triggers, load behavior, corruption handling)
+
+SAFE_SYSTEM.md — development and project-level safety and stability governance
+                 (owns: change management, MVP protection, AI development rules, backup strategy)
+```
+
+Note: SAVE_SYSTEM.md and SAFE_SYSTEM.md have distinct responsibilities.
+SAVE_SYSTEM.md defines in-game persistence. SAFE_SYSTEM.md defines development safety rules.
+
 ---
 
 # 07_UI

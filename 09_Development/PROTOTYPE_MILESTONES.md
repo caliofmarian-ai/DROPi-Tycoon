@@ -169,6 +169,35 @@ The game feels comfortable on mobile.
 
 ---
 
+# Milestone 5.5 — Save & Load
+
+## Goal
+
+Implement the minimal local Save & Load system before prototype completion.
+
+---
+
+## Tasks
+
+- Implement autosave after delivery completion
+- Implement autosave after upgrade purchase
+- Implement autosave after progression state change
+- Implement load on Continue
+- Implement new game guard (confirmation before overwriting valid save)
+- Implement corrupted/missing save handling
+- Verify all save/load test cases pass
+
+See `06_Technical/SAVE_SYSTEM.md` for the canonical save/load specification.
+
+---
+
+## Completion Criteria
+
+- Player progress is restored correctly after closing and reopening the game.
+- No crash or data loss occurs due to missing or invalid save data.
+
+---
+
 # Milestone 6 — Prototype Complete
 
 ## Goal
