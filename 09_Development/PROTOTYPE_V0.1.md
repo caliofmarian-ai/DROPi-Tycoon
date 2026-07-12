@@ -126,13 +126,46 @@ A delivery is completed when:
 
 Prototype includes:
 
-## Basic Transport
+## Starting Transport
 
-Initial option:
+The player begins Prototype v0.1 on foot.
 
-- Walking or basic vehicle
+Walking is the only transportation method at the start of the game.
 
-Future vehicles are not required.
+The Bicycle is not starting equipment.
+
+---
+
+## Bicycle — First Purchasable Vehicle
+
+The Bicycle is included in Prototype v0.1 as the first purchasable vehicle and the first vehicle progression milestone.
+
+Progression:
+
+```
+Player starts on foot
+      ↓
+Player completes initial deliveries
+      ↓
+Player earns money
+      ↓
+Player purchases the Bicycle
+      ↓
+Bicycle becomes owned persistently
+      ↓
+Bicycle increases movement speed
+```
+
+Rules:
+
+- The player earns money through initial on-foot deliveries.
+- The Bicycle is purchased using earned money through the existing upgrade/shop interaction.
+- After purchase, the player moves faster, improving delivery efficiency.
+- Bicycle ownership is persisted through Save & Load using the existing upgrade purchase persistence system (see `06_Technical/SAVE_SYSTEM.md`).
+- No exact purchase price is defined here; price is set during the balancing phase consistent with `09_Development/GAME_BALANCING_RULES.md`.
+- No advanced vehicle mechanics (maintenance, fuel, damage, enter/exit animation) are required for Prototype v0.1.
+
+No further vehicles are required for Prototype v0.1.
 
 ---
 
