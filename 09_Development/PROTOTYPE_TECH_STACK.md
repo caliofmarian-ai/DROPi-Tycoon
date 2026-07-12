@@ -91,9 +91,9 @@ Initial structure:
 DROPi_Tycoon/
 
 Scenes/
-  Main_Menu
-  Game_Map
-  Company_Interface
+  MainMenu
+  GameWorld
+  CompanyManagement
 
 Objects/
   Player
