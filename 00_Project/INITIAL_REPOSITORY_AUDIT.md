@@ -1,3 +1,15 @@
+# Document Information
+
+Document: INITIAL_REPOSITORY_AUDIT.md
+Project: DROPi Tycoon
+Version: 1.0.0
+Status: Historical Audit Record
+Author: Marian Caliof & OpenAI
+Language: English
+Last Updated: 2026-07-12
+
+---
+
 # INITIAL REPOSITORY AUDIT
 
 Date: 2026-07-12  
