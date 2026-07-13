@@ -313,6 +313,8 @@ These systems remain future expansion ideas.
 
 # Prototype Success Criteria
 
+**Scope and authority note:** This document owns Prototype v0.1 scope and approved feature inclusion. The success criteria below define what the prototype must achieve as a design goal. Final completion authority — the determination of whether Prototype v0.1 is complete and ready for release — is owned by `09_Development/PROTOTYPE_RELEASE_CHECKLIST.md`.
+
 Prototype v0.1 is successful if:
 
 The player can:

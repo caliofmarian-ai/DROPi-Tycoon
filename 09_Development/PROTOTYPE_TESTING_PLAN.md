@@ -25,6 +25,18 @@ The purpose of testing is to verify that the first playable version is:
 
 ---
 
+## Scope and Authority
+
+This document owns test procedures, test cases, and validation evidence for Prototype v0.1.
+
+It does not independently declare Prototype v0.1 complete.
+
+Test results and validation evidence feed into the authoritative completion gate, which is owned by `09_Development/PROTOTYPE_RELEASE_CHECKLIST.md`.
+
+---
+
+---
+
 # Testing Philosophy
 
 Testing is not only about finding bugs.
@@ -239,7 +251,9 @@ Each discovered issue should include:
 
 # Prototype Completion Criteria
 
-DROPi Tycoon Prototype v0.1 is considered complete when:
+The criteria below define the testing quality bar that must be met before prototype release evidence can be considered ready.
+
+**These criteria do not independently declare Prototype v0.1 complete.** Passing all tests below is necessary but not sufficient for completion. Final completion authority is owned by `09_Development/PROTOTYPE_RELEASE_CHECKLIST.md`.
 
 ## Gameplay
 

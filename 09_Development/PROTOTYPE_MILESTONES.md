@@ -204,6 +204,8 @@ See `06_Technical/SAVE_SYSTEM.md` for the canonical save/load specification.
 
 Create the first complete playable version.
 
+> **Milestone authority note:** This milestone represents implementation progress — the point at which all planned prototype features are implemented. It does not independently declare Prototype v0.1 complete for release. Final Prototype v0.1 completion is determined by `09_Development/PROTOTYPE_RELEASE_CHECKLIST.md`.
+
 ---
 
 ## Final Prototype Features
