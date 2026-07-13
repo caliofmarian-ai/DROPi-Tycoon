@@ -6,7 +6,7 @@ Version: 1.0.0
 Status: Documentation Control
 Author: Marian Caliof & OpenAI
 Language: English
-Last Updated: 2026-07-12
+Last Updated: 2026-07-13
 
 ---
 
@@ -278,6 +278,50 @@ Current state:
 - Economy, logistics, world, in-game AI, technical, UI, and asset domains are owned by their respective numbered folders.
 - Development process/governance is owned by `09_Development/`.
 - Historical AI reports in `09_Development/AI_Reports/` are non-canonical records unless a canonical document is explicitly updated.
+
+---
+
+# Document Authority Hierarchy
+
+This section records the global document authority hierarchy approved by the Project Owner to resolve audit finding F-27. It governs how conflicts between documents are resolved across the entire repository.
+
+## Approved Five-Level Hierarchy
+
+**Level 1 — Project Vision Authority**
+`00_Project/VISION.md` — project identity and non-negotiable vision constraints.
+
+**Level 2 — Global Gameplay Design Authority**
+`01_GameDesign/GDD.md` — global gameplay design rules.
+
+**Level 3 — Canonical System / Domain Authority**
+Canonical system/domain documents in:
+- `02_Economy/`
+- `03_Logistics/`
+- `04_World/`
+- `05_AI/`
+- `06_Technical/`
+- `07_UI/`
+
+These documents own domain-specific rules within their respective domains.
+
+**Level 4 — Prototype Scope Authority**
+`09_Development/PROTOTYPE_V0.1.md` — Prototype v0.1 scope constraints.
+
+**Level 5 — Implementation Specification Authority**
+`09_Development/` implementation specifications — documents describing how the approved canonical design and prototype scope are implemented.
+
+## Conflict-Resolution Rules
+
+The following rules apply when documents at different authority levels appear to conflict:
+
+1. **Detail, specialization, and narrowing:** Lower-priority documents may detail, specialize, or narrow higher-priority rules within their legitimate scope. This is permitted and does not constitute a contradiction.
+2. **No contradiction of higher-priority documents:** Lower-priority documents must not contradict higher-priority documents. If a contradiction exists, the higher-priority document governs.
+3. **Specificity does not override authority:** A more specific document does not automatically override a higher-priority document. Authority level takes precedence over specificity.
+4. **Domain ownership remains binding:** Domain ownership still applies. A document outside a domain must not redefine that domain's canonical rules.
+5. **Same-level conflict escalation:** If two canonical documents at the same authority level conflict and ownership/scope rules do not resolve the conflict, the AI agent must stop the affected change and escalate the conflict to the Project Owner.
+6. **Historical AI reports never override live canonical documents:** Reports in `09_Development/AI_Reports/` are evidence and traceability records only. They never override current live canonical documents.
+7. **Recency does not override authority:** A newer modification date, version number, commit order, or report sequence number alone does not override a higher-priority canonical document.
+8. **Project Owner decisions are binding:** Explicit Project Owner decisions override AI interpretation. Owner decisions must be persisted into the appropriate canonical document before dependent implementation proceeds.
 
 ---
 
