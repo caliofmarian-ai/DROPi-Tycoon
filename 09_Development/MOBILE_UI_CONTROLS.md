@@ -219,7 +219,7 @@ Order accepted:
 
 Delivery completed:
 
-"Delivery successful +50 coins"
+"Delivery successful +50 money"
 
 Upgrade purchased:
 
