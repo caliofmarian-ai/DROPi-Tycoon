@@ -175,7 +175,7 @@ READY
 
 Documentation:
 
-READY
+CORRECTIONS IN PROGRESS (F-01 through F-11 resolved; F-14, F-15 and MINOR findings remain open)
 
 Technology:
 
