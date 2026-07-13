@@ -36,6 +36,8 @@ It does not replace or redefine the canonical loop defined in `09_Development/PR
 
 # Player Fantasy
 
+The player fantasy is defined canonically in `00_Project/VISION.md` (The Player Fantasy) and `01_GameDesign/PROGRESSION.md` Stage 1. This section describes the first-session embodiment of that fantasy.
+
 The player starts as a small logistics entrepreneur.
 
 They do not own a large company.
@@ -221,6 +223,8 @@ The first experience does not include:
 ---
 
 # Design Rules
+
+First-experience design rules are derived from `01_GameDesign/GDD.md` (Gameplay Principles). The rules below apply those principles to the prototype first session.
 
 The first experience must be:
 
