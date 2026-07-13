@@ -233,7 +233,7 @@ UI Notification
 
 ↓
 
-"Delivery Completed +50 Coins"
+"Delivery Completed +50 money"
 ```
 
 ---
