@@ -20,6 +20,26 @@ The purpose is to verify that the prototype delivers a complete and understandab
 
 ---
 
+## Canonical Completion Gate Authority
+
+**This document is the authoritative final completion gate for Prototype v0.1.**
+
+- Prototype v0.1 is complete only when the required checklist items in this document are satisfied and human approval is recorded where required.
+- Completing milestones alone does not declare the prototype complete.
+- Passing individual tests alone does not declare the prototype complete.
+- Meeting scope or success criteria alone does not declare the prototype complete.
+- The final readiness decision is made here, not in any other document.
+
+Cross-references:
+
+- `09_Development/PROTOTYPE_V0.1.md` owns Prototype v0.1 scope and feature inclusion.
+- `09_Development/PROTOTYPE_TESTING_PLAN.md` owns test procedures and validation evidence.
+- `09_Development/PROTOTYPE_MILESTONES.md` owns implementation milestone sequencing.
+
+---
+
+---
+
 # Release Philosophy
 
 A prototype release does not need to be a finished game.
