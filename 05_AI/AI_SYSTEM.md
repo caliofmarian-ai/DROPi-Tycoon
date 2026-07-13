@@ -1,6 +1,6 @@
 # Document Information
 
-Document: AI_SYSTEMS.md
+Document: AI_SYSTEM.md
 Project: DROPi Tycoon
 Version: 1.0.0
 Status: Canonical
