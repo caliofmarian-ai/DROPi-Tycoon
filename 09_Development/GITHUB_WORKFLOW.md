@@ -29,9 +29,9 @@ The goal is to maintain:
 
 The GitHub repository is the central location for:
 
-- Documentation
+- Structured project documentation across numbered domain folders (`00_Project/` through `09_Development/`)
 - Game project files
-- Assets
+- Asset governance (`08_Assets/`)
 - Build versions
 - Development history
 
@@ -42,16 +42,30 @@ The GitHub repository is the central location for:
 ```
 DROPi-Tycoon
 
-├── Documentation
-
-├── Game
-
-├── Assets
-
-├── Builds
-
-└── README.md
+├── README.md
+├── 00_Project/
+├── 01_GameDesign/
+├── 02_Economy/
+├── 03_Logistics/
+├── 04_World/
+├── 05_AI/
+├── 06_Technical/
+├── 07_UI/
+├── 08_Assets/
+├── 09_Development/
+├── Game/
+└── Builds/
 ```
+
+The canonical complete repository structure map is owned by:
+
+`00_Project/DOCUMENT_INDEX.md`
+
+This document provides only a summarized root structure for workflow context.
+
+`09_Development/AI_Reports/` is a managed historical reporting directory governed by:
+
+`09_Development/AI_REPORTING_PROTOCOL.md`
 
 ---
 
