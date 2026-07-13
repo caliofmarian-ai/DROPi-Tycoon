@@ -20,7 +20,17 @@ The goal is to create a progression experience where the player feels constant i
 
 ---
 
+## Scope and Ownership
+
+Balancing rules in this document are Prototype v0.1 scope constraints. They narrow, not redefine, the canonical rules owned by `01_GameDesign/PROGRESSION.md`, `01_GameDesign/GAMEPLAY.md`, `02_Economy/ECONOMY.md`, and `03_Logistics/ORDERS.md`.
+
+Canonical game design authority remains with those domain documents. This document does not independently own economy rules, progression rules, logistics rules, reputation rules, or balancing philosophy.
+
+---
+
 # Balancing Philosophy
+
+Derived from canonical game design principles in `01_GameDesign/GDD.md` and `01_GameDesign/PROGRESSION.md`.
 
 The game should create the feeling:
 
@@ -108,6 +118,8 @@ The starting state should encourage growth.
 
 # Delivery Reward Rules
 
+Canonical reward design is defined in `03_Logistics/ORDERS.md`. The factors listed below are the Prototype v0.1 implementation scope of that canonical model.
+
 Rewards should consider:
 
 - Distance
@@ -184,6 +196,8 @@ Advanced upgrades:
 
 # Progression Balance
 
+Progression phases are derived from the canonical stage model in `01_GameDesign/PROGRESSION.md`. The phases below describe the Prototype v0.1 balance targets within Stage 1.
+
 The player should experience:
 
 Early game:
@@ -211,6 +225,8 @@ Difficulty can increase through:
 ---
 
 # Failure Balance
+
+Failure design principles are defined in `01_GameDesign/GAMEPLAY.md` (Failure section). The Prototype v0.1 balance rule is: small penalty, no permanent setback.
 
 Failure should teach the player.
 

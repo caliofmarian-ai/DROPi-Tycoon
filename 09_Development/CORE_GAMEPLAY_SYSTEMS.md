@@ -144,6 +144,8 @@ Controls package transportation and completion.
 
 ## Delivery Success
 
+Canonical delivery completion semantic is defined in `03_Logistics/ORDERS.md` (Completed state). The conditions below are the Prototype v0.1 implementation of that semantic.
+
 A delivery succeeds when:
 
 - Correct package is delivered.
@@ -173,6 +175,8 @@ Initial implementation:
 # System 4: Economy System
 
 ## Purpose
+
+Economy rules are canonically owned by `02_Economy/ECONOMY.md`. This section describes the Prototype v0.1 scope of that economy system.
 
 Controls company growth.
 
@@ -206,6 +210,8 @@ More successful deliveries = More company growth.
 # System 5: Upgrade System
 
 ## Purpose
+
+Canonical upgrade and progression design is owned by `01_GameDesign/PROGRESSION.md` Stage 1. The items listed here are the Prototype v0.1 implementation subset.
 
 Creates progression.
 
@@ -243,6 +249,8 @@ Improved rewards.
 
 ## Purpose
 
+Reputation is part of the canonical success/failure model defined in `01_GameDesign/GAMEPLAY.md`.
+
 Represents customer trust.
 
 ---
@@ -264,6 +272,8 @@ Decreases:
 # System 7: Progression System
 
 ## Purpose
+
+Canonical upgrade and progression design is owned by `01_GameDesign/PROGRESSION.md` Stage 1. The example below describes the Prototype v0.1 implementation subset.
 
 Defines company growth.
 

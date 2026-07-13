@@ -26,6 +26,12 @@ The map should prioritize:
 
 ---
 
+## Scope and Ownership
+
+This document defines the Prototype v0.1 first map implementation. Map design principles and canonical zone/location definitions are owned by `04_World/MAP.md` and `04_World/BUILDINGS.md`. This document narrows those canonical definitions to the prototype scope.
+
+---
+
 # Map Concept
 
 The first map represents a small urban neighborhood where a new delivery company begins operations.
@@ -168,6 +174,8 @@ Prototype objects:
 
 # Navigation Design
 
+Navigation clarity principles are derived from `04_World/MAP.md` (Map Philosophy). The specific prototype implementation applies these principles to the Prototype v0.1 map.
+
 The player should always understand:
 
 - Where they are
@@ -241,6 +249,8 @@ Avoid:
 ---
 
 # Design Principles
+
+These principles are derived from `04_World/MAP.md` (Balance Principles and Map Philosophy).
 
 The first map must be:
 
