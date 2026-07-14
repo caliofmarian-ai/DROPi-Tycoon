@@ -6,7 +6,7 @@ Version: 1.0.0
 Status: Documentation Control
 Author: Marian Caliof & OpenAI
 Language: English
-Last Updated: 2026-07-13
+Last Updated: 2026-07-14
 
 ---
 
@@ -242,6 +242,24 @@ Stable top-level documents:
 - Governance source: `09_Development/AI_REPORTING_PROTOCOL.md`.
 - Individual AI reports are not enumerated in this index.
 - Latest report sequence values are not stored in this index.
+
+---
+
+### Managed implementation-preparation documentation directory
+
+- `09_Development/Implementation_Preparation/` — non-authoritative implementation preparation package for Prototype v0.1.
+
+**Purpose:** Transforms approved canonical documentation into a dependency-ordered, agent-executable implementation plan. Allows future implementation agents to begin without inventing architecture, gameplay behavior, variable names, or scope.
+
+**Ownership:** Created and maintained by AI agents under Project Owner governance. The Project Owner decides when updates are required.
+
+**Discoverability policy:** The package is discoverable as a managed directory. Individual preparation files within it are not individually enumerated in this index.
+
+**Relationship to canonical docs:** This package is **non-authoritative**. It does not override, replace, or supplement any canonical document. If any conflict exists between a preparation file and a canonical document, the canonical document governs. All content in this directory traces to canonical documentation.
+
+**Maintenance expectations:** Point-in-time preparation artifact. If canonical documents are updated materially during implementation, affected sections of this package should be reviewed and updated. The Project Owner decides when such updates are required.
+
+**Non-authoritative rule:** No content in this directory constitutes a canonical gameplay, architecture, scope, or design decision unless explicitly confirmed by the Project Owner and recorded in the appropriate canonical document.
 
 ---
 
