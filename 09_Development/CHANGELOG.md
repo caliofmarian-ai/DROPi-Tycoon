@@ -6,7 +6,7 @@ Version: 1.0.0
 Status: Development Log
 Author: Marian Caliof & OpenAI
 Language: English
-Last Updated: 2026-07-14
+Last Updated: 2026-07-14 (BATCH-004)
 
 ---
 
@@ -31,6 +31,43 @@ Date
 Category
 
 Description
+
+---
+
+# [2026-07-14] - BATCH-004 Map/Player/Building World Setup
+
+## Added
+
+- Created 2 additional placeholder sprite PNG files in `Game/Assets/Sprites/`:
+  - `delivery_point_marker.png` (32×32, yellow diamond marker) — delivery/pickup point placeholder (REQ-168)
+  - `environment_road_tile.png` (32×32, gray road tile) — road/environment tile placeholder (REQ-172)
+- Registered 7 image resources in `Game/DROPi_Tycoon.json` (`resources.resources`):
+  - `player_character_idle`, `building_company_small`, `building_residential`, `building_commercial`,
+    `package_delivery`, `delivery_point_marker`, `environment_road_tile`
+- Created 5 global Sprite object types in `Game/DROPi_Tycoon.json`:
+  - `Player` (1 animation "Idle", variables CarryingPackage and MovementSpeed)
+  - `Building` (3 animations: "Company" anim=0, "Residential" anim=1, "Commercial" anim=2)
+  - `Package` (1 animation "Default")
+  - `DeliveryPoint` (1 animation "Default")
+  - `Environment` (1 animation "Road" — road/environment tiles)
+- Placed 16 static instances in `GameWorld` scene on `Base` layer:
+  - 1 Player at (380, 270)
+  - 1 Company Building (anim=0) at (368, 182)
+  - 2 Residential Buildings (anim=1) at (80, 60) and (160, 60)
+  - 2 Commercial Buildings (anim=2) at (580, 60) and (660, 60)
+  - 1 Package at (120, 440)
+  - 3 DeliveryPoints at (120, 490), (580, 470), (660, 510)
+  - 6 Environment road tiles at (240, 200), (272, 200), (304, 200), (336, 200), (432, 200), (464, 200)
+
+## Not Changed
+
+- No event conditions or actions added (conditions=0, actions=0).
+- No JavaScript introduced.
+- No behaviors added.
+- No movement, input, order, delivery, economy, progression, save/load, or AI logic added.
+- No playable prototype exists.
+- BATCH-001/002/003 artifacts remain intact.
+- BATCH-005 not started.
 
 ---
 
