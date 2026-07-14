@@ -95,7 +95,6 @@ Starting resources include:
 - Small amount of cash
 - One smartphone
 - One backpack
-- One delivery account
 
 The player does not start with a vehicle.
 
