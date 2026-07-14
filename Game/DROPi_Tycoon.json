@@ -106,7 +106,21 @@
       "variables": [],
       "instances": [],
       "objects": [],
-      "events": [],
+      "events": [
+        {
+          "disabled": false,
+          "folded": false,
+          "colorB": 228,
+          "colorG": 176,
+          "colorR": 74,
+          "creationTime": 0,
+          "name": "SceneFlow",
+          "source": "",
+          "type": "BuiltinCommonInstructions::Group",
+          "events": [],
+          "parameters": []
+        }
+      ],
       "layers": [
         {
           "ambientLightColorB": 200,
@@ -160,19 +174,344 @@
         "windowMask": false
       },
       "objectsGroups": [],
-      "variables": [],
+      "variables": [
+        {
+          "folded": true,
+          "name": "PlayerData",
+          "type": "structure",
+          "children": [
+            {
+              "name": "Name",
+              "type": "string",
+              "value": ""
+            },
+            {
+              "folded": true,
+              "name": "Position",
+              "type": "structure",
+              "children": [
+                {
+                  "name": "X",
+                  "type": "number",
+                  "value": 0
+                },
+                {
+                  "name": "Y",
+                  "type": "number",
+                  "value": 0
+                }
+              ]
+            },
+            {
+              "name": "CurrentOrder",
+              "type": "string",
+              "value": ""
+            },
+            {
+              "name": "CarryingPackage",
+              "type": "boolean",
+              "value": false
+            },
+            {
+              "name": "MovementSpeed",
+              "type": "number",
+              "value": 0
+            }
+          ]
+        },
+        {
+          "folded": true,
+          "name": "ActiveOrder",
+          "type": "structure",
+          "children": [
+            {
+              "name": "OrderID",
+              "type": "string",
+              "value": ""
+            },
+            {
+              "name": "PickupLocation",
+              "type": "string",
+              "value": ""
+            },
+            {
+              "name": "Destination",
+              "type": "string",
+              "value": ""
+            },
+            {
+              "name": "Reward",
+              "type": "number",
+              "value": 0
+            },
+            {
+              "name": "Status",
+              "type": "string",
+              "value": ""
+            },
+            {
+              "name": "Difficulty",
+              "type": "string",
+              "value": ""
+            }
+          ]
+        },
+        {
+          "folded": true,
+          "name": "WorldData",
+          "type": "structure",
+          "children": [
+            {
+              "name": "CurrentMap",
+              "type": "string",
+              "value": ""
+            },
+            {
+              "folded": true,
+              "name": "Buildings",
+              "type": "structure",
+              "children": []
+            },
+            {
+              "folded": true,
+              "name": "DeliveryPoints",
+              "type": "structure",
+              "children": []
+            },
+            {
+              "folded": true,
+              "name": "ActiveCustomers",
+              "type": "structure",
+              "children": []
+            }
+          ]
+        }
+      ],
       "instances": [],
       "objects": [],
-      "events": [],
+      "events": [
+        {
+          "disabled": false,
+          "folded": false,
+          "colorB": 228,
+          "colorG": 176,
+          "colorR": 74,
+          "creationTime": 0,
+          "name": "PlayerEvents",
+          "source": "",
+          "type": "BuiltinCommonInstructions::Group",
+          "events": [],
+          "parameters": []
+        },
+        {
+          "disabled": false,
+          "folded": false,
+          "colorB": 228,
+          "colorG": 176,
+          "colorR": 74,
+          "creationTime": 0,
+          "name": "OrderEvents",
+          "source": "",
+          "type": "BuiltinCommonInstructions::Group",
+          "events": [],
+          "parameters": []
+        },
+        {
+          "disabled": false,
+          "folded": false,
+          "colorB": 228,
+          "colorG": 176,
+          "colorR": 74,
+          "creationTime": 0,
+          "name": "DeliveryEvents",
+          "source": "",
+          "type": "BuiltinCommonInstructions::Group",
+          "events": [],
+          "parameters": []
+        },
+        {
+          "disabled": false,
+          "folded": false,
+          "colorB": 228,
+          "colorG": 176,
+          "colorR": 74,
+          "creationTime": 0,
+          "name": "EconomyEvents",
+          "source": "",
+          "type": "BuiltinCommonInstructions::Group",
+          "events": [],
+          "parameters": []
+        },
+        {
+          "disabled": false,
+          "folded": false,
+          "colorB": 228,
+          "colorG": 176,
+          "colorR": 74,
+          "creationTime": 0,
+          "name": "UIEvents",
+          "source": "",
+          "type": "BuiltinCommonInstructions::Group",
+          "events": [],
+          "parameters": []
+        },
+        {
+          "disabled": false,
+          "folded": false,
+          "colorB": 228,
+          "colorG": 176,
+          "colorR": 74,
+          "creationTime": 0,
+          "name": "SaveTriggers",
+          "source": "",
+          "type": "BuiltinCommonInstructions::Group",
+          "events": [],
+          "parameters": []
+        },
+        {
+          "disabled": false,
+          "folded": false,
+          "colorB": 228,
+          "colorG": 176,
+          "colorR": 74,
+          "creationTime": 0,
+          "name": "SceneFlow",
+          "source": "",
+          "type": "BuiltinCommonInstructions::Group",
+          "events": [],
+          "parameters": []
+        },
+        {
+          "disabled": false,
+          "folded": false,
+          "type": "BuiltinCommonInstructions::Link",
+          "include": {
+            "includeConfig": 0
+          },
+          "target": "OrderSystem"
+        },
+        {
+          "disabled": false,
+          "folded": false,
+          "type": "BuiltinCommonInstructions::Link",
+          "include": {
+            "includeConfig": 0
+          },
+          "target": "EconomySystem"
+        },
+        {
+          "disabled": false,
+          "folded": false,
+          "type": "BuiltinCommonInstructions::Link",
+          "include": {
+            "includeConfig": 0
+          },
+          "target": "ProgressionSystem"
+        }
+      ],
       "layers": [
         {
-          "ambientLightColorB": 200,
-          "ambientLightColorG": 200,
-          "ambientLightColorR": 200,
-          "followBaseLayerCamera": false,
-          "isLightingLayer": false,
-          "name": "",
+          "name": "Base",
+          "renderingType": "",
+          "cameraType": "",
           "visibility": true,
+          "isLocked": false,
+          "isLightingLayer": false,
+          "followBaseLayerCamera": false,
+          "ambientLightColorR": 200,
+          "ambientLightColorG": 200,
+          "ambientLightColorB": 200,
+          "camera3DNearPlaneDistance": 3,
+          "camera3DFarPlaneDistance": 10000,
+          "camera3DFieldOfView": 45,
+          "camera2DPlaneMaxDrawingDistance": 5000,
+          "cameras": [
+            {
+              "defaultSize": true,
+              "defaultViewport": true,
+              "height": 0,
+              "viewportBottom": 1,
+              "viewportLeft": 0,
+              "viewportRight": 1,
+              "viewportTop": 0,
+              "width": 0
+            }
+          ],
+          "effects": []
+        },
+        {
+          "name": "HUD",
+          "renderingType": "",
+          "cameraType": "",
+          "visibility": true,
+          "isLocked": false,
+          "isLightingLayer": false,
+          "followBaseLayerCamera": false,
+          "ambientLightColorR": 200,
+          "ambientLightColorG": 200,
+          "ambientLightColorB": 200,
+          "camera3DNearPlaneDistance": 3,
+          "camera3DFarPlaneDistance": 10000,
+          "camera3DFieldOfView": 45,
+          "camera2DPlaneMaxDrawingDistance": 5000,
+          "cameras": [
+            {
+              "defaultSize": true,
+              "defaultViewport": true,
+              "height": 0,
+              "viewportBottom": 1,
+              "viewportLeft": 0,
+              "viewportRight": 1,
+              "viewportTop": 0,
+              "width": 0
+            }
+          ],
+          "effects": []
+        },
+        {
+          "name": "Notifications",
+          "renderingType": "",
+          "cameraType": "",
+          "visibility": true,
+          "isLocked": false,
+          "isLightingLayer": false,
+          "followBaseLayerCamera": false,
+          "ambientLightColorR": 200,
+          "ambientLightColorG": 200,
+          "ambientLightColorB": 200,
+          "camera3DNearPlaneDistance": 3,
+          "camera3DFarPlaneDistance": 10000,
+          "camera3DFieldOfView": 45,
+          "camera2DPlaneMaxDrawingDistance": 5000,
+          "cameras": [
+            {
+              "defaultSize": true,
+              "defaultViewport": true,
+              "height": 0,
+              "viewportBottom": 1,
+              "viewportLeft": 0,
+              "viewportRight": 1,
+              "viewportTop": 0,
+              "width": 0
+            }
+          ],
+          "effects": []
+        },
+        {
+          "name": "Modal",
+          "renderingType": "",
+          "cameraType": "",
+          "visibility": true,
+          "isLocked": false,
+          "isLightingLayer": false,
+          "followBaseLayerCamera": false,
+          "ambientLightColorR": 200,
+          "ambientLightColorG": 200,
+          "ambientLightColorB": 200,
+          "camera3DNearPlaneDistance": 3,
+          "camera3DFarPlaneDistance": 10000,
+          "camera3DFieldOfView": 45,
+          "camera2DPlaneMaxDrawingDistance": 5000,
           "cameras": [
             {
               "defaultSize": true,
@@ -220,7 +559,21 @@
       "variables": [],
       "instances": [],
       "objects": [],
-      "events": [],
+      "events": [
+        {
+          "disabled": false,
+          "folded": false,
+          "colorB": 228,
+          "colorG": 176,
+          "colorR": 74,
+          "creationTime": 0,
+          "name": "SceneFlow",
+          "source": "",
+          "type": "BuiltinCommonInstructions::Group",
+          "events": [],
+          "parameters": []
+        }
+      ],
       "layers": [
         {
           "ambientLightColorB": 200,
@@ -248,7 +601,23 @@
       "behaviorsSharedData": []
     }
   ],
-  "externalEvents": [],
+  "externalEvents": [
+    {
+      "name": "OrderSystem",
+      "associatedLayout": "GameWorld",
+      "events": []
+    },
+    {
+      "name": "EconomySystem",
+      "associatedLayout": "GameWorld",
+      "events": []
+    },
+    {
+      "name": "ProgressionSystem",
+      "associatedLayout": "GameWorld",
+      "events": []
+    }
+  ],
   "eventsFunctionsExtensions": [],
   "externalLayouts": [],
   "externalSourceFiles": []

@@ -34,6 +34,26 @@ Description
 
 ---
 
+# [2026-07-14] - BATCH-002 Scene/Event Scaffold Wiring
+
+## Added
+
+- Added exactly three empty external event sheet scaffolds to `Game/DROPi_Tycoon.json`: `OrderSystem`, `EconomySystem`, and `ProgressionSystem`.
+- Added exactly seven empty GameWorld event-group scaffolds: `PlayerEvents`, `OrderEvents`, `DeliveryEvents`, `EconomyEvents`, `UIEvents`, `SaveTriggers`, and `SceneFlow`.
+- Added empty `SceneFlow` event-group scaffolds to `MainMenu` and `CompanyManagement`.
+- Added GameWorld scene-variable scaffolds: `PlayerData`, `ActiveOrder`, and `WorldData`, using canonical sub-structure names only.
+- Added GameWorld external-event binding references for the three empty external event sheets.
+- Added persistent implementation report `09_Development/AI_Reports/2026-07-14_061_BATCH_002_GDEVELOP_SCENE_EVENT_SCAFFOLD_IMPLEMENTATION.md`.
+
+## Changed
+
+- Replaced the default unnamed GameWorld layer setup with the approved four-layer scaffold partition: `Base`, `HUD`, `Notifications`, `Modal`.
+- Updated `00_Project/PROJECT_STATUS.md` to reflect BATCH-002 completion, scaffold status, and unchanged no-gameplay reality.
+
+No gameplay logic was implemented. No objects were added. No JavaScript, save/load behavior, extensions, placeholder assets, or later-batch systems were introduced.
+
+---
+
 # [2026-07-14] - BATCH-001 GDevelop Project Foundation
 
 ## Added
