@@ -16,13 +16,13 @@ Last Updated: 2026-07-14
 
 Phase:
 
-Prototype v0.1 Implementation — BATCH-001 Foundation Complete
+Prototype v0.1 Implementation — BATCH-002 Scene/Event Scaffold Complete
 
 ---
 
 # Current Objective
 
-Continue Prototype v0.1 implementation from the completed GDevelop project foundation.
+Continue Prototype v0.1 implementation from the completed scene/event scaffold foundation.
 
 The current focus is not the final game.
 
@@ -160,9 +160,9 @@ The prototype must prove the core idea before expansion.
 
 # Next Steps
 
-1. Validate and review BATCH-001 foundation artifacts.
-2. Start BATCH-002 scene/event scaffold wiring.
-3. Start BATCH-003 placeholder asset setup.
+1. Validate and review BATCH-002 scene/event scaffold artifacts.
+2. Start BATCH-003 placeholder asset setup.
+3. Start BATCH-004 map/player/building world setup after BATCH-003.
 4. Continue iterative development.
 
 ---
@@ -196,14 +196,16 @@ Implementation Preparation Status:
 - Required asset directories exist: `Game/Assets/Sprites`, `Game/Assets/Audio`, `Game/Assets/UI`
 - Exactly three empty scaffold scenes exist: `MainMenu`, `GameWorld`, `CompanyManagement`
 - Global roots created: `CompanyData`, `GameSettings`, `SaveFormatVersion`
+- GameWorld scene/event scaffold wiring created: 3 external event sheets, 7 GameWorld event groups, SceneFlow groups in MainMenu and CompanyManagement, 3 GameWorld scene-variable roots with canonical sub-structures, and 4 GameWorld layers
 - No gameplay objects, gameplay events, or gameplay logic have been implemented
 - No JavaScript has been introduced
-- No external event sheets have been created yet
+- External event sheets exist as empty scaffolds only
 - BATCH-001 is complete
-- BATCH-002 has not started
+- BATCH-002 is complete
+- BATCH-003 has not started
 - Active owner decisions: ODR-001 (player position persistence), ODR-003 (GameSettings persistence scope), ODR-004 (failure trigger definition)
 - ODR-002 reclassified (not an owner decision)
-- No owner decision blocks BATCH-001
+- No owner decision blocks BATCH-002
 
 ---
 
