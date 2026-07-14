@@ -16,7 +16,7 @@ Last Updated: 2026-07-14
 
 Phase:
 
-Prototype v0.1 Implementation — BATCH-002 Scene/Event Scaffold Complete
+Prototype v0.1 Implementation — BATCH-003 Placeholder Asset Setup Complete
 
 ---
 
@@ -160,10 +160,9 @@ The prototype must prove the core idea before expansion.
 
 # Next Steps
 
-1. Validate and review BATCH-002 scene/event scaffold artifacts.
-2. Start BATCH-003 placeholder asset setup.
-3. Start BATCH-004 map/player/building world setup after BATCH-003.
-4. Continue iterative development.
+1. Validate and review BATCH-003 placeholder asset artifacts.
+2. Start BATCH-004 map/player/building world setup after BATCH-003 merges.
+3. Continue iterative development.
 
 ---
 
@@ -183,7 +182,7 @@ READY
 
 Implementation:
 
-STARTED — BATCH-001 FOUNDATION COMPLETE; NO GAMEPLAY IMPLEMENTED
+STARTED — BATCH-001 FOUNDATION COMPLETE; BATCH-002 SCAFFOLD COMPLETE; BATCH-003 PLACEHOLDER ASSETS COMPLETE; NO GAMEPLAY IMPLEMENTED
 
 Implementation Preparation Status:
 
@@ -197,15 +196,18 @@ Implementation Preparation Status:
 - Exactly three empty scaffold scenes exist: `MainMenu`, `GameWorld`, `CompanyManagement`
 - Global roots created: `CompanyData`, `GameSettings`, `SaveFormatVersion`
 - GameWorld scene/event scaffold wiring created: 3 external event sheets, 7 GameWorld event groups, SceneFlow groups in MainMenu and CompanyManagement, 3 GameWorld scene-variable roots with canonical sub-structures, and 4 GameWorld layers
+- Placeholder asset library created: 7 sprite PNG placeholders and 1 UI icon PNG placeholder in canonical asset directories
 - No gameplay objects, gameplay events, or gameplay logic have been implemented
 - No JavaScript has been introduced
 - External event sheets exist as empty scaffolds only
+- No playable build exists
 - BATCH-001 is complete
 - BATCH-002 is complete
-- BATCH-003 has not started
+- BATCH-003 is complete — placeholder asset library created
+- BATCH-004 has not started
 - Active owner decisions: ODR-001 (player position persistence), ODR-003 (GameSettings persistence scope), ODR-004 (failure trigger definition)
 - ODR-002 reclassified (not an owner decision)
-- No owner decision blocks BATCH-002
+- No owner decision blocks BATCH-003 or BATCH-004
 
 ---
 
