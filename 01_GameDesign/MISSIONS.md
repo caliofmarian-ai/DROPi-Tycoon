@@ -132,7 +132,7 @@ Examples:
 
 • Reach 99% customer satisfaction.
 
-• Build 100 DronePorts.
+• Stage 7+: Build 100 DronePorts.
 
 • Expand internationally.
 
