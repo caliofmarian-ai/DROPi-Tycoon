@@ -440,6 +440,25 @@ None. NC-01, NC-02, and NC-05 are all fully resolved. No contradictions were dis
 
 ---
 
+# Post-Merge Amendment
+
+**Date:** 2026-07-14
+**Requested by:** Project Owner (pre-merge review comment)
+
+**Correction:** The F-27 entry in `09_Development/CHANGELOG.md` originally read:
+
+> "Global Document Authority Hierarchy added to DOCUMENT_INDEX.md, defining eight-level canonical resolution rules and AI-report non-override policy."
+
+This was factually inaccurate. F-27 introduced a **five-level** Document Authority Hierarchy and **eight** conflict-resolution rules (not eight hierarchy levels).
+
+**Files corrected:**
+- `09_Development/CHANGELOG.md` — F-27 bullet updated to: "Global five-level Document Authority Hierarchy added to DOCUMENT_INDEX.md, together with eight conflict-resolution rules and the AI-report non-override policy."
+- `09_Development/AI_Reports/2026-07-14_055_NC01_NC02_NC05_FOLLOW_UP_IMPLEMENTATION.md` — same F-27 bullet corrected in the NC-01 Correction Details section and in this amendment record.
+
+**Scope validation:** Only the two files listed above were modified. No other canonical files or historical reports were changed.
+
+---
+
 # NC Correction Details — Summary
 
 ## NC-01 Correction Details
@@ -458,7 +477,7 @@ None. NC-01, NC-02, and NC-05 are all fully resolved. No contradictions were dis
 - F-24: Prototype v0.1 authoritative completion gate established; `09_Development/PROTOTYPE_RELEASE_CHECKLIST.md` declared the single authoritative gate; PROTOTYPE_V0.1.md, PROTOTYPE_TESTING_PLAN.md, and PROTOTYPE_MILESTONES.md all defer to it explicitly.
 - F-25: INITIAL_REPOSITORY_AUDIT.md metadata and indexing completed.
 - F-26: PROJECT_INTAKE_PROTOCOL.md updated to support both Git clone and ZIP archive project intake modes.
-- F-27: Global Document Authority Hierarchy added to DOCUMENT_INDEX.md, defining eight-level canonical resolution rules and AI-report non-override policy.
+- F-27: Global five-level Document Authority Hierarchy added to DOCUMENT_INDEX.md, together with eight conflict-resolution rules and the AI-report non-override policy.
 - F-28: MISSIONS.md DronePort achievement corrected with Stage 7+ qualifier to avoid Prototype v0.1 scope contradiction.
 - F-29: Undefined starting resource "delivery account" removed from GAMEPLAY.md; Bicycle correctly described as the first purchasable vehicle.
 

@@ -54,7 +54,7 @@ Description
 - F-24: Prototype v0.1 authoritative completion gate established; `09_Development/PROTOTYPE_RELEASE_CHECKLIST.md` declared the single authoritative gate; PROTOTYPE_V0.1.md, PROTOTYPE_TESTING_PLAN.md, and PROTOTYPE_MILESTONES.md all defer to it explicitly.
 - F-25: INITIAL_REPOSITORY_AUDIT.md metadata and indexing completed.
 - F-26: PROJECT_INTAKE_PROTOCOL.md updated to support both Git clone and ZIP archive project intake modes.
-- F-27: Global Document Authority Hierarchy added to DOCUMENT_INDEX.md, defining eight-level canonical resolution rules and AI-report non-override policy.
+- F-27: Global five-level Document Authority Hierarchy added to DOCUMENT_INDEX.md, together with eight conflict-resolution rules and the AI-report non-override policy.
 - F-28: MISSIONS.md DronePort achievement corrected with Stage 7+ qualifier to avoid Prototype v0.1 scope contradiction.
 - F-29: Undefined starting resource "delivery account" removed from GAMEPLAY.md; Bicycle correctly described as the first purchasable vehicle.
 
