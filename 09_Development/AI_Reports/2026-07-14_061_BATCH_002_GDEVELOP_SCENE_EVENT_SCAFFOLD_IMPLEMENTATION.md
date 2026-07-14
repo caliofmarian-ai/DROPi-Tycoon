@@ -509,7 +509,9 @@ Excluded:
 8. Updated `00_Project/PROJECT_STATUS.md` to reflect BATCH-002 completion without overstating gameplay progress.
 9. Updated `09_Development/CHANGELOG.md` with a factual BATCH-002 entry.
 10. Ran structural validation and regression checks.
-11. Removed the local backup after successful validation.
+11. Ran secret scanning on all modified files.
+12. Ran CodeQL applicability check.
+13. Removed the local backup after successful validation.
 
 # Findings
 
@@ -826,13 +828,23 @@ Post-edit project state:
 
 ## Secret scan
 
-Pending at report creation time; executed after all edits and recorded in final session response.
+PASS.
+
+Scanned files:
+- `Game/DROPi_Tycoon.json`
+- `00_Project/PROJECT_STATUS.md`
+- `09_Development/CHANGELOG.md`
+- `09_Development/AI_Reports/2026-07-14_061_BATCH_002_GDEVELOP_SCENE_EVENT_SCAFFOLD_IMPLEMENTATION.md`
+
+Result: no secrets detected.
 
 ## CodeQL applicability
 
-No executable code was added.
+Tool executed.
 
-CodeQL applicability result: NOT APPLICABLE to gameplay/executable-code review scope for this batch, but tool still executed per workflow and recorded in final session response.
+Result: `No code changes detected for languages that CodeQL can analyze, so no analysis was performed.`
+
+Interpretation: no executable code was added; CodeQL review was effectively not applicable to this batch.
 
 ## Editor-open validation result
 
