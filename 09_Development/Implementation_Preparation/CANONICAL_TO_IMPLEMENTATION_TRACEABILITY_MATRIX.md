@@ -15,14 +15,13 @@ Last Updated: 2026-07-14
 ## Purpose
 
 Map every final valid requirement to at least one planned implementation evidence target.
-All references use corrected sequential IDs from `PROTOTYPE_V0.1_REQUIREMENTS_INVENTORY.md`.
 
 ## Coverage Calculation
 
 - Total valid requirements: **188**
 - Mapped requirements: **188**
 - Unmapped requirements: **0**
-- Duplicate mappings: **0** (intentional duplicates retained: none)
+- Duplicate mappings: **0**
 - Orphan artifacts: **0**
 - Exact traceability percentage: **100.00%** (`188 / 188 = 100.00%`)
 
@@ -116,9 +115,9 @@ All references use corrected sequential IDs from `PROTOTYPE_V0.1_REQUIREMENTS_IN
 | REQ-084 | Residential buildings (customer homes / delivery destinations) | CANONICAL REQUIREMENT | Map/world composition and interaction implementation | BATCH-004 |
 | REQ-085 | Commercial buildings (restaurants / shops / small businesses — order generation sources) | CANONICAL REQUIREMENT | Map/world composition and interaction implementation | BATCH-004 |
 | REQ-086 | Pickup points (storage / package collection locations) | CANONICAL REQUIREMENT | Map/world composition and interaction implementation | BATCH-004 |
-| REQ-087 | Buildings support interaction (tap to see name, available action) | CANONICAL REQUIREMENT | Map/world composition and interaction implementation | BATCH-004 |
+| REQ-087 | Buildings support interaction (tap to see name, available action) | CANONICAL REQUIREMENT | HUD/input/notification implementation evidence | BATCH-006/BATCH-010 |
 | REQ-088 | Main menu scene: Start Game, Settings, Information | CANONICAL REQUIREMENT | Project scaffold/architecture/schema implementation evidence | BATCH-001/BATCH-002 |
-| REQ-089 | Company Management scene: company info, upgrades, economy overview | CANONICAL REQUIREMENT | Economy/progression implementation evidence | BATCH-009/BATCH-012 |
+| REQ-089 | Company Management scene: company info, upgrades, economy overview | CANONICAL REQUIREMENT | Project scaffold/architecture/schema implementation evidence | BATCH-001/BATCH-002 |
 | REQ-090 | GameWorld HUD displays: current money, active order, delivery status | CANONICAL REQUIREMENT | HUD/input/notification implementation evidence | BATCH-006/BATCH-010 |
 | REQ-091 | Company status always visible: Money, Level, Reputation | CANONICAL REQUIREMENT | HUD/input/notification implementation evidence | BATCH-006/BATCH-010 |
 | REQ-092 | Active order display: pickup location, destination, reward | CANONICAL REQUIREMENT | HUD/input/notification implementation evidence | BATCH-006/BATCH-010 |
@@ -223,10 +222,10 @@ All references use corrected sequential IDs from `PROTOTYPE_V0.1_REQUIREMENTS_IN
 
 | Implementation Detail ID | Detail | Authority Type | Planned Artifact | Batch |
 |---|---|---|---|---|
-| IDR-011 | MainMenu→GameWorld transition implementation pattern | AUTHORIZED IMPLEMENTATION DETAIL | Scene transition events in MainMenu | BATCH-010b |
-| IDR-012 | CompanyManagement→GameWorld return transition pattern | AUTHORIZED IMPLEMENTATION DETAIL | Back/return transition in CompanyManagement | BATCH-011 |
-| IDR-013 | Scene-variable ownership for PlayerData/ActiveOrder/WorldData | AUTHORIZED IMPLEMENTATION DETAIL | GameWorld scene-variable setup | BATCH-004/BATCH-005 |
-| IDR-014 | UI layer partition names and ordering | AUTHORIZED IMPLEMENTATION DETAIL | Scene layer configuration | BATCH-010 |
+| IDR-008 | MainMenu→GameWorld transition implementation pattern | AUTHORIZED IMPLEMENTATION DETAIL | Scene transition events in MainMenu | BATCH-010b |
+| IDR-009 | CompanyManagement→GameWorld return transition pattern | AUTHORIZED IMPLEMENTATION DETAIL | Back/return transition in CompanyManagement | BATCH-011 |
+| IDR-010 | Scene-variable ownership for PlayerData/ActiveOrder/WorldData | AUTHORIZED IMPLEMENTATION DETAIL | GameWorld scene-variable setup | BATCH-004/BATCH-005 |
+| IDR-011 | UI layer partition names and ordering | AUTHORIZED IMPLEMENTATION DETAIL | Scene layer configuration | BATCH-010 |
 
 ---
 
