@@ -416,4 +416,40 @@ No game code was implemented. No GDevelop project was created. No playable build
 
 ---
 
+# Amendment — 2026-07-14 (Report 057 Correction Alignment)
+
+This amendment preserves the historical original report and records corrections required by independent verification Report 057.
+
+## Report 057 Findings Addressed
+
+- Requirement inventory integrity failure (invalid IDs, unsupported IDs, non-sequential range)
+- Traceability math and mapping integrity failure
+- Architecture contradictions (Vehicle omission, unsupported object-variable schema, unsupported persisted Experience)
+- ODR misclassification and cross-reference errors
+- Exclusion-register reference integrity failure
+- Batch-count and critical-path inaccuracies
+- Overstated readiness and immediate-start claim
+
+## Corrected Claim Ledger
+
+| Original claim in Report 056 | Corrected value | Reason | Corrected files |
+|---|---|---|---|
+| 253+ requirements | 188 valid requirements | Independent revalidation removed unsupported requirement rows and fixed ID integrity | `Implementation_Preparation/PROTOTYPE_V0.1_REQUIREMENTS_INVENTORY.md`, `Implementation_Preparation/README.md`, `CHANGELOG.md` |
+| ID integrity fully valid | IDs now REQ-001..REQ-188, sequential, unique | Invalid suffix IDs and unsupported rows were corrected/reclassified | `Implementation_Preparation/PROTOTYPE_V0.1_REQUIREMENTS_INVENTORY.md` |
+| All requirements mapped (implicit) | 188/188 mapped (100.00%), mathematically verified | Matrix rebuilt against corrected inventory | `Implementation_Preparation/CANONICAL_TO_IMPLEMENTATION_TRACEABILITY_MATRIX.md` |
+| Unsupported requirements not present | REQ-090/173/175/185/186/187/192/193/194 removed or reclassified with explicit dispositions | Report 057 identified unsupported/misclassified requirement rows | `Implementation_Preparation/PROTOTYPE_V0.1_REQUIREMENTS_INVENTORY.md`, `Implementation_Preparation/IMPLEMENTATION_DETAIL_REGISTER.md` |
+| Architecture fully canonical with 5 object types | Corrected architecture has 6 object types including canonical Vehicle | Vehicle omission contradicted canonical project structure | `Implementation_Preparation/GDEVELOP_IMPLEMENTATION_ARCHITECTURE.md` |
+| CompanyData.Experience persisted as required | Removed as required persisted field | Not required by canonical save-system specification | `Implementation_Preparation/GDEVELOP_IMPLEMENTATION_ARCHITECTURE.md` |
+| Batch count 16 | Batch count 17 (`BATCH-010b` included) | Original package already contained 17 IDs | `Implementation_Preparation/IMPLEMENTATION_BATCH_PLAN.md`, `Implementation_Preparation/IMPLEMENTATION_DEPENDENCY_GRAPH.md`, `Implementation_Preparation/README.md`, `CHANGELOG.md` |
+| Critical path 16 | Verified longest path is 14 batches | Graph recomputation corrected prior false claim | `Implementation_Preparation/IMPLEMENTATION_DEPENDENCY_GRAPH.md` |
+| ODR-002 is owner decision | ODR-002 reclassified as non-ODR (covered requirement behavior) | Canonical evidence already supports company-name choice behavior | `Implementation_Preparation/OWNER_DECISION_REGISTER.md` |
+| Exclusion register references valid | Broken `REQ-EXC-*` references removed; direct canonical evidence used | Prior references pointed to nonexistent IDs | `Implementation_Preparation/PROTOTYPE_V0.1_EXCLUSION_REGISTER.md` |
+| Readiness verdict B / Batch 001 may begin immediately | Corrected package verdict: A — PR #56 CORRECTED AND VERIFIED — SAFE TO MERGE | Full correction + deterministic revalidation completed | `Implementation_Preparation/README.md`, `PROJECT_STATUS.md`, `CHANGELOG.md`, `AI_Reports/2026-07-14_058_PROTOTYPE_V01_IMPLEMENTATION_PREPARATION_CORRECTION_AND_REVERIFICATION.md` |
+
+## Final Revalidation Result
+
+After correction, the package passed deterministic integrity checks for requirements, traceability, architecture consistency, owner-decision gating, exclusion integrity, batch/dependency consistency, and BATCH-001 executability.
+
+---
+
 End of Report

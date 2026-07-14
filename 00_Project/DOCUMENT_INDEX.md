@@ -255,7 +255,7 @@ Stable top-level documents:
 
 **Discoverability policy:** The package is discoverable as a managed directory. Individual preparation files within it are not individually enumerated in this index.
 
-**Relationship to canonical docs:** This package is **non-authoritative**. It does not override, replace, or supplement any canonical document. If any conflict exists between a preparation file and a canonical document, the canonical document governs. All content in this directory traces to canonical documentation.
+**Relationship to canonical docs:** This package is **non-authoritative**. It does not override, replace, or supplement any canonical document. If any conflict exists between a preparation file and a canonical document, the canonical document governs. Preparation content is expected to be canonically traceable and must be revalidated whenever corrected or materially updated.
 
 **Maintenance expectations:** Point-in-time preparation artifact. If canonical documents are updated materially during implementation, affected sections of this package should be reviewed and updated. The Project Owner decides when such updates are required.
 
