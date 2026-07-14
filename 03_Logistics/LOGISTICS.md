@@ -6,7 +6,7 @@ Version: 1.0.0
 Status: Canonical
 Author: Marian Caliof & OpenAI
 Language: English
-Last Updated: 2026-07-12
+Last Updated: 2026-07-14
 
 ---
 
@@ -237,6 +237,8 @@ The first playable version includes:
 - Bicycle delivery
 - Basic route calculation
 - Revenue generation
+
+Prototype scope is canonically owned by `09_Development/PROTOTYPE_V0.1.md`. The items listed here reflect the approved Prototype v0.1 scope.
 
 ---
 
