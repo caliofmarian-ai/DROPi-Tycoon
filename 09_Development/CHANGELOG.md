@@ -34,6 +34,24 @@ Description
 
 ---
 
+# [2026-07-14] - BATCH-001 GDevelop Project Foundation
+
+## Added
+
+- Created the initial GDevelop project scaffold at `Game/DROPi_Tycoon.json` using an official GDevelop example-derived JSON structure adapted to DROPi Tycoon foundation requirements.
+- Created required project asset directories: `Game/Assets/Sprites/`, `Game/Assets/Audio/`, and `Game/Assets/UI/`.
+- Added exactly three empty scaffold scenes with canonical names: `MainMenu`, `GameWorld`, `CompanyManagement`.
+- Added foundation-only global variable roots: `CompanyData`, `GameSettings`, `SaveFormatVersion`.
+- Added persistent implementation report `09_Development/AI_Reports/2026-07-14_059_BATCH_001_GDEVELOP_PROJECT_FOUNDATION_IMPLEMENTATION.md`.
+
+## Changed
+
+- Updated `00_Project/PROJECT_STATUS.md` to reflect that implementation has started, BATCH-001 is complete, no gameplay exists yet, and BATCH-002 has not started.
+
+No gameplay logic was implemented. No playable build exists. No external event sheets, JavaScript, save/load behavior, or future-batch systems were added.
+
+---
+
 # [0.1.0] - Initial Documentation Phase
 
 ## Added
