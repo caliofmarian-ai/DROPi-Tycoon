@@ -10,7 +10,7 @@
 - Branch: copilot/dropi-tycoon-prototype-v01-preparation
 - Base commit: d8e1dd0 (Merge pull request #55 from caliofmarian-ai/copilot/nc-01-nc-02-nc-05-doc-follow-up)
 - Resulting commit: (pending PR merge)
-- Pull Request: (pending creation)
+- Pull Request: https://github.com/caliofmarian-ai/DROPi-Tycoon/pull/56
 - Human approval status: Pending review
 
 ---
