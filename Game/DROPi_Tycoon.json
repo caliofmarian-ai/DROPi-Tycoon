@@ -53,10 +53,339 @@
     "currentPlatform": "GDevelop JS platform"
   },
   "resources": {
-    "resources": [],
+    "resources": [
+      {
+        "kind": "image",
+        "metadata": "",
+        "name": "player_character_idle",
+        "smoothed": true,
+        "userAdded": true,
+        "file": "Assets/Sprites/player_character_idle.png"
+      },
+      {
+        "kind": "image",
+        "metadata": "",
+        "name": "building_company_small",
+        "smoothed": true,
+        "userAdded": true,
+        "file": "Assets/Sprites/building_company_small.png"
+      },
+      {
+        "kind": "image",
+        "metadata": "",
+        "name": "building_residential",
+        "smoothed": true,
+        "userAdded": true,
+        "file": "Assets/Sprites/building_residential.png"
+      },
+      {
+        "kind": "image",
+        "metadata": "",
+        "name": "building_commercial",
+        "smoothed": true,
+        "userAdded": true,
+        "file": "Assets/Sprites/building_commercial.png"
+      },
+      {
+        "kind": "image",
+        "metadata": "",
+        "name": "package_delivery",
+        "smoothed": true,
+        "userAdded": true,
+        "file": "Assets/Sprites/package_delivery.png"
+      },
+      {
+        "kind": "image",
+        "metadata": "",
+        "name": "delivery_point_marker",
+        "smoothed": true,
+        "userAdded": true,
+        "file": "Assets/Sprites/delivery_point_marker.png"
+      },
+      {
+        "kind": "image",
+        "metadata": "",
+        "name": "environment_road_tile",
+        "smoothed": true,
+        "userAdded": true,
+        "file": "Assets/Sprites/environment_road_tile.png"
+      }
+    ],
     "resourceFolders": []
   },
-  "objects": [],
+  "objects": [
+    {
+      "name": "Player",
+      "type": "Sprite",
+      "updateIfNotVisible": false,
+      "adaptCollisionMaskAutomatically": true,
+      "variables": [
+        {
+          "folded": false,
+          "name": "CarryingPackage",
+          "type": "boolean",
+          "value": false
+        },
+        {
+          "folded": false,
+          "name": "MovementSpeed",
+          "type": "number",
+          "value": 0
+        }
+      ],
+      "effects": [],
+      "behaviors": [],
+      "animations": [
+        {
+          "name": "Idle",
+          "useMultipleDirections": false,
+          "directions": [
+            {
+              "looping": false,
+              "timeBetweenFrames": 0.08,
+              "sprites": [
+                {
+                  "image": "player_character_idle",
+                  "points": [],
+                  "originPoint": {
+                    "name": "origine",
+                    "x": 0,
+                    "y": 0
+                  },
+                  "centerPoint": {
+                    "name": "centre",
+                    "x": 0,
+                    "y": 0,
+                    "automatic": true
+                  },
+                  "hasCustomCollisionMask": false,
+                  "customCollisionMask": []
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Building",
+      "type": "Sprite",
+      "updateIfNotVisible": false,
+      "adaptCollisionMaskAutomatically": true,
+      "variables": [],
+      "effects": [],
+      "behaviors": [],
+      "animations": [
+        {
+          "name": "Company",
+          "useMultipleDirections": false,
+          "directions": [
+            {
+              "looping": false,
+              "timeBetweenFrames": 0.08,
+              "sprites": [
+                {
+                  "image": "building_company_small",
+                  "points": [],
+                  "originPoint": {
+                    "name": "origine",
+                    "x": 0,
+                    "y": 0
+                  },
+                  "centerPoint": {
+                    "name": "centre",
+                    "x": 0,
+                    "y": 0,
+                    "automatic": true
+                  },
+                  "hasCustomCollisionMask": false,
+                  "customCollisionMask": []
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Residential",
+          "useMultipleDirections": false,
+          "directions": [
+            {
+              "looping": false,
+              "timeBetweenFrames": 0.08,
+              "sprites": [
+                {
+                  "image": "building_residential",
+                  "points": [],
+                  "originPoint": {
+                    "name": "origine",
+                    "x": 0,
+                    "y": 0
+                  },
+                  "centerPoint": {
+                    "name": "centre",
+                    "x": 0,
+                    "y": 0,
+                    "automatic": true
+                  },
+                  "hasCustomCollisionMask": false,
+                  "customCollisionMask": []
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Commercial",
+          "useMultipleDirections": false,
+          "directions": [
+            {
+              "looping": false,
+              "timeBetweenFrames": 0.08,
+              "sprites": [
+                {
+                  "image": "building_commercial",
+                  "points": [],
+                  "originPoint": {
+                    "name": "origine",
+                    "x": 0,
+                    "y": 0
+                  },
+                  "centerPoint": {
+                    "name": "centre",
+                    "x": 0,
+                    "y": 0,
+                    "automatic": true
+                  },
+                  "hasCustomCollisionMask": false,
+                  "customCollisionMask": []
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Package",
+      "type": "Sprite",
+      "updateIfNotVisible": false,
+      "adaptCollisionMaskAutomatically": true,
+      "variables": [],
+      "effects": [],
+      "behaviors": [],
+      "animations": [
+        {
+          "name": "Default",
+          "useMultipleDirections": false,
+          "directions": [
+            {
+              "looping": false,
+              "timeBetweenFrames": 0.08,
+              "sprites": [
+                {
+                  "image": "package_delivery",
+                  "points": [],
+                  "originPoint": {
+                    "name": "origine",
+                    "x": 0,
+                    "y": 0
+                  },
+                  "centerPoint": {
+                    "name": "centre",
+                    "x": 0,
+                    "y": 0,
+                    "automatic": true
+                  },
+                  "hasCustomCollisionMask": false,
+                  "customCollisionMask": []
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "DeliveryPoint",
+      "type": "Sprite",
+      "updateIfNotVisible": false,
+      "adaptCollisionMaskAutomatically": true,
+      "variables": [],
+      "effects": [],
+      "behaviors": [],
+      "animations": [
+        {
+          "name": "Default",
+          "useMultipleDirections": false,
+          "directions": [
+            {
+              "looping": false,
+              "timeBetweenFrames": 0.08,
+              "sprites": [
+                {
+                  "image": "delivery_point_marker",
+                  "points": [],
+                  "originPoint": {
+                    "name": "origine",
+                    "x": 0,
+                    "y": 0
+                  },
+                  "centerPoint": {
+                    "name": "centre",
+                    "x": 0,
+                    "y": 0,
+                    "automatic": true
+                  },
+                  "hasCustomCollisionMask": false,
+                  "customCollisionMask": []
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Environment",
+      "type": "Sprite",
+      "updateIfNotVisible": false,
+      "adaptCollisionMaskAutomatically": true,
+      "variables": [],
+      "effects": [],
+      "behaviors": [],
+      "animations": [
+        {
+          "name": "Road",
+          "useMultipleDirections": false,
+          "directions": [
+            {
+              "looping": false,
+              "timeBetweenFrames": 0.08,
+              "sprites": [
+                {
+                  "image": "environment_road_tile",
+                  "points": [],
+                  "originPoint": {
+                    "name": "origine",
+                    "x": 0,
+                    "y": 0
+                  },
+                  "centerPoint": {
+                    "name": "centre",
+                    "x": 0,
+                    "y": 0,
+                    "automatic": true
+                  },
+                  "hasCustomCollisionMask": false,
+                  "customCollisionMask": []
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ],
   "objectsGroups": [],
   "variables": [
     {
@@ -287,7 +616,344 @@
           ]
         }
       ],
-      "instances": [],
+      "instances": [
+        {
+          "angle": 0,
+          "customSize": true,
+          "layer": "Base",
+          "locked": false,
+          "name": "Environment",
+          "persistentUuid": "f9f8424e-56af-47cf-92ed-f9bf29d674b8",
+          "x": 240,
+          "y": 200,
+          "zOrder": 1,
+          "width": 32,
+          "height": 32,
+          "numberProperties": [
+            {
+              "name": "animation",
+              "value": 0
+            }
+          ],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": true,
+          "layer": "Base",
+          "locked": false,
+          "name": "Environment",
+          "persistentUuid": "a205d88c-4de2-4fa6-b276-7f9ca7f4f722",
+          "x": 272,
+          "y": 200,
+          "zOrder": 1,
+          "width": 32,
+          "height": 32,
+          "numberProperties": [
+            {
+              "name": "animation",
+              "value": 0
+            }
+          ],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": true,
+          "layer": "Base",
+          "locked": false,
+          "name": "Environment",
+          "persistentUuid": "cee91bc8-df0a-4a1a-86b9-c6d400a47f7e",
+          "x": 304,
+          "y": 200,
+          "zOrder": 1,
+          "width": 32,
+          "height": 32,
+          "numberProperties": [
+            {
+              "name": "animation",
+              "value": 0
+            }
+          ],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": true,
+          "layer": "Base",
+          "locked": false,
+          "name": "Environment",
+          "persistentUuid": "b8ec5b4b-d1df-46de-882d-0ec5d9685a85",
+          "x": 336,
+          "y": 200,
+          "zOrder": 1,
+          "width": 32,
+          "height": 32,
+          "numberProperties": [
+            {
+              "name": "animation",
+              "value": 0
+            }
+          ],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": true,
+          "layer": "Base",
+          "locked": false,
+          "name": "Environment",
+          "persistentUuid": "a37a6e62-1694-4a33-a927-7ac2573ef3b1",
+          "x": 432,
+          "y": 200,
+          "zOrder": 1,
+          "width": 32,
+          "height": 32,
+          "numberProperties": [
+            {
+              "name": "animation",
+              "value": 0
+            }
+          ],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": true,
+          "layer": "Base",
+          "locked": false,
+          "name": "Environment",
+          "persistentUuid": "8690e85c-b18f-410f-806a-2d738282f52a",
+          "x": 464,
+          "y": 200,
+          "zOrder": 1,
+          "width": 32,
+          "height": 32,
+          "numberProperties": [
+            {
+              "name": "animation",
+              "value": 0
+            }
+          ],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": true,
+          "layer": "Base",
+          "locked": false,
+          "name": "Building",
+          "persistentUuid": "66e48acd-ab51-4e4d-a3b8-c01f5ed0ea78",
+          "x": 368,
+          "y": 182,
+          "zOrder": 2,
+          "width": 48,
+          "height": 48,
+          "numberProperties": [
+            {
+              "name": "animation",
+              "value": 0
+            }
+          ],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": true,
+          "layer": "Base",
+          "locked": false,
+          "name": "Building",
+          "persistentUuid": "d3cb3618-5770-4577-831a-7cc7a8f2b5a8",
+          "x": 80,
+          "y": 60,
+          "zOrder": 2,
+          "width": 48,
+          "height": 48,
+          "numberProperties": [
+            {
+              "name": "animation",
+              "value": 1
+            }
+          ],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": true,
+          "layer": "Base",
+          "locked": false,
+          "name": "Building",
+          "persistentUuid": "1d537b63-7640-4b9d-b302-4e9bc79698c4",
+          "x": 160,
+          "y": 60,
+          "zOrder": 2,
+          "width": 48,
+          "height": 48,
+          "numberProperties": [
+            {
+              "name": "animation",
+              "value": 1
+            }
+          ],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": true,
+          "layer": "Base",
+          "locked": false,
+          "name": "Building",
+          "persistentUuid": "c30d1e4a-287d-4644-b593-4323a8c662df",
+          "x": 580,
+          "y": 60,
+          "zOrder": 2,
+          "width": 48,
+          "height": 48,
+          "numberProperties": [
+            {
+              "name": "animation",
+              "value": 2
+            }
+          ],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": true,
+          "layer": "Base",
+          "locked": false,
+          "name": "Building",
+          "persistentUuid": "a38c8b86-faab-4194-bb95-3e767ba78366",
+          "x": 660,
+          "y": 60,
+          "zOrder": 2,
+          "width": 48,
+          "height": 48,
+          "numberProperties": [
+            {
+              "name": "animation",
+              "value": 2
+            }
+          ],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": true,
+          "layer": "Base",
+          "locked": false,
+          "name": "Player",
+          "persistentUuid": "87e491c7-7505-4863-ac1f-7cdc0f8aeb3b",
+          "x": 380,
+          "y": 270,
+          "zOrder": 3,
+          "width": 32,
+          "height": 32,
+          "numberProperties": [
+            {
+              "name": "animation",
+              "value": 0
+            }
+          ],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": true,
+          "layer": "Base",
+          "locked": false,
+          "name": "Package",
+          "persistentUuid": "c94fc1ff-4902-4e99-9ad8-15c134e26135",
+          "x": 120,
+          "y": 440,
+          "zOrder": 2,
+          "width": 32,
+          "height": 32,
+          "numberProperties": [
+            {
+              "name": "animation",
+              "value": 0
+            }
+          ],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": true,
+          "layer": "Base",
+          "locked": false,
+          "name": "DeliveryPoint",
+          "persistentUuid": "12abd97d-2177-4843-8a9c-6f8355ad20a2",
+          "x": 120,
+          "y": 490,
+          "zOrder": 2,
+          "width": 32,
+          "height": 32,
+          "numberProperties": [
+            {
+              "name": "animation",
+              "value": 0
+            }
+          ],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": true,
+          "layer": "Base",
+          "locked": false,
+          "name": "DeliveryPoint",
+          "persistentUuid": "f746922b-22c8-493c-b09b-24a53fb1785f",
+          "x": 580,
+          "y": 470,
+          "zOrder": 2,
+          "width": 32,
+          "height": 32,
+          "numberProperties": [
+            {
+              "name": "animation",
+              "value": 0
+            }
+          ],
+          "stringProperties": [],
+          "initialVariables": []
+        },
+        {
+          "angle": 0,
+          "customSize": true,
+          "layer": "Base",
+          "locked": false,
+          "name": "DeliveryPoint",
+          "persistentUuid": "beedeae4-674c-4726-a5fa-2ec6a6421442",
+          "x": 660,
+          "y": 510,
+          "zOrder": 2,
+          "width": 32,
+          "height": 32,
+          "numberProperties": [
+            {
+              "name": "animation",
+              "value": 0
+            }
+          ],
+          "stringProperties": [],
+          "initialVariables": []
+        }
+      ],
       "objects": [],
       "events": [
         {
