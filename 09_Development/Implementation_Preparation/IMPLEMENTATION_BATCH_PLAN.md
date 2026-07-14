@@ -2,9 +2,9 @@
 
 Document: IMPLEMENTATION_BATCH_PLAN.md
 Project: DROPi Tycoon
-Version: 1.1.0
+Version: 1.2.0
 Status: Implementation Preparation — Non-Authoritative
-Author: AI Agent (PR #56 correction from Report 057)
+Author: AI Agent (PR #56 correction from Report 057; corrected per Report 065/066)
 Language: English
 Last Updated: 2026-07-14
 
@@ -84,12 +84,12 @@ Define a dependency-ordered, scope-safe implementation plan for Prototype v0.1.
 
 ### BATCH-004
 - Objective: Implement map, player placement, and interaction-ready world entities.
-- Requirements: REQ-001..REQ-004, REQ-040..REQ-087, REQ-152..REQ-153.
-- Artifacts: GameWorld map, player object variables, interaction points.
+- Requirements: REQ-076, REQ-077, REQ-078, REQ-079, REQ-080, REQ-081, REQ-083, REQ-084, REQ-085, REQ-086, REQ-168, REQ-172.
+- Artifacts: GameWorld map composition, player start placement, building/interaction-point entities.
 - Dependencies: BATCH-002, BATCH-003.
 - Owner-decision gate: none.
-- Non-goals: no completed order lifecycle.
-- Validation: player can navigate world context with required locations.
+- Non-goals: no completed order lifecycle, no gameplay event logic, no save/load behavior.
+- Validation: world entities placed; player can navigate world context with required locations.
 - Acceptance criteria: world supports upcoming order flow batches.
 
 ### BATCH-005
