@@ -6,7 +6,7 @@ Version: 1.0.0
 Status: Active Development
 Author: Marian Caliof & OpenAI
 Language: English
-Last Updated: 2026-07-14 (BATCH-004)
+Last Updated: 2026-07-15 (BATCH-005)
 
 ---
 
@@ -16,7 +16,7 @@ Last Updated: 2026-07-14 (BATCH-004)
 
 Phase:
 
-Prototype v0.1 Implementation — BATCH-004 Map/Player/Building World Setup Complete
+Prototype v0.1 Implementation — BATCH-005 Order Generation + Lifecycle Core Complete
 
 ---
 
@@ -160,7 +160,7 @@ The prototype must prove the core idea before expansion.
 
 # Next Steps
 
-1. Continue iterative development — start BATCH-005 (order generation + lifecycle core) after BATCH-004 merges.
+1. Continue iterative development — start BATCH-006 (Tap-to-Move + camera behavior) after BATCH-005 merges.
 
 ---
 
@@ -180,7 +180,7 @@ READY
 
 Implementation:
 
-STARTED — BATCH-001 FOUNDATION COMPLETE; BATCH-002 SCAFFOLD COMPLETE; BATCH-003 PLACEHOLDER ASSETS COMPLETE; BATCH-004 WORLD SETUP COMPLETE; NO GAMEPLAY IMPLEMENTED; NO PLAYABLE PROTOTYPE EXISTS
+STARTED — BATCH-001 FOUNDATION COMPLETE; BATCH-002 SCAFFOLD COMPLETE; BATCH-003 PLACEHOLDER ASSETS COMPLETE; BATCH-004 WORLD SETUP COMPLETE; BATCH-005 ORDER LIFECYCLE CORE COMPLETE; NO PLAYABLE PROTOTYPE EXISTS
 
 Implementation Preparation Status:
 
@@ -204,7 +204,8 @@ Implementation Preparation Status:
 - BATCH-002 is complete
 - BATCH-003 is complete — placeholder asset library created
 - BATCH-004 is complete — visual world setup created; Player and static world entities placed; no movement or gameplay logic implemented; no playable prototype exists
-- BATCH-005 not started
+- BATCH-005 is complete — order lifecycle state machine implemented; Created→Available→Accepted event logic added; no pickup/delivery/economy/HUD logic implemented; no playable prototype exists
+- BATCH-006 not started
 - Active owner decisions: ODR-001 (player position persistence), ODR-003 (GameSettings persistence scope), ODR-004 (failure trigger definition)
 - ODR-002 reclassified (not an owner decision)
 - No owner decision blocks BATCH-003 or BATCH-004
