@@ -6,7 +6,7 @@ Version: 1.0.0
 Status: Active Development
 Author: Marian Caliof & OpenAI
 Language: English
-Last Updated: 2026-07-15 (BATCH-006)
+Last Updated: 2026-07-15 (BATCH-007)
 
 ---
 
@@ -16,7 +16,7 @@ Last Updated: 2026-07-15 (BATCH-006)
 
 Phase:
 
-Prototype v0.1 Implementation — BATCH-006 Tap-to-Move + Camera Behavior Complete
+Prototype v0.1 Implementation — BATCH-007 Pickup Proximity + Accepted→PickedUp Core Implemented
 
 ---
 
@@ -160,7 +160,8 @@ The prototype must prove the core idea before expansion.
 
 # Next Steps
 
-1. Continue iterative development — start BATCH-007 (Pickup Interaction) after BATCH-006 merges.
+1. Run Android/HTML5 runtime preview for the combined BATCH-006/BATCH-007 accept, movement, camera, and pickup flow.
+2. Keep BATCH-008 blocked until BATCH-007 runtime preview is reviewed.
 
 ---
 
@@ -180,7 +181,7 @@ READY
 
 Implementation:
 
-STARTED — BATCH-001 FOUNDATION COMPLETE; BATCH-002 SCAFFOLD COMPLETE; BATCH-003 PLACEHOLDER ASSETS COMPLETE; BATCH-004 WORLD SETUP COMPLETE; BATCH-005 ORDER LIFECYCLE CORE COMPLETE; BATCH-006 TAP-TO-MOVE + CAMERA COMPLETE; NO PLAYABLE PROTOTYPE EXISTS
+STARTED — BATCH-001 FOUNDATION COMPLETE; BATCH-002 SCAFFOLD COMPLETE; BATCH-003 PLACEHOLDER ASSETS COMPLETE; BATCH-004 WORLD SETUP COMPLETE; BATCH-005 ORDER LIFECYCLE CORE COMPLETE; BATCH-006 TAP-TO-MOVE + CAMERA COMPLETE; BATCH-007 PICKUP PROXIMITY + ACCEPTED→PICKEDUP CORE IMPLEMENTED; NO PLAYABLE PROTOTYPE EXISTS
 
 Implementation Preparation Status:
 
@@ -191,14 +192,14 @@ Implementation Preparation Status:
 - No playable build exists
 - GDevelop project file exists: `Game/DROPi_Tycoon.json`
 - Required asset directories exist: `Game/Assets/Sprites`, `Game/Assets/Audio`, `Game/Assets/UI`
-- Exactly three empty scaffold scenes exist: `MainMenu`, `GameWorld`, `CompanyManagement`
+- Exactly three implementation scenes exist: `MainMenu`, `GameWorld`, `CompanyManagement`
 - Global roots created: `CompanyData`, `GameSettings`, `SaveFormatVersion`
 - GameWorld scene/event scaffold wiring created: 3 external event sheets, 7 GameWorld event groups, SceneFlow groups in MainMenu and CompanyManagement, 3 GameWorld scene-variable roots with canonical sub-structures, and 4 GameWorld layers
 - Placeholder asset library created: 7 sprite PNG placeholders and 1 UI icon PNG placeholder in canonical asset directories; 2 additional BATCH-004 placeholder sprites added
 - Visual world setup created: Player and static world entities placed in GameWorld on Base layer
-- No gameplay objects, gameplay events, or gameplay logic have been implemented
+- Core gameplay logic is now present for order creation/acceptance, tap-to-move, camera follow, and pickup proximity
 - No JavaScript has been introduced
-- External event sheets exist as empty scaffolds only
+- `OrderSystem` external events contain the BATCH-005 order lifecycle core; `EconomySystem` and `ProgressionSystem` remain empty scaffolds
 - No playable build exists
 - BATCH-001 is complete
 - BATCH-002 is complete
@@ -206,9 +207,10 @@ Implementation Preparation Status:
 - BATCH-004 is complete — visual world setup created; Player and static world entities placed; no movement or gameplay logic implemented; no playable prototype exists
 - BATCH-005 is complete — order lifecycle state machine implemented; Created→Available→Accepted event logic added; no pickup/delivery/economy/HUD logic implemented; no playable prototype exists
 - BATCH-006 is complete — Tap-to-Move implemented; touch input (primary/Android-first) and mouse fallback (desktop); Player movement toward tapped target; camera follows Player; arrival stops movement; Idle/Move animation switching; movement speed and arrival threshold are configurable scene variables; no pickup/delivery/economy/HUD/AI/save-load logic implemented; no playable prototype exists
+- BATCH-007 is implemented — minimal Android-first order acceptance trigger exists on Package touch while order status is Available; automatic pickup proximity exists with configurable `PickupRadius` = 32; Accepted→PickedUp transition sets `PlayerData.CarryingPackage` and `Player.CarryingPackage` true; no delivery completion, failure, reward, economy, HUD, notification, AI, or save/load logic implemented; Android/HTML5 runtime preview still required
 - Active owner decisions: ODR-001 (player position persistence), ODR-003 (GameSettings persistence scope), ODR-004 (failure trigger definition)
 - ODR-002 reclassified (not an owner decision)
-- No owner decision blocks BATCH-003 or BATCH-004
+- No owner decision blocks BATCH-007
 
 ---
 
