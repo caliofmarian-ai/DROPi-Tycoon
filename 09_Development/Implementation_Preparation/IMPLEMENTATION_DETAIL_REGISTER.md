@@ -2,9 +2,9 @@
 
 Document: IMPLEMENTATION_DETAIL_REGISTER.md
 Project: DROPi Tycoon
-Version: 1.1.1
+Version: 1.2.0
 Status: Implementation Preparation — Non-Authoritative
-Author: AI Agent (PR #56 correction from Report 057; corrected per Report 073)
+Author: AI Agent (PR #56 correction from Report 057; corrected per Report 073; corrected per Report 078)
 Language: English
 Last Updated: 2026-07-15
 
@@ -113,6 +113,18 @@ Only implementation-owned choices that do not redefine canonical gameplay/econom
 - **Canonical constraints:** Prototype starts on foot and Bicycle increases movement speed after purchase (`PROTOTYPE_V0.1.md` Transportation System).
 - **Allowed freedom:** Exact baseline walking speed value before Bicycle ownership.
 - **Validation:** Baseline speed supports early deliveries while preserving a clear speed increase when Bicycle logic is implemented in later batches.
+
+## IDR-017 — Pickup Proximity Radius
+
+- **Canonical constraints:** Player must reach pickup location before pickup is allowed (`GAMEPLAY_EVENTS_FLOW.md` Pickup Process; `ORDERS.md` Accepted→PickedUp). Canonical documents require "Player reaches pickup location" and "verify correct location" but do not fix a numeric radius.
+- **Allowed freedom:** Exact numeric distance threshold in pixels for the "Player is close enough to Package to trigger pickup" condition. Recommended range: consistent with `ArrivalThreshold` sizing (IDR-013) and REQ-024 touch-target comfort (e.g., 32–48 px).
+- **Validation:** Threshold must be large enough for reliable Android-first touch-driven arrival without requiring pixel-perfect stop; must not allow spurious pickup from across the map; must survive minor BATCH-006 stop-snap overshoot.
+
+## IDR-018 — Accept Trigger Method (Minimal, BATCH-007)
+
+- **Canonical constraints:** Player must accept order through explicit action (`MOBILE_UI_CONTROLS.md` Accept Order; `ORDERS.md` Available→Accepted; REQ-036). Full HUD Accept-Order button styling and placement (REQ-036, REQ-102) are BATCH-010. BATCH-007 must supply only the minimal trigger that sets `ActiveOrder.AcceptRequested=1` to unblock the existing BATCH-005 `Available→Accepted` lifecycle event.
+- **Allowed freedom:** Exact touch gesture used for the BATCH-007 minimal accept trigger (e.g., touch on `Package` object while `Status="Available"`, or a touch-anywhere condition guarded by `Status="Available"`). The trigger must not introduce a button object or HUD text in BATCH-007.
+- **Validation:** Trigger must be touch-first (Android-first, no keyboard path); must reliably set `ActiveOrder.AcceptRequested=1`; must not create Accept-Order button object, HUD text, or any BATCH-010 artifact; must leave the full HUD Accept-Order button to BATCH-010.
 
 ---
 

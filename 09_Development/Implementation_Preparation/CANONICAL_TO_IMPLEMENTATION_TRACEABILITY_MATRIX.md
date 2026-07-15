@@ -2,9 +2,9 @@
 
 Document: CANONICAL_TO_IMPLEMENTATION_TRACEABILITY_MATRIX.md
 Project: DROPi Tycoon
-Version: 1.1.1
+Version: 1.2.0
 Status: Implementation Preparation — Non-Authoritative
-Author: AI Agent (PR #56 correction from Report 057; corrected per Report 073)
+Author: AI Agent (PR #56 correction from Report 057; corrected per Report 073; corrected per Report 078)
 Language: English
 Last Updated: 2026-07-15
 
@@ -69,10 +69,10 @@ Map every final valid requirement to at least one planned implementation evidenc
 | REQ-038 | On acceptance: order status changes, package assigned, player objective updated | CANONICAL REQUIREMENT | Order/event lifecycle implementation evidence | BATCH-005/BATCH-009 |
 | REQ-039 | Active order displayed in HUD/UI after acceptance | CANONICAL REQUIREMENT | HUD/input/notification implementation evidence | BATCH-010 |
 | REQ-040 | Player navigates to pickup location after order acceptance | CANONICAL REQUIREMENT | Batch-plan acceptance evidence | BATCH-015 |
-| REQ-041 | PackagePickedUp event fires when player reaches correct pickup location | CANONICAL REQUIREMENT | Order/event lifecycle implementation evidence | BATCH-005/BATCH-009 |
-| REQ-042 | Accepted → PickedUp state transition on pickup | CANONICAL REQUIREMENT | Order/event lifecycle implementation evidence | BATCH-005/BATCH-009 |
-| REQ-043 | Game verifies correct location before allowing pickup | CANONICAL REQUIREMENT | Order/event lifecycle implementation evidence | BATCH-005/BATCH-009 |
-| REQ-044 | Player carries package after pickup (CarryingPackage = true) | CANONICAL REQUIREMENT | Project scaffold/architecture/schema implementation evidence | BATCH-001/BATCH-002 |
+| REQ-041 | PackagePickedUp event fires when player reaches correct pickup location | CANONICAL REQUIREMENT | Pickup proximity + lifecycle transition implementation evidence | BATCH-007 |
+| REQ-042 | Accepted → PickedUp state transition on pickup | CANONICAL REQUIREMENT | Pickup proximity + lifecycle transition implementation evidence | BATCH-007 |
+| REQ-043 | Game verifies correct location before allowing pickup | CANONICAL REQUIREMENT | Pickup proximity + lifecycle transition implementation evidence | BATCH-007 |
+| REQ-044 | Player carries package after pickup (CarryingPackage = true) | CANONICAL REQUIREMENT | Pickup proximity + lifecycle transition implementation evidence (schema: BATCH-001/BATCH-002; runtime set: BATCH-007) | BATCH-007 |
 | REQ-045 | Player navigates to delivery destination after pickup | CANONICAL REQUIREMENT | Batch-plan acceptance evidence | BATCH-015 |
 | REQ-046 | DeliveryCompleted event fires when player reaches correct destination with package | CANONICAL REQUIREMENT | Order/event lifecycle implementation evidence | BATCH-005/BATCH-009 |
 | REQ-047 | PickedUp → Completed state transition on delivery | CANONICAL REQUIREMENT | Order/event lifecycle implementation evidence | BATCH-005/BATCH-009 |
