@@ -6,7 +6,7 @@ Version: 1.0.0
 Status: Development Log
 Author: Marian Caliof & OpenAI
 Language: English
-Last Updated: 2026-07-15 (BATCH-007)
+Last Updated: 2026-07-15 (WEB RUNTIME MIGRATION MILESTONE 001)
 
 ---
 
@@ -31,6 +31,60 @@ Date
 Category
 
 Description
+
+---
+
+# [2026-07-15] - WEB RUNTIME MIGRATION MILESTONE 001
+
+## Added
+
+- Created the first deployable browser runtime under `game-web/` using:
+  - `phaser` `3.90.0`
+  - `vite` `8.1.1`
+  - `typescript` `6.0.2`
+  - `vitest` `4.1.10`
+- Added a Railway-startable production server at `game-web/server/server.mjs` that:
+  - serves `dist/`;
+  - binds to `0.0.0.0`;
+  - listens on `process.env.PORT` with local fallback `3000`;
+  - returns `index.html` for browser navigation where appropriate.
+- Added automated order-logic tests in `game-web/tests/orderSystem.test.ts`.
+- Added environment-variable examples:
+  - `game-web/.env.example`
+  - `game-web/.env.railway.example`
+- Added migration/deployment documentation:
+  - `09_Development/Engine_Migration/ENVIRONMENT_VARIABLES.md`
+  - `09_Development/Engine_Migration/WEB_RUNTIME_MIGRATION_MILESTONE_001.md`
+  - `09_Development/Engine_Migration/FUTURE_SERVER_AUTHORITATIVE_ARCHITECTURE_PREPARATION.md`
+- Added Railway configuration file:
+  - `game-web/railway.json`
+- Added persistent implementation report:
+  - `09_Development/AI_Reports/2026-07-15_082_WEB_RUNTIME_MIGRATION_MILESTONE_001_RAILWAY_DEPLOYABLE_APPLICATION.md`
+
+## Ported Behavior
+
+- Ported only merged BATCH-001 through BATCH-007 behavior into the new web runtime:
+  - main menu;
+  - game world;
+  - company-management placeholder navigation;
+  - placeholder world composition;
+  - player movement;
+  - camera follow;
+  - package acceptance trigger;
+  - automatic pickup proximity;
+  - temporary debug/status display.
+
+## Preserved
+
+- `Game/DROPi_Tycoon.json` remains unchanged as archived/reference implementation source.
+- `Game/Assets/` remains unchanged as historical/reference asset source.
+- Canonical gameplay documentation and historical reports remain preserved.
+
+## Not Changed
+
+- No BATCH-008+ gameplay added.
+- No delivery completion, failure, rewards, Money changes, DROPiCoins logic, marketplace, payments, database, or save/load logic added.
+- No public Railway URL was verified during this repository task.
 
 ---
 
