@@ -2,11 +2,11 @@
 
 Document: IMPLEMENTATION_BATCH_PLAN.md
 Project: DROPi Tycoon
-Version: 1.2.0
+Version: 1.3.0
 Status: Implementation Preparation — Non-Authoritative
-Author: AI Agent (PR #56 correction from Report 057; corrected per Report 065/066)
+Author: AI Agent (PR #56 correction from Report 057; corrected per Report 065/066; corrected per Report 070)
 Language: English
-Last Updated: 2026-07-14
+Last Updated: 2026-07-15
 
 ---
 
@@ -93,14 +93,14 @@ Define a dependency-ordered, scope-safe implementation plan for Prototype v0.1.
 - Acceptance criteria: world supports upcoming order flow batches.
 
 ### BATCH-005
-- Objective: Implement order creation and canonical order-state progression core.
-- Requirements: REQ-030..REQ-039, REQ-050..REQ-059.
-- Artifacts: order generation and state-transition logic.
+- Objective: Implement order creation and canonical order-state progression core (Created → Available → Accepted only).
+- Requirements: REQ-035, REQ-037, REQ-038, REQ-050, REQ-051, REQ-052, REQ-054.
+- Artifacts: order state-machine definition and Created→Available→Accepted lifecycle logic in `OrderSystem` event sheet / `OrderEvents` group.
 - Dependencies: BATCH-004.
 - Owner-decision gate: none.
-- Non-goals: no delivery completion outcomes yet.
-- Validation: Created→Available→Accepted flow works deterministically.
-- Acceptance criteria: one active order model functions correctly.
+- Non-goals: no pickup interaction (Accepted→PickedUp); no delivery completion (PickedUp→Completed); no failure path (PickedUp→Failed); no economy or reputation logic; no HUD/button display; no save/load behavior; no BATCH-006+ features.
+- Validation: Created→Available→Accepted flow executes deterministically; no economy, HUD, or later-lifecycle logic is introduced.
+- Acceptance criteria: one active order model initialises with canonical state machine and advances through Created→Available→Accepted correctly.
 
 ### BATCH-006
 - Objective: Implement Tap-to-Move and camera tracking behavior.
