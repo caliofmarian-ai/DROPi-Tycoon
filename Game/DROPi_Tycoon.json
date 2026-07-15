@@ -686,6 +686,11 @@
           "name": "ArrivalThreshold",
           "type": "number",
           "value": 5
+        },
+        {
+          "name": "PickupRadius",
+          "type": "number",
+          "value": 32
         }
       ],
       "instances": [
@@ -1439,7 +1444,65 @@
           "name": "OrderEvents",
           "source": "",
           "type": "BuiltinCommonInstructions::Group",
-          "events": [],
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "disabled": false,
+              "folded": false,
+              "conditions": [
+                {
+                  "type": {
+                    "inverted": false,
+                    "value": "TouchHasStarted"
+                  },
+                  "parameters": [
+                    "0"
+                  ],
+                  "subInstructions": []
+                },
+                {
+                  "type": {
+                    "inverted": false,
+                    "value": "VarSceneTxt"
+                  },
+                  "parameters": [
+                    "ActiveOrder.Status",
+                    "=",
+                    "\"Available\""
+                  ],
+                  "subInstructions": []
+                },
+                {
+                  "type": {
+                    "inverted": false,
+                    "value": "IsCursorOnObject"
+                  },
+                  "parameters": [
+                    "Package",
+                    "",
+                    "",
+                    ""
+                  ],
+                  "subInstructions": []
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "inverted": false,
+                    "value": "ModVarScene"
+                  },
+                  "parameters": [
+                    "ActiveOrder.AcceptRequested",
+                    "=",
+                    "1"
+                  ],
+                  "subInstructions": []
+                }
+              ],
+              "events": []
+            }
+          ],
           "parameters": []
         },
         {
@@ -1452,7 +1515,103 @@
           "name": "DeliveryEvents",
           "source": "",
           "type": "BuiltinCommonInstructions::Group",
-          "events": [],
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "disabled": false,
+              "folded": false,
+              "conditions": [
+                {
+                  "type": {
+                    "inverted": false,
+                    "value": "VarSceneTxt"
+                  },
+                  "parameters": [
+                    "ActiveOrder.Status",
+                    "=",
+                    "\"Accepted\""
+                  ],
+                  "subInstructions": []
+                },
+                {
+                  "type": {
+                    "inverted": false,
+                    "value": "VarSceneTxt"
+                  },
+                  "parameters": [
+                    "ActiveOrder.PickupLocation",
+                    "=",
+                    "\"PickupZone\""
+                  ],
+                  "subInstructions": []
+                },
+                {
+                  "type": {
+                    "inverted": false,
+                    "value": "BooleanVariable"
+                  },
+                  "parameters": [
+                    "PlayerData.CarryingPackage",
+                    "False",
+                    ""
+                  ],
+                  "subInstructions": []
+                },
+                {
+                  "type": {
+                    "inverted": false,
+                    "value": "Distance"
+                  },
+                  "parameters": [
+                    "Player",
+                    "Package",
+                    "Variable(PickupRadius)"
+                  ],
+                  "subInstructions": []
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "inverted": false,
+                    "value": "ModVarSceneTxt"
+                  },
+                  "parameters": [
+                    "ActiveOrder.Status",
+                    "=",
+                    "\"PickedUp\""
+                  ],
+                  "subInstructions": []
+                },
+                {
+                  "type": {
+                    "inverted": false,
+                    "value": "SetBooleanVariable"
+                  },
+                  "parameters": [
+                    "PlayerData.CarryingPackage",
+                    "True",
+                    ""
+                  ],
+                  "subInstructions": []
+                },
+                {
+                  "type": {
+                    "inverted": false,
+                    "value": "SetBooleanObjectVariable"
+                  },
+                  "parameters": [
+                    "Player",
+                    "CarryingPackage",
+                    "True",
+                    ""
+                  ],
+                  "subInstructions": []
+                }
+              ],
+              "events": []
+            }
+          ],
           "parameters": []
         },
         {
