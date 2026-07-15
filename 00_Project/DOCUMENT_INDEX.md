@@ -2,11 +2,11 @@
 
 Document: DOCUMENT_INDEX.md
 Project: DROPi Tycoon
-Version: 1.0.0
+Version: 1.1.0
 Status: Documentation Control
 Author: Marian Caliof & OpenAI
 Language: English
-Last Updated: 2026-07-14
+Last Updated: 2026-07-15
 
 ---
 
@@ -52,6 +52,7 @@ README.md
 09_Development/
 Game/
 Builds/
+game-web/
 ```
 
 ---
@@ -263,6 +264,24 @@ Stable top-level documents:
 
 ---
 
+### Managed engine-migration documentation directory
+
+- `09_Development/Engine_Migration/` — migration and deployment documentation for the code-based web runtime.
+
+Stable documents:
+
+- `09_Development/Engine_Migration/ENVIRONMENT_VARIABLES.md`
+- `09_Development/Engine_Migration/FUTURE_SERVER_AUTHORITATIVE_ARCHITECTURE_PREPARATION.md`
+- `09_Development/Engine_Migration/WEB_RUNTIME_MIGRATION_MILESTONE_001.md`
+
+Authority note:
+
+- `WEB_RUNTIME_MIGRATION_MILESTONE_001.md` documents deployable runtime migration status.
+- `ENVIRONMENT_VARIABLES.md` documents the active web-runtime configuration contract.
+- `FUTURE_SERVER_AUTHORITATIVE_ARCHITECTURE_PREPARATION.md` is explicitly non-canonical preparation content and does not activate backend scope.
+
+---
+
 # Game/
 
 ## Purpose
@@ -286,6 +305,20 @@ Current state:
 
 - Placeholder-only (`Builds/.gitkeep`).
 - Generated build artifacts are not individually indexed here.
+
+---
+
+# game-web/
+
+## Purpose
+
+Managed root directory for the deployable browser runtime candidate used for Railway deployment.
+
+Current state:
+
+- Active Vite + TypeScript + Phaser web runtime
+- Contains the production server, frontend source, test files, and copied runtime assets required for deployment
+- Historical GDevelop source remains separately preserved in `Game/`
 
 ---
 
