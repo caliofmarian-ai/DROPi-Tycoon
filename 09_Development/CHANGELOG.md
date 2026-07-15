@@ -6,7 +6,7 @@ Version: 1.0.0
 Status: Development Log
 Author: Marian Caliof & OpenAI
 Language: English
-Last Updated: 2026-07-15 (BATCH-006)
+Last Updated: 2026-07-15 (BATCH-007)
 
 ---
 
@@ -31,6 +31,39 @@ Date
 Category
 
 Description
+
+---
+
+# [2026-07-15] - BATCH-007 Pickup Proximity + Accepted→PickedUp Core
+
+## Added
+
+- Added 1 new scene variable to `GameWorld` in `Game/DROPi_Tycoon.json`:
+  - `PickupRadius` (number, default 32) — configurable pickup proximity threshold for the BATCH-007 pickup check (IDR-017).
+- Implemented 1 standard event in the `OrderEvents` group of `GameWorld` in `Game/DROPi_Tycoon.json`:
+  - Conditions: `TouchHasStarted(0)`, `ActiveOrder.Status == "Available"`, and `IsCursorOnObject(Package)`.
+  - Action: Set `ActiveOrder.AcceptRequested = 1`.
+  - Result: the existing BATCH-005 `OrderSystem` event remains the only `Available → Accepted` transition and is now reachable on Android touch.
+- Implemented 1 standard event in the `DeliveryEvents` group of `GameWorld` in `Game/DROPi_Tycoon.json`:
+  - Conditions: `ActiveOrder.Status == "Accepted"`, `ActiveOrder.PickupLocation == "PickupZone"`, `PlayerData.CarryingPackage == False`, and `Distance(Player, Package) < Variable(PickupRadius)`.
+  - Actions: Set `ActiveOrder.Status = "PickedUp"`, set `PlayerData.CarryingPackage = True`, and set `Player.CarryingPackage = True`.
+  - Result: automatic pickup now happens only at the correct pickup location and only once per order lifecycle.
+
+## Requirements Implemented
+
+- REQ-041: `PackagePickedUp` event path implemented through pickup proximity at the correct pickup location.
+- REQ-042: `Accepted → PickedUp` order-state transition implemented.
+- REQ-043: pickup now validates the correct pickup location before firing.
+- REQ-044: carrying state now updates to true after pickup.
+
+## Not Changed
+
+- No delivery completion or failure logic added.
+- No reward, money, economy, progression, or save/load logic added.
+- No HUD button objects, notifications, or advanced UI added.
+- No Bicycle behavior, AI, missions, DronePorts, drones, vans, or other BATCH-008+ features added.
+- `OrderSystem` remains the sole owner of the `Available → Accepted` lifecycle transition.
+- `Package` visibility and placement remain unchanged.
 
 ---
 
