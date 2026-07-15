@@ -6,7 +6,7 @@ Version: 1.0.0
 Status: Development Log
 Author: Marian Caliof & OpenAI
 Language: English
-Last Updated: 2026-07-15 (WEB RUNTIME MIGRATION MILESTONE 001)
+Last Updated: 2026-07-15 (RAILWAY NODE/ROLLDOWN NATIVE BINDING DEPLOYMENT REPAIR)
 
 ---
 
@@ -31,6 +31,28 @@ Date
 Category
 
 Description
+
+---
+
+# [2026-07-15] - RAILWAY NODE/ROLLDOWN NATIVE BINDING DEPLOYMENT REPAIR
+
+## Fixed
+
+- Replaced NIXPACKS builder with Docker in `game-web/railway.json` to eliminate Railway resolving generic "Node 22" to 22.11.0.
+- Added `game-web/Dockerfile` using `node:22.12.0-alpine3.21` (multi-stage build + minimal production image) so the `@rolldown/binding-linux-x64-gnu` native binding installs correctly via `npm ci`.
+- Added `game-web/.dockerignore` to exclude `node_modules`, `dist`, and secrets from the Docker build context.
+- Added `"engines": { "node": ">=22.12.0 <23" }` to `game-web/package.json` to document the minimum Node requirement.
+
+## Root Cause
+
+Railway's Nixpacks builder resolved `NIXPACKS_NODE_VERSION=22` to `22.11.0`, which does not satisfy the `@rolldown/binding-linux-x64-gnu` engine requirement `^20.19.0 || >=22.12.0`. The npm optional-dependency bug (npm/cli#4828) caused the binding to be silently skipped, then Vite/Rolldown failed at build time with "Cannot find native binding".
+
+## Not Changed
+
+- No gameplay source files modified.
+- No BATCH-008 work introduced.
+- `game-web/package-lock.json` unchanged (lockfile was already correct; the binding entry was present).
+- `NIXPACKS_NODE_VERSION` Railway variable should be removed; it is superseded by the Dockerfile.
 
 ---
 
