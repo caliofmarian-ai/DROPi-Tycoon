@@ -2,9 +2,9 @@
 
 Document: IMPLEMENTATION_BATCH_PLAN.md
 Project: DROPi Tycoon
-Version: 1.3.0
+Version: 1.3.1
 Status: Implementation Preparation — Non-Authoritative
-Author: AI Agent (PR #56 correction from Report 057; corrected per Report 065/066; corrected per Report 070)
+Author: AI Agent (PR #56 correction from Report 057; corrected per Report 065/066; corrected per Report 070; corrected per Report 073)
 Language: English
 Last Updated: 2026-07-15
 
@@ -104,13 +104,15 @@ Define a dependency-ordered, scope-safe implementation plan for Prototype v0.1.
 
 ### BATCH-006
 - Objective: Implement Tap-to-Move and camera tracking behavior.
-- Requirements: REQ-016..REQ-024.
-- Artifacts: touch movement controls and camera follow behavior.
+- Requirements (core): REQ-016, REQ-020, REQ-021, REQ-023.
+- Constraints (applicable): REQ-024 (touch target sizing for mobile interaction).
+- Removed from BATCH-006 membership: REQ-017, REQ-018, REQ-019, REQ-022.
+- Artifacts: Android-first tap-to-move input handling, movement target scaffolding, player movement toward tapped world targets, and camera follow behavior.
 - Dependencies: BATCH-004.
 - Owner-decision gate: none.
-- Non-goals: no pickup/delivery resolution logic.
-- Validation: movement and camera behaviors pass mobile interaction checks.
-- Acceptance criteria: movement supports delivery route traversal.
+- Non-goals: no Accept Order button, no HUD order acceptance, no UI-driven `AcceptRequested`, no rewards/economy/progression, no pickup/delivery/failure handling, no save/load, no bicycle behavior, no AI/notifications/missions, no BATCH-007+ scope.
+- Validation: movement and camera behaviors pass Android-first interaction checks without keyboard or mouse-only dependency.
+- Acceptance criteria: tap-to-move and camera follow are implemented with only the allowed BATCH-006 core requirements plus REQ-024 constraint compliance.
 
 ### BATCH-007
 - Objective: Implement order acceptance UI flow and pickup transition.
