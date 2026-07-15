@@ -164,6 +164,35 @@
               ]
             }
           ]
+        },
+        {
+          "name": "Move",
+          "useMultipleDirections": false,
+          "directions": [
+            {
+              "looping": true,
+              "timeBetweenFrames": 0.08,
+              "sprites": [
+                {
+                  "image": "player_character_idle",
+                  "points": [],
+                  "originPoint": {
+                    "name": "origine",
+                    "x": 0,
+                    "y": 0
+                  },
+                  "centerPoint": {
+                    "name": "centre",
+                    "x": 0,
+                    "y": 0,
+                    "automatic": true
+                  },
+                  "hasCustomCollisionMask": false,
+                  "customCollisionMask": []
+                }
+              ]
+            }
+          ]
         }
       ]
     },
@@ -619,6 +648,44 @@
               "children": []
             }
           ]
+        },
+        {
+          "folded": false,
+          "name": "TapTarget",
+          "type": "structure",
+          "value": "",
+          "children": [
+            {
+              "folded": false,
+              "name": "X",
+              "type": "number",
+              "value": 380
+            },
+            {
+              "folded": false,
+              "name": "Y",
+              "type": "number",
+              "value": 270
+            }
+          ]
+        },
+        {
+          "folded": false,
+          "name": "IsMoving",
+          "type": "number",
+          "value": 0
+        },
+        {
+          "folded": false,
+          "name": "DistanceToTarget",
+          "type": "number",
+          "value": 0
+        },
+        {
+          "folded": false,
+          "name": "ArrivalThreshold",
+          "type": "number",
+          "value": 5
         }
       ],
       "instances": [
@@ -971,7 +1038,395 @@
           "name": "PlayerEvents",
           "source": "",
           "type": "BuiltinCommonInstructions::Group",
-          "events": [],
+          "events": [
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "disabled": false,
+              "folded": false,
+              "conditions": [
+                {
+                  "type": {
+                    "inverted": false,
+                    "value": "DepartScene"
+                  },
+                  "parameters": [
+                    ""
+                  ],
+                  "subInstructions": []
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "inverted": false,
+                    "value": "ModVarScene"
+                  },
+                  "parameters": [
+                    "PlayerData.MovementSpeed",
+                    "=",
+                    "150"
+                  ],
+                  "subInstructions": []
+                },
+                {
+                  "type": {
+                    "inverted": false,
+                    "value": "ModVarObjet"
+                  },
+                  "parameters": [
+                    "Player",
+                    "MovementSpeed",
+                    "=",
+                    "150"
+                  ],
+                  "subInstructions": []
+                },
+                {
+                  "type": {
+                    "inverted": false,
+                    "value": "ModVarScene"
+                  },
+                  "parameters": [
+                    "TapTarget.X",
+                    "=",
+                    "380"
+                  ],
+                  "subInstructions": []
+                },
+                {
+                  "type": {
+                    "inverted": false,
+                    "value": "ModVarScene"
+                  },
+                  "parameters": [
+                    "TapTarget.Y",
+                    "=",
+                    "270"
+                  ],
+                  "subInstructions": []
+                },
+                {
+                  "type": {
+                    "inverted": false,
+                    "value": "ModVarScene"
+                  },
+                  "parameters": [
+                    "ArrivalThreshold",
+                    "=",
+                    "5"
+                  ],
+                  "subInstructions": []
+                },
+                {
+                  "type": {
+                    "inverted": false,
+                    "value": "ModVarScene"
+                  },
+                  "parameters": [
+                    "IsMoving",
+                    "=",
+                    "0"
+                  ],
+                  "subInstructions": []
+                }
+              ],
+              "events": []
+            },
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "disabled": false,
+              "folded": false,
+              "conditions": [
+                {
+                  "type": {
+                    "inverted": false,
+                    "value": "TouchHasStarted"
+                  },
+                  "parameters": [
+                    "0"
+                  ],
+                  "subInstructions": []
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "inverted": false,
+                    "value": "ModVarScene"
+                  },
+                  "parameters": [
+                    "TapTarget.X",
+                    "=",
+                    "TouchX(\"Base\", 0)"
+                  ],
+                  "subInstructions": []
+                },
+                {
+                  "type": {
+                    "inverted": false,
+                    "value": "ModVarScene"
+                  },
+                  "parameters": [
+                    "TapTarget.Y",
+                    "=",
+                    "TouchY(\"Base\", 0)"
+                  ],
+                  "subInstructions": []
+                },
+                {
+                  "type": {
+                    "inverted": false,
+                    "value": "ModVarScene"
+                  },
+                  "parameters": [
+                    "IsMoving",
+                    "=",
+                    "1"
+                  ],
+                  "subInstructions": []
+                }
+              ],
+              "events": []
+            },
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "disabled": false,
+              "folded": false,
+              "conditions": [
+                {
+                  "type": {
+                    "inverted": false,
+                    "value": "MouseButtonReleased"
+                  },
+                  "parameters": [
+                    "Left"
+                  ],
+                  "subInstructions": []
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "inverted": false,
+                    "value": "ModVarScene"
+                  },
+                  "parameters": [
+                    "TapTarget.X",
+                    "=",
+                    "MouseX(\"Base\", 0)"
+                  ],
+                  "subInstructions": []
+                },
+                {
+                  "type": {
+                    "inverted": false,
+                    "value": "ModVarScene"
+                  },
+                  "parameters": [
+                    "TapTarget.Y",
+                    "=",
+                    "MouseY(\"Base\", 0)"
+                  ],
+                  "subInstructions": []
+                },
+                {
+                  "type": {
+                    "inverted": false,
+                    "value": "ModVarScene"
+                  },
+                  "parameters": [
+                    "IsMoving",
+                    "=",
+                    "1"
+                  ],
+                  "subInstructions": []
+                }
+              ],
+              "events": []
+            },
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "disabled": false,
+              "folded": false,
+              "conditions": [
+                {
+                  "type": {
+                    "inverted": false,
+                    "value": "VarScene"
+                  },
+                  "parameters": [
+                    "IsMoving",
+                    "=",
+                    "1"
+                  ],
+                  "subInstructions": []
+                }
+              ],
+              "actions": [
+                {
+                  "type": {
+                    "inverted": false,
+                    "value": "ModVarScene"
+                  },
+                  "parameters": [
+                    "DistanceToTarget",
+                    "=",
+                    "sqrt((Player.X() - Variable(TapTarget.X)) * (Player.X() - Variable(TapTarget.X)) + (Player.Y() - Variable(TapTarget.Y)) * (Player.Y() - Variable(TapTarget.Y)))"
+                  ],
+                  "subInstructions": []
+                }
+              ],
+              "events": [
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "disabled": false,
+                  "folded": false,
+                  "conditions": [
+                    {
+                      "type": {
+                        "inverted": false,
+                        "value": "VarScene"
+                      },
+                      "parameters": [
+                        "DistanceToTarget",
+                        ">",
+                        "Variable(ArrivalThreshold)"
+                      ],
+                      "subInstructions": []
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "inverted": false,
+                        "value": "MettreX"
+                      },
+                      "parameters": [
+                        "Player",
+                        "=",
+                        "Player.X() + cos(angleToPosition(Player.X(), Player.Y(), Variable(TapTarget.X), Variable(TapTarget.Y)) * 3.14159265 / 180) * Variable(PlayerData.MovementSpeed) * TimeDelta()"
+                      ],
+                      "subInstructions": []
+                    },
+                    {
+                      "type": {
+                        "inverted": false,
+                        "value": "MettreY"
+                      },
+                      "parameters": [
+                        "Player",
+                        "=",
+                        "Player.Y() + sin(angleToPosition(Player.X(), Player.Y(), Variable(TapTarget.X), Variable(TapTarget.Y)) * 3.14159265 / 180) * Variable(PlayerData.MovementSpeed) * TimeDelta()"
+                      ],
+                      "subInstructions": []
+                    },
+                    {
+                      "type": {
+                        "inverted": false,
+                        "value": "SetAnimationName"
+                      },
+                      "parameters": [
+                        "Player",
+                        "\"Move\""
+                      ],
+                      "subInstructions": []
+                    }
+                  ],
+                  "events": []
+                },
+                {
+                  "type": "BuiltinCommonInstructions::Standard",
+                  "disabled": false,
+                  "folded": false,
+                  "conditions": [
+                    {
+                      "type": {
+                        "inverted": true,
+                        "value": "VarScene"
+                      },
+                      "parameters": [
+                        "DistanceToTarget",
+                        ">",
+                        "Variable(ArrivalThreshold)"
+                      ],
+                      "subInstructions": []
+                    }
+                  ],
+                  "actions": [
+                    {
+                      "type": {
+                        "inverted": false,
+                        "value": "MettreX"
+                      },
+                      "parameters": [
+                        "Player",
+                        "=",
+                        "Variable(TapTarget.X)"
+                      ],
+                      "subInstructions": []
+                    },
+                    {
+                      "type": {
+                        "inverted": false,
+                        "value": "MettreY"
+                      },
+                      "parameters": [
+                        "Player",
+                        "=",
+                        "Variable(TapTarget.Y)"
+                      ],
+                      "subInstructions": []
+                    },
+                    {
+                      "type": {
+                        "inverted": false,
+                        "value": "ModVarScene"
+                      },
+                      "parameters": [
+                        "IsMoving",
+                        "=",
+                        "0"
+                      ],
+                      "subInstructions": []
+                    },
+                    {
+                      "type": {
+                        "inverted": false,
+                        "value": "SetAnimationName"
+                      },
+                      "parameters": [
+                        "Player",
+                        "\"Idle\""
+                      ],
+                      "subInstructions": []
+                    }
+                  ],
+                  "events": []
+                }
+              ]
+            },
+            {
+              "type": "BuiltinCommonInstructions::Standard",
+              "disabled": false,
+              "folded": false,
+              "conditions": [],
+              "actions": [
+                {
+                  "type": {
+                    "inverted": false,
+                    "value": "CentreSurObjet"
+                  },
+                  "parameters": [
+                    "",
+                    "Player",
+                    "yes"
+                  ],
+                  "subInstructions": []
+                }
+              ],
+              "events": []
+            }
+          ],
           "parameters": []
         },
         {
