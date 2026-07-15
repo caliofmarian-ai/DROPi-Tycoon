@@ -6,7 +6,7 @@ Version: 1.0.0
 Status: Development Log
 Author: Marian Caliof & OpenAI
 Language: English
-Last Updated: 2026-07-15 (BATCH-005)
+Last Updated: 2026-07-15 (BATCH-006)
 
 ---
 
@@ -31,6 +31,62 @@ Date
 Category
 
 Description
+
+---
+
+# [2026-07-15] - BATCH-006 Tap-to-Move + Camera Behavior
+
+## Added
+
+- Added `Move` animation to global `Player` sprite object in `Game/DROPi_Tycoon.json`.
+  - Uses same placeholder image frame as `Idle` animation (looping, 0.08s frame time).
+  - Enables Idle/Move animation switching; placeholder is replaceable with real walk cycle.
+- Added 4 new scene variables to `GameWorld` scene in `Game/DROPi_Tycoon.json`:
+  - `TapTarget` (structure: `X` number=380, `Y` number=270) — stores the tapped world position.
+  - `IsMoving` (number, default 0) — movement state flag (0=idle, 1=moving).
+  - `DistanceToTarget` (number, default 0) — updated each frame while moving; used for arrival check.
+  - `ArrivalThreshold` (number, default 5) — configurable pixel radius for "destination reached" (IDR-013).
+- Implemented `PlayerEvents` event group in `GameWorld` scene in `Game/DROPi_Tycoon.json` containing 5 standard events:
+  - Event 1: "BATCH-006 Init — Set movement defaults at scene start"
+    - Condition: `DepartScene` (at beginning of scene)
+    - Actions: Set `PlayerData.MovementSpeed` = 150 (configurable baseline — IDR-016), set `Player.MovementSpeed` = 150 (object variable sync), set `TapTarget.X` = 380 and `TapTarget.Y` = 270 (Player start position), set `ArrivalThreshold` = 5, set `IsMoving` = 0.
+  - Event 2: "BATCH-006 Touch Input — Primary tap-to-move (Android-first)"
+    - Condition: `TouchHasStarted(0)` — REQ-020 (touch-first control), REQ-021 (direct tap-to-move)
+    - Actions: Set `TapTarget.X` = `TouchX("Base", 0)`, `TapTarget.Y` = `TouchY("Base", 0)`, `IsMoving` = 1.
+  - Event 3: "BATCH-006 Mouse Fallback — Desktop testing"
+    - Condition: `MouseButtonReleased("Left")` — IDR-012 (optional mouse click fallback)
+    - Actions: Set `TapTarget.X` = `MouseX("Base", 0)`, `TapTarget.Y` = `MouseY("Base", 0)`, `IsMoving` = 1.
+  - Event 4: "BATCH-006 Movement — Move Player toward TapTarget each frame"
+    - Condition: `VarScene IsMoving = 1`
+    - Action: Update `DistanceToTarget` = `sqrt((Player.X()-TapTarget.X)^2+(Player.Y()-TapTarget.Y)^2)`.
+    - Sub-event A (still moving): `DistanceToTarget > ArrivalThreshold` → move Player X and Y using `angleToPosition` + `TimeDelta()`, set animation `"Move"`.
+    - Sub-event B (arrived): `DistanceToTarget <= ArrivalThreshold` → snap Player to TapTarget, set `IsMoving` = 0, set animation `"Idle"`.
+  - Event 5: "BATCH-006 Camera Follow — Center camera on Player each frame"
+    - Condition: (none — always)
+    - Action: `CentreSurObjet("", "Player", "yes")` — REQ-023 (camera follows player), IDR-015.
+
+## Requirements Implemented
+
+- REQ-016: Tap-to-Move behavior fully implemented as the canonical MVP movement method.
+- REQ-020: Touch-first control preserved; `TouchHasStarted(0)` is primary input.
+- REQ-021: Direct Tap-to-Move: player moves directly to tapped world coordinates.
+- REQ-023: Camera follows Player with `CentreSurObjet` each frame.
+- REQ-024 (constraint): Touch target sizing enforced via standard full-screen tap input; no HUD interaction added.
+
+## Not Changed
+
+- No Accept Order button or HUD acceptance behavior added.
+- No pickup interaction added.
+- No delivery interaction added.
+- No rewards, money, or economy logic added.
+- No save/load behavior added.
+- No HUD or notification elements added.
+- No AI, failure logic, bicycle, or progression logic added.
+- No JavaScript introduced.
+- No new sprite assets or audio assets added.
+- No BATCH-007+ functionality introduced.
+- BATCH-001/002/003/004/005 artifacts remain intact.
+- No playable prototype exists.
 
 ---
 

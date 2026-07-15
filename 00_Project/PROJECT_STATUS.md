@@ -6,7 +6,7 @@ Version: 1.0.0
 Status: Active Development
 Author: Marian Caliof & OpenAI
 Language: English
-Last Updated: 2026-07-15 (BATCH-005)
+Last Updated: 2026-07-15 (BATCH-006)
 
 ---
 
@@ -16,7 +16,7 @@ Last Updated: 2026-07-15 (BATCH-005)
 
 Phase:
 
-Prototype v0.1 Implementation — BATCH-005 Order Generation + Lifecycle Core Complete
+Prototype v0.1 Implementation — BATCH-006 Tap-to-Move + Camera Behavior Complete
 
 ---
 
@@ -160,7 +160,7 @@ The prototype must prove the core idea before expansion.
 
 # Next Steps
 
-1. Continue iterative development — start BATCH-006 (Tap-to-Move + camera behavior) after BATCH-005 merges.
+1. Continue iterative development — start BATCH-007 (Pickup Interaction) after BATCH-006 merges.
 
 ---
 
@@ -180,7 +180,7 @@ READY
 
 Implementation:
 
-STARTED — BATCH-001 FOUNDATION COMPLETE; BATCH-002 SCAFFOLD COMPLETE; BATCH-003 PLACEHOLDER ASSETS COMPLETE; BATCH-004 WORLD SETUP COMPLETE; BATCH-005 ORDER LIFECYCLE CORE COMPLETE; NO PLAYABLE PROTOTYPE EXISTS
+STARTED — BATCH-001 FOUNDATION COMPLETE; BATCH-002 SCAFFOLD COMPLETE; BATCH-003 PLACEHOLDER ASSETS COMPLETE; BATCH-004 WORLD SETUP COMPLETE; BATCH-005 ORDER LIFECYCLE CORE COMPLETE; BATCH-006 TAP-TO-MOVE + CAMERA COMPLETE; NO PLAYABLE PROTOTYPE EXISTS
 
 Implementation Preparation Status:
 
@@ -205,7 +205,7 @@ Implementation Preparation Status:
 - BATCH-003 is complete — placeholder asset library created
 - BATCH-004 is complete — visual world setup created; Player and static world entities placed; no movement or gameplay logic implemented; no playable prototype exists
 - BATCH-005 is complete — order lifecycle state machine implemented; Created→Available→Accepted event logic added; no pickup/delivery/economy/HUD logic implemented; no playable prototype exists
-- BATCH-006 not started
+- BATCH-006 is complete — Tap-to-Move implemented; touch input (primary/Android-first) and mouse fallback (desktop); Player movement toward tapped target; camera follows Player; arrival stops movement; Idle/Move animation switching; movement speed and arrival threshold are configurable scene variables; no pickup/delivery/economy/HUD/AI/save-load logic implemented; no playable prototype exists
 - Active owner decisions: ODR-001 (player position persistence), ODR-003 (GameSettings persistence scope), ODR-004 (failure trigger definition)
 - ODR-002 reclassified (not an owner decision)
 - No owner decision blocks BATCH-003 or BATCH-004
