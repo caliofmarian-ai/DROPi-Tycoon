@@ -6,7 +6,7 @@ Version: 1.0.0
 Status: Development Log
 Author: Marian Caliof & OpenAI
 Language: English
-Last Updated: 2026-07-14 (BATCH-004)
+Last Updated: 2026-07-15 (BATCH-005)
 
 ---
 
@@ -31,6 +31,46 @@ Date
 Category
 
 Description
+
+---
+
+# [2026-07-15] - BATCH-005 Order Generation + Lifecycle Core
+
+## Added
+
+- Added `AcceptRequested` child variable (number, default 0) to `ActiveOrder` scene variable in `GameWorld` scene in `Game/DROPi_Tycoon.json`.
+  - This is the implementation-owned trigger field (IDR-010) that BATCH-006 will set to 1 when the player presses the Accept Order button.
+- Added `OrderEvents` event group to `OrderSystem` external event sheet in `Game/DROPi_Tycoon.json` containing 2 standard events:
+  - Event 1: "Order Initialization — Created → Available"
+    - Condition: `DepartScene` (at beginning of scene)
+    - Actions: Set `ActiveOrder.OrderID` = "ORDER-001", `ActiveOrder.PickupLocation` = "PickupZone", `ActiveOrder.Destination` = "DeliveryZone", `ActiveOrder.Status` = "Created" then immediately = "Available" (REQ-035)
+  - Event 2: "Order Acceptance — Available → Accepted"
+    - Conditions: `ActiveOrder.Status == "Available"` AND `ActiveOrder.AcceptRequested == 1`
+    - Actions: Set `ActiveOrder.Status` = "Accepted" (REQ-037), Set `PlayerData.CurrentOrder` = `ActiveOrder.OrderID` (REQ-038 player objective), Reset `ActiveOrder.AcceptRequested` = 0 (REQ-038 acceptance complete)
+
+## Requirements Implemented
+
+- REQ-050: Six canonical order states defined and used in event logic: Created, Available, Accepted, PickedUp (downstream), Completed (downstream), Failed (downstream).
+- REQ-051: Allowed transitions enforced: Created→Available implemented; Available→Accepted implemented; downstream transitions (Accepted→PickedUp, PickedUp→Completed, PickedUp→Failed) reserved for BATCH-007/008.
+- REQ-052: Terminal states (Completed, Failed) have no outbound transitions — confirmed absent in current implementation.
+- REQ-054: No cancellation or assignment states present — confirmed.
+- REQ-035: Created→Available transition is system-driven and immediate (both states set in the same DepartScene event).
+- REQ-037: OrderAccepted event logic implemented: Available → Accepted state transition.
+- REQ-038: On acceptance: order status changed (Accepted), player objective updated (PlayerData.CurrentOrder), package assignment implicit in order state (AcceptRequested reset).
+
+## Not Changed
+
+- No pickup interaction added (Accepted→PickedUp reserved for BATCH-007).
+- No delivery interaction added.
+- No rewards, money, or economy logic added.
+- No save/load behavior added.
+- No HUD, notifications, or UI elements added.
+- No timers, AI, failure logic, bicycle, or progression logic added.
+- No JavaScript introduced.
+- No new objects, sprites, or assets added.
+- No BATCH-006+ functionality introduced.
+- BATCH-001/002/003/004 artifacts remain intact.
+- No playable prototype exists.
 
 ---
 
