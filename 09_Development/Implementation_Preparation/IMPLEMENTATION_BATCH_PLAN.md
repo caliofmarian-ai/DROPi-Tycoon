@@ -2,9 +2,9 @@
 
 Document: IMPLEMENTATION_BATCH_PLAN.md
 Project: DROPi Tycoon
-Version: 1.3.1
+Version: 1.4.0
 Status: Implementation Preparation — Non-Authoritative
-Author: AI Agent (PR #56 correction from Report 057; corrected per Report 065/066; corrected per Report 070; corrected per Report 073)
+Author: AI Agent (PR #56 correction from Report 057; corrected per Report 065/066; corrected per Report 070; corrected per Report 073; corrected per Report 078)
 Language: English
 Last Updated: 2026-07-15
 
@@ -36,7 +36,7 @@ Define a dependency-ordered, scope-safe implementation plan for Prototype v0.1.
 | BATCH-004 | Map/player/building world setup | BATCH-002, BATCH-003 | None |
 | BATCH-005 | Order generation + lifecycle core | BATCH-004 | None |
 | BATCH-006 | Tap-to-Move + camera behavior | BATCH-004 | None |
-| BATCH-007 | Order acceptance and pickup | BATCH-005, BATCH-006 | None |
+| BATCH-007 | Pickup-proximity core (minimal accept trigger + Accepted→PickedUp) | BATCH-005, BATCH-006 | None |
 | BATCH-008 | Delivery completion + failure path | BATCH-007 | ODR-004 required |
 | BATCH-009 | Economy reward/reputation updates | BATCH-008 | None |
 | BATCH-010 | HUD + notifications | BATCH-007, BATCH-009 | None |
@@ -115,14 +115,16 @@ Define a dependency-ordered, scope-safe implementation plan for Prototype v0.1.
 - Acceptance criteria: tap-to-move and camera follow are implemented with only the allowed BATCH-006 core requirements plus REQ-024 constraint compliance.
 
 ### BATCH-007
-- Objective: Implement order acceptance UI flow and pickup transition.
-- Requirements: REQ-040..REQ-049, REQ-088..REQ-109.
-- Artifacts: accept button handling, pickup validation, active-order HUD linkage.
+- Objective: Implement pickup-proximity core: minimal Android-first accept trigger and Accepted→PickedUp state transition.
+- Requirements (core): REQ-041, REQ-042, REQ-043, REQ-044.
+- Removed from BATCH-007 membership: REQ-040, REQ-045, REQ-046, REQ-047, REQ-048, REQ-049, REQ-088, REQ-089, REQ-090, REQ-091, REQ-092, REQ-093, REQ-094, REQ-095, REQ-096, REQ-097, REQ-098, REQ-099, REQ-100, REQ-101, REQ-102, REQ-103, REQ-104, REQ-105, REQ-106, REQ-107, REQ-108, REQ-109.
+- Artifacts: minimal accept trigger event (sets `ActiveOrder.AcceptRequested=1` on touch while `Status="Available"`; full HUD Accept-Order button styling deferred to BATCH-010), proximity-based `Accepted→PickedUp` state transition event, `PlayerData.CarryingPackage=true` on pickup.
 - Dependencies: BATCH-005, BATCH-006.
 - Owner-decision gate: none.
-- Non-goals: no completed/failed delivery outcomes.
-- Validation: Available→Accepted→PickedUp transition passes.
-- Acceptance criteria: pickup logic and UI state updates are correct.
+- AcceptRequested boundary: BATCH-007 supplies a minimal touch-based event that sets `ActiveOrder.AcceptRequested=1`, enabling the existing BATCH-005 `Available→Accepted` lifecycle event. The full HUD Accept-Order button (REQ-036, REQ-102) and acceptance feedback (REQ-105) remain in BATCH-010. Classification: **B — BATCH-007 must include a minimal Android-first acceptance trigger.**
+- Non-goals: no Accept-Order HUD button object or styling; no active-order HUD text; no delivery completion (`PickedUp→Completed`); no failure path (`PickedUp→Failed`); no economy, rewards, or money logic; no notifications; no save/load behavior; no HUD/UI implementation; no BATCH-008+ scope.
+- Validation: deterministic `Available→Accepted→PickedUp` transition executes; `CarryingPackage` is true after pickup and only after pickup; no `Completed`/`Failed` tokens introduced; all interactions are touch-only.
+- Acceptance criteria: pickup core executes without HUD, delivery, economy, or any BATCH-008+ feature; Android-first constraint preserved.
 
 ### BATCH-008
 - Objective: Implement delivery completion and failure branch execution.
