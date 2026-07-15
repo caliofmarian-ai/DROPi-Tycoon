@@ -2,11 +2,11 @@
 
 Document: IMPLEMENTATION_DETAIL_REGISTER.md
 Project: DROPi Tycoon
-Version: 1.1.0
+Version: 1.1.1
 Status: Implementation Preparation — Non-Authoritative
-Author: AI Agent (PR #56 correction from Report 057)
+Author: AI Agent (PR #56 correction from Report 057; corrected per Report 073)
 Language: English
-Last Updated: 2026-07-14
+Last Updated: 2026-07-15
 
 ---
 
@@ -83,6 +83,36 @@ Only implementation-owned choices that do not redefine canonical gameplay/econom
 - **Canonical constraints:** HUD visibility requirements are canonical.
 - **Allowed freedom:** Exact layer naming/order for Base/Notifications/Modal around HUD.
 - **Validation:** UI visibility, readability, and layering behavior pass mobile checks.
+
+## IDR-012 — Tap-to-Move Direct Movement Method
+
+- **Canonical constraints:** Tap-to-Move behavior is required (`MOBILE_UI_CONTROLS.md` Recommended MVP Choice).
+- **Allowed freedom:** Exact GDevelop movement implementation method (behavior-based movement, force-based motion, or equivalent).
+- **Validation:** Player reliably moves toward tapped world targets on Android-first touch flow.
+
+## IDR-013 — Target Arrival Threshold
+
+- **Canonical constraints:** Tapped destination must be reachable through Tap-to-Move behavior.
+- **Allowed freedom:** Numeric stop threshold for considering the destination reached.
+- **Validation:** Player stops near tapped target consistently without oscillation or overshoot loops.
+
+## IDR-014 — Tap Target Marker Representation
+
+- **Canonical constraints:** Tap destination intent must be clear enough for movement interaction.
+- **Allowed freedom:** Marker implementation choice (temporary marker object, visual-only cue, or no marker).
+- **Validation:** Tap-to-Move remains understandable and testable on Android without introducing HUD-order scope.
+
+## IDR-015 — Camera Follow Implementation Tuning
+
+- **Canonical constraints:** Camera must follow player with smooth movement and basic zoom (`MOBILE_UI_CONTROLS.md` Camera System / MVP Camera).
+- **Allowed freedom:** Exact follow action/mechanic, smoothing coefficients, and basic zoom value.
+- **Validation:** Camera remains centered/following player smoothly during movement with mobile-readable framing.
+
+## IDR-016 — Walking-Speed Baseline Before Bicycle Upgrade
+
+- **Canonical constraints:** Prototype starts on foot and Bicycle increases movement speed after purchase (`PROTOTYPE_V0.1.md` Transportation System).
+- **Allowed freedom:** Exact baseline walking speed value before Bicycle ownership.
+- **Validation:** Baseline speed supports early deliveries while preserving a clear speed increase when Bicycle logic is implemented in later batches.
 
 ---
 

@@ -2,11 +2,11 @@
 
 Document: GDEVELOP_IMPLEMENTATION_ARCHITECTURE.md
 Project: DROPi Tycoon
-Version: 1.1.0
+Version: 1.1.1
 Status: Implementation Preparation — Non-Authoritative
-Author: AI Agent (PR #56 correction from Report 057)
+Author: AI Agent (PR #56 correction from Report 057; corrected per Report 073)
 Language: English
-Last Updated: 2026-07-14
+Last Updated: 2026-07-15
 
 ---
 
@@ -141,6 +141,12 @@ GameWorld layer count for planning: **4 layers** (`Base`, `HUD`, `Notifications`
 | Element | Classification | Evidence |
 |---|---|---|
 | Tap-to-Move | CANONICAL REQUIREMENT | `MOBILE_UI_CONTROLS.md` Recommended MVP Choice |
+| Camera follows player | CANONICAL REQUIREMENT | `MOBILE_UI_CONTROLS.md` Camera System / MVP Camera |
+| Direct movement method (force/behavior/pathfinding choice) | AUTHORIZED IMPLEMENTATION DETAIL | Canonical docs require Tap-to-Move outcome but do not mandate one engine-specific movement method |
+| Arrival threshold value for "reached tapped target" | AUTHORIZED IMPLEMENTATION DETAIL | Canonical docs define movement outcome, not an exact numeric stop threshold |
+| Target marker implementation (object/temporary visual/no marker) | AUTHORIZED IMPLEMENTATION DETAIL | Canonical docs require tap destination movement, not a fixed marker artifact |
+| Camera-follow implementation mechanics (follow action, smoothing tuning, basic zoom value) | AUTHORIZED IMPLEMENTATION DETAIL | `MOBILE_UI_CONTROLS.md` requires follow + smooth movement + basic zoom without fixing implementation method or numeric values |
+| Walking movement-speed baseline value before Bicycle purchase | AUTHORIZED IMPLEMENTATION DETAIL | `PROTOTYPE_V0.1.md` requires on-foot start and later Bicycle speed increase; exact baseline value is not fixed canonically |
 
 ## 11) Save Slot Count
 
