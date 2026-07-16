@@ -2,11 +2,11 @@
 
 Document: AI_AGENT_EXECUTION_PROTOCOL.md
 Project: DROPi Tycoon
-Version: 1.0.0
+Version: 1.1.0
 Status: AI Development Operations
 Author: Marian Caliof & OpenAI
 Language: English
-Last Updated: 2026-07-12
+Last Updated: 2026-07-16
 
 ---
 
@@ -206,6 +206,23 @@ AI agents must request approval before:
 - Adding major systems
 - Modifying architecture
 - Expanding MVP scope
+
+---
+
+# Owner Directives Inspection Rule
+
+Before proposing or implementing any major change to architecture, universe design, business model, logistics, economy, marketplace, runtime, or documentation structure, AI agents **must** inspect:
+
+`09_Development/Owner_Directives/`
+
+**Rules:**
+
+1. If a relevant Owner Directive exists, its contents must be acknowledged and considered before any proposal proceeds.
+2. An Owner Directive must never be silently ignored.
+3. An Owner Directive must never be copied wholesale into canonical documents. Integration requires a dedicated canonical integration task.
+4. If a directive conflicts with existing canonical documents, the conflict must be surfaced and reported — never silently merged or overwritten.
+
+Owner Directives are authoritative strategic inputs from the Project Owner. They are not automatically canonical documentation. See `09_Development/Owner_Directives/README.md` for the complete governance rules.
 
 ---
 
