@@ -2,11 +2,11 @@
 
 Document: ARCHITECTURE.md
 Project: DROPi Tycoon
-Version: 1.0.0
+Version: 1.1.0
 Status: Canonical
 Author: Marian Caliof & OpenAI
 Language: English
-Last Updated: 2026-07-12
+Last Updated: 2026-07-16
 
 ---
 
@@ -283,6 +283,46 @@ Important systems must be easy to verify.
 DROPi Tycoon architecture is designed for a simulation game.
 
 Every technical decision must support gameplay, performance, maintainability, and future expansion.
+
+---
+
+# Web-First Platform Architecture
+
+DROPi Tycoon is a Web-First Application. The browser is the primary runtime.
+
+The official platform chain is:
+
+```
+GitHub
+→ Web Application
+→ Railway Deployment
+→ Browser Runtime
+→ Android Packaging
+→ Google Play Distribution
+```
+
+**Key decisions:**
+
+- The browser application is the primary deliverable.
+- Railway provides cloud deployment for the web runtime.
+- Android packaging wraps the same web application without a separate native runtime.
+- Google Play is the target distribution channel for the Android package.
+
+**Technology independence:**
+
+Implementation technologies — libraries, frameworks, build tools, and toolchains — are technical details. They are selected to serve the web-first architecture but are replaceable. No specific library or framework is a non-negotiable canonical dependency.
+
+See `00_Project/VISION.md` for the strategic Web-First direction and platform rationale.
+
+See `09_Development/Engine_Migration/WEB_RUNTIME_MIGRATION_MILESTONE_001.md` for the current deployable runtime milestone.
+
+---
+
+# Owner-Maintainability Architecture Principle
+
+The architecture must support project continuity without depending on proprietary tools, single agents, or undocumented knowledge.
+
+See `06_Technical/SAFE_SYSTEM.md` for the full Owner-Maintainability principle.
 
 ---
 

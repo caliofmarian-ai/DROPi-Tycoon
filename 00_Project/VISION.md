@@ -2,11 +2,11 @@
 
 Document: VISION.md
 Project: DROPi Tycoon
-Version: 1.0.0
+Version: 1.1.0
 Status: Canonical
 Author: Marian Caliof & OpenAI
 Language: English
-Last Updated: 2026-07-12
+Last Updated: 2026-07-16
 
 ---
 
@@ -119,6 +119,80 @@ DROPi Tycoon succeeds when players:
 DROPi Tycoon is inspired by the vision of the DROPi platform but is designed as an independent game.
 
 Whenever possible, gameplay systems should be architected so that concepts, algorithms, balancing ideas, and logistics models can be reused or adapted for future DROPi products.
+
+---
+
+# Project Design Hierarchy
+
+The project organizes its design and documentation into the following domains, ordered from highest to lowest abstraction:
+
+```
+Project Vision
+→ Universe Design
+→ Business Design
+→ Logistics Design
+→ Game Design
+→ UX Design
+→ Technical Design
+→ Implementation
+→ Verification
+→ Historical Reporting
+```
+
+Each level narrows and specializes the level above it. Lower-level documents must not contradict higher-level documents.
+
+---
+
+# Universe Design
+
+**Status:** Approved emerging domain — awaiting dedicated architecture and ownership audit.
+
+Universe Design is the domain that defines the persistent world and ecosystem in which DROPi Tycoon takes place. It sits immediately below Project Vision in the design hierarchy.
+
+Universe Design is distinct from Game Design:
+
+- **Universe Design** defines the persistent world and ecosystem — the stage.
+- **Game Design** defines player interaction with that world — the gameplay.
+
+Universe Design may eventually cover:
+
+- Persistent Earth-scale simulation
+- Continents, countries, regions, cities, districts, streets, and operational areas
+- Time and weather systems
+- Population simulation
+- Companies and competitive entities
+- Regional evolution and infrastructure
+- DronePort networks and logistics ecosystems
+- Regional economies
+- Technology evolution
+- World events
+
+A dedicated architecture and ownership audit is required before Universe Design documents are created or existing documents are reorganized to reflect this domain. Universe Design is not yet fully assigned to a canonical owner or directory. This entry records the domain as officially approved and awaiting that audit.
+
+See `00_Project/DOCUMENT_INDEX.md` for the documentation index entry and planned architecture registration.
+
+---
+
+# Web-First Platform Direction
+
+DROPi Tycoon is a Web-First Application.
+
+The official development and distribution chain is:
+
+```
+GitHub
+→ Web Application
+→ Railway Deployment
+→ Browser Runtime
+→ Android Packaging
+→ Google Play Distribution
+```
+
+The browser application is the primary runtime. The same web application will later be packaged for Android distribution.
+
+Implementation technologies (libraries, toolchains, and frameworks) are technical details. They are replaceable and must not be named as non-negotiable canonical dependencies in vision or design documents.
+
+See `06_Technical/ARCHITECTURE.md` for the canonical Web-First Architecture section.
 
 ---
 

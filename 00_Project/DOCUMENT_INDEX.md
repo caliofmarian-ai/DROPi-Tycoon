@@ -2,11 +2,11 @@
 
 Document: DOCUMENT_INDEX.md
 Project: DROPi Tycoon
-Version: 1.1.0
+Version: 1.2.0
 Status: Documentation Control
 Author: Marian Caliof & OpenAI
 Language: English
-Last Updated: 2026-07-15
+Last Updated: 2026-07-16
 
 ---
 
@@ -279,6 +279,115 @@ Authority note:
 - `WEB_RUNTIME_MIGRATION_MILESTONE_001.md` documents deployable runtime migration status.
 - `ENVIRONMENT_VARIABLES.md` documents the active web-runtime configuration contract.
 - `FUTURE_SERVER_AUTHORITATIVE_ARCHITECTURE_PREPARATION.md` is explicitly non-canonical preparation content and does not activate backend scope.
+
+---
+
+### Managed Owner Directives directory
+
+- `09_Development/Owner_Directives/` — permanent authoritative location for high-level strategic directives issued directly by the Project Owner.
+
+**Nature of Owner Directives:**
+
+- Owner Directives are authoritative strategic inputs issued by the Project Owner.
+- They are **not** automatically canonical documentation. A directive does not become canonical simply by existing in this directory.
+- They require dedicated canonical integration tasks before their contents enter the canonical documentation set.
+- AI agents **must** inspect this directory before proposing major architectural changes, universe design modifications, business model decisions, or documentation restructuring. See `09_Development/AI_AGENT_EXECUTION_PROTOCOL.md` for the mandatory inspection rule.
+
+**Governance source:** `09_Development/Owner_Directives/README.md`.
+
+Individual Owner Directives are not individually enumerated in this index. The `README.md` within the directory maintains the index of directives.
+
+---
+
+# Planned Future Documentation Architecture
+
+This section registers architecture concepts that are approved in principle but have not yet been fully implemented, reorganized, or created. Registering a concept here does not create any document or directory, and does not transfer or create canonical ownership.
+
+---
+
+## Universe Design Domain
+
+**Status:** Approved emerging domain — awaiting dedicated architecture and ownership audit.
+
+Universe Design is an approved documentation domain of DROPi Tycoon. It is positioned immediately below Project Vision in the design hierarchy:
+
+```
+Project Vision
+→ Universe Design
+→ Business Design
+→ Logistics Design
+→ Game Design
+→ UX Design
+→ Technical Design
+→ Implementation
+→ Verification
+→ Historical Reporting
+```
+
+Universe Design defines the persistent world and ecosystem. Game Design defines player interaction with that world.
+
+A dedicated architecture and ownership audit is required before Universe Design documents are created or canonical documents are reorganized to reflect this domain.
+
+See `00_Project/VISION.md` for the canonical description of the Universe Design domain.
+
+---
+
+## BIBLE-Level Canonical Documentation
+
+**Status:** Approved future architecture — no BIBLE files exist yet.
+
+The project approves the future use of domain-specific canonical BIBLE documents. BIBLE documents would serve as definitive authoritative references for major design domains (e.g., `WORLD_SIMULATION_BIBLE.md`, `LOGISTICS_BIBLE.md`, `ECONOMY_BIBLE.md`).
+
+No BIBLE files have been created. No BIBLE files should be created without completing the mandatory preparation process.
+
+**BIBLE creation requires all of the following in order:**
+
+1. Complete canonical audit of the target domain;
+2. Ownership mapping — identifying all existing documents that touch the domain;
+3. Overlap detection — identifying content that would need to move;
+4. Contradiction analysis — surfacing any conflicts between existing documents;
+5. Migration proposal — describing the full document change;
+6. Explicit Project Owner approval.
+
+A BIBLE must not duplicate an existing canonical owner. An approved BIBLE becomes the authoritative single source of truth for its domain; all other documents referencing that domain must defer to it.
+
+---
+
+## External DROPi Canonical Reference Package
+
+**Status:** Planned — package not yet uploaded.
+
+An external reference package named `DROPi_Canonical_Reference.zip` is expected to be provided in the future. The package has not been uploaded. It does not exist in the repository.
+
+**Policy — do not invent or create a placeholder for this package.**
+
+When the real package is uploaded, the following policies govern its treatment:
+
+- The real DROPi repository remains canonical for the real-world DROPi platform.
+- DROPi Tycoon remains canonical for its simulation and gameplay adaptation.
+- The package is treated as a read-only reference snapshot only.
+- Package contents do not automatically become Tycoon canon.
+- Package contents must not blindly overwrite Tycoon documentation.
+- A dedicated cross-project alignment audit is required before any content is integrated.
+
+**Cross-project alignment audit process (mandatory after upload):**
+
+1. Manifest inspection;
+2. Source commit verification;
+3. Complete document inventory;
+4. Terminology mapping;
+5. Architecture mapping;
+6. Overlap analysis;
+7. Contradiction analysis;
+8. Gameplay adaptation analysis;
+9. Project Owner approval;
+10. Integration into the correct Tycoon canonical owners only.
+
+**Recommended future repository location for external reference snapshots:**
+
+`09_Development/External_References/`
+
+This directory does not exist yet and must not be created until the actual package is ready for upload.
 
 ---
 

@@ -2,11 +2,11 @@
 
 Document: SAFE_SYSTEM.md
 Project: DROPi Tycoon
-Version: 1.0.1
+Version: 1.1.0
 Status: Canonical
 Author: Marian Caliof & OpenAI
 Language: English
-Last Updated: 2026-07-12
+Last Updated: 2026-07-16
 
 ---
 
@@ -194,6 +194,31 @@ They should not replace the entire logistics foundation.
 Safety means protecting the vision of DROPi Tycoon.
 
 Every technical decision must help the game grow without losing direction.
+
+---
+
+# Owner-Maintainability Principle
+
+DROPi Tycoon must remain continuable by the Project Owner and any capable AI assistant using only:
+
+- GitHub (repository and pull requests);
+- Railway (deployment and deployment logs);
+- Canonical documentation in the repository;
+- Repository files and standard web-development workflows.
+
+**The project must not permanently depend on:**
+
+- GitHub Copilot credits or any specific AI agent credit pool;
+- One specific AI agent or AI model;
+- Proprietary visual editors or closed project formats;
+- Undocumented manual knowledge held outside the repository;
+- Non-exportable systems or one private development machine.
+
+**AI agents may accelerate work**, but all knowledge and implementation must remain recoverable from the repository alone. If a concept exists only in an AI conversation and not in the repository, it is not durably part of the project.
+
+**Recovery requirement:**
+
+A new collaborator — human or AI — must be able to understand, continue, and deploy the project by reading only the canonical repository documentation and the repository files.
 
 ---
 
