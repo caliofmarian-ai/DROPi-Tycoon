@@ -9,7 +9,7 @@
 - Repository: `caliofmarian-ai/DROPi-Tycoon`
 - Branch: `copilot/complete-project-roadmap-architecture-part-1`
 - Base commit: `8846f0b394ced60c78d454c08f44ab40ac43ae53`
-- Resulting commit: `N/A — final correction commit recorded after commit/push`
+- Resulting commit: `7c8536ff35dce265264a6dca2670deb6147729d5`
 - Pull Request: `#85 — https://github.com/caliofmarian-ai/DROPi-Tycoon/pull/85`
 - Human approval status: Pending independent review
 
@@ -545,7 +545,7 @@ Correct PR #85 without merging it by restoring canonical root documents, repairi
 
 # Actions Performed
 
-- Restored the published Report 086 content from commit `670ee678f706a9af5c75f53e6bb3f1bad42f6575`.
+- Restored the published Report 086 content from commit `670ee678f706a9af5c75f53e6bb3f1bad42f6575` exactly and used Report 087 as the separate correction record required by protocol.
 - Restored full canonical base content for `00_Project/ROADMAP.md` and `00_Project/PROJECT_STATUS.md`, then applied narrow additive/status corrections only.
 - Reworked planning registries to separate Phase 0 canonical-documentation completion from historical legacy implementation batch ownership.
 - Corrected batch phase alignment for `RBATCH-002` and `RBATCH-003` and moved historical `BATCH-001` lineage under `M-002` / `E-003`.
@@ -565,7 +565,7 @@ Correct PR #85 without merging it by restoring canonical root documents, repairi
 - `E-033` and `E-037` lacked direct traceable children even though batch-level coverage existed.
 - The YAML had incomplete machine-readable legacy crosswalk data for future legacy batches.
 - Completed `RBATCH-001..RBATCH-008` lacked structured completion evidence.
-- The planning package lacked the required concept-by-concept Owner Directive coverage mapping.
+- The planning package lacked the required concept-by-concept Owner Directive coverage mapping; this correction added a 25-domain matrix covering all owner-requested strategic domains.
 - `ISSUE-025..ISSUE-034` incorrectly implied present implementation authorization despite `Planned — Future` parents.
 - The GitHub milestone inspection boundary had been removed and required restoration.
 - Report 086 on the branch improperly overwrote the already-published report instead of preserving it historically.
@@ -579,26 +579,62 @@ Correct PR #85 without merging it by restoring canonical root documents, repairi
 
 # Validation Performed
 
-- Pending final automated validation pass before commit/push finalization.
+- Parsed `09_Development/Planning/github_creation_plan.yaml` with Python `yaml.safe_load()`.
+- Verified metadata counts: 21 milestones, 46 epics, 54 batches, 34 executable issues, 32 planning placeholders, 122 labels.
+- Verified uniqueness and contiguity for milestone, epic, batch, issue, and placeholder ID sequences.
+- Verified bidirectional parent mappings and phase alignment across milestones, epics, batches, issues, and placeholders.
+- Verified semantic remapping: `M-001` keeps no legacy implementation batch, while historical `BATCH-001` maps to `RBATCH-001` under `M-002` / `E-003`.
+- Verified every non-completed batch and every non-completed epic has at least one child issue or placeholder.
+- Verified full 17-row legacy crosswalk and machine-readable completion evidence for `RBATCH-001..RBATCH-008`.
+- Verified milestone, epic, and batch dependency graphs are acyclic and all dependency references resolve.
+- Verified labels are unique, every assigned label resolves, and every label colour is a valid six-digit hex value.
+- Verified future-parent child issues (`ISSUE-025..ISSUE-034`) no longer use `status:ready` and now remain non-authorizing specification records.
+- Verified blocked/owner-gate fields align for `ISSUE-014..ISSUE-017`.
+- Verified the required 25 Owner Directive domains are all represented in the coverage matrix.
+- Verified canonical base content preservation for `00_Project/ROADMAP.md` and `00_Project/PROJECT_STATUS.md`.
+- Verified line-ending conventions: `ROADMAP.md` and `PROJECT_STATUS.md` remain CRLF, `DOCUMENT_INDEX.md` remains LF, and no mixed endings remain.
+- Verified Report 086 restore exactly matches commit `670ee678f706a9af5c75f53e6bb3f1bad42f6575`.
+- Ran `git config core.whitespace cr-at-eol` and `git diff --check`.
+- Ran secret scanning on every modified or created file.
+- Verified no modified path is under `game-web/`, `Game/`, or `Builds/`.
 
 # Validation Results
 
-- Pending final automated validation pass before commit/push finalization.
+- YAML parse: **passed**.
+- Metadata counts vs actual objects: **passed** (`21 / 46 / 54 / 34 / 32 / 122`).
+- ID uniqueness and contiguity: **passed**.
+- Markdown/YAML shared-field consistency: **passed**.
+- Bidirectional parent mapping and child phase alignment: **passed**.
+- Semantic parent remapping for `M-001` / `E-001` / `E-002` / `RBATCH-001` / legacy `BATCH-001`: **passed**.
+- Non-completed batch child coverage: **passed**.
+- Non-completed epic traceable-child coverage: **passed**.
+- Full legacy crosswalk in Markdown and YAML: **passed**.
+- Completed-batch evidence registry: **passed**.
+- Dependency resolution and graph acyclicity: **passed**.
+- Label resolution and hex-colour validation: **passed**.
+- Future-work authorization policy: **passed**.
+- Blocked/owner-gate field matching: **passed**.
+- Owner Directive coverage completeness: **passed**.
+- Canonical root-document preservation: **passed**.
+- Line-ending preservation and mixed-ending checks: **passed**.
+- `git diff --check` with `core.whitespace=cr-at-eol`: **passed** (exit code `0`, no output).
+- Secret scan: **passed**.
+- Gameplay/runtime/dependency/deployment/asset change exclusion: **passed**.
+- GitHub planning-object creation/modification: **not performed**, as required.
+- Direct `main` modification: **not performed**.
 
 # Unresolved Issues
 
-- Final correction commit SHA not yet recorded in metadata.
 - Another independent review is still required before merge.
 - Existing GitHub milestone objects were not directly inspected; labels, issues, and Projects also remain unreconciled.
 - Owner-gated late-phase strategic domains remain intentionally deferred.
 
 # Final Result/Status
 
-- Partial — correction package substantially updated, but final validation, final commit recording, PR description refresh, and remote verification remain outstanding.
+- Corrected — documentation/planning package repaired and committed at `7c8536ff35dce265264a6dca2670deb6147729d5`; PR #85 remains a draft planning-only correction pending PR-description refresh and remote re-verification before final completion response.
 
 # Follow-up Actions
 
-- Run the full validation suite required by the owner instruction.
-- Record validation evidence and final correction commit in this report.
-- Push the corrections to the existing PR #85 branch.
-- Verify the remote PR remains draft, open, unmerged, and targeted to `main`.
+- Refresh the remote PR #85 description with the final audited facts if tooling permits.
+- Re-verify the remote PR head SHA, base branch, draft state, changed-file list, and presence of restored/new reports before final completion response.
+- Keep PR #85 unmerged pending another independent review.
