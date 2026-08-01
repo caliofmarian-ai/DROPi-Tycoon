@@ -14,7 +14,7 @@ Last Updated: 2026-08-01
 
 This folder contains the first deployable browser runtime for DROPi Tycoon.
 
-It ports BATCH-001 through BATCH-008 prototype behavior from the archived GDevelop reference project.
+`game-web/` carries forward migrated BATCH-001 through BATCH-007 behavior and implements BATCH-008 directly in the active web runtime.
 
 The archived/reference GDevelop source remains unchanged in:
 
@@ -31,16 +31,15 @@ The archived/reference GDevelop source remains unchanged in:
 - Test runner: `vitest` `4.1.10`
 - Production server: custom Node.js static server at `server/server.mjs`
 
-Phaser `3.90.0` is the current web-runtime library implementation detail.
-It is replaceable and is not canonical DROPi Tycoon technology.
-Official direction remains a standard web-first application maintained in GitHub, deployed through Railway, and later packaged for Android.
-Phaser was selected because it is a code-first HTML5 2D runtime that can be fully maintained through GitHub without any external visual editor workflow.
+The active implementation is the standard web-first application maintained in GitHub, deployed through Railway, and later intended for Android packaging.
+GDevelop is not used by the active implementation; archived GDevelop files are historical reference only.
+Phaser `3.90.0` is the current web-runtime library implementation detail, is replaceable, and is not canonical DROPi Tycoon project technology.
 
 ---
 
 # Implemented Prototype Scope
 
-This web runtime reproduces the currently merged prototype behavior only:
+This PR branch implements the following prototype behavior:
 
 - Main menu
 - Game world

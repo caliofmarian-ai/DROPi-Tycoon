@@ -146,7 +146,7 @@ describe('delivery system — BATCH-008', () => {
     const state = buildPickedUpState()
     const result = attemptDelivery(state.activeOrder, state.player, {
       ...validDeliveryContext(state),
-      selectedDestination: 'WrongZone',
+      selectedDestination: 'DeliveryPoint',
     })
     expect(result.order.status).toBe('Failed')
   })
@@ -161,7 +161,7 @@ describe('delivery system — BATCH-008', () => {
     const state = buildPickedUpState()
     const result = attemptDelivery(state.activeOrder, state.player, {
       ...validDeliveryContext(state),
-      selectedDestination: 'WrongZone',
+      selectedDestination: 'DeliveryPoint',
     })
     expect(result.player.carryingPackage).toBe(false)
   })
@@ -176,7 +176,7 @@ describe('delivery system — BATCH-008', () => {
     const state = buildPickedUpState()
     const result = attemptDelivery(state.activeOrder, state.player, {
       ...validDeliveryContext(state),
-      selectedDestination: 'WrongZone',
+      selectedDestination: 'DeliveryPoint',
     })
     expect(result.player.currentOrder).toBe('')
   })
@@ -219,13 +219,23 @@ describe('delivery system — BATCH-008', () => {
     expect(result.order.status).toBe('Accepted')
   })
 
-  it('delivery with unfulfilled order conditions is rejected', () => {
+  it('delivery with unfulfilled order conditions or empty selected destination is rejected', () => {
     const state = buildPickedUpState()
     const result = attemptDelivery(state.activeOrder, state.player, {
       ...validDeliveryContext(state),
       orderConditionsMet: false,
     })
     expect(result.order.status).toBe('PickedUp')
+    expect(result.player.carryingPackage).toBe(true)
+    expect(result.player.currentOrder).toBe(state.activeOrder.orderId)
+
+    const emptyDestinationResult = attemptDelivery(state.activeOrder, state.player, {
+      ...validDeliveryContext(state),
+      selectedDestination: '   ',
+    })
+    expect(emptyDestinationResult.order.status).toBe('PickedUp')
+    expect(emptyDestinationResult.player.carryingPackage).toBe(true)
+    expect(emptyDestinationResult.player.currentOrder).toBe(state.activeOrder.orderId)
   })
 
   it('Completed cannot transition again', () => {

@@ -62,12 +62,14 @@ export const attemptDelivery = (
   context: DeliveryContext,
 ): { order: OrderState; player: PlayerState } => {
   const isTerminal = order.status === 'Completed' || order.status === 'Failed'
+  const hasSelectedDestination = context.selectedDestination.trim().length > 0
 
   const canDeliver =
     order.status === 'PickedUp' &&
     !isTerminal &&
     player.carryingPackage &&
     player.currentOrder === order.orderId &&
+    hasSelectedDestination &&
     context.orderConditionsMet &&
     context.distanceToDestination <= context.deliveryRadius
 
