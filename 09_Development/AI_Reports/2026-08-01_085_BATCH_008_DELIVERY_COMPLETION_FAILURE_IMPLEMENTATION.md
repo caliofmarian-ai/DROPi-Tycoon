@@ -9,12 +9,12 @@
 - Repository: caliofmarian-ai/DROPi-Tycoon
 - Branch: copilot/batch-008-delivery-completion-failure-path
 - Base commit: 3333618de4be72a2ade76442b887d692feaa48fc (Merge pull request #83)
-- Resulting commit: 3241590a8eb601af0f34c9efe02a09f7cd50f239
+- Resulting commit: N/A at report edit time (recorded in final response after commit)
 - Pull Request: https://github.com/caliofmarian-ai/DROPi-Tycoon/pull/84
 - Human approval status: Pending independent review
 - Initial implementation commit: 06f0397d7d35b7ed5ec59a8a442b9f7e2b0d5528
 - First independent-review correction commit: 5984896cd1b93f35ebf9d8f2140b99bad736f17e
-- New correction commit created by this task: 3241590a8eb601af0f34c9efe02a09f7cd50f239
+- New correction commit created by this task: 633d2e1ac2b64d48cfd8e5b908e5bfd2e3d7b475
 
 ---
 
@@ -22,6 +22,7 @@
 
 - Commit `5984896cd1b93f35ebf9d8f2140b99bad736f17e` attempted to correct Report 085 after independent review, but the `Original Task Instruction` section still did not preserve the full verbatim instruction required by `09_Development/AI_REPORTING_PROTOCOL.md`.
 - Commit `3241590a8eb601af0f34c9efe02a09f7cd50f239` reconciled the stale test-count/documentation evidence in current-state documents and revalidated the branch on Node `22.12.0` / npm `10.9.0`.
+- Commit `6ba3913959d9bd74c00c55ffeb31648fce0b5557` restored complete semantic instruction content, but changed list-marker/formatting fidelity in the verbatim section.
 - The present correction restores the full original instruction verbatim, records the corrected validation evidence, and aligns the report with the current draft PR state.
 
 ---
@@ -752,9 +753,12 @@ Wrong-destination failure path after fresh game/reload:
 - `09_Development/Implementation_Preparation/IMPLEMENTATION_BATCH_PLAN.md` — corrected the BATCH-008 validation summary to 30 tests and recorded the corrected breakdown.
 - `09_Development/Implementation_Preparation/IMPLEMENTATION_DEPENDENCY_GRAPH.md` — recorded that ODR-004 no longer blocks BATCH-008.
 - `09_Development/Implementation_Preparation/README.md` — corrected `Last Updated` metadata to `2026-08-01`.
+- `09_Development/Implementation_Preparation/GDEVELOP_IMPLEMENTATION_ARCHITECTURE.md` — corrected stale ODR-004 active-decision wording; recorded dated reclassification and archived/non-authoritative status.
+- `09_Development/Engine_Migration/WEB_RUNTIME_MIGRATION_MILESTONE_001.md` — preserved Milestone 001 historical scope while adding dated current-state amendment for post-milestone BATCH-008 implementation state.
 - `00_Project/PROJECT_STATUS.md` — current-state summary updated earlier in PR #84 to reflect implemented BATCH-008 behavior and 30-test status.
 - `09_Development/CHANGELOG.md` — corrected helper ownership/path, preserved CRLF, and recorded the 30-test breakdown plus stale-intent and inclusive-radius fixes.
-- `game-web/README.md` — documents implemented BATCH-008 scope and explicit BATCH-009 exclusions.
+- `game-web/README.md` — documents implemented BATCH-008 scope, explicit BATCH-009 exclusions, and explicit Phaser non-canonical/replaceable classification.
+- `09_Development/AI_Reports/2026-08-01_085_BATCH_008_DELIVERY_COMPLETION_FAILURE_IMPLEMENTATION.md` — corrected verbatim-instruction fidelity and restored required substantive sections/inspection evidence.
 
 ---
 
@@ -783,7 +787,8 @@ None.
 9. Ran the CRLF-aware diff check required for this repository and reconfirmed the semantic-only diff size for the two canonical CRLF files.
 10. Reviewed dependency/lockfile scope and runtime-code scope exclusions.
 11. Scanned the modified files for secrets.
-12. Attempted to replace the draft PR description with the corrected evidence via the available PR tool; the tool confirmed PR #84 exists but did not replace the existing GitHub PR body.
+12. Attempted to replace the draft PR description via `runtime-tools-create_pull_request`; tool confirmed PR #84 exists but did not replace body content.
+13. Attempted authenticated fallback updates (`gh pr edit` and `gh api` PATCH) and direct API PATCH attempts; all remote-write attempts returned authorization/network-policy failures in this environment.
 
 ---
 
@@ -792,6 +797,7 @@ None.
 - Report 085 is now compliant with the Original Instruction Preservation Rule: the full original instruction has been restored verbatim.
 - Commit `5984896cd1b93f35ebf9d8f2140b99bad736f17e` corrected several report issues but still left the required original instruction missing.
 - Commit `3241590a8eb601af0f34c9efe02a09f7cd50f239` corrected the remaining stale documentation references before this final report/PR-evidence pass.
+- Commit `6ba3913959d9bd74c00c55ffeb31648fce0b5557` preserved semantic instruction content but changed list-marker/spacing fidelity; this pass restores strict verbatim formatting preservation.
 - The final suite contains **30 tests**, broken down as **9** pre-existing tests on `main` + **14** initial BATCH-008 delivery tests + **1** inclusive-radius-boundary correction test + **6** delivery-intent regression tests.
 - `game-web/src/utils/deliveryIntent.ts` is a created helper file; `GameWorldScene.ts` imports and uses it.
 - `game-web/tests/orderSystem.test.ts` contains the additional inclusive-radius and stale-intent correction tests.
@@ -820,7 +826,7 @@ None.
 - `cd /home/runner/work/DROPi-Tycoon/DROPi-Tycoon/game-web && npm ci`
 - `cd /home/runner/work/DROPi-Tycoon/DROPi-Tycoon/game-web && npm test`
 - `cd /home/runner/work/DROPi-Tycoon/DROPi-Tycoon/game-web && npm run build`
-- `cd /home/runner/work/DROPi-Tycoon/DROPi-Tycoon/game-web && PORT=3000 npm run start` + `curl -s -o /tmp/dropi_http_body.txt -w '%{http_code}' http://127.0.0.1:3000/`
+- Python-supervised production-server smoke run of `npm run start` on `PORT=3000` + HTTP request to `http://127.0.0.1:3000/` with graceful process termination
 - `cd /home/runner/work/DROPi-Tycoon/DROPi-Tycoon && git -c core.whitespace=trailing-space,space-before-tab,cr-at-eol diff --check origin/main...HEAD`
 - `cd /home/runner/work/DROPi-Tycoon/DROPi-Tycoon && git diff --stat origin/main...HEAD -- 00_Project/PROJECT_STATUS.md 09_Development/CHANGELOG.md`
 - `cd /home/runner/work/DROPi-Tycoon/DROPi-Tycoon && git diff --name-only origin/main...HEAD -- game-web/package.json game-web/package-lock.json`
@@ -833,9 +839,9 @@ None.
 
 - `node --version`: `v22.12.0`
 - `npm --version`: `10.9.0`
-- `npm ci`: passed — `added 51 packages, and audited 52 packages in 3s`; `found 0 vulnerabilities`
+- `npm ci`: passed — `added 51 packages, and audited 52 packages in 4s`; `found 0 vulnerabilities`
 - `npm test`: passed — `✓ tests/orderSystem.test.ts (30 tests)` and `Tests 30 passed (30)`
-- `npm run build`: passed — `vite v8.1.1 building client environment for production...`, `✓ built in 701ms`, output `dist/index.html 1.47 kB`, `dist/assets/index-BONyVZq3.js 1,209.44 kB` (non-blocking chunk-size warning only)
+- `npm run build`: passed — `vite v8.1.1 building client environment for production...`, `✓ built in 779ms`, output `dist/index.html 1.47 kB`, `dist/assets/index-BONyVZq3.js 1,209.44 kB` (non-blocking chunk-size warning only)
 - Production-server HTTP smoke test: passed — `HTTP status: 200`
 - CRLF preservation: confirmed — `git diff --stat origin/main...HEAD -- 00_Project/PROJECT_STATUS.md 09_Development/CHANGELOG.md` reported semantic-only diffs (`PROJECT_STATUS.md`: 29 changed lines; `CHANGELOG.md`: 29 changed lines) with no full-file line-ending churn
 - CRLF-aware diff check: passed — `git -c core.whitespace=trailing-space,space-before-tab,cr-at-eol diff --check origin/main...HEAD` produced no output
