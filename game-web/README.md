@@ -31,6 +31,9 @@ The archived/reference GDevelop source remains unchanged in:
 - Test runner: `vitest` `4.1.10`
 - Production server: custom Node.js static server at `server/server.mjs`
 
+Phaser `3.90.0` is the current web-runtime library implementation detail.
+It is replaceable and is not canonical DROPi Tycoon technology.
+Official direction remains a standard web-first application maintained in GitHub, deployed through Railway, and later packaged for Android.
 Phaser was selected because it is a code-first HTML5 2D runtime that can be fully maintained through GitHub without any external visual editor workflow.
 
 ---

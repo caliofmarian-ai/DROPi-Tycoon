@@ -2,11 +2,11 @@
 
 Document: GDEVELOP_IMPLEMENTATION_ARCHITECTURE.md
 Project: DROPi Tycoon
-Version: 1.1.1
-Status: Implementation Preparation — Non-Authoritative
+Version: 1.1.2
+Status: Archived Reference / Implementation Preparation — Non-Authoritative
 Author: AI Agent (PR #56 correction from Report 057; corrected per Report 073)
 Language: English
-Last Updated: 2026-07-15
+Last Updated: 2026-08-01
 
 ---
 
@@ -16,7 +16,7 @@ Last Updated: 2026-07-15
 
 Define a canonically supported implementation architecture for Prototype v0.1 without creating game files.
 
-This package remains non-authoritative. Canonical documents govern.
+This package remains non-authoritative and archived/reference-only. Canonical documents govern.
 
 ---
 
@@ -172,9 +172,16 @@ GameWorld layer count for planning: **4 layers** (`Base`, `HUD`, `Notifications`
 
 - ODR-001: Player position persistence (previously misreferenced)
 - ODR-003: GameSettings persistence scope (previously misreferenced)
-- ODR-004: Failure trigger definition
+- ODR-004: Reclassified on 2026-08-01 (record only; not an active Owner Decision)
 
 ODR-002 is not an Owner Decision (reclassified to canonical requirement coverage in inventory).
+
+ODR-004 reclassification record:
+- Date: 2026-08-01
+- Active decision status: Not active
+- Canonical trigger authority: `09_Development/GAMEPLAY_EVENTS_FLOW.md` and `03_Logistics/ORDERS.md` already define wrong-destination interaction as the `PickedUp -> Failed` trigger
+- Cancellation scope: Manual cancellation is excluded from Prototype v0.1
+- Blocking impact: ODR-004 does not block BATCH-008
 
 ---
 

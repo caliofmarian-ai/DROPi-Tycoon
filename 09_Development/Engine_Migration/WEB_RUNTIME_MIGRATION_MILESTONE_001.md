@@ -2,11 +2,11 @@
 
 Document: WEB_RUNTIME_MIGRATION_MILESTONE_001.md
 Project: DROPi Tycoon
-Version: 0.1.0
+Version: 0.1.1
 Status: Migration Milestone Implemented
 Author: Marian Caliof & OpenAI
 Language: English
-Last Updated: 2026-07-15
+Last Updated: 2026-08-01
 
 ---
 
@@ -26,13 +26,14 @@ Final migration approval occurs only after the Project Owner tests the Railway b
 
 # Scope
 
-Only BATCH-001 through BATCH-007 behavior was ported.
+Historical Milestone 001 scope (as originally delivered on 2026-07-15):
+- Only BATCH-001 through BATCH-007 behavior was ported.
 
-No canonical gameplay change occurred.
+- No canonical gameplay change occurred.
 
-No BATCH-008 or later functionality was implemented.
+- No BATCH-008 or later functionality was implemented.
 
-No marketplace, premium purchasing, backend wallet, or database runtime is active in this milestone.
+- No marketplace, premium purchasing, backend wallet, or database runtime is active in this milestone.
 
 ---
 
@@ -51,6 +52,7 @@ Supporting toolchain:
 Reason:
 
 Phaser is a code-based HTML5 2D runtime that can be maintained entirely through GitHub without requiring the Project Owner to use an external visual editor.
+Phaser is an implementation detail, replaceable, and not canonical DROPi Tycoon technology.
 
 ---
 
@@ -90,7 +92,7 @@ The web runtime reproduces the currently merged prototype behavior:
 14. Minimal Android-compatible acceptance interaction
 15. Automatic pickup on correct proximity
 16. `CarryingPackage = true` after pickup
-17. No delivery completion
+17. [Historical Milestone 001 scope] No delivery completion
 18. No reward or Money modification
 19. No DROPiCoins functionality
 20. No marketplace
@@ -152,3 +154,18 @@ Approval happens only after:
 Future marketplace/backend architecture is planned but not implemented.
 
 The future server-authoritative preparation note is non-canonical and does not activate any backend service in the current milestone.
+
+---
+
+# Current-State Amendment (2026-08-01)
+
+- Milestone 001 originally covered only BATCH-001 through BATCH-007.
+- BATCH-007 was publicly verified on Railway on 2026-08-01.
+- BATCH-008 was implemented afterward in PR #84 (`feat: BATCH-008 — Delivery Completion + Failure Path`).
+- BATCH-008 adds terminal delivery outcomes:
+  - `PickedUp -> Completed` on correct destination
+  - `PickedUp -> Failed` on wrong destination
+- PR #84 review, merge, Railway redeployment, and public BATCH-008 verification are still pending.
+- GDevelop remains archived/reference-only.
+- Phaser remains a replaceable web-runtime implementation detail and is not canonical project technology.
+- Official direction remains a standard web-first application maintained in GitHub, deployed through Railway, and later packaged for Android.

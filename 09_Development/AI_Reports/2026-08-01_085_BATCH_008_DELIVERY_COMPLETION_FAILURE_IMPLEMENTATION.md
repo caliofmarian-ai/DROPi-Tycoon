@@ -28,7 +28,9 @@
 
 # Original Task Instruction
 
-Repository: `caliofmarian-ai/DROPi-Tycoon`
+BEGIN VERBATIM ORIGINAL INSTRUCTION
+
+Repository: caliofmarian-ai/DROPi-Tycoon
 
 TASK: Audit, reconcile, implement, test, document, commit, and open a Pull Request for BATCH-008 — Delivery Completion + Failure Path.
 
@@ -36,19 +38,19 @@ Work autonomously through the complete task. Do not ask the Project Owner to red
 
 CURRENT VERIFIED STATE
 
-* BATCH-001 through BATCH-007 are merged.
-* The public Railway runtime is available at:
+- BATCH-001 through BATCH-007 are merged.
+- The public Railway runtime is available at:
   `https://dropi-tycoon-production.up.railway.app/`
-* On 2026-08-01, the public BATCH-007 flow was manually verified:
+- On 2026-08-01, the public BATCH-007 flow was manually verified:
 
-  * `Available → Accepted`
-  * Player travels to the package
-  * `Accepted → PickedUp`
-  * `CarryingPackage = true`
-* This runtime verification removes the BATCH-007 preview blocker for BATCH-008.
-* PR #83 is already merged.
-* GitHub `main` is the authoritative repository state.
-* Do not rely on or assume the existence of any unpushed local implementation.
+  - `Available → Accepted`
+  - Player travels to the package
+  - `Accepted → PickedUp`
+  - `CarryingPackage = true`
+- This runtime verification removes the BATCH-007 preview blocker for BATCH-008.
+- PR #83 is already merged.
+- GitHub `main` is the authoritative repository state.
+- Do not rely on or assume the existence of any unpushed local implementation.
 
 OWNER INSTRUCTION
 
@@ -58,13 +60,13 @@ Do not introduce manual cancellation.
 
 Canonical interpretation for Prototype v0.1:
 
-* Correct destination interaction while carrying the active package:
+- Correct destination interaction while carrying the active package:
   `PickedUp → Completed`
-* Explicit interaction with a wrong delivery destination while carrying the active package:
+- Explicit interaction with a wrong delivery destination while carrying the active package:
   `PickedUp → Failed`
-* `Completed` and `Failed` are terminal states.
-* Cancellation states and cancellation events are excluded from Prototype v0.1.
-* Economy, rewards, Money, and reputation consequences belong to BATCH-009 and must not be implemented in BATCH-008.
+- `Completed` and `Failed` are terminal states.
+- Cancellation states and cancellation events are excluded from Prototype v0.1.
+- Economy, rewards, Money, and reputation consequences belong to BATCH-009 and must not be implemented in BATCH-008.
 
 REPOSITORY AND BRANCH PREPARATION
 
@@ -80,37 +82,37 @@ MANDATORY DOCUMENT INSPECTION
 
 Before modifying anything, read and reconcile at least:
 
-* `00_Project/DOCUMENT_INDEX.md`
-* `00_Project/PROJECT_STATUS.md`
-* `00_Project/VISION.md`
-* `01_GameDesign/GAMEPLAY.md`
-* `03_Logistics/ORDERS.md`
-* `03_Logistics/LOGISTICS.md`
-* `06_Technical/TDD.md`
-* `07_UI/UI.md`
-* `09_Development/PROTOTYPE_V0.1.md`
-* `09_Development/CORE_GAMEPLAY_SYSTEMS.md`
-* `09_Development/GAMEPLAY_EVENTS_FLOW.md`
-* `09_Development/GAME_DATA_STRUCTURE.md`
-* `09_Development/MOBILE_UI_CONTROLS.md`
-* `09_Development/GITHUB_WORKFLOW.md`
-* `09_Development/AI_AGENT_EXECUTION_PROTOCOL.md`
-* `09_Development/AI_REPORTING_PROTOCOL.md`
-* `09_Development/Engine_Migration/WEB_RUNTIME_MIGRATION_MILESTONE_001.md`
-* `09_Development/Implementation_Preparation/README.md`
-* `09_Development/Implementation_Preparation/PROTOTYPE_V0.1_REQUIREMENTS_INVENTORY.md`
-* `09_Development/Implementation_Preparation/IMPLEMENTATION_BATCH_PLAN.md`
-* `09_Development/Implementation_Preparation/IMPLEMENTATION_DEPENDENCY_GRAPH.md`
-* `09_Development/Implementation_Preparation/CANONICAL_TO_IMPLEMENTATION_TRACEABILITY_MATRIX.md`
-* `09_Development/Implementation_Preparation/GDEVELOP_IMPLEMENTATION_ARCHITECTURE.md`
-* `09_Development/Implementation_Preparation/IMPLEMENTATION_DETAIL_REGISTER.md`
-* `09_Development/Implementation_Preparation/OWNER_DECISION_REGISTER.md`
-* `09_Development/Implementation_Preparation/PROTOTYPE_V0.1_EXCLUSION_REGISTER.md`
-* `09_Development/Owner_Directives/README.md`
-* all relevant Owner Directives
-* relevant AI reports for BATCH-005 through BATCH-007 and the web-runtime/Railway migration, especially Reports 071–084 where present
-* all current files under `game-web/src/`
-* all current tests under `game-web/tests/`
+- `00_Project/DOCUMENT_INDEX.md`
+- `00_Project/PROJECT_STATUS.md`
+- `00_Project/VISION.md`
+- `01_GameDesign/GAMEPLAY.md`
+- `03_Logistics/ORDERS.md`
+- `03_Logistics/LOGISTICS.md`
+- `06_Technical/TDD.md`
+- `07_UI/UI.md`
+- `09_Development/PROTOTYPE_V0.1.md`
+- `09_Development/CORE_GAMEPLAY_SYSTEMS.md`
+- `09_Development/GAMEPLAY_EVENTS_FLOW.md`
+- `09_Development/GAME_DATA_STRUCTURE.md`
+- `09_Development/MOBILE_UI_CONTROLS.md`
+- `09_Development/GITHUB_WORKFLOW.md`
+- `09_Development/AI_AGENT_EXECUTION_PROTOCOL.md`
+- `09_Development/AI_REPORTING_PROTOCOL.md`
+- `09_Development/Engine_Migration/WEB_RUNTIME_MIGRATION_MILESTONE_001.md`
+- `09_Development/Implementation_Preparation/README.md`
+- `09_Development/Implementation_Preparation/PROTOTYPE_V0.1_REQUIREMENTS_INVENTORY.md`
+- `09_Development/Implementation_Preparation/IMPLEMENTATION_BATCH_PLAN.md`
+- `09_Development/Implementation_Preparation/IMPLEMENTATION_DEPENDENCY_GRAPH.md`
+- `09_Development/Implementation_Preparation/CANONICAL_TO_IMPLEMENTATION_TRACEABILITY_MATRIX.md`
+- `09_Development/Implementation_Preparation/GDEVELOP_IMPLEMENTATION_ARCHITECTURE.md`
+- `09_Development/Implementation_Preparation/IMPLEMENTATION_DETAIL_REGISTER.md`
+- `09_Development/Implementation_Preparation/OWNER_DECISION_REGISTER.md`
+- `09_Development/Implementation_Preparation/PROTOTYPE_V0.1_EXCLUSION_REGISTER.md`
+- `09_Development/Owner_Directives/README.md`
+- all relevant Owner Directives
+- relevant AI reports for BATCH-005 through BATCH-007 and the web-runtime/Railway migration, especially Reports 071–084 where present
+- all current files under `game-web/src/`
+- all current tests under `game-web/tests/`
 
 AUTHORITY AND CONFLICT RULES
 
@@ -118,18 +120,18 @@ Use the documentation hierarchy defined by the repository.
 
 In particular:
 
-* `03_Logistics/ORDERS.md` owns canonical order lifecycle semantics.
-* `09_Development/PROTOTYPE_V0.1.md` owns Prototype v0.1 gameplay scope.
-* `09_Development/GAMEPLAY_EVENTS_FLOW.md` defines:
+- `03_Logistics/ORDERS.md` owns canonical order lifecycle semantics.
+- `09_Development/PROTOTYPE_V0.1.md` owns Prototype v0.1 gameplay scope.
+- `09_Development/GAMEPLAY_EVENTS_FLOW.md` defines:
 
-  * correct-destination delivery completion;
-  * `DeliveryCompleted: PickedUp → Completed`;
-  * `DeliveryFailed: PickedUp → Failed`;
-  * wrong destination as a delivery-failure reason;
-  * absence of cancellation events in Prototype v0.1.
-* Implementation-preparation documents are non-authoritative and must not override canonical documents.
-* Historical AI reports are evidence, not canon.
-* Do not silently preserve a non-authoritative contradiction.
+  - correct-destination delivery completion;
+  - `DeliveryCompleted: PickedUp → Completed`;
+  - `DeliveryFailed: PickedUp → Failed`;
+  - wrong destination as a delivery-failure reason;
+  - absence of cancellation events in Prototype v0.1.
+- Implementation-preparation documents are non-authoritative and must not override canonical documents.
+- Historical AI reports are evidence, not canon.
+- Do not silently preserve a non-authoritative contradiction.
 
 ODR-004 RECONCILIATION
 
@@ -139,18 +141,18 @@ The existing preparation register incorrectly treats the DeliveryFailed trigger 
 
 Correct the non-authoritative preparation package in the same PR:
 
-* reclassify and remove ODR-004 from the active owner-decision list;
-* preserve a reclassification record explaining why it was removed;
-* state that the Project Owner instructed the agent on 2026-08-01 to apply the canonical documents without requesting a duplicate decision;
-* remove ODR-004 as a BATCH-008 blocker from:
+- reclassify and remove ODR-004 from the active owner-decision list;
+- preserve a reclassification record explaining why it was removed;
+- state that the Project Owner instructed the agent on 2026-08-01 to apply the canonical documents without requesting a duplicate decision;
+- remove ODR-004 as a BATCH-008 blocker from:
 
-  * `OWNER_DECISION_REGISTER.md`
-  * `IMPLEMENTATION_BATCH_PLAN.md`
-  * `IMPLEMENTATION_DEPENDENCY_GRAPH.md`
-  * preparation README/status summaries
-  * any other non-authoritative preparation document that still lists it as active;
-* do not change the canonical gameplay documents merely to justify this correction;
-* do not edit historical reports.
+  - `OWNER_DECISION_REGISTER.md`
+  - `IMPLEMENTATION_BATCH_PLAN.md`
+  - `IMPLEMENTATION_DEPENDENCY_GRAPH.md`
+  - preparation README/status summaries
+  - any other non-authoritative preparation document that still lists it as active;
+- do not change the canonical gameplay documents merely to justify this correction;
+- do not edit historical reports.
 
 If the requirement range assigned to BATCH-008 overlaps with BATCH-009 economy/reputation work, document and enforce the correct scope boundary. Do not implement economy simply because a broad requirement range contains later outcome requirements.
 
@@ -162,10 +164,10 @@ Implement BATCH-008 in the active Railway-deployable web runtime under:
 
 The archived GDevelop implementation remains reference-only:
 
-* do not modify `Game/DROPi_Tycoon.json`;
-* do not modify `Game/Assets/`;
-* do not generate a new GDevelop package;
-* do not attempt to make Phaser, GDevelop, or any other runtime library canonical.
+- do not modify `Game/DROPi_Tycoon.json`;
+- do not modify `Game/Assets/`;
+- do not generate a new GDevelop package;
+- do not attempt to make Phaser, GDevelop, or any other runtime library canonical.
 
 The official direction remains a standard web-first application maintained in GitHub, deployed through Railway, and later packaged for Android. Phaser is only a replaceable implementation detail of the current web runtime.
 
@@ -185,22 +187,22 @@ A delivery attempt may execute only when all required conditions are true:
 
 Successful branch:
 
-* if the selected/reached destination matches `ActiveOrder.Destination`:
+- if the selected/reached destination matches `ActiveOrder.Destination`:
 
-  * set order status to `Completed`;
-  * clear the carried-package state;
-  * clear the player’s current-order reference;
-  * do not apply reward, Money, reputation, progression, or new-order generation.
+  - set order status to `Completed`;
+  - clear the carried-package state;
+  - clear the player’s current-order reference;
+  - do not apply reward, Money, reputation, progression, or new-order generation.
 
 Failure branch:
 
-* if the selected/reached delivery point does not match `ActiveOrder.Destination`:
+- if the selected/reached delivery point does not match `ActiveOrder.Destination`:
 
-  * set order status to `Failed`;
-  * clear the carried-package state;
-  * clear the player’s current-order reference;
-  * do not apply Money or reputation penalties;
-  * do not introduce cancellation.
+  - set order status to `Failed`;
+  - clear the carried-package state;
+  - clear the player’s current-order reference;
+  - do not apply Money or reputation penalties;
+  - do not introduce cancellation.
 
 The failure must require an explicit delivery attempt at a wrong marker. Merely walking past or moving close to a wrong marker must not fail the order accidentally.
 
@@ -208,29 +210,29 @@ TERMINAL-STATE SAFETY
 
 Ensure:
 
-* `Completed` has no outbound transitions.
-* `Failed` has no outbound transitions.
-* A repeated tap cannot change a terminal result.
-* A completed order cannot become failed.
-* A failed order cannot become completed.
-* Delivery cannot execute without the active order’s package.
-* Delivery cannot execute outside the configured radius.
-* Delivery cannot execute before `PickedUp`.
-* Delivery cannot execute when order conditions are not fulfilled.
+- `Completed` has no outbound transitions.
+- `Failed` has no outbound transitions.
+- A repeated tap cannot change a terminal result.
+- A completed order cannot become failed.
+- A failed order cannot become completed.
+- Delivery cannot execute without the active order’s package.
+- Delivery cannot execute outside the configured radius.
+- Delivery cannot execute before `PickedUp`.
+- Delivery cannot execute when order conditions are not fulfilled.
 
 INTERACTION AND MOBILE REQUIREMENTS
 
-* Android/touch remains the primary input.
-* No keyboard requirement.
-* No hover dependency.
-* No mouse-only interaction.
-* Preserve existing Tap-to-Move behavior.
-* Preserve camera behavior.
-* Preserve package acceptance and pickup behavior.
-* Tapping a delivery marker after pickup should set the movement target to that marker and register the intended delivery attempt.
-* Avoid accidental conflict with the existing navigation buttons.
-* Keep delivery radius configurable.
-* Do not add physics or pathfinding merely for this batch.
+- Android/touch remains the primary input.
+- No keyboard requirement.
+- No hover dependency.
+- No mouse-only interaction.
+- Preserve existing Tap-to-Move behavior.
+- Preserve camera behavior.
+- Preserve package acceptance and pickup behavior.
+- Tapping a delivery marker after pickup should set the movement target to that marker and register the intended delivery attempt.
+- Avoid accidental conflict with the existing navigation buttons.
+- Keep delivery radius configurable.
+- Do not add physics or pathfinding merely for this batch.
 
 TEMPORARY FEEDBACK
 
@@ -238,10 +240,10 @@ The final HUD belongs to BATCH-010.
 
 For BATCH-008, update only the existing temporary debug/status surface as needed so the public flow can be tested:
 
-* before pickup: preserve existing guidance;
-* after `PickedUp`: explain that tapping the correct delivery marker completes the order and tapping a wrong delivery marker tests failure;
-* after `Completed`: display that the delivery completed and reward handling is deferred to BATCH-009;
-* after `Failed`: display that delivery failed at the wrong destination.
+- before pickup: preserve existing guidance;
+- after `PickedUp`: explain that tapping the correct delivery marker completes the order and tapping a wrong delivery marker tests failure;
+- after `Completed`: display that the delivery completed and reward handling is deferred to BATCH-009;
+- after `Failed`: display that delivery failed at the wrong destination.
 
 Do not create production HUD artwork, notifications, reward popups, or final interface styling.
 
@@ -249,32 +251,32 @@ STRICT NON-GOALS
 
 Do not implement:
 
-* reward calculation;
-* Money changes;
-* reputation increase or decrease;
-* economic penalties;
-* progression;
-* automatic next-order generation unless already required by the current batch’s verified architecture;
-* save/load;
-* persistence;
-* marketplace;
-* DROPiCoins;
-* payments;
-* wallets;
-* database;
-* backend;
-* multiplayer;
-* drones;
-* DronePorts;
-* vans;
-* bicycle behavior;
-* advanced vehicles;
-* missions;
-* final HUD;
-* final notifications;
-* production artwork;
-* sound or music;
-* BATCH-009 or any later batch.
+- reward calculation;
+- Money changes;
+- reputation increase or decrease;
+- economic penalties;
+- progression;
+- automatic next-order generation unless already required by the current batch’s verified architecture;
+- save/load;
+- persistence;
+- marketplace;
+- DROPiCoins;
+- payments;
+- wallets;
+- database;
+- backend;
+- multiplayer;
+- drones;
+- DronePorts;
+- vans;
+- bicycle behavior;
+- advanced vehicles;
+- missions;
+- final HUD;
+- final notifications;
+- production artwork;
+- sound or music;
+- BATCH-009 or any later batch.
 
 CODE ORGANIZATION
 
@@ -282,11 +284,11 @@ Preserve separation of concerns.
 
 Prefer:
 
-* a pure delivery-transition function in the order/delivery system;
-* a typed delivery context containing the selected destination, distance/radius, and order-condition result;
-* scene input/movement code responsible only for selecting a delivery marker and reaching it;
-* the order system as the sole owner of the state transition;
-* configurable world-state values rather than unexplained hard-coded logic.
+- a pure delivery-transition function in the order/delivery system;
+- a typed delivery context containing the selected destination, distance/radius, and order-condition result;
+- scene input/movement code responsible only for selecting a delivery marker and reaching it;
+- the order system as the sole owner of the state transition;
+- configurable world-state values rather than unexplained hard-coded logic.
 
 Do not duplicate the transition in several scene handlers.
 
@@ -315,17 +317,17 @@ Use the Node version required by the repository, preferably Node 22.12.x.
 
 From `game-web/`, run the repository-supported equivalents of:
 
-* clean dependency installation;
-* full test suite;
-* TypeScript/Vite production build;
-* production-server HTTP smoke test against generated `dist/`.
+- clean dependency installation;
+- full test suite;
+- TypeScript/Vite production build;
+- production-server HTTP smoke test against generated `dist/`.
 
 Also run:
 
-* `git diff --check`;
-* JSON/format validation where applicable;
-* secret scan;
-* review of the final diff for forbidden BATCH-009+ behavior.
+- `git diff --check`;
+- JSON/format validation where applicable;
+- secret scan;
+- review of the final diff for forbidden BATCH-009+ behavior.
 
 Do not modify dependency versions or the lockfile unless technically necessary for BATCH-008. If a dependency change becomes necessary, document the exact reason.
 
@@ -333,27 +335,27 @@ DOCUMENTATION UPDATES
 
 After successful implementation, update only the relevant current-state and non-authoritative preparation documents, including as applicable:
 
-* `00_Project/PROJECT_STATUS.md`
-* `09_Development/CHANGELOG.md`
-* `09_Development/Engine_Migration/WEB_RUNTIME_MIGRATION_MILESTONE_001.md`
-* `09_Development/Implementation_Preparation/README.md`
-* `09_Development/Implementation_Preparation/OWNER_DECISION_REGISTER.md`
-* `09_Development/Implementation_Preparation/IMPLEMENTATION_BATCH_PLAN.md`
-* `09_Development/Implementation_Preparation/IMPLEMENTATION_DEPENDENCY_GRAPH.md`
-* `09_Development/Implementation_Preparation/GDEVELOP_IMPLEMENTATION_ARCHITECTURE.md`
-* `game-web/README.md`
+- `00_Project/PROJECT_STATUS.md`
+- `09_Development/CHANGELOG.md`
+- `09_Development/Engine_Migration/WEB_RUNTIME_MIGRATION_MILESTONE_001.md`
+- `09_Development/Implementation_Preparation/README.md`
+- `09_Development/Implementation_Preparation/OWNER_DECISION_REGISTER.md`
+- `09_Development/Implementation_Preparation/IMPLEMENTATION_BATCH_PLAN.md`
+- `09_Development/Implementation_Preparation/IMPLEMENTATION_DEPENDENCY_GRAPH.md`
+- `09_Development/Implementation_Preparation/GDEVELOP_IMPLEMENTATION_ARCHITECTURE.md`
+- `game-web/README.md`
 
 Documentation must state accurately:
 
-* the public BATCH-007 Railway flow was verified on 2026-08-01;
-* BATCH-008 is implemented in the web runtime;
-* correct destination produces `Completed`;
-* wrong destination produces `Failed`;
-* terminal outcomes clear the carried package and current-order state;
-* BATCH-008 has no reward, Money, or reputation effects;
-* GDevelop remains archived/reference-only;
-* Phaser remains an implementation detail, not canonical technology;
-* BATCH-008 still requires PR review, Railway redeployment, and public verification before starting BATCH-009.
+- the public BATCH-007 Railway flow was verified on 2026-08-01;
+- BATCH-008 is implemented in the web runtime;
+- correct destination produces `Completed`;
+- wrong destination produces `Failed`;
+- terminal outcomes clear the carried package and current-order state;
+- BATCH-008 has no reward, Money, or reputation effects;
+- GDevelop remains archived/reference-only;
+- Phaser remains an implementation detail, not canonical technology;
+- BATCH-008 still requires PR review, Railway redeployment, and public verification before starting BATCH-009.
 
 Do not modify unrelated canonical documents.
 
@@ -373,33 +375,33 @@ Follow `AI_REPORTING_PROTOCOL.md` completely.
 
 The report must include:
 
-* complete original instruction;
-* repository and branch;
-* exact base commit;
-* canonical sources inspected;
-* authority analysis;
-* ODR-004 reconciliation;
-* exact implementation scope;
-* exact files inspected;
-* exact files created and modified;
-* delivery attempt model;
-* success conditions;
-* failure conditions;
-* destination identity mechanism;
-* delivery radius;
-* terminal-state protection;
-* touch-first behavior;
-* regression checks;
-* test commands;
-* test results;
-* build result;
-* HTTP smoke-test result;
-* secret scan result;
-* strict non-goal verification;
-* unresolved issues;
-* final verdict;
-* PR status;
-* post-merge Railway test plan.
+- complete original instruction;
+- repository and branch;
+- exact base commit;
+- canonical sources inspected;
+- authority analysis;
+- ODR-004 reconciliation;
+- exact implementation scope;
+- exact files inspected;
+- exact files created and modified;
+- delivery attempt model;
+- success conditions;
+- failure conditions;
+- destination identity mechanism;
+- delivery radius;
+- terminal-state protection;
+- touch-first behavior;
+- regression checks;
+- test commands;
+- test results;
+- build result;
+- HTTP smoke-test result;
+- secret scan result;
+- strict non-goal verification;
+- unresolved issues;
+- final verdict;
+- PR status;
+- post-merge Railway test plan.
 
 Do not rewrite or silently edit older AI reports.
 
@@ -418,14 +420,14 @@ After every required test passes:
 
 The PR description must include:
 
-* canonical basis;
-* ODR-004 reclassification;
-* implementation summary;
-* exact scope exclusions;
-* test/build results;
-* manual public verification plan;
-* Railway URL;
-* explicit statement that merge is pending review.
+- canonical basis;
+- ODR-004 reclassification;
+- implementation summary;
+- exact scope exclusions;
+- test/build results;
+- manual public verification plan;
+- Railway URL;
+- explicit statement that merge is pending review.
 
 POST-MERGE MANUAL TEST PLAN
 
@@ -457,29 +459,31 @@ FINAL RESPONSE REQUIRED
 
 Return:
 
-* branch name;
-* base commit;
-* resulting commit;
-* Pull Request link;
-* exact files created;
-* exact files modified;
-* ODR-004 reconciliation result;
-* success-path implementation result;
-* failure-path implementation result;
-* delivery radius;
-* touch/mobile result;
-* terminal-state result;
-* total tests passed;
-* build result;
-* HTTP smoke-test result;
-* secret scan result;
-* scope-exclusion result;
-* report path;
-* remaining unresolved items;
-* final verdict;
-* whether the PR is safe for independent review.
+- branch name;
+- base commit;
+- resulting commit;
+- Pull Request link;
+- exact files created;
+- exact files modified;
+- ODR-004 reconciliation result;
+- success-path implementation result;
+- failure-path implementation result;
+- delivery radius;
+- touch/mobile result;
+- terminal-state result;
+- total tests passed;
+- build result;
+- HTTP smoke-test result;
+- secret scan result;
+- scope-exclusion result;
+- report path;
+- remaining unresolved items;
+- final verdict;
+- whether the PR is safe for independent review.
 
 Do not ask the Project Owner to execute PC commands. Do not ask him to redefine the failure trigger. Do not merge the PR.
+
+END VERBATIM ORIGINAL INSTRUCTION
 
 ---
 
@@ -505,7 +509,7 @@ Correct the remaining non-code deficiencies in PR #84 without changing the worki
 
 **Correction scope completed in this pass**
 
-- Restored the complete verbatim original instruction in this report.
+- Restored the complete verbatim original instruction in this report (with the required verbatim delimiters).
 - Corrected current-state test-count references from `23` to the final `30`.
 - Corrected helper-path documentation to point to `game-web/src/utils/deliveryIntent.ts`.
 - Corrected Implementation Preparation README metadata (`Last Updated: 2026-08-01`).
@@ -515,30 +519,217 @@ Correct the remaining non-code deficiencies in PR #84 without changing the worki
 
 ---
 
+# Canonical Sources Inspected
+
+- Canonical/gameplay authority set: `03_Logistics/ORDERS.md`, `09_Development/PROTOTYPE_V0.1.md`, `09_Development/GAMEPLAY_EVENTS_FLOW.md`, `09_Development/GAME_DATA_STRUCTURE.md`.
+- Governance/reporting authority set: `09_Development/AI_REPORTING_PROTOCOL.md`, `09_Development/AI_AGENT_EXECUTION_PROTOCOL.md`, `09_Development/GITHUB_WORKFLOW.md`, `00_Project/DOCUMENT_INDEX.md`.
+- Current-state and migration set: `00_Project/PROJECT_STATUS.md`, `09_Development/CHANGELOG.md`, `09_Development/Engine_Migration/WEB_RUNTIME_MIGRATION_MILESTONE_001.md`.
+- Preparation package audited as non-authoritative reference: `09_Development/Implementation_Preparation/*` required files and `09_Development/Owner_Directives/*` required files.
+
+---
+
+# Authority Analysis
+
+- Canonical gameplay documents define the order lifecycle and delivery-outcome semantics.
+- Preparation documents are non-authoritative and can be corrected when they contradict canon.
+- Historical AI reports are evidentiary context only and do not override canonical docs.
+- The active runtime implementation under `game-web/` is the deployable path; GDevelop artifacts are archived/reference-only.
+
+---
+
+# ODR-004 Reconciliation
+
+- ODR-004 is recorded as reclassified on `2026-08-01`.
+- ODR-004 is not an active Owner Decision and does not block BATCH-008.
+- Wrong-destination interaction is already canonically defined as the failure trigger.
+- Manual cancellation remains excluded from Prototype v0.1.
+
+---
+
+# Exact Implementation Scope
+
+- BATCH-008 behavior preserved without gameplay regressions.
+- Correct destination attempt while carrying package in `PickedUp` produces `Completed`.
+- Explicit wrong-marker delivery attempt while carrying package in `PickedUp` produces `Failed`.
+- Both terminal outcomes clear `carryingPackage` and `currentOrder`.
+- `game-web/src/utils/deliveryIntent.ts` remains the created helper file for touch intent selection/clearing.
+- No reward, Money, reputation, or BATCH-009 functionality is introduced.
+
+---
+
+# Delivery Attempt Model
+
+- Delivery executes only after explicit marker selection/tap and arrival within configured radius.
+- Destination identity is compared deterministically against `ActiveOrder.Destination`.
+- Ordinary-ground tap clears stale delivery intent and prevents accidental wrong-marker evaluation.
+
+---
+
+# Success Conditions
+
+- Active order status must be `PickedUp`.
+- Player must be carrying the package and associated with current order.
+- Selected destination must match `ActiveOrder.Destination`.
+- Distance check is inclusive: `distance <= 48`.
+- Result: `Completed`, then clear `carryingPackage` and `currentOrder`.
+
+---
+
+# Failure Conditions
+
+- Active order status is `PickedUp`, package is carried, and an explicit marker intent exists.
+- Selected destination does not match `ActiveOrder.Destination`.
+- Arrival occurs within inclusive radius.
+- Result: `Failed`, then clear `carryingPackage` and `currentOrder`.
+- No penalty/reward/economy behavior is applied.
+
+---
+
+# Destination Identity Mechanism
+
+- Delivery destination identity is evaluated by direct marker ID matching against `ActiveOrder.Destination`.
+- Wrong marker interaction only fails on explicit intended-marker selection and reached-distance satisfaction.
+
+---
+
+# Delivery Radius
+
+- Configured radius: `48` pixels.
+- Comparator: inclusive `distance <= deliveryRadius`.
+
+---
+
+# Terminal-State Protection
+
+- `Completed` and `Failed` are terminal.
+- Repeated taps cannot transition out of terminal states.
+- `Completed` cannot become `Failed`, and `Failed` cannot become `Completed`.
+
+---
+
+# Touch-First Behavior
+
+- Touch/pointer tap remains the primary interaction path.
+- No keyboard requirement or hover dependency introduced.
+- Existing tap-to-move and camera behavior preserved.
+
+---
+
+# Stale-Intent Behavior
+
+- Tapping ordinary ground clears pending delivery intent.
+- This prevents stale marker intent from triggering accidental completion/failure when arriving elsewhere.
+
+---
+
+# Regression Checks
+
+- Existing BATCH-005 through BATCH-007 behavior/tests remain intact.
+- Full suite remains 30/30 passing.
+- Terminal transition safety and stale-intent path are covered by automated regression tests.
+
+---
+
+# Strict Non-Goal Verification
+
+- No reward distribution.
+- No Money/reputation changes.
+- No progression activation.
+- No BATCH-009 behavior.
+
+---
+
+# Post-Merge Railway Test Plan
+
+Railway URL: `https://dropi-tycoon-production.up.railway.app/`
+
+Success path:
+1. Open the Railway URL.
+2. Start the game.
+3. Tap the package to accept the order.
+4. Let the player reach the package.
+5. Confirm `PickedUp` and `CarryingPackage: true`.
+6. Tap the correct `DeliveryZone`.
+7. Confirm the player reaches the marker.
+8. Confirm status becomes `Completed`.
+9. Confirm `CarryingPackage: false`.
+10. Confirm no reward or Money change occurs yet.
+
+Wrong-destination failure path after fresh game/reload:
+1. Repeat acceptance and pickup.
+2. Tap a delivery marker that does not match the active order destination.
+3. Confirm the player reaches the selected marker.
+4. Confirm status becomes `Failed`.
+5. Confirm `CarryingPackage: false`.
+6. Confirm no reputation or Money penalty occurs yet.
+
+---
+
 # Files Inspected
 
-- `00_Project/PROJECT_STATUS.md`
-- `03_Logistics/ORDERS.md`
-- `09_Development/AI_REPORTING_PROTOCOL.md`
-- `09_Development/CHANGELOG.md`
-- `09_Development/Engine_Migration/WEB_RUNTIME_MIGRATION_MILESTONE_001.md`
-- `09_Development/GAMEPLAY_EVENTS_FLOW.md`
-- `09_Development/Implementation_Preparation/GDEVELOP_IMPLEMENTATION_ARCHITECTURE.md`
-- `09_Development/Implementation_Preparation/IMPLEMENTATION_BATCH_PLAN.md`
-- `09_Development/Implementation_Preparation/IMPLEMENTATION_DEPENDENCY_GRAPH.md`
-- `09_Development/Implementation_Preparation/OWNER_DECISION_REGISTER.md`
-- `09_Development/Implementation_Preparation/README.md`
-- `09_Development/AI_Reports/2026-08-01_085_BATCH_008_DELIVERY_COMPLETION_FAILURE_IMPLEMENTATION.md`
-- `game-web/README.md`
-- `game-web/package.json`
-- `game-web/src/scenes/GameWorldScene.ts`
-- `game-web/src/state/gameState.ts`
-- `game-web/src/systems/orderSystem.ts`
-- `game-web/src/types/game.ts`
-- `game-web/src/ui/DebugPanel.ts`
-- `game-web/src/utils/deliveryIntent.ts`
-- `game-web/tests/orderSystem.test.ts`
-- PR #84 metadata/body via GitHub pull-request read tool
+- Canonical/governance documents:
+  - `00_Project/DOCUMENT_INDEX.md`
+  - `00_Project/PROJECT_STATUS.md`
+  - `00_Project/VISION.md`
+  - `01_GameDesign/GAMEPLAY.md`
+  - `03_Logistics/ORDERS.md`
+  - `03_Logistics/LOGISTICS.md`
+  - `06_Technical/TDD.md`
+  - `07_UI/UI.md`
+  - `09_Development/PROTOTYPE_V0.1.md`
+  - `09_Development/CORE_GAMEPLAY_SYSTEMS.md`
+  - `09_Development/GAMEPLAY_EVENTS_FLOW.md`
+  - `09_Development/GAME_DATA_STRUCTURE.md`
+  - `09_Development/MOBILE_UI_CONTROLS.md`
+  - `09_Development/GITHUB_WORKFLOW.md`
+  - `09_Development/AI_AGENT_EXECUTION_PROTOCOL.md`
+  - `09_Development/AI_REPORTING_PROTOCOL.md`
+  - `09_Development/Engine_Migration/WEB_RUNTIME_MIGRATION_MILESTONE_001.md`
+- Implementation-preparation documents:
+  - `09_Development/Implementation_Preparation/README.md`
+  - `09_Development/Implementation_Preparation/PROTOTYPE_V0.1_REQUIREMENTS_INVENTORY.md`
+  - `09_Development/Implementation_Preparation/IMPLEMENTATION_BATCH_PLAN.md`
+  - `09_Development/Implementation_Preparation/IMPLEMENTATION_DEPENDENCY_GRAPH.md`
+  - `09_Development/Implementation_Preparation/CANONICAL_TO_IMPLEMENTATION_TRACEABILITY_MATRIX.md`
+  - `09_Development/Implementation_Preparation/GDEVELOP_IMPLEMENTATION_ARCHITECTURE.md`
+  - `09_Development/Implementation_Preparation/IMPLEMENTATION_DETAIL_REGISTER.md`
+  - `09_Development/Implementation_Preparation/OWNER_DECISION_REGISTER.md`
+  - `09_Development/Implementation_Preparation/PROTOTYPE_V0.1_EXCLUSION_REGISTER.md`
+- Owner directives:
+  - `09_Development/Owner_Directives/README.md`
+  - `09_Development/Owner_Directives/2026-07-16_MASTER_OWNER_DIRECTIVE_001.md`
+- Relevant reports 071–084:
+  - `09_Development/AI_Reports/2026-07-15_071_BATCH_005_ORDER_GENERATION_LIFECYCLE_CORE_IMPLEMENTATION.md`
+  - `09_Development/AI_Reports/2026-07-15_072_BATCH_005_ORDER_GENERATION_LIFECYCLE_CORE_INDEPENDENT_VERIFICATION.md`
+  - `09_Development/AI_Reports/2026-07-15_073_BATCH_006_PRE_IMPLEMENTATION_VERIFICATION_ANDROID_FIRST.md`
+  - `09_Development/AI_Reports/2026-07-15_074_BATCH_006_REQUIREMENT_MEMBERSHIP_CORRECTION.md`
+  - `09_Development/AI_Reports/2026-07-15_075_BATCH_006_TAP_TO_MOVE_CAMERA_IMPLEMENTATION.md`
+  - `09_Development/AI_Reports/2026-07-15_076_BATCH_006_TAP_TO_MOVE_CAMERA_INDEPENDENT_VERIFICATION.md`
+  - `09_Development/AI_Reports/2026-07-15_077_BATCH_007_PRE_IMPLEMENTATION_VERIFICATION_ANDROID_FIRST.md`
+  - `09_Development/AI_Reports/2026-07-15_078_BATCH_007_REQUIREMENT_MEMBERSHIP_AND_ACCEPTANCE_BOUNDARY_CORRECTION.md`
+  - `09_Development/AI_Reports/2026-07-15_079_BATCH_007_PICKUP_PROXIMITY_AND_ACCEPTANCE_TRIGGER_IMPLEMENTATION.md`
+  - `09_Development/AI_Reports/2026-07-15_080_BATCH_007_PICKUP_PROXIMITY_AND_ACCEPTANCE_TRIGGER_INDEPENDENT_VERIFICATION.md`
+  - `09_Development/AI_Reports/2026-07-15_081_FIRST_GDEVELOP_PORTABLE_PACKAGE_AND_ANDROID_PREVIEW_PREPARATION.md`
+  - `09_Development/AI_Reports/2026-07-15_082_WEB_RUNTIME_MIGRATION_MILESTONE_001_RAILWAY_DEPLOYABLE_APPLICATION.md`
+  - `09_Development/AI_Reports/2026-07-15_083_RAILWAY_NODE_ROLLDOWN_NATIVE_BINDING_DEPLOYMENT_REPAIR.md`
+  - `09_Development/AI_Reports/2026-07-16_084_OWNER_DIRECTIVES_UNIVERSE_DESIGN_BIBLE_DROPI_REFERENCE_WEB_FIRST_COMPLETION.md`
+- Web runtime source files (`game-web/src/`):
+  - `game-web/src/config/env.ts`
+  - `game-web/src/config/gameConfig.ts`
+  - `game-web/src/main.ts`
+  - `game-web/src/scenes/CompanyManagementScene.ts`
+  - `game-web/src/scenes/GameWorldScene.ts`
+  - `game-web/src/scenes/MainMenuScene.ts`
+  - `game-web/src/state/gameState.ts`
+  - `game-web/src/systems/orderSystem.ts`
+  - `game-web/src/types/game.ts`
+  - `game-web/src/ui/DebugPanel.ts`
+  - `game-web/src/utils/deliveryIntent.ts`
+- Web runtime tests (`game-web/tests/`):
+  - `game-web/tests/orderSystem.test.ts`
+- PR metadata source:
+  - PR #84 metadata/body via GitHub PR API/CLI query attempts during this correction pass.
+- Missing required paths from the mandatory list: none.
 
 ---
 
