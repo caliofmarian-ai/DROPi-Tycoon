@@ -41,20 +41,23 @@ Description
 - `DeliveryContext` type in `game-web/src/types/game.ts` with `selectedDestination`, `distanceToDestination`, `deliveryRadius`, `orderConditionsMet`.
 - `attemptDelivery` pure function in `game-web/src/systems/orderSystem.ts` implementing `PickedUp → Completed` (correct destination) and `PickedUp → Failed` (wrong destination) transitions with full terminal-state protection.
 - `deliveryRadius` (48) and `pendingDeliveryDestination` fields in `WorldState` and `createInitialWorldState`.
+- `selectDeliveryIntentFromTap` exported pure helper in `GameWorldScene.ts`; clears pending intent when tapping ordinary ground after a delivery marker.
 - Delivery tap-intent detection in `GameWorldScene.ts`: tapping a delivery marker while carrying a package registers `pendingDeliveryDestination`; `updateDeliveryState` executes `attemptDelivery` on arrival within `deliveryRadius`.
 - `DebugPanel` updated with post-pickup, completed, and failed guidance messages.
-- 14 new automated tests in `game-web/tests/orderSystem.test.ts` covering all BATCH-008 delivery scenarios.
+- 30 automated tests in `game-web/tests/orderSystem.test.ts` (23 BATCH-005–BATCH-008 delivery tests + 6 stale-intent regression tests + 1 radius-boundary test); all pass.
 
 ## Fixed (preparation documents)
 
 - ODR-004 reclassified in `OWNER_DECISION_REGISTER.md`, `IMPLEMENTATION_BATCH_PLAN.md`, `IMPLEMENTATION_DEPENDENCY_GRAPH.md`, and `Implementation_Preparation/README.md`; wrong-destination trigger resolved by canonical documents.
+- Stale delivery-intent cleared when player taps ordinary ground after selecting a delivery marker, preventing outdated intent from triggering delivery.
+- Delivery radius comparison corrected to `<=` (inclusive boundary).
 
 ## Verified
 
 - BATCH-007 public Railway flow manually verified on 2026-08-01 (Available→Accepted→PickedUp, CarryingPackage: true).
-- 23 automated tests pass.
+- 30 automated tests pass.
 - TypeScript + Vite production build passes.
-- HTTP 200 smoke test against `dist/` passes.
+- HTTP 200 smoke test against `dist/` passes.
 
 ---
 

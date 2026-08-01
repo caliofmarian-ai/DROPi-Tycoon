@@ -8,6 +8,7 @@ import {
 } from '../systems/orderSystem'
 import type { WorldState } from '../types/game'
 import { DebugPanel } from '../ui/DebugPanel'
+import { selectDeliveryIntentFromTap } from '../utils/deliveryIntent'
 
 const ROAD_POSITIONS = [
   { x: 240, y: 200 },
@@ -125,16 +126,12 @@ export class GameWorldScene extends Phaser.Scene {
       }
 
       if (this.worldState.activeOrder.status === 'PickedUp' && this.worldState.player.carryingPackage) {
-        const tappedPoint = DELIVERY_POINTS.filter(
-          (pt) => pt.label !== 'PickupZone',
-        ).find(
-          (pt) =>
-            Phaser.Math.Distance.Between(pointer.worldX, pointer.worldY, pt.x, pt.y) <=
-            DELIVERY_MARKER_TAP_RADIUS,
+        this.worldState.pendingDeliveryDestination = selectDeliveryIntentFromTap(
+          pointer.worldX,
+          pointer.worldY,
+          DELIVERY_POINTS,
+          DELIVERY_MARKER_TAP_RADIUS,
         )
-        if (tappedPoint) {
-          this.worldState.pendingDeliveryDestination = tappedPoint.label
-        }
       }
 
       this.debugPanel.update(this.worldState)

@@ -6,7 +6,7 @@ Version: 1.0.0
 Status: Active Development
 Author: Marian Caliof & OpenAI
 Language: English
-Last Updated: 2026-07-15 (WEB RUNTIME MIGRATION MILESTONE 001)
+Last Updated: 2026-08-01 (BATCH-008 DELIVERY OUTCOMES)
 
 ---
 
@@ -16,17 +16,13 @@ Last Updated: 2026-07-15 (WEB RUNTIME MIGRATION MILESTONE 001)
 
 Phase:
 
-Prototype v0.1 Web Runtime Migration — Railway-Deployable Browser Runtime Candidate Implemented
+Prototype v0.1 — BATCH-008 Delivery Outcomes Implemented; Pending Railway Verification and PR Review
 
 ---
 
 # Current Objective
 
-Validate the new deployable browser runtime candidate on Railway without changing canonical gameplay scope.
-
-The current focus is not the final game.
-
-The focus is creating a stable first playable prototype.
+Complete the independent review of PR #84, merge BATCH-008, redeploy to the public Railway runtime, and manually verify the Completed and Failed delivery paths before beginning BATCH-009.
 
 ---
 
@@ -165,8 +161,8 @@ The prototype must prove the core idea before expansion.
 # Next Steps
 
 1. BATCH-007 public Railway flow was manually verified on 2026-08-01 (Available→Accepted→PickedUp, CarryingPackage: true).
-2. BATCH-008 is implemented and pending PR review.
-3. After BATCH-008 PR is merged, redeploy to Railway and run public manual verification of Completed and Failed paths.
+2. BATCH-008 is implemented and pending PR #84 independent re-review.
+3. After PR #84 is merged, redeploy to Railway and run public manual verification of Completed and Failed paths.
 4. Begin BATCH-009 only after BATCH-008 Railway verification is complete.
 
 ---
@@ -206,14 +202,15 @@ Implementation Preparation Status:
 - Core gameplay logic is now present for order creation/acceptance, tap-to-move, camera follow, and pickup proximity
 - Code-based web runtime introduced in `game-web/` using Phaser/Vite/TypeScript; historical GDevelop source remains unchanged
 - `OrderSystem` external events contain the BATCH-005 order lifecycle core; `EconomySystem` and `ProgressionSystem` remain empty scaffolds
-- No playable build exists
+- A public deployable browser runtime is available at https://dropi-tycoon-production.up.railway.app/ (Railway); BATCH-007 flow publicly verified 2026-08-01 (archived GDevelop source: `Game/DROPi_Tycoon.json`)
 - BATCH-001 is complete
 - BATCH-002 is complete
 - BATCH-003 is complete — placeholder asset library created
 - BATCH-004 is complete — visual world setup created; Player and static world entities placed; no movement or gameplay logic implemented; no playable prototype exists
 - BATCH-005 is complete — order lifecycle state machine implemented; Created→Available→Accepted event logic added; no pickup/delivery/economy/HUD logic implemented; no playable prototype exists
 - BATCH-006 is complete — Tap-to-Move implemented; touch input (primary/Android-first) and mouse fallback (desktop); Player movement toward tapped target; camera follows Player; arrival stops movement; Idle/Move animation switching; movement speed and arrival threshold are configurable scene variables; no pickup/delivery/economy/HUD/AI/save-load logic implemented; no playable prototype exists
-- BATCH-008 is implemented — delivery completion (PickedUp→Completed on correct destination) and failure (PickedUp→Failed on wrong destination); terminal states have no outbound transitions; CarryingPackage and currentOrder cleared on both outcomes; delivery radius = 48; touch-first tap-on-marker intent registration; no reward, Money, or reputation effects; 23 automated tests pass; TypeScript build passes; HTTP 200 smoke test passes
+- BATCH-007 is implemented — minimal Android-first order acceptance trigger exists on Package touch while order status is Available; automatic pickup proximity exists with configurable `PickupRadius` = 32; Accepted→PickedUp transition sets `PlayerData.CarryingPackage` and `Player.CarryingPackage` true; no delivery completion, failure, reward, economy, HUD, notification, AI, or save/load logic implemented
+- BATCH-008 is implemented — delivery completion (PickedUp→Completed on correct destination) and failure (PickedUp→Failed on wrong destination); terminal states have no outbound transitions; CarryingPackage and currentOrder cleared on both outcomes; delivery radius = 48; touch-first tap-on-marker intent registration; no reward, Money, or reputation effects; 30 automated tests pass; TypeScript build passes; HTTP 200 smoke test passes
 - Web Runtime Migration Milestone 001 is implemented — `game-web/` now builds, tests, produces `dist/`, and starts on a production Node server compatible with Railway root-directory deployment
 - Public Railway browser verification of BATCH-007 flow completed on 2026-08-01: Available→Accepted, player travels to package, Accepted→PickedUp, CarryingPackage: true confirmed
 - BATCH-008 delivery outcomes implemented in `game-web/`: PickedUp→Completed (correct destination), PickedUp→Failed (wrong destination); terminal states protected; touch-first; no economy/reward/reputation effects

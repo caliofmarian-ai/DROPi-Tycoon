@@ -7,6 +7,7 @@ import {
   requestOrderAcceptance,
   transitionCreatedToAvailable,
 } from '../src/systems/orderSystem'
+import { selectDeliveryIntentFromTap } from '../src/utils/deliveryIntent'
 
 describe('order system', () => {
   it('allows Created to Available', () => {
@@ -252,5 +253,55 @@ describe('delivery system — BATCH-008', () => {
     expect(result.order).not.toHaveProperty('reputation')
     expect(result.player).not.toHaveProperty('money')
     expect(result.player).not.toHaveProperty('reputation')
+  })
+
+  it('delivery exactly at radius boundary (distance === deliveryRadius) completes order', () => {
+    const state = buildPickedUpState()
+    const result = attemptDelivery(state.activeOrder, state.player, {
+      ...validDeliveryContext(state),
+      distanceToDestination: state.deliveryRadius,
+    })
+    expect(result.order.status).toBe('Completed')
+  })
+})
+
+const DELIVERY_POINTS_TEST = [
+  { x: 120, y: 490, label: 'PickupZone' },
+  { x: 580, y: 470, label: 'DeliveryZone' },
+  { x: 660, y: 510, label: 'DeliveryPoint' },
+]
+const TAP_RADIUS = 36
+
+describe('delivery intent selection — stale intent', () => {
+  it('tapping a delivery marker registers that marker as intent', () => {
+    const intent = selectDeliveryIntentFromTap(580, 470, DELIVERY_POINTS_TEST, TAP_RADIUS)
+    expect(intent).toBe('DeliveryZone')
+  })
+
+  it('tapping ordinary ground returns empty string (no intent)', () => {
+    const intent = selectDeliveryIntentFromTap(300, 300, DELIVERY_POINTS_TEST, TAP_RADIUS)
+    expect(intent).toBe('')
+  })
+
+  it('tapping ordinary ground after a marker clears previous intent', () => {
+    let intent = selectDeliveryIntentFromTap(580, 470, DELIVERY_POINTS_TEST, TAP_RADIUS)
+    expect(intent).toBe('DeliveryZone')
+    intent = selectDeliveryIntentFromTap(300, 300, DELIVERY_POINTS_TEST, TAP_RADIUS)
+    expect(intent).toBe('')
+  })
+
+  it('tapping PickupZone does not register delivery intent', () => {
+    const intent = selectDeliveryIntentFromTap(120, 490, DELIVERY_POINTS_TEST, TAP_RADIUS)
+    expect(intent).toBe('')
+  })
+
+  it('tapping exactly at the tap radius boundary registers the marker', () => {
+    const intent = selectDeliveryIntentFromTap(580 + TAP_RADIUS, 470, DELIVERY_POINTS_TEST, TAP_RADIUS)
+    expect(intent).toBe('DeliveryZone')
+  })
+
+  it('tapping just outside the tap radius boundary does not register the marker', () => {
+    const intent = selectDeliveryIntentFromTap(580 + TAP_RADIUS + 1, 470, DELIVERY_POINTS_TEST, TAP_RADIUS)
+    expect(intent).toBe('')
   })
 })

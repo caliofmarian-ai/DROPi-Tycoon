@@ -69,7 +69,7 @@ export const attemptDelivery = (
     player.carryingPackage &&
     player.currentOrder === order.orderId &&
     context.orderConditionsMet &&
-    context.distanceToDestination < context.deliveryRadius
+    context.distanceToDestination <= context.deliveryRadius
 
   if (!canDeliver) {
     return { order, player }
