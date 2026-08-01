@@ -43,7 +43,6 @@ CURRENT VERIFIED STATE
 - The public Railway runtime is available at:
   `https://dropi-tycoon-production.up.railway.app/`
 - On 2026-08-01, the public BATCH-007 flow was manually verified:
-
   - `Available → Accepted`
   - Player travels to the package
   - `Accepted → PickedUp`
@@ -124,7 +123,6 @@ In particular:
 - `03_Logistics/ORDERS.md` owns canonical order lifecycle semantics.
 - `09_Development/PROTOTYPE_V0.1.md` owns Prototype v0.1 gameplay scope.
 - `09_Development/GAMEPLAY_EVENTS_FLOW.md` defines:
-
   - correct-destination delivery completion;
   - `DeliveryCompleted: PickedUp → Completed`;
   - `DeliveryFailed: PickedUp → Failed`;
@@ -146,7 +144,6 @@ Correct the non-authoritative preparation package in the same PR:
 - preserve a reclassification record explaining why it was removed;
 - state that the Project Owner instructed the agent on 2026-08-01 to apply the canonical documents without requesting a duplicate decision;
 - remove ODR-004 as a BATCH-008 blocker from:
-
   - `OWNER_DECISION_REGISTER.md`
   - `IMPLEMENTATION_BATCH_PLAN.md`
   - `IMPLEMENTATION_DEPENDENCY_GRAPH.md`
@@ -189,7 +186,6 @@ A delivery attempt may execute only when all required conditions are true:
 Successful branch:
 
 - if the selected/reached destination matches `ActiveOrder.Destination`:
-
   - set order status to `Completed`;
   - clear the carried-package state;
   - clear the player’s current-order reference;
@@ -198,7 +194,6 @@ Successful branch:
 Failure branch:
 
 - if the selected/reached delivery point does not match `ActiveOrder.Destination`:
-
   - set order status to `Failed`;
   - clear the carried-package state;
   - clear the player’s current-order reference;
@@ -515,7 +510,7 @@ Resolve the remaining PR #84 blockers by enforcing explicit delivery-marker sele
 - Corrected Implementation Preparation README metadata (`Last Updated: 2026-08-01`).
 - Revalidated the branch on Node `22.12.0` / npm `10.9.0`.
 - Preserved canonical CRLF line endings in `00_Project/PROJECT_STATUS.md` and `09_Development/CHANGELOG.md` while confirming semantic-only diff size against `origin/main`.
-- Prepared corrected PR body content and attempted authenticated remote PR #84 body replacement; environment policy/authorization blocks still prevented remote write completion.
+- Replaced the actual remote PR #84 body with the corrected 30-test evidence, validation results, scope exclusions, and both post-merge Railway test plans; verified the PR remains a draft on the required branch.
 
 ---
 
@@ -785,7 +780,7 @@ None.
 7. Corrected delivery tests to use real wrong-marker ID `DeliveryPoint` and extended an existing delivery-rejection test to prove empty selected destination preserves `PickedUp`, `carryingPackage`, and `currentOrder`.
 8. Updated `game-web/README.md` to remove incorrect BATCH-008-as-GDevelop-port wording and to state the accurate active web-runtime scope.
 9. Replaced the Report 085 original-instruction section with fenced `text` content and corrected related report statements (including amendment note for commit `6258c6c`).
-10. Attempted authenticated remote PR #84 body replacement (`gh pr edit` and REST PATCH) with corrected 30-test evidence and post-merge plans, but writes were blocked (HTTP 403 policy/authorization).
+10. Replaced the actual remote PR #84 body with corrected 30-test evidence, validation results, scope exclusions, and both post-merge test plans; verified the remote body and retained draft status.
 11. Revalidated the branch on Node `22.12.0` / npm `10.9.0` with clean dependency install, full test suite, and production build.
 12. Ran the required secret scan on modified files and verified no leaks.
 13. Confirmed final working tree cleanliness after edits and validation.
@@ -807,7 +802,7 @@ None.
 - Dependency and lockfile review remained clean: no `game-web/package.json` or `game-web/package-lock.json` diff exists relative to `origin/main`.
 - Scope-exclusion review found no BATCH-009 behavior in the changed runtime implementation; the only `reward`/`Money`/`reputation` matches are exclusion/assertion text in tests.
 - PR #84 remains a **draft** and is still **pending independent review**; it must not be merged yet.
-- The actual remote GitHub PR #84 body remains stale (`14 new tests`, `23 tests total`) because authenticated remote write operations were blocked in this environment (HTTP 403).
+- The actual remote GitHub PR #84 body reports 30/30 tests with the accurate `9 + 14 + 1 + 6` breakdown and contains both required post-merge Railway test plans; the PR remains a draft on `copilot/batch-008-delivery-completion-failure-path`.
 
 ---
 
@@ -860,15 +855,13 @@ None.
 4. **Public success-path verification still pending after merge** — `PickedUp → Completed` must be rechecked on `https://dropi-tycoon-production.up.railway.app/` after deployment.
 5. **Public wrong-destination failure-path verification still pending after merge** — `PickedUp → Failed` must be rechecked on `https://dropi-tycoon-production.up.railway.app/` after deployment.
 6. **BATCH-009 remains blocked by deployment/review readiness** — do not begin BATCH-009 until PR #84 is independently re-reviewed, merged, redeployed, and manually verified in public runtime.
-7. **GitHub PR description replacement is still pending** — the corrected PR body text is prepared, but remote write operations were blocked in this environment (HTTP 403).
-
 ---
 
 # Final Result/Status
 
 **Status: BATCH-008 implementation preserved; reporting/evidence corrections completed; PR #84 remains draft and pending independent review.**
 
-The gameplay implementation now also enforces explicit non-empty delivery-marker selection inside `attemptDelivery` and aligns test coverage to real marker IDs. Report 085 records the corrected instruction-container handling, README scope wording, validation evidence, clean working tree result, and current draft-PR status; remote PR-body replacement remains pending because authenticated writes were blocked in this environment. Merge remains pending independent review.
+The gameplay implementation now also enforces explicit non-empty delivery-marker selection inside `attemptDelivery` and aligns test coverage to real marker IDs. Report 085 records exact original-instruction preservation, README scope wording, validation evidence, clean working tree result, and the verified corrected draft-PR body. Merge remains pending independent review.
 
 ---
 
