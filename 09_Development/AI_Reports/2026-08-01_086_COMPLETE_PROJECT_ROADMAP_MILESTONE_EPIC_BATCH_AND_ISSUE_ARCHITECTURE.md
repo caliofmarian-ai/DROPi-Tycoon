@@ -9,7 +9,7 @@
 - Repository: `caliofmarian-ai/DROPi-Tycoon`
 - Branch: `copilot/complete-project-roadmap-architecture-part-1`
 - Base commit: `8846f0b394ced60c78d454c08f44ab40ac43ae53`
-- Resulting commit: `PENDING_COMMIT_AT_AUTHORING — read final PR #85 head after commit/push`
+- Resulting implementation commit: `17ef4c2fd43563dd9876555af364ede19dde43dd`
 - Pull Request: `#85 — https://github.com/caliofmarian-ai/DROPi-Tycoon/pull/85`
 - Human approval status: Pending new independent review
 
@@ -552,7 +552,7 @@ Correct the existing PR #85 planning package in-place so roadmap completeness, t
 - Label uniqueness and six-digit colour checks.
 - Blocked/owner-gate consistency checks.
 - Line-ending verification for `ROADMAP.md` and `DOCUMENT_INDEX.md`.
-- `git diff --check` and secret scan.
+- Byte-level trailing-whitespace audit, CRLF/LF line-ending audit, `git diff --check` review, secret scan, and CodeQL invocation.
 - Scope check confirming no gameplay/runtime/dependency/deployment/asset changes.
 
 # Validation Results
@@ -564,21 +564,23 @@ Correct the existing PR #85 planning package in-place so roadmap completeness, t
 - Legacy crosswalk is complete for `BATCH-001..BATCH-016` plus `BATCH-010b`.
 - Active web-runtime representation is accurate.
 - BATCH-008 closure evidence is repository-traceable.
+- Secret scanning passed.
+- CodeQL reported no analyzable code changes.
+- `git diff --check` against the audited base reports CR-at-EOL false positives on the intentionally preserved CRLF `ROADMAP.md`; byte-level whitespace inspection confirmed no actual trailing-space content.
 
 # Unresolved Issues
 
-- `Resulting commit` remains pending inside this file until the final push completes.
 - Phase 9 future branches remain owner-gated planning placeholders pending dedicated canonical audits.
 - This PR intentionally does not create or modify GitHub planning objects.
+- The changed-file scope expanded from the earlier 11-file draft package to 12 files because `PROJECT_STATUS.md` had to be corrected to reconcile live BATCH-008 closure evidence.
 
 # Final Result/Status
 
-Corrected — ready for a new independent review; PR #85 must remain draft and unmerged.
+Corrected — implementation commit `17ef4c2fd43563dd9876555af364ede19dde43dd` is ready for a new independent review; PR #85 must remain draft and unmerged.
 
 # Follow-up Actions
 
-- Commit and push the corrected documentation-only changes to PR #85.
-- Verify the remote head SHA, target branch, draft state, and changed-file scope after push.
+- Publish this amendment commit and re-verify the remote head SHA, target branch, draft state, and changed-file scope.
 
 # Amendment — Incorrect Claims in Earlier Report 086 Version
 
