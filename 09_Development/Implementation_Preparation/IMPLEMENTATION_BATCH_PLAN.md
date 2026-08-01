@@ -2,11 +2,11 @@
 
 Document: IMPLEMENTATION_BATCH_PLAN.md
 Project: DROPi Tycoon
-Version: 1.4.0
+Version: 1.5.0
 Status: Implementation Preparation — Non-Authoritative
-Author: AI Agent (PR #56 correction from Report 057; corrected per Report 065/066; corrected per Report 070; corrected per Report 073; corrected per Report 078)
+Author: AI Agent (PR #56 correction from Report 057; corrected per Report 065/066; corrected per Report 070; corrected per Report 073; corrected per Report 078; ODR-004 reclassified per Report 085)
 Language: English
-Last Updated: 2026-07-15
+Last Updated: 2026-08-01
 
 ---
 
@@ -37,7 +37,7 @@ Define a dependency-ordered, scope-safe implementation plan for Prototype v0.1.
 | BATCH-005 | Order generation + lifecycle core | BATCH-004 | None |
 | BATCH-006 | Tap-to-Move + camera behavior | BATCH-004 | None |
 | BATCH-007 | Pickup-proximity core (minimal accept trigger + Accepted→PickedUp) | BATCH-005, BATCH-006 | None |
-| BATCH-008 | Delivery completion + failure path | BATCH-007 | ODR-004 required |
+| BATCH-008 | Delivery completion + failure path | BATCH-007 | None (ODR-004 reclassified 2026-08-01; canonical documents resolve trigger) |
 | BATCH-009 | Economy reward/reputation updates | BATCH-008 | None |
 | BATCH-010 | HUD + notifications | BATCH-007, BATCH-009 | None |
 | BATCH-010b | MainMenu flow (Start/Continue/new-game guard) | BATCH-002 | None |
@@ -129,12 +129,12 @@ Define a dependency-ordered, scope-safe implementation plan for Prototype v0.1.
 ### BATCH-008
 - Objective: Implement delivery completion and failure branch execution.
 - Requirements: REQ-050..REQ-069.
-- Artifacts: destination validation, completion event, failure event trigger.
+- Artifacts: destination validation, completion event (`PickedUp → Completed`), failure event (`PickedUp → Failed`), terminal-state protection, delivery radius, touch-first input.
 - Dependencies: BATCH-007.
-- Owner-decision gate: **ODR-004 required before implementation**.
-- Non-goals: no persistence implementation.
-- Validation: PickedUp→Completed and PickedUp→Failed both testable.
-- Acceptance criteria: failure/complete paths comply with canonical loop.
+- Owner-decision gate: **None.** ODR-004 was reclassified on 2026-08-01. The canonical trigger is wrong-destination interaction per `GAMEPLAY_EVENTS_FLOW.md`. The Project Owner instructed the agent to apply canonical documents without a duplicate decision.
+- Non-goals: no economy, rewards, Money, reputation, persistence implementation.
+- Validation: PickedUp→Completed and PickedUp→Failed both testable; 30 automated tests pass (9 pre-existing on `main` + 14 initial BATCH-008 delivery tests + 1 inclusive-radius-boundary test + 6 delivery-intent regression tests); TypeScript build and HTTP smoke test pass.
+- Acceptance criteria: failure/complete paths comply with canonical loop; terminal states have no outbound transitions; BATCH-009 scope not introduced.
 
 ### BATCH-009
 - Objective: Implement economy and reputation outcomes from delivery results.

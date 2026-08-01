@@ -26,4 +26,6 @@ export const createInitialWorldState = (): WorldState => ({
   distanceToTarget: 0,
   arrivalThreshold: 5,
   pickupRadius: 32,
+  deliveryRadius: 48,
+  pendingDeliveryDestination: '',
 })

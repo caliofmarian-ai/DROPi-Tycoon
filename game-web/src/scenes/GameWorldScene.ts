@@ -1,8 +1,14 @@
 import Phaser from 'phaser'
 import { createInitialWorldState, WORLD_HEIGHT, WORLD_WIDTH } from '../state/gameState'
-import { attemptPickup, flagAcceptRequested, requestOrderAcceptance } from '../systems/orderSystem'
+import {
+  attemptDelivery,
+  attemptPickup,
+  flagAcceptRequested,
+  requestOrderAcceptance,
+} from '../systems/orderSystem'
 import type { WorldState } from '../types/game'
 import { DebugPanel } from '../ui/DebugPanel'
+import { selectDeliveryIntentFromTap } from '../utils/deliveryIntent'
 
 const ROAD_POSITIONS = [
   { x: 240, y: 200 },
@@ -26,6 +32,8 @@ const DELIVERY_POINTS = [
   { x: 580, y: 470, label: 'DeliveryZone' },
   { x: 660, y: 510, label: 'DeliveryPoint' },
 ]
+
+const DELIVERY_MARKER_TAP_RADIUS = 36
 
 export class GameWorldScene extends Phaser.Scene {
   private worldState!: WorldState
@@ -117,6 +125,15 @@ export class GameWorldScene extends Phaser.Scene {
         this.worldState.player = accepted.player
       }
 
+      if (this.worldState.activeOrder.status === 'PickedUp' && this.worldState.player.carryingPackage) {
+        this.worldState.pendingDeliveryDestination = selectDeliveryIntentFromTap(
+          pointer.worldX,
+          pointer.worldY,
+          DELIVERY_POINTS,
+          DELIVERY_MARKER_TAP_RADIUS,
+        )
+      }
+
       this.debugPanel.update(this.worldState)
     })
   }
@@ -124,6 +141,7 @@ export class GameWorldScene extends Phaser.Scene {
   update(_: number, delta: number): void {
     this.updateMovement(delta / 1000)
     this.updatePickupState()
+    this.updateDeliveryState()
     this.debugPanel.update(this.worldState)
   }
 
@@ -178,6 +196,46 @@ export class GameWorldScene extends Phaser.Scene {
 
     this.worldState.activeOrder = pickupAttempt.order
     this.worldState.player = pickupAttempt.player
+  }
+
+  private updateDeliveryState(): void {
+    if (
+      !this.worldState.pendingDeliveryDestination ||
+      this.worldState.activeOrder.status !== 'PickedUp'
+    ) {
+      return
+    }
+
+    const targetPoint = DELIVERY_POINTS.find(
+      (pt) => pt.label === this.worldState.pendingDeliveryDestination,
+    )
+    if (!targetPoint) {
+      return
+    }
+
+    const distanceToDestination = Phaser.Math.Distance.Between(
+      this.player.x,
+      this.player.y,
+      targetPoint.x,
+      targetPoint.y,
+    )
+
+    const deliveryResult = attemptDelivery(
+      this.worldState.activeOrder,
+      this.worldState.player,
+      {
+        selectedDestination: this.worldState.pendingDeliveryDestination,
+        distanceToDestination,
+        deliveryRadius: this.worldState.deliveryRadius,
+        orderConditionsMet: true,
+      },
+    )
+
+    if (deliveryResult.order.status !== this.worldState.activeOrder.status) {
+      this.worldState.activeOrder = deliveryResult.order
+      this.worldState.player = deliveryResult.player
+      this.worldState.pendingDeliveryDestination = ''
+    }
   }
 
   private createNavigationButtons(): void {

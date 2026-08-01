@@ -1,4 +1,4 @@
-import type { OrderState, PickupContext, PlayerState } from '../types/game'
+import type { DeliveryContext, OrderState, PickupContext, PlayerState } from '../types/game'
 
 export const transitionCreatedToAvailable = (order: OrderState): OrderState =>
   order.status === 'Created' ? { ...order, status: 'Available' } : order
@@ -52,6 +52,42 @@ export const attemptPickup = (
     player: {
       ...player,
       carryingPackage: true,
+    },
+  }
+}
+
+export const attemptDelivery = (
+  order: OrderState,
+  player: PlayerState,
+  context: DeliveryContext,
+): { order: OrderState; player: PlayerState } => {
+  const isTerminal = order.status === 'Completed' || order.status === 'Failed'
+  const hasSelectedDestination = context.selectedDestination.trim().length > 0
+
+  const canDeliver =
+    order.status === 'PickedUp' &&
+    !isTerminal &&
+    player.carryingPackage &&
+    player.currentOrder === order.orderId &&
+    hasSelectedDestination &&
+    context.orderConditionsMet &&
+    context.distanceToDestination <= context.deliveryRadius
+
+  if (!canDeliver) {
+    return { order, player }
+  }
+
+  const isCorrectDestination = context.selectedDestination === order.destination
+
+  return {
+    order: {
+      ...order,
+      status: isCorrectDestination ? 'Completed' : 'Failed',
+    },
+    player: {
+      ...player,
+      carryingPackage: false,
+      currentOrder: '',
     },
   }
 }

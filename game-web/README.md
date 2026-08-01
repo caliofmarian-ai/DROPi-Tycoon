@@ -6,7 +6,7 @@ Version: 0.1.0
 Status: Deployable Web Runtime Candidate
 Author: Marian Caliof & OpenAI
 Language: English
-Last Updated: 2026-07-15
+Last Updated: 2026-08-01
 
 ---
 
@@ -14,7 +14,7 @@ Last Updated: 2026-07-15
 
 This folder contains the first deployable browser runtime for DROPi Tycoon.
 
-It ports only the currently merged BATCH-001 through BATCH-007 prototype behavior from the archived GDevelop reference project.
+`game-web/` carries forward migrated BATCH-001 through BATCH-007 behavior and implements BATCH-008 directly in the active web runtime.
 
 The archived/reference GDevelop source remains unchanged in:
 
@@ -31,13 +31,15 @@ The archived/reference GDevelop source remains unchanged in:
 - Test runner: `vitest` `4.1.10`
 - Production server: custom Node.js static server at `server/server.mjs`
 
-Phaser was selected because it is a code-first HTML5 2D runtime that can be fully maintained through GitHub without any external visual editor workflow.
+The active implementation is the standard web-first application maintained in GitHub, deployed through Railway, and later intended for Android packaging.
+GDevelop is not used by the active implementation; archived GDevelop files are historical reference only.
+Phaser `3.90.0` is the current web-runtime library implementation detail, is replaceable, and is not canonical DROPi Tycoon project technology.
 
 ---
 
 # Implemented Prototype Scope
 
-This web runtime reproduces the currently merged prototype behavior only:
+This PR branch implements the following prototype behavior:
 
 - Main menu
 - Game world
@@ -55,21 +57,27 @@ This web runtime reproduces the currently merged prototype behavior only:
   - `Created -> Available`
   - `Available -> Accepted`
   - `Accepted -> PickedUp`
+  - `PickedUp -> Completed` (correct destination)
+  - `PickedUp -> Failed` (wrong destination)
 - Tap package to request acceptance
 - Automatic pickup on proximity
 - `CarryingPackage = true` after pickup
+- Tap delivery marker after pickup to register delivery intent
+- Delivery within radius (48 px) executes `attemptDelivery`
+- Correct destination → `Completed`; wrong destination → `Failed`
+- Both outcomes clear `CarryingPackage` and `currentOrder`
+- Terminal states `Completed` and `Failed` have no outbound transitions
+- No reward, Money, or reputation effects (BATCH-009)
 
 Not implemented in this milestone:
 
-- Delivery completion
-- Failure logic
 - Money changes
 - DROPiCoins logic
 - Marketplace
 - Payments
 - Database
 - Save/load
-- BATCH-008 or later gameplay
+- BATCH-009 or later gameplay
 
 ---
 

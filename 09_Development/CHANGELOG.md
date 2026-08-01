@@ -6,7 +6,7 @@ Version: 1.0.0
 Status: Development Log
 Author: Marian Caliof & OpenAI
 Language: English
-Last Updated: 2026-07-15 (RAILWAY NODE/ROLLDOWN NATIVE BINDING DEPLOYMENT REPAIR)
+Last Updated: 2026-08-01 (BATCH-008 DELIVERY OUTCOMES IMPLEMENTATION)
 
 ---
 
@@ -31,6 +31,33 @@ Date
 Category
 
 Description
+
+---
+
+# [2026-08-01] - BATCH-008 DELIVERY OUTCOMES IMPLEMENTATION
+
+## Added
+
+- `DeliveryContext` type in `game-web/src/types/game.ts` with `selectedDestination`, `distanceToDestination`, `deliveryRadius`, `orderConditionsMet`.
+- `attemptDelivery` pure function in `game-web/src/systems/orderSystem.ts` implementing `PickedUp → Completed` (correct destination) and `PickedUp → Failed` (wrong destination) transitions with full terminal-state protection.
+- `deliveryRadius` (48) and `pendingDeliveryDestination` fields in `WorldState` and `createInitialWorldState`.
+- `selectDeliveryIntentFromTap` exported pure helper in `game-web/src/utils/deliveryIntent.ts`; `GameWorldScene.ts` imports it and clears pending intent when tapping ordinary ground after a delivery marker.
+- Delivery tap-intent detection in `GameWorldScene.ts`: tapping a delivery marker while carrying a package registers `pendingDeliveryDestination`; `updateDeliveryState` executes `attemptDelivery` on arrival within `deliveryRadius`.
+- `DebugPanel` updated with post-pickup, completed, and failed guidance messages.
+- 30 automated tests in `game-web/tests/orderSystem.test.ts` (9 pre-existing tests on `main` + 14 initial BATCH-008 delivery tests + 1 inclusive-radius-boundary correction test + 6 delivery-intent selection/stale-intent regression tests); all pass.
+
+## Fixed (preparation documents)
+
+- ODR-004 reclassified in `OWNER_DECISION_REGISTER.md`, `IMPLEMENTATION_BATCH_PLAN.md`, `IMPLEMENTATION_DEPENDENCY_GRAPH.md`, and `Implementation_Preparation/README.md`; wrong-destination trigger resolved by canonical documents.
+- Stale delivery-intent cleared when player taps ordinary ground after selecting a delivery marker, preventing outdated intent from triggering delivery.
+- Delivery radius comparison corrected to `<=` (inclusive boundary).
+
+## Verified
+
+- BATCH-007 public Railway flow manually verified on 2026-08-01 (Available→Accepted→PickedUp, CarryingPackage: true).
+- 30 automated tests pass.
+- TypeScript + Vite production build passes.
+- HTTP 200 smoke test against `dist/` passes.
 
 ---
 
