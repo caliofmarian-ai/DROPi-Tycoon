@@ -28,11 +28,26 @@ export class DebugPanel {
   }
 
   update(state: WorldState): void {
+    const statusLine = `Order: ${state.activeOrder.status}`
+    const carryLine = `CarryingPackage: ${state.player.carryingPackage ? 'true' : 'false'}`
+
+    let guidanceLine: string
+    if (state.activeOrder.status === 'PickedUp') {
+      guidanceLine =
+        'Tap DeliveryZone to complete. Tap wrong marker to test failure.'
+    } else if (state.activeOrder.status === 'Completed') {
+      guidanceLine = 'Delivery completed! Reward handling deferred to BATCH-009.'
+    } else if (state.activeOrder.status === 'Failed') {
+      guidanceLine = 'Delivery failed at wrong destination.'
+    } else {
+      guidanceLine = 'Touch ground to move. Tap package to accept order.'
+    }
+
     this.text.setText([
       'TEMP DEBUG PANEL',
-      `Order: ${state.activeOrder.status}`,
-      `CarryingPackage: ${state.player.carryingPackage ? 'true' : 'false'}`,
-      'Touch ground to move. Tap package to accept order.',
+      statusLine,
+      carryLine,
+      guidanceLine,
     ])
   }
 }

@@ -36,10 +36,19 @@ export interface WorldState {
   distanceToTarget: number
   arrivalThreshold: number
   pickupRadius: number
+  deliveryRadius: number
+  pendingDeliveryDestination: string
 }
 
 export interface PickupContext {
   distanceToPackage: number
   expectedPickupLocation: string
   pickupRadius: number
+}
+
+export interface DeliveryContext {
+  selectedDestination: string
+  distanceToDestination: number
+  deliveryRadius: number
+  orderConditionsMet: boolean
 }

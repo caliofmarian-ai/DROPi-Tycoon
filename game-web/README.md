@@ -14,7 +14,7 @@ Last Updated: 2026-07-15
 
 This folder contains the first deployable browser runtime for DROPi Tycoon.
 
-It ports only the currently merged BATCH-001 through BATCH-007 prototype behavior from the archived GDevelop reference project.
+It ports BATCH-001 through BATCH-008 prototype behavior from the archived GDevelop reference project.
 
 The archived/reference GDevelop source remains unchanged in:
 
@@ -55,21 +55,27 @@ This web runtime reproduces the currently merged prototype behavior only:
   - `Created -> Available`
   - `Available -> Accepted`
   - `Accepted -> PickedUp`
+  - `PickedUp -> Completed` (correct destination)
+  - `PickedUp -> Failed` (wrong destination)
 - Tap package to request acceptance
 - Automatic pickup on proximity
 - `CarryingPackage = true` after pickup
+- Tap delivery marker after pickup to register delivery intent
+- Delivery within radius (48 px) executes `attemptDelivery`
+- Correct destination → `Completed`; wrong destination → `Failed`
+- Both outcomes clear `CarryingPackage` and `currentOrder`
+- Terminal states `Completed` and `Failed` have no outbound transitions
+- No reward, Money, or reputation effects (BATCH-009)
 
 Not implemented in this milestone:
 
-- Delivery completion
-- Failure logic
 - Money changes
 - DROPiCoins logic
 - Marketplace
 - Payments
 - Database
 - Save/load
-- BATCH-008 or later gameplay
+- BATCH-009 or later gameplay
 
 ---
 

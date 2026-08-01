@@ -164,8 +164,10 @@ The prototype must prove the core idea before expansion.
 
 # Next Steps
 
-1. Run Android/HTML5 runtime preview for the combined BATCH-006/BATCH-007 accept, movement, camera, and pickup flow.
-2. Keep BATCH-008 blocked until BATCH-007 runtime preview is reviewed.
+1. BATCH-007 public Railway flow was manually verified on 2026-08-01 (Available→Accepted→PickedUp, CarryingPackage: true).
+2. BATCH-008 is implemented and pending PR review.
+3. After BATCH-008 PR is merged, redeploy to Railway and run public manual verification of Completed and Failed paths.
+4. Begin BATCH-009 only after BATCH-008 Railway verification is complete.
 
 ---
 
@@ -185,7 +187,7 @@ READY
 
 Implementation:
 
-STARTED — BATCH-001 FOUNDATION COMPLETE; BATCH-002 SCAFFOLD COMPLETE; BATCH-003 PLACEHOLDER ASSETS COMPLETE; BATCH-004 WORLD SETUP COMPLETE; BATCH-005 ORDER LIFECYCLE CORE COMPLETE; BATCH-006 TAP-TO-MOVE + CAMERA COMPLETE; BATCH-007 PICKUP PROXIMITY + ACCEPTED→PICKEDUP CORE IMPLEMENTED; FIRST DEPLOYABLE WEB RUNTIME CANDIDATE CREATED IN `game-web/`; OWNER RAILWAY VALIDATION PENDING
+STARTED — BATCH-001 FOUNDATION COMPLETE; BATCH-002 SCAFFOLD COMPLETE; BATCH-003 PLACEHOLDER ASSETS COMPLETE; BATCH-004 WORLD SETUP COMPLETE; BATCH-005 ORDER LIFECYCLE CORE COMPLETE; BATCH-006 TAP-TO-MOVE + CAMERA COMPLETE; BATCH-007 PICKUP PROXIMITY + ACCEPTED→PICKEDUP CORE IMPLEMENTED AND RAILWAY-VERIFIED (2026-08-01); BATCH-008 DELIVERY OUTCOMES IMPLEMENTED (PR PENDING REVIEW)
 
 Implementation Preparation Status:
 
@@ -211,12 +213,14 @@ Implementation Preparation Status:
 - BATCH-004 is complete — visual world setup created; Player and static world entities placed; no movement or gameplay logic implemented; no playable prototype exists
 - BATCH-005 is complete — order lifecycle state machine implemented; Created→Available→Accepted event logic added; no pickup/delivery/economy/HUD logic implemented; no playable prototype exists
 - BATCH-006 is complete — Tap-to-Move implemented; touch input (primary/Android-first) and mouse fallback (desktop); Player movement toward tapped target; camera follows Player; arrival stops movement; Idle/Move animation switching; movement speed and arrival threshold are configurable scene variables; no pickup/delivery/economy/HUD/AI/save-load logic implemented; no playable prototype exists
-- BATCH-007 is implemented — minimal Android-first order acceptance trigger exists on Package touch while order status is Available; automatic pickup proximity exists with configurable `PickupRadius` = 32; Accepted→PickedUp transition sets `PlayerData.CarryingPackage` and `Player.CarryingPackage` true; no delivery completion, failure, reward, economy, HUD, notification, AI, or save/load logic implemented
+- BATCH-008 is implemented — delivery completion (PickedUp→Completed on correct destination) and failure (PickedUp→Failed on wrong destination); terminal states have no outbound transitions; CarryingPackage and currentOrder cleared on both outcomes; delivery radius = 48; touch-first tap-on-marker intent registration; no reward, Money, or reputation effects; 23 automated tests pass; TypeScript build passes; HTTP 200 smoke test passes
 - Web Runtime Migration Milestone 001 is implemented — `game-web/` now builds, tests, produces `dist/`, and starts on a production Node server compatible with Railway root-directory deployment
-- Public Railway browser verification is still pending; no public URL has been verified in-repo
-- Active owner decisions: ODR-001 (player position persistence), ODR-003 (GameSettings persistence scope), ODR-004 (failure trigger definition)
+- Public Railway browser verification of BATCH-007 flow completed on 2026-08-01: Available→Accepted, player travels to package, Accepted→PickedUp, CarryingPackage: true confirmed
+- BATCH-008 delivery outcomes implemented in `game-web/`: PickedUp→Completed (correct destination), PickedUp→Failed (wrong destination); terminal states protected; touch-first; no economy/reward/reputation effects
+- Active owner decisions: ODR-001 (player position persistence), ODR-003 (GameSettings persistence scope)
 - ODR-002 reclassified (not an owner decision)
-- No owner decision blocks BATCH-007
+- ODR-004 reclassified 2026-08-01: resolved by canonical documents; wrong-destination interaction triggers Failed; no longer an active owner decision
+- No owner decision blocks BATCH-008 or BATCH-009
 
 ---
 

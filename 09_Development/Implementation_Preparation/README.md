@@ -19,7 +19,7 @@ Last Updated: 2026-07-14
 - Final batch count: **17** (`BATCH-001..BATCH-016` + `BATCH-010b`)
 - Mapped requirements: **188 / 188**
 - Exact traceability percentage: **100.00%**
-- Owner decisions: **3 active** (ODR-001, ODR-003, ODR-004)
+- Owner decisions: **2 active** (ODR-001, ODR-003) — ODR-004 reclassified 2026-08-01, no longer active
 - No Owner decision blocks BATCH-001: **confirmed**
 
 Readiness verdict for this corrected package: **A — PR #56 CORRECTED AND VERIFIED — SAFE TO MERGE**

@@ -2,11 +2,11 @@
 
 Document: IMPLEMENTATION_DEPENDENCY_GRAPH.md
 Project: DROPi Tycoon
-Version: 1.1.0
+Version: 1.2.0
 Status: Implementation Preparation — Non-Authoritative
-Author: AI Agent (PR #56 correction from Report 057)
+Author: AI Agent (PR #56 correction from Report 057; ODR-004 reclassified per Report 085)
 Language: English
-Last Updated: 2026-07-14
+Last Updated: 2026-08-01
 
 ---
 
@@ -79,7 +79,7 @@ This replaces the incorrect previous claim of 16 sequential batches.
 
 ## Owner-Decision Blocking Dependencies
 
-- `BATCH-008` blocked by unresolved `ODR-004`
+- `BATCH-008` — ODR-004 reclassified 2026-08-01; no longer blocked. Canonical trigger resolved by `GAMEPLAY_EVENTS_FLOW.md`.
 - `BATCH-013` blocked by unresolved `ODR-001` and `ODR-003`
 - `BATCH-001` has no owner-decision blocker
 
