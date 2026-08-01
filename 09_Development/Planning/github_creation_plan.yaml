@@ -1,0 +1,1284 @@
+# github_creation_plan.yaml
+# Project: DROPi Tycoon
+# Version: 1.0.0
+# Status: Planning — Canonical
+# Author: AI Agent (Report 086)
+# Date: 2026-08-01
+#
+# IMPORTANT: This file is a planning document only.
+# No actual GitHub objects are created by this file or this PR.
+# Execution requires explicit owner approval.
+#
+# Schema: milestones[], labels[], issues[]
+# Each issue references milestone_id and label_names.
+
+metadata:
+  project: DROPi Tycoon
+  repository: caliofmarian-ai/DROPi-Tycoon
+  plan_version: "1.0.0"
+  created_date: "2026-08-01"
+  execution_status: NOT_EXECUTED
+  counts:
+    milestones: 21
+    epics: 37
+    batches: 42
+    labels: 101
+    executable_issues: 31
+    future_placeholders: 12
+
+# =============================================================================
+# MILESTONES
+# =============================================================================
+milestones:
+  - id: M-001
+    title: "Phase 0: Foundation & Documentation Complete"
+    description: "Canonical documentation framework, project architecture, repository structure, and game design foundations established and audited."
+    state: closed
+    phase: 0
+
+  - id: M-002
+    title: "Phase 1: Prototype Scaffold & Architecture"
+    description: "GDevelop project scaffold, scene/event architecture, and placeholder asset pipeline established."
+    state: closed
+    phase: 1
+
+  - id: M-003
+    title: "Phase 1: World Navigation"
+    description: "World map, player entity, interactive building entities, tap-to-move input, and camera tracking implemented."
+    state: closed
+    phase: 1
+
+  - id: M-004
+    title: "Phase 1: Order Lifecycle Core"
+    description: "Full order state machine from Created through Completed and Failed including order generation, pickup, and delivery."
+    state: closed
+    phase: 1
+
+  - id: M-005
+    title: "Phase 1: Economy, HUD & Game Flow"
+    description: "Economy and reputation outcomes; HUD panels and notifications; MainMenu Start/Continue flow."
+    state: open
+    phase: 1
+
+  - id: M-006
+    title: "Phase 1: Company Management & Bicycle"
+    description: "CompanyManagement scene with upgrade purchase flow; bicycle ownership flag and speed effect."
+    state: open
+    phase: 1
+
+  - id: M-007
+    title: "Phase 1: Save & Load System"
+    description: "Local device persistence including save serialization, load validation, and autosave triggers. Blocked by ODR-001 and ODR-003."
+    state: open
+    phase: 1
+    blocked_by:
+      - ODR-001
+      - ODR-003
+
+  - id: M-008
+    title: "Phase 1: Prototype v0.1 Verification & Release"
+    description: "Mobile optimization; full-loop integration verification; completion-gate verification package for owner review."
+    state: open
+    phase: 1
+
+  - id: M-009
+    title: "Phase 2: Employee & Financial Systems"
+    description: "Employee onboarding and salary system; daily expenses; financial reporting; customer reputation."
+    state: open
+    phase: 2
+
+  - id: M-010
+    title: "Phase 2: Vehicle Fleet Management"
+    description: "Vehicle purchasing catalog, maintenance costs, and Phase 2 integration verification."
+    state: open
+    phase: 2
+
+  - id: M-011
+    title: "Phase 3: Warehouse & District System"
+    description: "Warehouse infrastructure; multi-district map expansion; delivery zone management."
+    state: open
+    phase: 3
+
+  - id: M-012
+    title: "Phase 3: Advanced Fleet & Route Optimization"
+    description: "Fleet management dashboard; route optimization; vehicle upgrade system; Phase 3 integration."
+    state: open
+    phase: 3
+
+  - id: M-013
+    title: "Phase 4: Drone Research & Manufacturing"
+    description: "Drone research technology tree; drone manufacturing partners integration."
+    state: open
+    phase: 4
+
+  - id: M-014
+    title: "Phase 4: DronePort Infrastructure"
+    description: "DronePort construction system; battery swapping network implementation."
+    state: open
+    phase: 4
+
+  - id: M-015
+    title: "Phase 4: Autonomous Drone Operations"
+    description: "Autonomous delivery execution; flight restrictions and weather system; Phase 4 integration."
+    state: open
+    phase: 4
+
+  - id: M-016
+    title: "Phase 5: Dynamic Market System"
+    description: "Dynamic market with inflation, fuel prices, and electricity costs."
+    state: open
+    phase: 5
+
+  - id: M-017
+    title: "Phase 5: Financial Instruments & Competition"
+    description: "Business loans, investor system, competitor companies, advanced economy integration."
+    state: open
+    phase: 5
+
+  - id: M-018
+    title: "Phase 6: Autonomous Intelligence Systems"
+    description: "Smart routing, predictive demand, dynamic pricing, and AI dispatch center."
+    state: open
+    phase: 6
+
+  - id: M-019
+    title: "Phase 7: International Multi-City Logistics"
+    description: "Multiple cities, countries, customs, airports, and international logistics."
+    state: open
+    phase: 7
+
+  - id: M-020
+    title: "Phase 8: Global Empire & Corporate Systems"
+    description: "Public company, stock market, franchises, corporate headquarters, worldwide DronePort network."
+    state: open
+    phase: 8
+
+  - id: M-021
+    title: "Phase 9: Multiplayer & Community Systems"
+    description: "Multiplayer, cooperative companies, competitive economy, robotics, autonomous warehouses, community content."
+    state: open
+    phase: 9
+
+# =============================================================================
+# LABELS — Type (7)
+# =============================================================================
+labels:
+  # Type labels
+  - name: "type:implementation"
+    color: "0075ca"
+    description: "Gameplay or system implementation work"
+
+  - name: "type:design"
+    color: "7057ff"
+    description: "Design decisions and architecture specifications"
+
+  - name: "type:verification"
+    color: "e4e669"
+    description: "Testing, validation, and integration verification"
+
+  - name: "type:documentation"
+    color: "cfd3d7"
+    description: "Documentation creation or updates"
+
+  - name: "type:bug"
+    color: "d73a4a"
+    description: "Bug fix for a confirmed defect"
+
+  - name: "type:refactor"
+    color: "e99695"
+    description: "Code refactoring without functional change"
+
+  - name: "type:planning"
+    color: "f9d0c4"
+    description: "Planning, roadmap, or architectural definition"
+
+  # Phase labels (10)
+  - name: "phase:0"
+    color: "bfd4f2"
+    description: "Phase 0 — Foundation"
+
+  - name: "phase:1"
+    color: "d4c5f9"
+    description: "Phase 1 — First Playable Prototype"
+
+  - name: "phase:2"
+    color: "c2e0c6"
+    description: "Phase 2 — Company Management"
+
+  - name: "phase:3"
+    color: "fef2c0"
+    description: "Phase 3 — Logistics Expansion"
+
+  - name: "phase:4"
+    color: "fbd3c8"
+    description: "Phase 4 — Drone Technology"
+
+  - name: "phase:5"
+    color: "e8d7f0"
+    description: "Phase 5 — Advanced Economy"
+
+  - name: "phase:6"
+    color: "daf2e4"
+    description: "Phase 6 — Artificial Intelligence"
+
+  - name: "phase:7"
+    color: "fce8d0"
+    description: "Phase 7 — International Expansion"
+
+  - name: "phase:8"
+    color: "d0e8fc"
+    description: "Phase 8 — Global Corporation"
+
+  - name: "phase:9"
+    color: "f0f0f0"
+    description: "Phase 9 — Endless Evolution"
+
+  # Batch labels (42)
+  - name: "batch:rbatch-001"
+    color: "ededed"
+    description: "RBATCH-001 (Legacy BATCH-001 — Completed)"
+
+  - name: "batch:rbatch-002"
+    color: "ededed"
+    description: "RBATCH-002 (Legacy BATCH-002 — Completed)"
+
+  - name: "batch:rbatch-003"
+    color: "ededed"
+    description: "RBATCH-003 (Legacy BATCH-003 — Completed)"
+
+  - name: "batch:rbatch-004"
+    color: "ededed"
+    description: "RBATCH-004 (Legacy BATCH-004 — Completed)"
+
+  - name: "batch:rbatch-005"
+    color: "ededed"
+    description: "RBATCH-005 (Legacy BATCH-005 — Completed)"
+
+  - name: "batch:rbatch-006"
+    color: "ededed"
+    description: "RBATCH-006 (Legacy BATCH-006 — Completed)"
+
+  - name: "batch:rbatch-007"
+    color: "ededed"
+    description: "RBATCH-007 (Legacy BATCH-007 — Completed)"
+
+  - name: "batch:rbatch-008"
+    color: "ededed"
+    description: "RBATCH-008 (Legacy BATCH-008 — Completed)"
+
+  - name: "batch:rbatch-009"
+    color: "0e8a16"
+    description: "RBATCH-009 — Economy Reward & Reputation"
+
+  - name: "batch:rbatch-010"
+    color: "0e8a16"
+    description: "RBATCH-010 — HUD & Notifications"
+
+  - name: "batch:rbatch-011"
+    color: "0e8a16"
+    description: "RBATCH-011 — MainMenu Flow"
+
+  - name: "batch:rbatch-012"
+    color: "0e8a16"
+    description: "RBATCH-012 — CompanyManagement"
+
+  - name: "batch:rbatch-013"
+    color: "0e8a16"
+    description: "RBATCH-013 — Bicycle Ownership"
+
+  - name: "batch:rbatch-014"
+    color: "fbca04"
+    description: "RBATCH-014 — Save/Load (Blocked)"
+
+  - name: "batch:rbatch-015"
+    color: "0e8a16"
+    description: "RBATCH-015 — Mobile Optimization"
+
+  - name: "batch:rbatch-016"
+    color: "0e8a16"
+    description: "RBATCH-016 — Integration Verification"
+
+  - name: "batch:rbatch-017"
+    color: "0e8a16"
+    description: "RBATCH-017 — Release Checklist"
+
+  - name: "batch:rbatch-018"
+    color: "84b6eb"
+    description: "RBATCH-018 — Employee Onboarding"
+
+  - name: "batch:rbatch-019"
+    color: "84b6eb"
+    description: "RBATCH-019 — Financial Reporting"
+
+  - name: "batch:rbatch-020"
+    color: "84b6eb"
+    description: "RBATCH-020 — Customer Reputation"
+
+  - name: "batch:rbatch-021"
+    color: "84b6eb"
+    description: "RBATCH-021 — Reviews Display"
+
+  - name: "batch:rbatch-022"
+    color: "84b6eb"
+    description: "RBATCH-022 — Vehicle Purchasing"
+
+  - name: "batch:rbatch-023"
+    color: "84b6eb"
+    description: "RBATCH-023 — Vehicle Maintenance"
+
+  - name: "batch:rbatch-024"
+    color: "84b6eb"
+    description: "RBATCH-024 — Phase 2 Integration"
+
+  - name: "batch:rbatch-025"
+    color: "c5def5"
+    description: "RBATCH-025 — Warehouse"
+
+  - name: "batch:rbatch-026"
+    color: "c5def5"
+    description: "RBATCH-026 — Multi-District Map"
+
+  - name: "batch:rbatch-027"
+    color: "c5def5"
+    description: "RBATCH-027 — Delivery Zones"
+
+  - name: "batch:rbatch-028"
+    color: "c5def5"
+    description: "RBATCH-028 — Fleet Dashboard"
+
+  - name: "batch:rbatch-029"
+    color: "c5def5"
+    description: "RBATCH-029 — Route Optimization"
+
+  - name: "batch:rbatch-030"
+    color: "c5def5"
+    description: "RBATCH-030 — Vehicle Upgrades"
+
+  - name: "batch:rbatch-031"
+    color: "c5def5"
+    description: "RBATCH-031 — Phase 3 Integration"
+
+  - name: "batch:rbatch-032"
+    color: "f9c513"
+    description: "RBATCH-032 — Drone Research"
+
+  - name: "batch:rbatch-033"
+    color: "f9c513"
+    description: "RBATCH-033 — Drone Manufacturing"
+
+  - name: "batch:rbatch-034"
+    color: "f9c513"
+    description: "RBATCH-034 — DronePort Construction"
+
+  - name: "batch:rbatch-035"
+    color: "f9c513"
+    description: "RBATCH-035 — Battery Swapping"
+
+  - name: "batch:rbatch-036"
+    color: "f9c513"
+    description: "RBATCH-036 — Autonomous Delivery"
+
+  - name: "batch:rbatch-037"
+    color: "f9c513"
+    description: "RBATCH-037 — Flight Restrictions"
+
+  - name: "batch:rbatch-038"
+    color: "f9c513"
+    description: "RBATCH-038 — Phase 4 Integration"
+
+  - name: "batch:rbatch-039"
+    color: "e11d48"
+    description: "RBATCH-039 — Dynamic Market"
+
+  - name: "batch:rbatch-040"
+    color: "e11d48"
+    description: "RBATCH-040 — Loans & Investors"
+
+  - name: "batch:rbatch-041"
+    color: "e11d48"
+    description: "RBATCH-041 — Competition"
+
+  - name: "batch:rbatch-042"
+    color: "a855f7"
+    description: "RBATCH-042 — AI Dispatch Foundation"
+
+  # Epic labels (37)
+  - name: "epic:repo-documentation"
+    color: "bfd4f2"
+    description: "E-001 Repository Structure & Documentation"
+
+  - name: "epic:game-design-foundation"
+    color: "bfd4f2"
+    description: "E-002 Canonical Game Design Foundation"
+
+  - name: "epic:gdevelop-scaffold"
+    color: "d4c5f9"
+    description: "E-003 GDevelop Project Scaffold"
+
+  - name: "epic:asset-pipeline"
+    color: "d4c5f9"
+    description: "E-004 Asset Pipeline & Placeholder Assets"
+
+  - name: "epic:world-map"
+    color: "d4c5f9"
+    description: "E-005 World Map & Environment"
+
+  - name: "epic:player-movement"
+    color: "d4c5f9"
+    description: "E-006 Player Movement & Camera"
+
+  - name: "epic:order-generation"
+    color: "d4c5f9"
+    description: "E-007 Order Generation System"
+
+  - name: "epic:pickup-proximity"
+    color: "d4c5f9"
+    description: "E-008 Pickup Proximity System"
+
+  - name: "epic:delivery-completion"
+    color: "d4c5f9"
+    description: "E-009 Delivery Completion & Failure"
+
+  - name: "epic:economy-reputation"
+    color: "d4c5f9"
+    description: "E-010 Economy & Reputation Core"
+
+  - name: "epic:hud-notifications"
+    color: "d4c5f9"
+    description: "E-011 HUD & Notifications"
+
+  - name: "epic:mainmenu-gameflow"
+    color: "d4c5f9"
+    description: "E-012 MainMenu & Game Flow"
+
+  - name: "epic:company-management"
+    color: "d4c5f9"
+    description: "E-013 Company Management Scene"
+
+  - name: "epic:bicycle-ownership"
+    color: "d4c5f9"
+    description: "E-014 Bicycle Ownership System"
+
+  - name: "epic:save-load"
+    color: "d4c5f9"
+    description: "E-015 Save & Load System"
+
+  - name: "epic:mobile-optimization"
+    color: "d4c5f9"
+    description: "E-016 Mobile Optimization"
+
+  - name: "epic:integration-verification"
+    color: "d4c5f9"
+    description: "E-017 Full-Loop Integration Verification"
+
+  - name: "epic:employee-management"
+    color: "c2e0c6"
+    description: "E-018 Employee Management System"
+
+  - name: "epic:financial-reporting"
+    color: "c2e0c6"
+    description: "E-019 Financial Reporting & Daily Costs"
+
+  - name: "epic:customer-reputation"
+    color: "c2e0c6"
+    description: "E-020 Customer Reputation System"
+
+  - name: "epic:vehicle-fleet"
+    color: "c2e0c6"
+    description: "E-021 Vehicle Fleet Management"
+
+  - name: "epic:warehouse"
+    color: "fef2c0"
+    description: "E-022 Warehouse Infrastructure"
+
+  - name: "epic:multi-district"
+    color: "fef2c0"
+    description: "E-023 Multi-District Map Expansion"
+
+  - name: "epic:fleet-management"
+    color: "fef2c0"
+    description: "E-024 Fleet Management System"
+
+  - name: "epic:route-optimization"
+    color: "fef2c0"
+    description: "E-025 Route Optimization Engine"
+
+  - name: "epic:drone-research"
+    color: "fbd3c8"
+    description: "E-026 Drone Research & Technology Tree"
+
+  - name: "epic:drone-manufacturing"
+    color: "fbd3c8"
+    description: "E-027 Drone Manufacturing Partners"
+
+  - name: "epic:droneport"
+    color: "fbd3c8"
+    description: "E-028 DronePort Infrastructure System"
+
+  - name: "epic:battery-swapping"
+    color: "fbd3c8"
+    description: "E-029 Battery Swapping Network"
+
+  - name: "epic:autonomous-delivery"
+    color: "fbd3c8"
+    description: "E-030 Autonomous Delivery System"
+
+  - name: "epic:flight-restrictions"
+    color: "fbd3c8"
+    description: "E-031 Flight Restrictions & Weather"
+
+  - name: "epic:dynamic-market"
+    color: "e8d7f0"
+    description: "E-032 Dynamic Market System"
+
+  - name: "epic:fuel-electricity"
+    color: "e8d7f0"
+    description: "E-033 Fuel & Electricity Economy"
+
+  - name: "epic:loans-investors"
+    color: "e8d7f0"
+    description: "E-034 Business Loans & Investors"
+
+  - name: "epic:competition"
+    color: "e8d7f0"
+    description: "E-035 Competition & Market Rivals"
+
+  - name: "epic:smart-routing"
+    color: "daf2e4"
+    description: "E-036 Smart Routing & Predictive Demand"
+
+  - name: "epic:ai-dispatch"
+    color: "daf2e4"
+    description: "E-037 AI Dispatch & Autonomous Fleet"
+
+  # Status labels (5)
+  - name: "status:blocked"
+    color: "e4e669"
+    description: "Blocked by an owner decision or external dependency"
+
+  - name: "status:in-progress"
+    color: "0075ca"
+    description: "Actively being implemented"
+
+  - name: "status:ready"
+    color: "0e8a16"
+    description: "Ready for implementation"
+
+  - name: "status:needs-design"
+    color: "7057ff"
+    description: "Requires design decision before implementation"
+
+  - name: "status:future"
+    color: "cfd3d7"
+    description: "Deferred to future planning iteration"
+
+# =============================================================================
+# EXECUTABLE ISSUES (31)
+# =============================================================================
+issues:
+  # RBATCH-009 — Economy
+  - id: ISSUE-001
+    title: "Implement money reward on order completion"
+    milestone_id: M-005
+    label_names:
+      - "type:implementation"
+      - "phase:1"
+      - "batch:rbatch-009"
+      - "epic:economy-reputation"
+    body: |
+      **Batch:** RBATCH-009
+      **Epic:** E-010 Economy & Reputation Core
+
+      When an order transitions to Completed, apply the canonical money reward to PlayerData.Money.
+
+      **Acceptance Criteria:**
+      - PlayerData.Money increases by the configured reward value when PickedUp→Completed fires.
+      - Affordability checks remain coherent after reward application.
+
+  - id: ISSUE-002
+    title: "Implement reputation increase on delivery completion"
+    milestone_id: M-005
+    label_names:
+      - "type:implementation"
+      - "phase:1"
+      - "batch:rbatch-009"
+      - "epic:economy-reputation"
+    body: |
+      **Batch:** RBATCH-009
+      **Epic:** E-010 Economy & Reputation Core
+
+      When an order transitions to Completed, increase PlayerData.Reputation by the canonical value.
+
+      **Acceptance Criteria:**
+      - Reputation increases correctly after completion.
+      - Remains bounded by canonical maximum.
+
+  - id: ISSUE-003
+    title: "Implement money penalty on order failure"
+    milestone_id: M-005
+    label_names:
+      - "type:implementation"
+      - "phase:1"
+      - "batch:rbatch-009"
+      - "epic:economy-reputation"
+    body: |
+      **Batch:** RBATCH-009
+      **Epic:** E-010 Economy & Reputation Core
+
+      When an order transitions to Failed, apply the canonical money penalty clamped to zero minimum.
+
+      **Acceptance Criteria:**
+      - PlayerData.Money decreases correctly on failure.
+      - Negative money is prevented (clamped to 0).
+
+  - id: ISSUE-004
+    title: "Implement reputation decrease on order failure"
+    milestone_id: M-005
+    label_names:
+      - "type:implementation"
+      - "phase:1"
+      - "batch:rbatch-009"
+      - "epic:economy-reputation"
+    body: |
+      **Batch:** RBATCH-009
+      **Epic:** E-010 Economy & Reputation Core
+
+      When an order transitions to Failed, decrease PlayerData.Reputation by the canonical penalty value.
+
+      **Acceptance Criteria:**
+      - Reputation decreases correctly after failure.
+      - Remains bounded by canonical minimum.
+
+  # RBATCH-010 — HUD
+  - id: ISSUE-005
+    title: "Implement active-order HUD panel"
+    milestone_id: M-005
+    label_names:
+      - "type:implementation"
+      - "phase:1"
+      - "batch:rbatch-010"
+      - "epic:hud-notifications"
+    body: |
+      **Batch:** RBATCH-010
+      **Epic:** E-011 HUD & Notifications
+
+      Create the active-order HUD panel that displays current order destination, status, and package state.
+
+      **Acceptance Criteria:**
+      - Panel visible when an order is active.
+      - Panel hidden when no order is active.
+
+  - id: ISSUE-006
+    title: "Implement Accept Order button in HUD"
+    milestone_id: M-005
+    label_names:
+      - "type:implementation"
+      - "phase:1"
+      - "batch:rbatch-010"
+      - "epic:hud-notifications"
+    body: |
+      **Batch:** RBATCH-010
+      **Epic:** E-011 HUD & Notifications
+
+      Create the fully styled Accept Order button in the HUD (deferred from RBATCH-007 minimal touch trigger).
+
+      **Acceptance Criteria:**
+      - Button appears when an Available order is in range.
+      - Pressing it transitions order to Accepted.
+
+  - id: ISSUE-007
+    title: "Implement delivery status notifications"
+    milestone_id: M-005
+    label_names:
+      - "type:implementation"
+      - "phase:1"
+      - "batch:rbatch-010"
+      - "epic:hud-notifications"
+    body: |
+      **Batch:** RBATCH-010
+      **Epic:** E-011 HUD & Notifications
+
+      Display toast/banner notifications for order state transitions (Accepted, PickedUp, Completed, Failed).
+
+      **Acceptance Criteria:**
+      - Notification appears briefly on each canonical state transition.
+
+  # RBATCH-011 — MainMenu
+  - id: ISSUE-008
+    title: "Implement Start/Continue main menu flow"
+    milestone_id: M-005
+    label_names:
+      - "type:implementation"
+      - "phase:1"
+      - "batch:rbatch-011"
+      - "epic:mainmenu-gameflow"
+    body: |
+      **Batch:** RBATCH-011
+      **Epic:** E-012 MainMenu & Game Flow
+
+      MainMenu scene displays Start and Continue options. Continue is disabled when no save exists.
+
+      **Acceptance Criteria:**
+      - Start and Continue buttons behave per canonical save policy.
+      - Continue is unavailable when no save data exists.
+
+  - id: ISSUE-009
+    title: "Implement new-game overwrite guard"
+    milestone_id: M-005
+    label_names:
+      - "type:implementation"
+      - "phase:1"
+      - "batch:rbatch-011"
+      - "epic:mainmenu-gameflow"
+    body: |
+      **Batch:** RBATCH-011
+      **Epic:** E-012 MainMenu & Game Flow
+
+      When the player chooses Start with existing save data, display a confirmation guard dialog before overwriting.
+
+      **Acceptance Criteria:**
+      - Guard dialog appears when save data exists.
+      - Overwrite only proceeds if player confirms.
+
+  # RBATCH-012 — Company Management
+  - id: ISSUE-010
+    title: "Implement upgrade purchase flow"
+    milestone_id: M-006
+    label_names:
+      - "type:implementation"
+      - "phase:1"
+      - "batch:rbatch-012"
+      - "epic:company-management"
+    body: |
+      **Batch:** RBATCH-012
+      **Epic:** E-013 Company Management Scene
+
+      Player can browse and purchase available upgrades in the CompanyManagement scene with affordability enforcement.
+
+      **Acceptance Criteria:**
+      - Upgrade purchase deducts money correctly.
+      - Player cannot purchase upgrades they cannot afford.
+
+  - id: ISSUE-011
+    title: "Implement CompanyManagement scene navigation"
+    milestone_id: M-006
+    label_names:
+      - "type:implementation"
+      - "phase:1"
+      - "batch:rbatch-012"
+      - "epic:company-management"
+    body: |
+      **Batch:** RBATCH-012
+      **Epic:** E-013 Company Management Scene
+
+      Navigation between GameWorld and CompanyManagement scene from HUD; returns to GameWorld correctly.
+
+      **Acceptance Criteria:**
+      - Player can enter and exit CompanyManagement without losing game state.
+
+  # RBATCH-013 — Bicycle
+  - id: ISSUE-012
+    title: "Implement bicycle ownership flag"
+    milestone_id: M-006
+    label_names:
+      - "type:implementation"
+      - "phase:1"
+      - "batch:rbatch-013"
+      - "epic:bicycle-ownership"
+    body: |
+      **Batch:** RBATCH-013
+      **Epic:** E-014 Bicycle Ownership System
+
+      Purchase of bicycle sets PlayerData.HasBicycle flag. Flag persists correctly in game state.
+
+      **Acceptance Criteria:**
+      - HasBicycle is false initially.
+      - Becomes true after bicycle purchase.
+      - Does not reset on scene transitions.
+
+  - id: ISSUE-013
+    title: "Implement bicycle speed effect on player movement"
+    milestone_id: M-006
+    label_names:
+      - "type:implementation"
+      - "phase:1"
+      - "batch:rbatch-013"
+      - "epic:bicycle-ownership"
+    body: |
+      **Batch:** RBATCH-013
+      **Epic:** E-014 Bicycle Ownership System
+
+      When HasBicycle is true, apply the canonical speed multiplier to player movement speed.
+
+      **Acceptance Criteria:**
+      - Movement speed is visibly faster with bicycle.
+      - Walking speed unchanged without bicycle.
+
+  # RBATCH-014 — Save/Load
+  - id: ISSUE-014
+    title: "Implement save-game serialization"
+    milestone_id: M-007
+    label_names:
+      - "type:implementation"
+      - "phase:1"
+      - "batch:rbatch-014"
+      - "epic:save-load"
+      - "status:blocked"
+    body: |
+      **Batch:** RBATCH-014
+      **Epic:** E-015 Save & Load System
+      **Blocked by:** ODR-001, ODR-003
+
+      Serialize all canonical save-game fields to local device storage per the save policy.
+
+      **Acceptance Criteria:**
+      - All required fields persisted.
+      - Non-persisted fields excluded per canonical specification.
+
+  - id: ISSUE-015
+    title: "Implement save-game deserialization and load"
+    milestone_id: M-007
+    label_names:
+      - "type:implementation"
+      - "phase:1"
+      - "batch:rbatch-014"
+      - "epic:save-load"
+      - "status:blocked"
+    body: |
+      **Batch:** RBATCH-014
+      **Epic:** E-015 Save & Load System
+      **Blocked by:** ODR-001, ODR-003
+
+      Deserialize and validate save data from local device storage. Handle missing or corrupt save gracefully.
+
+      **Acceptance Criteria:**
+      - Valid save data loads correctly.
+      - Corrupt or missing data falls back to new-game state.
+
+  - id: ISSUE-016
+    title: "Implement autosave triggers"
+    milestone_id: M-007
+    label_names:
+      - "type:implementation"
+      - "phase:1"
+      - "batch:rbatch-014"
+      - "epic:save-load"
+      - "status:blocked"
+    body: |
+      **Batch:** RBATCH-014
+      **Epic:** E-015 Save & Load System
+      **Blocked by:** ODR-001, ODR-003
+
+      Autosave fires at canonical trigger points (order completion, scene exit, company management changes).
+
+      **Acceptance Criteria:**
+      - Autosave triggers at all required canonical events.
+      - No data loss between saves.
+
+  - id: ISSUE-017
+    title: "Implement save-slot validation"
+    milestone_id: M-007
+    label_names:
+      - "type:implementation"
+      - "phase:1"
+      - "batch:rbatch-014"
+      - "epic:save-load"
+      - "status:blocked"
+    body: |
+      **Batch:** RBATCH-014
+      **Epic:** E-015 Save & Load System
+      **Blocked by:** ODR-001, ODR-003
+
+      Validate save slot integrity on load; report version mismatches or schema violations.
+
+      **Acceptance Criteria:**
+      - Validation passes on fresh save.
+      - Validation fails gracefully on corrupt or version-incompatible data.
+
+  # RBATCH-015 — Mobile
+  - id: ISSUE-018
+    title: "Implement mobile viewport scaling"
+    milestone_id: M-008
+    label_names:
+      - "type:implementation"
+      - "phase:1"
+      - "batch:rbatch-015"
+      - "epic:mobile-optimization"
+    body: |
+      **Batch:** RBATCH-015
+      **Epic:** E-016 Mobile Optimization
+
+      Configure viewport scaling for Android target devices.
+
+      **Acceptance Criteria:**
+      - Game renders correctly on 720p and 1080p Android portrait and landscape.
+
+  - id: ISSUE-019
+    title: "Optimize touch interaction targets"
+    milestone_id: M-008
+    label_names:
+      - "type:implementation"
+      - "phase:1"
+      - "batch:rbatch-015"
+      - "epic:mobile-optimization"
+    body: |
+      **Batch:** RBATCH-015
+      **Epic:** E-016 Mobile Optimization
+
+      Verify all interactive touch targets meet minimum size requirements for reliable mobile tapping.
+
+      **Acceptance Criteria:**
+      - All HUD buttons and world touch targets meet canonical minimum touch target size (REQ-024).
+
+  # RBATCH-016 — Integration
+  - id: ISSUE-020
+    title: "Execute full-loop integration test suite"
+    milestone_id: M-008
+    label_names:
+      - "type:verification"
+      - "phase:1"
+      - "batch:rbatch-016"
+      - "epic:integration-verification"
+    body: |
+      **Batch:** RBATCH-016
+      **Epic:** E-017 Full-Loop Integration Verification
+
+      Execute integration tests covering the complete prototype gameplay loop.
+
+      **Acceptance Criteria:**
+      - All P0/P1 loop behaviors verified.
+      - No regression failures.
+
+  - id: ISSUE-021
+    title: "Document integration test results"
+    milestone_id: M-008
+    label_names:
+      - "type:documentation"
+      - "phase:1"
+      - "batch:rbatch-016"
+      - "epic:integration-verification"
+    body: |
+      **Batch:** RBATCH-016
+      **Epic:** E-017 Full-Loop Integration Verification
+
+      Create integration test evidence document with pass/fail results for all scenarios.
+
+      **Acceptance Criteria:**
+      - Evidence document exists.
+      - All pass/fail results recorded accurately.
+
+  # RBATCH-017 — Release
+  - id: ISSUE-022
+    title: "Assemble prototype release checklist evidence"
+    milestone_id: M-008
+    label_names:
+      - "type:verification"
+      - "phase:1"
+      - "batch:rbatch-017"
+      - "epic:integration-verification"
+    body: |
+      **Batch:** RBATCH-017
+      **Epic:** E-017 Full-Loop Integration Verification
+
+      Assemble complete evidence package for all prototype release checklist sections for owner review.
+
+      **Acceptance Criteria:**
+      - Checklist evidence is complete for all sections.
+      - No self-approval claims made.
+
+  - id: ISSUE-023
+    title: "Prepare owner review package"
+    milestone_id: M-008
+    label_names:
+      - "type:documentation"
+      - "phase:1"
+      - "batch:rbatch-017"
+      - "epic:integration-verification"
+    body: |
+      **Batch:** RBATCH-017
+      **Epic:** E-017 Full-Loop Integration Verification
+
+      Prepare and deliver the owner review package with all required artifacts.
+
+      **Acceptance Criteria:**
+      - Package accessible to Project Owner.
+      - All artifacts included.
+      - Owner instructed to review before approving.
+
+  # Phase 2 Issues
+  - id: ISSUE-024
+    title: "Design employee data model"
+    milestone_id: M-009
+    label_names:
+      - "type:design"
+      - "phase:2"
+      - "batch:rbatch-018"
+      - "epic:employee-management"
+    body: |
+      **Batch:** RBATCH-018
+      **Epic:** E-018 Employee Management System
+
+      Define the canonical employee data structure including attributes, salary fields, and hire/fire lifecycle.
+
+      **Acceptance Criteria:**
+      - Employee data model documented and approved before implementation.
+
+  - id: ISSUE-025
+    title: "Implement daily expense calculation"
+    milestone_id: M-009
+    label_names:
+      - "type:implementation"
+      - "phase:2"
+      - "batch:rbatch-019"
+      - "epic:financial-reporting"
+    body: |
+      **Batch:** RBATCH-019
+      **Epic:** E-019 Financial Reporting & Daily Costs
+
+      Implement daily expense deduction applying all operational costs at day-end.
+
+      **Acceptance Criteria:**
+      - Daily expenses deduct correctly.
+      - Negative balance handled per canonical policy.
+
+  - id: ISSUE-026
+    title: "Implement salary deduction system"
+    milestone_id: M-009
+    label_names:
+      - "type:implementation"
+      - "phase:2"
+      - "batch:rbatch-018"
+      - "epic:employee-management"
+    body: |
+      **Batch:** RBATCH-018
+      **Epic:** E-018 Employee Management System
+
+      Deduct employee salaries from company funds on each salary cycle event.
+
+      **Acceptance Criteria:**
+      - Salary deducts per employee per cycle.
+      - Insufficient funds handled per canonical policy.
+
+  - id: ISSUE-027
+    title: "Implement financial report display"
+    milestone_id: M-009
+    label_names:
+      - "type:implementation"
+      - "phase:2"
+      - "batch:rbatch-019"
+      - "epic:financial-reporting"
+    body: |
+      **Batch:** RBATCH-019
+      **Epic:** E-019 Financial Reporting & Daily Costs
+
+      Display a financial summary panel showing income, expenses, and net balance.
+
+      **Acceptance Criteria:**
+      - Financial report panel accessible from CompanyManagement scene.
+      - Shows accurate data.
+
+  - id: ISSUE-028
+    title: "Implement vehicle catalog and purchase UI"
+    milestone_id: M-010
+    label_names:
+      - "type:implementation"
+      - "phase:2"
+      - "batch:rbatch-022"
+      - "epic:vehicle-fleet"
+    body: |
+      **Batch:** RBATCH-022
+      **Epic:** E-021 Vehicle Fleet Management
+
+      Vehicle catalog browsable in CompanyManagement with purchase option and affordability check.
+
+      **Acceptance Criteria:**
+      - Player can view and purchase vehicles.
+      - Ownership tracked per vehicle.
+
+  - id: ISSUE-029
+    title: "Implement vehicle maintenance cost tracking"
+    milestone_id: M-010
+    label_names:
+      - "type:implementation"
+      - "phase:2"
+      - "batch:rbatch-023"
+      - "epic:vehicle-fleet"
+    body: |
+      **Batch:** RBATCH-023
+      **Epic:** E-021 Vehicle Fleet Management
+
+      Track maintenance costs per vehicle type and deduct from daily expenses.
+
+      **Acceptance Criteria:**
+      - Maintenance costs appear in financial report.
+      - Deduction accurate per vehicle owned.
+
+  - id: ISSUE-030
+    title: "Implement customer review system"
+    milestone_id: M-009
+    label_names:
+      - "type:implementation"
+      - "phase:2"
+      - "batch:rbatch-020"
+      - "epic:customer-reputation"
+    body: |
+      **Batch:** RBATCH-020
+      **Epic:** E-020 Customer Reputation System
+
+      Generate customer review events after each completed or failed order.
+
+      **Acceptance Criteria:**
+      - Reviews generated after each order outcome.
+      - Reputation score updates accordingly.
+
+  - id: ISSUE-031
+    title: "Implement reputation display in HUD"
+    milestone_id: M-009
+    label_names:
+      - "type:implementation"
+      - "phase:2"
+      - "batch:rbatch-021"
+      - "epic:customer-reputation"
+    body: |
+      **Batch:** RBATCH-021
+      **Epic:** E-020 Customer Reputation System
+
+      Display the current reputation score in HUD or CompanyManagement scene.
+
+      **Acceptance Criteria:**
+      - Reputation score visible to player.
+      - Updates in real time with each order outcome.
+
+# =============================================================================
+# FUTURE PLACEHOLDERS (12)
+# =============================================================================
+placeholders:
+  - id: PLACEHOLDER-001
+    title: "[PLACEHOLDER] Warehouse Construction System"
+    milestone_id: M-011
+    label_names:
+      - "type:planning"
+      - "phase:3"
+      - "batch:rbatch-025"
+      - "epic:warehouse"
+      - "status:future"
+    summary: "Full warehouse construction, inventory management, and dispatch routing. Requires Phase 3 detailed planning."
+
+  - id: PLACEHOLDER-002
+    title: "[PLACEHOLDER] Multi-District Map"
+    milestone_id: M-011
+    label_names:
+      - "type:planning"
+      - "phase:3"
+      - "batch:rbatch-026"
+      - "epic:multi-district"
+      - "status:future"
+    summary: "Expanded world map with multiple city districts and per-district logistics."
+
+  - id: PLACEHOLDER-003
+    title: "[PLACEHOLDER] Fleet Management Dashboard"
+    milestone_id: M-012
+    label_names:
+      - "type:planning"
+      - "phase:3"
+      - "batch:rbatch-028"
+      - "epic:fleet-management"
+      - "status:future"
+    summary: "Fleet dashboard with vehicle assignment, utilization tracking, and route visualization."
+
+  - id: PLACEHOLDER-004
+    title: "[PLACEHOLDER] Route Optimization Engine"
+    milestone_id: M-012
+    label_names:
+      - "type:planning"
+      - "phase:3"
+      - "batch:rbatch-029"
+      - "epic:route-optimization"
+      - "status:future"
+    summary: "Automated route optimization algorithm integrated into dispatch system."
+
+  - id: PLACEHOLDER-005
+    title: "[PLACEHOLDER] Drone Research Tree"
+    milestone_id: M-013
+    label_names:
+      - "type:planning"
+      - "phase:4"
+      - "batch:rbatch-032"
+      - "epic:drone-research"
+      - "status:future"
+    summary: "Drone technology research progression with unlock tree and research cost modeling."
+
+  - id: PLACEHOLDER-006
+    title: "[PLACEHOLDER] DronePort Infrastructure"
+    milestone_id: M-014
+    label_names:
+      - "type:planning"
+      - "phase:4"
+      - "batch:rbatch-034"
+      - "epic:droneport"
+      - "status:future"
+    summary: "DronePort construction, placement, and operational management system."
+
+  - id: PLACEHOLDER-007
+    title: "[PLACEHOLDER] Autonomous Drone Delivery"
+    milestone_id: M-015
+    label_names:
+      - "type:planning"
+      - "phase:4"
+      - "batch:rbatch-036"
+      - "epic:autonomous-delivery"
+      - "status:future"
+    summary: "Fully autonomous drone dispatch and delivery execution without manual player intervention."
+
+  - id: PLACEHOLDER-008
+    title: "[PLACEHOLDER] Dynamic Market System"
+    milestone_id: M-016
+    label_names:
+      - "type:planning"
+      - "phase:5"
+      - "batch:rbatch-039"
+      - "epic:dynamic-market"
+      - "status:future"
+    summary: "Dynamic market with inflation, demand-driven pricing, fuel costs, and electricity pricing."
+
+  - id: PLACEHOLDER-009
+    title: "[PLACEHOLDER] Business Loans & Investors"
+    milestone_id: M-017
+    label_names:
+      - "type:planning"
+      - "phase:5"
+      - "batch:rbatch-040"
+      - "epic:loans-investors"
+      - "status:future"
+    summary: "Business loan mechanics with repayment schedules and investor relationship system."
+
+  - id: PLACEHOLDER-010
+    title: "[PLACEHOLDER] Competitor AI Companies"
+    milestone_id: M-017
+    label_names:
+      - "type:planning"
+      - "phase:5"
+      - "batch:rbatch-041"
+      - "epic:competition"
+      - "status:future"
+    summary: "AI-controlled competitor companies operating in the same logistics market."
+
+  - id: PLACEHOLDER-011
+    title: "[PLACEHOLDER] Smart Routing & AI Dispatch"
+    milestone_id: M-018
+    label_names:
+      - "type:planning"
+      - "phase:6"
+      - "batch:rbatch-042"
+      - "epic:smart-routing"
+      - "status:future"
+    summary: "AI-driven smart routing, predictive demand modeling, and autonomous dispatch center."
+
+  - id: PLACEHOLDER-012
+    title: "[PLACEHOLDER] International Multi-City Expansion"
+    milestone_id: M-019
+    label_names:
+      - "type:planning"
+      - "phase:7"
+      - "status:future"
+    summary: "Multi-city, multi-country logistics with customs, airports, and international regulations."

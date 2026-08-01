@@ -2,11 +2,11 @@
 
 Document: DOCUMENT_INDEX.md
 Project: DROPi Tycoon
-Version: 1.2.0
+Version: 1.3.0
 Status: Documentation Control
 Author: Marian Caliof & OpenAI
 Language: English
-Last Updated: 2026-07-16
+Last Updated: 2026-08-01
 
 ---
 
@@ -261,6 +261,29 @@ Stable top-level documents:
 **Maintenance expectations:** Point-in-time preparation artifact. If canonical documents are updated materially during implementation, affected sections of this package should be reviewed and updated. The Project Owner decides when such updates are required.
 
 **Non-authoritative rule:** No content in this directory constitutes a canonical gameplay, architecture, scope, or design decision unless explicitly confirmed by the Project Owner and recorded in the appropriate canonical document.
+
+---
+
+### Managed planning documentation directory
+
+- `09_Development/Planning/` — canonical planning package for milestone, epic, batch, and issue architecture.
+
+**Purpose:** Defines the complete project roadmap planning architecture including milestones, epics, roadmap batches, GitHub issues, dependency graphs, label taxonomy, and GitHub creation plan.
+
+**Ownership:** Created and maintained by AI agents under Project Owner governance. This directory is the authoritative source for planning structure.
+
+**Contents (stable enumerated documents):**
+
+- `09_Development/Planning/MILESTONE_ARCHITECTURE.md` — 21 milestones (M-001 through M-021)
+- `09_Development/Planning/EPIC_CATALOG.md` — 37 epics (E-001 through E-037)
+- `09_Development/Planning/BATCH_ARCHITECTURE.md` — 42 roadmap batches (RBATCH-001 through RBATCH-042)
+- `09_Development/Planning/ISSUE_CATALOG.md` — 31 executable issues and 12 future placeholders
+- `09_Development/Planning/DEPENDENCY_GRAPH.md` — acyclic dependency graphs for milestones, epics, and batches
+- `09_Development/Planning/LABEL_TAXONOMY.md` — GitHub label taxonomy (101 labels)
+- `09_Development/Planning/GITHUB_CREATION_PLAN.md` — GitHub creation instructions
+- `09_Development/Planning/github_creation_plan.yaml` — machine-readable GitHub creation plan
+
+**Authority note:** The planning documents in this directory are planning-canonical. They do not override the gameplay canonical documents (`00_Project/ROADMAP.md`, `01_GameDesign/`, `02_Economy/`, etc.). Conflicts between planning scope and gameplay canonical documents must be escalated to the Project Owner.
 
 ---
 
