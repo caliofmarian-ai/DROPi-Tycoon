@@ -133,7 +133,7 @@ Define a dependency-ordered, scope-safe implementation plan for Prototype v0.1.
 - Dependencies: BATCH-007.
 - Owner-decision gate: **None.** ODR-004 was reclassified on 2026-08-01. The canonical trigger is wrong-destination interaction per `GAMEPLAY_EVENTS_FLOW.md`. The Project Owner instructed the agent to apply canonical documents without a duplicate decision.
 - Non-goals: no economy, rewards, Money, reputation, persistence implementation.
-- Validation: PickedUp→Completed and PickedUp→Failed both testable; 23 automated tests pass; TypeScript build and HTTP smoke test pass.
+- Validation: PickedUp→Completed and PickedUp→Failed both testable; 30 automated tests pass (9 pre-existing on `main` + 14 initial BATCH-008 delivery tests + 1 inclusive-radius-boundary test + 6 delivery-intent regression tests); TypeScript build and HTTP smoke test pass.
 - Acceptance criteria: failure/complete paths comply with canonical loop; terminal states have no outbound transitions; BATCH-009 scope not introduced.
 
 ### BATCH-009

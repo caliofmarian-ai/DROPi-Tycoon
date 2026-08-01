@@ -41,10 +41,10 @@ Description
 - `DeliveryContext` type in `game-web/src/types/game.ts` with `selectedDestination`, `distanceToDestination`, `deliveryRadius`, `orderConditionsMet`.
 - `attemptDelivery` pure function in `game-web/src/systems/orderSystem.ts` implementing `PickedUp → Completed` (correct destination) and `PickedUp → Failed` (wrong destination) transitions with full terminal-state protection.
 - `deliveryRadius` (48) and `pendingDeliveryDestination` fields in `WorldState` and `createInitialWorldState`.
-- `selectDeliveryIntentFromTap` exported pure helper in `GameWorldScene.ts`; clears pending intent when tapping ordinary ground after a delivery marker.
+- `selectDeliveryIntentFromTap` exported pure helper in `game-web/src/utils/deliveryIntent.ts`; `GameWorldScene.ts` imports it and clears pending intent when tapping ordinary ground after a delivery marker.
 - Delivery tap-intent detection in `GameWorldScene.ts`: tapping a delivery marker while carrying a package registers `pendingDeliveryDestination`; `updateDeliveryState` executes `attemptDelivery` on arrival within `deliveryRadius`.
 - `DebugPanel` updated with post-pickup, completed, and failed guidance messages.
-- 30 automated tests in `game-web/tests/orderSystem.test.ts` (23 BATCH-005–BATCH-008 delivery tests + 6 stale-intent regression tests + 1 radius-boundary test); all pass.
+- 30 automated tests in `game-web/tests/orderSystem.test.ts` (9 pre-existing tests on `main` + 14 initial BATCH-008 delivery tests + 1 inclusive-radius-boundary correction test + 6 delivery-intent selection/stale-intent regression tests); all pass.
 
 ## Fixed (preparation documents)
 
