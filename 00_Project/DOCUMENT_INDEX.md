@@ -2,7 +2,7 @@
 
 Document: DOCUMENT_INDEX.md
 Project: DROPi Tycoon
-Version: 1.3.0
+Version: 1.4.0
 Status: Documentation Control
 Author: Marian Caliof & OpenAI
 Language: English
@@ -277,7 +277,7 @@ Stable top-level documents:
 - `09_Development/Planning/MILESTONE_ARCHITECTURE.md` — 21 milestones (M-001 through M-021)
 - `09_Development/Planning/EPIC_CATALOG.md` — 46 epics (E-001 through E-046)
 - `09_Development/Planning/BATCH_ARCHITECTURE.md` — 54 roadmap batches (RBATCH-001 through RBATCH-054)
-- `09_Development/Planning/ISSUE_CATALOG.md` — 34 executable issues and 30 planning placeholders
+- `09_Development/Planning/ISSUE_CATALOG.md` — 34 executable issues and 32 planning placeholders
 - `09_Development/Planning/DEPENDENCY_GRAPH.md` — acyclic dependency graphs for milestones, epics, and batches
 - `09_Development/Planning/LABEL_TAXONOMY.md` — GitHub label taxonomy (122 labels)
 - `09_Development/Planning/GITHUB_CREATION_PLAN.md` — GitHub creation instructions

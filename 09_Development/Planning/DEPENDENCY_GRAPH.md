@@ -2,9 +2,9 @@
 
 Document: DEPENDENCY_GRAPH.md
 Project: DROPi Tycoon
-Version: 1.1.0
+Version: 1.2.0
 Status: Planning — Canonical
-Author: AI Agent (Report 086 correction amendment)
+Author: AI Agent (Report 087)
 Language: English
 Last Updated: 2026-08-01
 
@@ -12,7 +12,7 @@ Last Updated: 2026-08-01
 
 # Dependency Graph
 
-All milestone, epic, and batch graphs are acyclic.
+All milestone, epic, and batch graphs are acyclic. Bidirectional parent mappings and phase alignment are expected to match the YAML registry.
 
 ## Milestone Dependencies
 
@@ -150,10 +150,9 @@ All milestone, epic, and batch graphs are acyclic.
 | RBATCH-053 | RBATCH-052 |
 | RBATCH-054 | RBATCH-053 |
 
-
 ## Acyclicity Summary
 
-- Milestones: 21 nodes, strict forward chain, acyclic.
+- Milestones: 21 nodes, forward-only dependencies, acyclic.
 - Epics: 46 nodes, forward-only dependencies, acyclic.
 - Batches: 54 nodes, forward-only dependencies, acyclic.
 

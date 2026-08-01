@@ -2,9 +2,9 @@
 
 Document: MILESTONE_ARCHITECTURE.md
 Project: DROPi Tycoon
-Version: 1.1.0
+Version: 1.2.0
 Status: Planning — Canonical
-Author: AI Agent (Report 086 correction amendment)
+Author: AI Agent (Report 087)
 Language: English
 Last Updated: 2026-08-01
 
@@ -16,13 +16,14 @@ Last Updated: 2026-08-01
 
 - Total milestones: **21**
 - Complete roadmap coverage: **Phases 0–9 represented**
+- `M-001` is a canonical-documentation completion milestone; legacy implementation batch lineage begins at `M-002`.
 
 ## Milestone Registry
 
 | ID | Phase | Title | Status | Epics | Batches | Depends On | Owner Gates |
 |---|---|---|---|---|---|---|---|
-| M-001 | 0 | Foundation & Documentation Complete | COMPLETED | E-001, E-002 | RBATCH-001 | none | — |
-| M-002 | 1 | Prototype Scaffold & Runtime Foundation | COMPLETED | E-003, E-004 | RBATCH-002, RBATCH-003 | M-001 | — |
+| M-001 | 0 | Foundation & Documentation Complete | COMPLETED | E-001, E-002 | none | none | — |
+| M-002 | 1 | Prototype Scaffold & Runtime Foundation | COMPLETED | E-003, E-004 | RBATCH-001, RBATCH-002, RBATCH-003 | M-001 | — |
 | M-003 | 1 | World Navigation | COMPLETED | E-005, E-006 | RBATCH-004, RBATCH-006 | M-002 | — |
 | M-004 | 1 | Order Lifecycle Core | COMPLETED | E-007, E-008, E-009 | RBATCH-005, RBATCH-007, RBATCH-008 | M-003 | — |
 | M-005 | 1 | Economy, HUD & Game Flow | Planned — Not Started | E-010, E-011, E-012 | RBATCH-009, RBATCH-010, RBATCH-011 | M-004 | — |

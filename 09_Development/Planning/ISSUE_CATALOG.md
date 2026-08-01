@@ -2,9 +2,9 @@
 
 Document: ISSUE_CATALOG.md
 Project: DROPi Tycoon
-Version: 1.1.0
+Version: 1.2.0
 Status: Planning — Canonical
-Author: AI Agent (Report 086 correction amendment)
+Author: AI Agent (Report 087)
 Language: English
 Last Updated: 2026-08-01
 
@@ -15,7 +15,13 @@ Last Updated: 2026-08-01
 ## Count Summary
 
 - Executable issues: **34** (`ISSUE-001..ISSUE-034`)
-- Planning placeholders: **30** (`PLACEHOLDER-001..PLACEHOLDER-030`)
+- Planning placeholders: **32** (`PLACEHOLDER-001..PLACEHOLDER-032`)
+
+## Status Authorization Policy
+
+- `Ready for implementation` is reserved for issues whose parent milestone and batch are not `Planned — Future`.
+- `Specification prepared — future implementation only` means the issue content is documented but the parent roadmap status still blocks implementation authorization.
+- Planning placeholders are approved for GitHub placeholder creation but are not executable implementation commitments.
 
 ## Executable Issues
 
@@ -23,7 +29,7 @@ Last Updated: 2026-08-01
 |---|---|---|---|---|---|---|---|---|---|---|
 | ISSUE-001 | Implement money reward on order completion | RBATCH-009 | E-010 | M-005 | implementation | Ready for implementation | type:implementation, phase:1, batch:rbatch-009, epic:economy-reputation, status:ready | — | Apply canonical reward to company money on Completed. | Company money increases on PickedUp→Completed. |
 | ISSUE-002 | Implement reputation increase on delivery completion | RBATCH-009 | E-010 | M-005 | implementation | Ready for implementation | type:implementation, phase:1, batch:rbatch-009, epic:economy-reputation, status:ready | — | Increase reputation on Completed. | Reputation increases within approved bounds. |
-| ISSUE-003 | Resolve failure penalty modality before implementation | RBATCH-009 | E-010 | M-005 | design | Needs design / balancing decision | type:design, phase:1, batch:rbatch-009, epic:economy-reputation, status:needs-design | Balancing / owner-approved implementation-detail selection required | Decide whether any small failure penalty beyond reputation exists. | No unapproved money penalty is introduced. |
+| ISSUE-003 | Resolve failure penalty modality before implementation | RBATCH-009 | E-010 | M-005 | design | Needs design / balancing decision | type:design, phase:1, batch:rbatch-009, epic:economy-reputation, status:needs-design | — | Decide whether any small failure penalty beyond reputation exists. | No unapproved money penalty is introduced. |
 | ISSUE-004 | Implement reputation decrease on order failure | RBATCH-009 | E-010 | M-005 | implementation | Ready for implementation | type:implementation, phase:1, batch:rbatch-009, epic:economy-reputation, status:ready | — | Apply canonical reputation consequence on Failed. | Reputation decreases without permanent setback. |
 | ISSUE-005 | Implement active-order HUD panel | RBATCH-010 | E-011 | M-005 | implementation | Ready for implementation | type:implementation, phase:1, batch:rbatch-010, epic:hud-notifications, status:ready | — | Show destination/status/package state in HUD. | HUD appears only when order active. |
 | ISSUE-006 | Implement Accept Order button in HUD | RBATCH-010 | E-011 | M-005 | implementation | Ready for implementation | type:implementation, phase:1, batch:rbatch-010, epic:hud-notifications, status:ready | — | Connect HUD button to AcceptRequested flow. | Available orders can be accepted from HUD. |
@@ -45,16 +51,16 @@ Last Updated: 2026-08-01
 | ISSUE-022 | Assemble prototype release checklist evidence | RBATCH-017 | E-017 | M-008 | verification | Ready for implementation | type:verification, phase:1, batch:rbatch-017, epic:integration-verification, status:ready | — | Assemble release-checklist evidence for owner review. | Evidence is complete with no self-approval claim. |
 | ISSUE-023 | Prepare owner review package | RBATCH-017 | E-017 | M-008 | documentation | Ready for implementation | type:documentation, phase:1, batch:rbatch-017, epic:integration-verification, status:ready | — | Package review artifacts for the owner. | Artifacts and review instructions are included. |
 | ISSUE-024 | Design employee data model | RBATCH-018 | E-018 | M-009 | design | Needs design / canonical detailing | type:design, phase:2, batch:rbatch-018, epic:employee-management, status:needs-design | — | Define employee attributes, salary fields, and onboarding state. | Employee model is documented before deeper implementation. |
-| ISSUE-025 | Implement daily expense calculation | RBATCH-019 | E-019 | M-009 | implementation | Ready for implementation | type:implementation, phase:2, batch:rbatch-019, epic:financial-reporting, status:ready | — | Apply daily operational expenses. | Expenses deduct correctly. |
-| ISSUE-026 | Implement salary deduction system | RBATCH-018 | E-018 | M-009 | implementation | Ready for implementation | type:implementation, phase:2, batch:rbatch-018, epic:employee-management, status:ready | — | Deduct salaries on each salary cycle. | Salary deductions are accurate. |
-| ISSUE-027 | Implement financial report display | RBATCH-019 | E-019 | M-009 | implementation | Ready for implementation | type:implementation, phase:2, batch:rbatch-019, epic:financial-reporting, status:ready | — | Show income, expenses, and net balance. | Financial report is accessible and accurate. |
-| ISSUE-028 | Implement vehicle catalog and purchase UI | RBATCH-022 | E-021 | M-010 | implementation | Ready for implementation | type:implementation, phase:2, batch:rbatch-022, epic:vehicle-fleet, status:ready | — | Browse and purchase vehicles. | Vehicle ownership is tracked. |
-| ISSUE-029 | Implement vehicle maintenance cost tracking | RBATCH-023 | E-021 | M-010 | implementation | Ready for implementation | type:implementation, phase:2, batch:rbatch-023, epic:vehicle-fleet, status:ready | — | Track maintenance costs by vehicle. | Maintenance costs appear in reports. |
-| ISSUE-030 | Implement customer review generation system | RBATCH-020 | E-020 | M-009 | implementation | Ready for implementation | type:implementation, phase:2, batch:rbatch-020, epic:customer-reputation, status:ready | — | Generate reviews after completed/failed orders. | Reviews affect reputation. |
-| ISSUE-031 | Implement customer reviews display in CompanyManagement | RBATCH-021 | E-020 | M-009 | implementation | Ready for implementation | type:implementation, phase:2, batch:rbatch-021, epic:customer-reputation, status:ready | — | Show customer reviews and summaries, not only a raw reputation number. | Reviews are inspectable by players. |
-| ISSUE-032 | Implement employee hiring and onboarding workflow | RBATCH-018 | E-018 | M-009 | implementation | Ready for implementation | type:implementation, phase:2, batch:rbatch-018, epic:employee-management, status:ready | — | Implement hiring flow and onboarding state transitions. | Employees can be hired and become active. |
-| ISSUE-033 | Execute Phase 2 integration verification suite | RBATCH-024 | E-021 | M-010 | verification | Ready for implementation | type:verification, phase:2, batch:rbatch-024, epic:vehicle-fleet, status:ready | — | Verify employee, expense, review, vehicle purchase, and maintenance systems together. | Phase 2 scenarios execute end-to-end. |
-| ISSUE-034 | Document Phase 2 integration evidence | RBATCH-024 | E-021 | M-010 | documentation | Ready for implementation | type:documentation, phase:2, batch:rbatch-024, epic:vehicle-fleet, status:ready | — | Record Phase 2 integration evidence. | Covered scenarios and outcomes are documented. |
+| ISSUE-025 | Implement daily expense calculation | RBATCH-019 | E-019 | M-009 | implementation | Specification prepared — future implementation only | type:implementation, phase:2, batch:rbatch-019, epic:financial-reporting, status:future | Parent milestone and batch are Planned — Future | Apply daily operational expenses. | Expenses deduct correctly. |
+| ISSUE-026 | Implement salary deduction system | RBATCH-018 | E-018 | M-009 | implementation | Specification prepared — future implementation only | type:implementation, phase:2, batch:rbatch-018, epic:employee-management, status:future | Parent milestone and batch are Planned — Future | Deduct salaries on each salary cycle. | Salary deductions are accurate. |
+| ISSUE-027 | Implement financial report display | RBATCH-019 | E-019 | M-009 | implementation | Specification prepared — future implementation only | type:implementation, phase:2, batch:rbatch-019, epic:financial-reporting, status:future | Parent milestone and batch are Planned — Future | Show income, expenses, and net balance. | Financial report is accessible and accurate. |
+| ISSUE-028 | Implement vehicle catalog and purchase UI | RBATCH-022 | E-021 | M-010 | implementation | Specification prepared — future implementation only | type:implementation, phase:2, batch:rbatch-022, epic:vehicle-fleet, status:future | Parent milestone and batch are Planned — Future | Browse and purchase vehicles. | Vehicle ownership is tracked. |
+| ISSUE-029 | Implement vehicle maintenance cost tracking | RBATCH-023 | E-021 | M-010 | implementation | Specification prepared — future implementation only | type:implementation, phase:2, batch:rbatch-023, epic:vehicle-fleet, status:future | Parent milestone and batch are Planned — Future | Track maintenance costs by vehicle. | Maintenance costs appear in reports. |
+| ISSUE-030 | Implement customer review generation system | RBATCH-020 | E-020 | M-009 | implementation | Specification prepared — future implementation only | type:implementation, phase:2, batch:rbatch-020, epic:customer-reputation, status:future | Parent milestone and batch are Planned — Future | Generate reviews after completed/failed orders. | Reviews affect reputation. |
+| ISSUE-031 | Implement customer reviews display in CompanyManagement | RBATCH-021 | E-020 | M-009 | implementation | Specification prepared — future implementation only | type:implementation, phase:2, batch:rbatch-021, epic:customer-reputation, status:future | Parent milestone and batch are Planned — Future | Show customer reviews and summaries, not only a raw reputation number. | Reviews are inspectable by players. |
+| ISSUE-032 | Implement employee hiring and onboarding workflow | RBATCH-018 | E-018 | M-009 | implementation | Specification prepared — future implementation only | type:implementation, phase:2, batch:rbatch-018, epic:employee-management, status:future | Parent milestone and batch are Planned — Future | Implement hiring flow and onboarding state transitions. | Employees can be hired and become active. |
+| ISSUE-033 | Execute Phase 2 integration verification suite | RBATCH-024 | E-021 | M-010 | verification | Specification prepared — future implementation only | type:verification, phase:2, batch:rbatch-024, epic:vehicle-fleet, status:future | Parent milestone and batch are Planned — Future | Verify employee, expense, review, vehicle purchase, and maintenance systems together. | Phase 2 scenarios execute end-to-end. |
+| ISSUE-034 | Document Phase 2 integration evidence | RBATCH-024 | E-021 | M-010 | documentation | Specification prepared — future implementation only | type:documentation, phase:2, batch:rbatch-024, epic:vehicle-fleet, status:future | Parent milestone and batch are Planned — Future | Record Phase 2 integration evidence. | Covered scenarios and outcomes are documented. |
 
 ## Planning Placeholders
 
@@ -92,6 +98,8 @@ Placeholders are approved for GitHub placeholder creation but are not executable
 | PLACEHOLDER-028 | Cooperative & Competitive Company Interaction | RBATCH-052 | E-044 | M-021 | Planning placeholder — Approved for GitHub placeholder creation (owner-gated) | type:planning, phase:9, batch:rbatch-052, epic:multiplayer-foundation, status:needs-design | Dedicated multiplayer canonical architecture audit required | Cooperative and competitive company interaction. |
 | PLACEHOLDER-029 | Robotics & Autonomous Warehouse Systems | RBATCH-053 | E-045 | M-021 | Planning placeholder — Approved for GitHub placeholder creation (owner-gated) | type:planning, phase:9, batch:rbatch-053, epic:robotics-automation, status:needs-design | Dedicated robotics/autonomous-warehouse audit required | Robotics and autonomous warehouses. |
 | PLACEHOLDER-030 | Community, Smart-City & Frontier Expansion Governance | RBATCH-054 | E-046 | M-021 | Planning placeholder — Approved for GitHub placeholder creation (owner-gated) | type:planning, phase:9, batch:rbatch-054, epic:community-frontier, status:needs-design | Dedicated community/frontier audit required | Community content, smart-city integration, and frontier/space expansion. |
+| PLACEHOLDER-031 | Fuel & Electricity Economy Planning Coverage | RBATCH-039 | E-033 | M-016 | Planning placeholder — Approved for GitHub placeholder creation | type:planning, phase:5, batch:rbatch-039, epic:fuel-electricity, status:future | — | Fuel pricing, electricity costs, and operating-energy planning coverage for E-033. |
+| PLACEHOLDER-032 | AI Dispatch & Autonomous Fleet Planning Coverage | RBATCH-042 | E-037 | M-018 | Planning placeholder — Approved for GitHub placeholder creation | type:planning, phase:6, batch:rbatch-042, epic:ai-dispatch, status:future | — | AI dispatch policy and autonomous-fleet orchestration planning coverage for E-037. |
 
 ---
 

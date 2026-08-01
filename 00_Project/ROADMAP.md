@@ -2,7 +2,7 @@
 
 Document: ROADMAP.md
 Project: DROPi Tycoon
-Version: 2.1.0
+Version: 2.2.0
 Status: Canonical
 Author: Marian Caliof & OpenAI
 Language: English
@@ -12,44 +12,221 @@ Last Updated: 2026-08-01
 
 # Development Roadmap
 
-DROPi Tycoon remains a web-first application. The active deployable runtime is `game-web/`; archived GDevelop scaffold work remains reference-only in `Game/`. Libraries, frameworks, and engines are replaceable implementation details, not canonical technology.
+DROPi Tycoon remains a web-first project. The active deployable runtime is the standard code-based web runtime in `game-web/`, deployed through Railway; archived GDevelop work in `Game/` remains historical/reference-only. Specific libraries, frameworks, and engines are replaceable implementation details rather than canonical technology.
 
-## Phase Summary
+## Purpose
 
-- Phase 0: foundation complete.
-- Phase 1: prototype loop foundation complete through BATCH-008; remaining roadmap continues through verification/release.
-- Phase 2: employees, finance, reviews, vehicles.
-- Phase 3: warehouses, districts, zones, fleet optimization.
-- Phase 4: drones, DronePorts, weather, autonomy.
-- Phase 5: advanced economy.
-- Phase 6: autonomous intelligence systems.
-- Phase 7: international expansion now represented by explicit milestones, epics, batches, and placeholders.
-- Phase 8: global corporate systems now represented by explicit milestones, epics, batches, and placeholders.
-- Phase 9: multiplayer/community/frontier expansion now represented by explicit owner-gated planning branches.
+This document defines the long-term development strategy for DROPi Tycoon.
+
+The objective is to build the game incrementally while maintaining a stable, scalable, and AI-friendly architecture.
+
+Every new feature should build upon previously completed systems.
+
+---
+
+# Development Philosophy
+
+DROPi Tycoon follows an iterative development model.
+
+Each milestone delivers a playable version of the game while expanding existing systems rather than replacing them.
+
+No feature should require rewriting the core architecture.
+
+---
+
+# Phase 0 — Foundation
+
+Objective:
+
+Create a solid technical and design foundation.
+
+Deliverables:
+
+- Canonical documentation
+- Project architecture
+- Core gameplay definition
+- UI wireframes
+- Technical architecture
+- Repository structure
+- Asset pipeline
+
+Status:
+
+Completed — canonical documentation foundation established.
+
+---
+
+# Phase 1 — First Playable Prototype
+
+Objective:
+
+Deliver a minimal but fully playable logistics game.
+
+Features:
+
+- Small city map
+- One courier
+- Walking deliveries
+- Bicycle deliveries
+- Basic customer system
+- Package generation
+- Simple economy
+- Save & Load (local device persistence; see `06_Technical/SAVE_SYSTEM.md`)
+- Basic UI
+
+Success Criteria:
+
+The player can start a company, deliver packages, earn money, and continue growing.
+
+---
+
+# Phase 2 — Company Management
+
+Features:
+
+- Employees
+- Salaries
+- Daily expenses
+- Company reputation
+- Financial reports
+- Vehicle purchasing
+- Maintenance costs
+- Customer reviews
+
+---
+
+# Phase 3 — Logistics Expansion
+
+Features:
+
+- Warehouses
+- Multiple city districts
+- Delivery zones
+- Fleet management
+- Route optimization
+- Vehicle upgrades
+
+---
+
+# Phase 4 — Drone Technology
+
+Features:
+
+- Drone research
+- Drone manufacturing partners
+- DronePorts
+- Battery swapping
+- Autonomous deliveries
+- Flight restrictions
+- Weather effects
+
+---
+
+# Phase 5 — Advanced Economy
+
+Features:
+
+- Dynamic market
+- Inflation
+- Fuel prices
+- Electricity costs
+- Business loans
+- Investors
+- Competitors
+
+---
+
+# Phase 6 — Artificial Intelligence
+
+Features:
+
+- Smart routing
+- Predictive demand
+- Dynamic pricing
+- Autonomous fleet management
+- AI dispatch center
+
+---
+
+# Phase 7 — International Expansion
+
+Features:
+
+- Multiple cities
+- Multiple countries
+- Different regulations
+- Customs
+- Airports
+- Ports
+- International logistics
+
+---
+
+# Phase 8 — Global Corporation
+
+Features:
+
+- Public company
+- Stock market
+- Franchises
+- Corporate headquarters
+- Worldwide DronePort network
+
+---
+
+# Phase 9 — Endless Evolution
+
+Future systems may include:
+
+- Multiplayer
+- Cooperative companies
+- Competitive economy
+- Robotics
+- Autonomous warehouses
+- Smart cities
+- Space logistics
+- Community-created content
+
+---
+
+# Guiding Principles
+
+Every phase must:
+
+- Be playable.
+- Improve existing systems.
+- Avoid unnecessary complexity.
+- Remain compatible with future expansions.
+- Preserve save-game compatibility whenever possible.
+
+---
+
+# Success Metric
+
+Development is considered successful when every milestone results in a complete, enjoyable, and stable gameplay experience.
 
 ## Planning Architecture Reference
 
 - `09_Development/Planning/MILESTONE_ARCHITECTURE.md` — 21 milestones
 - `09_Development/Planning/EPIC_CATALOG.md` — 46 epics
 - `09_Development/Planning/BATCH_ARCHITECTURE.md` — 54 roadmap batches
-- `09_Development/Planning/ISSUE_CATALOG.md` — 34 executable issues and 30 planning placeholders
-- `09_Development/Planning/DEPENDENCY_GRAPH.md` — acyclic dependency graphs
+- `09_Development/Planning/ISSUE_CATALOG.md` — 34 executable issues and 32 planning placeholders
+- `09_Development/Planning/DEPENDENCY_GRAPH.md` — milestone, epic, and batch graphs validated acyclic
 - `09_Development/Planning/LABEL_TAXONOMY.md` — 122 labels
-- `09_Development/Planning/GITHUB_CREATION_PLAN.md` — non-destructive GitHub creation instructions
-- `09_Development/Planning/github_creation_plan.yaml` — machine-readable creation plan
+- `09_Development/Planning/GITHUB_CREATION_PLAN.md` — non-destructive GitHub creation procedure and Owner Directive coverage matrix
+- `09_Development/Planning/github_creation_plan.yaml` — machine-readable planning package
 
-## Counts at a Glance
+## Derived Planning Summary
 
 | Item | Count |
 |---|---|
 | Milestones | 21 |
 | Epics | 46 |
-| Roadmap Batches | 54 (RBATCH-001..RBATCH-054) |
+| Roadmap Batches | 54 (`RBATCH-001..RBATCH-054`) |
 | Legacy Crosswalk Entries | 17 |
 | Executable Issues | 34 |
-| Planning Placeholders | 30 |
+| Planning Placeholders | 32 |
 | Labels | 122 |
-
 
 ## Milestone Summary
 
@@ -77,10 +254,9 @@ DROPi Tycoon remains a web-first application. The active deployable runtime is `
 | M-020 | 8 | Global Empire & Corporate Systems | Planned — Future |
 | M-021 | 9 | Multiplayer & Community Systems | Planned — Future |
 
+## Legacy Numbering Authority Rule
 
-## Legacy Batch Crosswalk Rule
-
-Legacy `BATCH-001..BATCH-016` plus `BATCH-010b` remain historical references only. Execute the mapped `RBATCH-*` scope from `09_Development/Planning/BATCH_ARCHITECTURE.md`; use `09_Development/Implementation_Preparation/IMPLEMENTATION_BATCH_PLAN.md` only as historical lineage evidence.
+Legacy `BATCH-001..BATCH-016` plus `BATCH-010b` remain historical lineage only. `M-001` / `E-001` / `E-002` are completed canonical-documentation owners and are not evidenced by historical `BATCH-001`. Historical `BATCH-001` maps to `RBATCH-001` under `M-002` / `E-003`. Execute only the mapped `RBATCH-*` identifiers from `09_Development/Planning/BATCH_ARCHITECTURE.md`; use `09_Development/Implementation_Preparation/IMPLEMENTATION_BATCH_PLAN.md` as lineage evidence, not authoritative current planning.
 
 ---
 

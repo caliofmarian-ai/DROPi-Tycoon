@@ -4,7 +4,7 @@
 metadata:
   project: DROPi Tycoon
   repository: caliofmarian-ai/DROPi-Tycoon
-  plan_version: 1.1.0
+  plan_version: 1.2.0
   created_date: '2026-08-01'
   execution_status: NOT_EXECUTED
   counts:
@@ -13,9 +13,17 @@ metadata:
     batches: 54
     labels: 122
     executable_issues: 34
-    future_placeholders: 30
-  placeholder_policy: Placeholders are approved for GitHub placeholder creation but
-    are not executable implementation commitments.
+    future_placeholders: 32
+  placeholder_policy: Placeholders are approved for GitHub placeholder creation but are not executable implementation commitments.
+inspection_limitations:
+- Existing GitHub milestone objects were not directly inspected.
+- Existing labels, issues, and Projects must also be reconciled before creation.
+- No claim may be made that those objects were inspected if the available tools did not support it.
+- The creation plan must not run until manual or independent reconciliation and owner approval occur.
+status_authorization_policy:
+  status_ready_rule: Use status:ready only when the issue is implementation-authorized and its parent milestone and batch are not Planned — Future.
+  status_future_rule: Use status:future when the specification exists but parent roadmap status still prevents implementation authorization.
+  creation_rule: Do not create or assign future-status executable issues as active implementation work until manual reconciliation, owner approval, and parent-status advancement occur.
 milestones:
 - id: M-001
   title: Foundation & Documentation Complete
@@ -24,8 +32,7 @@ milestones:
   epic_ids:
   - E-001
   - E-002
-  batch_ids:
-  - RBATCH-001
+  batch_ids: []
   depends_on: []
 - id: M-002
   title: Prototype Scaffold & Runtime Foundation
@@ -35,6 +42,7 @@ milestones:
   - E-003
   - E-004
   batch_ids:
+  - RBATCH-001
   - RBATCH-002
   - RBATCH-003
   depends_on:
@@ -68,7 +76,7 @@ milestones:
 - id: M-005
   title: Economy, HUD & Game Flow
   phase: 1
-  status: "Planned \u2014 Not Started"
+  status: Planned — Not Started
   epic_ids:
   - E-010
   - E-011
@@ -82,7 +90,7 @@ milestones:
 - id: M-006
   title: Company Management & Bicycle
   phase: 1
-  status: "Planned \u2014 Not Started"
+  status: Planned — Not Started
   epic_ids:
   - E-013
   - E-014
@@ -94,7 +102,7 @@ milestones:
 - id: M-007
   title: Save & Load System
   phase: 1
-  status: "Planned \u2014 Blocked"
+  status: Planned — Blocked
   epic_ids:
   - E-015
   batch_ids:
@@ -105,7 +113,7 @@ milestones:
 - id: M-008
   title: Prototype v0.1 Verification & Release
   phase: 1
-  status: "Planned \u2014 Not Started"
+  status: Planned — Not Started
   epic_ids:
   - E-016
   - E-017
@@ -119,7 +127,7 @@ milestones:
 - id: M-009
   title: Employee & Financial Systems
   phase: 2
-  status: "Planned \u2014 Future"
+  status: Planned — Future
   epic_ids:
   - E-018
   - E-019
@@ -134,7 +142,7 @@ milestones:
 - id: M-010
   title: Vehicle Fleet Management
   phase: 2
-  status: "Planned \u2014 Future"
+  status: Planned — Future
   epic_ids:
   - E-021
   batch_ids:
@@ -146,7 +154,7 @@ milestones:
 - id: M-011
   title: Warehouse & District System
   phase: 3
-  status: "Planned \u2014 Future"
+  status: Planned — Future
   epic_ids:
   - E-022
   - E-023
@@ -159,7 +167,7 @@ milestones:
 - id: M-012
   title: Advanced Fleet & Route Optimization
   phase: 3
-  status: "Planned \u2014 Future"
+  status: Planned — Future
   epic_ids:
   - E-024
   - E-025
@@ -173,7 +181,7 @@ milestones:
 - id: M-013
   title: Drone Research & Manufacturing
   phase: 4
-  status: "Planned \u2014 Future"
+  status: Planned — Future
   epic_ids:
   - E-026
   - E-027
@@ -185,7 +193,7 @@ milestones:
 - id: M-014
   title: DronePort Infrastructure
   phase: 4
-  status: "Planned \u2014 Future"
+  status: Planned — Future
   epic_ids:
   - E-028
   - E-029
@@ -197,7 +205,7 @@ milestones:
 - id: M-015
   title: Autonomous Drone Operations
   phase: 4
-  status: "Planned \u2014 Future"
+  status: Planned — Future
   epic_ids:
   - E-030
   - E-031
@@ -210,7 +218,7 @@ milestones:
 - id: M-016
   title: Dynamic Market System
   phase: 5
-  status: "Planned \u2014 Future"
+  status: Planned — Future
   epic_ids:
   - E-032
   - E-033
@@ -221,7 +229,7 @@ milestones:
 - id: M-017
   title: Financial Instruments & Competition
   phase: 5
-  status: "Planned \u2014 Future"
+  status: Planned — Future
   epic_ids:
   - E-034
   - E-035
@@ -233,7 +241,7 @@ milestones:
 - id: M-018
   title: Autonomous Intelligence Systems
   phase: 6
-  status: "Planned \u2014 Future"
+  status: Planned — Future
   epic_ids:
   - E-036
   - E-037
@@ -244,7 +252,7 @@ milestones:
 - id: M-019
   title: International Multi-City Logistics
   phase: 7
-  status: "Planned \u2014 Future"
+  status: Planned — Future
   epic_ids:
   - E-038
   - E-039
@@ -259,7 +267,7 @@ milestones:
 - id: M-020
   title: Global Empire & Corporate Systems
   phase: 8
-  status: "Planned \u2014 Future"
+  status: Planned — Future
   epic_ids:
   - E-041
   - E-042
@@ -274,7 +282,7 @@ milestones:
 - id: M-021
   title: Multiplayer & Community Systems
   phase: 9
-  status: "Planned \u2014 Future"
+  status: Planned — Future
   epic_ids:
   - E-044
   - E-045
@@ -286,24 +294,21 @@ milestones:
   - RBATCH-054
   depends_on:
   - M-020
-  owner_gates: Dedicated multiplayer/frontier audits required before executable issue
-    creation
+  owner_gates: Dedicated multiplayer/frontier audits required before executable issue creation
 epics:
 - id: E-001
   title: Repository Structure & Documentation Framework
   phase: 0
   milestone_id: M-001
   status: COMPLETED
-  batch_ids:
-  - RBATCH-001
+  batch_ids: []
   depends_on: []
 - id: E-002
   title: Canonical Game Design Foundation
   phase: 0
   milestone_id: M-001
   status: COMPLETED
-  batch_ids:
-  - RBATCH-001
+  batch_ids: []
   depends_on: []
 - id: E-003
   title: Historical Scaffold & Runtime Foundation
@@ -311,6 +316,7 @@ epics:
   milestone_id: M-002
   status: COMPLETED
   batch_ids:
+  - RBATCH-001
   - RBATCH-002
   depends_on:
   - E-001
@@ -374,7 +380,7 @@ epics:
   title: Economy & Reputation Core
   phase: 1
   milestone_id: M-005
-  status: "Planned \u2014 Not Started"
+  status: Planned — Not Started
   batch_ids:
   - RBATCH-009
   depends_on:
@@ -383,7 +389,7 @@ epics:
   title: HUD & Notifications
   phase: 1
   milestone_id: M-005
-  status: "Planned \u2014 Not Started"
+  status: Planned — Not Started
   batch_ids:
   - RBATCH-010
   depends_on:
@@ -392,7 +398,7 @@ epics:
   title: MainMenu & Game Flow
   phase: 1
   milestone_id: M-005
-  status: "Planned \u2014 Not Started"
+  status: Planned — Not Started
   batch_ids:
   - RBATCH-011
   depends_on:
@@ -401,7 +407,7 @@ epics:
   title: Company Management Scene
   phase: 1
   milestone_id: M-006
-  status: "Planned \u2014 Not Started"
+  status: Planned — Not Started
   batch_ids:
   - RBATCH-012
   depends_on:
@@ -411,7 +417,7 @@ epics:
   title: Bicycle Ownership System
   phase: 1
   milestone_id: M-006
-  status: "Planned \u2014 Not Started"
+  status: Planned — Not Started
   batch_ids:
   - RBATCH-013
   depends_on:
@@ -421,7 +427,7 @@ epics:
   title: Save & Load System
   phase: 1
   milestone_id: M-007
-  status: "Planned \u2014 Blocked"
+  status: Planned — Blocked
   batch_ids:
   - RBATCH-014
   depends_on:
@@ -432,7 +438,7 @@ epics:
   title: Mobile Optimization
   phase: 1
   milestone_id: M-008
-  status: "Planned \u2014 Not Started"
+  status: Planned — Not Started
   batch_ids:
   - RBATCH-015
   depends_on:
@@ -441,7 +447,7 @@ epics:
   title: Full-Loop Integration Verification
   phase: 1
   milestone_id: M-008
-  status: "Planned \u2014 Not Started"
+  status: Planned — Not Started
   batch_ids:
   - RBATCH-016
   - RBATCH-017
@@ -451,7 +457,7 @@ epics:
   title: Employee Management System
   phase: 2
   milestone_id: M-009
-  status: "Planned \u2014 Future"
+  status: Planned — Future
   batch_ids:
   - RBATCH-018
   depends_on:
@@ -460,7 +466,7 @@ epics:
   title: Financial Reporting & Daily Costs
   phase: 2
   milestone_id: M-009
-  status: "Planned \u2014 Future"
+  status: Planned — Future
   batch_ids:
   - RBATCH-019
   depends_on:
@@ -469,7 +475,7 @@ epics:
   title: Customer Review & Reputation System
   phase: 2
   milestone_id: M-009
-  status: "Planned \u2014 Future"
+  status: Planned — Future
   batch_ids:
   - RBATCH-020
   - RBATCH-021
@@ -479,7 +485,7 @@ epics:
   title: Vehicle Fleet Management
   phase: 2
   milestone_id: M-010
-  status: "Planned \u2014 Future"
+  status: Planned — Future
   batch_ids:
   - RBATCH-022
   - RBATCH-023
@@ -492,7 +498,7 @@ epics:
   title: Warehouse Infrastructure
   phase: 3
   milestone_id: M-011
-  status: "Planned \u2014 Future"
+  status: Planned — Future
   batch_ids:
   - RBATCH-025
   depends_on:
@@ -501,7 +507,7 @@ epics:
   title: Multi-District Map Expansion
   phase: 3
   milestone_id: M-011
-  status: "Planned \u2014 Future"
+  status: Planned — Future
   batch_ids:
   - RBATCH-026
   - RBATCH-027
@@ -511,7 +517,7 @@ epics:
   title: Fleet Management System
   phase: 3
   milestone_id: M-012
-  status: "Planned \u2014 Future"
+  status: Planned — Future
   batch_ids:
   - RBATCH-028
   depends_on:
@@ -520,7 +526,7 @@ epics:
   title: Route Optimization & Vehicle Upgrades
   phase: 3
   milestone_id: M-012
-  status: "Planned \u2014 Future"
+  status: Planned — Future
   batch_ids:
   - RBATCH-029
   - RBATCH-030
@@ -531,7 +537,7 @@ epics:
   title: Drone Research & Technology Tree
   phase: 4
   milestone_id: M-013
-  status: "Planned \u2014 Future"
+  status: Planned — Future
   batch_ids:
   - RBATCH-032
   depends_on:
@@ -540,7 +546,7 @@ epics:
   title: Drone Manufacturing Partners
   phase: 4
   milestone_id: M-013
-  status: "Planned \u2014 Future"
+  status: Planned — Future
   batch_ids:
   - RBATCH-033
   depends_on:
@@ -549,7 +555,7 @@ epics:
   title: DronePort Infrastructure System
   phase: 4
   milestone_id: M-014
-  status: "Planned \u2014 Future"
+  status: Planned — Future
   batch_ids:
   - RBATCH-034
   depends_on:
@@ -558,7 +564,7 @@ epics:
   title: Battery Swapping Network
   phase: 4
   milestone_id: M-014
-  status: "Planned \u2014 Future"
+  status: Planned — Future
   batch_ids:
   - RBATCH-035
   depends_on:
@@ -567,7 +573,7 @@ epics:
   title: Autonomous Delivery System
   phase: 4
   milestone_id: M-015
-  status: "Planned \u2014 Future"
+  status: Planned — Future
   batch_ids:
   - RBATCH-036
   depends_on:
@@ -576,7 +582,7 @@ epics:
   title: Flight Restrictions & Weather
   phase: 4
   milestone_id: M-015
-  status: "Planned \u2014 Future"
+  status: Planned — Future
   batch_ids:
   - RBATCH-037
   - RBATCH-038
@@ -586,7 +592,7 @@ epics:
   title: Dynamic Market System
   phase: 5
   milestone_id: M-016
-  status: "Planned \u2014 Future"
+  status: Planned — Future
   batch_ids:
   - RBATCH-039
   depends_on:
@@ -595,7 +601,7 @@ epics:
   title: Fuel & Electricity Economy
   phase: 5
   milestone_id: M-016
-  status: "Planned \u2014 Future"
+  status: Planned — Future
   batch_ids:
   - RBATCH-039
   depends_on:
@@ -604,7 +610,7 @@ epics:
   title: Business Loans & Investors
   phase: 5
   milestone_id: M-017
-  status: "Planned \u2014 Future"
+  status: Planned — Future
   batch_ids:
   - RBATCH-040
   depends_on:
@@ -613,7 +619,7 @@ epics:
   title: Competition & Market Rivals
   phase: 5
   milestone_id: M-017
-  status: "Planned \u2014 Future"
+  status: Planned — Future
   batch_ids:
   - RBATCH-041
   depends_on:
@@ -623,7 +629,7 @@ epics:
   title: Smart Routing & Predictive Demand
   phase: 6
   milestone_id: M-018
-  status: "Planned \u2014 Future"
+  status: Planned — Future
   batch_ids:
   - RBATCH-042
   depends_on:
@@ -632,7 +638,7 @@ epics:
   title: AI Dispatch & Autonomous Fleet
   phase: 6
   milestone_id: M-018
-  status: "Planned \u2014 Future"
+  status: Planned — Future
   batch_ids:
   - RBATCH-042
   depends_on:
@@ -641,7 +647,7 @@ epics:
   title: International Operations Foundation
   phase: 7
   milestone_id: M-019
-  status: "Planned \u2014 Future"
+  status: Planned — Future
   batch_ids:
   - RBATCH-043
   - RBATCH-044
@@ -651,7 +657,7 @@ epics:
   title: Cross-Border Compliance & Customs
   phase: 7
   milestone_id: M-019
-  status: "Planned \u2014 Future"
+  status: Planned — Future
   batch_ids:
   - RBATCH-045
   depends_on:
@@ -660,7 +666,7 @@ epics:
   title: International Intermodal Gateways
   phase: 7
   milestone_id: M-019
-  status: "Planned \u2014 Future"
+  status: Planned — Future
   batch_ids:
   - RBATCH-046
   depends_on:
@@ -669,7 +675,7 @@ epics:
   title: Corporate Governance & Headquarters
   phase: 8
   milestone_id: M-020
-  status: "Planned \u2014 Future"
+  status: Planned — Future
   batch_ids:
   - RBATCH-047
   depends_on:
@@ -678,7 +684,7 @@ epics:
   title: Public Markets & Investor Governance
   phase: 8
   milestone_id: M-020
-  status: "Planned \u2014 Future"
+  status: Planned — Future
   batch_ids:
   - RBATCH-048
   depends_on:
@@ -687,7 +693,7 @@ epics:
   title: Franchise & Worldwide Network Orchestration
   phase: 8
   milestone_id: M-020
-  status: "Planned \u2014 Future"
+  status: Planned — Future
   batch_ids:
   - RBATCH-049
   - RBATCH-050
@@ -698,7 +704,7 @@ epics:
   title: Shared-World Multiplayer Foundation
   phase: 9
   milestone_id: M-021
-  status: "Planned \u2014 Future"
+  status: Planned — Future
   batch_ids:
   - RBATCH-051
   - RBATCH-052
@@ -708,7 +714,7 @@ epics:
   title: Robotics & Autonomous Operations Growth
   phase: 9
   milestone_id: M-021
-  status: "Planned \u2014 Future"
+  status: Planned — Future
   batch_ids:
   - RBATCH-053
   depends_on:
@@ -717,7 +723,7 @@ epics:
   title: Community & Frontier Expansion Governance
   phase: 9
   milestone_id: M-021
-  status: "Planned \u2014 Future"
+  status: Planned — Future
   batch_ids:
   - RBATCH-054
   depends_on:
@@ -725,35 +731,70 @@ epics:
   - E-045
 batches:
 - id: RBATCH-001
-  phase: 0
-  milestone_id: M-001
-  epic_ids:
-  - E-001
-  - E-002
-  title: Historical Prototype Scaffold Foundation
-  status: COMPLETED
-  depends_on: []
-  legacy_id: BATCH-001
-- id: RBATCH-002
-  phase: 0
+  phase: 1
   milestone_id: M-002
   epic_ids:
   - E-003
-  title: Historical Scene/Event Scaffold Baseline
+  title: Historical GDevelop Project Foundation Scaffold
+  status: COMPLETED
+  depends_on: []
+  legacy_id: BATCH-001
+  legacy_status: COMPLETED
+  authoritative_planning_source: 09_Development/Planning/BATCH_ARCHITECTURE.md
+  historical_lineage_source: 09_Development/Implementation_Preparation/IMPLEMENTATION_BATCH_PLAN.md
+  legacy_execution_rule: Historical numbering only; execute the mapped RBATCH identifier and never ambiguous legacy numbering.
+  completion_evidence:
+    legacy_id: BATCH-001
+    implementation_commit: N/A — requires historical inspection
+    pull_request: N/A — requires historical inspection
+    ai_report: 09_Development/AI_Reports/2026-07-14_059_BATCH_001_GDEVELOP_PROJECT_FOUNDATION_IMPLEMENTATION.md
+    automated_validation_evidence: N/A — requires historical inspection
+    railway_public_verification_evidence: N/A — not applicable
+    final_status: COMPLETED
+- id: RBATCH-002
+  phase: 1
+  milestone_id: M-002
+  epic_ids:
+  - E-003
+  title: Historical Scene/Event Scaffold Wiring
   status: COMPLETED
   depends_on:
   - RBATCH-001
   legacy_id: BATCH-002
+  legacy_status: COMPLETED
+  authoritative_planning_source: 09_Development/Planning/BATCH_ARCHITECTURE.md
+  historical_lineage_source: 09_Development/Implementation_Preparation/IMPLEMENTATION_BATCH_PLAN.md
+  legacy_execution_rule: Historical numbering only; execute the mapped RBATCH identifier and never ambiguous legacy numbering.
+  completion_evidence:
+    legacy_id: BATCH-002
+    implementation_commit: N/A — requires historical inspection
+    pull_request: N/A — requires historical inspection
+    ai_report: 09_Development/AI_Reports/2026-07-14_061_BATCH_002_GDEVELOP_SCENE_EVENT_SCAFFOLD_IMPLEMENTATION.md
+    automated_validation_evidence: 09_Development/AI_Reports/2026-07-14_060_BATCH_002_PRE_IMPLEMENTATION_VERIFICATION.md
+    railway_public_verification_evidence: N/A — not applicable
+    final_status: COMPLETED
 - id: RBATCH-003
-  phase: 0
+  phase: 1
   milestone_id: M-002
   epic_ids:
   - E-004
-  title: Placeholder Asset Baseline
+  title: Historical Placeholder Asset Baseline
   status: COMPLETED
   depends_on:
   - RBATCH-001
   legacy_id: BATCH-003
+  legacy_status: COMPLETED
+  authoritative_planning_source: 09_Development/Planning/BATCH_ARCHITECTURE.md
+  historical_lineage_source: 09_Development/Implementation_Preparation/IMPLEMENTATION_BATCH_PLAN.md
+  legacy_execution_rule: Historical numbering only; execute the mapped RBATCH identifier and never ambiguous legacy numbering.
+  completion_evidence:
+    legacy_id: BATCH-003
+    implementation_commit: N/A — requires historical inspection
+    pull_request: N/A — requires historical inspection
+    ai_report: 09_Development/AI_Reports/2026-07-14_064_BATCH_003_PLACEHOLDER_ASSET_SETUP_IMPLEMENTATION.md
+    automated_validation_evidence: 09_Development/AI_Reports/2026-07-14_063_BATCH_003_PRE_IMPLEMENTATION_VERIFICATION_ANDROID_FIRST.md
+    railway_public_verification_evidence: N/A — not applicable
+    final_status: COMPLETED
 - id: RBATCH-004
   phase: 1
   milestone_id: M-003
@@ -765,6 +806,18 @@ batches:
   - RBATCH-002
   - RBATCH-003
   legacy_id: BATCH-004
+  legacy_status: COMPLETED
+  authoritative_planning_source: 09_Development/Planning/BATCH_ARCHITECTURE.md
+  historical_lineage_source: 09_Development/Implementation_Preparation/IMPLEMENTATION_BATCH_PLAN.md
+  legacy_execution_rule: Historical numbering only; execute the mapped RBATCH identifier and never ambiguous legacy numbering.
+  completion_evidence:
+    legacy_id: BATCH-004
+    implementation_commit: N/A — requires historical inspection
+    pull_request: N/A — requires historical inspection
+    ai_report: 09_Development/AI_Reports/2026-07-14_067_BATCH_004_MAP_PLAYER_BUILDING_WORLD_SETUP_IMPLEMENTATION.md
+    automated_validation_evidence: 09_Development/AI_Reports/2026-07-14_068_BATCH_004_MAP_PLAYER_BUILDING_WORLD_SETUP_INDEPENDENT_VERIFICATION.md
+    railway_public_verification_evidence: N/A — not applicable
+    final_status: COMPLETED
 - id: RBATCH-005
   phase: 1
   milestone_id: M-004
@@ -775,6 +828,18 @@ batches:
   depends_on:
   - RBATCH-004
   legacy_id: BATCH-005
+  legacy_status: COMPLETED
+  authoritative_planning_source: 09_Development/Planning/BATCH_ARCHITECTURE.md
+  historical_lineage_source: 09_Development/Implementation_Preparation/IMPLEMENTATION_BATCH_PLAN.md
+  legacy_execution_rule: Historical numbering only; execute the mapped RBATCH identifier and never ambiguous legacy numbering.
+  completion_evidence:
+    legacy_id: BATCH-005
+    implementation_commit: N/A — requires historical inspection
+    pull_request: N/A — requires historical inspection
+    ai_report: 09_Development/AI_Reports/2026-07-15_071_BATCH_005_ORDER_GENERATION_LIFECYCLE_CORE_IMPLEMENTATION.md
+    automated_validation_evidence: 09_Development/AI_Reports/2026-07-15_072_BATCH_005_ORDER_GENERATION_LIFECYCLE_CORE_INDEPENDENT_VERIFICATION.md
+    railway_public_verification_evidence: N/A — not applicable
+    final_status: COMPLETED
 - id: RBATCH-006
   phase: 1
   milestone_id: M-003
@@ -785,6 +850,18 @@ batches:
   depends_on:
   - RBATCH-004
   legacy_id: BATCH-006
+  legacy_status: COMPLETED
+  authoritative_planning_source: 09_Development/Planning/BATCH_ARCHITECTURE.md
+  historical_lineage_source: 09_Development/Implementation_Preparation/IMPLEMENTATION_BATCH_PLAN.md
+  legacy_execution_rule: Historical numbering only; execute the mapped RBATCH identifier and never ambiguous legacy numbering.
+  completion_evidence:
+    legacy_id: BATCH-006
+    implementation_commit: N/A — requires historical inspection
+    pull_request: N/A — requires historical inspection
+    ai_report: 09_Development/AI_Reports/2026-07-15_075_BATCH_006_TAP_TO_MOVE_CAMERA_IMPLEMENTATION.md
+    automated_validation_evidence: 09_Development/AI_Reports/2026-07-15_076_BATCH_006_TAP_TO_MOVE_CAMERA_INDEPENDENT_VERIFICATION.md
+    railway_public_verification_evidence: N/A — not applicable
+    final_status: COMPLETED
 - id: RBATCH-007
   phase: 1
   milestone_id: M-004
@@ -796,6 +873,18 @@ batches:
   - RBATCH-005
   - RBATCH-006
   legacy_id: BATCH-007
+  legacy_status: COMPLETED
+  authoritative_planning_source: 09_Development/Planning/BATCH_ARCHITECTURE.md
+  historical_lineage_source: 09_Development/Implementation_Preparation/IMPLEMENTATION_BATCH_PLAN.md
+  legacy_execution_rule: Historical numbering only; execute the mapped RBATCH identifier and never ambiguous legacy numbering.
+  completion_evidence:
+    legacy_id: BATCH-007
+    implementation_commit: N/A — requires historical inspection
+    pull_request: N/A — requires historical inspection
+    ai_report: 09_Development/AI_Reports/2026-07-15_079_BATCH_007_PICKUP_PROXIMITY_AND_ACCEPTANCE_TRIGGER_IMPLEMENTATION.md
+    automated_validation_evidence: 09_Development/AI_Reports/2026-07-15_080_BATCH_007_PICKUP_PROXIMITY_AND_ACCEPTANCE_TRIGGER_INDEPENDENT_VERIFICATION.md
+    railway_public_verification_evidence: 00_Project/PROJECT_STATUS.md — public Railway verification of Available→Accepted→PickedUp on 2026-08-01
+    final_status: COMPLETED
 - id: RBATCH-008
   phase: 1
   milestone_id: M-004
@@ -806,102 +895,159 @@ batches:
   depends_on:
   - RBATCH-007
   legacy_id: BATCH-008
+  legacy_status: COMPLETED
+  authoritative_planning_source: 09_Development/Planning/BATCH_ARCHITECTURE.md
+  historical_lineage_source: 09_Development/Implementation_Preparation/IMPLEMENTATION_BATCH_PLAN.md
+  legacy_execution_rule: Historical numbering only; execute the mapped RBATCH identifier and never ambiguous legacy numbering.
+  completion_evidence:
+    legacy_id: BATCH-008
+    implementation_commit: 9cdabff6f762300a71e898792ebe0a44dfbcb6d0
+    pull_request: 'PR #84 — https://github.com/caliofmarian-ai/DROPi-Tycoon/pull/84'
+    ai_report: 09_Development/AI_Reports/2026-08-01_085_BATCH_008_DELIVERY_COMPLETION_FAILURE_IMPLEMENTATION.md
+    automated_validation_evidence: Report 085 — 30 automated tests, TypeScript build pass, HTTP 200 smoke test
+    railway_public_verification_evidence: '00_Project/PROJECT_STATUS.md — PR #84 merged, Railway redeployed, PickedUp→Completed and wrong-destination PickedUp→Failed publicly verified, CarryingPackage cleared in both outcomes'
+    final_status: COMPLETED
 - id: RBATCH-009
   phase: 1
   milestone_id: M-005
   epic_ids:
   - E-010
   title: Economy Reward & Failure Consequences
-  status: "Planned \u2014 Not Started"
+  status: Planned — Not Started
   depends_on:
   - RBATCH-008
+  legacy_id: BATCH-009
+  legacy_status: NEVER STARTED
+  authoritative_planning_source: 09_Development/Planning/BATCH_ARCHITECTURE.md
+  historical_lineage_source: 09_Development/Implementation_Preparation/IMPLEMENTATION_BATCH_PLAN.md
+  legacy_execution_rule: Historical numbering only; execute the mapped RBATCH identifier and never ambiguous legacy numbering.
 - id: RBATCH-010
   phase: 1
   milestone_id: M-005
   epic_ids:
   - E-011
   title: HUD + Notifications
-  status: "Planned \u2014 Not Started"
+  status: Planned — Not Started
   depends_on:
   - RBATCH-007
   - RBATCH-009
+  legacy_id: BATCH-010
+  legacy_status: NEVER STARTED
+  authoritative_planning_source: 09_Development/Planning/BATCH_ARCHITECTURE.md
+  historical_lineage_source: 09_Development/Implementation_Preparation/IMPLEMENTATION_BATCH_PLAN.md
+  legacy_execution_rule: Historical numbering only; execute the mapped RBATCH identifier and never ambiguous legacy numbering.
 - id: RBATCH-011
   phase: 1
   milestone_id: M-005
   epic_ids:
   - E-012
   title: MainMenu Flow
-  status: "Planned \u2014 Not Started"
+  status: Planned — Not Started
   depends_on:
   - RBATCH-002
+  legacy_id: BATCH-010b
+  legacy_status: NEVER STARTED
+  authoritative_planning_source: 09_Development/Planning/BATCH_ARCHITECTURE.md
+  historical_lineage_source: 09_Development/Implementation_Preparation/IMPLEMENTATION_BATCH_PLAN.md
+  legacy_execution_rule: Historical numbering only; execute the mapped RBATCH identifier and never ambiguous legacy numbering.
 - id: RBATCH-012
   phase: 1
   milestone_id: M-006
   epic_ids:
   - E-013
   title: CompanyManagement + Upgrade Purchase Flow
-  status: "Planned \u2014 Not Started"
+  status: Planned — Not Started
   depends_on:
   - RBATCH-009
   - RBATCH-010
+  legacy_id: BATCH-011
+  legacy_status: NEVER STARTED
+  authoritative_planning_source: 09_Development/Planning/BATCH_ARCHITECTURE.md
+  historical_lineage_source: 09_Development/Implementation_Preparation/IMPLEMENTATION_BATCH_PLAN.md
+  legacy_execution_rule: Historical numbering only; execute the mapped RBATCH identifier and never ambiguous legacy numbering.
 - id: RBATCH-013
   phase: 1
   milestone_id: M-006
   epic_ids:
   - E-014
   title: Bicycle Ownership + Speed Increase
-  status: "Planned \u2014 Not Started"
+  status: Planned — Not Started
   depends_on:
   - RBATCH-012
   - RBATCH-006
+  legacy_id: BATCH-012
+  legacy_status: NEVER STARTED
+  authoritative_planning_source: 09_Development/Planning/BATCH_ARCHITECTURE.md
+  historical_lineage_source: 09_Development/Implementation_Preparation/IMPLEMENTATION_BATCH_PLAN.md
+  legacy_execution_rule: Historical numbering only; execute the mapped RBATCH identifier and never ambiguous legacy numbering.
 - id: RBATCH-014
   phase: 1
   milestone_id: M-007
   epic_ids:
   - E-015
   title: Save/Load Implementation
-  status: "Planned \u2014 Blocked"
+  status: Planned — Blocked
   depends_on:
   - RBATCH-012
   - RBATCH-013
   - RBATCH-011
   owner_gates: ODR-001, ODR-003
+  legacy_id: BATCH-013
+  legacy_status: NEVER STARTED
+  authoritative_planning_source: 09_Development/Planning/BATCH_ARCHITECTURE.md
+  historical_lineage_source: 09_Development/Implementation_Preparation/IMPLEMENTATION_BATCH_PLAN.md
+  legacy_execution_rule: Historical numbering only; execute the mapped RBATCH identifier and never ambiguous legacy numbering.
 - id: RBATCH-015
   phase: 1
   milestone_id: M-008
   epic_ids:
   - E-016
   title: Mobile Optimization
-  status: "Planned \u2014 Not Started"
+  status: Planned — Not Started
   depends_on:
   - RBATCH-010
   - RBATCH-014
+  legacy_id: BATCH-014
+  legacy_status: NEVER STARTED
+  authoritative_planning_source: 09_Development/Planning/BATCH_ARCHITECTURE.md
+  historical_lineage_source: 09_Development/Implementation_Preparation/IMPLEMENTATION_BATCH_PLAN.md
+  legacy_execution_rule: Historical numbering only; execute the mapped RBATCH identifier and never ambiguous legacy numbering.
 - id: RBATCH-016
   phase: 1
   milestone_id: M-008
   epic_ids:
   - E-017
   title: Full-Loop Integration Verification
-  status: "Planned \u2014 Not Started"
+  status: Planned — Not Started
   depends_on:
   - RBATCH-015
+  legacy_id: BATCH-015
+  legacy_status: NEVER STARTED
+  authoritative_planning_source: 09_Development/Planning/BATCH_ARCHITECTURE.md
+  historical_lineage_source: 09_Development/Implementation_Preparation/IMPLEMENTATION_BATCH_PLAN.md
+  legacy_execution_rule: Historical numbering only; execute the mapped RBATCH identifier and never ambiguous legacy numbering.
 - id: RBATCH-017
   phase: 1
   milestone_id: M-008
   epic_ids:
   - E-017
   title: Release-Checklist Verification Package
-  status: "Planned \u2014 Not Started"
+  status: Planned — Not Started
   depends_on:
   - RBATCH-016
   owner_gates: Human owner approval required
+  legacy_id: BATCH-016
+  legacy_status: NEVER STARTED
+  authoritative_planning_source: 09_Development/Planning/BATCH_ARCHITECTURE.md
+  historical_lineage_source: 09_Development/Implementation_Preparation/IMPLEMENTATION_BATCH_PLAN.md
+  legacy_execution_rule: Historical numbering only; execute the mapped RBATCH identifier and never ambiguous legacy numbering.
 - id: RBATCH-018
   phase: 2
   milestone_id: M-009
   epic_ids:
   - E-018
   title: Employee Hiring & Onboarding
-  status: "Planned \u2014 Future"
+  status: Planned — Future
   depends_on:
   - RBATCH-017
 - id: RBATCH-019
@@ -910,7 +1056,7 @@ batches:
   epic_ids:
   - E-019
   title: Daily Expenses & Financial Reporting
-  status: "Planned \u2014 Future"
+  status: Planned — Future
   depends_on:
   - RBATCH-018
 - id: RBATCH-020
@@ -919,7 +1065,7 @@ batches:
   epic_ids:
   - E-020
   title: Customer Review Generation & Reputation
-  status: "Planned \u2014 Future"
+  status: Planned — Future
   depends_on:
   - RBATCH-009
 - id: RBATCH-021
@@ -928,7 +1074,7 @@ batches:
   epic_ids:
   - E-020
   title: Customer Reviews Display
-  status: "Planned \u2014 Future"
+  status: Planned — Future
   depends_on:
   - RBATCH-020
 - id: RBATCH-022
@@ -937,7 +1083,7 @@ batches:
   epic_ids:
   - E-021
   title: Vehicle Purchasing System
-  status: "Planned \u2014 Future"
+  status: Planned — Future
   depends_on:
   - RBATCH-019
 - id: RBATCH-023
@@ -946,7 +1092,7 @@ batches:
   epic_ids:
   - E-021
   title: Vehicle Maintenance Costs
-  status: "Planned \u2014 Future"
+  status: Planned — Future
   depends_on:
   - RBATCH-022
 - id: RBATCH-024
@@ -955,7 +1101,7 @@ batches:
   epic_ids:
   - E-021
   title: Phase 2 Integration Verification
-  status: "Planned \u2014 Future"
+  status: Planned — Future
   depends_on:
   - RBATCH-021
   - RBATCH-023
@@ -965,7 +1111,7 @@ batches:
   epic_ids:
   - E-022
   title: Warehouse Implementation
-  status: "Planned \u2014 Future"
+  status: Planned — Future
   depends_on:
   - RBATCH-024
 - id: RBATCH-026
@@ -974,7 +1120,7 @@ batches:
   epic_ids:
   - E-023
   title: Multi-District Map Expansion
-  status: "Planned \u2014 Future"
+  status: Planned — Future
   depends_on:
   - RBATCH-025
 - id: RBATCH-027
@@ -983,7 +1129,7 @@ batches:
   epic_ids:
   - E-023
   title: Delivery Zone Management
-  status: "Planned \u2014 Future"
+  status: Planned — Future
   depends_on:
   - RBATCH-026
 - id: RBATCH-028
@@ -992,7 +1138,7 @@ batches:
   epic_ids:
   - E-024
   title: Fleet Management Dashboard
-  status: "Planned \u2014 Future"
+  status: Planned — Future
   depends_on:
   - RBATCH-027
 - id: RBATCH-029
@@ -1001,7 +1147,7 @@ batches:
   epic_ids:
   - E-025
   title: Route Optimization Engine
-  status: "Planned \u2014 Future"
+  status: Planned — Future
   depends_on:
   - RBATCH-028
 - id: RBATCH-030
@@ -1010,7 +1156,7 @@ batches:
   epic_ids:
   - E-025
   title: Vehicle Upgrade System
-  status: "Planned \u2014 Future"
+  status: Planned — Future
   depends_on:
   - RBATCH-029
 - id: RBATCH-031
@@ -1019,7 +1165,7 @@ batches:
   epic_ids:
   - E-025
   title: Phase 3 Integration Verification
-  status: "Planned \u2014 Future"
+  status: Planned — Future
   depends_on:
   - RBATCH-024
   - RBATCH-030
@@ -1029,7 +1175,7 @@ batches:
   epic_ids:
   - E-026
   title: Drone Research System
-  status: "Planned \u2014 Future"
+  status: Planned — Future
   depends_on:
   - RBATCH-031
 - id: RBATCH-033
@@ -1038,7 +1184,7 @@ batches:
   epic_ids:
   - E-027
   title: Drone Manufacturing Partners
-  status: "Planned \u2014 Future"
+  status: Planned — Future
   depends_on:
   - RBATCH-032
 - id: RBATCH-034
@@ -1047,7 +1193,7 @@ batches:
   epic_ids:
   - E-028
   title: DronePort Construction
-  status: "Planned \u2014 Future"
+  status: Planned — Future
   depends_on:
   - RBATCH-033
 - id: RBATCH-035
@@ -1056,7 +1202,7 @@ batches:
   epic_ids:
   - E-029
   title: Battery Swapping Network
-  status: "Planned \u2014 Future"
+  status: Planned — Future
   depends_on:
   - RBATCH-034
 - id: RBATCH-036
@@ -1065,7 +1211,7 @@ batches:
   epic_ids:
   - E-030
   title: Autonomous Delivery Execution
-  status: "Planned \u2014 Future"
+  status: Planned — Future
   depends_on:
   - RBATCH-035
 - id: RBATCH-037
@@ -1074,7 +1220,7 @@ batches:
   epic_ids:
   - E-031
   title: Flight Restrictions & Weather
-  status: "Planned \u2014 Future"
+  status: Planned — Future
   depends_on:
   - RBATCH-036
 - id: RBATCH-038
@@ -1083,7 +1229,7 @@ batches:
   epic_ids:
   - E-031
   title: Phase 4 Integration Verification
-  status: "Planned \u2014 Future"
+  status: Planned — Future
   depends_on:
   - RBATCH-031
   - RBATCH-037
@@ -1094,7 +1240,7 @@ batches:
   - E-032
   - E-033
   title: Dynamic Market System
-  status: "Planned \u2014 Future"
+  status: Planned — Future
   depends_on:
   - RBATCH-038
 - id: RBATCH-040
@@ -1103,7 +1249,7 @@ batches:
   epic_ids:
   - E-034
   title: Business Loans & Investor System
-  status: "Planned \u2014 Future"
+  status: Planned — Future
   depends_on:
   - RBATCH-039
 - id: RBATCH-041
@@ -1112,7 +1258,7 @@ batches:
   epic_ids:
   - E-035
   title: Competition & Advanced Economy Integration
-  status: "Planned \u2014 Future"
+  status: Planned — Future
   depends_on:
   - RBATCH-040
 - id: RBATCH-042
@@ -1122,7 +1268,7 @@ batches:
   - E-036
   - E-037
   title: Smart Routing & AI Dispatch Foundation
-  status: "Planned \u2014 Future"
+  status: Planned — Future
   depends_on:
   - RBATCH-041
 - id: RBATCH-043
@@ -1131,7 +1277,7 @@ batches:
   epic_ids:
   - E-038
   title: Multi-City Operations Foundation
-  status: "Planned \u2014 Future"
+  status: Planned — Future
   depends_on:
   - RBATCH-042
 - id: RBATCH-044
@@ -1140,7 +1286,7 @@ batches:
   epic_ids:
   - E-038
   title: Country Entry & Regulatory Permissions
-  status: "Planned \u2014 Future"
+  status: Planned — Future
   depends_on:
   - RBATCH-043
 - id: RBATCH-045
@@ -1149,7 +1295,7 @@ batches:
   epic_ids:
   - E-039
   title: Customs & Cross-Border Handling
-  status: "Planned \u2014 Future"
+  status: Planned — Future
   depends_on:
   - RBATCH-044
 - id: RBATCH-046
@@ -1158,7 +1304,7 @@ batches:
   epic_ids:
   - E-040
   title: International Air/Sea Gateway Network
-  status: "Planned \u2014 Future"
+  status: Planned — Future
   depends_on:
   - RBATCH-045
 - id: RBATCH-047
@@ -1167,7 +1313,7 @@ batches:
   epic_ids:
   - E-041
   title: Corporate Headquarters & Governance
-  status: "Planned \u2014 Future"
+  status: Planned — Future
   depends_on:
   - RBATCH-046
 - id: RBATCH-048
@@ -1176,7 +1322,7 @@ batches:
   epic_ids:
   - E-042
   title: Public Company & Stock Market Systems
-  status: "Planned \u2014 Future"
+  status: Planned — Future
   depends_on:
   - RBATCH-047
 - id: RBATCH-049
@@ -1185,7 +1331,7 @@ batches:
   epic_ids:
   - E-043
   title: Franchise Network Expansion
-  status: "Planned \u2014 Future"
+  status: Planned — Future
   depends_on:
   - RBATCH-047
 - id: RBATCH-050
@@ -1194,7 +1340,7 @@ batches:
   epic_ids:
   - E-043
   title: Worldwide Network Coordination
-  status: "Planned \u2014 Future"
+  status: Planned — Future
   depends_on:
   - RBATCH-048
   - RBATCH-049
@@ -1204,7 +1350,7 @@ batches:
   epic_ids:
   - E-044
   title: Shared-World Company Presence
-  status: "Planned \u2014 Future"
+  status: Planned — Future
   depends_on:
   - RBATCH-050
   owner_gates: Dedicated multiplayer canonical architecture audit required
@@ -1214,7 +1360,7 @@ batches:
   epic_ids:
   - E-044
   title: Cooperative & Competitive Company Interaction
-  status: "Planned \u2014 Future"
+  status: Planned — Future
   depends_on:
   - RBATCH-051
   owner_gates: Dedicated multiplayer canonical architecture audit required
@@ -1224,7 +1370,7 @@ batches:
   epic_ids:
   - E-045
   title: Robotics & Autonomous Warehouse Planning
-  status: "Planned \u2014 Future"
+  status: Planned — Future
   depends_on:
   - RBATCH-052
   owner_gates: Dedicated robotics/autonomous-warehouse audit required
@@ -1234,10 +1380,178 @@ batches:
   epic_ids:
   - E-046
   title: Community, Smart-City & Frontier Expansion Governance
-  status: "Planned \u2014 Future"
+  status: Planned — Future
   depends_on:
   - RBATCH-053
   owner_gates: Dedicated community/frontier audit required
+legacy_crosswalk:
+- legacy_id: BATCH-001
+  rbatch_id: RBATCH-001
+  historical_status: COMPLETED
+  authoritative_planning_source: 09_Development/Planning/BATCH_ARCHITECTURE.md
+  historical_lineage_source: 09_Development/Implementation_Preparation/IMPLEMENTATION_BATCH_PLAN.md
+  execution_rule: Historical numbering only; execute the mapped RBATCH identifier and never ambiguous legacy numbering.
+- legacy_id: BATCH-002
+  rbatch_id: RBATCH-002
+  historical_status: COMPLETED
+  authoritative_planning_source: 09_Development/Planning/BATCH_ARCHITECTURE.md
+  historical_lineage_source: 09_Development/Implementation_Preparation/IMPLEMENTATION_BATCH_PLAN.md
+  execution_rule: Historical numbering only; execute the mapped RBATCH identifier and never ambiguous legacy numbering.
+- legacy_id: BATCH-003
+  rbatch_id: RBATCH-003
+  historical_status: COMPLETED
+  authoritative_planning_source: 09_Development/Planning/BATCH_ARCHITECTURE.md
+  historical_lineage_source: 09_Development/Implementation_Preparation/IMPLEMENTATION_BATCH_PLAN.md
+  execution_rule: Historical numbering only; execute the mapped RBATCH identifier and never ambiguous legacy numbering.
+- legacy_id: BATCH-004
+  rbatch_id: RBATCH-004
+  historical_status: COMPLETED
+  authoritative_planning_source: 09_Development/Planning/BATCH_ARCHITECTURE.md
+  historical_lineage_source: 09_Development/Implementation_Preparation/IMPLEMENTATION_BATCH_PLAN.md
+  execution_rule: Historical numbering only; execute the mapped RBATCH identifier and never ambiguous legacy numbering.
+- legacy_id: BATCH-005
+  rbatch_id: RBATCH-005
+  historical_status: COMPLETED
+  authoritative_planning_source: 09_Development/Planning/BATCH_ARCHITECTURE.md
+  historical_lineage_source: 09_Development/Implementation_Preparation/IMPLEMENTATION_BATCH_PLAN.md
+  execution_rule: Historical numbering only; execute the mapped RBATCH identifier and never ambiguous legacy numbering.
+- legacy_id: BATCH-006
+  rbatch_id: RBATCH-006
+  historical_status: COMPLETED
+  authoritative_planning_source: 09_Development/Planning/BATCH_ARCHITECTURE.md
+  historical_lineage_source: 09_Development/Implementation_Preparation/IMPLEMENTATION_BATCH_PLAN.md
+  execution_rule: Historical numbering only; execute the mapped RBATCH identifier and never ambiguous legacy numbering.
+- legacy_id: BATCH-007
+  rbatch_id: RBATCH-007
+  historical_status: COMPLETED
+  authoritative_planning_source: 09_Development/Planning/BATCH_ARCHITECTURE.md
+  historical_lineage_source: 09_Development/Implementation_Preparation/IMPLEMENTATION_BATCH_PLAN.md
+  execution_rule: Historical numbering only; execute the mapped RBATCH identifier and never ambiguous legacy numbering.
+- legacy_id: BATCH-008
+  rbatch_id: RBATCH-008
+  historical_status: COMPLETED
+  authoritative_planning_source: 09_Development/Planning/BATCH_ARCHITECTURE.md
+  historical_lineage_source: 09_Development/Implementation_Preparation/IMPLEMENTATION_BATCH_PLAN.md
+  execution_rule: Historical numbering only; execute the mapped RBATCH identifier and never ambiguous legacy numbering.
+- legacy_id: BATCH-009
+  rbatch_id: RBATCH-009
+  historical_status: NEVER STARTED
+  authoritative_planning_source: 09_Development/Planning/BATCH_ARCHITECTURE.md
+  historical_lineage_source: 09_Development/Implementation_Preparation/IMPLEMENTATION_BATCH_PLAN.md
+  execution_rule: Historical numbering only; execute the mapped RBATCH identifier and never ambiguous legacy numbering.
+- legacy_id: BATCH-010
+  rbatch_id: RBATCH-010
+  historical_status: NEVER STARTED
+  authoritative_planning_source: 09_Development/Planning/BATCH_ARCHITECTURE.md
+  historical_lineage_source: 09_Development/Implementation_Preparation/IMPLEMENTATION_BATCH_PLAN.md
+  execution_rule: Historical numbering only; execute the mapped RBATCH identifier and never ambiguous legacy numbering.
+- legacy_id: BATCH-010b
+  rbatch_id: RBATCH-011
+  historical_status: NEVER STARTED
+  authoritative_planning_source: 09_Development/Planning/BATCH_ARCHITECTURE.md
+  historical_lineage_source: 09_Development/Implementation_Preparation/IMPLEMENTATION_BATCH_PLAN.md
+  execution_rule: Historical numbering only; execute the mapped RBATCH identifier and never ambiguous legacy numbering.
+- legacy_id: BATCH-011
+  rbatch_id: RBATCH-012
+  historical_status: NEVER STARTED
+  authoritative_planning_source: 09_Development/Planning/BATCH_ARCHITECTURE.md
+  historical_lineage_source: 09_Development/Implementation_Preparation/IMPLEMENTATION_BATCH_PLAN.md
+  execution_rule: Historical numbering only; execute the mapped RBATCH identifier and never ambiguous legacy numbering.
+- legacy_id: BATCH-012
+  rbatch_id: RBATCH-013
+  historical_status: NEVER STARTED
+  authoritative_planning_source: 09_Development/Planning/BATCH_ARCHITECTURE.md
+  historical_lineage_source: 09_Development/Implementation_Preparation/IMPLEMENTATION_BATCH_PLAN.md
+  execution_rule: Historical numbering only; execute the mapped RBATCH identifier and never ambiguous legacy numbering.
+- legacy_id: BATCH-013
+  rbatch_id: RBATCH-014
+  historical_status: NEVER STARTED
+  authoritative_planning_source: 09_Development/Planning/BATCH_ARCHITECTURE.md
+  historical_lineage_source: 09_Development/Implementation_Preparation/IMPLEMENTATION_BATCH_PLAN.md
+  execution_rule: Historical numbering only; execute the mapped RBATCH identifier and never ambiguous legacy numbering.
+- legacy_id: BATCH-014
+  rbatch_id: RBATCH-015
+  historical_status: NEVER STARTED
+  authoritative_planning_source: 09_Development/Planning/BATCH_ARCHITECTURE.md
+  historical_lineage_source: 09_Development/Implementation_Preparation/IMPLEMENTATION_BATCH_PLAN.md
+  execution_rule: Historical numbering only; execute the mapped RBATCH identifier and never ambiguous legacy numbering.
+- legacy_id: BATCH-015
+  rbatch_id: RBATCH-016
+  historical_status: NEVER STARTED
+  authoritative_planning_source: 09_Development/Planning/BATCH_ARCHITECTURE.md
+  historical_lineage_source: 09_Development/Implementation_Preparation/IMPLEMENTATION_BATCH_PLAN.md
+  execution_rule: Historical numbering only; execute the mapped RBATCH identifier and never ambiguous legacy numbering.
+- legacy_id: BATCH-016
+  rbatch_id: RBATCH-017
+  historical_status: NEVER STARTED
+  authoritative_planning_source: 09_Development/Planning/BATCH_ARCHITECTURE.md
+  historical_lineage_source: 09_Development/Implementation_Preparation/IMPLEMENTATION_BATCH_PLAN.md
+  execution_rule: Historical numbering only; execute the mapped RBATCH identifier and never ambiguous legacy numbering.
+completed_batch_evidence:
+- rbatch_id: RBATCH-001
+  legacy_id: BATCH-001
+  implementation_commit: N/A — requires historical inspection
+  pull_request: N/A — requires historical inspection
+  ai_report: 09_Development/AI_Reports/2026-07-14_059_BATCH_001_GDEVELOP_PROJECT_FOUNDATION_IMPLEMENTATION.md
+  automated_validation_evidence: N/A — requires historical inspection
+  railway_public_verification_evidence: N/A — not applicable
+  final_status: COMPLETED
+- rbatch_id: RBATCH-002
+  legacy_id: BATCH-002
+  implementation_commit: N/A — requires historical inspection
+  pull_request: N/A — requires historical inspection
+  ai_report: 09_Development/AI_Reports/2026-07-14_061_BATCH_002_GDEVELOP_SCENE_EVENT_SCAFFOLD_IMPLEMENTATION.md
+  automated_validation_evidence: 09_Development/AI_Reports/2026-07-14_060_BATCH_002_PRE_IMPLEMENTATION_VERIFICATION.md
+  railway_public_verification_evidence: N/A — not applicable
+  final_status: COMPLETED
+- rbatch_id: RBATCH-003
+  legacy_id: BATCH-003
+  implementation_commit: N/A — requires historical inspection
+  pull_request: N/A — requires historical inspection
+  ai_report: 09_Development/AI_Reports/2026-07-14_064_BATCH_003_PLACEHOLDER_ASSET_SETUP_IMPLEMENTATION.md
+  automated_validation_evidence: 09_Development/AI_Reports/2026-07-14_063_BATCH_003_PRE_IMPLEMENTATION_VERIFICATION_ANDROID_FIRST.md
+  railway_public_verification_evidence: N/A — not applicable
+  final_status: COMPLETED
+- rbatch_id: RBATCH-004
+  legacy_id: BATCH-004
+  implementation_commit: N/A — requires historical inspection
+  pull_request: N/A — requires historical inspection
+  ai_report: 09_Development/AI_Reports/2026-07-14_067_BATCH_004_MAP_PLAYER_BUILDING_WORLD_SETUP_IMPLEMENTATION.md
+  automated_validation_evidence: 09_Development/AI_Reports/2026-07-14_068_BATCH_004_MAP_PLAYER_BUILDING_WORLD_SETUP_INDEPENDENT_VERIFICATION.md
+  railway_public_verification_evidence: N/A — not applicable
+  final_status: COMPLETED
+- rbatch_id: RBATCH-005
+  legacy_id: BATCH-005
+  implementation_commit: N/A — requires historical inspection
+  pull_request: N/A — requires historical inspection
+  ai_report: 09_Development/AI_Reports/2026-07-15_071_BATCH_005_ORDER_GENERATION_LIFECYCLE_CORE_IMPLEMENTATION.md
+  automated_validation_evidence: 09_Development/AI_Reports/2026-07-15_072_BATCH_005_ORDER_GENERATION_LIFECYCLE_CORE_INDEPENDENT_VERIFICATION.md
+  railway_public_verification_evidence: N/A — not applicable
+  final_status: COMPLETED
+- rbatch_id: RBATCH-006
+  legacy_id: BATCH-006
+  implementation_commit: N/A — requires historical inspection
+  pull_request: N/A — requires historical inspection
+  ai_report: 09_Development/AI_Reports/2026-07-15_075_BATCH_006_TAP_TO_MOVE_CAMERA_IMPLEMENTATION.md
+  automated_validation_evidence: 09_Development/AI_Reports/2026-07-15_076_BATCH_006_TAP_TO_MOVE_CAMERA_INDEPENDENT_VERIFICATION.md
+  railway_public_verification_evidence: N/A — not applicable
+  final_status: COMPLETED
+- rbatch_id: RBATCH-007
+  legacy_id: BATCH-007
+  implementation_commit: N/A — requires historical inspection
+  pull_request: N/A — requires historical inspection
+  ai_report: 09_Development/AI_Reports/2026-07-15_079_BATCH_007_PICKUP_PROXIMITY_AND_ACCEPTANCE_TRIGGER_IMPLEMENTATION.md
+  automated_validation_evidence: 09_Development/AI_Reports/2026-07-15_080_BATCH_007_PICKUP_PROXIMITY_AND_ACCEPTANCE_TRIGGER_INDEPENDENT_VERIFICATION.md
+  railway_public_verification_evidence: 00_Project/PROJECT_STATUS.md — public Railway verification of Available→Accepted→PickedUp on 2026-08-01
+  final_status: COMPLETED
+- rbatch_id: RBATCH-008
+  legacy_id: BATCH-008
+  implementation_commit: 9cdabff6f762300a71e898792ebe0a44dfbcb6d0
+  pull_request: 'PR #84 — https://github.com/caliofmarian-ai/DROPi-Tycoon/pull/84'
+  ai_report: 09_Development/AI_Reports/2026-08-01_085_BATCH_008_DELIVERY_COMPLETION_FAILURE_IMPLEMENTATION.md
+  automated_validation_evidence: Report 085 — 30 automated tests, TypeScript build pass, HTTP 200 smoke test
+  railway_public_verification_evidence: '00_Project/PROJECT_STATUS.md — PR #84 merged, Railway redeployed, PickedUp→Completed and wrong-destination PickedUp→Failed publicly verified, CarryingPackage cleared in both outcomes'
+  final_status: COMPLETED
 labels:
 - name: type:implementation
   color: 0075ca
@@ -1483,6 +1797,7 @@ labels:
   color: 7057ff
 - name: status:future
   color: cfd3d7
+  description: Future roadmap work or specification prepared but not implementation-authorized.
 issues:
 - id: ISSUE-001
   title: Implement money reward on order completion
@@ -1499,7 +1814,7 @@ issues:
   - epic:economy-reputation
   - status:ready
   description: Apply canonical reward to company money on Completed.
-  acceptance_criteria: "Company money increases on PickedUp\u2192Completed."
+  acceptance_criteria: Company money increases on PickedUp→Completed.
 - id: ISSUE-002
   title: Implement reputation increase on delivery completion
   batch_id: RBATCH-009
@@ -1530,8 +1845,7 @@ issues:
   - batch:rbatch-009
   - epic:economy-reputation
   - status:needs-design
-  blocked_or_owner_gate: Balancing / owner-approved implementation-detail selection
-    required
+  blocked_or_owner_gate: Balancing / owner-approved implementation-detail selection required
   description: Decide whether any small failure penalty beyond reputation exists.
   acceptance_criteria: No unapproved money penalty is introduced.
 - id: ISSUE-004
@@ -1676,8 +1990,7 @@ issues:
   - batch:rbatch-013
   - epic:bicycle-ownership
   - status:ready
-  description: Use the approved upgrade ownership path instead of an unapproved standalone
-    bicycle-ownership field.
+  description: Use the approved upgrade ownership path instead of an unapproved standalone bicycle-ownership field.
   acceptance_criteria: Ownership is stored through purchased-upgrade state.
 - id: ISSUE-013
   title: Implement bicycle movement-speed increase after purchase
@@ -1728,8 +2041,7 @@ issues:
   - status:blocked
   blocked_or_owner_gate: ODR-001, ODR-003
   description: Handle missing/corrupted/incompatible saves per SAVE_SYSTEM.md.
-  acceptance_criteria: Missing save starts new game; corrupted data informs player
-    and requires confirmation.
+  acceptance_criteria: Missing save starts new game; corrupted data informs player and requires confirmation.
 - id: ISSUE-016
   title: Implement canonical autosave triggers
   batch_id: RBATCH-014
@@ -1745,8 +2057,7 @@ issues:
   - epic:save-load
   - status:blocked
   blocked_or_owner_gate: ODR-001, ODR-003
-  description: Use only delivery completion, upgrade purchase, progression change,
-    and tutorial-step completion if present.
+  description: Use only delivery completion, upgrade purchase, progression change, and tutorial-step completion if present.
   acceptance_criteria: No unapproved generic scene-exit trigger is used.
 - id: ISSUE-017
   title: Implement save-slot validation
@@ -1779,8 +2090,7 @@ issues:
   - batch:rbatch-015
   - epic:mobile-optimization
   - status:ready
-  description: Fit the Android-first web runtime to the supported target matrix selected
-    during implementation.
+  description: Fit the Android-first web runtime to the supported target matrix selected during implementation.
   acceptance_criteria: No unapproved portrait/landscape canon is implied.
 - id: ISSUE-019
   title: Optimize touch interaction targets for comfortable tapping
@@ -1812,7 +2122,7 @@ issues:
   - batch:rbatch-016
   - epic:integration-verification
   - status:ready
-  description: "Run startup\u2192completion/failure loop coverage."
+  description: Run startup→completion/failure loop coverage.
   acceptance_criteria: All P0/P1 behaviors verified.
 - id: ISSUE-021
   title: Document integration test results
@@ -1885,15 +2195,17 @@ issues:
   milestone_id: M-009
   phase: 2
   type: implementation
-  status: Ready for implementation
+  status: Specification prepared — future implementation only
   label_names:
   - type:implementation
   - phase:2
   - batch:rbatch-019
   - epic:financial-reporting
-  - status:ready
+  - status:future
   description: Apply daily operational expenses.
   acceptance_criteria: Expenses deduct correctly.
+  blocked_by: Parent milestone and batch are Planned — Future
+  execution_authorization: Not authorized for implementation until the parent milestone and batch no longer have Planned — Future status.
 - id: ISSUE-026
   title: Implement salary deduction system
   batch_id: RBATCH-018
@@ -1901,15 +2213,17 @@ issues:
   milestone_id: M-009
   phase: 2
   type: implementation
-  status: Ready for implementation
+  status: Specification prepared — future implementation only
   label_names:
   - type:implementation
   - phase:2
   - batch:rbatch-018
   - epic:employee-management
-  - status:ready
+  - status:future
   description: Deduct salaries on each salary cycle.
   acceptance_criteria: Salary deductions are accurate.
+  blocked_by: Parent milestone and batch are Planned — Future
+  execution_authorization: Not authorized for implementation until the parent milestone and batch no longer have Planned — Future status.
 - id: ISSUE-027
   title: Implement financial report display
   batch_id: RBATCH-019
@@ -1917,15 +2231,17 @@ issues:
   milestone_id: M-009
   phase: 2
   type: implementation
-  status: Ready for implementation
+  status: Specification prepared — future implementation only
   label_names:
   - type:implementation
   - phase:2
   - batch:rbatch-019
   - epic:financial-reporting
-  - status:ready
+  - status:future
   description: Show income, expenses, and net balance.
   acceptance_criteria: Financial report is accessible and accurate.
+  blocked_by: Parent milestone and batch are Planned — Future
+  execution_authorization: Not authorized for implementation until the parent milestone and batch no longer have Planned — Future status.
 - id: ISSUE-028
   title: Implement vehicle catalog and purchase UI
   batch_id: RBATCH-022
@@ -1933,15 +2249,17 @@ issues:
   milestone_id: M-010
   phase: 2
   type: implementation
-  status: Ready for implementation
+  status: Specification prepared — future implementation only
   label_names:
   - type:implementation
   - phase:2
   - batch:rbatch-022
   - epic:vehicle-fleet
-  - status:ready
+  - status:future
   description: Browse and purchase vehicles.
   acceptance_criteria: Vehicle ownership is tracked.
+  blocked_by: Parent milestone and batch are Planned — Future
+  execution_authorization: Not authorized for implementation until the parent milestone and batch no longer have Planned — Future status.
 - id: ISSUE-029
   title: Implement vehicle maintenance cost tracking
   batch_id: RBATCH-023
@@ -1949,15 +2267,17 @@ issues:
   milestone_id: M-010
   phase: 2
   type: implementation
-  status: Ready for implementation
+  status: Specification prepared — future implementation only
   label_names:
   - type:implementation
   - phase:2
   - batch:rbatch-023
   - epic:vehicle-fleet
-  - status:ready
+  - status:future
   description: Track maintenance costs by vehicle.
   acceptance_criteria: Maintenance costs appear in reports.
+  blocked_by: Parent milestone and batch are Planned — Future
+  execution_authorization: Not authorized for implementation until the parent milestone and batch no longer have Planned — Future status.
 - id: ISSUE-030
   title: Implement customer review generation system
   batch_id: RBATCH-020
@@ -1965,15 +2285,17 @@ issues:
   milestone_id: M-009
   phase: 2
   type: implementation
-  status: Ready for implementation
+  status: Specification prepared — future implementation only
   label_names:
   - type:implementation
   - phase:2
   - batch:rbatch-020
   - epic:customer-reputation
-  - status:ready
+  - status:future
   description: Generate reviews after completed/failed orders.
   acceptance_criteria: Reviews affect reputation.
+  blocked_by: Parent milestone and batch are Planned — Future
+  execution_authorization: Not authorized for implementation until the parent milestone and batch no longer have Planned — Future status.
 - id: ISSUE-031
   title: Implement customer reviews display in CompanyManagement
   batch_id: RBATCH-021
@@ -1981,15 +2303,17 @@ issues:
   milestone_id: M-009
   phase: 2
   type: implementation
-  status: Ready for implementation
+  status: Specification prepared — future implementation only
   label_names:
   - type:implementation
   - phase:2
   - batch:rbatch-021
   - epic:customer-reputation
-  - status:ready
+  - status:future
   description: Show customer reviews and summaries, not only a raw reputation number.
   acceptance_criteria: Reviews are inspectable by players.
+  blocked_by: Parent milestone and batch are Planned — Future
+  execution_authorization: Not authorized for implementation until the parent milestone and batch no longer have Planned — Future status.
 - id: ISSUE-032
   title: Implement employee hiring and onboarding workflow
   batch_id: RBATCH-018
@@ -1997,15 +2321,17 @@ issues:
   milestone_id: M-009
   phase: 2
   type: implementation
-  status: Ready for implementation
+  status: Specification prepared — future implementation only
   label_names:
   - type:implementation
   - phase:2
   - batch:rbatch-018
   - epic:employee-management
-  - status:ready
+  - status:future
   description: Implement hiring flow and onboarding state transitions.
   acceptance_criteria: Employees can be hired and become active.
+  blocked_by: Parent milestone and batch are Planned — Future
+  execution_authorization: Not authorized for implementation until the parent milestone and batch no longer have Planned — Future status.
 - id: ISSUE-033
   title: Execute Phase 2 integration verification suite
   batch_id: RBATCH-024
@@ -2013,16 +2339,17 @@ issues:
   milestone_id: M-010
   phase: 2
   type: verification
-  status: Ready for implementation
+  status: Specification prepared — future implementation only
   label_names:
   - type:verification
   - phase:2
   - batch:rbatch-024
   - epic:vehicle-fleet
-  - status:ready
-  description: Verify employee, expense, review, vehicle purchase, and maintenance
-    systems together.
+  - status:future
+  description: Verify employee, expense, review, vehicle purchase, and maintenance systems together.
   acceptance_criteria: Phase 2 scenarios execute end-to-end.
+  blocked_by: Parent milestone and batch are Planned — Future
+  execution_authorization: Not authorized for implementation until the parent milestone and batch no longer have Planned — Future status.
 - id: ISSUE-034
   title: Document Phase 2 integration evidence
   batch_id: RBATCH-024
@@ -2030,15 +2357,17 @@ issues:
   milestone_id: M-010
   phase: 2
   type: documentation
-  status: Ready for implementation
+  status: Specification prepared — future implementation only
   label_names:
   - type:documentation
   - phase:2
   - batch:rbatch-024
   - epic:vehicle-fleet
-  - status:ready
+  - status:future
   description: Record Phase 2 integration evidence.
   acceptance_criteria: Covered scenarios and outcomes are documented.
+  blocked_by: Parent milestone and batch are Planned — Future
+  execution_authorization: Not authorized for implementation until the parent milestone and batch no longer have Planned — Future status.
 placeholders:
 - id: PLACEHOLDER-001
   title: Warehouse Construction System
@@ -2047,7 +2376,7 @@ placeholders:
   milestone_id: M-011
   phase: 3
   type: planning
-  status: "Planning placeholder \u2014 Approved for GitHub placeholder creation"
+  status: Planning placeholder — Approved for GitHub placeholder creation
   label_names:
   - type:planning
   - phase:3
@@ -2062,7 +2391,7 @@ placeholders:
   milestone_id: M-011
   phase: 3
   type: planning
-  status: "Planning placeholder \u2014 Approved for GitHub placeholder creation"
+  status: Planning placeholder — Approved for GitHub placeholder creation
   label_names:
   - type:planning
   - phase:3
@@ -2077,7 +2406,7 @@ placeholders:
   milestone_id: M-011
   phase: 3
   type: planning
-  status: "Planning placeholder \u2014 Approved for GitHub placeholder creation"
+  status: Planning placeholder — Approved for GitHub placeholder creation
   label_names:
   - type:planning
   - phase:3
@@ -2092,7 +2421,7 @@ placeholders:
   milestone_id: M-012
   phase: 3
   type: planning
-  status: "Planning placeholder \u2014 Approved for GitHub placeholder creation"
+  status: Planning placeholder — Approved for GitHub placeholder creation
   label_names:
   - type:planning
   - phase:3
@@ -2107,7 +2436,7 @@ placeholders:
   milestone_id: M-012
   phase: 3
   type: planning
-  status: "Planning placeholder \u2014 Approved for GitHub placeholder creation"
+  status: Planning placeholder — Approved for GitHub placeholder creation
   label_names:
   - type:planning
   - phase:3
@@ -2122,7 +2451,7 @@ placeholders:
   milestone_id: M-012
   phase: 3
   type: planning
-  status: "Planning placeholder \u2014 Approved for GitHub placeholder creation"
+  status: Planning placeholder — Approved for GitHub placeholder creation
   label_names:
   - type:planning
   - phase:3
@@ -2137,7 +2466,7 @@ placeholders:
   milestone_id: M-012
   phase: 3
   type: planning
-  status: "Planning placeholder \u2014 Approved for GitHub placeholder creation"
+  status: Planning placeholder — Approved for GitHub placeholder creation
   label_names:
   - type:planning
   - phase:3
@@ -2152,7 +2481,7 @@ placeholders:
   milestone_id: M-013
   phase: 4
   type: planning
-  status: "Planning placeholder \u2014 Approved for GitHub placeholder creation"
+  status: Planning placeholder — Approved for GitHub placeholder creation
   label_names:
   - type:planning
   - phase:4
@@ -2167,7 +2496,7 @@ placeholders:
   milestone_id: M-013
   phase: 4
   type: planning
-  status: "Planning placeholder \u2014 Approved for GitHub placeholder creation"
+  status: Planning placeholder — Approved for GitHub placeholder creation
   label_names:
   - type:planning
   - phase:4
@@ -2182,7 +2511,7 @@ placeholders:
   milestone_id: M-014
   phase: 4
   type: planning
-  status: "Planning placeholder \u2014 Approved for GitHub placeholder creation"
+  status: Planning placeholder — Approved for GitHub placeholder creation
   label_names:
   - type:planning
   - phase:4
@@ -2197,7 +2526,7 @@ placeholders:
   milestone_id: M-014
   phase: 4
   type: planning
-  status: "Planning placeholder \u2014 Approved for GitHub placeholder creation"
+  status: Planning placeholder — Approved for GitHub placeholder creation
   label_names:
   - type:planning
   - phase:4
@@ -2212,7 +2541,7 @@ placeholders:
   milestone_id: M-015
   phase: 4
   type: planning
-  status: "Planning placeholder \u2014 Approved for GitHub placeholder creation"
+  status: Planning placeholder — Approved for GitHub placeholder creation
   label_names:
   - type:planning
   - phase:4
@@ -2227,7 +2556,7 @@ placeholders:
   milestone_id: M-015
   phase: 4
   type: planning
-  status: "Planning placeholder \u2014 Approved for GitHub placeholder creation"
+  status: Planning placeholder — Approved for GitHub placeholder creation
   label_names:
   - type:planning
   - phase:4
@@ -2242,7 +2571,7 @@ placeholders:
   milestone_id: M-015
   phase: 4
   type: planning
-  status: "Planning placeholder \u2014 Approved for GitHub placeholder creation"
+  status: Planning placeholder — Approved for GitHub placeholder creation
   label_names:
   - type:planning
   - phase:4
@@ -2257,7 +2586,7 @@ placeholders:
   milestone_id: M-016
   phase: 5
   type: planning
-  status: "Planning placeholder \u2014 Approved for GitHub placeholder creation"
+  status: Planning placeholder — Approved for GitHub placeholder creation
   label_names:
   - type:planning
   - phase:5
@@ -2272,7 +2601,7 @@ placeholders:
   milestone_id: M-017
   phase: 5
   type: planning
-  status: "Planning placeholder \u2014 Approved for GitHub placeholder creation"
+  status: Planning placeholder — Approved for GitHub placeholder creation
   label_names:
   - type:planning
   - phase:5
@@ -2287,7 +2616,7 @@ placeholders:
   milestone_id: M-017
   phase: 5
   type: planning
-  status: "Planning placeholder \u2014 Approved for GitHub placeholder creation"
+  status: Planning placeholder — Approved for GitHub placeholder creation
   label_names:
   - type:planning
   - phase:5
@@ -2302,7 +2631,7 @@ placeholders:
   milestone_id: M-018
   phase: 6
   type: planning
-  status: "Planning placeholder \u2014 Approved for GitHub placeholder creation"
+  status: Planning placeholder — Approved for GitHub placeholder creation
   label_names:
   - type:planning
   - phase:6
@@ -2317,7 +2646,7 @@ placeholders:
   milestone_id: M-019
   phase: 7
   type: planning
-  status: "Planning placeholder \u2014 Approved for GitHub placeholder creation"
+  status: Planning placeholder — Approved for GitHub placeholder creation
   label_names:
   - type:planning
   - phase:7
@@ -2332,7 +2661,7 @@ placeholders:
   milestone_id: M-019
   phase: 7
   type: planning
-  status: "Planning placeholder \u2014 Approved for GitHub placeholder creation"
+  status: Planning placeholder — Approved for GitHub placeholder creation
   label_names:
   - type:planning
   - phase:7
@@ -2347,7 +2676,7 @@ placeholders:
   milestone_id: M-019
   phase: 7
   type: planning
-  status: "Planning placeholder \u2014 Approved for GitHub placeholder creation"
+  status: Planning placeholder — Approved for GitHub placeholder creation
   label_names:
   - type:planning
   - phase:7
@@ -2362,7 +2691,7 @@ placeholders:
   milestone_id: M-019
   phase: 7
   type: planning
-  status: "Planning placeholder \u2014 Approved for GitHub placeholder creation"
+  status: Planning placeholder — Approved for GitHub placeholder creation
   label_names:
   - type:planning
   - phase:7
@@ -2377,7 +2706,7 @@ placeholders:
   milestone_id: M-020
   phase: 8
   type: planning
-  status: "Planning placeholder \u2014 Approved for GitHub placeholder creation"
+  status: Planning placeholder — Approved for GitHub placeholder creation
   label_names:
   - type:planning
   - phase:8
@@ -2392,7 +2721,7 @@ placeholders:
   milestone_id: M-020
   phase: 8
   type: planning
-  status: "Planning placeholder \u2014 Approved for GitHub placeholder creation"
+  status: Planning placeholder — Approved for GitHub placeholder creation
   label_names:
   - type:planning
   - phase:8
@@ -2407,7 +2736,7 @@ placeholders:
   milestone_id: M-020
   phase: 8
   type: planning
-  status: "Planning placeholder \u2014 Approved for GitHub placeholder creation"
+  status: Planning placeholder — Approved for GitHub placeholder creation
   label_names:
   - type:planning
   - phase:8
@@ -2422,7 +2751,7 @@ placeholders:
   milestone_id: M-020
   phase: 8
   type: planning
-  status: "Planning placeholder \u2014 Approved for GitHub placeholder creation"
+  status: Planning placeholder — Approved for GitHub placeholder creation
   label_names:
   - type:planning
   - phase:8
@@ -2437,7 +2766,7 @@ placeholders:
   milestone_id: M-021
   phase: 9
   type: planning
-  status: "Planning placeholder \u2014 Approved for GitHub placeholder creation (owner-gated)"
+  status: Planning placeholder — Approved for GitHub placeholder creation (owner-gated)
   label_names:
   - type:planning
   - phase:9
@@ -2453,7 +2782,7 @@ placeholders:
   milestone_id: M-021
   phase: 9
   type: planning
-  status: "Planning placeholder \u2014 Approved for GitHub placeholder creation (owner-gated)"
+  status: Planning placeholder — Approved for GitHub placeholder creation (owner-gated)
   label_names:
   - type:planning
   - phase:9
@@ -2469,7 +2798,7 @@ placeholders:
   milestone_id: M-021
   phase: 9
   type: planning
-  status: "Planning placeholder \u2014 Approved for GitHub placeholder creation (owner-gated)"
+  status: Planning placeholder — Approved for GitHub placeholder creation (owner-gated)
   label_names:
   - type:planning
   - phase:9
@@ -2485,7 +2814,7 @@ placeholders:
   milestone_id: M-021
   phase: 9
   type: planning
-  status: "Planning placeholder \u2014 Approved for GitHub placeholder creation (owner-gated)"
+  status: Planning placeholder — Approved for GitHub placeholder creation (owner-gated)
   label_names:
   - type:planning
   - phase:9
@@ -2494,3 +2823,245 @@ placeholders:
   - status:needs-design
   owner_gates: Dedicated community/frontier audit required
   summary: Community content, smart-city integration, and frontier/space expansion.
+- id: PLACEHOLDER-031
+  title: Fuel & Electricity Economy Planning Coverage
+  batch_id: RBATCH-039
+  epic_id: E-033
+  milestone_id: M-016
+  phase: 5
+  type: planning
+  status: Planning placeholder — Approved for GitHub placeholder creation
+  label_names:
+  - type:planning
+  - phase:5
+  - batch:rbatch-039
+  - epic:fuel-electricity
+  - status:future
+  summary: Fuel pricing, electricity costs, and operating-energy planning coverage for E-033.
+- id: PLACEHOLDER-032
+  title: AI Dispatch & Autonomous Fleet Planning Coverage
+  batch_id: RBATCH-042
+  epic_id: E-037
+  milestone_id: M-018
+  phase: 6
+  type: planning
+  status: Planning placeholder — Approved for GitHub placeholder creation
+  label_names:
+  - type:planning
+  - phase:6
+  - batch:rbatch-042
+  - epic:ai-dispatch
+  - status:future
+  summary: AI dispatch policy and autonomous-fleet orchestration planning coverage for E-037.
+owner_directive_coverage:
+- domain: global persistent world architecture
+  mapping: Explicitly deferred owner-gated planning item
+  references:
+  - M-021
+  - E-044
+  - RBATCH-051
+  - RBATCH-052
+  - 06_Technical/SAVE_SYSTEM.md
+  notes: Dedicated multiplayer canonical architecture audit required before executable implementation.
+- domain: hierarchical world scale
+  mapping: Existing milestone/epic/batch/placeholder
+  references:
+  - M-019
+  - E-038
+  - E-040
+  - RBATCH-043
+  - RBATCH-046
+  notes: Represented through multi-city and intermodal expansion planning.
+- domain: visibility versus operational access
+  mapping: Explicitly deferred owner-gated planning item
+  references:
+  - M-019
+  - E-038
+  - E-039
+  notes: Ownership and canonical location remain owner-directed and require manual integration.
+- domain: company expansion
+  mapping: Existing milestone/epic/batch/placeholder
+  references:
+  - M-006
+  - E-013
+  - E-014
+  - M-020
+  - E-043
+  notes: Early company growth and later franchise expansion are both represented.
+- domain: logistics infrastructure
+  mapping: Existing milestone/epic/batch/placeholder
+  references:
+  - M-011
+  - E-022
+  - M-014
+  - E-028
+  - M-019
+  - E-040
+  notes: Warehouse, DronePort, and gateway infrastructure are planned.
+- domain: DronePort architecture
+  mapping: Existing milestone/epic/batch/placeholder
+  references:
+  - 03_Logistics/DRONEPORTS.md
+  - M-014
+  - E-028
+  - RBATCH-034
+  notes: DronePort planning is explicit and remains future work.
+- domain: logistics coverage
+  mapping: Existing milestone/epic/batch/placeholder
+  references:
+  - 03_Logistics/LOGISTICS.md
+  - M-019
+  - E-038
+  - E-039
+  - E-040
+  notes: Coverage expands from prototype logistics to international operations.
+- domain: multimodal logistics
+  mapping: Existing milestone/epic/batch/placeholder
+  references:
+  - M-019
+  - E-040
+  - RBATCH-046
+  notes: International intermodal gateways cover the multimodal branch.
+- domain: global and regional economy
+  mapping: Existing milestone/epic/batch/placeholder
+  references:
+  - M-016
+  - E-032
+  - E-033
+  - M-017
+  - E-034
+  - E-035
+  notes: Regional and macro-economy planning exists in phases 5 and 8.
+- domain: marketplace and player-to-player economy
+  mapping: Explicitly deferred owner-gated planning item
+  references:
+  - 02_Economy/MARKET.md
+  - M-017
+  - E-035
+  notes: Marketplace expansion beyond existing canon remains owner-gated and not decomposed into executable work.
+- domain: standard/premium currency separation
+  mapping: Explicitly deferred owner-gated planning item
+  references:
+  - 02_Economy/ECONOMY.md
+  notes: Owner directive raises this as strategy; no canonical implementation authorization exists yet.
+- domain: vehicle categories, models, instances, attributes, maintenance, upgrades, and marketplace
+  mapping: Existing milestone/epic/batch/placeholder
+  references:
+  - 03_Logistics/VEHICLES.md
+  - M-010
+  - E-021
+  - RBATCH-022
+  - RBATCH-023
+  - M-012
+  - E-025
+  - RBATCH-030
+  notes: Vehicle marketplace ownership remains deferred even though purchase/maintenance/upgrade branches are planned.
+- domain: company identity and value
+  mapping: Cross-cutting governance requirement
+  references:
+  - 00_Project/VISION.md
+  - 01_GameDesign/PROGRESSION.md
+  - M-006
+  - M-020
+  notes: Company identity/value spans canonical vision plus future governance/corporate milestones.
+- domain: employees
+  mapping: Existing milestone/epic/batch/issue/placeholder
+  references:
+  - M-009
+  - E-018
+  - RBATCH-018
+  - ISSUE-024
+  - ISSUE-026
+  - ISSUE-032
+  notes: Employee management is explicitly planned.
+- domain: partners
+  mapping: Existing milestone/epic/batch/placeholder
+  references:
+  - M-013
+  - E-027
+  - RBATCH-033
+  notes: Manufacturing/logistics partner planning exists.
+- domain: merchants
+  mapping: Cross-cutting governance requirement
+  references:
+  - 03_Logistics/LOGISTICS.md
+  - 03_Logistics/ORDERS.md
+  notes: Merchants remain part of current logistics canon but do not yet have a separate planning branch.
+- domain: AI roles
+  mapping: Existing milestone/epic/batch/placeholder
+  references:
+  - 05_AI/AI_SYSTEM.md
+  - 05_AI/AI_AGENTS.md
+  - M-018
+  - E-036
+  - E-037
+  - M-021
+  - E-045
+  notes: Routing, dispatch, and later robotics/autonomy are planned.
+- domain: corporate growth
+  mapping: Existing milestone/epic/batch/placeholder
+  references:
+  - M-017
+  - E-034
+  - E-035
+  - M-020
+  - E-041
+  - E-042
+  - E-043
+  notes: Financial competition and governance phases represent corporate growth.
+- domain: player and progression philosophy
+  mapping: Cross-cutting governance requirement
+  references:
+  - 01_GameDesign/PROGRESSION.md
+  - 09_Development/PROTOTYPE_V0.1.md
+  - M-005
+  - M-006
+  notes: Progression remains canon-owned and planning must not outrun prototype philosophy.
+- domain: difficulty and failure
+  mapping: Cross-cutting governance requirement
+  references:
+  - 09_Development/GAME_BALANCING_RULES.md
+  - ISSUE-003
+  - ISSUE-004
+  notes: Failure effects remain canon/balancing-governed and no extra penalty is authorized.
+- domain: multiplayer
+  mapping: Explicitly deferred owner-gated planning item
+  references:
+  - M-021
+  - E-044
+  - RBATCH-051
+  - RBATCH-052
+  notes: Multiplayer requires owner-gated canonical architecture before implementation.
+- domain: persistence
+  mapping: Existing milestone/epic/batch/issue/placeholder
+  references:
+  - 06_Technical/SAVE_SYSTEM.md
+  - M-007
+  - E-015
+  - RBATCH-014
+  - ISSUE-014
+  - ISSUE-015
+  - ISSUE-016
+  - ISSUE-017
+  notes: Persistence is planned but blocked by ODR-001 and ODR-003.
+- domain: backward compatibility
+  mapping: Cross-cutting governance requirement
+  references:
+  - 00_Project/ROADMAP.md
+  - 06_Technical/SAVE_SYSTEM.md
+  notes: Save compatibility and roadmap stability are governance obligations rather than standalone implementation work.
+- domain: community/frontier expansion
+  mapping: Explicitly deferred owner-gated planning item
+  references:
+  - M-021
+  - E-046
+  - RBATCH-054
+  - PLACEHOLDER-030
+  notes: Owner-gated late-phase expansion only.
+- domain: cross-project canonical-alignment obligations
+  mapping: Cross-cutting governance requirement
+  references:
+  - 00_Project/ROADMAP.md
+  - 00_Project/PROJECT_STATUS.md
+  - 09_Development/Owner_Directives/2026-07-16_MASTER_OWNER_DIRECTIVE_001.md
+  notes: Alignment obligations are documented as governance and require deliberate canonical integration, not automatic implementation.

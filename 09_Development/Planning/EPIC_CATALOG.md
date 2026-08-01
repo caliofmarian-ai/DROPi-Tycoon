@@ -2,9 +2,9 @@
 
 Document: EPIC_CATALOG.md
 Project: DROPi Tycoon
-Version: 1.1.0
+Version: 1.2.0
 Status: Planning — Canonical
-Author: AI Agent (Report 086 correction amendment)
+Author: AI Agent (Report 087)
 Language: English
 Last Updated: 2026-08-01
 
@@ -15,15 +15,15 @@ Last Updated: 2026-08-01
 ## Count Summary
 
 - Total epics: **46**
-- Phases 7–9 are no longer deferred; they have explicit epic coverage.
+- `E-001` and `E-002` remain completed canonical-documentation epics without legacy implementation-batch ownership.
 
 ## Epic Registry
 
 | ID | Phase | Milestone | Title | Status | Batches | Depends On |
 |---|---|---|---|---|---|---|
-| E-001 | 0 | M-001 | Repository Structure & Documentation Framework | COMPLETED | RBATCH-001 | none |
-| E-002 | 0 | M-001 | Canonical Game Design Foundation | COMPLETED | RBATCH-001 | none |
-| E-003 | 1 | M-002 | Historical Scaffold & Runtime Foundation | COMPLETED | RBATCH-002 | E-001 |
+| E-001 | 0 | M-001 | Repository Structure & Documentation Framework | COMPLETED | none | none |
+| E-002 | 0 | M-001 | Canonical Game Design Foundation | COMPLETED | none | none |
+| E-003 | 1 | M-002 | Historical Scaffold & Runtime Foundation | COMPLETED | RBATCH-001, RBATCH-002 | E-001 |
 | E-004 | 1 | M-002 | Asset Pipeline & Placeholder Assets | COMPLETED | RBATCH-003 | E-003 |
 | E-005 | 1 | M-003 | World Map & Environment | COMPLETED | RBATCH-004 | E-003, E-004 |
 | E-006 | 1 | M-003 | Player Movement & Camera | COMPLETED | RBATCH-006 | E-005 |
