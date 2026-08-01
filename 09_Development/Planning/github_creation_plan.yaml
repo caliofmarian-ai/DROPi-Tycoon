@@ -1,1284 +1,2496 @@
 # github_creation_plan.yaml
-# Project: DROPi Tycoon
-# Version: 1.0.0
-# Status: Planning — Canonical
-# Author: AI Agent (Report 086)
-# Date: 2026-08-01
-#
-# IMPORTANT: This file is a planning document only.
-# No actual GitHub objects are created by this file or this PR.
-# Execution requires explicit owner approval.
-#
-# Schema: milestones[], labels[], issues[]
-# Each issue references milestone_id and label_names.
+# No GitHub objects are created or modified by this PR.
 
 metadata:
   project: DROPi Tycoon
   repository: caliofmarian-ai/DROPi-Tycoon
-  plan_version: "1.0.0"
-  created_date: "2026-08-01"
+  plan_version: 1.1.0
+  created_date: '2026-08-01'
   execution_status: NOT_EXECUTED
   counts:
     milestones: 21
-    epics: 37
-    batches: 42
-    labels: 101
-    executable_issues: 31
-    future_placeholders: 12
-
-# =============================================================================
-# MILESTONES
-# =============================================================================
+    epics: 46
+    batches: 54
+    labels: 122
+    executable_issues: 34
+    future_placeholders: 30
+  placeholder_policy: Placeholders are approved for GitHub placeholder creation but
+    are not executable implementation commitments.
 milestones:
-  - id: M-001
-    title: "Phase 0: Foundation & Documentation Complete"
-    description: "Canonical documentation framework, project architecture, repository structure, and game design foundations established and audited."
-    state: closed
-    phase: 0
-
-  - id: M-002
-    title: "Phase 1: Prototype Scaffold & Architecture"
-    description: "GDevelop project scaffold, scene/event architecture, and placeholder asset pipeline established."
-    state: closed
-    phase: 1
-
-  - id: M-003
-    title: "Phase 1: World Navigation"
-    description: "World map, player entity, interactive building entities, tap-to-move input, and camera tracking implemented."
-    state: closed
-    phase: 1
-
-  - id: M-004
-    title: "Phase 1: Order Lifecycle Core"
-    description: "Full order state machine from Created through Completed and Failed including order generation, pickup, and delivery."
-    state: closed
-    phase: 1
-
-  - id: M-005
-    title: "Phase 1: Economy, HUD & Game Flow"
-    description: "Economy and reputation outcomes; HUD panels and notifications; MainMenu Start/Continue flow."
-    state: open
-    phase: 1
-
-  - id: M-006
-    title: "Phase 1: Company Management & Bicycle"
-    description: "CompanyManagement scene with upgrade purchase flow; bicycle ownership flag and speed effect."
-    state: open
-    phase: 1
-
-  - id: M-007
-    title: "Phase 1: Save & Load System"
-    description: "Local device persistence including save serialization, load validation, and autosave triggers. Blocked by ODR-001 and ODR-003."
-    state: open
-    phase: 1
-    blocked_by:
-      - ODR-001
-      - ODR-003
-
-  - id: M-008
-    title: "Phase 1: Prototype v0.1 Verification & Release"
-    description: "Mobile optimization; full-loop integration verification; completion-gate verification package for owner review."
-    state: open
-    phase: 1
-
-  - id: M-009
-    title: "Phase 2: Employee & Financial Systems"
-    description: "Employee onboarding and salary system; daily expenses; financial reporting; customer reputation."
-    state: open
-    phase: 2
-
-  - id: M-010
-    title: "Phase 2: Vehicle Fleet Management"
-    description: "Vehicle purchasing catalog, maintenance costs, and Phase 2 integration verification."
-    state: open
-    phase: 2
-
-  - id: M-011
-    title: "Phase 3: Warehouse & District System"
-    description: "Warehouse infrastructure; multi-district map expansion; delivery zone management."
-    state: open
-    phase: 3
-
-  - id: M-012
-    title: "Phase 3: Advanced Fleet & Route Optimization"
-    description: "Fleet management dashboard; route optimization; vehicle upgrade system; Phase 3 integration."
-    state: open
-    phase: 3
-
-  - id: M-013
-    title: "Phase 4: Drone Research & Manufacturing"
-    description: "Drone research technology tree; drone manufacturing partners integration."
-    state: open
-    phase: 4
-
-  - id: M-014
-    title: "Phase 4: DronePort Infrastructure"
-    description: "DronePort construction system; battery swapping network implementation."
-    state: open
-    phase: 4
-
-  - id: M-015
-    title: "Phase 4: Autonomous Drone Operations"
-    description: "Autonomous delivery execution; flight restrictions and weather system; Phase 4 integration."
-    state: open
-    phase: 4
-
-  - id: M-016
-    title: "Phase 5: Dynamic Market System"
-    description: "Dynamic market with inflation, fuel prices, and electricity costs."
-    state: open
-    phase: 5
-
-  - id: M-017
-    title: "Phase 5: Financial Instruments & Competition"
-    description: "Business loans, investor system, competitor companies, advanced economy integration."
-    state: open
-    phase: 5
-
-  - id: M-018
-    title: "Phase 6: Autonomous Intelligence Systems"
-    description: "Smart routing, predictive demand, dynamic pricing, and AI dispatch center."
-    state: open
-    phase: 6
-
-  - id: M-019
-    title: "Phase 7: International Multi-City Logistics"
-    description: "Multiple cities, countries, customs, airports, and international logistics."
-    state: open
-    phase: 7
-
-  - id: M-020
-    title: "Phase 8: Global Empire & Corporate Systems"
-    description: "Public company, stock market, franchises, corporate headquarters, worldwide DronePort network."
-    state: open
-    phase: 8
-
-  - id: M-021
-    title: "Phase 9: Multiplayer & Community Systems"
-    description: "Multiplayer, cooperative companies, competitive economy, robotics, autonomous warehouses, community content."
-    state: open
-    phase: 9
-
-# =============================================================================
-# LABELS — Type (7)
-# =============================================================================
+- id: M-001
+  title: Foundation & Documentation Complete
+  phase: 0
+  status: COMPLETED
+  epic_ids:
+  - E-001
+  - E-002
+  batch_ids:
+  - RBATCH-001
+  depends_on: []
+- id: M-002
+  title: Prototype Scaffold & Runtime Foundation
+  phase: 1
+  status: COMPLETED
+  epic_ids:
+  - E-003
+  - E-004
+  batch_ids:
+  - RBATCH-002
+  - RBATCH-003
+  depends_on:
+  - M-001
+- id: M-003
+  title: World Navigation
+  phase: 1
+  status: COMPLETED
+  epic_ids:
+  - E-005
+  - E-006
+  batch_ids:
+  - RBATCH-004
+  - RBATCH-006
+  depends_on:
+  - M-002
+- id: M-004
+  title: Order Lifecycle Core
+  phase: 1
+  status: COMPLETED
+  epic_ids:
+  - E-007
+  - E-008
+  - E-009
+  batch_ids:
+  - RBATCH-005
+  - RBATCH-007
+  - RBATCH-008
+  depends_on:
+  - M-003
+- id: M-005
+  title: Economy, HUD & Game Flow
+  phase: 1
+  status: "Planned \u2014 Not Started"
+  epic_ids:
+  - E-010
+  - E-011
+  - E-012
+  batch_ids:
+  - RBATCH-009
+  - RBATCH-010
+  - RBATCH-011
+  depends_on:
+  - M-004
+- id: M-006
+  title: Company Management & Bicycle
+  phase: 1
+  status: "Planned \u2014 Not Started"
+  epic_ids:
+  - E-013
+  - E-014
+  batch_ids:
+  - RBATCH-012
+  - RBATCH-013
+  depends_on:
+  - M-005
+- id: M-007
+  title: Save & Load System
+  phase: 1
+  status: "Planned \u2014 Blocked"
+  epic_ids:
+  - E-015
+  batch_ids:
+  - RBATCH-014
+  depends_on:
+  - M-006
+  owner_gates: ODR-001, ODR-003
+- id: M-008
+  title: Prototype v0.1 Verification & Release
+  phase: 1
+  status: "Planned \u2014 Not Started"
+  epic_ids:
+  - E-016
+  - E-017
+  batch_ids:
+  - RBATCH-015
+  - RBATCH-016
+  - RBATCH-017
+  depends_on:
+  - M-007
+  owner_gates: Human owner approval for RBATCH-017 closure
+- id: M-009
+  title: Employee & Financial Systems
+  phase: 2
+  status: "Planned \u2014 Future"
+  epic_ids:
+  - E-018
+  - E-019
+  - E-020
+  batch_ids:
+  - RBATCH-018
+  - RBATCH-019
+  - RBATCH-020
+  - RBATCH-021
+  depends_on:
+  - M-008
+- id: M-010
+  title: Vehicle Fleet Management
+  phase: 2
+  status: "Planned \u2014 Future"
+  epic_ids:
+  - E-021
+  batch_ids:
+  - RBATCH-022
+  - RBATCH-023
+  - RBATCH-024
+  depends_on:
+  - M-009
+- id: M-011
+  title: Warehouse & District System
+  phase: 3
+  status: "Planned \u2014 Future"
+  epic_ids:
+  - E-022
+  - E-023
+  batch_ids:
+  - RBATCH-025
+  - RBATCH-026
+  - RBATCH-027
+  depends_on:
+  - M-010
+- id: M-012
+  title: Advanced Fleet & Route Optimization
+  phase: 3
+  status: "Planned \u2014 Future"
+  epic_ids:
+  - E-024
+  - E-025
+  batch_ids:
+  - RBATCH-028
+  - RBATCH-029
+  - RBATCH-030
+  - RBATCH-031
+  depends_on:
+  - M-011
+- id: M-013
+  title: Drone Research & Manufacturing
+  phase: 4
+  status: "Planned \u2014 Future"
+  epic_ids:
+  - E-026
+  - E-027
+  batch_ids:
+  - RBATCH-032
+  - RBATCH-033
+  depends_on:
+  - M-012
+- id: M-014
+  title: DronePort Infrastructure
+  phase: 4
+  status: "Planned \u2014 Future"
+  epic_ids:
+  - E-028
+  - E-029
+  batch_ids:
+  - RBATCH-034
+  - RBATCH-035
+  depends_on:
+  - M-013
+- id: M-015
+  title: Autonomous Drone Operations
+  phase: 4
+  status: "Planned \u2014 Future"
+  epic_ids:
+  - E-030
+  - E-031
+  batch_ids:
+  - RBATCH-036
+  - RBATCH-037
+  - RBATCH-038
+  depends_on:
+  - M-014
+- id: M-016
+  title: Dynamic Market System
+  phase: 5
+  status: "Planned \u2014 Future"
+  epic_ids:
+  - E-032
+  - E-033
+  batch_ids:
+  - RBATCH-039
+  depends_on:
+  - M-015
+- id: M-017
+  title: Financial Instruments & Competition
+  phase: 5
+  status: "Planned \u2014 Future"
+  epic_ids:
+  - E-034
+  - E-035
+  batch_ids:
+  - RBATCH-040
+  - RBATCH-041
+  depends_on:
+  - M-016
+- id: M-018
+  title: Autonomous Intelligence Systems
+  phase: 6
+  status: "Planned \u2014 Future"
+  epic_ids:
+  - E-036
+  - E-037
+  batch_ids:
+  - RBATCH-042
+  depends_on:
+  - M-017
+- id: M-019
+  title: International Multi-City Logistics
+  phase: 7
+  status: "Planned \u2014 Future"
+  epic_ids:
+  - E-038
+  - E-039
+  - E-040
+  batch_ids:
+  - RBATCH-043
+  - RBATCH-044
+  - RBATCH-045
+  - RBATCH-046
+  depends_on:
+  - M-018
+- id: M-020
+  title: Global Empire & Corporate Systems
+  phase: 8
+  status: "Planned \u2014 Future"
+  epic_ids:
+  - E-041
+  - E-042
+  - E-043
+  batch_ids:
+  - RBATCH-047
+  - RBATCH-048
+  - RBATCH-049
+  - RBATCH-050
+  depends_on:
+  - M-019
+- id: M-021
+  title: Multiplayer & Community Systems
+  phase: 9
+  status: "Planned \u2014 Future"
+  epic_ids:
+  - E-044
+  - E-045
+  - E-046
+  batch_ids:
+  - RBATCH-051
+  - RBATCH-052
+  - RBATCH-053
+  - RBATCH-054
+  depends_on:
+  - M-020
+  owner_gates: Dedicated multiplayer/frontier audits required before executable issue
+    creation
+epics:
+- id: E-001
+  title: Repository Structure & Documentation Framework
+  phase: 0
+  milestone_id: M-001
+  status: COMPLETED
+  batch_ids:
+  - RBATCH-001
+  depends_on: []
+- id: E-002
+  title: Canonical Game Design Foundation
+  phase: 0
+  milestone_id: M-001
+  status: COMPLETED
+  batch_ids:
+  - RBATCH-001
+  depends_on: []
+- id: E-003
+  title: Historical Scaffold & Runtime Foundation
+  phase: 1
+  milestone_id: M-002
+  status: COMPLETED
+  batch_ids:
+  - RBATCH-002
+  depends_on:
+  - E-001
+- id: E-004
+  title: Asset Pipeline & Placeholder Assets
+  phase: 1
+  milestone_id: M-002
+  status: COMPLETED
+  batch_ids:
+  - RBATCH-003
+  depends_on:
+  - E-003
+- id: E-005
+  title: World Map & Environment
+  phase: 1
+  milestone_id: M-003
+  status: COMPLETED
+  batch_ids:
+  - RBATCH-004
+  depends_on:
+  - E-003
+  - E-004
+- id: E-006
+  title: Player Movement & Camera
+  phase: 1
+  milestone_id: M-003
+  status: COMPLETED
+  batch_ids:
+  - RBATCH-006
+  depends_on:
+  - E-005
+- id: E-007
+  title: Order Generation System
+  phase: 1
+  milestone_id: M-004
+  status: COMPLETED
+  batch_ids:
+  - RBATCH-005
+  depends_on:
+  - E-005
+- id: E-008
+  title: Pickup Proximity System
+  phase: 1
+  milestone_id: M-004
+  status: COMPLETED
+  batch_ids:
+  - RBATCH-007
+  depends_on:
+  - E-007
+  - E-006
+- id: E-009
+  title: Delivery Completion & Failure
+  phase: 1
+  milestone_id: M-004
+  status: COMPLETED
+  batch_ids:
+  - RBATCH-008
+  depends_on:
+  - E-008
+- id: E-010
+  title: Economy & Reputation Core
+  phase: 1
+  milestone_id: M-005
+  status: "Planned \u2014 Not Started"
+  batch_ids:
+  - RBATCH-009
+  depends_on:
+  - E-009
+- id: E-011
+  title: HUD & Notifications
+  phase: 1
+  milestone_id: M-005
+  status: "Planned \u2014 Not Started"
+  batch_ids:
+  - RBATCH-010
+  depends_on:
+  - E-010
+- id: E-012
+  title: MainMenu & Game Flow
+  phase: 1
+  milestone_id: M-005
+  status: "Planned \u2014 Not Started"
+  batch_ids:
+  - RBATCH-011
+  depends_on:
+  - E-003
+- id: E-013
+  title: Company Management Scene
+  phase: 1
+  milestone_id: M-006
+  status: "Planned \u2014 Not Started"
+  batch_ids:
+  - RBATCH-012
+  depends_on:
+  - E-010
+  - E-011
+- id: E-014
+  title: Bicycle Ownership System
+  phase: 1
+  milestone_id: M-006
+  status: "Planned \u2014 Not Started"
+  batch_ids:
+  - RBATCH-013
+  depends_on:
+  - E-013
+  - E-006
+- id: E-015
+  title: Save & Load System
+  phase: 1
+  milestone_id: M-007
+  status: "Planned \u2014 Blocked"
+  batch_ids:
+  - RBATCH-014
+  depends_on:
+  - E-013
+  - E-014
+  - E-012
+- id: E-016
+  title: Mobile Optimization
+  phase: 1
+  milestone_id: M-008
+  status: "Planned \u2014 Not Started"
+  batch_ids:
+  - RBATCH-015
+  depends_on:
+  - E-015
+- id: E-017
+  title: Full-Loop Integration Verification
+  phase: 1
+  milestone_id: M-008
+  status: "Planned \u2014 Not Started"
+  batch_ids:
+  - RBATCH-016
+  - RBATCH-017
+  depends_on:
+  - E-016
+- id: E-018
+  title: Employee Management System
+  phase: 2
+  milestone_id: M-009
+  status: "Planned \u2014 Future"
+  batch_ids:
+  - RBATCH-018
+  depends_on:
+  - E-017
+- id: E-019
+  title: Financial Reporting & Daily Costs
+  phase: 2
+  milestone_id: M-009
+  status: "Planned \u2014 Future"
+  batch_ids:
+  - RBATCH-019
+  depends_on:
+  - E-018
+- id: E-020
+  title: Customer Review & Reputation System
+  phase: 2
+  milestone_id: M-009
+  status: "Planned \u2014 Future"
+  batch_ids:
+  - RBATCH-020
+  - RBATCH-021
+  depends_on:
+  - E-010
+- id: E-021
+  title: Vehicle Fleet Management
+  phase: 2
+  milestone_id: M-010
+  status: "Planned \u2014 Future"
+  batch_ids:
+  - RBATCH-022
+  - RBATCH-023
+  - RBATCH-024
+  depends_on:
+  - E-018
+  - E-019
+  - E-020
+- id: E-022
+  title: Warehouse Infrastructure
+  phase: 3
+  milestone_id: M-011
+  status: "Planned \u2014 Future"
+  batch_ids:
+  - RBATCH-025
+  depends_on:
+  - E-021
+- id: E-023
+  title: Multi-District Map Expansion
+  phase: 3
+  milestone_id: M-011
+  status: "Planned \u2014 Future"
+  batch_ids:
+  - RBATCH-026
+  - RBATCH-027
+  depends_on:
+  - E-022
+- id: E-024
+  title: Fleet Management System
+  phase: 3
+  milestone_id: M-012
+  status: "Planned \u2014 Future"
+  batch_ids:
+  - RBATCH-028
+  depends_on:
+  - E-023
+- id: E-025
+  title: Route Optimization & Vehicle Upgrades
+  phase: 3
+  milestone_id: M-012
+  status: "Planned \u2014 Future"
+  batch_ids:
+  - RBATCH-029
+  - RBATCH-030
+  - RBATCH-031
+  depends_on:
+  - E-024
+- id: E-026
+  title: Drone Research & Technology Tree
+  phase: 4
+  milestone_id: M-013
+  status: "Planned \u2014 Future"
+  batch_ids:
+  - RBATCH-032
+  depends_on:
+  - E-025
+- id: E-027
+  title: Drone Manufacturing Partners
+  phase: 4
+  milestone_id: M-013
+  status: "Planned \u2014 Future"
+  batch_ids:
+  - RBATCH-033
+  depends_on:
+  - E-026
+- id: E-028
+  title: DronePort Infrastructure System
+  phase: 4
+  milestone_id: M-014
+  status: "Planned \u2014 Future"
+  batch_ids:
+  - RBATCH-034
+  depends_on:
+  - E-027
+- id: E-029
+  title: Battery Swapping Network
+  phase: 4
+  milestone_id: M-014
+  status: "Planned \u2014 Future"
+  batch_ids:
+  - RBATCH-035
+  depends_on:
+  - E-028
+- id: E-030
+  title: Autonomous Delivery System
+  phase: 4
+  milestone_id: M-015
+  status: "Planned \u2014 Future"
+  batch_ids:
+  - RBATCH-036
+  depends_on:
+  - E-029
+- id: E-031
+  title: Flight Restrictions & Weather
+  phase: 4
+  milestone_id: M-015
+  status: "Planned \u2014 Future"
+  batch_ids:
+  - RBATCH-037
+  - RBATCH-038
+  depends_on:
+  - E-030
+- id: E-032
+  title: Dynamic Market System
+  phase: 5
+  milestone_id: M-016
+  status: "Planned \u2014 Future"
+  batch_ids:
+  - RBATCH-039
+  depends_on:
+  - E-031
+- id: E-033
+  title: Fuel & Electricity Economy
+  phase: 5
+  milestone_id: M-016
+  status: "Planned \u2014 Future"
+  batch_ids:
+  - RBATCH-039
+  depends_on:
+  - E-032
+- id: E-034
+  title: Business Loans & Investors
+  phase: 5
+  milestone_id: M-017
+  status: "Planned \u2014 Future"
+  batch_ids:
+  - RBATCH-040
+  depends_on:
+  - E-032
+- id: E-035
+  title: Competition & Market Rivals
+  phase: 5
+  milestone_id: M-017
+  status: "Planned \u2014 Future"
+  batch_ids:
+  - RBATCH-041
+  depends_on:
+  - E-033
+  - E-034
+- id: E-036
+  title: Smart Routing & Predictive Demand
+  phase: 6
+  milestone_id: M-018
+  status: "Planned \u2014 Future"
+  batch_ids:
+  - RBATCH-042
+  depends_on:
+  - E-035
+- id: E-037
+  title: AI Dispatch & Autonomous Fleet
+  phase: 6
+  milestone_id: M-018
+  status: "Planned \u2014 Future"
+  batch_ids:
+  - RBATCH-042
+  depends_on:
+  - E-036
+- id: E-038
+  title: International Operations Foundation
+  phase: 7
+  milestone_id: M-019
+  status: "Planned \u2014 Future"
+  batch_ids:
+  - RBATCH-043
+  - RBATCH-044
+  depends_on:
+  - E-037
+- id: E-039
+  title: Cross-Border Compliance & Customs
+  phase: 7
+  milestone_id: M-019
+  status: "Planned \u2014 Future"
+  batch_ids:
+  - RBATCH-045
+  depends_on:
+  - E-038
+- id: E-040
+  title: International Intermodal Gateways
+  phase: 7
+  milestone_id: M-019
+  status: "Planned \u2014 Future"
+  batch_ids:
+  - RBATCH-046
+  depends_on:
+  - E-039
+- id: E-041
+  title: Corporate Governance & Headquarters
+  phase: 8
+  milestone_id: M-020
+  status: "Planned \u2014 Future"
+  batch_ids:
+  - RBATCH-047
+  depends_on:
+  - E-040
+- id: E-042
+  title: Public Markets & Investor Governance
+  phase: 8
+  milestone_id: M-020
+  status: "Planned \u2014 Future"
+  batch_ids:
+  - RBATCH-048
+  depends_on:
+  - E-041
+- id: E-043
+  title: Franchise & Worldwide Network Orchestration
+  phase: 8
+  milestone_id: M-020
+  status: "Planned \u2014 Future"
+  batch_ids:
+  - RBATCH-049
+  - RBATCH-050
+  depends_on:
+  - E-041
+  - E-042
+- id: E-044
+  title: Shared-World Multiplayer Foundation
+  phase: 9
+  milestone_id: M-021
+  status: "Planned \u2014 Future"
+  batch_ids:
+  - RBATCH-051
+  - RBATCH-052
+  depends_on:
+  - E-043
+- id: E-045
+  title: Robotics & Autonomous Operations Growth
+  phase: 9
+  milestone_id: M-021
+  status: "Planned \u2014 Future"
+  batch_ids:
+  - RBATCH-053
+  depends_on:
+  - E-044
+- id: E-046
+  title: Community & Frontier Expansion Governance
+  phase: 9
+  milestone_id: M-021
+  status: "Planned \u2014 Future"
+  batch_ids:
+  - RBATCH-054
+  depends_on:
+  - E-044
+  - E-045
+batches:
+- id: RBATCH-001
+  phase: 0
+  milestone_id: M-001
+  epic_ids:
+  - E-001
+  - E-002
+  title: Historical Prototype Scaffold Foundation
+  status: COMPLETED
+  depends_on: []
+  legacy_id: BATCH-001
+- id: RBATCH-002
+  phase: 0
+  milestone_id: M-002
+  epic_ids:
+  - E-003
+  title: Historical Scene/Event Scaffold Baseline
+  status: COMPLETED
+  depends_on:
+  - RBATCH-001
+  legacy_id: BATCH-002
+- id: RBATCH-003
+  phase: 0
+  milestone_id: M-002
+  epic_ids:
+  - E-004
+  title: Placeholder Asset Baseline
+  status: COMPLETED
+  depends_on:
+  - RBATCH-001
+  legacy_id: BATCH-003
+- id: RBATCH-004
+  phase: 1
+  milestone_id: M-003
+  epic_ids:
+  - E-005
+  title: Map/Player/Building World Setup
+  status: COMPLETED
+  depends_on:
+  - RBATCH-002
+  - RBATCH-003
+  legacy_id: BATCH-004
+- id: RBATCH-005
+  phase: 1
+  milestone_id: M-004
+  epic_ids:
+  - E-007
+  title: Order Generation + Lifecycle Core
+  status: COMPLETED
+  depends_on:
+  - RBATCH-004
+  legacy_id: BATCH-005
+- id: RBATCH-006
+  phase: 1
+  milestone_id: M-003
+  epic_ids:
+  - E-006
+  title: Tap-to-Move + Camera
+  status: COMPLETED
+  depends_on:
+  - RBATCH-004
+  legacy_id: BATCH-006
+- id: RBATCH-007
+  phase: 1
+  milestone_id: M-004
+  epic_ids:
+  - E-008
+  title: Pickup Proximity Core
+  status: COMPLETED
+  depends_on:
+  - RBATCH-005
+  - RBATCH-006
+  legacy_id: BATCH-007
+- id: RBATCH-008
+  phase: 1
+  milestone_id: M-004
+  epic_ids:
+  - E-009
+  title: Delivery Completion + Failure Path
+  status: COMPLETED
+  depends_on:
+  - RBATCH-007
+  legacy_id: BATCH-008
+- id: RBATCH-009
+  phase: 1
+  milestone_id: M-005
+  epic_ids:
+  - E-010
+  title: Economy Reward & Failure Consequences
+  status: "Planned \u2014 Not Started"
+  depends_on:
+  - RBATCH-008
+- id: RBATCH-010
+  phase: 1
+  milestone_id: M-005
+  epic_ids:
+  - E-011
+  title: HUD + Notifications
+  status: "Planned \u2014 Not Started"
+  depends_on:
+  - RBATCH-007
+  - RBATCH-009
+- id: RBATCH-011
+  phase: 1
+  milestone_id: M-005
+  epic_ids:
+  - E-012
+  title: MainMenu Flow
+  status: "Planned \u2014 Not Started"
+  depends_on:
+  - RBATCH-002
+- id: RBATCH-012
+  phase: 1
+  milestone_id: M-006
+  epic_ids:
+  - E-013
+  title: CompanyManagement + Upgrade Purchase Flow
+  status: "Planned \u2014 Not Started"
+  depends_on:
+  - RBATCH-009
+  - RBATCH-010
+- id: RBATCH-013
+  phase: 1
+  milestone_id: M-006
+  epic_ids:
+  - E-014
+  title: Bicycle Ownership + Speed Increase
+  status: "Planned \u2014 Not Started"
+  depends_on:
+  - RBATCH-012
+  - RBATCH-006
+- id: RBATCH-014
+  phase: 1
+  milestone_id: M-007
+  epic_ids:
+  - E-015
+  title: Save/Load Implementation
+  status: "Planned \u2014 Blocked"
+  depends_on:
+  - RBATCH-012
+  - RBATCH-013
+  - RBATCH-011
+  owner_gates: ODR-001, ODR-003
+- id: RBATCH-015
+  phase: 1
+  milestone_id: M-008
+  epic_ids:
+  - E-016
+  title: Mobile Optimization
+  status: "Planned \u2014 Not Started"
+  depends_on:
+  - RBATCH-010
+  - RBATCH-014
+- id: RBATCH-016
+  phase: 1
+  milestone_id: M-008
+  epic_ids:
+  - E-017
+  title: Full-Loop Integration Verification
+  status: "Planned \u2014 Not Started"
+  depends_on:
+  - RBATCH-015
+- id: RBATCH-017
+  phase: 1
+  milestone_id: M-008
+  epic_ids:
+  - E-017
+  title: Release-Checklist Verification Package
+  status: "Planned \u2014 Not Started"
+  depends_on:
+  - RBATCH-016
+  owner_gates: Human owner approval required
+- id: RBATCH-018
+  phase: 2
+  milestone_id: M-009
+  epic_ids:
+  - E-018
+  title: Employee Hiring & Onboarding
+  status: "Planned \u2014 Future"
+  depends_on:
+  - RBATCH-017
+- id: RBATCH-019
+  phase: 2
+  milestone_id: M-009
+  epic_ids:
+  - E-019
+  title: Daily Expenses & Financial Reporting
+  status: "Planned \u2014 Future"
+  depends_on:
+  - RBATCH-018
+- id: RBATCH-020
+  phase: 2
+  milestone_id: M-009
+  epic_ids:
+  - E-020
+  title: Customer Review Generation & Reputation
+  status: "Planned \u2014 Future"
+  depends_on:
+  - RBATCH-009
+- id: RBATCH-021
+  phase: 2
+  milestone_id: M-009
+  epic_ids:
+  - E-020
+  title: Customer Reviews Display
+  status: "Planned \u2014 Future"
+  depends_on:
+  - RBATCH-020
+- id: RBATCH-022
+  phase: 2
+  milestone_id: M-010
+  epic_ids:
+  - E-021
+  title: Vehicle Purchasing System
+  status: "Planned \u2014 Future"
+  depends_on:
+  - RBATCH-019
+- id: RBATCH-023
+  phase: 2
+  milestone_id: M-010
+  epic_ids:
+  - E-021
+  title: Vehicle Maintenance Costs
+  status: "Planned \u2014 Future"
+  depends_on:
+  - RBATCH-022
+- id: RBATCH-024
+  phase: 2
+  milestone_id: M-010
+  epic_ids:
+  - E-021
+  title: Phase 2 Integration Verification
+  status: "Planned \u2014 Future"
+  depends_on:
+  - RBATCH-021
+  - RBATCH-023
+- id: RBATCH-025
+  phase: 3
+  milestone_id: M-011
+  epic_ids:
+  - E-022
+  title: Warehouse Implementation
+  status: "Planned \u2014 Future"
+  depends_on:
+  - RBATCH-024
+- id: RBATCH-026
+  phase: 3
+  milestone_id: M-011
+  epic_ids:
+  - E-023
+  title: Multi-District Map Expansion
+  status: "Planned \u2014 Future"
+  depends_on:
+  - RBATCH-025
+- id: RBATCH-027
+  phase: 3
+  milestone_id: M-011
+  epic_ids:
+  - E-023
+  title: Delivery Zone Management
+  status: "Planned \u2014 Future"
+  depends_on:
+  - RBATCH-026
+- id: RBATCH-028
+  phase: 3
+  milestone_id: M-012
+  epic_ids:
+  - E-024
+  title: Fleet Management Dashboard
+  status: "Planned \u2014 Future"
+  depends_on:
+  - RBATCH-027
+- id: RBATCH-029
+  phase: 3
+  milestone_id: M-012
+  epic_ids:
+  - E-025
+  title: Route Optimization Engine
+  status: "Planned \u2014 Future"
+  depends_on:
+  - RBATCH-028
+- id: RBATCH-030
+  phase: 3
+  milestone_id: M-012
+  epic_ids:
+  - E-025
+  title: Vehicle Upgrade System
+  status: "Planned \u2014 Future"
+  depends_on:
+  - RBATCH-029
+- id: RBATCH-031
+  phase: 3
+  milestone_id: M-012
+  epic_ids:
+  - E-025
+  title: Phase 3 Integration Verification
+  status: "Planned \u2014 Future"
+  depends_on:
+  - RBATCH-024
+  - RBATCH-030
+- id: RBATCH-032
+  phase: 4
+  milestone_id: M-013
+  epic_ids:
+  - E-026
+  title: Drone Research System
+  status: "Planned \u2014 Future"
+  depends_on:
+  - RBATCH-031
+- id: RBATCH-033
+  phase: 4
+  milestone_id: M-013
+  epic_ids:
+  - E-027
+  title: Drone Manufacturing Partners
+  status: "Planned \u2014 Future"
+  depends_on:
+  - RBATCH-032
+- id: RBATCH-034
+  phase: 4
+  milestone_id: M-014
+  epic_ids:
+  - E-028
+  title: DronePort Construction
+  status: "Planned \u2014 Future"
+  depends_on:
+  - RBATCH-033
+- id: RBATCH-035
+  phase: 4
+  milestone_id: M-014
+  epic_ids:
+  - E-029
+  title: Battery Swapping Network
+  status: "Planned \u2014 Future"
+  depends_on:
+  - RBATCH-034
+- id: RBATCH-036
+  phase: 4
+  milestone_id: M-015
+  epic_ids:
+  - E-030
+  title: Autonomous Delivery Execution
+  status: "Planned \u2014 Future"
+  depends_on:
+  - RBATCH-035
+- id: RBATCH-037
+  phase: 4
+  milestone_id: M-015
+  epic_ids:
+  - E-031
+  title: Flight Restrictions & Weather
+  status: "Planned \u2014 Future"
+  depends_on:
+  - RBATCH-036
+- id: RBATCH-038
+  phase: 4
+  milestone_id: M-015
+  epic_ids:
+  - E-031
+  title: Phase 4 Integration Verification
+  status: "Planned \u2014 Future"
+  depends_on:
+  - RBATCH-031
+  - RBATCH-037
+- id: RBATCH-039
+  phase: 5
+  milestone_id: M-016
+  epic_ids:
+  - E-032
+  - E-033
+  title: Dynamic Market System
+  status: "Planned \u2014 Future"
+  depends_on:
+  - RBATCH-038
+- id: RBATCH-040
+  phase: 5
+  milestone_id: M-017
+  epic_ids:
+  - E-034
+  title: Business Loans & Investor System
+  status: "Planned \u2014 Future"
+  depends_on:
+  - RBATCH-039
+- id: RBATCH-041
+  phase: 5
+  milestone_id: M-017
+  epic_ids:
+  - E-035
+  title: Competition & Advanced Economy Integration
+  status: "Planned \u2014 Future"
+  depends_on:
+  - RBATCH-040
+- id: RBATCH-042
+  phase: 6
+  milestone_id: M-018
+  epic_ids:
+  - E-036
+  - E-037
+  title: Smart Routing & AI Dispatch Foundation
+  status: "Planned \u2014 Future"
+  depends_on:
+  - RBATCH-041
+- id: RBATCH-043
+  phase: 7
+  milestone_id: M-019
+  epic_ids:
+  - E-038
+  title: Multi-City Operations Foundation
+  status: "Planned \u2014 Future"
+  depends_on:
+  - RBATCH-042
+- id: RBATCH-044
+  phase: 7
+  milestone_id: M-019
+  epic_ids:
+  - E-038
+  title: Country Entry & Regulatory Permissions
+  status: "Planned \u2014 Future"
+  depends_on:
+  - RBATCH-043
+- id: RBATCH-045
+  phase: 7
+  milestone_id: M-019
+  epic_ids:
+  - E-039
+  title: Customs & Cross-Border Handling
+  status: "Planned \u2014 Future"
+  depends_on:
+  - RBATCH-044
+- id: RBATCH-046
+  phase: 7
+  milestone_id: M-019
+  epic_ids:
+  - E-040
+  title: International Air/Sea Gateway Network
+  status: "Planned \u2014 Future"
+  depends_on:
+  - RBATCH-045
+- id: RBATCH-047
+  phase: 8
+  milestone_id: M-020
+  epic_ids:
+  - E-041
+  title: Corporate Headquarters & Governance
+  status: "Planned \u2014 Future"
+  depends_on:
+  - RBATCH-046
+- id: RBATCH-048
+  phase: 8
+  milestone_id: M-020
+  epic_ids:
+  - E-042
+  title: Public Company & Stock Market Systems
+  status: "Planned \u2014 Future"
+  depends_on:
+  - RBATCH-047
+- id: RBATCH-049
+  phase: 8
+  milestone_id: M-020
+  epic_ids:
+  - E-043
+  title: Franchise Network Expansion
+  status: "Planned \u2014 Future"
+  depends_on:
+  - RBATCH-047
+- id: RBATCH-050
+  phase: 8
+  milestone_id: M-020
+  epic_ids:
+  - E-043
+  title: Worldwide Network Coordination
+  status: "Planned \u2014 Future"
+  depends_on:
+  - RBATCH-048
+  - RBATCH-049
+- id: RBATCH-051
+  phase: 9
+  milestone_id: M-021
+  epic_ids:
+  - E-044
+  title: Shared-World Company Presence
+  status: "Planned \u2014 Future"
+  depends_on:
+  - RBATCH-050
+  owner_gates: Dedicated multiplayer canonical architecture audit required
+- id: RBATCH-052
+  phase: 9
+  milestone_id: M-021
+  epic_ids:
+  - E-044
+  title: Cooperative & Competitive Company Interaction
+  status: "Planned \u2014 Future"
+  depends_on:
+  - RBATCH-051
+  owner_gates: Dedicated multiplayer canonical architecture audit required
+- id: RBATCH-053
+  phase: 9
+  milestone_id: M-021
+  epic_ids:
+  - E-045
+  title: Robotics & Autonomous Warehouse Planning
+  status: "Planned \u2014 Future"
+  depends_on:
+  - RBATCH-052
+  owner_gates: Dedicated robotics/autonomous-warehouse audit required
+- id: RBATCH-054
+  phase: 9
+  milestone_id: M-021
+  epic_ids:
+  - E-046
+  title: Community, Smart-City & Frontier Expansion Governance
+  status: "Planned \u2014 Future"
+  depends_on:
+  - RBATCH-053
+  owner_gates: Dedicated community/frontier audit required
 labels:
-  # Type labels
-  - name: "type:implementation"
-    color: "0075ca"
-    description: "Gameplay or system implementation work"
-
-  - name: "type:design"
-    color: "7057ff"
-    description: "Design decisions and architecture specifications"
-
-  - name: "type:verification"
-    color: "e4e669"
-    description: "Testing, validation, and integration verification"
-
-  - name: "type:documentation"
-    color: "cfd3d7"
-    description: "Documentation creation or updates"
-
-  - name: "type:bug"
-    color: "d73a4a"
-    description: "Bug fix for a confirmed defect"
-
-  - name: "type:refactor"
-    color: "e99695"
-    description: "Code refactoring without functional change"
-
-  - name: "type:planning"
-    color: "f9d0c4"
-    description: "Planning, roadmap, or architectural definition"
-
-  # Phase labels (10)
-  - name: "phase:0"
-    color: "bfd4f2"
-    description: "Phase 0 — Foundation"
-
-  - name: "phase:1"
-    color: "d4c5f9"
-    description: "Phase 1 — First Playable Prototype"
-
-  - name: "phase:2"
-    color: "c2e0c6"
-    description: "Phase 2 — Company Management"
-
-  - name: "phase:3"
-    color: "fef2c0"
-    description: "Phase 3 — Logistics Expansion"
-
-  - name: "phase:4"
-    color: "fbd3c8"
-    description: "Phase 4 — Drone Technology"
-
-  - name: "phase:5"
-    color: "e8d7f0"
-    description: "Phase 5 — Advanced Economy"
-
-  - name: "phase:6"
-    color: "daf2e4"
-    description: "Phase 6 — Artificial Intelligence"
-
-  - name: "phase:7"
-    color: "fce8d0"
-    description: "Phase 7 — International Expansion"
-
-  - name: "phase:8"
-    color: "d0e8fc"
-    description: "Phase 8 — Global Corporation"
-
-  - name: "phase:9"
-    color: "f0f0f0"
-    description: "Phase 9 — Endless Evolution"
-
-  # Batch labels (42)
-  - name: "batch:rbatch-001"
-    color: "ededed"
-    description: "RBATCH-001 (Legacy BATCH-001 — Completed)"
-
-  - name: "batch:rbatch-002"
-    color: "ededed"
-    description: "RBATCH-002 (Legacy BATCH-002 — Completed)"
-
-  - name: "batch:rbatch-003"
-    color: "ededed"
-    description: "RBATCH-003 (Legacy BATCH-003 — Completed)"
-
-  - name: "batch:rbatch-004"
-    color: "ededed"
-    description: "RBATCH-004 (Legacy BATCH-004 — Completed)"
-
-  - name: "batch:rbatch-005"
-    color: "ededed"
-    description: "RBATCH-005 (Legacy BATCH-005 — Completed)"
-
-  - name: "batch:rbatch-006"
-    color: "ededed"
-    description: "RBATCH-006 (Legacy BATCH-006 — Completed)"
-
-  - name: "batch:rbatch-007"
-    color: "ededed"
-    description: "RBATCH-007 (Legacy BATCH-007 — Completed)"
-
-  - name: "batch:rbatch-008"
-    color: "ededed"
-    description: "RBATCH-008 (Legacy BATCH-008 — Completed)"
-
-  - name: "batch:rbatch-009"
-    color: "0e8a16"
-    description: "RBATCH-009 — Economy Reward & Reputation"
-
-  - name: "batch:rbatch-010"
-    color: "0e8a16"
-    description: "RBATCH-010 — HUD & Notifications"
-
-  - name: "batch:rbatch-011"
-    color: "0e8a16"
-    description: "RBATCH-011 — MainMenu Flow"
-
-  - name: "batch:rbatch-012"
-    color: "0e8a16"
-    description: "RBATCH-012 — CompanyManagement"
-
-  - name: "batch:rbatch-013"
-    color: "0e8a16"
-    description: "RBATCH-013 — Bicycle Ownership"
-
-  - name: "batch:rbatch-014"
-    color: "fbca04"
-    description: "RBATCH-014 — Save/Load (Blocked)"
-
-  - name: "batch:rbatch-015"
-    color: "0e8a16"
-    description: "RBATCH-015 — Mobile Optimization"
-
-  - name: "batch:rbatch-016"
-    color: "0e8a16"
-    description: "RBATCH-016 — Integration Verification"
-
-  - name: "batch:rbatch-017"
-    color: "0e8a16"
-    description: "RBATCH-017 — Release Checklist"
-
-  - name: "batch:rbatch-018"
-    color: "84b6eb"
-    description: "RBATCH-018 — Employee Onboarding"
-
-  - name: "batch:rbatch-019"
-    color: "84b6eb"
-    description: "RBATCH-019 — Financial Reporting"
-
-  - name: "batch:rbatch-020"
-    color: "84b6eb"
-    description: "RBATCH-020 — Customer Reputation"
-
-  - name: "batch:rbatch-021"
-    color: "84b6eb"
-    description: "RBATCH-021 — Reviews Display"
-
-  - name: "batch:rbatch-022"
-    color: "84b6eb"
-    description: "RBATCH-022 — Vehicle Purchasing"
-
-  - name: "batch:rbatch-023"
-    color: "84b6eb"
-    description: "RBATCH-023 — Vehicle Maintenance"
-
-  - name: "batch:rbatch-024"
-    color: "84b6eb"
-    description: "RBATCH-024 — Phase 2 Integration"
-
-  - name: "batch:rbatch-025"
-    color: "c5def5"
-    description: "RBATCH-025 — Warehouse"
-
-  - name: "batch:rbatch-026"
-    color: "c5def5"
-    description: "RBATCH-026 — Multi-District Map"
-
-  - name: "batch:rbatch-027"
-    color: "c5def5"
-    description: "RBATCH-027 — Delivery Zones"
-
-  - name: "batch:rbatch-028"
-    color: "c5def5"
-    description: "RBATCH-028 — Fleet Dashboard"
-
-  - name: "batch:rbatch-029"
-    color: "c5def5"
-    description: "RBATCH-029 — Route Optimization"
-
-  - name: "batch:rbatch-030"
-    color: "c5def5"
-    description: "RBATCH-030 — Vehicle Upgrades"
-
-  - name: "batch:rbatch-031"
-    color: "c5def5"
-    description: "RBATCH-031 — Phase 3 Integration"
-
-  - name: "batch:rbatch-032"
-    color: "f9c513"
-    description: "RBATCH-032 — Drone Research"
-
-  - name: "batch:rbatch-033"
-    color: "f9c513"
-    description: "RBATCH-033 — Drone Manufacturing"
-
-  - name: "batch:rbatch-034"
-    color: "f9c513"
-    description: "RBATCH-034 — DronePort Construction"
-
-  - name: "batch:rbatch-035"
-    color: "f9c513"
-    description: "RBATCH-035 — Battery Swapping"
-
-  - name: "batch:rbatch-036"
-    color: "f9c513"
-    description: "RBATCH-036 — Autonomous Delivery"
-
-  - name: "batch:rbatch-037"
-    color: "f9c513"
-    description: "RBATCH-037 — Flight Restrictions"
-
-  - name: "batch:rbatch-038"
-    color: "f9c513"
-    description: "RBATCH-038 — Phase 4 Integration"
-
-  - name: "batch:rbatch-039"
-    color: "e11d48"
-    description: "RBATCH-039 — Dynamic Market"
-
-  - name: "batch:rbatch-040"
-    color: "e11d48"
-    description: "RBATCH-040 — Loans & Investors"
-
-  - name: "batch:rbatch-041"
-    color: "e11d48"
-    description: "RBATCH-041 — Competition"
-
-  - name: "batch:rbatch-042"
-    color: "a855f7"
-    description: "RBATCH-042 — AI Dispatch Foundation"
-
-  # Epic labels (37)
-  - name: "epic:repo-documentation"
-    color: "bfd4f2"
-    description: "E-001 Repository Structure & Documentation"
-
-  - name: "epic:game-design-foundation"
-    color: "bfd4f2"
-    description: "E-002 Canonical Game Design Foundation"
-
-  - name: "epic:gdevelop-scaffold"
-    color: "d4c5f9"
-    description: "E-003 GDevelop Project Scaffold"
-
-  - name: "epic:asset-pipeline"
-    color: "d4c5f9"
-    description: "E-004 Asset Pipeline & Placeholder Assets"
-
-  - name: "epic:world-map"
-    color: "d4c5f9"
-    description: "E-005 World Map & Environment"
-
-  - name: "epic:player-movement"
-    color: "d4c5f9"
-    description: "E-006 Player Movement & Camera"
-
-  - name: "epic:order-generation"
-    color: "d4c5f9"
-    description: "E-007 Order Generation System"
-
-  - name: "epic:pickup-proximity"
-    color: "d4c5f9"
-    description: "E-008 Pickup Proximity System"
-
-  - name: "epic:delivery-completion"
-    color: "d4c5f9"
-    description: "E-009 Delivery Completion & Failure"
-
-  - name: "epic:economy-reputation"
-    color: "d4c5f9"
-    description: "E-010 Economy & Reputation Core"
-
-  - name: "epic:hud-notifications"
-    color: "d4c5f9"
-    description: "E-011 HUD & Notifications"
-
-  - name: "epic:mainmenu-gameflow"
-    color: "d4c5f9"
-    description: "E-012 MainMenu & Game Flow"
-
-  - name: "epic:company-management"
-    color: "d4c5f9"
-    description: "E-013 Company Management Scene"
-
-  - name: "epic:bicycle-ownership"
-    color: "d4c5f9"
-    description: "E-014 Bicycle Ownership System"
-
-  - name: "epic:save-load"
-    color: "d4c5f9"
-    description: "E-015 Save & Load System"
-
-  - name: "epic:mobile-optimization"
-    color: "d4c5f9"
-    description: "E-016 Mobile Optimization"
-
-  - name: "epic:integration-verification"
-    color: "d4c5f9"
-    description: "E-017 Full-Loop Integration Verification"
-
-  - name: "epic:employee-management"
-    color: "c2e0c6"
-    description: "E-018 Employee Management System"
-
-  - name: "epic:financial-reporting"
-    color: "c2e0c6"
-    description: "E-019 Financial Reporting & Daily Costs"
-
-  - name: "epic:customer-reputation"
-    color: "c2e0c6"
-    description: "E-020 Customer Reputation System"
-
-  - name: "epic:vehicle-fleet"
-    color: "c2e0c6"
-    description: "E-021 Vehicle Fleet Management"
-
-  - name: "epic:warehouse"
-    color: "fef2c0"
-    description: "E-022 Warehouse Infrastructure"
-
-  - name: "epic:multi-district"
-    color: "fef2c0"
-    description: "E-023 Multi-District Map Expansion"
-
-  - name: "epic:fleet-management"
-    color: "fef2c0"
-    description: "E-024 Fleet Management System"
-
-  - name: "epic:route-optimization"
-    color: "fef2c0"
-    description: "E-025 Route Optimization Engine"
-
-  - name: "epic:drone-research"
-    color: "fbd3c8"
-    description: "E-026 Drone Research & Technology Tree"
-
-  - name: "epic:drone-manufacturing"
-    color: "fbd3c8"
-    description: "E-027 Drone Manufacturing Partners"
-
-  - name: "epic:droneport"
-    color: "fbd3c8"
-    description: "E-028 DronePort Infrastructure System"
-
-  - name: "epic:battery-swapping"
-    color: "fbd3c8"
-    description: "E-029 Battery Swapping Network"
-
-  - name: "epic:autonomous-delivery"
-    color: "fbd3c8"
-    description: "E-030 Autonomous Delivery System"
-
-  - name: "epic:flight-restrictions"
-    color: "fbd3c8"
-    description: "E-031 Flight Restrictions & Weather"
-
-  - name: "epic:dynamic-market"
-    color: "e8d7f0"
-    description: "E-032 Dynamic Market System"
-
-  - name: "epic:fuel-electricity"
-    color: "e8d7f0"
-    description: "E-033 Fuel & Electricity Economy"
-
-  - name: "epic:loans-investors"
-    color: "e8d7f0"
-    description: "E-034 Business Loans & Investors"
-
-  - name: "epic:competition"
-    color: "e8d7f0"
-    description: "E-035 Competition & Market Rivals"
-
-  - name: "epic:smart-routing"
-    color: "daf2e4"
-    description: "E-036 Smart Routing & Predictive Demand"
-
-  - name: "epic:ai-dispatch"
-    color: "daf2e4"
-    description: "E-037 AI Dispatch & Autonomous Fleet"
-
-  # Status labels (5)
-  - name: "status:blocked"
-    color: "e4e669"
-    description: "Blocked by an owner decision or external dependency"
-
-  - name: "status:in-progress"
-    color: "0075ca"
-    description: "Actively being implemented"
-
-  - name: "status:ready"
-    color: "0e8a16"
-    description: "Ready for implementation"
-
-  - name: "status:needs-design"
-    color: "7057ff"
-    description: "Requires design decision before implementation"
-
-  - name: "status:future"
-    color: "cfd3d7"
-    description: "Deferred to future planning iteration"
-
-# =============================================================================
-# EXECUTABLE ISSUES (31)
-# =============================================================================
+- name: type:implementation
+  color: 0075ca
+- name: type:design
+  color: 7057ff
+- name: type:verification
+  color: e4e669
+- name: type:documentation
+  color: cfd3d7
+- name: type:bug
+  color: d73a4a
+- name: type:refactor
+  color: e99695
+- name: type:planning
+  color: f9d0c4
+- name: phase:0
+  color: bfd4f2
+- name: phase:1
+  color: d4c5f9
+- name: phase:2
+  color: c2e0c6
+- name: phase:3
+  color: fef2c0
+- name: phase:4
+  color: fbd3c8
+- name: phase:5
+  color: e8d7f0
+- name: phase:6
+  color: daf2e4
+- name: phase:7
+  color: fce8d0
+- name: phase:8
+  color: d0e8fc
+- name: phase:9
+  color: f0f0f0
+- name: batch:rbatch-001
+  color: ededed
+- name: batch:rbatch-002
+  color: ededed
+- name: batch:rbatch-003
+  color: ededed
+- name: batch:rbatch-004
+  color: ededed
+- name: batch:rbatch-005
+  color: ededed
+- name: batch:rbatch-006
+  color: ededed
+- name: batch:rbatch-007
+  color: ededed
+- name: batch:rbatch-008
+  color: ededed
+- name: batch:rbatch-009
+  color: d4c5f9
+- name: batch:rbatch-010
+  color: d4c5f9
+- name: batch:rbatch-011
+  color: d4c5f9
+- name: batch:rbatch-012
+  color: d4c5f9
+- name: batch:rbatch-013
+  color: d4c5f9
+- name: batch:rbatch-014
+  color: fbca04
+- name: batch:rbatch-015
+  color: d4c5f9
+- name: batch:rbatch-016
+  color: d4c5f9
+- name: batch:rbatch-017
+  color: d4c5f9
+- name: batch:rbatch-018
+  color: c2e0c6
+- name: batch:rbatch-019
+  color: c2e0c6
+- name: batch:rbatch-020
+  color: c2e0c6
+- name: batch:rbatch-021
+  color: c2e0c6
+- name: batch:rbatch-022
+  color: c2e0c6
+- name: batch:rbatch-023
+  color: c2e0c6
+- name: batch:rbatch-024
+  color: c2e0c6
+- name: batch:rbatch-025
+  color: fef2c0
+- name: batch:rbatch-026
+  color: fef2c0
+- name: batch:rbatch-027
+  color: fef2c0
+- name: batch:rbatch-028
+  color: fef2c0
+- name: batch:rbatch-029
+  color: fef2c0
+- name: batch:rbatch-030
+  color: fef2c0
+- name: batch:rbatch-031
+  color: fef2c0
+- name: batch:rbatch-032
+  color: fbd3c8
+- name: batch:rbatch-033
+  color: fbd3c8
+- name: batch:rbatch-034
+  color: fbd3c8
+- name: batch:rbatch-035
+  color: fbd3c8
+- name: batch:rbatch-036
+  color: fbd3c8
+- name: batch:rbatch-037
+  color: fbd3c8
+- name: batch:rbatch-038
+  color: fbd3c8
+- name: batch:rbatch-039
+  color: e8d7f0
+- name: batch:rbatch-040
+  color: e8d7f0
+- name: batch:rbatch-041
+  color: e8d7f0
+- name: batch:rbatch-042
+  color: daf2e4
+- name: batch:rbatch-043
+  color: fce8d0
+- name: batch:rbatch-044
+  color: fce8d0
+- name: batch:rbatch-045
+  color: fce8d0
+- name: batch:rbatch-046
+  color: fce8d0
+- name: batch:rbatch-047
+  color: d0e8fc
+- name: batch:rbatch-048
+  color: d0e8fc
+- name: batch:rbatch-049
+  color: d0e8fc
+- name: batch:rbatch-050
+  color: d0e8fc
+- name: batch:rbatch-051
+  color: f0f0f0
+- name: batch:rbatch-052
+  color: f0f0f0
+- name: batch:rbatch-053
+  color: f0f0f0
+- name: batch:rbatch-054
+  color: f0f0f0
+- name: epic:repo-documentation
+  color: bfd4f2
+- name: epic:game-design-foundation
+  color: bfd4f2
+- name: epic:runtime-foundation
+  color: d4c5f9
+- name: epic:asset-pipeline
+  color: d4c5f9
+- name: epic:world-map
+  color: d4c5f9
+- name: epic:player-movement
+  color: d4c5f9
+- name: epic:order-generation
+  color: d4c5f9
+- name: epic:pickup-proximity
+  color: d4c5f9
+- name: epic:delivery-completion
+  color: d4c5f9
+- name: epic:economy-reputation
+  color: d4c5f9
+- name: epic:hud-notifications
+  color: d4c5f9
+- name: epic:mainmenu-gameflow
+  color: d4c5f9
+- name: epic:company-management
+  color: d4c5f9
+- name: epic:bicycle-ownership
+  color: d4c5f9
+- name: epic:save-load
+  color: d4c5f9
+- name: epic:mobile-optimization
+  color: d4c5f9
+- name: epic:integration-verification
+  color: d4c5f9
+- name: epic:employee-management
+  color: c2e0c6
+- name: epic:financial-reporting
+  color: c2e0c6
+- name: epic:customer-reputation
+  color: c2e0c6
+- name: epic:vehicle-fleet
+  color: c2e0c6
+- name: epic:warehouse
+  color: fef2c0
+- name: epic:multi-district
+  color: fef2c0
+- name: epic:fleet-management
+  color: fef2c0
+- name: epic:route-optimization
+  color: fef2c0
+- name: epic:drone-research
+  color: fbd3c8
+- name: epic:drone-manufacturing
+  color: fbd3c8
+- name: epic:droneport
+  color: fbd3c8
+- name: epic:battery-swapping
+  color: fbd3c8
+- name: epic:autonomous-delivery
+  color: fbd3c8
+- name: epic:flight-restrictions
+  color: fbd3c8
+- name: epic:dynamic-market
+  color: e8d7f0
+- name: epic:fuel-electricity
+  color: e8d7f0
+- name: epic:loans-investors
+  color: e8d7f0
+- name: epic:competition
+  color: e8d7f0
+- name: epic:smart-routing
+  color: daf2e4
+- name: epic:ai-dispatch
+  color: daf2e4
+- name: epic:international-operations
+  color: fce8d0
+- name: epic:cross-border-compliance
+  color: fce8d0
+- name: epic:intermodal-gateways
+  color: fce8d0
+- name: epic:corporate-governance
+  color: d0e8fc
+- name: epic:public-markets
+  color: d0e8fc
+- name: epic:franchise-network
+  color: d0e8fc
+- name: epic:multiplayer-foundation
+  color: f0f0f0
+- name: epic:robotics-automation
+  color: f0f0f0
+- name: epic:community-frontier
+  color: f0f0f0
+- name: status:blocked
+  color: e4e669
+- name: status:in-progress
+  color: 0075ca
+- name: status:ready
+  color: 0e8a16
+- name: status:needs-design
+  color: 7057ff
+- name: status:future
+  color: cfd3d7
 issues:
-  # RBATCH-009 — Economy
-  - id: ISSUE-001
-    title: "Implement money reward on order completion"
-    milestone_id: M-005
-    label_names:
-      - "type:implementation"
-      - "phase:1"
-      - "batch:rbatch-009"
-      - "epic:economy-reputation"
-    body: |
-      **Batch:** RBATCH-009
-      **Epic:** E-010 Economy & Reputation Core
-
-      When an order transitions to Completed, apply the canonical money reward to PlayerData.Money.
-
-      **Acceptance Criteria:**
-      - PlayerData.Money increases by the configured reward value when PickedUp→Completed fires.
-      - Affordability checks remain coherent after reward application.
-
-  - id: ISSUE-002
-    title: "Implement reputation increase on delivery completion"
-    milestone_id: M-005
-    label_names:
-      - "type:implementation"
-      - "phase:1"
-      - "batch:rbatch-009"
-      - "epic:economy-reputation"
-    body: |
-      **Batch:** RBATCH-009
-      **Epic:** E-010 Economy & Reputation Core
-
-      When an order transitions to Completed, increase PlayerData.Reputation by the canonical value.
-
-      **Acceptance Criteria:**
-      - Reputation increases correctly after completion.
-      - Remains bounded by canonical maximum.
-
-  - id: ISSUE-003
-    title: "Implement money penalty on order failure"
-    milestone_id: M-005
-    label_names:
-      - "type:implementation"
-      - "phase:1"
-      - "batch:rbatch-009"
-      - "epic:economy-reputation"
-    body: |
-      **Batch:** RBATCH-009
-      **Epic:** E-010 Economy & Reputation Core
-
-      When an order transitions to Failed, apply the canonical money penalty clamped to zero minimum.
-
-      **Acceptance Criteria:**
-      - PlayerData.Money decreases correctly on failure.
-      - Negative money is prevented (clamped to 0).
-
-  - id: ISSUE-004
-    title: "Implement reputation decrease on order failure"
-    milestone_id: M-005
-    label_names:
-      - "type:implementation"
-      - "phase:1"
-      - "batch:rbatch-009"
-      - "epic:economy-reputation"
-    body: |
-      **Batch:** RBATCH-009
-      **Epic:** E-010 Economy & Reputation Core
-
-      When an order transitions to Failed, decrease PlayerData.Reputation by the canonical penalty value.
-
-      **Acceptance Criteria:**
-      - Reputation decreases correctly after failure.
-      - Remains bounded by canonical minimum.
-
-  # RBATCH-010 — HUD
-  - id: ISSUE-005
-    title: "Implement active-order HUD panel"
-    milestone_id: M-005
-    label_names:
-      - "type:implementation"
-      - "phase:1"
-      - "batch:rbatch-010"
-      - "epic:hud-notifications"
-    body: |
-      **Batch:** RBATCH-010
-      **Epic:** E-011 HUD & Notifications
-
-      Create the active-order HUD panel that displays current order destination, status, and package state.
-
-      **Acceptance Criteria:**
-      - Panel visible when an order is active.
-      - Panel hidden when no order is active.
-
-  - id: ISSUE-006
-    title: "Implement Accept Order button in HUD"
-    milestone_id: M-005
-    label_names:
-      - "type:implementation"
-      - "phase:1"
-      - "batch:rbatch-010"
-      - "epic:hud-notifications"
-    body: |
-      **Batch:** RBATCH-010
-      **Epic:** E-011 HUD & Notifications
-
-      Create the fully styled Accept Order button in the HUD (deferred from RBATCH-007 minimal touch trigger).
-
-      **Acceptance Criteria:**
-      - Button appears when an Available order is in range.
-      - Pressing it transitions order to Accepted.
-
-  - id: ISSUE-007
-    title: "Implement delivery status notifications"
-    milestone_id: M-005
-    label_names:
-      - "type:implementation"
-      - "phase:1"
-      - "batch:rbatch-010"
-      - "epic:hud-notifications"
-    body: |
-      **Batch:** RBATCH-010
-      **Epic:** E-011 HUD & Notifications
-
-      Display toast/banner notifications for order state transitions (Accepted, PickedUp, Completed, Failed).
-
-      **Acceptance Criteria:**
-      - Notification appears briefly on each canonical state transition.
-
-  # RBATCH-011 — MainMenu
-  - id: ISSUE-008
-    title: "Implement Start/Continue main menu flow"
-    milestone_id: M-005
-    label_names:
-      - "type:implementation"
-      - "phase:1"
-      - "batch:rbatch-011"
-      - "epic:mainmenu-gameflow"
-    body: |
-      **Batch:** RBATCH-011
-      **Epic:** E-012 MainMenu & Game Flow
-
-      MainMenu scene displays Start and Continue options. Continue is disabled when no save exists.
-
-      **Acceptance Criteria:**
-      - Start and Continue buttons behave per canonical save policy.
-      - Continue is unavailable when no save data exists.
-
-  - id: ISSUE-009
-    title: "Implement new-game overwrite guard"
-    milestone_id: M-005
-    label_names:
-      - "type:implementation"
-      - "phase:1"
-      - "batch:rbatch-011"
-      - "epic:mainmenu-gameflow"
-    body: |
-      **Batch:** RBATCH-011
-      **Epic:** E-012 MainMenu & Game Flow
-
-      When the player chooses Start with existing save data, display a confirmation guard dialog before overwriting.
-
-      **Acceptance Criteria:**
-      - Guard dialog appears when save data exists.
-      - Overwrite only proceeds if player confirms.
-
-  # RBATCH-012 — Company Management
-  - id: ISSUE-010
-    title: "Implement upgrade purchase flow"
-    milestone_id: M-006
-    label_names:
-      - "type:implementation"
-      - "phase:1"
-      - "batch:rbatch-012"
-      - "epic:company-management"
-    body: |
-      **Batch:** RBATCH-012
-      **Epic:** E-013 Company Management Scene
-
-      Player can browse and purchase available upgrades in the CompanyManagement scene with affordability enforcement.
-
-      **Acceptance Criteria:**
-      - Upgrade purchase deducts money correctly.
-      - Player cannot purchase upgrades they cannot afford.
-
-  - id: ISSUE-011
-    title: "Implement CompanyManagement scene navigation"
-    milestone_id: M-006
-    label_names:
-      - "type:implementation"
-      - "phase:1"
-      - "batch:rbatch-012"
-      - "epic:company-management"
-    body: |
-      **Batch:** RBATCH-012
-      **Epic:** E-013 Company Management Scene
-
-      Navigation between GameWorld and CompanyManagement scene from HUD; returns to GameWorld correctly.
-
-      **Acceptance Criteria:**
-      - Player can enter and exit CompanyManagement without losing game state.
-
-  # RBATCH-013 — Bicycle
-  - id: ISSUE-012
-    title: "Implement bicycle ownership flag"
-    milestone_id: M-006
-    label_names:
-      - "type:implementation"
-      - "phase:1"
-      - "batch:rbatch-013"
-      - "epic:bicycle-ownership"
-    body: |
-      **Batch:** RBATCH-013
-      **Epic:** E-014 Bicycle Ownership System
-
-      Purchase of bicycle sets PlayerData.HasBicycle flag. Flag persists correctly in game state.
-
-      **Acceptance Criteria:**
-      - HasBicycle is false initially.
-      - Becomes true after bicycle purchase.
-      - Does not reset on scene transitions.
-
-  - id: ISSUE-013
-    title: "Implement bicycle speed effect on player movement"
-    milestone_id: M-006
-    label_names:
-      - "type:implementation"
-      - "phase:1"
-      - "batch:rbatch-013"
-      - "epic:bicycle-ownership"
-    body: |
-      **Batch:** RBATCH-013
-      **Epic:** E-014 Bicycle Ownership System
-
-      When HasBicycle is true, apply the canonical speed multiplier to player movement speed.
-
-      **Acceptance Criteria:**
-      - Movement speed is visibly faster with bicycle.
-      - Walking speed unchanged without bicycle.
-
-  # RBATCH-014 — Save/Load
-  - id: ISSUE-014
-    title: "Implement save-game serialization"
-    milestone_id: M-007
-    label_names:
-      - "type:implementation"
-      - "phase:1"
-      - "batch:rbatch-014"
-      - "epic:save-load"
-      - "status:blocked"
-    body: |
-      **Batch:** RBATCH-014
-      **Epic:** E-015 Save & Load System
-      **Blocked by:** ODR-001, ODR-003
-
-      Serialize all canonical save-game fields to local device storage per the save policy.
-
-      **Acceptance Criteria:**
-      - All required fields persisted.
-      - Non-persisted fields excluded per canonical specification.
-
-  - id: ISSUE-015
-    title: "Implement save-game deserialization and load"
-    milestone_id: M-007
-    label_names:
-      - "type:implementation"
-      - "phase:1"
-      - "batch:rbatch-014"
-      - "epic:save-load"
-      - "status:blocked"
-    body: |
-      **Batch:** RBATCH-014
-      **Epic:** E-015 Save & Load System
-      **Blocked by:** ODR-001, ODR-003
-
-      Deserialize and validate save data from local device storage. Handle missing or corrupt save gracefully.
-
-      **Acceptance Criteria:**
-      - Valid save data loads correctly.
-      - Corrupt or missing data falls back to new-game state.
-
-  - id: ISSUE-016
-    title: "Implement autosave triggers"
-    milestone_id: M-007
-    label_names:
-      - "type:implementation"
-      - "phase:1"
-      - "batch:rbatch-014"
-      - "epic:save-load"
-      - "status:blocked"
-    body: |
-      **Batch:** RBATCH-014
-      **Epic:** E-015 Save & Load System
-      **Blocked by:** ODR-001, ODR-003
-
-      Autosave fires at canonical trigger points (order completion, scene exit, company management changes).
-
-      **Acceptance Criteria:**
-      - Autosave triggers at all required canonical events.
-      - No data loss between saves.
-
-  - id: ISSUE-017
-    title: "Implement save-slot validation"
-    milestone_id: M-007
-    label_names:
-      - "type:implementation"
-      - "phase:1"
-      - "batch:rbatch-014"
-      - "epic:save-load"
-      - "status:blocked"
-    body: |
-      **Batch:** RBATCH-014
-      **Epic:** E-015 Save & Load System
-      **Blocked by:** ODR-001, ODR-003
-
-      Validate save slot integrity on load; report version mismatches or schema violations.
-
-      **Acceptance Criteria:**
-      - Validation passes on fresh save.
-      - Validation fails gracefully on corrupt or version-incompatible data.
-
-  # RBATCH-015 — Mobile
-  - id: ISSUE-018
-    title: "Implement mobile viewport scaling"
-    milestone_id: M-008
-    label_names:
-      - "type:implementation"
-      - "phase:1"
-      - "batch:rbatch-015"
-      - "epic:mobile-optimization"
-    body: |
-      **Batch:** RBATCH-015
-      **Epic:** E-016 Mobile Optimization
-
-      Configure viewport scaling for Android target devices.
-
-      **Acceptance Criteria:**
-      - Game renders correctly on 720p and 1080p Android portrait and landscape.
-
-  - id: ISSUE-019
-    title: "Optimize touch interaction targets"
-    milestone_id: M-008
-    label_names:
-      - "type:implementation"
-      - "phase:1"
-      - "batch:rbatch-015"
-      - "epic:mobile-optimization"
-    body: |
-      **Batch:** RBATCH-015
-      **Epic:** E-016 Mobile Optimization
-
-      Verify all interactive touch targets meet minimum size requirements for reliable mobile tapping.
-
-      **Acceptance Criteria:**
-      - All HUD buttons and world touch targets meet canonical minimum touch target size (REQ-024).
-
-  # RBATCH-016 — Integration
-  - id: ISSUE-020
-    title: "Execute full-loop integration test suite"
-    milestone_id: M-008
-    label_names:
-      - "type:verification"
-      - "phase:1"
-      - "batch:rbatch-016"
-      - "epic:integration-verification"
-    body: |
-      **Batch:** RBATCH-016
-      **Epic:** E-017 Full-Loop Integration Verification
-
-      Execute integration tests covering the complete prototype gameplay loop.
-
-      **Acceptance Criteria:**
-      - All P0/P1 loop behaviors verified.
-      - No regression failures.
-
-  - id: ISSUE-021
-    title: "Document integration test results"
-    milestone_id: M-008
-    label_names:
-      - "type:documentation"
-      - "phase:1"
-      - "batch:rbatch-016"
-      - "epic:integration-verification"
-    body: |
-      **Batch:** RBATCH-016
-      **Epic:** E-017 Full-Loop Integration Verification
-
-      Create integration test evidence document with pass/fail results for all scenarios.
-
-      **Acceptance Criteria:**
-      - Evidence document exists.
-      - All pass/fail results recorded accurately.
-
-  # RBATCH-017 — Release
-  - id: ISSUE-022
-    title: "Assemble prototype release checklist evidence"
-    milestone_id: M-008
-    label_names:
-      - "type:verification"
-      - "phase:1"
-      - "batch:rbatch-017"
-      - "epic:integration-verification"
-    body: |
-      **Batch:** RBATCH-017
-      **Epic:** E-017 Full-Loop Integration Verification
-
-      Assemble complete evidence package for all prototype release checklist sections for owner review.
-
-      **Acceptance Criteria:**
-      - Checklist evidence is complete for all sections.
-      - No self-approval claims made.
-
-  - id: ISSUE-023
-    title: "Prepare owner review package"
-    milestone_id: M-008
-    label_names:
-      - "type:documentation"
-      - "phase:1"
-      - "batch:rbatch-017"
-      - "epic:integration-verification"
-    body: |
-      **Batch:** RBATCH-017
-      **Epic:** E-017 Full-Loop Integration Verification
-
-      Prepare and deliver the owner review package with all required artifacts.
-
-      **Acceptance Criteria:**
-      - Package accessible to Project Owner.
-      - All artifacts included.
-      - Owner instructed to review before approving.
-
-  # Phase 2 Issues
-  - id: ISSUE-024
-    title: "Design employee data model"
-    milestone_id: M-009
-    label_names:
-      - "type:design"
-      - "phase:2"
-      - "batch:rbatch-018"
-      - "epic:employee-management"
-    body: |
-      **Batch:** RBATCH-018
-      **Epic:** E-018 Employee Management System
-
-      Define the canonical employee data structure including attributes, salary fields, and hire/fire lifecycle.
-
-      **Acceptance Criteria:**
-      - Employee data model documented and approved before implementation.
-
-  - id: ISSUE-025
-    title: "Implement daily expense calculation"
-    milestone_id: M-009
-    label_names:
-      - "type:implementation"
-      - "phase:2"
-      - "batch:rbatch-019"
-      - "epic:financial-reporting"
-    body: |
-      **Batch:** RBATCH-019
-      **Epic:** E-019 Financial Reporting & Daily Costs
-
-      Implement daily expense deduction applying all operational costs at day-end.
-
-      **Acceptance Criteria:**
-      - Daily expenses deduct correctly.
-      - Negative balance handled per canonical policy.
-
-  - id: ISSUE-026
-    title: "Implement salary deduction system"
-    milestone_id: M-009
-    label_names:
-      - "type:implementation"
-      - "phase:2"
-      - "batch:rbatch-018"
-      - "epic:employee-management"
-    body: |
-      **Batch:** RBATCH-018
-      **Epic:** E-018 Employee Management System
-
-      Deduct employee salaries from company funds on each salary cycle event.
-
-      **Acceptance Criteria:**
-      - Salary deducts per employee per cycle.
-      - Insufficient funds handled per canonical policy.
-
-  - id: ISSUE-027
-    title: "Implement financial report display"
-    milestone_id: M-009
-    label_names:
-      - "type:implementation"
-      - "phase:2"
-      - "batch:rbatch-019"
-      - "epic:financial-reporting"
-    body: |
-      **Batch:** RBATCH-019
-      **Epic:** E-019 Financial Reporting & Daily Costs
-
-      Display a financial summary panel showing income, expenses, and net balance.
-
-      **Acceptance Criteria:**
-      - Financial report panel accessible from CompanyManagement scene.
-      - Shows accurate data.
-
-  - id: ISSUE-028
-    title: "Implement vehicle catalog and purchase UI"
-    milestone_id: M-010
-    label_names:
-      - "type:implementation"
-      - "phase:2"
-      - "batch:rbatch-022"
-      - "epic:vehicle-fleet"
-    body: |
-      **Batch:** RBATCH-022
-      **Epic:** E-021 Vehicle Fleet Management
-
-      Vehicle catalog browsable in CompanyManagement with purchase option and affordability check.
-
-      **Acceptance Criteria:**
-      - Player can view and purchase vehicles.
-      - Ownership tracked per vehicle.
-
-  - id: ISSUE-029
-    title: "Implement vehicle maintenance cost tracking"
-    milestone_id: M-010
-    label_names:
-      - "type:implementation"
-      - "phase:2"
-      - "batch:rbatch-023"
-      - "epic:vehicle-fleet"
-    body: |
-      **Batch:** RBATCH-023
-      **Epic:** E-021 Vehicle Fleet Management
-
-      Track maintenance costs per vehicle type and deduct from daily expenses.
-
-      **Acceptance Criteria:**
-      - Maintenance costs appear in financial report.
-      - Deduction accurate per vehicle owned.
-
-  - id: ISSUE-030
-    title: "Implement customer review system"
-    milestone_id: M-009
-    label_names:
-      - "type:implementation"
-      - "phase:2"
-      - "batch:rbatch-020"
-      - "epic:customer-reputation"
-    body: |
-      **Batch:** RBATCH-020
-      **Epic:** E-020 Customer Reputation System
-
-      Generate customer review events after each completed or failed order.
-
-      **Acceptance Criteria:**
-      - Reviews generated after each order outcome.
-      - Reputation score updates accordingly.
-
-  - id: ISSUE-031
-    title: "Implement reputation display in HUD"
-    milestone_id: M-009
-    label_names:
-      - "type:implementation"
-      - "phase:2"
-      - "batch:rbatch-021"
-      - "epic:customer-reputation"
-    body: |
-      **Batch:** RBATCH-021
-      **Epic:** E-020 Customer Reputation System
-
-      Display the current reputation score in HUD or CompanyManagement scene.
-
-      **Acceptance Criteria:**
-      - Reputation score visible to player.
-      - Updates in real time with each order outcome.
-
-# =============================================================================
-# FUTURE PLACEHOLDERS (12)
-# =============================================================================
+- id: ISSUE-001
+  title: Implement money reward on order completion
+  batch_id: RBATCH-009
+  epic_id: E-010
+  milestone_id: M-005
+  phase: 1
+  type: implementation
+  status: Ready for implementation
+  label_names:
+  - type:implementation
+  - phase:1
+  - batch:rbatch-009
+  - epic:economy-reputation
+  - status:ready
+  description: Apply canonical reward to company money on Completed.
+  acceptance_criteria: "Company money increases on PickedUp\u2192Completed."
+- id: ISSUE-002
+  title: Implement reputation increase on delivery completion
+  batch_id: RBATCH-009
+  epic_id: E-010
+  milestone_id: M-005
+  phase: 1
+  type: implementation
+  status: Ready for implementation
+  label_names:
+  - type:implementation
+  - phase:1
+  - batch:rbatch-009
+  - epic:economy-reputation
+  - status:ready
+  description: Increase reputation on Completed.
+  acceptance_criteria: Reputation increases within approved bounds.
+- id: ISSUE-003
+  title: Resolve failure penalty modality before implementation
+  batch_id: RBATCH-009
+  epic_id: E-010
+  milestone_id: M-005
+  phase: 1
+  type: design
+  status: Needs design / balancing decision
+  label_names:
+  - type:design
+  - phase:1
+  - batch:rbatch-009
+  - epic:economy-reputation
+  - status:needs-design
+  blocked_or_owner_gate: Balancing / owner-approved implementation-detail selection
+    required
+  description: Decide whether any small failure penalty beyond reputation exists.
+  acceptance_criteria: No unapproved money penalty is introduced.
+- id: ISSUE-004
+  title: Implement reputation decrease on order failure
+  batch_id: RBATCH-009
+  epic_id: E-010
+  milestone_id: M-005
+  phase: 1
+  type: implementation
+  status: Ready for implementation
+  label_names:
+  - type:implementation
+  - phase:1
+  - batch:rbatch-009
+  - epic:economy-reputation
+  - status:ready
+  description: Apply canonical reputation consequence on Failed.
+  acceptance_criteria: Reputation decreases without permanent setback.
+- id: ISSUE-005
+  title: Implement active-order HUD panel
+  batch_id: RBATCH-010
+  epic_id: E-011
+  milestone_id: M-005
+  phase: 1
+  type: implementation
+  status: Ready for implementation
+  label_names:
+  - type:implementation
+  - phase:1
+  - batch:rbatch-010
+  - epic:hud-notifications
+  - status:ready
+  description: Show destination/status/package state in HUD.
+  acceptance_criteria: HUD appears only when order active.
+- id: ISSUE-006
+  title: Implement Accept Order button in HUD
+  batch_id: RBATCH-010
+  epic_id: E-011
+  milestone_id: M-005
+  phase: 1
+  type: implementation
+  status: Ready for implementation
+  label_names:
+  - type:implementation
+  - phase:1
+  - batch:rbatch-010
+  - epic:hud-notifications
+  - status:ready
+  description: Connect HUD button to AcceptRequested flow.
+  acceptance_criteria: Available orders can be accepted from HUD.
+- id: ISSUE-007
+  title: Implement delivery status notifications
+  batch_id: RBATCH-010
+  epic_id: E-011
+  milestone_id: M-005
+  phase: 1
+  type: implementation
+  status: Ready for implementation
+  label_names:
+  - type:implementation
+  - phase:1
+  - batch:rbatch-010
+  - epic:hud-notifications
+  - status:ready
+  description: Show notifications for Accepted/PickedUp/Completed/Failed.
+  acceptance_criteria: Notification appears on each state change.
+- id: ISSUE-008
+  title: Implement Start/Continue main menu flow
+  batch_id: RBATCH-011
+  epic_id: E-012
+  milestone_id: M-005
+  phase: 1
+  type: implementation
+  status: Ready for implementation
+  label_names:
+  - type:implementation
+  - phase:1
+  - batch:rbatch-011
+  - epic:mainmenu-gameflow
+  - status:ready
+  description: Show Start and Continue with valid-save checks.
+  acceptance_criteria: Continue unavailable when no valid save exists.
+- id: ISSUE-009
+  title: Implement new-game overwrite guard
+  batch_id: RBATCH-011
+  epic_id: E-012
+  milestone_id: M-005
+  phase: 1
+  type: implementation
+  status: Ready for implementation
+  label_names:
+  - type:implementation
+  - phase:1
+  - batch:rbatch-011
+  - epic:mainmenu-gameflow
+  - status:ready
+  description: Require confirmation before replacing an existing save.
+  acceptance_criteria: No silent overwrite occurs.
+- id: ISSUE-010
+  title: Implement upgrade purchase flow
+  batch_id: RBATCH-012
+  epic_id: E-013
+  milestone_id: M-006
+  phase: 1
+  type: implementation
+  status: Ready for implementation
+  label_names:
+  - type:implementation
+  - phase:1
+  - batch:rbatch-012
+  - epic:company-management
+  - status:ready
+  description: Purchase upgrades with affordability enforcement.
+  acceptance_criteria: Player cannot buy unaffordable upgrades.
+- id: ISSUE-011
+  title: Implement CompanyManagement scene navigation
+  batch_id: RBATCH-012
+  epic_id: E-013
+  milestone_id: M-006
+  phase: 1
+  type: implementation
+  status: Ready for implementation
+  label_names:
+  - type:implementation
+  - phase:1
+  - batch:rbatch-012
+  - epic:company-management
+  - status:ready
+  description: Move between GameWorld and CompanyManagement safely.
+  acceptance_criteria: Scene transitions preserve game state.
+- id: ISSUE-012
+  title: Implement bicycle ownership through purchased-upgrade persistence
+  batch_id: RBATCH-013
+  epic_id: E-014
+  milestone_id: M-006
+  phase: 1
+  type: implementation
+  status: Ready for implementation
+  label_names:
+  - type:implementation
+  - phase:1
+  - batch:rbatch-013
+  - epic:bicycle-ownership
+  - status:ready
+  description: Use the approved upgrade ownership path instead of an unapproved standalone
+    bicycle-ownership field.
+  acceptance_criteria: Ownership is stored through purchased-upgrade state.
+- id: ISSUE-013
+  title: Implement bicycle movement-speed increase after purchase
+  batch_id: RBATCH-013
+  epic_id: E-014
+  milestone_id: M-006
+  phase: 1
+  type: implementation
+  status: Ready for implementation
+  label_names:
+  - type:implementation
+  - phase:1
+  - batch:rbatch-013
+  - epic:bicycle-ownership
+  - status:ready
+  description: Apply faster movement after bicycle purchase using approved balancing.
+  acceptance_criteria: Movement is faster with bicycle ownership.
+- id: ISSUE-014
+  title: Implement save-game serialization
+  batch_id: RBATCH-014
+  epic_id: E-015
+  milestone_id: M-007
+  phase: 1
+  type: implementation
+  status: Blocked by owner decision
+  label_names:
+  - type:implementation
+  - phase:1
+  - batch:rbatch-014
+  - epic:save-load
+  - status:blocked
+  blocked_or_owner_gate: ODR-001, ODR-003
+  description: Serialize canonical save fields only.
+  acceptance_criteria: Required save fields persist and excluded fields do not.
+- id: ISSUE-015
+  title: Implement save-game deserialization and load
+  batch_id: RBATCH-014
+  epic_id: E-015
+  milestone_id: M-007
+  phase: 1
+  type: implementation
+  status: Blocked by owner decision
+  label_names:
+  - type:implementation
+  - phase:1
+  - batch:rbatch-014
+  - epic:save-load
+  - status:blocked
+  blocked_or_owner_gate: ODR-001, ODR-003
+  description: Handle missing/corrupted/incompatible saves per SAVE_SYSTEM.md.
+  acceptance_criteria: Missing save starts new game; corrupted data informs player
+    and requires confirmation.
+- id: ISSUE-016
+  title: Implement canonical autosave triggers
+  batch_id: RBATCH-014
+  epic_id: E-015
+  milestone_id: M-007
+  phase: 1
+  type: implementation
+  status: Blocked by owner decision
+  label_names:
+  - type:implementation
+  - phase:1
+  - batch:rbatch-014
+  - epic:save-load
+  - status:blocked
+  blocked_or_owner_gate: ODR-001, ODR-003
+  description: Use only delivery completion, upgrade purchase, progression change,
+    and tutorial-step completion if present.
+  acceptance_criteria: No unapproved generic scene-exit trigger is used.
+- id: ISSUE-017
+  title: Implement save-slot validation
+  batch_id: RBATCH-014
+  epic_id: E-015
+  milestone_id: M-007
+  phase: 1
+  type: implementation
+  status: Blocked by owner decision
+  label_names:
+  - type:implementation
+  - phase:1
+  - batch:rbatch-014
+  - epic:save-load
+  - status:blocked
+  blocked_or_owner_gate: ODR-001, ODR-003
+  description: Validate version/schema integrity without silent overwrite.
+  acceptance_criteria: Invalid saves fail gracefully.
+- id: ISSUE-018
+  title: Implement mobile viewport fit strategy for supported Android targets
+  batch_id: RBATCH-015
+  epic_id: E-016
+  milestone_id: M-008
+  phase: 1
+  type: implementation
+  status: Ready for implementation
+  label_names:
+  - type:implementation
+  - phase:1
+  - batch:rbatch-015
+  - epic:mobile-optimization
+  - status:ready
+  description: Fit the Android-first web runtime to the supported target matrix selected
+    during implementation.
+  acceptance_criteria: No unapproved portrait/landscape canon is implied.
+- id: ISSUE-019
+  title: Optimize touch interaction targets for comfortable tapping
+  batch_id: RBATCH-015
+  epic_id: E-016
+  milestone_id: M-008
+  phase: 1
+  type: implementation
+  status: Ready for implementation
+  label_names:
+  - type:implementation
+  - phase:1
+  - batch:rbatch-015
+  - epic:mobile-optimization
+  - status:ready
+  description: Adjust hit areas to satisfy qualitative touch comfort.
+  acceptance_criteria: Any numeric threshold is implementation detail, not canon.
+- id: ISSUE-020
+  title: Execute full-loop integration test suite
+  batch_id: RBATCH-016
+  epic_id: E-017
+  milestone_id: M-008
+  phase: 1
+  type: verification
+  status: Ready for implementation
+  label_names:
+  - type:verification
+  - phase:1
+  - batch:rbatch-016
+  - epic:integration-verification
+  - status:ready
+  description: "Run startup\u2192completion/failure loop coverage."
+  acceptance_criteria: All P0/P1 behaviors verified.
+- id: ISSUE-021
+  title: Document integration test results
+  batch_id: RBATCH-016
+  epic_id: E-017
+  milestone_id: M-008
+  phase: 1
+  type: documentation
+  status: Ready for implementation
+  label_names:
+  - type:documentation
+  - phase:1
+  - batch:rbatch-016
+  - epic:integration-verification
+  - status:ready
+  description: Record integration evidence.
+  acceptance_criteria: Results are documented accurately.
+- id: ISSUE-022
+  title: Assemble prototype release checklist evidence
+  batch_id: RBATCH-017
+  epic_id: E-017
+  milestone_id: M-008
+  phase: 1
+  type: verification
+  status: Ready for implementation
+  label_names:
+  - type:verification
+  - phase:1
+  - batch:rbatch-017
+  - epic:integration-verification
+  - status:ready
+  description: Assemble release-checklist evidence for owner review.
+  acceptance_criteria: Evidence is complete with no self-approval claim.
+- id: ISSUE-023
+  title: Prepare owner review package
+  batch_id: RBATCH-017
+  epic_id: E-017
+  milestone_id: M-008
+  phase: 1
+  type: documentation
+  status: Ready for implementation
+  label_names:
+  - type:documentation
+  - phase:1
+  - batch:rbatch-017
+  - epic:integration-verification
+  - status:ready
+  description: Package review artifacts for the owner.
+  acceptance_criteria: Artifacts and review instructions are included.
+- id: ISSUE-024
+  title: Design employee data model
+  batch_id: RBATCH-018
+  epic_id: E-018
+  milestone_id: M-009
+  phase: 2
+  type: design
+  status: Needs design / canonical detailing
+  label_names:
+  - type:design
+  - phase:2
+  - batch:rbatch-018
+  - epic:employee-management
+  - status:needs-design
+  description: Define employee attributes, salary fields, and onboarding state.
+  acceptance_criteria: Employee model is documented before deeper implementation.
+- id: ISSUE-025
+  title: Implement daily expense calculation
+  batch_id: RBATCH-019
+  epic_id: E-019
+  milestone_id: M-009
+  phase: 2
+  type: implementation
+  status: Ready for implementation
+  label_names:
+  - type:implementation
+  - phase:2
+  - batch:rbatch-019
+  - epic:financial-reporting
+  - status:ready
+  description: Apply daily operational expenses.
+  acceptance_criteria: Expenses deduct correctly.
+- id: ISSUE-026
+  title: Implement salary deduction system
+  batch_id: RBATCH-018
+  epic_id: E-018
+  milestone_id: M-009
+  phase: 2
+  type: implementation
+  status: Ready for implementation
+  label_names:
+  - type:implementation
+  - phase:2
+  - batch:rbatch-018
+  - epic:employee-management
+  - status:ready
+  description: Deduct salaries on each salary cycle.
+  acceptance_criteria: Salary deductions are accurate.
+- id: ISSUE-027
+  title: Implement financial report display
+  batch_id: RBATCH-019
+  epic_id: E-019
+  milestone_id: M-009
+  phase: 2
+  type: implementation
+  status: Ready for implementation
+  label_names:
+  - type:implementation
+  - phase:2
+  - batch:rbatch-019
+  - epic:financial-reporting
+  - status:ready
+  description: Show income, expenses, and net balance.
+  acceptance_criteria: Financial report is accessible and accurate.
+- id: ISSUE-028
+  title: Implement vehicle catalog and purchase UI
+  batch_id: RBATCH-022
+  epic_id: E-021
+  milestone_id: M-010
+  phase: 2
+  type: implementation
+  status: Ready for implementation
+  label_names:
+  - type:implementation
+  - phase:2
+  - batch:rbatch-022
+  - epic:vehicle-fleet
+  - status:ready
+  description: Browse and purchase vehicles.
+  acceptance_criteria: Vehicle ownership is tracked.
+- id: ISSUE-029
+  title: Implement vehicle maintenance cost tracking
+  batch_id: RBATCH-023
+  epic_id: E-021
+  milestone_id: M-010
+  phase: 2
+  type: implementation
+  status: Ready for implementation
+  label_names:
+  - type:implementation
+  - phase:2
+  - batch:rbatch-023
+  - epic:vehicle-fleet
+  - status:ready
+  description: Track maintenance costs by vehicle.
+  acceptance_criteria: Maintenance costs appear in reports.
+- id: ISSUE-030
+  title: Implement customer review generation system
+  batch_id: RBATCH-020
+  epic_id: E-020
+  milestone_id: M-009
+  phase: 2
+  type: implementation
+  status: Ready for implementation
+  label_names:
+  - type:implementation
+  - phase:2
+  - batch:rbatch-020
+  - epic:customer-reputation
+  - status:ready
+  description: Generate reviews after completed/failed orders.
+  acceptance_criteria: Reviews affect reputation.
+- id: ISSUE-031
+  title: Implement customer reviews display in CompanyManagement
+  batch_id: RBATCH-021
+  epic_id: E-020
+  milestone_id: M-009
+  phase: 2
+  type: implementation
+  status: Ready for implementation
+  label_names:
+  - type:implementation
+  - phase:2
+  - batch:rbatch-021
+  - epic:customer-reputation
+  - status:ready
+  description: Show customer reviews and summaries, not only a raw reputation number.
+  acceptance_criteria: Reviews are inspectable by players.
+- id: ISSUE-032
+  title: Implement employee hiring and onboarding workflow
+  batch_id: RBATCH-018
+  epic_id: E-018
+  milestone_id: M-009
+  phase: 2
+  type: implementation
+  status: Ready for implementation
+  label_names:
+  - type:implementation
+  - phase:2
+  - batch:rbatch-018
+  - epic:employee-management
+  - status:ready
+  description: Implement hiring flow and onboarding state transitions.
+  acceptance_criteria: Employees can be hired and become active.
+- id: ISSUE-033
+  title: Execute Phase 2 integration verification suite
+  batch_id: RBATCH-024
+  epic_id: E-021
+  milestone_id: M-010
+  phase: 2
+  type: verification
+  status: Ready for implementation
+  label_names:
+  - type:verification
+  - phase:2
+  - batch:rbatch-024
+  - epic:vehicle-fleet
+  - status:ready
+  description: Verify employee, expense, review, vehicle purchase, and maintenance
+    systems together.
+  acceptance_criteria: Phase 2 scenarios execute end-to-end.
+- id: ISSUE-034
+  title: Document Phase 2 integration evidence
+  batch_id: RBATCH-024
+  epic_id: E-021
+  milestone_id: M-010
+  phase: 2
+  type: documentation
+  status: Ready for implementation
+  label_names:
+  - type:documentation
+  - phase:2
+  - batch:rbatch-024
+  - epic:vehicle-fleet
+  - status:ready
+  description: Record Phase 2 integration evidence.
+  acceptance_criteria: Covered scenarios and outcomes are documented.
 placeholders:
-  - id: PLACEHOLDER-001
-    title: "[PLACEHOLDER] Warehouse Construction System"
-    milestone_id: M-011
-    label_names:
-      - "type:planning"
-      - "phase:3"
-      - "batch:rbatch-025"
-      - "epic:warehouse"
-      - "status:future"
-    summary: "Full warehouse construction, inventory management, and dispatch routing. Requires Phase 3 detailed planning."
-
-  - id: PLACEHOLDER-002
-    title: "[PLACEHOLDER] Multi-District Map"
-    milestone_id: M-011
-    label_names:
-      - "type:planning"
-      - "phase:3"
-      - "batch:rbatch-026"
-      - "epic:multi-district"
-      - "status:future"
-    summary: "Expanded world map with multiple city districts and per-district logistics."
-
-  - id: PLACEHOLDER-003
-    title: "[PLACEHOLDER] Fleet Management Dashboard"
-    milestone_id: M-012
-    label_names:
-      - "type:planning"
-      - "phase:3"
-      - "batch:rbatch-028"
-      - "epic:fleet-management"
-      - "status:future"
-    summary: "Fleet dashboard with vehicle assignment, utilization tracking, and route visualization."
-
-  - id: PLACEHOLDER-004
-    title: "[PLACEHOLDER] Route Optimization Engine"
-    milestone_id: M-012
-    label_names:
-      - "type:planning"
-      - "phase:3"
-      - "batch:rbatch-029"
-      - "epic:route-optimization"
-      - "status:future"
-    summary: "Automated route optimization algorithm integrated into dispatch system."
-
-  - id: PLACEHOLDER-005
-    title: "[PLACEHOLDER] Drone Research Tree"
-    milestone_id: M-013
-    label_names:
-      - "type:planning"
-      - "phase:4"
-      - "batch:rbatch-032"
-      - "epic:drone-research"
-      - "status:future"
-    summary: "Drone technology research progression with unlock tree and research cost modeling."
-
-  - id: PLACEHOLDER-006
-    title: "[PLACEHOLDER] DronePort Infrastructure"
-    milestone_id: M-014
-    label_names:
-      - "type:planning"
-      - "phase:4"
-      - "batch:rbatch-034"
-      - "epic:droneport"
-      - "status:future"
-    summary: "DronePort construction, placement, and operational management system."
-
-  - id: PLACEHOLDER-007
-    title: "[PLACEHOLDER] Autonomous Drone Delivery"
-    milestone_id: M-015
-    label_names:
-      - "type:planning"
-      - "phase:4"
-      - "batch:rbatch-036"
-      - "epic:autonomous-delivery"
-      - "status:future"
-    summary: "Fully autonomous drone dispatch and delivery execution without manual player intervention."
-
-  - id: PLACEHOLDER-008
-    title: "[PLACEHOLDER] Dynamic Market System"
-    milestone_id: M-016
-    label_names:
-      - "type:planning"
-      - "phase:5"
-      - "batch:rbatch-039"
-      - "epic:dynamic-market"
-      - "status:future"
-    summary: "Dynamic market with inflation, demand-driven pricing, fuel costs, and electricity pricing."
-
-  - id: PLACEHOLDER-009
-    title: "[PLACEHOLDER] Business Loans & Investors"
-    milestone_id: M-017
-    label_names:
-      - "type:planning"
-      - "phase:5"
-      - "batch:rbatch-040"
-      - "epic:loans-investors"
-      - "status:future"
-    summary: "Business loan mechanics with repayment schedules and investor relationship system."
-
-  - id: PLACEHOLDER-010
-    title: "[PLACEHOLDER] Competitor AI Companies"
-    milestone_id: M-017
-    label_names:
-      - "type:planning"
-      - "phase:5"
-      - "batch:rbatch-041"
-      - "epic:competition"
-      - "status:future"
-    summary: "AI-controlled competitor companies operating in the same logistics market."
-
-  - id: PLACEHOLDER-011
-    title: "[PLACEHOLDER] Smart Routing & AI Dispatch"
-    milestone_id: M-018
-    label_names:
-      - "type:planning"
-      - "phase:6"
-      - "batch:rbatch-042"
-      - "epic:smart-routing"
-      - "status:future"
-    summary: "AI-driven smart routing, predictive demand modeling, and autonomous dispatch center."
-
-  - id: PLACEHOLDER-012
-    title: "[PLACEHOLDER] International Multi-City Expansion"
-    milestone_id: M-019
-    label_names:
-      - "type:planning"
-      - "phase:7"
-      - "status:future"
-    summary: "Multi-city, multi-country logistics with customs, airports, and international regulations."
+- id: PLACEHOLDER-001
+  title: Warehouse Construction System
+  batch_id: RBATCH-025
+  epic_id: E-022
+  milestone_id: M-011
+  phase: 3
+  type: planning
+  status: "Planning placeholder \u2014 Approved for GitHub placeholder creation"
+  label_names:
+  - type:planning
+  - phase:3
+  - batch:rbatch-025
+  - epic:warehouse
+  - status:future
+  summary: Warehouse construction, inventory management, and dispatch routing.
+- id: PLACEHOLDER-002
+  title: Multi-District Map
+  batch_id: RBATCH-026
+  epic_id: E-023
+  milestone_id: M-011
+  phase: 3
+  type: planning
+  status: "Planning placeholder \u2014 Approved for GitHub placeholder creation"
+  label_names:
+  - type:planning
+  - phase:3
+  - batch:rbatch-026
+  - epic:multi-district
+  - status:future
+  summary: Expanded world map with multiple districts.
+- id: PLACEHOLDER-003
+  title: Delivery Zone Management
+  batch_id: RBATCH-027
+  epic_id: E-023
+  milestone_id: M-011
+  phase: 3
+  type: planning
+  status: "Planning placeholder \u2014 Approved for GitHub placeholder creation"
+  label_names:
+  - type:planning
+  - phase:3
+  - batch:rbatch-027
+  - epic:multi-district
+  - status:future
+  summary: Delivery zones and zone-based routing.
+- id: PLACEHOLDER-004
+  title: Fleet Management Dashboard
+  batch_id: RBATCH-028
+  epic_id: E-024
+  milestone_id: M-012
+  phase: 3
+  type: planning
+  status: "Planning placeholder \u2014 Approved for GitHub placeholder creation"
+  label_names:
+  - type:planning
+  - phase:3
+  - batch:rbatch-028
+  - epic:fleet-management
+  - status:future
+  summary: Fleet assignment and utilization dashboard.
+- id: PLACEHOLDER-005
+  title: Route Optimization Engine
+  batch_id: RBATCH-029
+  epic_id: E-025
+  milestone_id: M-012
+  phase: 3
+  type: planning
+  status: "Planning placeholder \u2014 Approved for GitHub placeholder creation"
+  label_names:
+  - type:planning
+  - phase:3
+  - batch:rbatch-029
+  - epic:route-optimization
+  - status:future
+  summary: Automated route optimization.
+- id: PLACEHOLDER-006
+  title: Vehicle Upgrade System
+  batch_id: RBATCH-030
+  epic_id: E-025
+  milestone_id: M-012
+  phase: 3
+  type: planning
+  status: "Planning placeholder \u2014 Approved for GitHub placeholder creation"
+  label_names:
+  - type:planning
+  - phase:3
+  - batch:rbatch-030
+  - epic:route-optimization
+  - status:future
+  summary: Vehicle upgrades and progression.
+- id: PLACEHOLDER-007
+  title: Phase 3 Integration Verification
+  batch_id: RBATCH-031
+  epic_id: E-025
+  milestone_id: M-012
+  phase: 3
+  type: planning
+  status: "Planning placeholder \u2014 Approved for GitHub placeholder creation"
+  label_names:
+  - type:planning
+  - phase:3
+  - batch:rbatch-031
+  - epic:route-optimization
+  - status:future
+  summary: Phase 3 integration evidence package.
+- id: PLACEHOLDER-008
+  title: Drone Research Tree
+  batch_id: RBATCH-032
+  epic_id: E-026
+  milestone_id: M-013
+  phase: 4
+  type: planning
+  status: "Planning placeholder \u2014 Approved for GitHub placeholder creation"
+  label_names:
+  - type:planning
+  - phase:4
+  - batch:rbatch-032
+  - epic:drone-research
+  - status:future
+  summary: Drone research progression.
+- id: PLACEHOLDER-009
+  title: Drone Manufacturing Partners
+  batch_id: RBATCH-033
+  epic_id: E-027
+  milestone_id: M-013
+  phase: 4
+  type: planning
+  status: "Planning placeholder \u2014 Approved for GitHub placeholder creation"
+  label_names:
+  - type:planning
+  - phase:4
+  - batch:rbatch-033
+  - epic:drone-manufacturing
+  - status:future
+  summary: Manufacturing-partner integration.
+- id: PLACEHOLDER-010
+  title: DronePort Infrastructure
+  batch_id: RBATCH-034
+  epic_id: E-028
+  milestone_id: M-014
+  phase: 4
+  type: planning
+  status: "Planning placeholder \u2014 Approved for GitHub placeholder creation"
+  label_names:
+  - type:planning
+  - phase:4
+  - batch:rbatch-034
+  - epic:droneport
+  - status:future
+  summary: DronePort construction and operations.
+- id: PLACEHOLDER-011
+  title: Battery Swapping Network
+  batch_id: RBATCH-035
+  epic_id: E-029
+  milestone_id: M-014
+  phase: 4
+  type: planning
+  status: "Planning placeholder \u2014 Approved for GitHub placeholder creation"
+  label_names:
+  - type:planning
+  - phase:4
+  - batch:rbatch-035
+  - epic:battery-swapping
+  - status:future
+  summary: Battery swapping support.
+- id: PLACEHOLDER-012
+  title: Autonomous Drone Delivery
+  batch_id: RBATCH-036
+  epic_id: E-030
+  milestone_id: M-015
+  phase: 4
+  type: planning
+  status: "Planning placeholder \u2014 Approved for GitHub placeholder creation"
+  label_names:
+  - type:planning
+  - phase:4
+  - batch:rbatch-036
+  - epic:autonomous-delivery
+  - status:future
+  summary: Autonomous drone dispatch and delivery.
+- id: PLACEHOLDER-013
+  title: Flight Restrictions & Weather
+  batch_id: RBATCH-037
+  epic_id: E-031
+  milestone_id: M-015
+  phase: 4
+  type: planning
+  status: "Planning placeholder \u2014 Approved for GitHub placeholder creation"
+  label_names:
+  - type:planning
+  - phase:4
+  - batch:rbatch-037
+  - epic:flight-restrictions
+  - status:future
+  summary: Flight restrictions and weather effects.
+- id: PLACEHOLDER-014
+  title: Phase 4 Integration Verification
+  batch_id: RBATCH-038
+  epic_id: E-031
+  milestone_id: M-015
+  phase: 4
+  type: planning
+  status: "Planning placeholder \u2014 Approved for GitHub placeholder creation"
+  label_names:
+  - type:planning
+  - phase:4
+  - batch:rbatch-038
+  - epic:flight-restrictions
+  - status:future
+  summary: Phase 4 integration evidence package.
+- id: PLACEHOLDER-015
+  title: Dynamic Market System
+  batch_id: RBATCH-039
+  epic_id: E-032
+  milestone_id: M-016
+  phase: 5
+  type: planning
+  status: "Planning placeholder \u2014 Approved for GitHub placeholder creation"
+  label_names:
+  - type:planning
+  - phase:5
+  - batch:rbatch-039
+  - epic:dynamic-market
+  - status:future
+  summary: Dynamic market and inflation.
+- id: PLACEHOLDER-016
+  title: Business Loans & Investors
+  batch_id: RBATCH-040
+  epic_id: E-034
+  milestone_id: M-017
+  phase: 5
+  type: planning
+  status: "Planning placeholder \u2014 Approved for GitHub placeholder creation"
+  label_names:
+  - type:planning
+  - phase:5
+  - batch:rbatch-040
+  - epic:loans-investors
+  - status:future
+  summary: Loan mechanics and investor relations.
+- id: PLACEHOLDER-017
+  title: Competitor AI Companies
+  batch_id: RBATCH-041
+  epic_id: E-035
+  milestone_id: M-017
+  phase: 5
+  type: planning
+  status: "Planning placeholder \u2014 Approved for GitHub placeholder creation"
+  label_names:
+  - type:planning
+  - phase:5
+  - batch:rbatch-041
+  - epic:competition
+  - status:future
+  summary: Competitor companies.
+- id: PLACEHOLDER-018
+  title: Smart Routing & AI Dispatch
+  batch_id: RBATCH-042
+  epic_id: E-036
+  milestone_id: M-018
+  phase: 6
+  type: planning
+  status: "Planning placeholder \u2014 Approved for GitHub placeholder creation"
+  label_names:
+  - type:planning
+  - phase:6
+  - batch:rbatch-042
+  - epic:smart-routing
+  - status:future
+  summary: AI routing and dispatch foundations.
+- id: PLACEHOLDER-019
+  title: Multi-City Operations Foundation
+  batch_id: RBATCH-043
+  epic_id: E-038
+  milestone_id: M-019
+  phase: 7
+  type: planning
+  status: "Planning placeholder \u2014 Approved for GitHub placeholder creation"
+  label_names:
+  - type:planning
+  - phase:7
+  - batch:rbatch-043
+  - epic:international-operations
+  - status:future
+  summary: Multiple-city operating regions.
+- id: PLACEHOLDER-020
+  title: Country Entry & Regulatory Permissions
+  batch_id: RBATCH-044
+  epic_id: E-038
+  milestone_id: M-019
+  phase: 7
+  type: planning
+  status: "Planning placeholder \u2014 Approved for GitHub placeholder creation"
+  label_names:
+  - type:planning
+  - phase:7
+  - batch:rbatch-044
+  - epic:international-operations
+  - status:future
+  summary: Country entry and permissions.
+- id: PLACEHOLDER-021
+  title: Customs & Cross-Border Handling
+  batch_id: RBATCH-045
+  epic_id: E-039
+  milestone_id: M-019
+  phase: 7
+  type: planning
+  status: "Planning placeholder \u2014 Approved for GitHub placeholder creation"
+  label_names:
+  - type:planning
+  - phase:7
+  - batch:rbatch-045
+  - epic:cross-border-compliance
+  - status:future
+  summary: Customs and border handling.
+- id: PLACEHOLDER-022
+  title: International Gateway Network
+  batch_id: RBATCH-046
+  epic_id: E-040
+  milestone_id: M-019
+  phase: 7
+  type: planning
+  status: "Planning placeholder \u2014 Approved for GitHub placeholder creation"
+  label_names:
+  - type:planning
+  - phase:7
+  - batch:rbatch-046
+  - epic:intermodal-gateways
+  - status:future
+  summary: Airport/port/intermodal gateways.
+- id: PLACEHOLDER-023
+  title: Corporate Headquarters Governance
+  batch_id: RBATCH-047
+  epic_id: E-041
+  milestone_id: M-020
+  phase: 8
+  type: planning
+  status: "Planning placeholder \u2014 Approved for GitHub placeholder creation"
+  label_names:
+  - type:planning
+  - phase:8
+  - batch:rbatch-047
+  - epic:corporate-governance
+  - status:future
+  summary: Corporate headquarters and governance.
+- id: PLACEHOLDER-024
+  title: Public Company & Stock Market Systems
+  batch_id: RBATCH-048
+  epic_id: E-042
+  milestone_id: M-020
+  phase: 8
+  type: planning
+  status: "Planning placeholder \u2014 Approved for GitHub placeholder creation"
+  label_names:
+  - type:planning
+  - phase:8
+  - batch:rbatch-048
+  - epic:public-markets
+  - status:future
+  summary: Public market systems.
+- id: PLACEHOLDER-025
+  title: Franchise Network Expansion
+  batch_id: RBATCH-049
+  epic_id: E-043
+  milestone_id: M-020
+  phase: 8
+  type: planning
+  status: "Planning placeholder \u2014 Approved for GitHub placeholder creation"
+  label_names:
+  - type:planning
+  - phase:8
+  - batch:rbatch-049
+  - epic:franchise-network
+  - status:future
+  summary: Franchise growth.
+- id: PLACEHOLDER-026
+  title: Worldwide Network Coordination
+  batch_id: RBATCH-050
+  epic_id: E-043
+  milestone_id: M-020
+  phase: 8
+  type: planning
+  status: "Planning placeholder \u2014 Approved for GitHub placeholder creation"
+  label_names:
+  - type:planning
+  - phase:8
+  - batch:rbatch-050
+  - epic:franchise-network
+  - status:future
+  summary: Worldwide network coordination.
+- id: PLACEHOLDER-027
+  title: Shared-World Company Presence
+  batch_id: RBATCH-051
+  epic_id: E-044
+  milestone_id: M-021
+  phase: 9
+  type: planning
+  status: "Planning placeholder \u2014 Approved for GitHub placeholder creation (owner-gated)"
+  label_names:
+  - type:planning
+  - phase:9
+  - batch:rbatch-051
+  - epic:multiplayer-foundation
+  - status:needs-design
+  owner_gates: Dedicated multiplayer canonical architecture audit required
+  summary: Shared-world company presence.
+- id: PLACEHOLDER-028
+  title: Cooperative & Competitive Company Interaction
+  batch_id: RBATCH-052
+  epic_id: E-044
+  milestone_id: M-021
+  phase: 9
+  type: planning
+  status: "Planning placeholder \u2014 Approved for GitHub placeholder creation (owner-gated)"
+  label_names:
+  - type:planning
+  - phase:9
+  - batch:rbatch-052
+  - epic:multiplayer-foundation
+  - status:needs-design
+  owner_gates: Dedicated multiplayer canonical architecture audit required
+  summary: Cooperative and competitive company interaction.
+- id: PLACEHOLDER-029
+  title: Robotics & Autonomous Warehouse Systems
+  batch_id: RBATCH-053
+  epic_id: E-045
+  milestone_id: M-021
+  phase: 9
+  type: planning
+  status: "Planning placeholder \u2014 Approved for GitHub placeholder creation (owner-gated)"
+  label_names:
+  - type:planning
+  - phase:9
+  - batch:rbatch-053
+  - epic:robotics-automation
+  - status:needs-design
+  owner_gates: Dedicated robotics/autonomous-warehouse audit required
+  summary: Robotics and autonomous warehouses.
+- id: PLACEHOLDER-030
+  title: Community, Smart-City & Frontier Expansion Governance
+  batch_id: RBATCH-054
+  epic_id: E-046
+  milestone_id: M-021
+  phase: 9
+  type: planning
+  status: "Planning placeholder \u2014 Approved for GitHub placeholder creation (owner-gated)"
+  label_names:
+  - type:planning
+  - phase:9
+  - batch:rbatch-054
+  - epic:community-frontier
+  - status:needs-design
+  owner_gates: Dedicated community/frontier audit required
+  summary: Community content, smart-city integration, and frontier/space expansion.
