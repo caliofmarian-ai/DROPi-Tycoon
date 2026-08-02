@@ -219,6 +219,12 @@ Implementation Preparation Status:
 - Public Railway browser verification of BATCH-007 flow completed on 2026-08-01: Available→Accepted, player travels to package, Accepted→PickedUp, CarryingPackage: true confirmed
 - BATCH-008 delivery outcomes merged in `main` and publicly verified in `game-web/`: PickedUp→Completed (correct destination) and wrong-destination PickedUp→Failed both passed; CarryingPackage cleared in both outcomes; no economy/reward/reputation effects introduced
 - RBATCH-009 implemented on branch `copilot/copilotrbatch-009-economy-reputation-outcomes` (draft PR #86 open); economy settlement, company state, order reward, and affordability helper implemented; 64 tests pass; pending independent review and Railway deployment verification
+- Planning materialization reconciliation verified on 2026-08-02: labels 122/122; milestones 21/21; epics 46/46; batch issues 54/54; executable issues 34/34; planning placeholders 32/32; total canonical planning issues 166/166
+- M-005 status: In Progress
+- E-010 status: COMPLETED through merged and Railway-verified RBATCH-009
+- E-011 status: Draft PR implementation exists — pending independent review
+- RBATCH-010 status: Draft PR — Pending Independent Review
+- ISSUE-005/ISSUE-006/ISSUE-007 status: Draft PR implementation exists — pending independent review
 - Active owner decisions: ODR-001 (player position persistence), ODR-003 (GameSettings persistence scope)
 - ODR-002 reclassified (not an owner decision)
 - ODR-004 reclassified 2026-08-01: resolved by canonical documents; wrong-destination interaction triggers Failed; no longer an active owner decision

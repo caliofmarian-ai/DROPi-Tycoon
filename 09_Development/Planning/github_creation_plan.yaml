@@ -14,6 +14,16 @@ metadata:
     labels: 122
     executable_issues: 34
     future_placeholders: 32
+    canonical_planning_issues_total: 166
+  materialization_reconciliation:
+    verified_date: '2026-08-02'
+    labels_verified: 122/122
+    milestones_verified: 21/21
+    epics_verified: 46/46
+    batch_issues_verified: 54/54
+    executable_issues_verified: 34/34
+    planning_placeholders_verified: 32/32
+    canonical_planning_issues_verified: 166/166
   placeholder_policy: Placeholders are approved for GitHub placeholder creation but are not executable implementation commitments.
 inspection_limitations:
 - Existing GitHub milestone objects were not directly inspected.
@@ -76,7 +86,7 @@ milestones:
 - id: M-005
   title: Economy, HUD & Game Flow
   phase: 1
-  status: Planned — Not Started
+  status: In Progress
   epic_ids:
   - E-010
   - E-011
@@ -380,7 +390,7 @@ epics:
   title: Economy & Reputation Core
   phase: 1
   milestone_id: M-005
-  status: Planned — Not Started
+  status: "COMPLETED — merged PR #86 and Railway-verified 2026-08-02"
   batch_ids:
   - RBATCH-009
   depends_on:
@@ -389,7 +399,7 @@ epics:
   title: HUD & Notifications
   phase: 1
   milestone_id: M-005
-  status: Planned — Not Started
+  status: Draft PR implementation exists — pending independent review
   batch_ids:
   - RBATCH-010
   depends_on:

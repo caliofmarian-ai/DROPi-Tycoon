@@ -16,6 +16,7 @@ Last Updated: 2026-08-01
 
 - Executable issues: **34** (`ISSUE-001..ISSUE-034`)
 - Planning placeholders: **32** (`PLACEHOLDER-001..PLACEHOLDER-032`)
+- Canonical planning issues total: **166** (54 batch issues + 34 executable + 32 placeholders + 46 epic-linked planning issue anchors)
 
 ## Status Authorization Policy
 

@@ -89,6 +89,13 @@ describe('ISSUE-005 — HUD view model: buildHUDData', () => {
     expect(data.destination).toBe('DeliveryZone')
   })
 
+  it('includes pickup location and reward from active order', () => {
+    const world = createInitialWorldState()
+    const data = buildHUDData(world, createInitialCompanyState())
+    expect(data.pickupLocation).toBe('PickupZone')
+    expect(data.reward).toBe(BALANCING.ORDER_REWARD)
+  })
+
   it('returns carryingPackage: false when player is not carrying', () => {
     const world = createInitialWorldState()
     const company = createInitialCompanyState()
@@ -266,6 +273,14 @@ describe('ISSUE-006 — HUD accept action does not affect player movement or del
       expect(result.accepted).toBe(false)
       expect(result.order.acceptRequested).toBe(false)
       expect(result.order.status).toBe('Available')
+    })
+
+    it('mismatched requested order id never overwrites currentOrder', () => {
+      const world = createInitialWorldState()
+      world.player.currentOrder = 'ORDER-OTHER'
+      const result = applyOrderAcceptanceRequest(world, 'ORDER-UNKNOWN')
+      expect(result.accepted).toBe(false)
+      expect(result.worldState.player.currentOrder).toBe('ORDER-OTHER')
     })
   })
 
@@ -699,5 +714,15 @@ describe('ISSUE-007 — notification expiry callback clears controller state', (
     expect(expired.active).toBe(false)
     expect(expired.message).toBeNull()
     expect(expired.trackedStatus).toBe('Accepted')
+  })
+
+  it('shutdown-safe clearing is idempotent when called repeatedly', () => {
+    const state = createNotificationState('PickedUp')
+    const withMessage = updateNotification(state, 'Completed').state
+    const afterFirst = clearNotification(withMessage)
+    const afterSecond = clearNotification(afterFirst)
+    expect(afterFirst).toEqual(afterSecond)
+    expect(afterSecond.active).toBe(false)
+    expect(afterSecond.message).toBeNull()
   })
 })

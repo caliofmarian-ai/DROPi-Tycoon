@@ -89,8 +89,7 @@ Description
 
 ## Not Changed
 
-- No RBATCH-010 or later batches implemented.
-- No final HUD or notification system.
+- No RBATCH-011 or later batches implemented.
 - No upgrade-purchase UI.
 - No save/load or persistence.
 - No new-order generation.
