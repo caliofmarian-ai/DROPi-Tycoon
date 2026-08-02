@@ -321,10 +321,23 @@ describe('delivery intent selection — stale intent', () => {
 const buildPickedUpOrder = () => {
   const state = createInitialWorldState()
   state.activeOrder.status = 'PickedUp'
+  state.activeOrder.economySettled = false
   return state.activeOrder
 }
 
 const freshCompany = () => createInitialCompanyState()
+
+const buildCompletedOrder = (order: ReturnType<typeof buildPickedUpOrder>) => ({
+  ...order,
+  status: 'Completed' as const,
+  economySettled: false,
+})
+
+const buildFailedOrder = (order: ReturnType<typeof buildPickedUpOrder>) => ({
+  ...order,
+  status: 'Failed' as const,
+  economySettled: false,
+})
 
 describe('RBATCH-009 — initial state', () => {
   it('initial company money is 0', () => {
@@ -341,87 +354,129 @@ describe('RBATCH-009 — initial state', () => {
 })
 
 describe('RBATCH-009 — successful delivery settlement', () => {
-  it('PickedUp to Completed adds 100 money', () => {
-    const order = buildPickedUpOrder()
+  it('settlement inputs are not mutated', () => {
+    const previousOrder = buildPickedUpOrder()
+    const nextOrder = buildCompletedOrder(previousOrder)
     const company = freshCompany()
-    const result = settleDeliveryOutcome('PickedUp', 'Completed', order, company)
+    const previousSnapshot = { ...previousOrder }
+    const nextSnapshot = { ...nextOrder }
+    const companySnapshot = { ...company }
+    const result = settleDeliveryOutcome(previousOrder, nextOrder, company)
+    expect(result.applied).toBe(true)
+    expect(previousOrder).toEqual(previousSnapshot)
+    expect(nextOrder).toEqual(nextSnapshot)
+    expect(company).toEqual(companySnapshot)
+  })
+
+  it('a valid PickedUp to Completed settlement applies once', () => {
+    const previousOrder = buildPickedUpOrder()
+    const nextOrder = buildCompletedOrder(previousOrder)
+    const company = freshCompany()
+    const result = settleDeliveryOutcome(previousOrder, nextOrder, company)
     expect(result.applied).toBe(true)
     if (result.applied) {
       expect(result.company.money).toBe(100)
-    }
-  })
-
-  it('PickedUp to Completed changes reputation from 50 to 52', () => {
-    const order = buildPickedUpOrder()
-    const company = freshCompany()
-    const result = settleDeliveryOutcome('PickedUp', 'Completed', order, company)
-    expect(result.applied).toBe(true)
-    if (result.applied) {
       expect(result.company.reputation).toBe(52)
+      expect(result.order.status).toBe('Completed')
+      expect(result.order.economySettled).toBe(true)
     }
   })
 
-  it('reputation clamps at 100 on success', () => {
-    const order = buildPickedUpOrder()
-    const result = settleDeliveryOutcome('PickedUp', 'Completed', order, { money: 0, reputation: 99 })
-    expect(result.applied).toBe(true)
-    if (result.applied) {
-      expect(result.company.reputation).toBe(100)
-    }
+  it('the same order cannot be settled again after the settled marker is stored', () => {
+    const previousOrder = buildPickedUpOrder()
+    const nextOrder = buildCompletedOrder(previousOrder)
+    const company = freshCompany()
+    const first = settleDeliveryOutcome(previousOrder, nextOrder, company)
+    expect(first.applied).toBe(true)
+    if (!first.applied) return
+    const second = settleDeliveryOutcome(first.order, first.order, first.company)
+    expect(second.applied).toBe(false)
   })
 
-  it('reputation does not exceed 100 when already at max', () => {
-    const order = buildPickedUpOrder()
-    const result = settleDeliveryOutcome('PickedUp', 'Completed', order, { money: 0, reputation: 100 })
-    expect(result.applied).toBe(true)
-    if (result.applied) {
-      expect(result.company.reputation).toBe(100)
+  it('repeated integration/update processing cannot pay twice', () => {
+    const applySettlementOnTransition = (
+      previousOrder: ReturnType<typeof buildPickedUpOrder>,
+      deliveredOrder: ReturnType<typeof buildPickedUpOrder>,
+      company: ReturnType<typeof freshCompany>,
+    ) => {
+      if (deliveredOrder.status === previousOrder.status) {
+        return { order: deliveredOrder, company }
+      }
+      const settlement = settleDeliveryOutcome(previousOrder, deliveredOrder, company)
+      if (settlement.applied) {
+        return { order: settlement.order, company: settlement.company }
+      }
+      return { order: deliveredOrder, company }
     }
+
+    const initialOrder = buildPickedUpOrder()
+    const transitionOrder = buildCompletedOrder(initialOrder)
+    const firstFrame = applySettlementOnTransition(initialOrder, transitionOrder, freshCompany())
+    const secondFrame = applySettlementOnTransition(
+      firstFrame.order,
+      firstFrame.order,
+      firstFrame.company,
+    )
+    expect(firstFrame.company.money).toBe(100)
+    expect(secondFrame.company.money).toBe(100)
+    expect(secondFrame.order.economySettled).toBe(true)
+  })
+
+  it('mismatched order.status and transition state are rejected', () => {
+    const previousOrder = { ...buildPickedUpOrder(), status: 'Available' as const }
+    const nextOrder = buildCompletedOrder(buildPickedUpOrder())
+    const result = settleDeliveryOutcome(previousOrder, nextOrder, freshCompany())
+    expect(result.applied).toBe(false)
+  })
+
+  it('mismatched previous-order and next-order IDs are rejected', () => {
+    const previousOrder = buildPickedUpOrder()
+    const nextOrder = { ...buildCompletedOrder(previousOrder), orderId: 'ORDER-999' }
+    const result = settleDeliveryOutcome(previousOrder, nextOrder, freshCompany())
+    expect(result.applied).toBe(false)
+  })
+
+  it('a transition that does not originate from PickedUp is rejected', () => {
+    const previousOrder = { ...buildPickedUpOrder(), status: 'Accepted' as const }
+    const nextOrder = buildCompletedOrder(buildPickedUpOrder())
+    const result = settleDeliveryOutcome(previousOrder, nextOrder, freshCompany())
+    expect(result.applied).toBe(false)
+  })
+
+  it('a non-terminal target is rejected', () => {
+    const previousOrder = buildPickedUpOrder()
+    const nextOrder = { ...previousOrder, status: 'PickedUp' as const }
+    const result = settleDeliveryOutcome(previousOrder, nextOrder, freshCompany())
+    expect(result.applied).toBe(false)
   })
 })
 
 describe('RBATCH-009 — failed delivery settlement', () => {
-  it('PickedUp to Failed leaves money at 0', () => {
-    const order = buildPickedUpOrder()
-    const company = freshCompany()
-    const result = settleDeliveryOutcome('PickedUp', 'Failed', order, company)
+  it('PickedUp to Failed leaves money at 0 and reputation at 45', () => {
+    const previousOrder = buildPickedUpOrder()
+    const nextOrder = buildFailedOrder(previousOrder)
+    const result = settleDeliveryOutcome(previousOrder, nextOrder, freshCompany())
     expect(result.applied).toBe(true)
-    if (result.applied) {
-      expect(result.company.money).toBe(0)
-    }
+    if (!result.applied) return
+    expect(result.company.money).toBe(0)
+    expect(result.company.reputation).toBe(45)
+    expect(result.order.economySettled).toBe(true)
   })
 
-  it('PickedUp to Failed changes reputation from 50 to 45', () => {
-    const order = buildPickedUpOrder()
-    const company = freshCompany()
-    const result = settleDeliveryOutcome('PickedUp', 'Failed', order, company)
+  it('failure never deducts existing money', () => {
+    const previousOrder = buildPickedUpOrder()
+    const nextOrder = buildFailedOrder(previousOrder)
+    const result = settleDeliveryOutcome(previousOrder, nextOrder, { money: 75, reputation: 50 })
     expect(result.applied).toBe(true)
     if (result.applied) {
-      expect(result.company.reputation).toBe(45)
-    }
-  })
-
-  it('failure never makes money negative', () => {
-    const order = buildPickedUpOrder()
-    const result = settleDeliveryOutcome('PickedUp', 'Failed', order, { money: 0, reputation: 50 })
-    expect(result.applied).toBe(true)
-    if (result.applied) {
-      expect(result.company.money).toBeGreaterThanOrEqual(0)
+      expect(result.company.money).toBe(75)
     }
   })
 
   it('reputation clamps at 0 on failure', () => {
-    const order = buildPickedUpOrder()
-    const result = settleDeliveryOutcome('PickedUp', 'Failed', order, { money: 0, reputation: 3 })
-    expect(result.applied).toBe(true)
-    if (result.applied) {
-      expect(result.company.reputation).toBe(0)
-    }
-  })
-
-  it('reputation does not go below 0 when already at zero', () => {
-    const order = buildPickedUpOrder()
-    const result = settleDeliveryOutcome('PickedUp', 'Failed', order, { money: 0, reputation: 0 })
+    const previousOrder = buildPickedUpOrder()
+    const nextOrder = buildFailedOrder(previousOrder)
+    const result = settleDeliveryOutcome(previousOrder, nextOrder, { money: 0, reputation: 3 })
     expect(result.applied).toBe(true)
     if (result.applied) {
       expect(result.company.reputation).toBe(0)
@@ -429,51 +484,119 @@ describe('RBATCH-009 — failed delivery settlement', () => {
   })
 })
 
-describe('RBATCH-009 — non-terminal transitions do not change economy', () => {
-  const statuses: Array<'Created' | 'Available' | 'Accepted' | 'PickedUp'> = [
-    'Created', 'Available', 'Accepted', 'PickedUp',
-  ]
+describe('RBATCH-009 — numeric safety and overflow', () => {
+  it('fractional reward is rejected', () => {
+    const previousOrder = buildPickedUpOrder()
+    const nextOrder = { ...buildCompletedOrder(previousOrder), reward: 0.5 }
+    const result = settleDeliveryOutcome(previousOrder, nextOrder, freshCompany())
+    expect(result.applied).toBe(false)
+  })
 
-  for (const status of statuses) {
-    it(`${status} without terminal target does not apply settlement`, () => {
-      const order = { ...buildPickedUpOrder(), status }
-      const company = freshCompany()
-      const result = settleDeliveryOutcome(status as any, 'PickedUp' as any, order, company)
-      expect(result.applied).toBe(false)
+  it('fractional money is rejected', () => {
+    const previousOrder = buildPickedUpOrder()
+    const nextOrder = buildCompletedOrder(previousOrder)
+    const result = settleDeliveryOutcome(previousOrder, nextOrder, { money: 0.5, reputation: 50 })
+    expect(result.applied).toBe(false)
+  })
+
+  it('fractional reputation is rejected', () => {
+    const previousOrder = buildPickedUpOrder()
+    const nextOrder = buildCompletedOrder(previousOrder)
+    const result = settleDeliveryOutcome(previousOrder, nextOrder, { money: 0, reputation: 50.5 })
+    expect(result.applied).toBe(false)
+  })
+
+  it('unsafe integers are rejected', () => {
+    const previousOrder = buildPickedUpOrder()
+    const nextOrder = buildCompletedOrder(previousOrder)
+    const unsafeRewardResult = settleDeliveryOutcome(
+      previousOrder,
+      { ...nextOrder, reward: Number.MAX_SAFE_INTEGER + 1 },
+      freshCompany(),
+    )
+    const unsafeMoneyResult = settleDeliveryOutcome(previousOrder, nextOrder, {
+      money: Number.MAX_SAFE_INTEGER + 1,
+      reputation: 50,
     })
-  }
+    const unsafeReputationResult = settleDeliveryOutcome(previousOrder, nextOrder, {
+      money: 0,
+      reputation: Number.MAX_SAFE_INTEGER + 1,
+    })
+    expect(unsafeRewardResult.applied).toBe(false)
+    expect(unsafeMoneyResult.applied).toBe(false)
+    expect(unsafeReputationResult.applied).toBe(false)
+  })
 
-  it('Completed cannot generate another settlement', () => {
-    const order = { ...buildPickedUpOrder(), status: 'Completed' as const }
-    const result = settleDeliveryOutcome('Completed', 'Completed', order, freshCompany())
+  it('an addition that would exceed Number.MAX_SAFE_INTEGER is rejected', () => {
+    const previousOrder = buildPickedUpOrder()
+    const nextOrder = { ...buildCompletedOrder(previousOrder), reward: 1 }
+    const result = settleDeliveryOutcome(previousOrder, nextOrder, {
+      money: Number.MAX_SAFE_INTEGER,
+      reputation: 50,
+    })
     expect(result.applied).toBe(false)
   })
 
-  it('Failed cannot generate another settlement', () => {
-    const order = { ...buildPickedUpOrder(), status: 'Failed' as const }
-    const result = settleDeliveryOutcome('Failed', 'Completed', order, freshCompany())
+  it('finite inputs that overflow to Infinity are rejected', () => {
+    const previousOrder = buildPickedUpOrder()
+    const nextOrder = { ...buildCompletedOrder(previousOrder), reward: Number.MAX_VALUE }
+    const result = settleDeliveryOutcome(previousOrder, nextOrder, {
+      money: Number.MAX_VALUE,
+      reputation: 50,
+    })
     expect(result.applied).toBe(false)
   })
 
-  it('an invalid transition (Available to Completed) does not change economy', () => {
-    const order = buildPickedUpOrder()
-    const result = settleDeliveryOutcome('Available', 'Completed', order, freshCompany())
+  it('no invalid settlement changes company or order state', () => {
+    const previousOrder = buildPickedUpOrder()
+    const nextOrder = { ...buildCompletedOrder(previousOrder), reward: 0.5 }
+    const company = freshCompany()
+    const previousSnapshot = { ...previousOrder }
+    const nextSnapshot = { ...nextOrder }
+    const companySnapshot = { ...company }
+    const result = settleDeliveryOutcome(previousOrder, nextOrder, company)
     expect(result.applied).toBe(false)
+    expect(previousOrder).toEqual(previousSnapshot)
+    expect(nextOrder).toEqual(nextSnapshot)
+    expect(company).toEqual(companySnapshot)
   })
 })
 
-describe('RBATCH-009 — repeated-frame safety', () => {
-  it('calling settleDeliveryOutcome with the same terminal transition a second time does not apply', () => {
-    const order = buildPickedUpOrder()
-    const company = freshCompany()
-    // First settlement
-    const first = settleDeliveryOutcome('PickedUp', 'Completed', order, company)
-    expect(first.applied).toBe(true)
+describe('RBATCH-009 — clamping and canonical outcomes', () => {
+  it('success still produces Money 100 and Reputation 52', () => {
+    const previousOrder = buildPickedUpOrder()
+    const nextOrder = buildCompletedOrder(previousOrder)
+    const result = settleDeliveryOutcome(previousOrder, nextOrder, freshCompany())
+    expect(result.applied).toBe(true)
+    if (result.applied) {
+      expect(result.company).toEqual({ money: 100, reputation: 52 })
+    }
+  })
 
-    // Simulating a second call using the now-terminal order (status is already Completed)
-    const terminalOrder = { ...order, status: 'Completed' as const }
-    const second = settleDeliveryOutcome('Completed', 'Completed', terminalOrder, first.applied ? first.company : company)
-    expect(second.applied).toBe(false)
+  it('failure still produces Money 0 and Reputation 45', () => {
+    const previousOrder = buildPickedUpOrder()
+    const nextOrder = buildFailedOrder(previousOrder)
+    const result = settleDeliveryOutcome(previousOrder, nextOrder, freshCompany())
+    expect(result.applied).toBe(true)
+    if (result.applied) {
+      expect(result.company).toEqual({ money: 0, reputation: 45 })
+    }
+  })
+
+  it('reputation still clamps at 100 and 0', () => {
+    const previousOrder = buildPickedUpOrder()
+    const successOrder = buildCompletedOrder(previousOrder)
+    const failOrder = buildFailedOrder(previousOrder)
+    const successResult = settleDeliveryOutcome(previousOrder, successOrder, { money: 0, reputation: 99 })
+    const failResult = settleDeliveryOutcome(previousOrder, failOrder, { money: 0, reputation: 3 })
+    expect(successResult.applied).toBe(true)
+    expect(failResult.applied).toBe(true)
+    if (successResult.applied) {
+      expect(successResult.company.reputation).toBe(100)
+    }
+    if (failResult.applied) {
+      expect(failResult.company.reputation).toBe(0)
+    }
   })
 })
 

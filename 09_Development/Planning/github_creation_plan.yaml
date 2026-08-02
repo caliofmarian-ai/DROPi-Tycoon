@@ -913,7 +913,7 @@ batches:
   epic_ids:
   - E-010
   title: Economy Reward & Failure Consequences
-  status: Planned — Not Started
+  status: Draft PR — Pending Independent Review
   depends_on:
   - RBATCH-008
   legacy_id: BATCH-009
@@ -1806,13 +1806,13 @@ issues:
   milestone_id: M-005
   phase: 1
   type: implementation
-  status: Ready for implementation
+  status: Draft PR implementation exists — pending independent review
   label_names:
   - type:implementation
   - phase:1
   - batch:rbatch-009
   - epic:economy-reputation
-  - status:ready
+  - status:in-progress
   description: Apply canonical reward to company money on Completed.
   acceptance_criteria: Company money increases on PickedUp→Completed.
 - id: ISSUE-002
@@ -1822,13 +1822,13 @@ issues:
   milestone_id: M-005
   phase: 1
   type: implementation
-  status: Ready for implementation
+  status: Draft PR implementation exists — pending independent review
   label_names:
   - type:implementation
   - phase:1
   - batch:rbatch-009
   - epic:economy-reputation
-  - status:ready
+  - status:in-progress
   description: Increase reputation on Completed.
   acceptance_criteria: Reputation increases within approved bounds.
 - id: ISSUE-003
@@ -1845,7 +1845,7 @@ issues:
   - batch:rbatch-009
   - epic:economy-reputation
   - status:owner-resolved
-  blocked_or_owner_gate: Resolved — owner approved modality on 2026-08-02
+  blocked_or_owner_gate: Resolved — owner approved modality on 2026-08-02; no payout; reputation −5 (clamped at zero); existing money unchanged; no additional monetary penalty.
   description: >
     Owner has approved the failure-penalty modality: failed order receives no
     payout; reputation decreases by 5 (clamped at 0); existing money is not
@@ -1860,13 +1860,13 @@ issues:
   milestone_id: M-005
   phase: 1
   type: implementation
-  status: Ready for implementation
+  status: Draft PR implementation exists — pending independent review
   label_names:
   - type:implementation
   - phase:1
   - batch:rbatch-009
   - epic:economy-reputation
-  - status:ready
+  - status:in-progress
   description: Apply canonical reputation consequence on Failed.
   acceptance_criteria: Reputation decreases without permanent setback.
 - id: ISSUE-005

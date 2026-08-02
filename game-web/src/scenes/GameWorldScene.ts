@@ -224,9 +224,9 @@ export class GameWorldScene extends Phaser.Scene {
       targetPoint.y,
     )
 
-    const prevStatus = this.worldState.activeOrder.status
+    const previousOrder = this.worldState.activeOrder
     const deliveryResult = attemptDelivery(
-      this.worldState.activeOrder,
+      previousOrder,
       this.worldState.player,
       {
         selectedDestination: this.worldState.pendingDeliveryDestination,
@@ -236,17 +236,18 @@ export class GameWorldScene extends Phaser.Scene {
       },
     )
 
-    if (deliveryResult.order.status !== prevStatus) {
+    if (deliveryResult.order.status !== previousOrder.status) {
       const settlement = settleDeliveryOutcome(
-        prevStatus,
-        deliveryResult.order.status,
-        this.worldState.activeOrder,
+        previousOrder,
+        deliveryResult.order,
         this.companyState,
       )
       if (settlement.applied) {
         this.companyState = settlement.company
+        this.worldState.activeOrder = settlement.order
+      } else {
+        this.worldState.activeOrder = deliveryResult.order
       }
-      this.worldState.activeOrder = deliveryResult.order
       this.worldState.player = deliveryResult.player
       this.worldState.pendingDeliveryDestination = ''
     }

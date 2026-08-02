@@ -16,6 +16,7 @@ export interface OrderState {
   status: OrderStatus
   acceptRequested: boolean
   reward: number
+  economySettled: boolean
 }
 
 export interface CompanyState {

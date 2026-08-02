@@ -2,7 +2,7 @@ import { BALANCING } from '../config/balancing'
 import type { CompanyState, OrderState } from '../types/game'
 
 export type SettlementOutcome =
-  | { applied: true; company: CompanyState }
+  | { applied: true; company: CompanyState; order: OrderState }
   | { applied: false; reason: string }
 
 /**
@@ -17,49 +17,66 @@ export type SettlementOutcome =
  * - No Phaser dependency
  */
 export const settleDeliveryOutcome = (
-  prevStatus: OrderState['status'],
-  nextStatus: OrderState['status'],
-  order: OrderState,
+  previousOrder: OrderState,
+  nextOrder: OrderState,
   company: CompanyState,
 ): SettlementOutcome => {
-  if (prevStatus !== 'PickedUp') {
+  if (previousOrder.orderId !== nextOrder.orderId) {
+    return { applied: false, reason: 'Previous and next order IDs do not match' }
+  }
+
+  if (previousOrder.status !== 'PickedUp') {
     return { applied: false, reason: 'Transition did not originate from PickedUp' }
   }
 
-  if (nextStatus !== 'Completed' && nextStatus !== 'Failed') {
+  if (nextOrder.status !== 'Completed' && nextOrder.status !== 'Failed') {
     return { applied: false, reason: 'Transition target is not a terminal state' }
   }
 
-  if (!Number.isFinite(order.reward) || order.reward < 0) {
-    return { applied: false, reason: 'Order reward is not a valid non-negative finite number' }
+  if (previousOrder.economySettled || nextOrder.economySettled) {
+    return { applied: false, reason: 'Order settlement already applied' }
   }
 
-  if (!Number.isFinite(company.money) || company.money < 0) {
-    return { applied: false, reason: 'Company money is not a valid non-negative finite number' }
+  if (!Number.isSafeInteger(nextOrder.reward) || nextOrder.reward < 0) {
+    return { applied: false, reason: 'Order reward must be a non-negative safe integer' }
   }
 
-  if (!Number.isFinite(company.reputation)) {
-    return { applied: false, reason: 'Company reputation is not a finite number' }
+  if (!Number.isSafeInteger(company.money) || company.money < 0) {
+    return { applied: false, reason: 'Company money must be a non-negative safe integer' }
   }
 
-  if (nextStatus === 'Completed') {
-    const rawMoney = company.money + order.reward
-    const money = Math.max(0, rawMoney)
+  if (!Number.isSafeInteger(company.reputation)) {
+    return { applied: false, reason: 'Company reputation must be a safe integer' }
+  }
+
+  if (nextOrder.status === 'Completed') {
+    const money = company.money + nextOrder.reward
+    if (!Number.isSafeInteger(money) || money < 0) {
+      return { applied: false, reason: 'Settlement money result is invalid' }
+    }
     const rawReputation = company.reputation + BALANCING.REPUTATION_ON_SUCCESS
     const reputation = Math.min(
       BALANCING.REPUTATION_MAX,
       Math.max(BALANCING.REPUTATION_MIN, rawReputation),
     )
-    return { applied: true, company: { money, reputation } }
+    return {
+      applied: true,
+      company: { money, reputation },
+      order: { ...nextOrder, economySettled: true },
+    }
   }
 
-  // nextStatus === 'Failed'
+  // nextOrder.status === 'Failed'
   const rawReputation = company.reputation + BALANCING.REPUTATION_ON_FAILURE
   const reputation = Math.min(
     BALANCING.REPUTATION_MAX,
     Math.max(BALANCING.REPUTATION_MIN, rawReputation),
   )
-  return { applied: true, company: { money: company.money, reputation } }
+  return {
+    applied: true,
+    company: { money: company.money, reputation },
+    order: { ...nextOrder, economySettled: true },
+  }
 }
 
 /**

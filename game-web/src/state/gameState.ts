@@ -24,6 +24,7 @@ export const createInitialWorldState = (): WorldState => ({
     status: 'Available',
     acceptRequested: false,
     reward: BALANCING.ORDER_REWARD,
+    economySettled: false,
   },
   tapTarget: {
     x: 380,
