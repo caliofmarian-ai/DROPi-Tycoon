@@ -35,7 +35,7 @@ Last Updated: 2026-08-01
 | BATCH-006 | RBATCH-006 | COMPLETED | M-003 / E-006 | 09_Development/Planning/BATCH_ARCHITECTURE.md | 09_Development/Implementation_Preparation/IMPLEMENTATION_BATCH_PLAN.md |
 | BATCH-007 | RBATCH-007 | COMPLETED | M-004 / E-008 | 09_Development/Planning/BATCH_ARCHITECTURE.md | 09_Development/Implementation_Preparation/IMPLEMENTATION_BATCH_PLAN.md |
 | BATCH-008 | RBATCH-008 | COMPLETED | M-004 / E-009 | 09_Development/Planning/BATCH_ARCHITECTURE.md | 09_Development/Implementation_Preparation/IMPLEMENTATION_BATCH_PLAN.md |
-| BATCH-009 | RBATCH-009 | NEVER STARTED | M-005 / E-010 | 09_Development/Planning/BATCH_ARCHITECTURE.md | 09_Development/Implementation_Preparation/IMPLEMENTATION_BATCH_PLAN.md |
+| BATCH-009 | RBATCH-009 | DRAFT PR OPEN — PENDING INDEPENDENT REVIEW | M-005 / E-010 | 09_Development/Planning/BATCH_ARCHITECTURE.md | 09_Development/Implementation_Preparation/IMPLEMENTATION_BATCH_PLAN.md |
 | BATCH-010 | RBATCH-010 | NEVER STARTED | M-005 / E-011 | 09_Development/Planning/BATCH_ARCHITECTURE.md | 09_Development/Implementation_Preparation/IMPLEMENTATION_BATCH_PLAN.md |
 | BATCH-010b | RBATCH-011 | NEVER STARTED | M-005 / E-012 | 09_Development/Planning/BATCH_ARCHITECTURE.md | 09_Development/Implementation_Preparation/IMPLEMENTATION_BATCH_PLAN.md |
 | BATCH-011 | RBATCH-012 | NEVER STARTED | M-006 / E-013 | 09_Development/Planning/BATCH_ARCHITECTURE.md | 09_Development/Implementation_Preparation/IMPLEMENTATION_BATCH_PLAN.md |
@@ -59,7 +59,7 @@ Legacy numbering is historical only. Execute the mapped `RBATCH-*` identifier; a
 | RBATCH-006 | 1 | M-003 | E-006 | Tap-to-Move + Camera | COMPLETED | RBATCH-004 | BATCH-006 | — |
 | RBATCH-007 | 1 | M-004 | E-008 | Pickup Proximity Core | COMPLETED | RBATCH-005, RBATCH-006 | BATCH-007 | — |
 | RBATCH-008 | 1 | M-004 | E-009 | Delivery Completion + Failure Path | COMPLETED | RBATCH-007 | BATCH-008 | — |
-| RBATCH-009 | 1 | M-005 | E-010 | Economy Reward & Failure Consequences | Planned — Not Started | RBATCH-008 | BATCH-009 | — |
+| RBATCH-009 | 1 | M-005 | E-010 | Economy Reward & Failure Consequences | Draft PR — Pending Independent Review | RBATCH-008 | BATCH-009 | — |
 | RBATCH-010 | 1 | M-005 | E-011 | HUD + Notifications | Planned — Not Started | RBATCH-007, RBATCH-009 | BATCH-010 | — |
 | RBATCH-011 | 1 | M-005 | E-012 | MainMenu Flow | Planned — Not Started | RBATCH-002 | BATCH-010b | — |
 | RBATCH-012 | 1 | M-006 | E-013 | CompanyManagement + Upgrade Purchase Flow | Planned — Not Started | RBATCH-009, RBATCH-010 | BATCH-011 | — |

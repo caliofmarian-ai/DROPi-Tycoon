@@ -1832,22 +1832,27 @@ issues:
   description: Increase reputation on Completed.
   acceptance_criteria: Reputation increases within approved bounds.
 - id: ISSUE-003
-  title: Resolve failure penalty modality before implementation
+  title: Failure penalty modality — owner-resolved
   batch_id: RBATCH-009
   epic_id: E-010
   milestone_id: M-005
   phase: 1
   type: design
-  status: Needs design / balancing decision
+  status: Owner-resolved
   label_names:
   - type:design
   - phase:1
   - batch:rbatch-009
   - epic:economy-reputation
-  - status:needs-design
-  blocked_or_owner_gate: Balancing / owner-approved implementation-detail selection required
-  description: Decide whether any small failure penalty beyond reputation exists.
-  acceptance_criteria: No unapproved money penalty is introduced.
+  - status:owner-resolved
+  blocked_or_owner_gate: Resolved — owner approved modality on 2026-08-02
+  description: >
+    Owner has approved the failure-penalty modality: failed order receives no
+    payout; reputation decreases by 5 (clamped at 0); existing money is not
+    deducted; no additional monetary penalty is authorized.
+  acceptance_criteria: >
+    Failed delivery produces no payout, reputation −5 clamped at 0, existing
+    money unchanged. No extra penalty introduced.
 - id: ISSUE-004
   title: Implement reputation decrease on order failure
   batch_id: RBATCH-009

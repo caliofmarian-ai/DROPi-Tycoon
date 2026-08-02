@@ -15,6 +15,12 @@ export interface OrderState {
   destination: string
   status: OrderStatus
   acceptRequested: boolean
+  reward: number
+}
+
+export interface CompanyState {
+  money: number
+  reputation: number
 }
 
 export interface PlayerState {

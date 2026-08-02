@@ -6,7 +6,7 @@ Version: 1.2.0
 Status: Active Development
 Author: Marian Caliof & OpenAI
 Language: English
-Last Updated: 2026-08-01 (BATCH-008 RAILWAY VERIFICATION CLOSED; PR #85 DRAFT CORRECTION)
+Last Updated: 2026-08-02 (RBATCH-009 ECONOMY AND REPUTATION OUTCOMES — DRAFT PR OPEN)
 
 ---
 
@@ -16,13 +16,13 @@ Last Updated: 2026-08-01 (BATCH-008 RAILWAY VERIFICATION CLOSED; PR #85 DRAFT CO
 
 Phase:
 
-Prototype v0.1 — BATCH-008 Delivery Outcomes Merged and Railway-Verified; BATCH-009 Not Started at the Planning Boundary
+Prototype v0.1 — BATCH-008 Delivery Outcomes Merged and Railway-Verified; RBATCH-009 Economy and Reputation Outcomes Implemented on Draft PR Pending Independent Review
 
 ---
 
 # Current Objective
 
-Keep the verified public web runtime stable, preserve the merged BATCH-008 evidence, and correct draft PR #85 without beginning BATCH-009 implementation before another independent review.
+Keep the verified public web runtime stable, preserve the merged BATCH-008 evidence, and implement RBATCH-009 economy and reputation outcomes on a draft PR pending independent review before merging.
 
 ---
 
@@ -187,7 +187,7 @@ READY
 
 Implementation:
 
-STARTED — BATCH-001 FOUNDATION COMPLETE; BATCH-002 SCAFFOLD COMPLETE; BATCH-003 PLACEHOLDER ASSETS COMPLETE; BATCH-004 WORLD SETUP COMPLETE; BATCH-005 ORDER LIFECYCLE CORE COMPLETE; BATCH-006 TAP-TO-MOVE + CAMERA COMPLETE; BATCH-007 PICKUP PROXIMITY + ACCEPTED→PICKEDUP CORE IMPLEMENTED AND RAILWAY-VERIFIED (2026-08-01); BATCH-008 DELIVERY OUTCOMES COMPLETE; PR #84 MERGED; RAILWAY REDEPLOYED; PUBLIC COMPLETED/FAILED VERIFICATION PASSED
+STARTED — BATCH-001 FOUNDATION COMPLETE; BATCH-002 SCAFFOLD COMPLETE; BATCH-003 PLACEHOLDER ASSETS COMPLETE; BATCH-004 WORLD SETUP COMPLETE; BATCH-005 ORDER LIFECYCLE CORE COMPLETE; BATCH-006 TAP-TO-MOVE + CAMERA COMPLETE; BATCH-007 PICKUP PROXIMITY + ACCEPTED→PICKEDUP CORE IMPLEMENTED AND RAILWAY-VERIFIED (2026-08-01); BATCH-008 DELIVERY OUTCOMES COMPLETE; PR #84 MERGED; RAILWAY REDEPLOYED; PUBLIC COMPLETED/FAILED VERIFICATION PASSED; RBATCH-009 ECONOMY AND REPUTATION OUTCOMES IMPLEMENTED ON DRAFT PR — PENDING INDEPENDENT REVIEW
 
 Implementation Preparation Status:
 
@@ -215,15 +215,17 @@ Implementation Preparation Status:
 - BATCH-006 is complete — Tap-to-Move implemented; touch input (primary/Android-first) and mouse fallback (desktop); Player movement toward tapped target; camera follows Player; arrival stops movement; Idle/Move animation switching; movement speed and arrival threshold are configurable scene variables; no pickup/delivery/economy/HUD/AI/save-load logic implemented; no playable prototype exists
 - BATCH-007 is implemented — minimal Android-first order acceptance trigger exists on Package touch while order status is Available; automatic pickup proximity exists with configurable `PickupRadius` = 32; Accepted→PickedUp transition sets `PlayerData.CarryingPackage` and `Player.CarryingPackage` true; no delivery completion, failure, reward, economy, HUD, notification, AI, or save/load logic implemented
 - BATCH-008 is complete — delivery completion (PickedUp→Completed on correct destination) and failure (PickedUp→Failed on wrong destination) are merged; terminal states have no outbound transitions; CarryingPackage and currentOrder clear in both outcomes; delivery radius = 48; touch-first tap-on-marker intent registration; no reward, Money, or reputation effects; 30 automated tests pass; TypeScript build passes; HTTP 200 smoke test passes
+- RBATCH-009 is implemented on a draft PR pending independent review — CompanyState (money=0, reputation=50) and OrderState.reward (100) added; pure settleDeliveryOutcome and canAfford domain functions created in economySettlement.ts; balancing constants in config/balancing.ts; settlement integrated once on PickedUp→terminal transition in GameWorldScene; DebugPanel shows Money, Reputation, order status, guidance; 64 automated tests pass; TypeScript build passes; HTTP 200 smoke test passes; no final HUD, no upgrade UI, no save/load, no RBATCH-010+ behavior
 - Web Runtime Migration Milestone 001 is implemented — `game-web/` now builds, tests, produces `dist/`, and starts on a production Node server compatible with Railway root-directory deployment
 - Public Railway browser verification of BATCH-007 flow completed on 2026-08-01: Available→Accepted, player travels to package, Accepted→PickedUp, CarryingPackage: true confirmed
 - BATCH-008 delivery outcomes merged in `main` and publicly verified in `game-web/`: PickedUp→Completed (correct destination) and wrong-destination PickedUp→Failed both passed; CarryingPackage cleared in both outcomes; no economy/reward/reputation effects introduced
+- RBATCH-009 implemented on branch `copilot/rbatch-009-economy-reputation-outcomes` (draft PR open); economy settlement, company state, order reward, and affordability helper implemented; 64 tests pass; pending independent review and Railway deployment verification
 - Active owner decisions: ODR-001 (player position persistence), ODR-003 (GameSettings persistence scope)
 - ODR-002 reclassified (not an owner decision)
 - ODR-004 reclassified 2026-08-01: resolved by canonical documents; wrong-destination interaction triggers Failed; no longer an active owner decision
 - PR #84 merged into `main`; Railway redeployed successfully; public `PickedUp → Completed` verification passed; public wrong-destination `PickedUp → Failed` verification passed
 - CarryingPackage clears in both BATCH-008 terminal outcomes
-- BATCH-009 had not started at the planning boundary for PR #85
+- RBATCH-009 economy and reputation settlement implemented; approved balancing values applied; no RBATCH-010+ behavior
 - PR #85 is a draft planning correction awaiting independent review and must not be merged yet
 
 ---

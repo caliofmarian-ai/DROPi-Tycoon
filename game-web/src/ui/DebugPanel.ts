@@ -1,6 +1,6 @@
 import Phaser from 'phaser'
 import { appConfig } from '../config/env'
-import type { WorldState } from '../types/game'
+import type { CompanyState, WorldState } from '../types/game'
 
 export class DebugPanel {
   private readonly container: Phaser.GameObjects.Container
@@ -9,7 +9,7 @@ export class DebugPanel {
 
   constructor(scene: Phaser.Scene) {
     const background = scene.add
-      .rectangle(20, 20, 360, 112, 0x0f172a, 0.88)
+      .rectangle(20, 20, 360, 160, 0x0f172a, 0.88)
       .setOrigin(0)
       .setScrollFactor(0)
       .setStrokeStyle(2, 0x38bdf8, 0.7)
@@ -27,24 +27,27 @@ export class DebugPanel {
     this.container.setVisible(appConfig.enableDebugPanel)
   }
 
-  update(state: WorldState): void {
+  update(state: WorldState, company: CompanyState): void {
+    const moneyLine = `Money: ${company.money}`
+    const reputationLine = `Reputation: ${company.reputation}`
     const statusLine = `Order: ${state.activeOrder.status}`
     const carryLine = `CarryingPackage: ${state.player.carryingPackage ? 'true' : 'false'}`
 
     let guidanceLine: string
     if (state.activeOrder.status === 'PickedUp') {
-      guidanceLine =
-        'Tap DeliveryZone to complete. Tap wrong marker to test failure.'
+      guidanceLine = 'Tap DeliveryZone to complete. Tap wrong marker to test failure.'
     } else if (state.activeOrder.status === 'Completed') {
-      guidanceLine = 'Delivery completed! Reward handling deferred to BATCH-009.'
+      guidanceLine = 'Delivery completed! Reward applied.'
     } else if (state.activeOrder.status === 'Failed') {
-      guidanceLine = 'Delivery failed at wrong destination.'
+      guidanceLine = 'Delivery failed. No reward. Reputation -5.'
     } else {
       guidanceLine = 'Touch ground to move. Tap package to accept order.'
     }
 
     this.text.setText([
       'TEMP DEBUG PANEL',
+      moneyLine,
+      reputationLine,
       statusLine,
       carryLine,
       guidanceLine,
