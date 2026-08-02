@@ -913,11 +913,14 @@ batches:
   epic_ids:
   - E-010
   title: Economy Reward & Failure Consequences
-  status: Draft PR — Pending Independent Review
+  status: COMPLETED — merged in PR #86 and Railway-verified on 2026-08-02
   depends_on:
   - RBATCH-008
   legacy_id: BATCH-009
-  legacy_status: NEVER STARTED
+  legacy_status: COMPLETED
+  implementation_head: 10c1b4df1703015367bd68e504d5713656681289
+  merge_commit: b449769f2cfdfcf915ad2680e68960dc902d8796
+  final_test_result: '73/73'
   authoritative_planning_source: 09_Development/Planning/BATCH_ARCHITECTURE.md
   historical_lineage_source: 09_Development/Implementation_Preparation/IMPLEMENTATION_BATCH_PLAN.md
   legacy_execution_rule: Historical numbering only; execute the mapped RBATCH identifier and never ambiguous legacy numbering.
@@ -927,7 +930,7 @@ batches:
   epic_ids:
   - E-011
   title: HUD + Notifications
-  status: Planned — Not Started
+  status: Draft PR — Pending Independent Review
   depends_on:
   - RBATCH-007
   - RBATCH-009
@@ -1806,13 +1809,13 @@ issues:
   milestone_id: M-005
   phase: 1
   type: implementation
-  status: Draft PR implementation exists — pending independent review
+  status: COMPLETED — merged PR #86, Railway-verified 2026-08-02
   label_names:
   - type:implementation
   - phase:1
   - batch:rbatch-009
   - epic:economy-reputation
-  - status:in-progress
+  - status:done
   description: Apply canonical reward to company money on Completed.
   acceptance_criteria: Company money increases on PickedUp→Completed.
 - id: ISSUE-002
@@ -1822,13 +1825,13 @@ issues:
   milestone_id: M-005
   phase: 1
   type: implementation
-  status: Draft PR implementation exists — pending independent review
+  status: COMPLETED — merged PR #86, Railway-verified 2026-08-02
   label_names:
   - type:implementation
   - phase:1
   - batch:rbatch-009
   - epic:economy-reputation
-  - status:in-progress
+  - status:done
   description: Increase reputation on Completed.
   acceptance_criteria: Reputation increases within approved bounds.
 - id: ISSUE-003
@@ -1860,13 +1863,13 @@ issues:
   milestone_id: M-005
   phase: 1
   type: implementation
-  status: Draft PR implementation exists — pending independent review
+  status: COMPLETED — merged PR #86, Railway-verified 2026-08-02
   label_names:
   - type:implementation
   - phase:1
   - batch:rbatch-009
   - epic:economy-reputation
-  - status:in-progress
+  - status:done
   description: Apply canonical reputation consequence on Failed.
   acceptance_criteria: Reputation decreases without permanent setback.
 - id: ISSUE-005
@@ -1876,13 +1879,13 @@ issues:
   milestone_id: M-005
   phase: 1
   type: implementation
-  status: Ready for implementation
+  status: Draft PR implementation exists — pending independent review
   label_names:
   - type:implementation
   - phase:1
   - batch:rbatch-010
   - epic:hud-notifications
-  - status:ready
+  - status:in-progress
   description: Show destination/status/package state in HUD.
   acceptance_criteria: HUD appears only when order active.
 - id: ISSUE-006
@@ -1892,13 +1895,13 @@ issues:
   milestone_id: M-005
   phase: 1
   type: implementation
-  status: Ready for implementation
+  status: Draft PR implementation exists — pending independent review
   label_names:
   - type:implementation
   - phase:1
   - batch:rbatch-010
   - epic:hud-notifications
-  - status:ready
+  - status:in-progress
   description: Connect HUD button to AcceptRequested flow.
   acceptance_criteria: Available orders can be accepted from HUD.
 - id: ISSUE-007
@@ -1908,13 +1911,13 @@ issues:
   milestone_id: M-005
   phase: 1
   type: implementation
-  status: Ready for implementation
+  status: Draft PR implementation exists — pending independent review
   label_names:
   - type:implementation
   - phase:1
   - batch:rbatch-010
   - epic:hud-notifications
-  - status:ready
+  - status:in-progress
   description: Show notifications for Accepted/PickedUp/Completed/Failed.
   acceptance_criteria: Notification appears on each state change.
 - id: ISSUE-008

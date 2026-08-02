@@ -6,7 +6,7 @@ Version: 1.0.0
 Status: Development Log
 Author: Marian Caliof & OpenAI
 Language: English
-Last Updated: 2026-08-02 (RBATCH-009 ECONOMY AND REPUTATION OUTCOMES IMPLEMENTATION)
+Last Updated: 2026-08-02 (RBATCH-010 HUD + NOTIFICATIONS IMPLEMENTATION)
 
 ---
 
@@ -45,18 +45,47 @@ Description
 - `createInitialCompanyState` in `game-web/src/state/gameState.ts` returning `{ money: 0, reputation: 50 }`.
 - Settlement integration in `GameWorldScene.ts`: `settleDeliveryOutcome` is called exactly once on the frame the status transitions from PickedUp to a terminal state.
 - `DebugPanel.ts` updated to display `Money`, `Reputation`, order status, carried-package status and guidance; updated guidance messages for Completed and Failed.
-- 34 new automated tests in `game-web/tests/orderSystem.test.ts`; BATCH-008 exclusion test replaced with correct RBATCH-009 assertion; total 64 tests pass.
+- 34 new automated tests in `game-web/tests/orderSystem.test.ts`; BATCH-008 exclusion test replaced with correct RBATCH-009 assertion; total 73 tests pass (independently verified after merge of PR #86).
 - ISSUE-003 corrected to owner-resolved status in `09_Development/Planning/ISSUE_CATALOG.md` and `09_Development/Planning/github_creation_plan.yaml`.
 - AI Report 088: `09_Development/AI_Reports/2026-08-02_088_RBATCH_009_ECONOMY_REPUTATION_OUTCOMES_IMPLEMENTATION.md`.
 
 ## Verified
 
-- 64 automated tests pass (vitest run).
+- 73 automated tests pass (final independently verified result; PR #86 merged 2026-08-02; Railway-verified).
 - TypeScript + Vite production build passes.
 - HTTP 200 smoke test passes.
 - `git diff --check` passes (no CRLF whitespace errors).
 - No secrets detected.
 - No dependency or lockfile changes.
+
+---
+
+# [2026-08-02] - RBATCH-010 HUD + NOTIFICATIONS IMPLEMENTATION
+
+## Added
+
+- `game-web/src/ui/HUDViewModel.ts` — pure, independently testable HUD view-model functions: `isActiveOrderStatus`, `isAcceptButtonVisible`, `buildHUDData`. No Phaser dependency.
+- `game-web/src/ui/NotificationController.ts` — pure, independently testable notification state machine: `notificationForTransition`, `createNotificationState`, `updateNotification`, `clearNotification`. No Phaser dependency.
+- `game-web/src/ui/GameHUD.ts` — Phaser-based, camera-fixed player HUD displaying Money, Reputation, active-order status/destination/carrying-state, and the Accept Order button. Active-order panel hidden for terminal (Completed, Failed) and pre-active (Created) statuses. Accept button visible only for Available.
+- `game-web/src/ui/NotificationDisplay.ts` — Phaser-based camera-fixed notification display. Shows one message at a time with 3-second auto-dismiss. Timer cleared on scene shutdown to prevent leaks.
+- Accept Order button in HUD: triggers `flagAcceptRequested` + `requestOrderAcceptance` through the existing canonical domain path. Isolated from game-world pointer handling via extended `containsPoint` exclusion.
+- Secondary compatibility acceptance path (package-tap while Available) preserved per canon.
+- Pointer isolation: `GameHUD.containsPoint(x, y)` added to scene `pointerdown` guard, preventing HUD button presses from registering movement or delivery intent.
+- Delivery lifecycle notifications for Available→Accepted, Accepted→PickedUp, PickedUp→Completed, PickedUp→Failed. Idempotent: only fires on genuine state transitions, never per-frame duplicates.
+- `DebugPanel` retired from `GameWorldScene` public runtime. Import removed. `DebugPanel.ts` file retained (not dead per repository audit — `appConfig.enableDebugPanel` remains a valid config field).
+- Main Menu stale text corrected: replaced "No economy, rewards, or marketplace are active in this build." with "Economy, reputation and delivery rewards active."
+- `game-web/tests/hud.test.ts` — 70 new deterministic tests covering HUD view-model, notification state machine, accept-order action, pointer isolation, and RBATCH-007..RBATCH-009 regressions.
+- AI Report 089: `09_Development/AI_Reports/2026-08-02_089_RBATCH_010_HUD_NOTIFICATIONS_IMPLEMENTATION.md`.
+
+## Verified
+
+- 143 automated tests pass (73 existing + 70 new; vitest run).
+- TypeScript + Vite production build passes.
+- HTTP 200 smoke test passes.
+- `git diff --check` passes (no CRLF whitespace errors).
+- No secrets detected.
+- No dependency or lockfile changes.
+- Draft PR open, unmerged, pending independent review.
 
 ## Not Changed
 
