@@ -10,7 +10,7 @@
 - Branch: copilot/rbatch-009-economy-reputation-outcomes
 - Base commit: ec76860b362a3ec1a5bdecbb81ebc254e95f5b08
 - Resulting commit: f3a12d4edd2e2824ae5905e7b76d3baf6a974f7c
-- Pull Request: draft PR — title: "feat: RBATCH-009 — Economy and reputation outcomes"
+- Pull Request: https://github.com/caliofmarian-ai/DROPi-Tycoon/pull/86
 - Human approval status: Pending independent review
 - Railway deployment: Pending merge and redeployment
 - Public verification: Pending
