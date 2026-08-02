@@ -444,6 +444,7 @@ Corrected architecture:
 - It applies an explicit idempotency marker (`economySettled: true`) on the returned terminal order state.
 - It rejects second-settlement attempts when either previous or next order state is already settled.
 - It enforces safe-integer and finite safety on reward/money/reputation and rejects unsafe/overflow results.
+- It now validates `previousOrder.reward` and `nextOrder.reward` as non-negative safe integers, requires the reward to remain unchanged across settlement, and requires the unchanged value to equal `BALANCING.ORDER_REWARD` for Prototype v0.1.
 - `GameWorldScene` stores both returned company state and returned settled order state coherently.
 
 This PR remains **open, draft, unmerged**, pending independent review. No deployment/public verification is claimed.
@@ -645,6 +646,99 @@ Exit code: 0
    - `Number.isSafeInteger` enforced for reward, money, reputation
 4. Overflow protection:
    - settlement rejects invalid money result (`Infinity`, `NaN`, unsafe integer, negative)
+
+---
+
+# Post-Review Correction — Reward-Transition Integrity
+
+- Independently verified pre-correction head: `31d5cc60ba32fb3ca941073fc0e6e5cd09785629`
+- Implementation correction commit: `66fbbbd9fcd80e3a779e60a004b6c42a2ad65c79`
+- This report may be committed separately after the implementation correction so the report does not create a self-referential SHA loop.
+
+Corrected settlement validation:
+
+- `previousOrder.reward` must be a non-negative safe integer.
+- `nextOrder.reward` must still be a non-negative safe integer.
+- `previousOrder.reward === nextOrder.reward` is now required.
+- For Prototype v0.1, the unchanged reward must equal `BALANCING.ORDER_REWARD` (`100`).
+- Rejection preserves the existing no-mutation / no-settlement-applied behavior for both `PickedUp -> Completed` and `PickedUp -> Failed`.
+- Existing `economySettled` idempotency behavior remains unchanged.
+
+Added deterministic coverage:
+
+- `100 -> 100` completion succeeds and pays exactly `100`.
+- `100 -> 1000` completion is rejected.
+- `100 -> 1000` failure transition is rejected.
+- Equal but unauthorized rewards such as `900 -> 900` are rejected.
+- Fractional, negative and unsafe previous rewards are rejected even when the next reward is valid.
+- Invalid reward transitions do not mutate company or order inputs.
+
+Correction validation commands, outputs, and exit codes:
+
+```text
+Command: cd game-web && npm ci --prefer-offline
+Output (relevant):
+npm warn EBADENGINE ... required: { node: '>=22.12.0 <23' }, current: { node: 'v24.18.0', npm: '11.16.0' }
+added 51 packages, and audited 52 packages in 4s
+found 0 vulnerabilities
+Exit code: 0
+```
+
+```text
+Command: cd game-web && npm test
+Output (relevant):
+✓ tests/orderSystem.test.ts (73 tests)
+Test Files  1 passed (1)
+Tests 73 passed (73)
+Exit code: 0
+```
+
+```text
+Command: cd game-web && npm run build
+Output (relevant):
+✓ built in 701ms
+Exit code: 0
+Note: Vite reported a pre-existing large-chunk warning after build, but the build succeeded.
+```
+
+```text
+Command: cd game-web && node server/server.mjs  # background; then curl http://127.0.0.1:3000/
+Output:
+HTTP_STATUS:200
+Exit code: 0
+```
+
+```text
+Command: git -c core.whitespace=trailing-space,space-before-tab,cr-at-eol diff --check 31d5cc60ba32fb3ca941073fc0e6e5cd09785629...HEAD
+Output: (none)
+Exit code: 0
+```
+
+```text
+Command: git diff --name-only 31d5cc60ba32fb3ca941073fc0e6e5cd09785629...HEAD
+Output:
+game-web/src/systems/economySettlement.ts
+game-web/tests/orderSystem.test.ts
+Exit code: 0
+```
+
+```text
+Command: git diff --name-only 31d5cc60ba32fb3ca941073fc0e6e5cd09785629...HEAD -- game-web/package.json game-web/package-lock.json
+Output: (none)
+Exit code: 0
+```
+
+```text
+Command: git diff --name-only 31d5cc60ba32fb3ca941073fc0e6e5cd09785629...HEAD -- Game/
+Output: (none)
+Exit code: 0
+```
+
+```text
+Command: codeql_checker (javascript)
+Output: Found 0 alerts
+Exit code: 0
+```
 
 ---
 
