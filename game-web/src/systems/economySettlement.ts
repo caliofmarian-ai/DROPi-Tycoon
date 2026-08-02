@@ -37,8 +37,20 @@ export const settleDeliveryOutcome = (
     return { applied: false, reason: 'Order settlement already applied' }
   }
 
+  if (!Number.isSafeInteger(previousOrder.reward) || previousOrder.reward < 0) {
+    return { applied: false, reason: 'Previous order reward must be a non-negative safe integer' }
+  }
+
   if (!Number.isSafeInteger(nextOrder.reward) || nextOrder.reward < 0) {
     return { applied: false, reason: 'Order reward must be a non-negative safe integer' }
+  }
+
+  if (previousOrder.reward !== nextOrder.reward) {
+    return { applied: false, reason: 'Order reward must remain unchanged across settlement' }
+  }
+
+  if (previousOrder.reward !== BALANCING.ORDER_REWARD) {
+    return { applied: false, reason: 'Order reward must match the approved prototype reward' }
   }
 
   if (!Number.isSafeInteger(company.money) || company.money < 0) {

@@ -382,6 +382,30 @@ describe('RBATCH-009 — successful delivery settlement', () => {
     }
   })
 
+  it('100 to 100 completion succeeds and pays exactly 100', () => {
+    const previousOrder = { ...buildPickedUpOrder(), reward: 100 }
+    const nextOrder = { ...buildCompletedOrder(previousOrder), reward: 100 }
+    const result = settleDeliveryOutcome(previousOrder, nextOrder, freshCompany())
+    expect(result.applied).toBe(true)
+    if (!result.applied) return
+    expect(result.company.money).toBe(100)
+    expect(result.company.reputation).toBe(52)
+  })
+
+  it('100 to 1000 completion is rejected', () => {
+    const previousOrder = { ...buildPickedUpOrder(), reward: 100 }
+    const nextOrder = { ...buildCompletedOrder(previousOrder), reward: 1000 }
+    const company = freshCompany()
+    const previousSnapshot = { ...previousOrder }
+    const nextSnapshot = { ...nextOrder }
+    const companySnapshot = { ...company }
+    const result = settleDeliveryOutcome(previousOrder, nextOrder, company)
+    expect(result.applied).toBe(false)
+    expect(previousOrder).toEqual(previousSnapshot)
+    expect(nextOrder).toEqual(nextSnapshot)
+    expect(company).toEqual(companySnapshot)
+  })
+
   it('the same order cannot be settled again after the settled marker is stored', () => {
     const previousOrder = buildPickedUpOrder()
     const nextOrder = buildCompletedOrder(previousOrder)
@@ -482,14 +506,47 @@ describe('RBATCH-009 — failed delivery settlement', () => {
       expect(result.company.reputation).toBe(0)
     }
   })
+
+  it('100 to 1000 failure transition is rejected', () => {
+    const previousOrder = { ...buildPickedUpOrder(), reward: 100 }
+    const nextOrder = { ...buildFailedOrder(previousOrder), reward: 1000 }
+    const result = settleDeliveryOutcome(previousOrder, nextOrder, freshCompany())
+    expect(result.applied).toBe(false)
+  })
 })
 
 describe('RBATCH-009 — numeric safety and overflow', () => {
+  it('equal but unauthorized rewards are rejected', () => {
+    const previousOrder = { ...buildPickedUpOrder(), reward: 900 }
+    const nextOrder = { ...buildCompletedOrder(previousOrder), reward: 900 }
+    const result = settleDeliveryOutcome(previousOrder, nextOrder, freshCompany())
+    expect(result.applied).toBe(false)
+  })
+
   it('fractional reward is rejected', () => {
     const previousOrder = buildPickedUpOrder()
     const nextOrder = { ...buildCompletedOrder(previousOrder), reward: 0.5 }
     const result = settleDeliveryOutcome(previousOrder, nextOrder, freshCompany())
     expect(result.applied).toBe(false)
+  })
+
+  it('invalid previous rewards are rejected even when the next reward is valid', () => {
+    const invalidPreviousRewards = [0.5, -1, Number.MAX_SAFE_INTEGER + 1]
+
+    for (const reward of invalidPreviousRewards) {
+      const previousOrder = { ...buildPickedUpOrder(), reward }
+      const nextOrder = { ...buildCompletedOrder(previousOrder), reward: BALANCING.ORDER_REWARD }
+      const company = freshCompany()
+      const previousSnapshot = { ...previousOrder }
+      const nextSnapshot = { ...nextOrder }
+      const companySnapshot = { ...company }
+      const result = settleDeliveryOutcome(previousOrder, nextOrder, company)
+
+      expect(result.applied).toBe(false)
+      expect(previousOrder).toEqual(previousSnapshot)
+      expect(nextOrder).toEqual(nextSnapshot)
+      expect(company).toEqual(companySnapshot)
+    }
   })
 
   it('fractional money is rejected', () => {
