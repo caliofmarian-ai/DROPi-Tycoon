@@ -243,8 +243,8 @@ All commands run on Node 24.18.0 / npm 11.16.0 (sandbox environment; Node 22.12.
 12. TypeScript/Vite production build
 13. Production server HTTP smoke test
 14. CRLF-aware diff check against exact base `b449769f2cfdfcf915ad2680e68960dc902d8796`
-15. Exact changed-path list (22 files including new test file)
-16. Complete PR-range secret scan (all 22 changed files)
+15. Exact changed-path list (23 files including new test file and root .gitignore)
+16. Complete PR-range secret scan (all 23 changed files)
 17. Dependency/lockfile comparison
 18. YAML parsing
 19. Exact Markdown/YAML status, crosswalk, evidence-count and materialization comparison
@@ -411,16 +411,18 @@ game-web/src/ui/pointerIsolation.ts
 game-web/tests/gamehud-propagation.test.ts
 game-web/tests/hud.test.ts
 + game-web/tests/notification-display.test.ts  (new — untracked at time of base-range check; included in Correction Pass 2 commit)
++ .gitignore  (new — root-level gitignore to exclude node_modules; added in Correction Pass 2 cleanup)
 ```
-Total: 22 files.
+Total: 23 files.
 
 Classifications:
-- **Created**: `game-web/tests/gamehud-propagation.test.ts`, `game-web/tests/notification-display.test.ts`
+- **Created**: `.gitignore`, `game-web/tests/gamehud-propagation.test.ts`, `game-web/tests/notification-display.test.ts`
 - **Modified**: all remaining 20 files
 
-## 15) Complete PR-range secret scan (all 22 changed files)
+## 15) Complete PR-range secret scan (all 23 changed files)
 ```
-runtime-tools-secret_scanning on all 22 PR-changed paths:
+runtime-tools-secret_scanning on all 23 PR-changed paths:
+  .gitignore
   00_Project/PROJECT_STATUS.md
   09_Development/AI_Reports/2026-08-02_089_RBATCH_010_HUD_NOTIFICATIONS_IMPLEMENTATION.md
   09_Development/CHANGELOG.md
@@ -578,7 +580,7 @@ All Correction Pass 1 and Correction Pass 2 code/test/planning/documentation ite
 - TypeScript/Vite production build passes.
 - HTTP 200 smoke test passes.
 - CRLF-aware check against exact base `b449769f2cfdfcf915ad2680e68960dc902d8796` passes (exit 0).
-- No secrets in any of the 22 PR-changed files.
+- No secrets in any of the 23 PR-changed files.
 - No lockfile or dependency changes.
 - YAML parses without error; all shared fields validated exactly against BATCH_ARCHITECTURE.md.
 - `completed_batch_evidence` contains 9 entries (RBATCH-001..RBATCH-009).
@@ -587,7 +589,7 @@ All Correction Pass 1 and Correction Pass 2 code/test/planning/documentation ite
 - Reports 085–088 unchanged.
 - No archived `Game/` changes.
 - No RBATCH-011+ implementation.
-- 22 files in full PR range (21 tracked + 1 created).
+- 23 files in full PR range (20 tracked + 3 created: .gitignore, gamehud-propagation.test.ts, notification-display.test.ts).
 - PR #253 remains open, draft, unmerged, and pending independent review.
 - No Railway deployment or public verification has occurred.
 - Remote PR body update could not be performed (DNS monitoring proxy blocks `api.github.com`); full intended body is embedded in this report.
