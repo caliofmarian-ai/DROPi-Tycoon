@@ -350,6 +350,25 @@ describe('ISSUE-007 — notificationForTransition', () => {
     expect(msg).toMatch(/successful|success|complet/i)
   })
 
+  it('canonical completion notification is exactly "Delivery successful +100 money" (REQ-106)', () => {
+    expect(NOTIFICATION_MESSAGES.completed).toBe('Delivery successful +100 money')
+  })
+
+  it('canonical accepted message provides required feedback', () => {
+    expect(NOTIFICATION_MESSAGES.accepted).toBeTruthy()
+    expect(typeof NOTIFICATION_MESSAGES.accepted).toBe('string')
+  })
+
+  it('canonical pickedUp message provides required feedback', () => {
+    expect(NOTIFICATION_MESSAGES.pickedUp).toBeTruthy()
+    expect(typeof NOTIFICATION_MESSAGES.pickedUp).toBe('string')
+  })
+
+  it('canonical failed message provides required feedback', () => {
+    expect(NOTIFICATION_MESSAGES.failed).toBeTruthy()
+    expect(typeof NOTIFICATION_MESSAGES.failed).toBe('string')
+  })
+
   it('PickedUp→Failed message contains meaningful failure text', () => {
     const msg = notificationForTransition('PickedUp', 'Failed')
     expect(msg).not.toBeNull()

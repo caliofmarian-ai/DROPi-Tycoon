@@ -16,7 +16,7 @@ Last Updated: 2026-08-01
 
 - Total roadmap batches: **54** (`RBATCH-001..RBATCH-054`)
 - Legacy crosswalk entries: **17** (`BATCH-001..BATCH-016` plus `BATCH-010b`)
-- Completed legacy batches with machine-readable completion evidence: **8** (`RBATCH-001..RBATCH-008`)
+- Completed legacy batches with machine-readable completion evidence: **9** (`RBATCH-001..RBATCH-009`)
 
 ## Semantic Ownership Correction
 
@@ -106,7 +106,7 @@ Legacy numbering is historical only. Execute the mapped `RBATCH-*` identifier; a
 | RBATCH-053 | 9 | M-021 | E-045 | Robotics & Autonomous Warehouse Planning | Planned — Future | RBATCH-052 | — | Dedicated robotics/autonomous-warehouse audit required |
 | RBATCH-054 | 9 | M-021 | E-046 | Community, Smart-City & Frontier Expansion Governance | Planned — Future | RBATCH-053 | — | Dedicated community/frontier audit required |
 
-## Completion Evidence Registry (`RBATCH-001..RBATCH-008`)
+## Completion Evidence Registry (`RBATCH-001..RBATCH-009`)
 
 | RBATCH | Legacy ID | Implementation Commit | Pull Request | AI Report | Automated Validation Evidence | Railway/Public Verification | Final Status |
 |---|---|---|---|---|---|---|---|
@@ -118,6 +118,7 @@ Legacy numbering is historical only. Execute the mapped `RBATCH-*` identifier; a
 | RBATCH-006 | BATCH-006 | N/A — requires historical inspection | N/A — requires historical inspection | 09_Development/AI_Reports/2026-07-15_075_BATCH_006_TAP_TO_MOVE_CAMERA_IMPLEMENTATION.md | 09_Development/AI_Reports/2026-07-15_076_BATCH_006_TAP_TO_MOVE_CAMERA_INDEPENDENT_VERIFICATION.md | N/A — not applicable | COMPLETED |
 | RBATCH-007 | BATCH-007 | N/A — requires historical inspection | N/A — requires historical inspection | 09_Development/AI_Reports/2026-07-15_079_BATCH_007_PICKUP_PROXIMITY_AND_ACCEPTANCE_TRIGGER_IMPLEMENTATION.md | 09_Development/AI_Reports/2026-07-15_080_BATCH_007_PICKUP_PROXIMITY_AND_ACCEPTANCE_TRIGGER_INDEPENDENT_VERIFICATION.md | 00_Project/PROJECT_STATUS.md — public Railway verification of Available→Accepted→PickedUp on 2026-08-01 | COMPLETED |
 | RBATCH-008 | BATCH-008 | 9cdabff6f762300a71e898792ebe0a44dfbcb6d0 | PR #84 — https://github.com/caliofmarian-ai/DROPi-Tycoon/pull/84 | 09_Development/AI_Reports/2026-08-01_085_BATCH_008_DELIVERY_COMPLETION_FAILURE_IMPLEMENTATION.md | Report 085 — 30 automated tests, TypeScript build pass, HTTP 200 smoke test | 00_Project/PROJECT_STATUS.md — PR #84 merged, Railway redeployed, PickedUp→Completed and wrong-destination PickedUp→Failed publicly verified, CarryingPackage cleared in both outcomes | COMPLETED |
+| RBATCH-009 | BATCH-009 | 10c1b4df1703015367bd68e504d5713656681289 | PR #86 — https://github.com/caliofmarian-ai/DROPi-Tycoon/pull/86 | 09_Development/AI_Reports/2026-08-01_086_RBATCH_009_ECONOMY_REWARD_FAILURE_CONSEQUENCES_IMPLEMENTATION.md | 73/73 automated tests, TypeScript build pass, HTTP 200 smoke test | 00_Project/PROJECT_STATUS.md — PR #86 merged, Railway redeployed, PickedUp→Completed +100 money and +2 reputation and PickedUp→Failed −5 reputation publicly verified on 2026-08-02 | COMPLETED |
 
 ## Contiguity Verification
 

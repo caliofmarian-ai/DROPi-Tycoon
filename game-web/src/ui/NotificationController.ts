@@ -7,7 +7,7 @@ import type { OrderStatus } from '../types/game'
 export const NOTIFICATION_MESSAGES = {
   accepted: 'Order accepted! Head to the pickup zone.',
   pickedUp: 'Package collected! Deliver to DeliveryZone.',
-  completed: 'Delivery successful! +100',
+  completed: 'Delivery successful +100 money',
   failed: 'Delivery failed. Reputation \u22125.',
 } as const
 
