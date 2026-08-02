@@ -111,7 +111,15 @@ export class GameHUD {
       .setScrollFactor(0)
       .setDepth(HUD_DEPTH + 2)
 
-    const handleAccept = () => {
+    const handleAccept = (
+      _pointer: Phaser.Input.Pointer,
+      _localX: number,
+      _localY: number,
+      event: Phaser.Types.Input.EventData,
+    ) => {
+      // Stop propagation first so the scene-level POINTER_DOWN handler never
+      // receives this press — even after acceptance hides the button.
+      event.stopPropagation()
       onAccept()
     }
     this.acceptButton.on('pointerdown', handleAccept)

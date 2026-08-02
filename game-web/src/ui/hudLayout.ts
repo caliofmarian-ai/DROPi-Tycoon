@@ -68,3 +68,25 @@ export const buildHUDLayout = (canvasWidth: number, canvasHeight: number): HUDLa
     orderTextWidth: orderPanel.width - acceptButton.width - 38,
   }
 }
+
+/**
+ * Derives notification panel layout from runtime canvas and HUD dimensions.
+ *
+ * The notification is placed below the active-order panel (never overlapping the
+ * company panel, order panel, Accept button or navigation buttons), horizontally
+ * centred, and kept fully within the canvas at all supported resolutions.
+ */
+export const buildNotificationLayout = (canvasWidth: number, canvasHeight: number): RectBounds => {
+  const hud = buildHUDLayout(canvasWidth, canvasHeight)
+  const notifHeight = 54
+  const margin = 12
+  const notifWidth = Math.min(canvasWidth - 32, Math.floor(canvasWidth * 0.78))
+  const top = bottom(hud.orderPanel) + margin
+  const cx = Math.floor(canvasWidth / 2)
+  return {
+    left: cx - Math.floor(notifWidth / 2),
+    top,
+    width: notifWidth,
+    height: notifHeight,
+  }
+}

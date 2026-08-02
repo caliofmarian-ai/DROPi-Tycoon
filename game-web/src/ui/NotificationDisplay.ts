@@ -1,4 +1,5 @@
 import Phaser from 'phaser'
+import { buildNotificationLayout } from './hudLayout'
 
 /** Duration in milliseconds before a notification auto-dismisses. */
 export const NOTIFICATION_DURATION_MS = 3000
@@ -26,12 +27,14 @@ export class NotificationDisplay {
     this.scene = scene
     this.onExpired = onExpired
 
-    // Centered near top of canvas, above the HUD elements.
-    const cx = scene.scale.width / 2
-    const cy = 90
+    // Derived layout: positioned below the active-order panel with responsive
+    // width, fully inside the canvas, never overlapping HUD or nav buttons.
+    const notifLayout = buildNotificationLayout(scene.scale.width, scene.scale.height)
+    const cx = notifLayout.left + Math.floor(notifLayout.width / 2)
+    const cy = notifLayout.top + Math.floor(notifLayout.height / 2)
 
     this.background = scene.add
-      .rectangle(cx, cy, 600, 54, 0x1e293b, 0.92)
+      .rectangle(cx, cy, notifLayout.width, notifLayout.height, 0x1e293b, 0.92)
       .setStrokeStyle(2, 0x38bdf8, 0.8)
       .setScrollFactor(0)
       .setDepth(40)

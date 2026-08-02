@@ -32,7 +32,7 @@ import {
   notificationForTransition,
   updateNotification,
 } from '../src/ui/NotificationController'
-import { buildHUDLayout, boundsIntersect, isBoundsInsideCanvas, NAV_BUTTON_BOUNDS } from '../src/ui/hudLayout'
+import { buildHUDLayout, buildNotificationLayout, boundsIntersect, isBoundsInsideCanvas, NAV_BUTTON_BOUNDS } from '../src/ui/hudLayout'
 import { isPointerOnInteractiveUI } from '../src/ui/pointerIsolation'
 import type { OrderStatus, WorldState } from '../src/types/game'
 
@@ -724,5 +724,46 @@ describe('ISSUE-007 — notification expiry callback clears controller state', (
     expect(afterFirst).toEqual(afterSecond)
     expect(afterSecond.active).toBe(false)
     expect(afterSecond.message).toBeNull()
+  })
+})
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Notification layout: non-overlap with HUD panels at 800×600 and 1280×720
+// ─────────────────────────────────────────────────────────────────────────────
+
+describe('RBATCH-010 — notification layout: non-overlap with HUD panels', () => {
+  function assertNoOverlap(canvasWidth: number, canvasHeight: number) {
+    const hudLayout = buildHUDLayout(canvasWidth, canvasHeight)
+    const notif = buildNotificationLayout(canvasWidth, canvasHeight)
+
+    expect(boundsIntersect(notif, hudLayout.companyPanel)).toBe(false)
+    expect(boundsIntersect(notif, hudLayout.orderPanel)).toBe(false)
+    expect(boundsIntersect(notif, hudLayout.acceptButton)).toBe(false)
+    NAV_BUTTON_BOUNDS.forEach((nav) => {
+      expect(boundsIntersect(notif, nav)).toBe(false)
+    })
+    expect(isBoundsInsideCanvas(notif, canvasWidth, canvasHeight)).toBe(true)
+  }
+
+  it('notification does not overlap HUD panels or nav buttons at 800×600', () => {
+    assertNoOverlap(800, 600)
+  })
+
+  it('notification does not overlap HUD panels or nav buttons at 1280×720', () => {
+    assertNoOverlap(1280, 720)
+  })
+
+  it('notification width is responsive (not fixed at 600) at 1280×720', () => {
+    const notif800 = buildNotificationLayout(800, 600)
+    const notif1280 = buildNotificationLayout(1280, 720)
+    // Width must be wider at larger canvas (responsive)
+    expect(notif1280.width).toBeGreaterThan(notif800.width)
+  })
+
+  it('notification stays fully inside canvas at both resolutions', () => {
+    const n800 = buildNotificationLayout(800, 600)
+    expect(isBoundsInsideCanvas(n800, 800, 600)).toBe(true)
+    const n1280 = buildNotificationLayout(1280, 720)
+    expect(isBoundsInsideCanvas(n1280, 1280, 720)).toBe(true)
   })
 })
