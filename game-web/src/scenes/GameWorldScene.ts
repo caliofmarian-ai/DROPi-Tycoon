@@ -3,19 +3,21 @@ import { createInitialCompanyState, createInitialWorldState, WORLD_HEIGHT, WORLD
 import {
   attemptDelivery,
   attemptPickup,
-  flagAcceptRequested,
-  requestOrderAcceptance,
 } from '../systems/orderSystem'
+import { applyOrderAcceptanceRequest } from '../systems/orderAcceptance'
 import { settleDeliveryOutcome } from '../systems/economySettlement'
 import type { CompanyState, WorldState } from '../types/game'
 import { GameHUD } from '../ui/GameHUD'
 import { NotificationDisplay } from '../ui/NotificationDisplay'
 import { buildHUDData } from '../ui/HUDViewModel'
 import {
+  clearNotification,
   createNotificationState,
   updateNotification,
   type NotificationState,
 } from '../ui/NotificationController'
+import { isPointerOnInteractiveUI } from '../ui/pointerIsolation'
+import type { RectBounds } from '../ui/hudLayout'
 import { selectDeliveryIntentFromTap } from '../utils/deliveryIntent'
 
 const ROAD_POSITIONS = [
@@ -59,6 +61,8 @@ export class GameWorldScene extends Phaser.Scene {
   private notificationState!: NotificationState
 
   private readonly menuButtons: Phaser.GameObjects.Rectangle[] = []
+  private readonly menuButtonBounds: RectBounds[] = []
+  private pointerDownHandler: ((pointer: Phaser.Input.Pointer) => void) | null = null
 
   constructor() {
     super('GameWorld')
@@ -116,15 +120,18 @@ export class GameWorldScene extends Phaser.Scene {
     this.notificationState = createNotificationState(this.worldState.activeOrder.status)
     this.createNavigationButtons()
     this.gameHUD = new GameHUD(this, () => this.onAcceptButtonPressed())
-    this.notificationDisplay = new NotificationDisplay(this)
+    this.notificationDisplay = new NotificationDisplay(this, () => {
+      this.notificationState = clearNotification(this.notificationState)
+    })
     this.gameHUD.update(buildHUDData(this.worldState, this.companyState))
 
-    this.events.on(Phaser.Scenes.Events.SHUTDOWN, () => {
-      this.notificationDisplay.destroy()
-    })
-
-    this.input.on('pointerdown', (pointer: Phaser.Input.Pointer) => {
-      if (this.isPointerOnMenuButton(pointer) || this.gameHUD.containsPoint(pointer.x, pointer.y)) {
+    this.pointerDownHandler = (pointer: Phaser.Input.Pointer) => {
+      if (
+        isPointerOnInteractiveUI(pointer.x, pointer.y, {
+          menuButtonBounds: this.menuButtonBounds,
+          hudControlBounds: this.gameHUD.getInteractiveBounds(),
+        })
+      ) {
         return
       }
 
@@ -132,8 +139,6 @@ export class GameWorldScene extends Phaser.Scene {
       this.worldState.isMoving = true
 
       // Compatibility acceptance path: tap near the package sprite while Available.
-      // The HUD Accept button is the canonical accept trigger; this touch path may
-      // remain as a secondary convenience per canon.
       if (
         this.worldState.activeOrder.status === 'Available' &&
         Phaser.Math.Distance.Between(
@@ -143,7 +148,7 @@ export class GameWorldScene extends Phaser.Scene {
           this.packagePosition.y,
         ) <= 28
       ) {
-        this.applyAcceptance()
+        this.applyAcceptance(this.worldState.activeOrder.orderId)
       }
 
       if (this.worldState.activeOrder.status === 'PickedUp' && this.worldState.player.carryingPackage) {
@@ -156,14 +161,13 @@ export class GameWorldScene extends Phaser.Scene {
       }
 
       this.gameHUD.update(buildHUDData(this.worldState, this.companyState))
-    })
+    }
+    this.input.on('pointerdown', this.pointerDownHandler)
+    this.events.once(Phaser.Scenes.Events.SHUTDOWN, this.handleSceneShutdown, this)
   }
 
   private onAcceptButtonPressed(): void {
-    if (this.worldState.activeOrder.status !== 'Available') {
-      return
-    }
-    this.applyAcceptance()
+    this.applyAcceptance(this.worldState.activeOrder.orderId)
     this.gameHUD.update(buildHUDData(this.worldState, this.companyState))
   }
 
@@ -171,12 +175,10 @@ export class GameWorldScene extends Phaser.Scene {
    * Apply the Available → Accepted transition through the canonical domain path.
    * Safe to call from both the HUD button and the package-tap compatibility path.
    */
-  private applyAcceptance(): void {
+  private applyAcceptance(requestedOrderId: string): void {
     const previousStatus = this.worldState.activeOrder.status
-    this.worldState.activeOrder = flagAcceptRequested(this.worldState.activeOrder)
-    const accepted = requestOrderAcceptance(this.worldState.activeOrder, this.worldState.player)
-    this.worldState.activeOrder = accepted.order
-    this.worldState.player = accepted.player
+    const accepted = applyOrderAcceptanceRequest(this.worldState, requestedOrderId)
+    this.worldState = accepted.worldState
     this.emitNotificationIfTransitioned(previousStatus, this.worldState.activeOrder.status)
   }
 
@@ -343,9 +345,21 @@ export class GameWorldScene extends Phaser.Scene {
 
     button.on('pointerdown', onTap)
     this.menuButtons.push(button)
+    this.menuButtonBounds.push({
+      left: x - 78,
+      top: y - 27,
+      width: 156,
+      height: 54,
+    })
   }
 
-  private isPointerOnMenuButton(pointer: Phaser.Input.Pointer): boolean {
-    return this.menuButtons.some((button) => button.getBounds().contains(pointer.x, pointer.y))
+  private handleSceneShutdown(): void {
+    if (this.pointerDownHandler) {
+      this.input.off('pointerdown', this.pointerDownHandler)
+      this.pointerDownHandler = null
+    }
+    this.notificationDisplay.destroy()
+    this.menuButtons.length = 0
+    this.menuButtonBounds.length = 0
   }
 }

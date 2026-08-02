@@ -20,9 +20,11 @@ export class NotificationDisplay {
   private readonly text: Phaser.GameObjects.Text
   private dismissTimer: Phaser.Time.TimerEvent | null = null
   private readonly scene: Phaser.Scene
+  private readonly onExpired?: () => void
 
-  constructor(scene: Phaser.Scene) {
+  constructor(scene: Phaser.Scene, onExpired?: () => void) {
     this.scene = scene
+    this.onExpired = onExpired
 
     // Centered near top of canvas, above the HUD elements.
     const cx = scene.scale.width / 2
@@ -64,6 +66,7 @@ export class NotificationDisplay {
 
     this.dismissTimer = this.scene.time.delayedCall(NOTIFICATION_DURATION_MS, () => {
       this.hide()
+      this.onExpired?.()
     })
   }
 

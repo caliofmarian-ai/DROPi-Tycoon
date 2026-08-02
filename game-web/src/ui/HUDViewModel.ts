@@ -1,4 +1,5 @@
 import type { CompanyState, OrderStatus, WorldState } from '../types/game'
+import { isOrderAcceptanceEligible } from '../systems/orderSystem'
 
 /**
  * Canonical active-order states: statuses for which the active-order HUD panel is shown.
@@ -13,16 +14,24 @@ export const isActiveOrderStatus = (status: OrderStatus): boolean =>
   (ACTIVE_ORDER_STATUSES as ReadonlyArray<string>).includes(status)
 
 /**
- * Accept Order button is shown only when the order is Available.
- * All other states (Created, Accepted, PickedUp, Completed, Failed) must hide/disable it.
+ * Accept Order button is shown only when the canonical acceptance-eligibility
+ * rule allows accepting the currently active order.
  */
-export const isAcceptButtonVisible = (status: OrderStatus): boolean => status === 'Available'
+export const isAcceptButtonVisible = (worldState: WorldState): boolean =>
+  isOrderAcceptanceEligible(
+    worldState.activeOrder,
+    worldState.player,
+    worldState.activeOrder.orderId,
+  )
 
 export interface HUDData {
   money: number
   reputation: number
+  orderId: string
   orderStatus: OrderStatus
+  pickupLocation: string
   destination: string
+  reward: number
   carryingPackage: boolean
   showActiveOrder: boolean
   showAcceptButton: boolean
@@ -37,10 +46,13 @@ export const buildHUDData = (worldState: WorldState, companyState: CompanyState)
   return {
     money: companyState.money,
     reputation: companyState.reputation,
+    orderId: activeOrder.orderId,
     orderStatus: activeOrder.status,
+    pickupLocation: activeOrder.pickupLocation,
     destination: activeOrder.destination,
+    reward: activeOrder.reward,
     carryingPackage: player.carryingPackage,
     showActiveOrder: isActiveOrderStatus(activeOrder.status),
-    showAcceptButton: isAcceptButtonVisible(activeOrder.status),
+    showAcceptButton: isAcceptButtonVisible(worldState),
   }
 }

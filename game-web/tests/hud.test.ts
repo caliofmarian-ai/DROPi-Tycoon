@@ -15,9 +15,10 @@ import { createInitialCompanyState, createInitialWorldState } from '../src/state
 import {
   attemptDelivery,
   attemptPickup,
-  flagAcceptRequested,
   requestOrderAcceptance,
+  isOrderAcceptanceEligible,
 } from '../src/systems/orderSystem'
+import { applyOrderAcceptanceRequest, canRequestOrderAcceptance } from '../src/systems/orderAcceptance'
 import { settleDeliveryOutcome } from '../src/systems/economySettlement'
 import {
   buildHUDData,
@@ -31,6 +32,8 @@ import {
   notificationForTransition,
   updateNotification,
 } from '../src/ui/NotificationController'
+import { buildHUDLayout, boundsIntersect, isBoundsInsideCanvas, NAV_BUTTON_BOUNDS } from '../src/ui/hudLayout'
+import { isPointerOnInteractiveUI } from '../src/ui/pointerIsolation'
 import type { OrderStatus, WorldState } from '../src/types/game'
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -142,28 +145,27 @@ describe('ISSUE-005 — HUD view model: buildHUDData', () => {
 // ─────────────────────────────────────────────────────────────────────────────
 
 describe('ISSUE-006 — Accept Order button visibility', () => {
-  it('Accept button visible only for Available', () => {
-    expect(isAcceptButtonVisible('Available')).toBe(true)
+  it('Accept button visible for eligible Available order', () => {
+    const world = createInitialWorldState()
+    expect(isAcceptButtonVisible(world)).toBe(true)
   })
 
   it('Accept button hidden for Created', () => {
-    expect(isAcceptButtonVisible('Created')).toBe(false)
+    const world = createInitialWorldState()
+    world.activeOrder.status = 'Created'
+    expect(isAcceptButtonVisible(world)).toBe(false)
   })
 
-  it('Accept button hidden for Accepted (already accepted)', () => {
-    expect(isAcceptButtonVisible('Accepted')).toBe(false)
+  it('Accept button hidden when player has mismatched currentOrder', () => {
+    const world = createInitialWorldState()
+    world.player.currentOrder = 'ORDER-OTHER'
+    expect(isAcceptButtonVisible(world)).toBe(false)
   })
 
-  it('Accept button hidden for PickedUp', () => {
-    expect(isAcceptButtonVisible('PickedUp')).toBe(false)
-  })
-
-  it('Accept button hidden for Completed (terminal)', () => {
-    expect(isAcceptButtonVisible('Completed')).toBe(false)
-  })
-
-  it('Accept button hidden for Failed (terminal)', () => {
-    expect(isAcceptButtonVisible('Failed')).toBe(false)
+  it('Accept button hidden when player is already carrying', () => {
+    const world = createInitialWorldState()
+    world.player.carryingPackage = true
+    expect(isAcceptButtonVisible(world)).toBe(false)
   })
 
   it('buildHUDData showAcceptButton true for Available', () => {
@@ -181,117 +183,102 @@ describe('ISSUE-006 — Accept Order button visibility', () => {
 })
 
 describe('ISSUE-006 — Accept Order action through canonical path', () => {
-  it('pressing Accept performs the Available→Accepted transition', () => {
+  it('empty currentOrder + not carrying + matching Available order succeeds', () => {
     const world = createInitialWorldState()
-    const flagged = flagAcceptRequested(world.activeOrder)
-    const result = requestOrderAcceptance(flagged, world.player)
-    expect(result.order.status).toBe('Accepted')
+    const accepted = applyOrderAcceptanceRequest(world, world.activeOrder.orderId)
+    expect(accepted.accepted).toBe(true)
+    expect(accepted.worldState.activeOrder.status).toBe('Accepted')
+    expect(accepted.worldState.player.currentOrder).toBe(world.activeOrder.orderId)
+    expect(accepted.worldState.activeOrder.acceptRequested).toBe(false)
   })
 
-  it('acceptance sets currentOrder on the player', () => {
+  it('currentOrder mismatch rejects without mutation and clears acceptRequested', () => {
     const world = createInitialWorldState()
-    const flagged = flagAcceptRequested(world.activeOrder)
-    const result = requestOrderAcceptance(flagged, world.player)
-    expect(result.player.currentOrder).toBe('ORDER-001')
+    world.player.currentOrder = 'ORDER-OTHER'
+    const before = structuredClone(world)
+    const rejected = applyOrderAcceptanceRequest(world, world.activeOrder.orderId)
+    expect(rejected.accepted).toBe(false)
+    expect(rejected.worldState.activeOrder.status).toBe(before.activeOrder.status)
+    expect(rejected.worldState.player.currentOrder).toBe('ORDER-OTHER')
+    expect(rejected.worldState.player.carryingPackage).toBe(before.player.carryingPackage)
+    expect(rejected.worldState.activeOrder.acceptRequested).toBe(false)
   })
 
-  it('acceptance clears acceptRequested', () => {
+  it('already carrying rejects without mutation and clears acceptRequested', () => {
     const world = createInitialWorldState()
-    const flagged = flagAcceptRequested(world.activeOrder)
-    const result = requestOrderAcceptance(flagged, world.player)
-    expect(result.order.acceptRequested).toBe(false)
+    world.player.carryingPackage = true
+    const beforeOrder = { ...world.activeOrder }
+    const rejected = applyOrderAcceptanceRequest(world, world.activeOrder.orderId)
+    expect(rejected.accepted).toBe(false)
+    expect(rejected.worldState.player.carryingPackage).toBe(true)
+    expect(rejected.worldState.activeOrder.status).toBe(beforeOrder.status)
+    expect(rejected.worldState.activeOrder.acceptRequested).toBe(false)
   })
 
-  it('repeated press cannot accept twice: second call on already-Accepted order returns unchanged', () => {
-    const world = createInitialWorldState()
-    const flagged = flagAcceptRequested(world.activeOrder)
-    const first = requestOrderAcceptance(flagged, world.player)
-    // Second call: try to flag and accept again on an already-Accepted order
-    const reflagged = flagAcceptRequested(first.order)
-    const second = requestOrderAcceptance(reflagged, first.player)
-    expect(second.order.status).toBe('Accepted') // still Accepted, not re-transitioned
-    // acceptRequested does not get set on a non-Available order
-    expect(reflagged.acceptRequested).toBe(false)
+  it('already Accepted/PickedUp/Completed/Failed orders remain rejected', () => {
+    const statuses: OrderStatus[] = ['Accepted', 'PickedUp', 'Completed', 'Failed']
+    statuses.forEach((status) => {
+      const world = createInitialWorldState()
+      world.activeOrder.status = status
+      const rejected = applyOrderAcceptanceRequest(world, world.activeOrder.orderId)
+      expect(rejected.accepted).toBe(false)
+      expect(rejected.worldState.activeOrder.status).toBe(status)
+      expect(rejected.worldState.activeOrder.acceptRequested).toBe(false)
+    })
   })
 
-  it('Created order cannot be accepted via canonical path', () => {
+  it('repeated rapid presses perform exactly one Available→Accepted transition', () => {
     const world = createInitialWorldState()
-    world.activeOrder.status = 'Created'
-    world.activeOrder.acceptRequested = true
-    const result = requestOrderAcceptance(world.activeOrder, world.player)
-    expect(result.order.status).toBe('Created')
-  })
-
-  it('Accepted order cannot be accepted again', () => {
-    const world = createInitialWorldState()
-    world.activeOrder.status = 'Accepted'
-    world.activeOrder.acceptRequested = true
-    const result = requestOrderAcceptance(world.activeOrder, world.player)
-    expect(result.order.status).toBe('Accepted')
-  })
-
-  it('PickedUp order cannot be accepted', () => {
-    const world = createInitialWorldState()
-    world.activeOrder.status = 'PickedUp'
-    world.activeOrder.acceptRequested = true
-    const result = requestOrderAcceptance(world.activeOrder, world.player)
-    expect(result.order.status).toBe('PickedUp')
-  })
-
-  it('Completed order cannot be accepted', () => {
-    const world = createInitialWorldState()
-    world.activeOrder.status = 'Completed'
-    world.activeOrder.acceptRequested = true
-    const result = requestOrderAcceptance(world.activeOrder, world.player)
-    expect(result.order.status).toBe('Completed')
-  })
-
-  it('Failed order cannot be accepted', () => {
-    const world = createInitialWorldState()
-    world.activeOrder.status = 'Failed'
-    world.activeOrder.acceptRequested = true
-    const result = requestOrderAcceptance(world.activeOrder, world.player)
-    expect(result.order.status).toBe('Failed')
-  })
-
-  it('mismatched player/order state: acceptRequested without Available status is rejected', () => {
-    const world = createInitialWorldState()
-    // Simulate a state where acceptRequested is true but order is already PickedUp
-    world.activeOrder.status = 'PickedUp'
-    world.activeOrder.acceptRequested = true
-    const result = requestOrderAcceptance(world.activeOrder, world.player)
-    expect(result.order.status).toBe('PickedUp')
-    expect(result.player.currentOrder).toBe('')
+    let current = world
+    let transitions = 0
+    for (let i = 0; i < 6; i++) {
+      const next = applyOrderAcceptanceRequest(current, current.activeOrder.orderId)
+      if (current.activeOrder.status === 'Available' && next.worldState.activeOrder.status === 'Accepted') {
+        transitions++
+      }
+      current = next.worldState
+    }
+    expect(transitions).toBe(1)
+    expect(current.activeOrder.status).toBe('Accepted')
   })
 })
 
 describe('ISSUE-006 — HUD accept action does not affect player movement or delivery', () => {
-  /** Simulate the HUD accept action as a pure state update (no Phaser). */
-  function simulateHUDAccept(worldState: WorldState): WorldState {
-    if (worldState.activeOrder.status !== 'Available') return worldState
-    const flagged = flagAcceptRequested(worldState.activeOrder)
-    const result = requestOrderAcceptance(flagged, worldState.player)
-    if (result.order.status !== 'Accepted') return worldState
-    return { ...worldState, activeOrder: result.order, player: result.player }
-  }
-
   it('HUD accept does not change tapTarget (movement target unchanged)', () => {
     const world = createInitialWorldState()
     const originalTarget = { ...world.tapTarget }
-    const updated = simulateHUDAccept(world)
+    const updated = applyOrderAcceptanceRequest(world, world.activeOrder.orderId).worldState
     expect(updated.tapTarget).toEqual(originalTarget)
+  })
+
+  describe('ISSUE-006 — canonical acceptance eligibility and request invariants', () => {
+    it('eligibility requires requested order id to match active order', () => {
+      const world = createInitialWorldState()
+      expect(isOrderAcceptanceEligible(world.activeOrder, world.player, 'ORDER-OTHER')).toBe(false)
+      expect(canRequestOrderAcceptance(world, 'ORDER-OTHER')).toBe(false)
+    })
+
+    it('rejected request clears stranded acceptRequested flag', () => {
+      const world = createInitialWorldState()
+      world.player.carryingPackage = true
+      world.activeOrder.acceptRequested = true
+      const result = requestOrderAcceptance(world.activeOrder, world.player, world.activeOrder.orderId)
+      expect(result.accepted).toBe(false)
+      expect(result.order.acceptRequested).toBe(false)
+      expect(result.order.status).toBe('Available')
+    })
   })
 
   it('HUD accept does not change isMoving flag', () => {
     const world = createInitialWorldState()
     world.isMoving = false
-    const updated = simulateHUDAccept(world)
+    const updated = applyOrderAcceptanceRequest(world, world.activeOrder.orderId).worldState
     expect(updated.isMoving).toBe(false)
   })
 
   it('HUD accept does not register a pendingDeliveryDestination', () => {
     const world = createInitialWorldState()
-    const updated = simulateHUDAccept(world)
+    const updated = applyOrderAcceptanceRequest(world, world.activeOrder.orderId).worldState
     expect(updated.pendingDeliveryDestination).toBe('')
   })
 })
@@ -653,5 +640,64 @@ describe('RBATCH-010 — tap-to-move and pickup regressions', () => {
       pickupRadius: world.pickupRadius,
     })
     expect(result.order.status).toBe('Accepted')
+  })
+})
+
+describe('ISSUE-005/006 — HUD layout and pointer isolation production helpers', () => {
+  it('layout bounds stay inside 800x600 canvas and avoid nav overlap', () => {
+    const layout = buildHUDLayout(800, 600)
+    expect(isBoundsInsideCanvas(layout.companyPanel, 800, 600)).toBe(true)
+    expect(isBoundsInsideCanvas(layout.orderPanel, 800, 600)).toBe(true)
+    expect(isBoundsInsideCanvas(layout.acceptButton, 800, 600)).toBe(true)
+    expect(layout.acceptButton.width).toBeGreaterThanOrEqual(44)
+    expect(layout.acceptButton.height).toBeGreaterThanOrEqual(44)
+    NAV_BUTTON_BOUNDS.forEach((nav) => {
+      expect(boundsIntersect(layout.orderPanel, nav)).toBe(false)
+      expect(boundsIntersect(layout.acceptButton, nav)).toBe(false)
+    })
+  })
+
+  it('layout bounds stay inside 1280x720 canvas and avoid nav overlap', () => {
+    const layout = buildHUDLayout(1280, 720)
+    expect(isBoundsInsideCanvas(layout.companyPanel, 1280, 720)).toBe(true)
+    expect(isBoundsInsideCanvas(layout.orderPanel, 1280, 720)).toBe(true)
+    expect(isBoundsInsideCanvas(layout.acceptButton, 1280, 720)).toBe(true)
+    NAV_BUTTON_BOUNDS.forEach((nav) => {
+      expect(boundsIntersect(layout.orderPanel, nav)).toBe(false)
+      expect(boundsIntersect(layout.acceptButton, nav)).toBe(false)
+    })
+  })
+
+  it('pointer isolation helper blocks Accept press while preserving world movement state', () => {
+    const world = createInitialWorldState()
+    const layout = buildHUDLayout(800, 600)
+    const pressX = layout.acceptButton.left + 5
+    const pressY = layout.acceptButton.top + 5
+
+    const blocked = isPointerOnInteractiveUI(pressX, pressY, {
+      menuButtonBounds: NAV_BUTTON_BOUNDS,
+      hudControlBounds: [layout.acceptButton],
+    })
+    expect(blocked).toBe(true)
+
+    const accepted = applyOrderAcceptanceRequest(world, world.activeOrder.orderId).worldState
+    expect(accepted.activeOrder.status).toBe('Accepted')
+    expect(accepted.tapTarget).toEqual(world.tapTarget)
+    expect(accepted.isMoving).toBe(world.isMoving)
+    expect(accepted.pendingDeliveryDestination).toBe(world.pendingDeliveryDestination)
+  })
+})
+
+describe('ISSUE-007 — notification expiry callback clears controller state', () => {
+  it('expiry uses clearNotification to clear active+message while preserving tracked status', () => {
+    const initial = createNotificationState('Available')
+    const accepted = updateNotification(initial, 'Accepted').state
+    expect(accepted.active).toBe(true)
+    expect(accepted.message).toBe(NOTIFICATION_MESSAGES.accepted)
+
+    const expired = clearNotification(accepted)
+    expect(expired.active).toBe(false)
+    expect(expired.message).toBeNull()
+    expect(expired.trackedStatus).toBe('Accepted')
   })
 })

@@ -1,26 +1,16 @@
 import Phaser from 'phaser'
 import type { HUDData } from './HUDViewModel'
+import { boundsContainPoint, buildHUDLayout, type RectBounds } from './hudLayout'
 
 /**
- * Canvas dimensions assumed by the HUD layout (matches VITE_GAME_WIDTH/HEIGHT defaults).
- * These are Phaser canvas units, not physical pixels.
- */
-const CANVAS_WIDTH = 1280
-const CANVAS_HEIGHT = 720
-
 /** z-depth for all HUD elements — sits above game world and navigation buttons. */
 const HUD_DEPTH = 30
 
 /**
  * Player-facing GameWorld HUD.
  *
- * Layout (1280×720 canvas, scrollFactor=0 throughout):
- *   Top-right  — Company status panel (Money, Reputation) at x=[1050,1272], y=[8,70]
- *   Bottom     — Active-order panel at x=[420,1272], y=[465,571]
- *                Accept Order button within the active-order panel at right
- *
- * Navigation buttons (created by GameWorldScene) occupy x=[32,368], y=[521,575].
- * The active-order panel starts at x=420, so there is no overlap.
+ * Layout is derived from the active Phaser scale size (scene.scale.width/height),
+ * with all elements fixed to camera (scrollFactor = 0).
  *
  * Pointer exclusion: call `containsPoint(pointer.x, pointer.y)` from the scene's
  * pointerdown handler.  Returns true when the pointer is over any interactive HUD
@@ -41,19 +31,28 @@ export class GameHUD {
    *                  The callback must check order state for idempotency.
    */
   constructor(scene: Phaser.Scene, onAccept: () => void) {
+    const layout = buildHUDLayout(scene.scale.width, scene.scale.height)
+
     // ── Company status panel ─────────────────────────────────────────────────
-    const companyPanelCX = CANVAS_WIDTH - 111  // 1169
-    const companyPanelCY = 39
+    const companyPanelCX = layout.companyPanel.left + layout.companyPanel.width / 2
+    const companyPanelCY = layout.companyPanel.top + layout.companyPanel.height / 2
     scene.add
-      .rectangle(companyPanelCX, companyPanelCY, 222, 62, 0x0f172a, 0.9)
+      .rectangle(
+        companyPanelCX,
+        companyPanelCY,
+        layout.companyPanel.width,
+        layout.companyPanel.height,
+        0x0f172a,
+        0.9,
+      )
       .setStrokeStyle(2, 0x38bdf8, 0.6)
       .setScrollFactor(0)
       .setDepth(HUD_DEPTH)
 
     this.companyText = scene.add
-      .text(companyPanelCX - 104, 14, '', {
+      .text(layout.companyPanel.left + 10, layout.companyPanel.top + 8, '', {
         fontFamily: 'Arial',
-        fontSize: '20px',
+        fontSize: '18px',
         color: '#f8fafc',
         lineSpacing: 2,
       })
@@ -61,28 +60,29 @@ export class GameHUD {
       .setDepth(HUD_DEPTH + 1)
 
     // ── Active-order panel ───────────────────────────────────────────────────
-    // Occupies x=[420,1272], y=[465,571].
-    // Nav buttons are at x=[32,368], y=[521,575] — no overlap.
-    const orderPanelLeft = 420
-    const orderPanelTop = 465
-    const orderPanelW = CANVAS_WIDTH - orderPanelLeft - 8    // 852
-    const orderPanelH = 106
-    const orderPanelCX = orderPanelLeft + orderPanelW / 2
-    const orderPanelCY = orderPanelTop + orderPanelH / 2
+    const orderPanelCX = layout.orderPanel.left + layout.orderPanel.width / 2
+    const orderPanelCY = layout.orderPanel.top + layout.orderPanel.height / 2
 
     this.orderBg = scene.add
-      .rectangle(orderPanelCX, orderPanelCY, orderPanelW, orderPanelH, 0x0f172a, 0.9)
+      .rectangle(
+        orderPanelCX,
+        orderPanelCY,
+        layout.orderPanel.width,
+        layout.orderPanel.height,
+        0x0f172a,
+        0.9,
+      )
       .setStrokeStyle(2, 0x38bdf8, 0.6)
       .setScrollFactor(0)
       .setDepth(HUD_DEPTH)
 
     this.orderText = scene.add
-      .text(orderPanelLeft + 10, orderPanelTop + 10, '', {
+      .text(layout.orderPanel.left + 10, layout.orderPanel.top + 10, '', {
         fontFamily: 'Arial',
-        fontSize: '19px',
+        fontSize: '17px',
         color: '#f8fafc',
-        wordWrap: { width: 580 },
-        lineSpacing: 4,
+        wordWrap: { width: layout.orderTextWidth },
+        lineSpacing: 3,
       })
       .setScrollFactor(0)
       .setDepth(HUD_DEPTH + 1)
@@ -90,11 +90,11 @@ export class GameHUD {
     // ── Accept Order button ──────────────────────────────────────────────────
     // Minimum touch target 44×44 px (canonical mobile requirement).
     // Positioned at right side of the active-order panel.
-    const acceptCX = CANVAS_WIDTH - 75  // 1205
-    const acceptCY = orderPanelTop + orderPanelH / 2  // 518
+    const acceptCX = layout.acceptButton.left + layout.acceptButton.width / 2
+    const acceptCY = layout.acceptButton.top + layout.acceptButton.height / 2
 
     this.acceptButton = scene.add
-      .rectangle(acceptCX, acceptCY, 120, 52, 0x16a34a, 1)
+      .rectangle(acceptCX, acceptCY, layout.acceptButton.width, layout.acceptButton.height, 0x16a34a, 1)
       .setStrokeStyle(2, 0x86efac)
       .setScrollFactor(0)
       .setDepth(HUD_DEPTH + 1)
@@ -103,20 +103,18 @@ export class GameHUD {
     this.acceptLabel = scene.add
       .text(acceptCX, acceptCY, 'Accept', {
         fontFamily: 'Arial',
-        fontSize: '20px',
+        fontSize: '18px',
         color: '#f0fdf4',
         fontStyle: 'bold',
       })
       .setOrigin(0.5)
       .setScrollFactor(0)
       .setDepth(HUD_DEPTH + 2)
-      .setInteractive({ useHandCursor: true })
 
     const handleAccept = () => {
       onAccept()
     }
     this.acceptButton.on('pointerdown', handleAccept)
-    this.acceptLabel.on('pointerdown', handleAccept)
   }
 
   /**
@@ -133,10 +131,13 @@ export class GameHUD {
     this.orderText.setVisible(showOrder)
 
     if (showOrder) {
-      const carrying = data.carryingPackage ? ' [Carrying package]' : ''
       this.orderText.setText([
-        `Order: ${data.orderStatus}${carrying}`,
+        `Order: ${data.orderId}`,
+        `Status: ${data.orderStatus}`,
+        `Pickup: ${data.pickupLocation}`,
         `Destination: ${data.destination}`,
+        `Reward: ${data.reward}`,
+        `Package: ${data.carryingPackage ? 'Carrying' : 'Not carrying'}`,
       ])
     }
 
@@ -152,20 +153,27 @@ export class GameHUD {
    */
   containsPoint(x: number, y: number): boolean {
     if (!this.acceptButton.visible) return false
-    return this.acceptButton.getBounds().contains(x, y)
+    const bounds = this.getAcceptButtonBounds()
+    return boundsContainPoint(bounds, x, y)
   }
 
   /**
    * The canvas-space bounding box of the Accept button — exposed for tests.
    */
-  getAcceptButtonBounds(): Phaser.Geom.Rectangle {
-    return this.acceptButton.getBounds()
+  getAcceptButtonBounds(): RectBounds {
+    const bounds = this.acceptButton.getBounds()
+    return {
+      left: bounds.x,
+      top: bounds.y,
+      width: bounds.width,
+      height: bounds.height,
+    }
   }
 
   /**
-   * Canvas height used by this layout — exposed so tests can verify positioning.
+   * Returns all active interactive UI bounds.
    */
-  static get CANVAS_HEIGHT(): number {
-    return CANVAS_HEIGHT
+  getInteractiveBounds(): RectBounds[] {
+    return this.acceptButton.visible ? [this.getAcceptButtonBounds()] : []
   }
 }
