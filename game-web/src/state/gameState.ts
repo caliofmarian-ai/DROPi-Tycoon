@@ -1,7 +1,13 @@
-import type { WorldState } from '../types/game'
+import { BALANCING } from '../config/balancing'
+import type { CompanyState, WorldState } from '../types/game'
 
 export const WORLD_WIDTH = 800
 export const WORLD_HEIGHT = 600
+
+export const createInitialCompanyState = (): CompanyState => ({
+  money: BALANCING.INITIAL_MONEY,
+  reputation: BALANCING.INITIAL_REPUTATION,
+})
 
 export const createInitialWorldState = (): WorldState => ({
   player: {
@@ -17,6 +23,8 @@ export const createInitialWorldState = (): WorldState => ({
     destination: 'DeliveryZone',
     status: 'Available',
     acceptRequested: false,
+    reward: BALANCING.ORDER_REWARD,
+    economySettled: false,
   },
   tapTarget: {
     x: 380,

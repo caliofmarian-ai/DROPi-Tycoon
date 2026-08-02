@@ -6,7 +6,7 @@ Version: 1.0.0
 Status: Development Log
 Author: Marian Caliof & OpenAI
 Language: English
-Last Updated: 2026-08-01 (BATCH-008 DELIVERY OUTCOMES IMPLEMENTATION)
+Last Updated: 2026-08-02 (RBATCH-009 ECONOMY AND REPUTATION OUTCOMES IMPLEMENTATION)
 
 ---
 
@@ -31,6 +31,41 @@ Date
 Category
 
 Description
+
+---
+
+# [2026-08-02] - RBATCH-009 ECONOMY AND REPUTATION OUTCOMES IMPLEMENTATION
+
+## Added
+
+- `CompanyState` interface (`money`, `reputation`) in `game-web/src/types/game.ts`.
+- `reward: number` field on `OrderState` in `game-web/src/types/game.ts`.
+- `game-web/src/config/balancing.ts` — canonical owner-approved balancing constants for Prototype v0.1: `INITIAL_MONEY: 0`, `INITIAL_REPUTATION: 50`, `ORDER_REWARD: 100`, `REPUTATION_ON_SUCCESS: +2`, `REPUTATION_ON_FAILURE: −5`, `REPUTATION_MIN: 0`, `REPUTATION_MAX: 100`.
+- `game-web/src/systems/economySettlement.ts` — pure, independently testable domain logic: `settleDeliveryOutcome` (applies money/reputation on PickedUp→Completed/Failed, clamps reputation 0..100, guards against non-finite/negative values, never applies twice) and `canAfford` (pure reusable affordability check, no side effects).
+- `createInitialCompanyState` in `game-web/src/state/gameState.ts` returning `{ money: 0, reputation: 50 }`.
+- Settlement integration in `GameWorldScene.ts`: `settleDeliveryOutcome` is called exactly once on the frame the status transitions from PickedUp to a terminal state.
+- `DebugPanel.ts` updated to display `Money`, `Reputation`, order status, carried-package status and guidance; updated guidance messages for Completed and Failed.
+- 34 new automated tests in `game-web/tests/orderSystem.test.ts`; BATCH-008 exclusion test replaced with correct RBATCH-009 assertion; total 64 tests pass.
+- ISSUE-003 corrected to owner-resolved status in `09_Development/Planning/ISSUE_CATALOG.md` and `09_Development/Planning/github_creation_plan.yaml`.
+- AI Report 088: `09_Development/AI_Reports/2026-08-02_088_RBATCH_009_ECONOMY_REPUTATION_OUTCOMES_IMPLEMENTATION.md`.
+
+## Verified
+
+- 64 automated tests pass (vitest run).
+- TypeScript + Vite production build passes.
+- HTTP 200 smoke test passes.
+- `git diff --check` passes (no CRLF whitespace errors).
+- No secrets detected.
+- No dependency or lockfile changes.
+
+## Not Changed
+
+- No RBATCH-010 or later batches implemented.
+- No final HUD or notification system.
+- No upgrade-purchase UI.
+- No save/load or persistence.
+- No new-order generation.
+- No archived Game/ files modified.
 
 ---
 

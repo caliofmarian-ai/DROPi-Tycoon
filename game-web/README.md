@@ -14,7 +14,7 @@ Last Updated: 2026-08-01
 
 This folder contains the first deployable browser runtime for DROPi Tycoon.
 
-`game-web/` carries forward migrated BATCH-001 through BATCH-007 behavior and implements BATCH-008 directly in the active web runtime.
+`game-web/` carries forward migrated BATCH-001 through BATCH-007 behavior, implements BATCH-008 delivery outcomes, and adds RBATCH-009 economy and reputation outcomes on a draft PR pending independent review.
 
 The archived/reference GDevelop source remains unchanged in:
 
@@ -67,17 +67,24 @@ This PR branch implements the following prototype behavior:
 - Correct destination → `Completed`; wrong destination → `Failed`
 - Both outcomes clear `CarryingPackage` and `currentOrder`
 - Terminal states `Completed` and `Failed` have no outbound transitions
-- No reward, Money, or reputation effects (BATCH-009)
+- Company state: `money` (initial 0) and `reputation` (initial 50)
+- Order reward: 100 (owner-approved balancing value)
+- Successful delivery (PickedUp→Completed): money +100, reputation +2 (clamped 0..100)
+- Failed delivery (PickedUp→Failed): money unchanged (no deduction), reputation −5 (clamped 0..100)
+- Economy settlement applied exactly once on terminal transition
+- Affordability helper (`canAfford`) available for future upgrade purchasing
+- Temporary debug panel shows Money, Reputation, order status, carried-package, guidance
 
 Not implemented in this milestone:
 
-- Money changes
+- Final HUD or notification system
+- Upgrade-purchase UI
 - DROPiCoins logic
 - Marketplace
 - Payments
 - Database
 - Save/load
-- BATCH-009 or later gameplay
+- RBATCH-010 or later gameplay
 
 ---
 

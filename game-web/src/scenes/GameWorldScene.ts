@@ -1,12 +1,13 @@
 import Phaser from 'phaser'
-import { createInitialWorldState, WORLD_HEIGHT, WORLD_WIDTH } from '../state/gameState'
+import { createInitialCompanyState, createInitialWorldState, WORLD_HEIGHT, WORLD_WIDTH } from '../state/gameState'
 import {
   attemptDelivery,
   attemptPickup,
   flagAcceptRequested,
   requestOrderAcceptance,
 } from '../systems/orderSystem'
-import type { WorldState } from '../types/game'
+import { settleDeliveryOutcome } from '../systems/economySettlement'
+import type { CompanyState, WorldState } from '../types/game'
 import { DebugPanel } from '../ui/DebugPanel'
 import { selectDeliveryIntentFromTap } from '../utils/deliveryIntent'
 
@@ -38,6 +39,8 @@ const DELIVERY_MARKER_TAP_RADIUS = 36
 export class GameWorldScene extends Phaser.Scene {
   private worldState!: WorldState
 
+  private companyState!: CompanyState
+
   private player!: Phaser.GameObjects.Sprite
 
   private readonly packagePosition = new Phaser.Math.Vector2(120, 440)
@@ -63,6 +66,7 @@ export class GameWorldScene extends Phaser.Scene {
 
   create(): void {
     this.worldState = createInitialWorldState()
+    this.companyState = createInitialCompanyState()
 
     this.cameras.main.setBackgroundColor('#91d0ff')
     this.cameras.main.setBounds(0, 0, WORLD_WIDTH, WORLD_HEIGHT)
@@ -99,7 +103,7 @@ export class GameWorldScene extends Phaser.Scene {
     this.cameras.main.startFollow(this.player, false, 1, 1)
 
     this.debugPanel = new DebugPanel(this)
-    this.debugPanel.update(this.worldState)
+    this.debugPanel.update(this.worldState, this.companyState)
     this.createNavigationButtons()
 
     this.input.on('pointerdown', (pointer: Phaser.Input.Pointer) => {
@@ -134,7 +138,7 @@ export class GameWorldScene extends Phaser.Scene {
         )
       }
 
-      this.debugPanel.update(this.worldState)
+      this.debugPanel.update(this.worldState, this.companyState)
     })
   }
 
@@ -142,7 +146,7 @@ export class GameWorldScene extends Phaser.Scene {
     this.updateMovement(delta / 1000)
     this.updatePickupState()
     this.updateDeliveryState()
-    this.debugPanel.update(this.worldState)
+    this.debugPanel.update(this.worldState, this.companyState)
   }
 
   private updateMovement(deltaSeconds: number): void {
@@ -220,8 +224,9 @@ export class GameWorldScene extends Phaser.Scene {
       targetPoint.y,
     )
 
+    const previousOrder = this.worldState.activeOrder
     const deliveryResult = attemptDelivery(
-      this.worldState.activeOrder,
+      previousOrder,
       this.worldState.player,
       {
         selectedDestination: this.worldState.pendingDeliveryDestination,
@@ -231,8 +236,18 @@ export class GameWorldScene extends Phaser.Scene {
       },
     )
 
-    if (deliveryResult.order.status !== this.worldState.activeOrder.status) {
-      this.worldState.activeOrder = deliveryResult.order
+    if (deliveryResult.order.status !== previousOrder.status) {
+      const settlement = settleDeliveryOutcome(
+        previousOrder,
+        deliveryResult.order,
+        this.companyState,
+      )
+      if (settlement.applied) {
+        this.companyState = settlement.company
+        this.worldState.activeOrder = settlement.order
+      } else {
+        this.worldState.activeOrder = deliveryResult.order
+      }
       this.worldState.player = deliveryResult.player
       this.worldState.pendingDeliveryDestination = ''
     }
