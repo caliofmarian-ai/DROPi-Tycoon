@@ -12,7 +12,7 @@
 - Implementation commit: `7de4fb15bb46e11a30d1c24a0fa72ccd7abb60c9` (HUD, Accept button, notifications, propagation fix, notification layout, tests)
 - Correction Pass 1 commit: `8778db5dadd1e28afd1c6b508d7c373e358a2999` (Report 089, PROJECT_STATUS, CHANGELOG, README)
 - Correction Pass 2 commit: `509b7c512b7c0fa4966da9a623f9d2d16bf3f836` / `21fd56f358e3ad4de26b39a748add3e9359548cc` (root .gitignore, Report 089 file-count update, 170/170 confirmed)
-- Correction Pass 3 commit: see final remote head SHA after this document is pushed
+- Correction Pass 3 commit: `581485b901d4ec2b901d7aaa054ecdaf0947ed3c` (verbatim original instruction inserted; YAML execution_status corrected)
 - Pull Request: https://github.com/caliofmarian-ai/DROPi-Tycoon/pull/253
 - Human approval status: Pending independent review — draft PR #253 open, unmerged
 
