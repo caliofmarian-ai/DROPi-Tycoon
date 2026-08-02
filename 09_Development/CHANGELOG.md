@@ -74,12 +74,13 @@ Description
 - Delivery lifecycle notifications for Available→Accepted, Accepted→PickedUp, PickedUp→Completed, PickedUp→Failed. Idempotent: only fires on genuine state transitions, never per-frame duplicates.
 - `DebugPanel` retired from `GameWorldScene` public runtime. Import removed. `DebugPanel.ts` file retained (not dead per repository audit — `appConfig.enableDebugPanel` remains a valid config field).
 - Main Menu stale text corrected: replaced "No economy, rewards, or marketplace are active in this build." with "Economy, reputation and delivery rewards active."
-- `game-web/tests/hud.test.ts` — 70 new deterministic tests covering HUD view-model, notification state machine, accept-order action, pointer isolation, and RBATCH-007..RBATCH-009 regressions.
+- `game-web/tests/hud.test.ts` — 70 new deterministic tests covering HUD view-model, notification state machine, accept-order action, pointer isolation, and RBATCH-007..RBATCH-009 regressions; 4 new notification layout non-overlap tests (800×600 and 1280×720).
+- `game-web/tests/gamehud-propagation.test.ts` — 5 new component-level adversarial tests importing real GameHUD with Phaser mock: proves stopPropagation fires before onAccept, acceptance occurs once, scene handler cannot process the same event, world state unchanged, and hidden-button area is unblocked.
 - AI Report 089: `09_Development/AI_Reports/2026-08-02_089_RBATCH_010_HUD_NOTIFICATIONS_IMPLEMENTATION.md`.
 
 ## Verified
 
-- 143 automated tests pass (73 existing + 70 new; vitest run).
+- 154 automated tests pass (73 orderSystem.test.ts + 149 hud.test.ts + gamehud-propagation.test.ts; vitest run).
 - TypeScript + Vite production build passes.
 - HTTP 200 smoke test passes.
 - `git diff --check` passes (no CRLF whitespace errors).

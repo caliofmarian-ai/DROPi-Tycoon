@@ -164,9 +164,9 @@ The prototype must prove the core idea before expansion.
 
 # Next Steps
 
-1. Keep PR #86 open as draft on branch `copilot/copilotrbatch-009-economy-reputation-outcomes` until independent review passes.
-2. Preserve the public Railway-verified BATCH-008 runtime evidence in documentation and reports.
-3. Complete RBATCH-009 corrections on PR #86, then proceed to merge/deploy/public verification only after independent approval.
+1. Correct and independently review PR #253 (RBATCH-010 HUD + Notifications) on branch `copilot/rbatch-010-hud-notifications`.
+2. Preserve the public Railway-verified BATCH-008 and RBATCH-009 runtime evidence in documentation and reports.
+3. Proceed to merge/deploy/public verification of PR #253 only after independent approval; no RBATCH-011+ behavior exists.
 
 ---
 
@@ -214,11 +214,11 @@ Implementation Preparation Status:
 - BATCH-006 is complete — Tap-to-Move implemented; touch input (primary/Android-first) and mouse fallback (desktop); Player movement toward tapped target; camera follows Player; arrival stops movement; Idle/Move animation switching; movement speed and arrival threshold are configurable scene variables; no pickup/delivery/economy/HUD/AI/save-load logic implemented; no playable prototype exists
 - BATCH-007 is implemented — minimal Android-first order acceptance trigger exists on Package touch while order status is Available; automatic pickup proximity exists with configurable `PickupRadius` = 32; Accepted→PickedUp transition sets `PlayerData.CarryingPackage` and `Player.CarryingPackage` true; no delivery completion, failure, reward, economy, HUD, notification, AI, or save/load logic implemented
 - BATCH-008 is complete — delivery completion (PickedUp→Completed on correct destination) and failure (PickedUp→Failed on wrong destination) are merged; terminal states have no outbound transitions; CarryingPackage and currentOrder clear in both outcomes; delivery radius = 48; touch-first tap-on-marker intent registration; no reward, Money, or reputation effects; 30 automated tests pass; TypeScript build passes; HTTP 200 smoke test passes
-- RBATCH-009 is implemented on a draft PR pending independent review — CompanyState (money=0, reputation=50) and OrderState.reward (100) added; pure settleDeliveryOutcome and canAfford domain functions created in economySettlement.ts; balancing constants in config/balancing.ts; settlement integrated once on PickedUp→terminal transition in GameWorldScene; DebugPanel shows Money, Reputation, order status, guidance; 64 automated tests pass; TypeScript build passes; HTTP 200 smoke test passes; no final HUD, no upgrade UI, no save/load, no RBATCH-010+ behavior
+- RBATCH-009 is COMPLETED and merged — CompanyState (money=0, reputation=50) and OrderState.reward (100) added; pure settleDeliveryOutcome and canAfford domain functions created in economySettlement.ts; balancing constants in config/balancing.ts; settlement integrated once on PickedUp→terminal transition in GameWorldScene; DebugPanel shows Money, Reputation, order status, guidance; 73 automated tests passed (final independently verified result); TypeScript build passes; HTTP 200 smoke test passes; merged in PR #86, Railway-verified 2026-08-02; no final HUD, no upgrade UI, no save/load, no RBATCH-010+ behavior
 - Web Runtime Migration Milestone 001 is implemented — `game-web/` now builds, tests, produces `dist/`, and starts on a production Node server compatible with Railway root-directory deployment
 - Public Railway browser verification of BATCH-007 flow completed on 2026-08-01: Available→Accepted, player travels to package, Accepted→PickedUp, CarryingPackage: true confirmed
 - BATCH-008 delivery outcomes merged in `main` and publicly verified in `game-web/`: PickedUp→Completed (correct destination) and wrong-destination PickedUp→Failed both passed; CarryingPackage cleared in both outcomes; no economy/reward/reputation effects introduced
-- RBATCH-009 implemented on branch `copilot/copilotrbatch-009-economy-reputation-outcomes` (draft PR #86 open); economy settlement, company state, order reward, and affordability helper implemented; 64 tests pass; pending independent review and Railway deployment verification
+- RBATCH-009 completed and merged in PR #86 (branch `copilot/copilotrbatch-009-economy-reputation-outcomes`); economy settlement, company state, order reward, and affordability helper implemented; 73 tests passed (final independently verified); Railway-verified 2026-08-02
 - Planning materialization reconciliation verified on 2026-08-02: labels 122/122; milestones 21/21; epics 46/46; batch issues 54/54; executable issues 34/34; planning placeholders 32/32; total canonical planning issues 166/166
 - M-005 status: In Progress
 - E-010 status: COMPLETED through merged and Railway-verified RBATCH-009

@@ -74,9 +74,9 @@ This PR branch implements the following prototype behavior:
 - Economy settlement applied exactly once on terminal transition
 - Affordability helper (`canAfford`) available for future upgrade purchasing
 - **Player-facing HUD**: camera-fixed panel showing Money, Reputation, active-order status, destination, carrying state, and Accept Order button (visible for Available only; hidden for terminal/pre-active states)
-- **Delivery lifecycle notifications**: shown once per canonical state transition (Available→Accepted, Accepted→PickedUp, PickedUp→Completed, PickedUp→Failed); idempotent (no per-frame duplicates); 3-second auto-dismiss; timer cleaned up on scene shutdown
+- **Delivery lifecycle notifications**: shown once per canonical state transition (Available→Accepted, Accepted→PickedUp, PickedUp→Completed, PickedUp→Failed); idempotent (no per-frame duplicates); 3-second auto-dismiss; timer cleaned up on scene shutdown; responsive width and position derived from canvas size; no overlap with HUD panels or navigation buttons
 - Active-order panel automatically hidden when order status is Completed or Failed (no stale panel)
-- HUD pointer isolation: Accept button presses do not trigger player movement or delivery intent
+- HUD pointer isolation: Accept button `pointerdown` calls `stopPropagation()` before invoking acceptance, so the scene-level pointer handler never processes the same tap; after the button is hidden the former area is fully unblocked for world input
 
 Not implemented in this milestone:
 
