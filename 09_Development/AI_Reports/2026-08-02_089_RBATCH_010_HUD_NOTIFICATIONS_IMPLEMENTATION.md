@@ -14,7 +14,7 @@
 - Correction Pass 2 commit: `509b7c512b7c0fa4966da9a623f9d2d16bf3f836` / `21fd56f358e3ad4de26b39a748add3e9359548cc` (root .gitignore, Report 089 file-count update, 170/170 confirmed)
 - Correction Pass 3 commit: `581485b901d4ec2b901d7aaa054ecdaf0947ed3c` (verbatim original instruction inserted; YAML execution_status corrected)
 - Correction Pass 4 commit: `17079025c7c60d735aa86fd955cb0cfdbbc66011` (focused-test results corrected; PROJECT_STATUS, GITHUB_CREATION_PLAN, planning doc dates corrected; Report 089 sections, classification, CRLF, secret scan, comparison rebuilt)
-- Resulting commit: `17079025c7c60d735aa86fd955cb0cfdbbc66011` (Correction Pass 4 final head)
+- Resulting commit: `f9aa404afef6d85f7441af2fe7d1b94b624ffcb9` (Correction Pass 4 final — CP4 SHA recorded in metadata; section 22 updated with exact PR-body attempt evidence)
 - Pull Request: https://github.com/caliofmarian-ai/DROPi-Tycoon/pull/253
 - Human approval status: Pending independent review — draft PR #253 open, unmerged
 
