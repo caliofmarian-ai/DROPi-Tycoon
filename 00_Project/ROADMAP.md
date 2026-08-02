@@ -2,15 +2,17 @@
 
 Document: ROADMAP.md
 Project: DROPi Tycoon
-Version: 1.0.0
+Version: 2.2.0
 Status: Canonical
 Author: Marian Caliof & OpenAI
 Language: English
-Last Updated: 2026-07-12
+Last Updated: 2026-08-01
 
 ---
 
 # Development Roadmap
+
+DROPi Tycoon remains a web-first project. The active deployable runtime is the standard code-based web runtime in `game-web/`, deployed through Railway; archived GDevelop work in `Game/` remains historical/reference-only. Specific libraries, frameworks, and engines are replaceable implementation details rather than canonical technology.
 
 ## Purpose
 
@@ -50,7 +52,7 @@ Deliverables:
 
 Status:
 
-Current Phase
+Completed — canonical documentation foundation established.
 
 ---
 
@@ -202,6 +204,59 @@ Every phase must:
 # Success Metric
 
 Development is considered successful when every milestone results in a complete, enjoyable, and stable gameplay experience.
+
+## Planning Architecture Reference
+
+- `09_Development/Planning/MILESTONE_ARCHITECTURE.md` — 21 milestones
+- `09_Development/Planning/EPIC_CATALOG.md` — 46 epics
+- `09_Development/Planning/BATCH_ARCHITECTURE.md` — 54 roadmap batches
+- `09_Development/Planning/ISSUE_CATALOG.md` — 34 executable issues and 32 planning placeholders
+- `09_Development/Planning/DEPENDENCY_GRAPH.md` — milestone, epic, and batch graphs validated acyclic
+- `09_Development/Planning/LABEL_TAXONOMY.md` — 122 labels
+- `09_Development/Planning/GITHUB_CREATION_PLAN.md` — non-destructive GitHub creation procedure and Owner Directive coverage matrix
+- `09_Development/Planning/github_creation_plan.yaml` — machine-readable planning package
+
+## Derived Planning Summary
+
+| Item | Count |
+|---|---|
+| Milestones | 21 |
+| Epics | 46 |
+| Roadmap Batches | 54 (`RBATCH-001..RBATCH-054`) |
+| Legacy Crosswalk Entries | 17 |
+| Executable Issues | 34 |
+| Planning Placeholders | 32 |
+| Labels | 122 |
+
+## Milestone Summary
+
+| ID | Phase | Title | Status |
+|---|---|---|---|
+| M-001 | 0 | Foundation & Documentation Complete | COMPLETED |
+| M-002 | 1 | Prototype Scaffold & Runtime Foundation | COMPLETED |
+| M-003 | 1 | World Navigation | COMPLETED |
+| M-004 | 1 | Order Lifecycle Core | COMPLETED |
+| M-005 | 1 | Economy, HUD & Game Flow | Planned — Not Started |
+| M-006 | 1 | Company Management & Bicycle | Planned — Not Started |
+| M-007 | 1 | Save & Load System | Planned — Blocked |
+| M-008 | 1 | Prototype v0.1 Verification & Release | Planned — Not Started |
+| M-009 | 2 | Employee & Financial Systems | Planned — Future |
+| M-010 | 2 | Vehicle Fleet Management | Planned — Future |
+| M-011 | 3 | Warehouse & District System | Planned — Future |
+| M-012 | 3 | Advanced Fleet & Route Optimization | Planned — Future |
+| M-013 | 4 | Drone Research & Manufacturing | Planned — Future |
+| M-014 | 4 | DronePort Infrastructure | Planned — Future |
+| M-015 | 4 | Autonomous Drone Operations | Planned — Future |
+| M-016 | 5 | Dynamic Market System | Planned — Future |
+| M-017 | 5 | Financial Instruments & Competition | Planned — Future |
+| M-018 | 6 | Autonomous Intelligence Systems | Planned — Future |
+| M-019 | 7 | International Multi-City Logistics | Planned — Future |
+| M-020 | 8 | Global Empire & Corporate Systems | Planned — Future |
+| M-021 | 9 | Multiplayer & Community Systems | Planned — Future |
+
+## Legacy Numbering Authority Rule
+
+Legacy `BATCH-001..BATCH-016` plus `BATCH-010b` remain historical lineage only. `M-001` / `E-001` / `E-002` are completed canonical-documentation owners and are not evidenced by historical `BATCH-001`. Historical `BATCH-001` maps to `RBATCH-001` under `M-002` / `E-003`. Execute only the mapped `RBATCH-*` identifiers from `09_Development/Planning/BATCH_ARCHITECTURE.md`; use `09_Development/Implementation_Preparation/IMPLEMENTATION_BATCH_PLAN.md` as lineage evidence, not authoritative current planning.
 
 ---
 
