@@ -3,12 +3,38 @@ import type { DeliveryContext, OrderState, PickupContext, PlayerState } from '..
 export const transitionCreatedToAvailable = (order: OrderState): OrderState =>
   order.status === 'Created' ? { ...order, status: 'Available' } : order
 
+/**
+ * Canonical acceptance eligibility for a specific requested order.
+ * Used by both UI visibility and transactional acceptance.
+ */
+export const isOrderAcceptanceEligible = (
+  order: OrderState,
+  player: PlayerState,
+  requestedOrderId: string,
+): boolean =>
+  order.status === 'Available' &&
+  requestedOrderId === order.orderId &&
+  !player.carryingPackage &&
+  (player.currentOrder === '' || player.currentOrder === order.orderId)
+
 export const requestOrderAcceptance = (
   order: OrderState,
   player: PlayerState,
-): { order: OrderState; player: PlayerState } => {
-  if (order.status !== 'Available' || !order.acceptRequested) {
-    return { order, player }
+  requestedOrderId = order.orderId,
+): { order: OrderState; player: PlayerState; accepted: boolean } => {
+  if (!order.acceptRequested) {
+    return { order, player, accepted: false }
+  }
+
+  if (!isOrderAcceptanceEligible(order, player, requestedOrderId)) {
+    return {
+      order: {
+        ...order,
+        acceptRequested: false,
+      },
+      player,
+      accepted: false,
+    }
   }
 
   return {
@@ -21,6 +47,7 @@ export const requestOrderAcceptance = (
       ...player,
       currentOrder: order.orderId,
     },
+    accepted: true,
   }
 }
 

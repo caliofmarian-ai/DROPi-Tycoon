@@ -32,7 +32,7 @@ export class MainMenuScene extends Phaser.Scene {
       .text(
         width / 2,
         270,
-        'Android-first prototype port.\nNo economy, rewards, or marketplace are active in this build.',
+        'Android-first prototype.\nEconomy, reputation and delivery rewards active.',
         {
           fontFamily: 'Arial',
           fontSize: '24px',

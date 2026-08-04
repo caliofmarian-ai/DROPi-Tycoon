@@ -6,7 +6,7 @@ metadata:
   repository: caliofmarian-ai/DROPi-Tycoon
   plan_version: 1.2.0
   created_date: '2026-08-01'
-  execution_status: NOT_EXECUTED
+  execution_status: INVENTORY_MATERIALIZED — GitHub inventory independently materialized and verified 2026-08-02; creation plan script was not run (inventory already exists)
   counts:
     milestones: 21
     epics: 46
@@ -14,12 +14,21 @@ metadata:
     labels: 122
     executable_issues: 34
     future_placeholders: 32
+    canonical_planning_issues_total: 166
+  materialization_reconciliation:
+    verified_date: '2026-08-02'
+    labels_verified: 122/122
+    milestones_verified: 21/21
+    epics_verified: 46/46
+    batch_issues_verified: 54/54
+    executable_issues_verified: 34/34
+    planning_placeholders_verified: 32/32
+    canonical_planning_issues_verified: 166/166
   placeholder_policy: Placeholders are approved for GitHub placeholder creation but are not executable implementation commitments.
 inspection_limitations:
-- Existing GitHub milestone objects were not directly inspected.
-- Existing labels, issues, and Projects must also be reconciled before creation.
-- No claim may be made that those objects were inspected if the available tools did not support it.
-- The creation plan must not run until manual or independent reconciliation and owner approval occur.
+- GitHub inventory (labels 122/122, milestones 21/21, epics 46/46, batch issues 54/54, executable issues 34/34, planning placeholders 32/32, total 166/166) was independently verified and materialized on 2026-08-02; verified counts are recorded in materialization_reconciliation above.
+- The creation plan script must not run because the GitHub inventory already exists; executing it would create duplicate objects.
+- No additional pre-creation reconciliation is required; the existing inventory matches the canonical counts in this plan exactly.
 status_authorization_policy:
   status_ready_rule: Use status:ready only when the issue is implementation-authorized and its parent milestone and batch are not Planned — Future.
   status_future_rule: Use status:future when the specification exists but parent roadmap status still prevents implementation authorization.
@@ -76,7 +85,7 @@ milestones:
 - id: M-005
   title: Economy, HUD & Game Flow
   phase: 1
-  status: Planned — Not Started
+  status: In Progress
   epic_ids:
   - E-010
   - E-011
@@ -380,7 +389,7 @@ epics:
   title: Economy & Reputation Core
   phase: 1
   milestone_id: M-005
-  status: Planned — Not Started
+  status: "COMPLETED — merged PR #86 and Railway-verified 2026-08-02"
   batch_ids:
   - RBATCH-009
   depends_on:
@@ -389,7 +398,7 @@ epics:
   title: HUD & Notifications
   phase: 1
   milestone_id: M-005
-  status: Planned — Not Started
+  status: Draft PR implementation exists — pending independent review
   batch_ids:
   - RBATCH-010
   depends_on:
@@ -913,11 +922,14 @@ batches:
   epic_ids:
   - E-010
   title: Economy Reward & Failure Consequences
-  status: Draft PR — Pending Independent Review
+  status: 'COMPLETED — merged in PR #86 and Railway-verified on 2026-08-02'
   depends_on:
   - RBATCH-008
   legacy_id: BATCH-009
-  legacy_status: NEVER STARTED
+  legacy_status: COMPLETED
+  implementation_head: 10c1b4df1703015367bd68e504d5713656681289
+  merge_commit: b449769f2cfdfcf915ad2680e68960dc902d8796
+  final_test_result: '73/73'
   authoritative_planning_source: 09_Development/Planning/BATCH_ARCHITECTURE.md
   historical_lineage_source: 09_Development/Implementation_Preparation/IMPLEMENTATION_BATCH_PLAN.md
   legacy_execution_rule: Historical numbering only; execute the mapped RBATCH identifier and never ambiguous legacy numbering.
@@ -927,12 +939,12 @@ batches:
   epic_ids:
   - E-011
   title: HUD + Notifications
-  status: Planned — Not Started
+  status: Draft PR — Pending Independent Review
   depends_on:
   - RBATCH-007
   - RBATCH-009
   legacy_id: BATCH-010
-  legacy_status: NEVER STARTED
+  legacy_status: Draft PR — Pending Independent Review
   authoritative_planning_source: 09_Development/Planning/BATCH_ARCHITECTURE.md
   historical_lineage_source: 09_Development/Implementation_Preparation/IMPLEMENTATION_BATCH_PLAN.md
   legacy_execution_rule: Historical numbering only; execute the mapped RBATCH identifier and never ambiguous legacy numbering.
@@ -1435,13 +1447,13 @@ legacy_crosswalk:
   execution_rule: Historical numbering only; execute the mapped RBATCH identifier and never ambiguous legacy numbering.
 - legacy_id: BATCH-009
   rbatch_id: RBATCH-009
-  historical_status: NEVER STARTED
+  historical_status: COMPLETED
   authoritative_planning_source: 09_Development/Planning/BATCH_ARCHITECTURE.md
   historical_lineage_source: 09_Development/Implementation_Preparation/IMPLEMENTATION_BATCH_PLAN.md
   execution_rule: Historical numbering only; execute the mapped RBATCH identifier and never ambiguous legacy numbering.
 - legacy_id: BATCH-010
   rbatch_id: RBATCH-010
-  historical_status: NEVER STARTED
+  historical_status: Draft PR — Pending Independent Review
   authoritative_planning_source: 09_Development/Planning/BATCH_ARCHITECTURE.md
   historical_lineage_source: 09_Development/Implementation_Preparation/IMPLEMENTATION_BATCH_PLAN.md
   execution_rule: Historical numbering only; execute the mapped RBATCH identifier and never ambiguous legacy numbering.
@@ -1551,6 +1563,14 @@ completed_batch_evidence:
   ai_report: 09_Development/AI_Reports/2026-08-01_085_BATCH_008_DELIVERY_COMPLETION_FAILURE_IMPLEMENTATION.md
   automated_validation_evidence: Report 085 — 30 automated tests, TypeScript build pass, HTTP 200 smoke test
   railway_public_verification_evidence: '00_Project/PROJECT_STATUS.md — PR #84 merged, Railway redeployed, PickedUp→Completed and wrong-destination PickedUp→Failed publicly verified, CarryingPackage cleared in both outcomes'
+  final_status: COMPLETED
+- rbatch_id: RBATCH-009
+  legacy_id: BATCH-009
+  implementation_commit: 10c1b4df1703015367bd68e504d5713656681289
+  pull_request: 'PR #86 — https://github.com/caliofmarian-ai/DROPi-Tycoon/pull/86'
+  ai_report: 09_Development/AI_Reports/2026-08-01_086_RBATCH_009_ECONOMY_REWARD_FAILURE_CONSEQUENCES_IMPLEMENTATION.md
+  automated_validation_evidence: '73/73 automated tests, TypeScript build pass, HTTP 200 smoke test — verified 2026-08-02'
+  railway_public_verification_evidence: '00_Project/PROJECT_STATUS.md — PR #86 merged, Railway redeployed, PickedUp→Completed +100 money and +2 reputation and PickedUp→Failed −5 reputation publicly verified on 2026-08-02'
   final_status: COMPLETED
 labels:
 - name: type:implementation
@@ -1806,13 +1826,13 @@ issues:
   milestone_id: M-005
   phase: 1
   type: implementation
-  status: Draft PR implementation exists — pending independent review
+  status: COMPLETED — merged PR #86, Railway-verified 2026-08-02
   label_names:
   - type:implementation
   - phase:1
   - batch:rbatch-009
   - epic:economy-reputation
-  - status:in-progress
+  - status:done
   description: Apply canonical reward to company money on Completed.
   acceptance_criteria: Company money increases on PickedUp→Completed.
 - id: ISSUE-002
@@ -1822,13 +1842,13 @@ issues:
   milestone_id: M-005
   phase: 1
   type: implementation
-  status: Draft PR implementation exists — pending independent review
+  status: COMPLETED — merged PR #86, Railway-verified 2026-08-02
   label_names:
   - type:implementation
   - phase:1
   - batch:rbatch-009
   - epic:economy-reputation
-  - status:in-progress
+  - status:done
   description: Increase reputation on Completed.
   acceptance_criteria: Reputation increases within approved bounds.
 - id: ISSUE-003
@@ -1860,13 +1880,13 @@ issues:
   milestone_id: M-005
   phase: 1
   type: implementation
-  status: Draft PR implementation exists — pending independent review
+  status: COMPLETED — merged PR #86, Railway-verified 2026-08-02
   label_names:
   - type:implementation
   - phase:1
   - batch:rbatch-009
   - epic:economy-reputation
-  - status:in-progress
+  - status:done
   description: Apply canonical reputation consequence on Failed.
   acceptance_criteria: Reputation decreases without permanent setback.
 - id: ISSUE-005
@@ -1876,13 +1896,13 @@ issues:
   milestone_id: M-005
   phase: 1
   type: implementation
-  status: Ready for implementation
+  status: Draft PR implementation exists — pending independent review
   label_names:
   - type:implementation
   - phase:1
   - batch:rbatch-010
   - epic:hud-notifications
-  - status:ready
+  - status:in-progress
   description: Show destination/status/package state in HUD.
   acceptance_criteria: HUD appears only when order active.
 - id: ISSUE-006
@@ -1892,13 +1912,13 @@ issues:
   milestone_id: M-005
   phase: 1
   type: implementation
-  status: Ready for implementation
+  status: Draft PR implementation exists — pending independent review
   label_names:
   - type:implementation
   - phase:1
   - batch:rbatch-010
   - epic:hud-notifications
-  - status:ready
+  - status:in-progress
   description: Connect HUD button to AcceptRequested flow.
   acceptance_criteria: Available orders can be accepted from HUD.
 - id: ISSUE-007
@@ -1908,13 +1928,13 @@ issues:
   milestone_id: M-005
   phase: 1
   type: implementation
-  status: Ready for implementation
+  status: Draft PR implementation exists — pending independent review
   label_names:
   - type:implementation
   - phase:1
   - batch:rbatch-010
   - epic:hud-notifications
-  - status:ready
+  - status:in-progress
   description: Show notifications for Accepted/PickedUp/Completed/Failed.
   acceptance_criteria: Notification appears on each state change.
 - id: ISSUE-008

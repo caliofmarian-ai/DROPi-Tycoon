@@ -6,7 +6,7 @@ Version: 1.2.0
 Status: Planning — Canonical
 Author: AI Agent (Report 087)
 Language: English
-Last Updated: 2026-08-01
+Last Updated: 2026-08-02
 
 ---
 
@@ -26,7 +26,7 @@ Last Updated: 2026-08-01
 | M-002 | 1 | Prototype Scaffold & Runtime Foundation | COMPLETED | E-003, E-004 | RBATCH-001, RBATCH-002, RBATCH-003 | M-001 | — |
 | M-003 | 1 | World Navigation | COMPLETED | E-005, E-006 | RBATCH-004, RBATCH-006 | M-002 | — |
 | M-004 | 1 | Order Lifecycle Core | COMPLETED | E-007, E-008, E-009 | RBATCH-005, RBATCH-007, RBATCH-008 | M-003 | — |
-| M-005 | 1 | Economy, HUD & Game Flow | Planned — Not Started | E-010, E-011, E-012 | RBATCH-009, RBATCH-010, RBATCH-011 | M-004 | — |
+| M-005 | 1 | Economy, HUD & Game Flow | In Progress | E-010, E-011, E-012 | RBATCH-009, RBATCH-010, RBATCH-011 | M-004 | — |
 | M-006 | 1 | Company Management & Bicycle | Planned — Not Started | E-013, E-014 | RBATCH-012, RBATCH-013 | M-005 | — |
 | M-007 | 1 | Save & Load System | Planned — Blocked | E-015 | RBATCH-014 | M-006 | ODR-001, ODR-003 |
 | M-008 | 1 | Prototype v0.1 Verification & Release | Planned — Not Started | E-016, E-017 | RBATCH-015, RBATCH-016, RBATCH-017 | M-007 | Human owner approval for RBATCH-017 closure |
