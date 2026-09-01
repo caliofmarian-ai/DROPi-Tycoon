@@ -2,11 +2,11 @@
 
 Document: ROADMAP.md
 Project: DROPi Tycoon
-Version: 2.2.0
+Version: 2.3.0
 Status: Canonical
 Author: Marian Caliof & OpenAI
 Language: English
-Last Updated: 2026-08-01
+Last Updated: 2026-09-01
 
 ---
 
@@ -31,6 +31,16 @@ DROPi Tycoon follows an iterative development model.
 Each milestone delivers a playable version of the game while expanding existing systems rather than replacing them.
 
 No feature should require rewriting the core architecture.
+
+## Long-Term Visual Quality Direction
+
+The minimal visual presentation of Prototype v0.1 is a temporary development stage, not the intended final quality bar for DROPi Tycoon.
+
+The long-term product is expected to evolve toward a substantially richer, polished, and visually impressive game experience. Later phases may improve or replace prototype presentation through higher-fidelity art, environments, buildings, vehicles, characters, animation, lighting, visual effects, UI presentation, audio-visual feedback, and other production-quality assets.
+
+The word **minimal** in Phase 1 describes implementation scope only. It must never be interpreted as a permanent limit on visual quality, depth, ambition, or production value.
+
+Core systems — including economy, logistics, progression, Save/Load, simulation state, and game rules — must remain sufficiently separated from rendering and temporary assets so visual technology and art direction can evolve without rewriting the underlying game logic.
 
 ---
 
@@ -60,7 +70,7 @@ Completed — canonical documentation foundation established.
 
 Objective:
 
-Deliver a minimal but fully playable logistics game.
+Deliver a minimal but fully playable logistics game. The minimal scope validates gameplay foundations; it does not define the final visual quality of the product.
 
 Features:
 
@@ -195,15 +205,16 @@ Every phase must:
 
 - Be playable.
 - Improve existing systems.
-- Avoid unnecessary complexity.
+- Avoid unnecessary complexity that does not improve the player experience.
 - Remain compatible with future expansions.
 - Preserve save-game compatibility whenever possible.
+- Allow visual fidelity and presentation quality to improve without forcing core-system rewrites.
 
 ---
 
 # Success Metric
 
-Development is considered successful when every milestone results in a complete, enjoyable, and stable gameplay experience.
+Development is considered successful when every milestone results in a complete, enjoyable, and stable gameplay experience while preserving the path toward the long-term product-quality target.
 
 ## Planning Architecture Reference
 
@@ -236,9 +247,9 @@ Development is considered successful when every milestone results in a complete,
 | M-002 | 1 | Prototype Scaffold & Runtime Foundation | COMPLETED |
 | M-003 | 1 | World Navigation | COMPLETED |
 | M-004 | 1 | Order Lifecycle Core | COMPLETED |
-| M-005 | 1 | Economy, HUD & Game Flow | Planned — Not Started |
-| M-006 | 1 | Company Management & Bicycle | Planned — Not Started |
-| M-007 | 1 | Save & Load System | Planned — Blocked |
+| M-005 | 1 | Economy, HUD & Game Flow | In Progress |
+| M-006 | 1 | Company Management & Bicycle | In Progress |
+| M-007 | 1 | Save & Load System | In Progress |
 | M-008 | 1 | Prototype v0.1 Verification & Release | Planned — Not Started |
 | M-009 | 2 | Employee & Financial Systems | Planned — Future |
 | M-010 | 2 | Vehicle Fleet Management | Planned — Future |
