@@ -1,0 +1,79 @@
+name: RBATCH-010 Independent Validation
+
+on:
+  push:
+    branches:
+      - copilot/rbatch-010-hud-notifications
+  pull_request:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    defaults:
+      run:
+        working-directory: game-web
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node 22.12.0
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22.12.0
+          cache: npm
+          cache-dependency-path: game-web/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run full automated test suite
+        run: npm test
+
+      - name: TypeScript and production build
+        run: npm run build
+
+      - name: Production server HTTP smoke test
+        shell: bash
+        run: |
+          set -euo pipefail
+          PORT=3000 npm start > /tmp/dropi-tycoon-server.log 2>&1 &
+          SERVER_PID=$!
+          trap 'kill "$SERVER_PID" 2>/dev/null || true' EXIT
+          for i in {1..30}; do
+            if curl --fail --silent --show-error http://127.0.0.1:3000/ > /tmp/dropi-tycoon-index.html; then
+              test -s /tmp/dropi-tycoon-index.html
+              echo "HTTP smoke test: PASS"
+              exit 0
+            fi
+            sleep 1
+          done
+          cat /tmp/dropi-tycoon-server.log
+          exit 1
+
+      - name: PR-range whitespace validation
+        working-directory: .
+        shell: bash
+        run: |
+          set -euo pipefail
+          git -c core.whitespace=cr-at-eol diff --check origin/main...HEAD
+
+      - name: Confirm archived Game runtime unchanged
+        working-directory: .
+        shell: bash
+        run: |
+          set -euo pipefail
+          if git diff --name-only origin/main...HEAD | grep -q '^Game/'; then
+            echo 'Archived Game/ files changed unexpectedly.'
+            git diff --name-only origin/main...HEAD | grep '^Game/'
+            exit 1
+          fi
+          echo 'Archived Game/ unchanged: PASS'
