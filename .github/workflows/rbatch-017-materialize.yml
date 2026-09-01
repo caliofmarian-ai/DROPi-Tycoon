@@ -1,0 +1,428 @@
+name: RBATCH-017 Materialize Release Evidence
+
+on:
+  push:
+    branches:
+      - openai/rbatch-017-release-evidence
+
+permissions:
+  contents: write
+
+jobs:
+  materialize:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: openai/rbatch-017-release-evidence
+          fetch-depth: 0
+
+      - name: Materialize release evidence and planning state
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          from pathlib import Path
+          import re
+
+          ROOT = Path('.')
+          BRANCH = 'openai/rbatch-017-release-evidence'
+          gate = 'RESOLVED 2026-09-01 — human owner explicitly approved RBATCH-017 execution; final Prototype v0.1 release approval remains separate'
+          batch_status = 'In Progress — owner execution gate resolved; release evidence package under review'
+          epic_status = 'In Progress — RBATCH-016 merged; RBATCH-017 release evidence package under review'
+          issue_status = 'In Progress — RBATCH-017 release evidence package active'
+
+          def load(path_str):
+              path = ROOT / path_str
+              raw = path.read_bytes().decode('utf-8')
+              nl = '\r\n' if '\r\n' in raw else '\n'
+              return path, raw.replace('\r\n', '\n'), nl
+
+          def save(path, text, nl):
+              path.write_bytes(text.replace('\n', nl).encode('utf-8'))
+
+          def update_row(text, prefix, updater):
+              lines = text.splitlines()
+              indexes = [i for i, line in enumerate(lines) if line.startswith(prefix)]
+              if len(indexes) != 1:
+                  raise RuntimeError(f'Expected exactly one row {prefix!r}, found {len(indexes)}')
+              i = indexes[0]
+              cells = [c.strip() for c in lines[i].strip().strip('|').split('|')]
+              updater(cells)
+              lines[i] = '| ' + ' | '.join(cells) + ' |'
+              return '\n'.join(lines) + ('\n' if text.endswith('\n') else '')
+
+          def yaml_block(text, item_id):
+              marker = f'- id: {item_id}\n'
+              start = text.find(marker)
+              if start < 0:
+                  raise RuntimeError(f'Missing YAML block {item_id}')
+              nxt = text.find('\n- id: ', start + len(marker))
+              end = len(text) if nxt < 0 else nxt + 1
+              return start, end, text[start:end]
+
+          def yaml_field(text, item_id, field, value):
+              start, end, block = yaml_block(text, item_id)
+              pattern = rf'(^  {re.escape(field)}: ).+$'
+              updated, count = re.subn(pattern, lambda m: m.group(1) + repr(value), block, count=1, flags=re.MULTILINE)
+              if count != 1:
+                  raise RuntimeError(f'Cannot update {field} in {item_id}')
+              return text[:start] + updated + text[end:]
+
+          def yaml_label(text, item_id, old_values, new_value):
+              start, end, block = yaml_block(text, item_id)
+              for old in old_values:
+                  block = block.replace(old, new_value)
+              return text[:start] + block + text[end:]
+
+          # Canonical completion gate: remove stale engine-specific requirement and add evidence boundary.
+          path, text, nl = load('09_Development/PROTOTYPE_RELEASE_CHECKLIST.md')
+          text = text.replace('Version: 1.0.0', 'Version: 1.1.0', 1)
+          text = re.sub(r'Last Updated: .*', 'Last Updated: 2026-09-01', text, count=1)
+          old = '- [ ] Project opens correctly in GDevelop'
+          new = '- [ ] Deployable web runtime opens correctly'
+          if old not in text and new not in text:
+              raise RuntimeError('Cannot find stale project-open checklist item')
+          text = text.replace(old, new, 1)
+          anchor = '- `09_Development/PROTOTYPE_MILESTONES.md` owns implementation milestone sequencing.\n'
+          evidence_note = '''\n## RBATCH-017 Evidence Boundary\n\nRBATCH-017 was explicitly authorized by the human Project Owner on 2026-09-01. That approval authorizes execution of the verification package; it is **not** the final Prototype v0.1 release sign-off required by REQ-187.\n\nEvidence is assembled in:\n\n- `09_Development/Release_Evidence/PROTOTYPE_V0.1_RELEASE_EVIDENCE.md`\n- `09_Development/Release_Evidence/PROTOTYPE_V0.1_OWNER_REVIEW_PACKAGE.md`\n\nThe seven sections below are evaluated using three evidence states:\n\n- **AUTOMATED PASS** — deterministic repository/CI evidence exists.\n- **HUMAN / DEVICE / PUBLIC CHECK PENDING** — the criterion requires observation that repository CI cannot truthfully provide.\n- **FINAL OWNER SIGN-OFF PENDING** — the Project Owner has not yet declared Prototype v0.1 complete.\n\nChecklist boxes remain authoritative release decisions and are intentionally left unchecked until final owner review. Automated evidence does not self-approve subjective or external checks.\n'''
+          if '## RBATCH-017 Evidence Boundary' not in text:
+              if anchor not in text:
+                  raise RuntimeError('Cannot find release-checklist cross-reference anchor')
+              text = text.replace(anchor, anchor + evidence_note, 1)
+          save(path, text, nl)
+
+          # Markdown planning crosswalk.
+          path, text, nl = load('09_Development/Planning/BATCH_ARCHITECTURE.md')
+          def legacy_batch(cells):
+              cells[2] = batch_status
+          text = update_row(text, '| BATCH-016 | RBATCH-017 |', legacy_batch)
+          def rbatch(cells):
+              cells[5] = batch_status
+              cells[8] = gate
+          text = update_row(text, '| RBATCH-017 |', rbatch)
+          save(path, text, nl)
+
+          path, text, nl = load('09_Development/Planning/EPIC_CATALOG.md')
+          text = update_row(text, '| E-017 |', lambda c: c.__setitem__(4, epic_status))
+          save(path, text, nl)
+
+          path, text, nl = load('09_Development/Planning/ISSUE_CATALOG.md')
+          for iid in ('ISSUE-022', 'ISSUE-023'):
+              def update_issue(cells):
+                  cells[6] = issue_status
+                  cells[7] = cells[7].replace('status:ready', 'status:in-progress')
+                  cells[8] = gate
+              text = update_row(text, f'| {iid} |', update_issue)
+          save(path, text, nl)
+
+          path, text, nl = load('09_Development/Planning/github_creation_plan.yaml')
+          text = yaml_field(text, 'RBATCH-017', 'status', batch_status)
+          text = yaml_field(text, 'RBATCH-017', 'owner_gates', gate)
+          text = yaml_field(text, 'E-017', 'status', epic_status)
+          for iid in ('ISSUE-022', 'ISSUE-023'):
+              text = yaml_field(text, iid, 'status', issue_status)
+              text = yaml_field(text, iid, 'blocked_or_owner_gate', gate)
+              text = yaml_label(text, iid, ('status:ready',), 'status:in-progress')
+          save(path, text, nl)
+
+          path, text, nl = load('00_Project/PROJECT_STATUS.md')
+          text = re.sub(r'Last Updated: .*', 'Last Updated: 2026-09-01 (RBATCH-017 authorized by owner; release evidence package active)', text, count=1)
+          text = re.sub(
+              r'# Current Objective\n\n.*?\n\n---',
+              '# Current Objective\n\nExecute RBATCH-017 release-checklist verification, preserve automated-vs-human evidence boundaries, and deliver the owner review package. Final Prototype v0.1 release sign-off remains a separate human owner decision after evidence review.\n\n---',
+              text, count=1, flags=re.DOTALL)
+          save(path, text, nl)
+
+          path, text, nl = load('09_Development/CHANGELOG.md')
+          marker = '# [2026-09-01] - RBATCH-016 FULL-LOOP INTEGRATION MERGE CHECKPOINT'
+          section = '''# [2026-09-01] - RBATCH-017 RELEASE EVIDENCE EXECUTION AUTHORIZED\n\n## Owner gate\n\n- Human Project Owner explicitly approved execution of RBATCH-017 on 2026-09-01.\n- The execution gate is resolved.\n- This authorization is not treated as final Prototype v0.1 release sign-off.\n\n## Release-gate correction\n\n- Corrected the stale GDevelop-specific project-open checklist item to an engine-agnostic deployable web-runtime criterion.\n- Archived `Game/` remains reference-only and unchanged.\n\n## Evidence package\n\n- Added a seven-section release evidence matrix.\n- Added an owner review package with explicit manual/device/public/subjective checks.\n- Automated evidence and human-observation evidence remain distinct.\n\n---\n\n'''
+          if '# [2026-09-01] - RBATCH-017 RELEASE EVIDENCE EXECUTION AUTHORIZED' not in text:
+              if marker not in text:
+                  raise RuntimeError('Cannot find changelog insertion marker')
+              text = text.replace(marker, section + marker, 1)
+          save(path, text, nl)
+
+          print('RBATCH-017 planning/canonical materialization: PASS')
+          PY
+
+          mkdir -p 09_Development/Release_Evidence
+
+          cat > 09_Development/Release_Evidence/PROTOTYPE_V0.1_RELEASE_EVIDENCE.md <<'EOF'
+          # DROPi Tycoon Prototype v0.1 — Release Evidence Matrix
+
+          Date: 2026-09-01
+          Batch: RBATCH-017
+          Issues: #208 / ISSUE-022, #209 / ISSUE-023
+          Authoritative gate: `09_Development/PROTOTYPE_RELEASE_CHECKLIST.md`
+
+          ## Purpose
+
+          This document verifies all seven release-checklist sections by mapping each section to the strongest evidence currently available. It does not convert automated evidence into human observation and does not declare Prototype v0.1 released.
+
+          ## Evidence states
+
+          - **AUTOMATED PASS** — deterministic source/tests/build/CI evidence exists.
+          - **HUMAN / DEVICE / PUBLIC CHECK PENDING** — a criterion requires real observation outside repository CI.
+          - **FINAL OWNER SIGN-OFF PENDING** — the final completion decision required by REQ-187 has not yet been recorded.
+
+          ## Baseline evidence
+
+          - RBATCH-016 integration report: `09_Development/AI_Reports/2026-09-01_096_RBATCH_016_FULL_LOOP_INTEGRATION_VERIFICATION.md`.
+          - RBATCH-016 PR #265 CI: run `33563515533` — SUCCESS.
+          - RBATCH-016 post-merge `main` CI: run `33563908596` — SUCCESS.
+          - Post-RBATCH-016 planning checkpoint PR #266 and `main` CI: run `33564613672` — SUCCESS.
+          - Full automated suite includes order lifecycle, HUD, MainMenu, company management, Bicycle, Save/Load, mobile viewport/touch, notifications, and connected full-loop integration tests.
+
+          ## 1. Project Stability
+
+          | Criterion | Evidence status | Evidence |
+          |---|---|---|
+          | Deployable web runtime opens correctly | AUTOMATED PASS | Production build and local production-server HTTP smoke pass in CI. |
+          | No critical errors | AUTOMATED PASS for repository/build path | Full test suite, TypeScript/Vite build and HTTP smoke pass. Runtime/device defects not exercised by CI remain outside this claim. |
+          | Game launches successfully | AUTOMATED PASS | Production server HTTP smoke returns a non-empty page. |
+          | Main scene loads correctly | AUTOMATED PASS for implemented scene flow | MainMenu and GameWorld source contracts/tests pass. |
+          | No broken references | AUTOMATED PASS for compiled/tested paths | TypeScript/Vite build and full suite pass. |
+
+          Section 1 status: **AUTOMATED PASS**, with public Railway/browser observation still separately pending where desired.
+
+          ## 2. Core Gameplay
+
+          | Area | Evidence status | Evidence |
+          |---|---|---|
+          | Enter world / move / interact | AUTOMATED PASS | MainMenu, world movement/input, HUD and interaction tests are in the full suite. |
+          | Generate / accept / display order | AUTOMATED PASS | `orderSystem.test.ts`, `hud.test.ts`, `gamehud-propagation.test.ts`, full-loop integration. |
+          | Pickup / destination / completion | AUTOMATED PASS | Order lifecycle and full-loop success path. |
+          | Rewards / money update / upgrade cost | AUTOMATED PASS | Economy settlement, company-management and Bicycle purchase tests; full-loop integration. |
+          | Failure path and reputation consequence | AUTOMATED PASS | Full-loop wrong-destination failure scenario. |
+
+          Section 2 status: **AUTOMATED PASS**.
+
+          ## 3. User Interface
+
+          | Criterion | Evidence status | Evidence |
+          |---|---|---|
+          | Money visible | AUTOMATED PASS | HUD tests and integrated propagation. |
+          | Active order visible | AUTOMATED PASS | HUD tests and integrated propagation. |
+          | Buttons functional | AUTOMATED PASS | MainMenu, HUD and CompanyManagement interaction tests. |
+          | Messages understandable | HUMAN CHECK PENDING | Notification content is deterministic/tested, but human comprehensibility is observational. |
+          | Interface works on mobile screens | AUTOMATED PASS for layout contracts; DEVICE CHECK PENDING | Representative viewport/touch invariants pass; physical-device observation is separate. |
+
+          Section 3 status: **MIXED — automated functional coverage complete; human clarity/device observation pending**.
+
+          ## 4. Mobile Experience
+
+          | Criterion | Evidence status | Evidence |
+          |---|---|---|
+          | Touch controls work | AUTOMATED PASS for input contracts; DEVICE CHECK PENDING | Mobile/touch tests pass; physical touch feel remains observational. |
+          | Buttons easy to press | AUTOMATED PASS for minimum target contracts; HUMAN DEVICE CHECK PENDING | Touch-target sizing tests pass. |
+          | Text readable | HUMAN DEVICE CHECK PENDING | Cannot be truthfully certified from headless CI alone. |
+          | Performance acceptable | PHYSICAL DEVICE / PUBLIC RUNTIME CHECK PENDING | CI build/smoke is not a device-performance benchmark. |
+          | Different screen sizes work | AUTOMATED PASS for representative viewport contracts; DEVICE CHECK PENDING | Portrait/landscape representative viewport tests pass. |
+
+          Section 4 status: **MIXED — deterministic mobile contracts pass; physical-device readability/performance remain pending**.
+
+          ## 5. Balance
+
+          | Criterion | Evidence status | Evidence |
+          |---|---|---|
+          | Starting resources permit play | AUTOMATED PASS for deterministic configuration/path | Fresh-start connected scenario proceeds into order loop. |
+          | First delivery achievable | AUTOMATED PASS | Full-loop success scenario completes a fresh-start delivery. |
+          | Rewards feel meaningful | HUMAN CHECK PENDING | Subjective experience. |
+          | First upgrade reachable | AUTOMATED PASS | Successful delivery → Bicycle purchase is covered by connected integration. |
+          | Progress feels motivating | HUMAN CHECK PENDING | Subjective experience. |
+
+          Section 5 status: **MIXED — economic reachability passes; subjective balance remains owner/player observation**.
+
+          ## 6. Quality
+
+          | Criterion | Evidence status | Evidence |
+          |---|---|---|
+          | No gameplay-breaking bugs | AUTOMATED PASS for tested scope | Full suite/build/connected loop all pass. This is not a claim that untested environments contain zero defects. |
+          | No confusing interactions | HUMAN CHECK PENDING | Requires player observation. |
+          | Player understands objective | HUMAN CHECK PENDING | Requires player observation. |
+          | First five minutes enjoyable | HUMAN CHECK PENDING | Subjective player-experience criterion. |
+
+          Section 6 status: **MIXED — automated stability passes; UX quality questions remain human**.
+
+          ## 7. Save & Load
+
+          | Criterion | Evidence status | Evidence |
+          |---|---|---|
+          | Save after delivery completion | AUTOMATED PASS | Canonical autosave policy + full-loop integration. |
+          | Save after upgrade purchase | AUTOMATED PASS | `save-system.test.ts` + Bicycle/full-loop integration. |
+          | Continue restores correct state | AUTOMATED PASS | Save decode/restore and connected load continuity tests. |
+          | Earned money/upgrades persist | AUTOMATED PASS | Persistence serialization/restore and full-loop integration. |
+          | New Game with no save | AUTOMATED PASS | Save-slot missing path and MainMenu/New Game implementation tests. |
+          | Valid save requires confirmation before overwrite | AUTOMATED PASS | RBATCH-014 new-game overwrite guard coverage. |
+          | Corrupted/unreadable save does not crash | AUTOMATED PASS | `save-system.test.ts` corrupted/incompatible validation. |
+          | Player informed when restore fails | AUTOMATED PASS for implemented recovery messaging contract | RBATCH-014 MainMenu/save recovery coverage. |
+          | Invalid save replacement requires confirmation / preservation | AUTOMATED PASS | Invalid raw save is preserved before explicitly confirmed replacement. |
+
+          Section 7 status: **AUTOMATED PASS**.
+
+          ## Requirements REQ-185..REQ-188
+
+          - **REQ-185** — PASS: authoritative completion gate remains `PROTOTYPE_RELEASE_CHECKLIST.md`.
+          - **REQ-186** — PASS: all seven sections are explicitly evaluated in this matrix.
+          - **REQ-187** — PENDING FINAL OWNER SIGN-OFF: execution approval for RBATCH-017 is recorded, but final completion approval is intentionally separate.
+          - **REQ-188** — PASS: implementation-preparation did not pre-check release items; RBATCH-017 also leaves authoritative checklist boxes unchecked pending final owner review.
+
+          ## Current release verdict
+
+          **EVIDENCE PACKAGE COMPLETE — FINAL RELEASE SIGN-OFF NOT YET RECORDED.**
+
+          Automated release evidence is strong enough to present to the owner. Remaining blockers to a truthful final release declaration are the human/device/public/subjective observations listed in the owner review package and the final explicit owner decision.
+          EOF
+
+          cat > 09_Development/Release_Evidence/PROTOTYPE_V0.1_OWNER_REVIEW_PACKAGE.md <<'EOF'
+          # DROPi Tycoon Prototype v0.1 — Owner Review Package
+
+          Date: 2026-09-01
+          Batch: RBATCH-017
+          Authoritative gate: `09_Development/PROTOTYPE_RELEASE_CHECKLIST.md`
+
+          ## What has already been verified automatically
+
+          Repository CI verifies the compiled web runtime, local production-server launch, the complete deterministic gameplay loop, success/failure settlement, HUD and menu behavior, company upgrade/Bicycle progression, Save/Load safety and continuity, and representative mobile viewport/touch contracts.
+
+          ## What the owner still needs to observe
+
+          These items are intentionally not self-approved by CI:
+
+          1. Open the current public/Railway build on the Android phone and confirm it launches and reaches the playable world.
+          2. Confirm text is comfortably readable on the phone.
+          3. Confirm touch controls and buttons feel comfortable to use, not merely that their tested hit areas meet code-level contracts.
+          4. Confirm performance feels acceptable during normal play on the phone.
+          5. Confirm notifications/messages are understandable.
+          6. Confirm the objective and next action are clear without technical knowledge.
+          7. Confirm rewards/progression feel meaningful and motivating for a prototype.
+          8. Play approximately the first five minutes and answer whether the experience is enjoyable enough to prove the concept.
+
+          ## Final owner questions
+
+          After those observations, answer:
+
+          - Gameplay: Is the core loop fun enough for Prototype v0.1?
+          - Clarity: Do you understand what to do without explanation from the developer?
+          - Progression: Does earning money and buying the first upgrade feel rewarding?
+          - Future: Does this prototype prove a foundation worth expanding?
+
+          ## Decision choices
+
+          **APPROVE PROTOTYPE v0.1 RELEASE** — use only if the remaining human/device checks are satisfactory.
+
+          **HOLD PROTOTYPE v0.1 RELEASE** — use if one or more observations need correction; record the exact failed item(s) so corrective issues can be opened without ambiguity.
+
+          ## Governance note
+
+          The Project Owner's 2026-09-01 message approving RBATCH-017 resolved the batch execution gate. It did **not** automatically answer the final review questions above and is not reused as release sign-off.
+          EOF
+
+          cat > 09_Development/AI_Reports/2026-09-01_097_RBATCH_017_RELEASE_CHECKLIST_VERIFICATION_PACKAGE.md <<'EOF'
+          # RBATCH-017 — Release-Checklist Verification Package
+
+          Date: 2026-09-01
+          Repository: `caliofmarian-ai/DROPi-Tycoon`
+          Branch: `openai/rbatch-017-release-evidence`
+          Issues: #208, #209
+
+          ## Owner authorization
+
+          The human Project Owner explicitly approved execution of RBATCH-017 on 2026-09-01. The execution gate is therefore resolved.
+
+          This authorization is deliberately not conflated with the final Prototype v0.1 release sign-off required by REQ-187.
+
+          ## Canonical correction
+
+          `09_Development/PROTOTYPE_RELEASE_CHECKLIST.md` contained one stale engine-specific item requiring the project to open in GDevelop. The live product direction is engine-agnostic web runtime, with historical `Game/` retained as archive/reference. The release gate was corrected to require the deployable web runtime to open correctly; archived `Game/` was not modified.
+
+          ## Artifacts produced
+
+          - `09_Development/Release_Evidence/PROTOTYPE_V0.1_RELEASE_EVIDENCE.md`
+          - `09_Development/Release_Evidence/PROTOTYPE_V0.1_OWNER_REVIEW_PACKAGE.md`
+          - updated authoritative `09_Development/PROTOTYPE_RELEASE_CHECKLIST.md`
+          - synchronized active planning in Markdown/YAML.
+
+          ## Evidence boundary
+
+          Automated evidence may certify deterministic code/test/build contracts. It cannot truthfully certify physical-device performance, subjective enjoyment, human readability, clarity, or motivation. Those remain explicit owner checks.
+
+          ## Verdict at package creation
+
+          RBATCH-017 evidence assembly: **IMPLEMENTED — pending branch CI and PR review**.
+
+          Prototype v0.1 final release: **NOT SELF-APPROVED**.
+          EOF
+
+      - name: Verify materialized package
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 -m pip install --quiet pyyaml
+          python3 - <<'PY'
+          from pathlib import Path
+          import yaml
+
+          with open('09_Development/Planning/github_creation_plan.yaml', encoding='utf-8') as f:
+              data = yaml.safe_load(f)
+          batches = {x['id']: x for x in data['batches']}
+          epics = {x['id']: x for x in data['epics']}
+          issues = {x['id']: x for x in data['issues']}
+
+          assert batches['RBATCH-017']['status'].startswith('In Progress')
+          assert batches['RBATCH-017']['owner_gates'].startswith('RESOLVED 2026-09-01')
+          assert epics['E-017']['status'].startswith('In Progress')
+          for iid in ('ISSUE-022', 'ISSUE-023'):
+              assert issues[iid]['status'].startswith('In Progress')
+              assert 'status:in-progress' in issues[iid]['label_names']
+              assert issues[iid]['blocked_or_owner_gate'].startswith('RESOLVED 2026-09-01')
+
+          checklist = Path('09_Development/PROTOTYPE_RELEASE_CHECKLIST.md').read_text(encoding='utf-8')
+          assert 'Project opens correctly in GDevelop' not in checklist
+          assert 'Deployable web runtime opens correctly' in checklist
+          assert 'FINAL OWNER SIGN-OFF PENDING' in checklist
+          assert checklist.count('# 1. Project Stability') == 1
+          for n in range(1, 8):
+              assert f'# {n}.' in checklist
+
+          evidence = Path('09_Development/Release_Evidence/PROTOTYPE_V0.1_RELEASE_EVIDENCE.md').read_text(encoding='utf-8')
+          for n in range(1, 8):
+              assert f'## {n}.' in evidence
+          assert 'FINAL RELEASE SIGN-OFF NOT YET RECORDED' in evidence
+          assert 'REQ-185' in evidence and 'REQ-188' in evidence
+
+          owner = Path('09_Development/Release_Evidence/PROTOTYPE_V0.1_OWNER_REVIEW_PACKAGE.md').read_text(encoding='utf-8')
+          assert 'APPROVE PROTOTYPE v0.1 RELEASE' in owner
+          assert 'HOLD PROTOTYPE v0.1 RELEASE' in owner
+          assert 'did **not** automatically' in owner
+
+          print('RBATCH-017 evidence package validation: PASS')
+          PY
+          git -c core.whitespace=cr-at-eol diff --check
+          if git diff --name-only | grep -q '^Game/'; then
+            echo 'ERROR: archived Game/ changed'
+            exit 1
+          fi
+
+      - name: Commit ordinary RBATCH-017 files
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add \
+            00_Project/PROJECT_STATUS.md \
+            09_Development/PROTOTYPE_RELEASE_CHECKLIST.md \
+            09_Development/CHANGELOG.md \
+            09_Development/Planning/BATCH_ARCHITECTURE.md \
+            09_Development/Planning/EPIC_CATALOG.md \
+            09_Development/Planning/ISSUE_CATALOG.md \
+            09_Development/Planning/github_creation_plan.yaml \
+            09_Development/Release_Evidence/PROTOTYPE_V0.1_RELEASE_EVIDENCE.md \
+            09_Development/Release_Evidence/PROTOTYPE_V0.1_OWNER_REVIEW_PACKAGE.md \
+            09_Development/AI_Reports/2026-09-01_097_RBATCH_017_RELEASE_CHECKLIST_VERIFICATION_PACKAGE.md
+          git commit -m 'docs: assemble RBATCH-017 release evidence package'
+          git push origin HEAD:openai/rbatch-017-release-evidence
