@@ -1,0 +1,139 @@
+name: RBATCH-013 Post-Merge Checkpoint
+
+on:
+  push:
+    branches:
+      - openai/post-rbatch-013-checkpoint
+
+permissions:
+  contents: write
+
+jobs:
+  reconcile:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: openai/post-rbatch-013-checkpoint
+          fetch-depth: 0
+
+      - name: Reconcile canonical planning after PR 257 merge
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          from pathlib import Path
+          import re
+
+          def load(path_str):
+              path = Path(path_str)
+              raw = path.read_bytes().decode('utf-8')
+              nl = '\r\n' if '\r\n' in raw else '\n'
+              return path, raw.replace('\r\n', '\n'), nl
+
+          def save(path, text, nl):
+              path.write_bytes(text.replace('\n', nl).encode('utf-8'))
+
+          def one(text, old, new):
+              count = text.count(old)
+              if count != 1:
+                  raise RuntimeError(f'Expected exactly one occurrence of {old!r}, found {count}')
+              return text.replace(old, new, 1)
+
+          def yaml_status(text, item_id, value):
+              pattern = rf"(^- id: {re.escape(item_id)}\n(?:(?!^- id: ).*\n)*?^  status: ).+$"
+              updated, count = re.subn(pattern, rf"\1'{value}'", text, count=1, flags=re.MULTILINE)
+              if count != 1:
+                  raise RuntimeError(f'Could not update YAML status for {item_id}')
+              return updated
+
+          def yaml_label(text, item_id, old, new):
+              marker = f'- id: {item_id}\n'
+              start = text.find(marker)
+              if start < 0:
+                  raise RuntimeError(f'Could not locate {item_id}')
+              next_item = text.find('\n- id: ', start + len(marker))
+              end = len(text) if next_item < 0 else next_item + 1
+              block = text[start:end]
+              if block.count(old) != 1:
+                  raise RuntimeError(f'Expected one {old} in {item_id}, found {block.count(old)}')
+              return text[:start] + block.replace(old, new, 1) + text[end:]
+
+          path, text, nl = load('09_Development/Planning/BATCH_ARCHITECTURE.md')
+          text = one(text,
+              '| BATCH-012 | RBATCH-013 | PR #257 — validation complete; pending merge | M-006 / E-014 |',
+              '| BATCH-012 | RBATCH-013 | MERGED in PR #257 — pending Railway/public verification | M-006 / E-014 |')
+          text = one(text,
+              '| RBATCH-013 | 1 | M-006 | E-014 | Bicycle Ownership + Speed Increase | PR #257 — validation complete; pending merge |',
+              '| RBATCH-013 | 1 | M-006 | E-014 | Bicycle Ownership + Speed Increase | MERGED in PR #257 — pending Railway/public verification |')
+          save(path, text, nl)
+
+          path, text, nl = load('09_Development/Planning/EPIC_CATALOG.md')
+          text = one(text,
+              '| E-014 | 1 | M-006 | Bicycle Ownership System | PR #257 — validation complete; pending merge |',
+              '| E-014 | 1 | M-006 | Bicycle Ownership System | MERGED in PR #257 — pending Railway/public verification |')
+          save(path, text, nl)
+
+          path, text, nl = load('09_Development/Planning/ISSUE_CATALOG.md')
+          text = one(text,
+              '| ISSUE-012 | Implement bicycle ownership through purchased-upgrade persistence | RBATCH-013 | E-014 | M-006 | implementation | PR #257 implementation validated — pending merge | type:implementation, phase:1, batch:rbatch-013, epic:bicycle-ownership, status:in-progress |',
+              '| ISSUE-012 | Implement bicycle ownership through purchased-upgrade persistence | RBATCH-013 | E-014 | M-006 | implementation | COMPLETED — merged PR #257; Railway/public verification pending at RBATCH-013 level | type:implementation, phase:1, batch:rbatch-013, epic:bicycle-ownership, status:done |')
+          text = one(text,
+              '| ISSUE-013 | Implement bicycle movement-speed increase after purchase | RBATCH-013 | E-014 | M-006 | implementation | PR #257 implementation validated — pending merge | type:implementation, phase:1, batch:rbatch-013, epic:bicycle-ownership, status:in-progress |',
+              '| ISSUE-013 | Implement bicycle movement-speed increase after purchase | RBATCH-013 | E-014 | M-006 | implementation | COMPLETED — merged PR #257; Railway/public verification pending at RBATCH-013 level | type:implementation, phase:1, batch:rbatch-013, epic:bicycle-ownership, status:done |')
+          save(path, text, nl)
+
+          path, text, nl = load('09_Development/Planning/github_creation_plan.yaml')
+          text = yaml_status(text, 'RBATCH-013', 'MERGED in PR #257 — pending Railway/public verification')
+          text = yaml_status(text, 'E-014', 'MERGED in PR #257 — pending Railway/public verification')
+          text = yaml_status(text, 'ISSUE-012', 'COMPLETED — merged PR #257; Railway/public verification pending at RBATCH-013 level')
+          text = yaml_status(text, 'ISSUE-013', 'COMPLETED — merged PR #257; Railway/public verification pending at RBATCH-013 level')
+          text = yaml_label(text, 'ISSUE-012', 'status:in-progress', 'status:done')
+          text = yaml_label(text, 'ISSUE-013', 'status:in-progress', 'status:done')
+          save(path, text, nl)
+
+          print('Post-RBATCH-013 planning reconciliation prepared: PASS')
+          PY
+
+      - name: Verify checkpoint
+        shell: bash
+        run: |
+          set -euo pipefail
+          grep -F "RBATCH-013 | 1 | M-006 | E-014 | Bicycle Ownership + Speed Increase | MERGED in PR #257" 09_Development/Planning/BATCH_ARCHITECTURE.md
+          grep -F "E-014 | 1 | M-006 | Bicycle Ownership System | MERGED in PR #257" 09_Development/Planning/EPIC_CATALOG.md
+          grep -F "ISSUE-012 | Implement bicycle ownership" 09_Development/Planning/ISSUE_CATALOG.md | grep -F "status:done"
+          grep -F "ISSUE-013 | Implement bicycle movement-speed" 09_Development/Planning/ISSUE_CATALOG.md | grep -F "status:done"
+          python3 - <<'PY'
+          import yaml
+          with open('09_Development/Planning/github_creation_plan.yaml', encoding='utf-8') as handle:
+              data = yaml.safe_load(handle)
+          batches = {x['id']: x for x in data['batches']}
+          epics = {x['id']: x for x in data['epics']}
+          issues = {x['id']: x for x in data['issues']}
+          assert 'MERGED' in batches['RBATCH-013']['status']
+          assert 'MERGED' in epics['E-014']['status']
+          for issue_id in ('ISSUE-012', 'ISSUE-013'):
+              assert issues[issue_id]['status'].startswith('COMPLETED')
+              assert 'status:done' in issues[issue_id]['label_names']
+          print('Post-RBATCH-013 YAML checkpoint: PASS')
+          PY
+
+      - name: Commit checkpoint planning
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add \
+            09_Development/Planning/BATCH_ARCHITECTURE.md \
+            09_Development/Planning/EPIC_CATALOG.md \
+            09_Development/Planning/ISSUE_CATALOG.md \
+            09_Development/Planning/github_creation_plan.yaml
+          if git diff --cached --quiet; then
+            echo "No checkpoint changes to commit."
+            exit 0
+          fi
+          git commit -m "docs: reconcile RBATCH-013 merge checkpoint"
+          git push origin HEAD:openai/post-rbatch-013-checkpoint
