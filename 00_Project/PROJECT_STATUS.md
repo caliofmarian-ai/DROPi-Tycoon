@@ -6,7 +6,7 @@ Version: 1.2.0
 Status: Active Development
 Author: Marian Caliof & OpenAI
 Language: English
-Last Updated: 2026-09-01 (RBATCH-016 merged in PR #265; RBATCH-017 release checklist pending human owner approval)
+Last Updated: 2026-09-01 (RBATCH-017 owner-authorized; release evidence package active)
 
 ---
 
@@ -22,7 +22,7 @@ Prototype v0.1 — RBATCH-010 through RBATCH-016 MERGED; automated integration v
 
 # Current Objective
 
-Await explicit human owner approval for RBATCH-017, then assemble the release-checklist evidence and owner review package without self-approval claims. Railway/public/physical-device evidence remains distinct from automated CI evidence.
+Execute RBATCH-017 release-checklist verification and deliver the owner review package while keeping automated evidence separate from human/device/public observations. Final Prototype v0.1 release sign-off remains a separate human owner decision.
 
 ---
 

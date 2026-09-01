@@ -43,7 +43,7 @@ Last Updated: 2026-09-01
 | BATCH-013 | RBATCH-014 | MERGED in PR #259 — pending Railway/public verification | M-007 / E-015 | 09_Development/Planning/BATCH_ARCHITECTURE.md | 09_Development/Implementation_Preparation/IMPLEMENTATION_BATCH_PLAN.md |
 | BATCH-014 | RBATCH-015 | MERGED in PR #263 — pending Railway/public mobile verification | M-008 / E-016 | 09_Development/Planning/BATCH_ARCHITECTURE.md | 09_Development/Implementation_Preparation/IMPLEMENTATION_BATCH_PLAN.md |
 | BATCH-015 | RBATCH-016 | MERGED in PR #265 — automated integration verified; release evidence pending RBATCH-017 owner review | M-008 / E-017 | 09_Development/Planning/BATCH_ARCHITECTURE.md | 09_Development/Implementation_Preparation/IMPLEMENTATION_BATCH_PLAN.md |
-| BATCH-016 | RBATCH-017 | NEVER STARTED | M-008 / E-017 | 09_Development/Planning/BATCH_ARCHITECTURE.md | 09_Development/Implementation_Preparation/IMPLEMENTATION_BATCH_PLAN.md |
+| BATCH-016 | RBATCH-017 | In Progress — owner execution gate resolved; release evidence package under review | M-008 / E-017 | 09_Development/Planning/BATCH_ARCHITECTURE.md | 09_Development/Implementation_Preparation/IMPLEMENTATION_BATCH_PLAN.md |
 
 Legacy numbering is historical only. Execute the mapped `RBATCH-*` identifier; ambiguous old numbering is prohibited.
 
@@ -67,7 +67,7 @@ Legacy numbering is historical only. Execute the mapped `RBATCH-*` identifier; a
 | RBATCH-014 | 1 | M-007 | E-015 | Save/Load Implementation | MERGED in PR #259 — pending Railway/public verification | RBATCH-012, RBATCH-013, RBATCH-011 | BATCH-013 | Resolved 2026-09-01 — ODR-001=A; ODR-003=B |
 | RBATCH-015 | 1 | M-008 | E-016 | Mobile Optimization | MERGED in PR #263 — pending Railway/public mobile verification | RBATCH-010, RBATCH-014 | BATCH-014 | — |
 | RBATCH-016 | 1 | M-008 | E-017 | Full-Loop Integration Verification | MERGED in PR #265 — automated integration verified; release evidence pending RBATCH-017 owner review | RBATCH-015 | BATCH-015 | — |
-| RBATCH-017 | 1 | M-008 | E-017 | Release-Checklist Verification Package | Planned — Not Started | RBATCH-016 | BATCH-016 | Human owner approval required |
+| RBATCH-017 | 1 | M-008 | E-017 | Release-Checklist Verification Package | In Progress — owner execution gate resolved; release evidence package under review | RBATCH-016 | BATCH-016 | RESOLVED 2026-09-01 — human owner explicitly approved RBATCH-017 execution; final Prototype v0.1 release approval remains separate |
 | RBATCH-018 | 2 | M-009 | E-018 | Employee Hiring & Onboarding | Planned — Future | RBATCH-017 | — | — |
 | RBATCH-019 | 2 | M-009 | E-019 | Daily Expenses & Financial Reporting | Planned — Future | RBATCH-018 | — | — |
 | RBATCH-020 | 2 | M-009 | E-020 | Customer Review Generation & Reputation | Planned — Future | RBATCH-009 | — | — |

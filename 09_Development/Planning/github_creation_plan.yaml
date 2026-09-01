@@ -456,7 +456,7 @@ epics:
   title: Full-Loop Integration Verification
   phase: 1
   milestone_id: M-008
-  status: 'In Progress — RBATCH-016 merged; RBATCH-017 pending human owner approval'
+  status: 'In Progress — RBATCH-016 merged; RBATCH-017 release evidence package under review'
   batch_ids:
   - RBATCH-016
   - RBATCH-017
@@ -1044,10 +1044,10 @@ batches:
   epic_ids:
   - E-017
   title: Release-Checklist Verification Package
-  status: Planned — Not Started
+  status: 'In Progress — owner execution gate resolved; release evidence package under review'
   depends_on:
   - RBATCH-016
-  owner_gates: Human owner approval required
+  owner_gates: 'RESOLVED 2026-09-01 — human owner explicitly approved RBATCH-017 execution; final Prototype v0.1 release approval remains separate'
   legacy_id: BATCH-016
   legacy_status: NEVER STARTED
   authoritative_planning_source: 09_Development/Planning/BATCH_ARCHITECTURE.md
@@ -2173,13 +2173,14 @@ issues:
   milestone_id: M-008
   phase: 1
   type: verification
-  status: Ready for implementation
+  status: 'In Progress — RBATCH-017 release evidence package active'
   label_names:
   - type:verification
   - phase:1
   - batch:rbatch-017
   - epic:integration-verification
-  - status:ready
+  - status:in-progress
+  blocked_or_owner_gate: 'RESOLVED 2026-09-01 — human owner explicitly approved RBATCH-017 execution; final Prototype v0.1 release approval remains separate'
   description: Assemble release-checklist evidence for owner review.
   acceptance_criteria: Evidence is complete with no self-approval claim.
 - id: ISSUE-023
@@ -2189,13 +2190,14 @@ issues:
   milestone_id: M-008
   phase: 1
   type: documentation
-  status: Ready for implementation
+  status: 'In Progress — RBATCH-017 release evidence package active'
   label_names:
   - type:documentation
   - phase:1
   - batch:rbatch-017
   - epic:integration-verification
-  - status:ready
+  - status:in-progress
+  blocked_or_owner_gate: 'RESOLVED 2026-09-01 — human owner explicitly approved RBATCH-017 execution; final Prototype v0.1 release approval remains separate'
   description: Package review artifacts for the owner.
   acceptance_criteria: Artifacts and review instructions are included.
 - id: ISSUE-024
