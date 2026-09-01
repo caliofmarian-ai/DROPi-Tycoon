@@ -19,6 +19,33 @@ jobs:
           ref: openai/rbatch-013-bicycle-speed
           fetch-depth: 0
 
+      - name: Harden issue-block label updater
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          from pathlib import Path
+
+          path = Path('scripts/reconcile_rbatch_013_planning.py')
+          text = path.read_text(encoding='utf-8')
+          start = text.index('def set_yaml_issue_label_status')
+          end = text.index('\n\n# Batch architecture.', start)
+          replacement = '''def set_yaml_issue_label_status(text: str, issue_id: str, old: str, new: str) -> str:
+              marker = f"- id: {issue_id}\\n"
+              start = text.find(marker)
+              if start < 0:
+                  raise RuntimeError(f"Could not locate YAML issue block for {issue_id}")
+              next_item = text.find("\\n- id: ", start + len(marker))
+              end = len(text) if next_item < 0 else next_item + 1
+              block = text[start:end]
+              if block.count(old) != 1:
+                  raise RuntimeError(f"Expected one {old} label in {issue_id}, found {block.count(old)}")
+              updated_block = block.replace(old, new)
+              return text[:start] + updated_block + text[end:]
+          '''
+          path.write_text(text[:start] + replacement + text[end:], encoding='utf-8')
+          PY
+
       - name: Apply deterministic planning reconciliation
         run: python3 scripts/reconcile_rbatch_013_planning.py
 
