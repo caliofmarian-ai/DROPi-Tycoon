@@ -119,16 +119,16 @@ jobs:
           assert milestones['M-007']['status'] == 'In Progress'
           assert milestones['M-007']['owner_gates'].startswith('RESOLVED')
           assert milestones['M-008']['status'] == 'In Progress'
+          assert milestones['M-008']['owner_gates'].startswith('Final Prototype v0.1 owner release sign-off')
 
-          for batch_id in ('RBATCH-010', 'RBATCH-011', 'RBATCH-012', 'RBATCH-013', 'RBATCH-014', 'RBATCH-015', 'RBATCH-016'):
+          for batch_id in ('RBATCH-010', 'RBATCH-011', 'RBATCH-012', 'RBATCH-013', 'RBATCH-014', 'RBATCH-015', 'RBATCH-016', 'RBATCH-017'):
               assert 'MERGED' in batches[batch_id]['status']
           assert batches['RBATCH-014']['owner_gates'].startswith('RESOLVED')
-          assert batches['RBATCH-017']['status'].startswith('In Progress')
           assert batches['RBATCH-017']['owner_gates'].startswith('RESOLVED 2026-09-01')
 
           for epic_id in ('E-011', 'E-012', 'E-013', 'E-014', 'E-015', 'E-016'):
               assert 'MERGED' in epics[epic_id]['status']
-          assert epics['E-017']['status'].startswith('In Progress')
+          assert epics['E-017']['status'].startswith('COMPLETED')
 
           assert issues['ISSUE-008']['batch_id'] == 'RBATCH-011'
           assert issues['ISSUE-008']['epic_id'] == 'E-012'
@@ -175,14 +175,14 @@ jobs:
               assert issues[issue_id]['batch_id'] == 'RBATCH-017'
               assert issues[issue_id]['epic_id'] == 'E-017'
               assert issues[issue_id]['milestone_id'] == 'M-008'
-              assert issues[issue_id]['status'].startswith('In Progress')
+              assert issues[issue_id]['status'].startswith('COMPLETED')
               assert issues[issue_id]['blocked_or_owner_gate'].startswith('RESOLVED 2026-09-01')
-              assert 'status:in-progress' in issues[issue_id]['label_names']
+              assert 'status:done' in issues[issue_id]['label_names']
 
           print('Active planning crosswalk validation: PASS')
           PY
 
-      - name: Validate RBATCH-017 release evidence boundary
+      - name: Validate Prototype v0.1 final owner gate
         working-directory: .
         shell: bash
         run: |
@@ -193,6 +193,7 @@ jobs:
           checklist = Path('09_Development/PROTOTYPE_RELEASE_CHECKLIST.md').read_text(encoding='utf-8')
           evidence = Path('09_Development/Release_Evidence/PROTOTYPE_V0.1_RELEASE_EVIDENCE.md').read_text(encoding='utf-8')
           owner = Path('09_Development/Release_Evidence/PROTOTYPE_V0.1_OWNER_REVIEW_PACKAGE.md').read_text(encoding='utf-8')
+          report = Path('09_Development/AI_Reports/2026-09-01_098_RBATCH_017_POST_MERGE_CLOSURE_CHECKPOINT.md').read_text(encoding='utf-8')
 
           assert 'Project opens correctly in GDevelop' not in checklist
           assert 'Deployable web runtime opens correctly' in checklist
@@ -203,10 +204,13 @@ jobs:
               assert f'## {section}.' in evidence
           for req in range(185, 189):
               assert f'REQ-{req}' in evidence
-          assert 'EVIDENCE PACKAGE COMPLETE — FINAL RELEASE SIGN-OFF NOT YET RECORDED' in evidence
+          assert 'EVIDENCE PACKAGE MERGED — FINAL RELEASE SIGN-OFF NOT YET RECORDED' in evidence
+          assert '33566223185' in evidence and '33566313283' in evidence
 
           assert 'APPROVE PROTOTYPE v0.1 RELEASE' in owner
           assert 'HOLD PROTOTYPE v0.1 RELEASE' in owner
           assert 'did **not** automatically' in owner
-          print('RBATCH-017 release evidence boundary: PASS')
+          assert 'M-008 remains In Progress' in report
+          assert 'No Railway/public/physical-device or subjective observation is invented' in report
+          print('Prototype v0.1 final owner gate: PASS')
           PY
