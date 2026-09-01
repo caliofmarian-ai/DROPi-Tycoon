@@ -436,7 +436,7 @@ epics:
   title: Save & Load System
   phase: 1
   milestone_id: M-007
-  status: 'PR #259 — validation complete; pending merge'
+  status: 'MERGED in PR #259 — pending Railway/public verification'
   batch_ids:
   - RBATCH-014
   depends_on:
@@ -998,7 +998,7 @@ batches:
   epic_ids:
   - E-015
   title: Save/Load Implementation
-  status: 'PR #259 — validation complete; pending merge'
+  status: 'MERGED in PR #259 — pending Railway/public verification'
   depends_on:
   - RBATCH-012
   - RBATCH-013
@@ -1960,13 +1960,13 @@ issues:
   milestone_id: M-007
   phase: 1
   type: implementation
-  status: 'PR #259 implementation validated — pending merge'
+  status: 'COMPLETED — merged PR #259; Railway/public verification pending at RBATCH-014 level'
   label_names:
   - type:implementation
   - phase:1
   - batch:rbatch-014
   - epic:save-load
-  - status:in-progress
+  - status:done
   blocked_or_owner_gate: 'RESOLVED 2026-09-01 — ODR-001=A; ODR-003=B'
   description: Require confirmation before replacing an existing valid save as part of the canonical save/load path.
   acceptance_criteria: No valid save is silently overwritten.
@@ -2041,13 +2041,13 @@ issues:
   milestone_id: M-007
   phase: 1
   type: implementation
-  status: 'PR #259 implementation validated — pending merge'
+  status: 'COMPLETED — merged PR #259; Railway/public verification pending at RBATCH-014 level'
   label_names:
   - type:implementation
   - phase:1
   - batch:rbatch-014
   - epic:save-load
-  - status:in-progress
+  - status:done
   blocked_or_owner_gate: 'RESOLVED 2026-09-01 — ODR-001=A; ODR-003=B'
   description: Serialize canonical save fields only.
   acceptance_criteria: Required save fields persist and excluded fields do not.
@@ -2058,13 +2058,13 @@ issues:
   milestone_id: M-007
   phase: 1
   type: implementation
-  status: 'PR #259 implementation validated — pending merge'
+  status: 'COMPLETED — merged PR #259; Railway/public verification pending at RBATCH-014 level'
   label_names:
   - type:implementation
   - phase:1
   - batch:rbatch-014
   - epic:save-load
-  - status:in-progress
+  - status:done
   blocked_or_owner_gate: 'RESOLVED 2026-09-01 — ODR-001=A; ODR-003=B'
   description: Handle missing/corrupted/incompatible saves per SAVE_SYSTEM.md.
   acceptance_criteria: Missing save starts new game; corrupted data informs player and requires confirmation.
@@ -2075,13 +2075,13 @@ issues:
   milestone_id: M-007
   phase: 1
   type: implementation
-  status: 'PR #259 implementation validated — pending merge'
+  status: 'COMPLETED — merged PR #259; Railway/public verification pending at RBATCH-014 level'
   label_names:
   - type:implementation
   - phase:1
   - batch:rbatch-014
   - epic:save-load
-  - status:in-progress
+  - status:done
   blocked_or_owner_gate: 'RESOLVED 2026-09-01 — ODR-001=A; ODR-003=B'
   description: Use only delivery completion, upgrade purchase, progression change, and tutorial-step completion if present.
   acceptance_criteria: No unapproved generic scene-exit trigger is used.
@@ -2092,13 +2092,13 @@ issues:
   milestone_id: M-007
   phase: 1
   type: implementation
-  status: 'PR #259 implementation validated — pending merge'
+  status: 'COMPLETED — merged PR #259; Railway/public verification pending at RBATCH-014 level'
   label_names:
   - type:implementation
   - phase:1
   - batch:rbatch-014
   - epic:save-load
-  - status:in-progress
+  - status:done
   blocked_or_owner_gate: 'RESOLVED 2026-09-01 — ODR-001=A; ODR-003=B'
   description: Validate version/schema integrity without silent overwrite.
   acceptance_criteria: Invalid saves fail gracefully.

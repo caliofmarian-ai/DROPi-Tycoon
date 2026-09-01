@@ -6,7 +6,7 @@ Version: 1.2.0
 Status: Active Development
 Author: Marian Caliof & OpenAI
 Language: English
-Last Updated: 2026-09-01 (RBATCH-014 Save/Load validated on PR #259; owner gates resolved)
+Last Updated: 2026-09-01 (RBATCH-014 merged in PR #259; RBATCH-015 Mobile Optimization ready)
 
 ---
 
@@ -16,13 +16,13 @@ Last Updated: 2026-09-01 (RBATCH-014 Save/Load validated on PR #259; owner gates
 
 Phase:
 
-Prototype v0.1 — RBATCH-010/011/012/013 MERGED pending Railway/public verification; RBATCH-014 Save/Load validated on PR #259 pending merge
+Prototype v0.1 — RBATCH-010/011/012/013/014 MERGED pending Railway/public verification; RBATCH-015 Mobile Optimization is the next implementation batch
 
 ---
 
 # Current Objective
 
-Complete final review and merge of PR #259 (RBATCH-014 Save/Load), preserving engine-independent persistence and the resolved ODR-001=A / ODR-003=B scope.
+Execute RBATCH-015 Mobile Optimization (ISSUE-018/#204 viewport fit and ISSUE-019/#205 comfortable touch targets) while preserving the merged Save/Load contract and the canonical long-term visual-quality direction.
 
 ---
 
@@ -235,9 +235,9 @@ Implementation Preparation Status:
 - Owner decisions resolved 2026-09-01: ODR-001=A (do not persist player position); ODR-003=B (persist only TutorialStatus from GameSettings)
 
 - M-007 status: In Progress
-- E-015 status: PR #259 — validation complete; pending merge
-- RBATCH-014 status: PR #259 — validation complete; pending merge
-- ISSUE-009/ISSUE-014/ISSUE-015/ISSUE-016/ISSUE-017 status: PR #259 implementation validated — pending merge
+- E-015 status: MERGED in PR #259 — pending Railway/public verification
+- RBATCH-014 status: MERGED in PR #259 — pending Railway/public verification
+- ISSUE-009/ISSUE-014/ISSUE-015/ISSUE-016/ISSUE-017 status: COMPLETED — merged PR #259; Railway/public verification pending at RBATCH-014 level
 - RBATCH-014 validation run `33559283892`: 242/242 tests passed across 8 files; TypeScript/Vite build, HTTP smoke, whitespace, archived `Game/` guard, YAML syntax/counts and pre-reconciliation planning crosswalk passed
 - Save/Load v1 persists company progression and TutorialStatus only; player position, active order, WorldData and other GameSettings are excluded by the resolved owner decisions
 - Current prototype visuals are explicitly temporary; persistence and gameplay state remain decoupled from rendering/assets so later high-fidelity visual evolution does not require Save/Load rewrites

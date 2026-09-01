@@ -34,6 +34,22 @@ Description
 
 ---
 
+# [2026-09-01] - RBATCH-014 MERGE CHECKPOINT
+
+## Merged
+
+- PR #259 / RBATCH-014 merged into `main` as `6faf7e5f932d33dac766d1d73109e290310c1edc`.
+- Main post-merge CI run `33560288015` succeeded.
+- ISSUE-009 and ISSUE-014 through ISSUE-017 closed as completed.
+
+## Planning
+
+- RBATCH-014 / E-015 now record merged status pending Railway/public gameplay verification.
+- M-007 remains In Progress until public verification is observed.
+- RBATCH-015 Mobile Optimization remains the next ready implementation batch.
+
+---
+
 # [2026-09-01] - RBATCH-014 SAVE/LOAD VALIDATION
 
 ## Owner Decisions

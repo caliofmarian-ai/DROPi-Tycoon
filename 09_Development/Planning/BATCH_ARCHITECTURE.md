@@ -40,7 +40,7 @@ Last Updated: 2026-09-01
 | BATCH-010b | RBATCH-011 | MERGED in PR #255 — pending Railway/public verification | M-005 / E-012 | 09_Development/Planning/BATCH_ARCHITECTURE.md | 09_Development/Implementation_Preparation/IMPLEMENTATION_BATCH_PLAN.md |
 | BATCH-011 | RBATCH-012 | MERGED in PR #256 — pending Railway/public verification | M-006 / E-013 | 09_Development/Planning/BATCH_ARCHITECTURE.md | 09_Development/Implementation_Preparation/IMPLEMENTATION_BATCH_PLAN.md |
 | BATCH-012 | RBATCH-013 | MERGED in PR #257 — pending Railway/public verification | M-006 / E-014 | 09_Development/Planning/BATCH_ARCHITECTURE.md | 09_Development/Implementation_Preparation/IMPLEMENTATION_BATCH_PLAN.md |
-| BATCH-013 | RBATCH-014 | PR #259 — validation complete; pending merge | M-007 / E-015 | 09_Development/Planning/BATCH_ARCHITECTURE.md | 09_Development/Implementation_Preparation/IMPLEMENTATION_BATCH_PLAN.md |
+| BATCH-013 | RBATCH-014 | MERGED in PR #259 — pending Railway/public verification | M-007 / E-015 | 09_Development/Planning/BATCH_ARCHITECTURE.md | 09_Development/Implementation_Preparation/IMPLEMENTATION_BATCH_PLAN.md |
 | BATCH-014 | RBATCH-015 | NEVER STARTED | M-008 / E-016 | 09_Development/Planning/BATCH_ARCHITECTURE.md | 09_Development/Implementation_Preparation/IMPLEMENTATION_BATCH_PLAN.md |
 | BATCH-015 | RBATCH-016 | NEVER STARTED | M-008 / E-017 | 09_Development/Planning/BATCH_ARCHITECTURE.md | 09_Development/Implementation_Preparation/IMPLEMENTATION_BATCH_PLAN.md |
 | BATCH-016 | RBATCH-017 | NEVER STARTED | M-008 / E-017 | 09_Development/Planning/BATCH_ARCHITECTURE.md | 09_Development/Implementation_Preparation/IMPLEMENTATION_BATCH_PLAN.md |
@@ -64,7 +64,7 @@ Legacy numbering is historical only. Execute the mapped `RBATCH-*` identifier; a
 | RBATCH-011 | 1 | M-005 | E-012 | MainMenu Flow | MERGED in PR #255 — pending Railway/public verification | RBATCH-002 | BATCH-010b | — |
 | RBATCH-012 | 1 | M-006 | E-013 | CompanyManagement + Upgrade Purchase Flow | MERGED in PR #256 — pending Railway/public verification | RBATCH-009, RBATCH-010 | BATCH-011 | — |
 | RBATCH-013 | 1 | M-006 | E-014 | Bicycle Ownership + Speed Increase | MERGED in PR #257 — pending Railway/public verification | RBATCH-012, RBATCH-006 | BATCH-012 | — |
-| RBATCH-014 | 1 | M-007 | E-015 | Save/Load Implementation | PR #259 — validation complete; pending merge | RBATCH-012, RBATCH-013, RBATCH-011 | BATCH-013 | Resolved 2026-09-01 — ODR-001=A; ODR-003=B |
+| RBATCH-014 | 1 | M-007 | E-015 | Save/Load Implementation | MERGED in PR #259 — pending Railway/public verification | RBATCH-012, RBATCH-013, RBATCH-011 | BATCH-013 | Resolved 2026-09-01 — ODR-001=A; ODR-003=B |
 | RBATCH-015 | 1 | M-008 | E-016 | Mobile Optimization | Planned — Not Started | RBATCH-010, RBATCH-014 | BATCH-014 | — |
 | RBATCH-016 | 1 | M-008 | E-017 | Full-Loop Integration Verification | Planned — Not Started | RBATCH-015 | BATCH-015 | — |
 | RBATCH-017 | 1 | M-008 | E-017 | Release-Checklist Verification Package | Planned — Not Started | RBATCH-016 | BATCH-016 | Human owner approval required |
