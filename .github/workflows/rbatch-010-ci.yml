@@ -115,9 +115,9 @@ jobs:
           issues = {item['id']: item for item in data['issues']}
 
           assert 'MERGED' in batches['RBATCH-010']['status']
-          assert batches['RBATCH-011']['status'].startswith('Draft PR #254')
+          assert batches['RBATCH-011']['status'].startswith('PR #255')
           assert 'MERGED' in epics['E-011']['status']
-          assert epics['E-012']['status'].startswith('Draft PR #254')
+          assert epics['E-012']['status'].startswith('PR #255')
 
           assert issues['ISSUE-008']['batch_id'] == 'RBATCH-011'
           assert issues['ISSUE-008']['epic_id'] == 'E-012'
