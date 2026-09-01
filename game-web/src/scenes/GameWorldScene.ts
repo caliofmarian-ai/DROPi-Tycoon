@@ -3,12 +3,21 @@ import { createInitialCompanyState, createInitialWorldState, WORLD_HEIGHT, WORLD
 import {
   attemptDelivery,
   attemptPickup,
-  flagAcceptRequested,
-  requestOrderAcceptance,
 } from '../systems/orderSystem'
+import { applyOrderAcceptanceRequest } from '../systems/orderAcceptance'
 import { settleDeliveryOutcome } from '../systems/economySettlement'
 import type { CompanyState, WorldState } from '../types/game'
-import { DebugPanel } from '../ui/DebugPanel'
+import { GameHUD } from '../ui/GameHUD'
+import { NotificationDisplay } from '../ui/NotificationDisplay'
+import { buildHUDData } from '../ui/HUDViewModel'
+import {
+  clearNotification,
+  createNotificationState,
+  updateNotification,
+  type NotificationState,
+} from '../ui/NotificationController'
+import { isPointerOnInteractiveUI } from '../ui/pointerIsolation'
+import type { RectBounds } from '../ui/hudLayout'
 import { selectDeliveryIntentFromTap } from '../utils/deliveryIntent'
 
 const ROAD_POSITIONS = [
@@ -45,9 +54,15 @@ export class GameWorldScene extends Phaser.Scene {
 
   private readonly packagePosition = new Phaser.Math.Vector2(120, 440)
 
-  private debugPanel!: DebugPanel
+  private gameHUD!: GameHUD
+
+  private notificationDisplay!: NotificationDisplay
+
+  private notificationState!: NotificationState
 
   private readonly menuButtons: Phaser.GameObjects.Rectangle[] = []
+  private readonly menuButtonBounds: RectBounds[] = []
+  private pointerDownHandler: ((pointer: Phaser.Input.Pointer) => void) | null = null
 
   constructor() {
     super('GameWorld')
@@ -102,18 +117,28 @@ export class GameWorldScene extends Phaser.Scene {
 
     this.cameras.main.startFollow(this.player, false, 1, 1)
 
-    this.debugPanel = new DebugPanel(this)
-    this.debugPanel.update(this.worldState, this.companyState)
+    this.notificationState = createNotificationState(this.worldState.activeOrder.status)
     this.createNavigationButtons()
+    this.gameHUD = new GameHUD(this, () => this.onAcceptButtonPressed())
+    this.notificationDisplay = new NotificationDisplay(this, () => {
+      this.notificationState = clearNotification(this.notificationState)
+    })
+    this.gameHUD.update(buildHUDData(this.worldState, this.companyState))
 
-    this.input.on('pointerdown', (pointer: Phaser.Input.Pointer) => {
-      if (this.isPointerOnMenuButton(pointer)) {
+    this.pointerDownHandler = (pointer: Phaser.Input.Pointer) => {
+      if (
+        isPointerOnInteractiveUI(pointer.x, pointer.y, {
+          menuButtonBounds: this.menuButtonBounds,
+          hudControlBounds: this.gameHUD.getInteractiveBounds(),
+        })
+      ) {
         return
       }
 
       this.worldState.tapTarget = { x: pointer.worldX, y: pointer.worldY }
       this.worldState.isMoving = true
 
+      // Compatibility acceptance path: tap near the package sprite while Available.
       if (
         this.worldState.activeOrder.status === 'Available' &&
         Phaser.Math.Distance.Between(
@@ -123,10 +148,7 @@ export class GameWorldScene extends Phaser.Scene {
           this.packagePosition.y,
         ) <= 28
       ) {
-        this.worldState.activeOrder = flagAcceptRequested(this.worldState.activeOrder)
-        const accepted = requestOrderAcceptance(this.worldState.activeOrder, this.worldState.player)
-        this.worldState.activeOrder = accepted.order
-        this.worldState.player = accepted.player
+        this.applyAcceptance(this.worldState.activeOrder.orderId)
       }
 
       if (this.worldState.activeOrder.status === 'PickedUp' && this.worldState.player.carryingPackage) {
@@ -138,15 +160,33 @@ export class GameWorldScene extends Phaser.Scene {
         )
       }
 
-      this.debugPanel.update(this.worldState, this.companyState)
-    })
+      this.gameHUD.update(buildHUDData(this.worldState, this.companyState))
+    }
+    this.input.on('pointerdown', this.pointerDownHandler)
+    this.events.once(Phaser.Scenes.Events.SHUTDOWN, this.handleSceneShutdown, this)
+  }
+
+  private onAcceptButtonPressed(): void {
+    this.applyAcceptance(this.worldState.activeOrder.orderId)
+    this.gameHUD.update(buildHUDData(this.worldState, this.companyState))
+  }
+
+  /**
+   * Apply the Available → Accepted transition through the canonical domain path.
+   * Safe to call from both the HUD button and the package-tap compatibility path.
+   */
+  private applyAcceptance(requestedOrderId: string): void {
+    const previousStatus = this.worldState.activeOrder.status
+    const accepted = applyOrderAcceptanceRequest(this.worldState, requestedOrderId)
+    this.worldState = accepted.worldState
+    this.emitNotificationIfTransitioned(previousStatus, this.worldState.activeOrder.status)
   }
 
   update(_: number, delta: number): void {
     this.updateMovement(delta / 1000)
     this.updatePickupState()
     this.updateDeliveryState()
-    this.debugPanel.update(this.worldState, this.companyState)
+    this.gameHUD.update(buildHUDData(this.worldState, this.companyState))
   }
 
   private updateMovement(deltaSeconds: number): void {
@@ -187,6 +227,7 @@ export class GameWorldScene extends Phaser.Scene {
   }
 
   private updatePickupState(): void {
+    const previousStatus = this.worldState.activeOrder.status
     const pickupAttempt = attemptPickup(this.worldState.activeOrder, this.worldState.player, {
       distanceToPackage: Phaser.Math.Distance.Between(
         this.player.x,
@@ -200,6 +241,7 @@ export class GameWorldScene extends Phaser.Scene {
 
     this.worldState.activeOrder = pickupAttempt.order
     this.worldState.player = pickupAttempt.player
+    this.emitNotificationIfTransitioned(previousStatus, this.worldState.activeOrder.status)
   }
 
   private updateDeliveryState(): void {
@@ -250,6 +292,28 @@ export class GameWorldScene extends Phaser.Scene {
       }
       this.worldState.player = deliveryResult.player
       this.worldState.pendingDeliveryDestination = ''
+      this.emitNotificationIfTransitioned(previousOrder.status, this.worldState.activeOrder.status)
+    }
+  }
+
+  /**
+   * Check whether the order status has changed since the notification controller
+   * last observed it.  If a canonical notification message exists for the
+   * transition, display it once.  Safe to call after any state update — idempotent
+   * when the status has not changed.
+   */
+  private emitNotificationIfTransitioned(
+    _previousStatus: string,
+    currentStatus: string,
+  ): void {
+    const result = updateNotification(
+      this.notificationState,
+      // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
+      currentStatus as import('../types/game').OrderStatus,
+    )
+    this.notificationState = result.state
+    if (result.newMessage !== null) {
+      this.notificationDisplay.show(result.newMessage)
     }
   }
 
@@ -281,9 +345,21 @@ export class GameWorldScene extends Phaser.Scene {
 
     button.on('pointerdown', onTap)
     this.menuButtons.push(button)
+    this.menuButtonBounds.push({
+      left: x - 78,
+      top: y - 27,
+      width: 156,
+      height: 54,
+    })
   }
 
-  private isPointerOnMenuButton(pointer: Phaser.Input.Pointer): boolean {
-    return this.menuButtons.some((button) => button.getBounds().contains(pointer.x, pointer.y))
+  private handleSceneShutdown(): void {
+    if (this.pointerDownHandler) {
+      this.input.off('pointerdown', this.pointerDownHandler)
+      this.pointerDownHandler = null
+    }
+    this.notificationDisplay.destroy()
+    this.menuButtons.length = 0
+    this.menuButtonBounds.length = 0
   }
 }

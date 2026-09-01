@@ -6,7 +6,7 @@ Version: 0.1.0
 Status: Deployable Web Runtime Candidate
 Author: Marian Caliof & OpenAI
 Language: English
-Last Updated: 2026-08-01
+Last Updated: 2026-08-02
 
 ---
 
@@ -14,7 +14,7 @@ Last Updated: 2026-08-01
 
 This folder contains the first deployable browser runtime for DROPi Tycoon.
 
-`game-web/` carries forward migrated BATCH-001 through BATCH-007 behavior, implements BATCH-008 delivery outcomes, and adds RBATCH-009 economy and reputation outcomes on a draft PR pending independent review.
+`game-web/` carries forward migrated BATCH-001 through BATCH-007 behavior, implements BATCH-008 delivery outcomes, has RBATCH-009 economy and reputation outcomes merged and Railway-verified, and adds RBATCH-010 HUD and notifications on a draft PR pending independent review.
 
 The archived/reference GDevelop source remains unchanged in:
 
@@ -41,7 +41,7 @@ Phaser `3.90.0` is the current web-runtime library implementation detail, is rep
 
 This PR branch implements the following prototype behavior:
 
-- Main menu
+- Main menu (updated to reflect active economy)
 - Game world
 - Company-management placeholder navigation
 - Placeholder world composition
@@ -59,7 +59,7 @@ This PR branch implements the following prototype behavior:
   - `Accepted -> PickedUp`
   - `PickedUp -> Completed` (correct destination)
   - `PickedUp -> Failed` (wrong destination)
-- Tap package to request acceptance
+- Accept Order button in player-facing HUD (canonical trigger; package-tap remains compatibility path)
 - Automatic pickup on proximity
 - `CarryingPackage = true` after pickup
 - Tap delivery marker after pickup to register delivery intent
@@ -73,18 +73,21 @@ This PR branch implements the following prototype behavior:
 - Failed delivery (PickedUp→Failed): money unchanged (no deduction), reputation −5 (clamped 0..100)
 - Economy settlement applied exactly once on terminal transition
 - Affordability helper (`canAfford`) available for future upgrade purchasing
-- Temporary debug panel shows Money, Reputation, order status, carried-package, guidance
+- **Player-facing HUD**: camera-fixed panel showing Money, Reputation, active-order status, destination, carrying state, and Accept Order button (visible for Available only; hidden for terminal/pre-active states)
+- **Delivery lifecycle notifications**: shown once per canonical state transition (Available→Accepted, Accepted→PickedUp, PickedUp→Completed, PickedUp→Failed); idempotent (no per-frame duplicates); 3-second auto-dismiss; timer cleaned up on scene shutdown; responsive width and position derived from canvas size; no overlap with HUD panels or navigation buttons
+- Active-order panel automatically hidden when order status is Completed or Failed (no stale panel)
+- HUD pointer isolation: Accept button `pointerdown` calls `stopPropagation()` before invoking acceptance, so the scene-level pointer handler never processes the same tap; after the button is hidden the former area is fully unblocked for world input
 
 Not implemented in this milestone:
 
-- Final HUD or notification system
+- RBATCH-011 MainMenu flow (Start/Continue/new-game guard)
 - Upgrade-purchase UI
 - DROPiCoins logic
 - Marketplace
 - Payments
 - Database
 - Save/load
-- RBATCH-010 or later gameplay
+- RBATCH-012 or later gameplay
 
 ---
 

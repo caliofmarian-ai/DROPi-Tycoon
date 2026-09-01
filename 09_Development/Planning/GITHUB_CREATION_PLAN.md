@@ -6,7 +6,7 @@ Version: 1.2.0
 Status: Planning — Canonical
 Author: AI Agent (Report 087)
 Language: English
-Last Updated: 2026-08-01
+Last Updated: 2026-08-02
 
 ---
 
@@ -14,31 +14,35 @@ Last Updated: 2026-08-01
 
 This is a planning document only. No GitHub milestones, labels, issues, or Projects are created or modified by this PR.
 
-## Final Counts
+## Final Counts and Verified Materialization State
 
-| Item | Count |
-|---|---|
-| Milestones | 21 |
-| Epics | 46 |
-| Batches | 54 |
-| Labels | 122 |
-| Executable Issues | 34 |
-| Future Placeholders | 32 |
+The canonical GitHub planning inventory was independently materialized and verified on 2026-08-02.
+The inventory already exists. The creation plan script must **not** be rerun because executing it would create duplicate objects.
 
-## Inspection Boundary and Required Limitation
+| Item | Canonical Count | Verified |
+|---|---|---|
+| Milestones | 21 | 21/21 |
+| Epics | 46 | 46/46 |
+| Batches | 54 | 54/54 |
+| Labels | 122 | 122/122 |
+| Executable Issues | 34 | 34/34 |
+| Future Placeholders | 32 | 32/32 |
+| Total Canonical Planning Issues | 166 | 166/166 |
 
-- Existing GitHub milestone objects were not directly inspected.
-- Existing labels, issues, and Projects must also be reconciled before creation.
-- No claim may be made that those objects were inspected if the available tools did not support it.
-- The creation plan must not run until manual or independent reconciliation and owner approval occur.
+Verification date: 2026-08-02.
 
-Independent repository issue search for `RBATCH` does not prove that labels, milestones, or Projects were absent. Manual or independent reconciliation remains mandatory.
+## Materialization State
+
+- The GitHub inventory (labels 122/122, milestones 21/21, epics 46/46, batch issues 54/54, executable issues 34/34, planning placeholders 32/32, total 166/166) was independently verified and materialized on 2026-08-02.
+- This document does not claim these objects were created by PR #253. They were independently materialized before that PR was opened.
+- The creation plan script must not run because the GitHub inventory already exists; executing it would create duplicate objects.
+- No additional pre-creation reconciliation is required; the existing inventory matches the canonical counts in this plan exactly.
 
 ## Status Authorization Policy
 
 - Use status:ready only when the issue is implementation-authorized and its parent milestone and batch are not Planned — Future.
 - Use status:future when the specification exists but parent roadmap status still prevents implementation authorization.
-- Do not create or assign future-status executable issues as active implementation work until manual reconciliation, owner approval, and parent-status advancement occur.
+- Do not create or assign future-status executable issues as active implementation work until parent-status advancement occurs.
 
 ## Non-Destructive Execution Procedure
 
@@ -86,13 +90,14 @@ Independent repository issue search for `RBATCH` does not prove that labels, mil
 
 ## Pre-Execution Checklist
 
-- [ ] Owner approval obtained
-- [ ] Existing GitHub milestones reconciled
-- [ ] Existing GitHub labels reconciled
-- [ ] Existing GitHub issues and Projects reconciled
-- [ ] `github_creation_plan.yaml` parsed successfully
-- [ ] Future-status executable issues remain non-authorized until parent roadmap status advances
-- [ ] No destructive action has been implicitly authorized
+**IMPORTANT: The GitHub planning inventory already exists (verified 2026-08-02). The creation plan script must NOT be run. Executing it would create duplicate objects.**
+
+- [x] GitHub milestones verified: 21/21 (2026-08-02)
+- [x] GitHub labels verified: 122/122 (2026-08-02)
+- [x] GitHub issues verified: epics 46/46, batches 54/54, executable 34/34, placeholders 32/32, total 166/166 (2026-08-02)
+- [x] `github_creation_plan.yaml` parsed successfully
+- [x] Future-status executable issues remain non-authorized until parent roadmap status advances
+- [x] No destructive action authorized — creation plan must not be rerun
 
 ---
 
