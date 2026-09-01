@@ -29,7 +29,7 @@ Last Updated: 2026-08-02
 | M-005 | 1 | Economy, HUD & Game Flow | In Progress | E-010, E-011, E-012 | RBATCH-009, RBATCH-010, RBATCH-011 | M-004 | — |
 | M-006 | 1 | Company Management & Bicycle | In Progress | E-013, E-014 | RBATCH-012, RBATCH-013 | M-005 | — |
 | M-007 | 1 | Save & Load System | In Progress | E-015 | RBATCH-014 | M-006 | Resolved 2026-09-01 — ODR-001=A; ODR-003=B |
-| M-008 | 1 | Prototype v0.1 Verification & Release | In Progress | E-016, E-017 | RBATCH-015, RBATCH-016, RBATCH-017 | M-007 | Human owner approval for RBATCH-017 closure |
+| M-008 | 1 | Prototype v0.1 Verification & Release | In Progress | E-016, E-017 | RBATCH-015, RBATCH-016, RBATCH-017 | M-007 | Final Prototype v0.1 owner release sign-off required after human/device/public review (REQ-187) |
 | M-009 | 2 | Employee & Financial Systems | Planned — Future | E-018, E-019, E-020 | RBATCH-018, RBATCH-019, RBATCH-020, RBATCH-021 | M-008 | — |
 | M-010 | 2 | Vehicle Fleet Management | Planned — Future | E-021 | RBATCH-022, RBATCH-023, RBATCH-024 | M-009 | — |
 | M-011 | 3 | Warehouse & District System | Planned — Future | E-022, E-023 | RBATCH-025, RBATCH-026, RBATCH-027 | M-010 | — |
