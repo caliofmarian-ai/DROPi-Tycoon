@@ -51,6 +51,23 @@ Description
 
 ---
 
+# [2026-09-01] - RBATCH-016 FULL-LOOP INTEGRATION MERGE CHECKPOINT
+
+## Merged
+
+- PR #265 / RBATCH-016 merged into `main` as `9fc494d098dc860bb337ce1e1504aba8c08d4171`.
+- PR CI run `33563515533` succeeded.
+- Main post-merge CI run `33563908596` succeeded.
+- ISSUE-020/#206 and ISSUE-021/#207 closed as completed and synchronized to `status:done`.
+
+## Next gate
+
+- RBATCH-017 remains Planned — Not Started.
+- Human owner approval required.
+- No self-approval is recorded.
+
+---
+
 # [2026-09-01] - RBATCH-015 MERGE CHECKPOINT
 
 ## Merged
