@@ -122,7 +122,7 @@ milestones:
 - id: M-008
   title: Prototype v0.1 Verification & Release
   phase: 1
-  status: Planned — Not Started
+  status: 'In Progress'
   epic_ids:
   - E-016
   - E-017
@@ -447,7 +447,7 @@ epics:
   title: Mobile Optimization
   phase: 1
   milestone_id: M-008
-  status: Planned — Not Started
+  status: 'PR #263 — validation complete; pending merge'
   batch_ids:
   - RBATCH-015
   depends_on:
@@ -1015,7 +1015,7 @@ batches:
   epic_ids:
   - E-016
   title: Mobile Optimization
-  status: Planned — Not Started
+  status: 'PR #263 — validation complete; pending merge'
   depends_on:
   - RBATCH-010
   - RBATCH-014
@@ -2109,13 +2109,13 @@ issues:
   milestone_id: M-008
   phase: 1
   type: implementation
-  status: Ready for implementation
+  status: 'PR #263 implementation validated — pending merge'
   label_names:
   - type:implementation
   - phase:1
   - batch:rbatch-015
   - epic:mobile-optimization
-  - status:ready
+  - status:in-progress
   description: Fit the Android-first web runtime to the supported target matrix selected during implementation.
   acceptance_criteria: No unapproved portrait/landscape canon is implied.
 - id: ISSUE-019
@@ -2125,13 +2125,13 @@ issues:
   milestone_id: M-008
   phase: 1
   type: implementation
-  status: Ready for implementation
+  status: 'PR #263 implementation validated — pending merge'
   label_names:
   - type:implementation
   - phase:1
   - batch:rbatch-015
   - epic:mobile-optimization
-  - status:ready
+  - status:in-progress
   description: Adjust hit areas to satisfy qualitative touch comfort.
   acceptance_criteria: Any numeric threshold is implementation detail, not canon.
 - id: ISSUE-020

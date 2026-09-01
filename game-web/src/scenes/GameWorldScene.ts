@@ -22,6 +22,10 @@ import {
 } from '../ui/NotificationController'
 import { isPointerOnInteractiveUI } from '../ui/pointerIsolation'
 import type { RectBounds } from '../ui/hudLayout'
+import {
+  buildNavigationButtonBounds,
+  type LayoutRect,
+} from '../ui/mobileViewport'
 import { selectDeliveryIntentFromTap } from '../utils/deliveryIntent'
 
 const ROAD_POSITIONS = [
@@ -49,6 +53,9 @@ const DELIVERY_POINTS = [
 
 const DELIVERY_MARKER_TAP_RADIUS = 36
 
+const rectCenterX = (rect: LayoutRect): number => rect.left + rect.width / 2
+const rectCenterY = (rect: LayoutRect): number => rect.top + rect.height / 2
+
 export class GameWorldScene extends Phaser.Scene {
   private worldState!: WorldState
 
@@ -67,6 +74,13 @@ export class GameWorldScene extends Phaser.Scene {
   private readonly menuButtons: Phaser.GameObjects.Rectangle[] = []
   private readonly menuButtonBounds: RectBounds[] = []
   private pointerDownHandler: ((pointer: Phaser.Input.Pointer) => void) | null = null
+
+  private readonly handleResize = (): void => {
+    if (this.worldState && this.companyState) {
+      this.syncRuntimeSession()
+    }
+    this.scene.restart()
+  }
 
   constructor() {
     super('GameWorld')
@@ -144,7 +158,6 @@ export class GameWorldScene extends Phaser.Scene {
       this.worldState.tapTarget = { x: pointer.worldX, y: pointer.worldY }
       this.worldState.isMoving = true
 
-      // Compatibility acceptance path: tap near the package sprite while Available.
       if (
         this.worldState.activeOrder.status === 'Available' &&
         Phaser.Math.Distance.Between(
@@ -169,6 +182,7 @@ export class GameWorldScene extends Phaser.Scene {
       this.gameHUD.update(buildHUDData(this.worldState, this.companyState))
     }
     this.input.on('pointerdown', this.pointerDownHandler)
+    this.scale.on(Phaser.Scale.Events.RESIZE, this.handleResize)
     this.events.once(Phaser.Scenes.Events.SHUTDOWN, this.handleSceneShutdown, this)
   }
 
@@ -177,10 +191,6 @@ export class GameWorldScene extends Phaser.Scene {
     this.gameHUD.update(buildHUDData(this.worldState, this.companyState))
   }
 
-  /**
-   * Apply the Available → Accepted transition through the canonical domain path.
-   * Safe to call from both the HUD button and the package-tap compatibility path.
-   */
   private applyAcceptance(requestedOrderId: string): void {
     const previousStatus = this.worldState.activeOrder.status
     const accepted = applyOrderAcceptanceRequest(this.worldState, requestedOrderId)
@@ -314,12 +324,6 @@ export class GameWorldScene extends Phaser.Scene {
     }
   }
 
-  /**
-   * Check whether the order status has changed since the notification controller
-   * last observed it. If a canonical notification message exists for the
-   * transition, display it once. Safe to call after any state update — idempotent
-   * when the status has not changed.
-   */
   private emitNotificationIfTransitioned(
     _previousStatus: string,
     currentStatus: string,
@@ -336,8 +340,9 @@ export class GameWorldScene extends Phaser.Scene {
   }
 
   private createNavigationButtons(): void {
-    this.createMenuButton(110, 548, 'Main Menu', () => this.openMainMenu())
-    this.createMenuButton(290, 548, 'Company', () => this.openCompanyManagement())
+    const bounds = buildNavigationButtonBounds(this.scale.width, this.scale.height)
+    this.createMenuButton(bounds[0], 'Main Menu', () => this.openMainMenu())
+    this.createMenuButton(bounds[1], 'Company', () => this.openCompanyManagement())
   }
 
   private openMainMenu(): void {
@@ -354,9 +359,12 @@ export class GameWorldScene extends Phaser.Scene {
     replaceGameSession(this.worldState, this.companyState)
   }
 
-  private createMenuButton(x: number, y: number, label: string, onTap: () => void): void {
+  private createMenuButton(bounds: LayoutRect, label: string, onTap: () => void): void {
+    const x = rectCenterX(bounds)
+    const y = rectCenterY(bounds)
+    const fontSize = bounds.height <= 50 ? 17 : 20
     const button = this.add
-      .rectangle(x, y, 156, 54, 0x1d4ed8, 0.95)
+      .rectangle(x, y, bounds.width, bounds.height, 0x1d4ed8, 0.95)
       .setStrokeStyle(2, 0xbfdbfe)
       .setScrollFactor(0)
       .setDepth(20)
@@ -365,23 +373,19 @@ export class GameWorldScene extends Phaser.Scene {
     this.add
       .text(x, y, label, {
         fontFamily: 'Arial',
-        fontSize: '22px',
+        fontSize: `${fontSize}px`,
         color: '#eff6ff',
         fontStyle: 'bold',
+        align: 'center',
+        wordWrap: { width: Math.max(80, bounds.width - 10) },
       })
       .setOrigin(0.5)
       .setScrollFactor(0)
       .setDepth(21)
 
-    // Single input owner: the label is intentionally non-interactive.
     button.on('pointerdown', onTap)
     this.menuButtons.push(button)
-    this.menuButtonBounds.push({
-      left: x - 78,
-      top: y - 27,
-      width: 156,
-      height: 54,
-    })
+    this.menuButtonBounds.push({ ...bounds })
   }
 
   private handleSceneShutdown(): void {
@@ -389,6 +393,7 @@ export class GameWorldScene extends Phaser.Scene {
       this.input.off('pointerdown', this.pointerDownHandler)
       this.pointerDownHandler = null
     }
+    this.scale.off(Phaser.Scale.Events.RESIZE, this.handleResize)
     this.notificationDisplay.destroy()
     this.menuButtons.length = 0
     this.menuButtonBounds.length = 0

@@ -6,7 +6,7 @@ Version: 1.2.0
 Status: Active Development
 Author: Marian Caliof & OpenAI
 Language: English
-Last Updated: 2026-09-01 (RBATCH-014 merged in PR #259; RBATCH-015 Mobile Optimization ready)
+Last Updated: 2026-09-01 (RBATCH-015 Mobile Optimization validated on PR #263; pending merge)
 
 ---
 
@@ -16,13 +16,13 @@ Last Updated: 2026-09-01 (RBATCH-014 merged in PR #259; RBATCH-015 Mobile Optimi
 
 Phase:
 
-Prototype v0.1 — RBATCH-010/011/012/013/014 MERGED pending Railway/public verification; RBATCH-015 Mobile Optimization is the next implementation batch
+Prototype v0.1 — RBATCH-010/011/012/013/014 MERGED pending Railway/public verification; RBATCH-015 Mobile Optimization validated on PR #263 pending merge
 
 ---
 
 # Current Objective
 
-Execute RBATCH-015 Mobile Optimization (ISSUE-018/#204 viewport fit and ISSUE-019/#205 comfortable touch targets) while preserving the merged Save/Load contract and the canonical long-term visual-quality direction.
+Complete final validation and merge of PR #263 (RBATCH-015 Mobile Optimization), then perform public/mobile verification before advancing its merged checkpoint. Preserve viewport/rendering independence so later high-fidelity visual evolution remains unconstrained.
 
 ---
 
@@ -164,9 +164,9 @@ The prototype must prove the core idea before expansion.
 
 # Next Steps
 
-1. Complete final-head validation and merge PR #256 for RBATCH-012 CompanyManagement + Upgrade Purchase Flow.
-2. After merge, verify the public Railway runtime without claiming visual/touch acceptance until observed.
-3. Proceed to RBATCH-013 Bicycle Ownership + Speed Increase; keep persistent Save/Load blocked behind ODR-001 and ODR-003.
+1. Complete final-head CI and merge PR #263 for RBATCH-015 Mobile Optimization.
+2. Verify responsive viewport fit and comfortable touch interaction on the public Railway runtime using representative Android portrait and landscape sizes.
+3. Proceed to RBATCH-016 Full-Loop Integration Verification after the RBATCH-015 merge checkpoint is reconciled.
 
 ---
 
@@ -241,6 +241,14 @@ Implementation Preparation Status:
 - RBATCH-014 validation run `33559283892`: 242/242 tests passed across 8 files; TypeScript/Vite build, HTTP smoke, whitespace, archived `Game/` guard, YAML syntax/counts and pre-reconciliation planning crosswalk passed
 - Save/Load v1 persists company progression and TutorialStatus only; player position, active order, WorldData and other GameSettings are excluded by the resolved owner decisions
 - Current prototype visuals are explicitly temporary; persistence and gameplay state remain decoupled from rendering/assets so later high-fidelity visual evolution does not require Save/Load rewrites
+
+- M-008 status: In Progress
+- E-016 status: PR #263 — validation complete; pending merge
+- RBATCH-015 status: PR #263 — validation complete; pending merge
+- ISSUE-018/ISSUE-019 status: PR #263 implementation validated — pending merge
+- RBATCH-015 validation run `33562041087`: 274/274 tests passed across 9 files, including 32/32 mobile viewport/touch tests; TypeScript/Vite build, HTTP smoke, whitespace, archived `Game/` guard, YAML syntax/counts and planning crosswalk passed
+- Mobile implementation supports representative portrait and landscape Android viewports without declaring either orientation permanent canon
+- Touch comfort is enforced in actual screen-space canvas pixels through an implementation-level threshold; the threshold is not canonical gameplay design
 - ODR-002 reclassified (not an owner decision)
 - ODR-004 reclassified 2026-08-01: resolved by canonical documents; wrong-destination interaction triggers Failed; no longer an active owner decision
 - PR #84 merged into `main`; Railway redeployed successfully; public `PickedUp → Completed` verification passed; public wrong-destination `PickedUp → Failed` verification passed

@@ -118,13 +118,18 @@ jobs:
           assert milestones['M-006']['status'] == 'In Progress'
           assert milestones['M-007']['status'] == 'In Progress'
           assert milestones['M-007']['owner_gates'].startswith('RESOLVED')
+          assert milestones['M-008']['status'] == 'In Progress'
 
           for batch_id in ('RBATCH-010', 'RBATCH-011', 'RBATCH-012', 'RBATCH-013', 'RBATCH-014'):
               assert 'MERGED' in batches[batch_id]['status']
           assert batches['RBATCH-014']['owner_gates'].startswith('RESOLVED')
+          assert batches['RBATCH-015']['status'].startswith('PR #263')
+          assert batches['RBATCH-016']['status'] == 'Planned — Not Started'
 
           for epic_id in ('E-011', 'E-012', 'E-013', 'E-014', 'E-015'):
               assert 'MERGED' in epics[epic_id]['status']
+          assert epics['E-016']['status'].startswith('PR #263')
+          assert epics['E-017']['status'] == 'Planned — Not Started'
 
           assert issues['ISSUE-008']['batch_id'] == 'RBATCH-011'
           assert issues['ISSUE-008']['epic_id'] == 'E-012'
@@ -157,7 +162,8 @@ jobs:
               assert issues[issue_id]['batch_id'] == 'RBATCH-015'
               assert issues[issue_id]['epic_id'] == 'E-016'
               assert issues[issue_id]['milestone_id'] == 'M-008'
-              assert 'status:ready' in issues[issue_id]['label_names']
+              assert issues[issue_id]['status'].startswith('PR #263')
+              assert 'status:in-progress' in issues[issue_id]['label_names']
 
           print('Active planning crosswalk validation: PASS')
           PY

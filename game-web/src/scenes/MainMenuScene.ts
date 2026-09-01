@@ -22,9 +22,11 @@ import {
   type MainMenuPanel,
   type MainMenuState,
 } from '../ui/MainMenuViewModel'
+import {
+  buildMainMenuLayout,
+  type MainMenuLayout,
+} from '../ui/mobileViewport'
 
-const BUTTON_WIDTH = 360
-const BUTTON_HEIGHT = 64
 const MODAL_DEPTH = 90
 
 export class MainMenuScene extends Phaser.Scene {
@@ -43,100 +45,141 @@ export class MainMenuScene extends Phaser.Scene {
   private modalCancelButton!: Phaser.GameObjects.Rectangle
   private modalCancelLabel!: Phaser.GameObjects.Text
 
+  private readonly handleResize = (): void => {
+    this.scene.restart()
+  }
+
   constructor() {
     super('MainMenu')
   }
 
   create(): void {
-    const { width } = this.scale
+    const { width, height } = this.scale
     this.menuState = createMainMenuState()
     this.saveStorage = getBrowserSaveStorage()
     this.saveSlot = this.saveStorage
       ? inspectSaveSlot(this.saveStorage)
       : { kind: 'unavailable', reason: 'Local storage is unavailable.' }
 
+    const actionCount = this.saveSlot.kind === 'valid' ? 4 : 3
+    const hasNotice =
+      this.saveSlot.kind === 'corrupted' ||
+      this.saveSlot.kind === 'incompatible' ||
+      this.saveSlot.kind === 'unavailable'
+    const layout = buildMainMenuLayout(width, height, actionCount, hasNotice)
+
     this.cameras.main.setBackgroundColor('#10151d')
 
     this.add
-      .text(width / 2, 78, appConfig.appName, {
+      .text(layout.title.x, layout.title.y, appConfig.appName, {
         fontFamily: 'Arial',
-        fontSize: '52px',
+        fontSize: `${layout.title.fontSize}px`,
         color: '#f8fafc',
         fontStyle: 'bold',
       })
       .setOrigin(0.5)
 
     this.add
-      .text(width / 2, 136, `Web Runtime Candidate v${appConfig.appVersion}`, {
-        fontFamily: 'Arial',
-        fontSize: '22px',
-        color: '#cbd5e1',
-      })
-      .setOrigin(0.5)
-
-    this.add
       .text(
-        width / 2,
-        200,
-        'Start small. Deliver locally. Grow your company.',
+        layout.subtitle.x,
+        layout.subtitle.y,
+        `Web Runtime Candidate v${appConfig.appVersion}`,
         {
           fontFamily: 'Arial',
-          fontSize: '22px',
-          color: '#e2e8f0',
-          align: 'center',
+          fontSize: `${layout.subtitle.fontSize}px`,
+          color: '#cbd5e1',
         },
       )
       .setOrigin(0.5)
 
-    this.createModal()
-    this.createSaveAwareActions(width)
+    this.add
+      .text(
+        layout.tagline.x,
+        layout.tagline.y,
+        'Start small. Deliver locally. Grow your company.',
+        {
+          fontFamily: 'Arial',
+          fontSize: `${layout.tagline.fontSize}px`,
+          color: '#e2e8f0',
+          align: 'center',
+          wordWrap: { width: Math.max(180, width - 28) },
+        },
+      )
+      .setOrigin(0.5)
+
+    this.createModal(layout)
+    this.createSaveAwareActions(layout)
+
+    this.scale.on(Phaser.Scale.Events.RESIZE, this.handleResize)
+    this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => {
+      this.scale.off(Phaser.Scale.Events.RESIZE, this.handleResize)
+    })
   }
 
-  private createSaveAwareActions(width: number): void {
+  private createSaveAwareActions(layout: MainMenuLayout): void {
     if (this.saveSlot.kind === 'valid') {
-      this.createButton(width / 2, 292, 'Continue Game', () => this.continueGame())
-      this.createButton(width / 2, 368, 'Start New Game', () => this.requestStartNewGame())
-      this.createButton(width / 2, 444, 'Settings', () => this.showPanel('settings'))
-      this.createButton(width / 2, 520, 'Information', () => this.showPanel('information'))
+      const labels = ['Continue Game', 'Start New Game', 'Settings', 'Information']
+      const actions = [
+        () => this.continueGame(),
+        () => this.requestStartNewGame(),
+        () => this.showPanel('settings'),
+        () => this.showPanel('information'),
+      ]
+      layout.actionCenters.forEach((center, index) => {
+        this.createButton(center.x, center.y, labels[index], actions[index], layout)
+      })
       return
     }
 
     if (this.saveSlot.kind === 'corrupted' || this.saveSlot.kind === 'incompatible') {
       this.add
         .text(
-          width / 2,
-          250,
+          layout.notice.x,
+          layout.notice.y,
           'Local progress cannot be restored. Your existing save will be preserved until you confirm replacement.',
           {
             fontFamily: 'Arial',
-            fontSize: '17px',
+            fontSize: `${layout.notice.fontSize}px`,
             color: '#fecaca',
             align: 'center',
-            wordWrap: { width: Math.min(width - 72, 680) },
+            wordWrap: { width: layout.notice.wrapWidth },
           },
         )
         .setOrigin(0.5)
 
-      this.createButton(width / 2, 342, 'Start New Game', () => this.requestStartNewGame())
-      this.createButton(width / 2, 430, 'Settings', () => this.showPanel('settings'))
-      this.createButton(width / 2, 518, 'Information', () => this.showPanel('information'))
+      const labels = ['Start New Game', 'Settings', 'Information']
+      const actions = [
+        () => this.requestStartNewGame(),
+        () => this.showPanel('settings'),
+        () => this.showPanel('information'),
+      ]
+      layout.actionCenters.forEach((center, index) => {
+        this.createButton(center.x, center.y, labels[index], actions[index], layout)
+      })
       return
     }
 
     if (this.saveSlot.kind === 'unavailable') {
       this.add
-        .text(width / 2, 252, 'Local save storage is unavailable in this environment.', {
+        .text(layout.notice.x, layout.notice.y, 'Local save storage is unavailable in this environment.', {
           fontFamily: 'Arial',
-          fontSize: '17px',
+          fontSize: `${layout.notice.fontSize}px`,
           color: '#fde68a',
           align: 'center',
+          wordWrap: { width: layout.notice.wrapWidth },
         })
         .setOrigin(0.5)
     }
 
-    this.createButton(width / 2, 330, 'Start Game', () => this.startGame())
-    this.createButton(width / 2, 420, 'Settings', () => this.showPanel('settings'))
-    this.createButton(width / 2, 510, 'Information', () => this.showPanel('information'))
+    const labels = ['Start Game', 'Settings', 'Information']
+    const actions = [
+      () => this.startGame(),
+      () => this.showPanel('settings'),
+      () => this.showPanel('information'),
+    ]
+    layout.actionCenters.forEach((center, index) => {
+      this.createButton(center.x, center.y, labels[index], actions[index], layout)
+    })
   }
 
   private startGame(): void {
@@ -160,7 +203,6 @@ export class MainMenuScene extends Phaser.Scene {
     const session = restoreGameSessionFromSave(inspection.save)
     replaceEntireGameSession(session)
 
-    // A repaired payload or recovered staging write is normalized immediately.
     if (inspection.repaired || inspection.source === 'staging') {
       writeSaveSlot(this.saveStorage, session)
     }
@@ -217,31 +259,35 @@ export class MainMenuScene extends Phaser.Scene {
     return 'Saved progress is available.'
   }
 
-  private createButton(x: number, y: number, label: string, onTap: () => void): void {
+  private createButton(
+    x: number,
+    y: number,
+    label: string,
+    onTap: () => void,
+    layout: MainMenuLayout,
+  ): void {
     const button = this.add
-      .rectangle(x, y, BUTTON_WIDTH, BUTTON_HEIGHT, 0x2563eb, 1)
+      .rectangle(x, y, layout.buttonWidth, layout.buttonHeight, 0x2563eb, 1)
       .setStrokeStyle(3, 0x93c5fd)
       .setInteractive({ useHandCursor: true })
 
     this.add
       .text(x, y, label, {
         fontFamily: 'Arial',
-        fontSize: '27px',
+        fontSize: `${layout.buttonFontSize}px`,
         color: '#eff6ff',
         fontStyle: 'bold',
       })
       .setOrigin(0.5)
 
-    // Only the rectangle owns input. The label is intentionally non-interactive.
     button.on('pointerdown', onTap)
   }
 
-  private createModal(): void {
+  private createModal(layout: MainMenuLayout): void {
     const { width, height } = this.scale
-    const panelWidth = Math.min(width - 48, 640)
-    const panelHeight = Math.min(height - 80, 360)
     const centerX = width / 2
     const centerY = height / 2
+    const modal = layout.modal
 
     this.modalOverlay = this.add
       .rectangle(centerX, centerY, width, height, 0x020617, 0.72)
@@ -251,57 +297,95 @@ export class MainMenuScene extends Phaser.Scene {
       .on('pointerdown', () => this.hidePanel())
 
     this.modalPanel = this.add
-      .rectangle(centerX, centerY, panelWidth, panelHeight, 0x0f172a, 0.98)
+      .rectangle(
+        modal.panel.left + modal.panel.width / 2,
+        modal.panel.top + modal.panel.height / 2,
+        modal.panel.width,
+        modal.panel.height,
+        0x0f172a,
+        0.98,
+      )
       .setStrokeStyle(3, 0x38bdf8, 0.8)
       .setDepth(MODAL_DEPTH + 1)
       .setVisible(false)
 
     this.modalText = this.add
-      .text(centerX, centerY - 46, '', {
+      .text(modal.textCenter.x, modal.textCenter.y, '', {
         fontFamily: 'Arial',
-        fontSize: '22px',
+        fontSize: `${modal.textFontSize}px`,
         color: '#f8fafc',
         align: 'center',
-        lineSpacing: 5,
-        wordWrap: { width: panelWidth - 48 },
+        lineSpacing: 4,
+        wordWrap: { width: modal.textWrapWidth },
       })
       .setOrigin(0.5)
       .setDepth(MODAL_DEPTH + 2)
       .setVisible(false)
 
-    const actionY = centerY + panelHeight / 2 - 45
+    this.modalCloseButton = this.createModalActionButton(
+      centerX,
+      modal.actionY,
+      modal.closeWidth,
+      modal.actionHeight,
+    ).on('pointerdown', this.stopAnd(() => this.hidePanel()))
+    this.modalCloseLabel = this.createModalActionLabel(
+      centerX,
+      modal.actionY,
+      'Close',
+      modal.textFontSize,
+    )
 
-    this.modalCloseButton = this.createModalActionButton(centerX, actionY, 180)
-      .on('pointerdown', this.stopAnd(() => this.hidePanel()))
-    this.modalCloseLabel = this.createModalActionLabel(centerX, actionY, 'Close')
+    this.modalConfirmButton = this.createModalActionButton(
+      modal.confirmX,
+      modal.actionY,
+      modal.dualWidth,
+      modal.actionHeight,
+    ).on('pointerdown', this.stopAnd(() => this.confirmPendingAction()))
+    this.modalConfirmLabel = this.createModalActionLabel(
+      modal.confirmX,
+      modal.actionY,
+      'Confirm',
+      modal.textFontSize,
+    )
 
-    this.modalConfirmButton = this.createModalActionButton(centerX - 112, actionY, 190)
-      .on('pointerdown', this.stopAnd(() => this.confirmPendingAction()))
-    this.modalConfirmLabel = this.createModalActionLabel(centerX - 112, actionY, 'Confirm')
-
-    this.modalCancelButton = this.createModalActionButton(centerX + 112, actionY, 190)
-      .on('pointerdown', this.stopAnd(() => this.hidePanel()))
-    this.modalCancelLabel = this.createModalActionLabel(centerX + 112, actionY, 'Cancel')
+    this.modalCancelButton = this.createModalActionButton(
+      modal.cancelX,
+      modal.actionY,
+      modal.dualWidth,
+      modal.actionHeight,
+    ).on('pointerdown', this.stopAnd(() => this.hidePanel()))
+    this.modalCancelLabel = this.createModalActionLabel(
+      modal.cancelX,
+      modal.actionY,
+      'Cancel',
+      modal.textFontSize,
+    )
   }
 
   private createModalActionButton(
     x: number,
     y: number,
     width: number,
+    height: number,
   ): Phaser.GameObjects.Rectangle {
     return this.add
-      .rectangle(x, y, width, 56, 0x2563eb, 1)
+      .rectangle(x, y, width, height, 0x2563eb, 1)
       .setStrokeStyle(2, 0x93c5fd)
       .setDepth(MODAL_DEPTH + 3)
       .setInteractive({ useHandCursor: true })
       .setVisible(false)
   }
 
-  private createModalActionLabel(x: number, y: number, label: string): Phaser.GameObjects.Text {
+  private createModalActionLabel(
+    x: number,
+    y: number,
+    label: string,
+    fontSize: number,
+  ): Phaser.GameObjects.Text {
     return this.add
       .text(x, y, label, {
         fontFamily: 'Arial',
-        fontSize: '23px',
+        fontSize: `${fontSize}px`,
         color: '#eff6ff',
         fontStyle: 'bold',
       })
