@@ -5,8 +5,16 @@ export const WORLD_WIDTH = 800
 export const WORLD_HEIGHT = 600
 
 export const createInitialCompanyState = (): CompanyState => ({
+  companyName: BALANCING.INITIAL_COMPANY_NAME,
   money: BALANCING.INITIAL_MONEY,
+  level: BALANCING.INITIAL_COMPANY_LEVEL,
   reputation: BALANCING.INITIAL_REPUTATION,
+  purchasedUpgradeLevels: {
+    DeliverySpeed: 0,
+    Capacity: 0,
+    Efficiency: 0,
+    Bicycle: 0,
+  },
 })
 
 export const createInitialWorldState = (): WorldState => ({
