@@ -1,0 +1,231 @@
+name: RBATCH-016 Post-Merge Checkpoint
+
+on:
+  push:
+    branches:
+      - openai/post-rbatch-016-checkpoint
+
+permissions:
+  contents: write
+
+jobs:
+  reconcile:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: openai/post-rbatch-016-checkpoint
+          fetch-depth: 0
+
+      - name: Reconcile canonical planning after PR 265 merge
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          from pathlib import Path
+          import re
+
+          ROOT = Path('.')
+          ISSUE_IDS = ('ISSUE-020', 'ISSUE-021')
+          merged = 'MERGED in PR #265 — automated integration verified; release evidence pending RBATCH-017 owner review'
+          issue_done = 'COMPLETED — merged PR #265; PR CI 33563515533 and main CI 33563908596 succeeded'
+          epic_status = 'In Progress — RBATCH-016 merged; RBATCH-017 pending human owner approval'
+
+          def load(path_str):
+              path = ROOT / path_str
+              raw = path.read_bytes().decode('utf-8')
+              nl = '\r\n' if '\r\n' in raw else '\n'
+              return path, raw.replace('\r\n', '\n'), nl
+
+          def save(path, text, nl):
+              path.write_bytes(text.replace('\n', nl).encode('utf-8'))
+
+          def update_row(text, prefix, updater):
+              lines = text.splitlines()
+              matches = [i for i, line in enumerate(lines) if line.startswith(prefix)]
+              if len(matches) != 1:
+                  raise RuntimeError(f'Expected one row {prefix!r}, found {len(matches)}')
+              idx = matches[0]
+              cells = [c.strip() for c in lines[idx].strip().strip('|').split('|')]
+              updater(cells)
+              lines[idx] = '| ' + ' | '.join(cells) + ' |'
+              return '\n'.join(lines) + ('\n' if text.endswith('\n') else '')
+
+          def yaml_block(text, item_id):
+              marker = f'- id: {item_id}\n'
+              start = text.find(marker)
+              if start < 0:
+                  raise RuntimeError(f'Missing YAML block {item_id}')
+              nxt = text.find('\n- id: ', start + len(marker))
+              end = len(text) if nxt < 0 else nxt + 1
+              return start, end, text[start:end]
+
+          def yaml_field(text, item_id, field, value):
+              start, end, block = yaml_block(text, item_id)
+              pattern = rf'(^  {re.escape(field)}: ).+$'
+              updated, count = re.subn(pattern, lambda m: m.group(1) + repr(value), block, count=1, flags=re.MULTILINE)
+              if count != 1:
+                  raise RuntimeError(f'Cannot update {field} in {item_id}')
+              return text[:start] + updated + text[end:]
+
+          def yaml_label(text, item_id, old, new):
+              start, end, block = yaml_block(text, item_id)
+              if old not in block:
+                  if new in block:
+                      return text
+                  raise RuntimeError(f'Missing label {old} in {item_id}')
+              return text[:start] + block.replace(old, new, 1) + text[end:]
+
+          path, text, nl = load('09_Development/Planning/BATCH_ARCHITECTURE.md')
+          text = update_row(text, '| BATCH-015 | RBATCH-016 |', lambda cells: cells.__setitem__(2, merged))
+          text = update_row(text, '| RBATCH-016 |', lambda cells: cells.__setitem__(5, merged))
+          save(path, text, nl)
+
+          path, text, nl = load('09_Development/Planning/EPIC_CATALOG.md')
+          text = update_row(text, '| E-017 |', lambda cells: cells.__setitem__(4, epic_status))
+          save(path, text, nl)
+
+          path, text, nl = load('09_Development/Planning/ISSUE_CATALOG.md')
+          for issue_id in ISSUE_IDS:
+              def updater(cells):
+                  cells[6] = issue_done
+                  cells[7] = cells[7].replace('status:ready', 'status:done').replace('status:in-progress', 'status:done')
+              text = update_row(text, f'| {issue_id} |', updater)
+          save(path, text, nl)
+
+          path, text, nl = load('09_Development/Planning/github_creation_plan.yaml')
+          text = yaml_field(text, 'RBATCH-016', 'status', merged)
+          text = yaml_field(text, 'E-017', 'status', epic_status)
+          for issue_id in ISSUE_IDS:
+              text = yaml_field(text, issue_id, 'status', issue_done)
+              text = yaml_label(text, issue_id, 'status:ready', 'status:done')
+              text = yaml_label(text, issue_id, 'status:in-progress', 'status:done') if 'status:in-progress' in yaml_block(text, issue_id)[2] else text
+          save(path, text, nl)
+
+          path, text, nl = load('00_Project/PROJECT_STATUS.md')
+          text = re.sub(r'Last Updated: .*', 'Last Updated: 2026-09-01 (RBATCH-016 merged in PR #265; RBATCH-017 release checklist pending human owner approval)', text, count=1)
+          text = re.sub(
+              r'Prototype v0\.1 — .*?\n\n---',
+              'Prototype v0.1 — RBATCH-010 through RBATCH-016 MERGED; automated integration verified; RBATCH-017 Release-Checklist Verification Package pending human owner approval\n\n---',
+              text, count=1, flags=re.DOTALL)
+          text = re.sub(
+              r'# Current Objective\n\n.*?\n\n---',
+              '# Current Objective\n\nAwait explicit human owner approval for RBATCH-017, then assemble the release-checklist evidence and owner review package without self-approval claims. Railway/public/physical-device evidence remains distinct from automated CI evidence.\n\n---',
+              text, count=1, flags=re.DOTALL)
+          save(path, text, nl)
+
+          path, text, nl = load('09_Development/CHANGELOG.md')
+          marker = '# [2026-09-01] - RBATCH-015 MERGE CHECKPOINT'
+          section = '''# [2026-09-01] - RBATCH-016 FULL-LOOP INTEGRATION MERGE CHECKPOINT\n\n## Merged\n\n- PR #265 / RBATCH-016 merged into `main` as `9fc494d098dc860bb337ce1e1504aba8c08d4171`.\n- PR CI run `33563515533` succeeded.\n- Main post-merge CI run `33563908596` succeeded.\n- ISSUE-020/#206 and ISSUE-021/#207 closed as completed and synchronized to `status:done`.\n\n## Verified integration\n\n- Fresh start → accept → pickup → successful delivery → economy settlement.\n- Successful delivery → Bicycle purchase → derived movement speed → autosave/load continuity.\n- Fresh start → accept → pickup → wrong-destination failure → reputation settlement → autosave/load continuity.\n- Persistence boundaries continue to exclude transient world/order state.\n- Representative mobile viewport/touch invariants remain part of the full automated suite.\n\n## Next gate\n\n- RBATCH-017 Release-Checklist Verification Package remains Planned — Not Started.\n- Canonical owner gate: Human owner approval required.\n- No self-approval is recorded.\n\n---\n\n'''
+          if section.strip() not in text:
+              if marker not in text:
+                  raise RuntimeError('Cannot find changelog insertion marker')
+              text = text.replace(marker, section + marker, 1)
+          save(path, text, nl)
+
+          path, text, nl = load('.github/workflows/rbatch-010-ci.yml')
+          text = text.replace(
+              "          assert batches['RBATCH-016']['status'] == 'Planned — Not Started'\n",
+              "          assert 'MERGED' in batches['RBATCH-016']['status']\n          assert batches['RBATCH-017']['status'] == 'Planned — Not Started'\n          assert batches['RBATCH-017']['owner_gates'] == 'Human owner approval required'\n",
+              1,
+          )
+          text = text.replace(
+              "          assert epics['E-017']['status'] == 'Planned — Not Started'\n",
+              "          assert epics['E-017']['status'].startswith('In Progress')\n",
+              1,
+          )
+          anchor = "          for issue_id in ('ISSUE-018', 'ISSUE-019'):\n              assert issues[issue_id]['batch_id'] == 'RBATCH-015'\n              assert issues[issue_id]['epic_id'] == 'E-016'\n              assert issues[issue_id]['milestone_id'] == 'M-008'\n              assert issues[issue_id]['status'].startswith('COMPLETED')\n              assert 'status:done' in issues[issue_id]['label_names']\n"
+          addition = anchor + "\n          for issue_id in ('ISSUE-020', 'ISSUE-021'):\n              assert issues[issue_id]['batch_id'] == 'RBATCH-016'\n              assert issues[issue_id]['epic_id'] == 'E-017'\n              assert issues[issue_id]['milestone_id'] == 'M-008'\n              assert issues[issue_id]['status'].startswith('COMPLETED')\n              assert 'status:done' in issues[issue_id]['label_names']\n"
+          if anchor not in text:
+              raise RuntimeError('Cannot find active crosswalk ISSUE-018/019 block')
+          text = text.replace(anchor, addition, 1)
+          save(path, text, nl)
+
+          print('Post-RBATCH-016 reconciliation prepared: PASS')
+          PY
+
+      - name: Add persistent RBATCH-016 integration report
+        shell: bash
+        run: |
+          set -euo pipefail
+          cat > 09_Development/AI_Reports/2026-09-01_096_RBATCH_016_FULL_LOOP_INTEGRATION_VERIFICATION.md <<'EOF'
+          # RBATCH-016 — Full-Loop Integration Verification Report
+
+          Date: 2026-09-01
+          Repository: `caliofmarian-ai/DROPi-Tycoon`
+          Pull Request: #265
+          Merge commit: `9fc494d098dc860bb337ce1e1504aba8c08d4171`
+
+          ## Result
+
+          RBATCH-016 automated integration verification is complete.
+
+          GitHub Actions evidence:
+
+          - PR head `ce32e118828a858542a3f6af05b361ea76f01974` — run `33563515533` — SUCCESS.
+          - `main` merge commit `9fc494d098dc860bb337ce1e1504aba8c08d4171` — run `33563908596` — SUCCESS.
+
+          ## Connected scenarios verified
+
+          The integrated test suite verifies the implemented Prototype v0.1 systems as connected deterministic flows rather than only isolated unit contracts:
+
+          1. Fresh startup → order acceptance → pickup → correct delivery → economy/reputation settlement.
+          2. Successful delivery → Bicycle purchase → Bicycle-derived movement speed → canonical upgrade autosave → Continue/load continuity.
+          3. Fresh startup → order acceptance → pickup → wrong-destination failure → reputation penalty → canonical persistence continuity.
+          4. Persisted company/progression state survives load while excluded transient world/order state is reset according to ODR-001/ODR-003.
+          5. Transient acceptance/pickup states do not become unauthorized autosave events.
+          6. Representative portrait/landscape viewport and touch-target contracts remain in the full automated suite.
+
+          ## Evidence boundary
+
+          This report certifies automated repository integration only. It does not claim Railway/public URL or physical Android-device observations that were not performed through GitHub Actions.
+
+          ## Release boundary
+
+          RBATCH-017 remains separate. Its purpose is to assemble release-checklist evidence and the owner review package. Canon requires human owner approval before RBATCH-017 execution, and this report does not self-approve that gate.
+          EOF
+
+      - name: Verify checkpoint
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 -m pip install --quiet pyyaml
+          python3 - <<'PY'
+          import yaml
+          with open('09_Development/Planning/github_creation_plan.yaml', encoding='utf-8') as handle:
+              data = yaml.safe_load(handle)
+          batches = {x['id']: x for x in data['batches']}
+          epics = {x['id']: x for x in data['epics']}
+          issues = {x['id']: x for x in data['issues']}
+          milestones = {x['id']: x for x in data['milestones']}
+          assert milestones['M-008']['status'] == 'In Progress'
+          assert 'MERGED' in batches['RBATCH-016']['status']
+          assert batches['RBATCH-017']['status'] == 'Planned — Not Started'
+          assert batches['RBATCH-017']['owner_gates'] == 'Human owner approval required'
+          assert epics['E-017']['status'].startswith('In Progress')
+          for issue_id in ('ISSUE-020', 'ISSUE-021'):
+              assert issues[issue_id]['status'].startswith('COMPLETED')
+              assert 'status:done' in issues[issue_id]['label_names']
+          print('Post-RBATCH-016 YAML checkpoint: PASS')
+          PY
+          git -c core.whitespace=cr-at-eol diff --check
+
+      - name: Commit checkpoint
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add \
+            .github/workflows/rbatch-010-ci.yml \
+            00_Project/PROJECT_STATUS.md \
+            09_Development/AI_Reports/2026-09-01_096_RBATCH_016_FULL_LOOP_INTEGRATION_VERIFICATION.md \
+            09_Development/CHANGELOG.md \
+            09_Development/Planning/BATCH_ARCHITECTURE.md \
+            09_Development/Planning/EPIC_CATALOG.md \
+            09_Development/Planning/ISSUE_CATALOG.md \
+            09_Development/Planning/github_creation_plan.yaml
+          git commit -m 'docs: reconcile RBATCH-016 merge checkpoint'
+          git push origin HEAD:openai/post-rbatch-016-checkpoint
