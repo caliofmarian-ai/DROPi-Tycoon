@@ -2,11 +2,11 @@
 
 Document: PROTOTYPE_RELEASE_CHECKLIST.md
 Project: DROPi Tycoon
-Version: 1.0.0
+Version: 1.1.0
 Status: Prototype Validation
 Author: Marian Caliof & OpenAI
 Language: English
-Last Updated: 2026-07-12
+Last Updated: 2026-09-01
 
 ---
 
@@ -36,6 +36,23 @@ Cross-references:
 - `09_Development/PROTOTYPE_TESTING_PLAN.md` owns test procedures and validation evidence.
 - `09_Development/PROTOTYPE_MILESTONES.md` owns implementation milestone sequencing.
 
+## RBATCH-017 Evidence Boundary
+
+RBATCH-017 was explicitly authorized by the human Project Owner on 2026-09-01. That approval authorizes execution of this verification package; it is **not** the final Prototype v0.1 release sign-off required by REQ-187.
+
+Evidence is assembled in:
+
+- `09_Development/Release_Evidence/PROTOTYPE_V0.1_RELEASE_EVIDENCE.md`
+- `09_Development/Release_Evidence/PROTOTYPE_V0.1_OWNER_REVIEW_PACKAGE.md`
+
+Evidence states used by RBATCH-017:
+
+- **AUTOMATED PASS** — deterministic repository/CI evidence exists.
+- **HUMAN / DEVICE / PUBLIC CHECK PENDING** — real observation is still required.
+- **FINAL OWNER SIGN-OFF PENDING** — the Project Owner has not yet declared Prototype v0.1 complete.
+
+The authoritative checklist boxes remain unchecked until final owner review. Automated evidence never self-approves subjective or external checks.
+
 ---
 
 ---
@@ -57,7 +74,7 @@ It must prove that:
 
 ## Checklist
 
-- [ ] Project opens correctly in GDevelop
+- [ ] Deployable web runtime opens correctly
 - [ ] No critical errors
 - [ ] Game launches successfully
 - [ ] Main scene loads correctly

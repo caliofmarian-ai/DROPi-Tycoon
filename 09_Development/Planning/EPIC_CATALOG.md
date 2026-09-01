@@ -37,7 +37,7 @@ Last Updated: 2026-09-01
 | E-014 | 1 | M-006 | Bicycle Ownership System | MERGED in PR #257 — pending Railway/public verification | RBATCH-013 | E-013, E-006 |
 | E-015 | 1 | M-007 | Save & Load System | MERGED in PR #259 — pending Railway/public verification | RBATCH-014 | E-013, E-014, E-012 |
 | E-016 | 1 | M-008 | Mobile Optimization | MERGED in PR #263 — pending Railway/public mobile verification | RBATCH-015 | E-015 |
-| E-017 | 1 | M-008 | Full-Loop Integration Verification | In Progress — RBATCH-016 merged; RBATCH-017 pending human owner approval | RBATCH-016, RBATCH-017 | E-016 |
+| E-017 | 1 | M-008 | Full-Loop Integration Verification | In Progress — RBATCH-016 merged; RBATCH-017 release evidence package under review | RBATCH-016, RBATCH-017 | E-016 |
 | E-018 | 2 | M-009 | Employee Management System | Planned — Future | RBATCH-018 | E-017 |
 | E-019 | 2 | M-009 | Financial Reporting & Daily Costs | Planned — Future | RBATCH-019 | E-018 |
 | E-020 | 2 | M-009 | Customer Review & Reputation System | Planned — Future | RBATCH-020, RBATCH-021 | E-010 |

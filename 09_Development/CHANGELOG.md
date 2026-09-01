@@ -34,6 +34,22 @@ Description
 
 ---
 
+# [2026-09-01] - RBATCH-017 RELEASE EVIDENCE EXECUTION AUTHORIZED
+
+## Owner gate
+
+- Human Project Owner explicitly approved execution of RBATCH-017 on 2026-09-01.
+- This resolves the batch execution gate only; final Prototype v0.1 release sign-off remains separate.
+
+## Release gate and evidence
+
+- Reconciled the stale GDevelop-specific project-open criterion to the engine-agnostic deployable web runtime.
+- Archived `Game/` remains reference-only and unchanged.
+- Added a seven-section release evidence matrix and an owner review package.
+- Automated evidence is kept distinct from manual/device/public/subjective checks.
+
+---
+
 # [2026-09-01] - RBATCH-016 FULL-LOOP INTEGRATION MERGE CHECKPOINT
 
 ## Merged
