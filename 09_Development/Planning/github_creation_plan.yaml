@@ -426,7 +426,7 @@ epics:
   title: Bicycle Ownership System
   phase: 1
   milestone_id: M-006
-  status: 'PR #257 — validation complete; pending merge'
+  status: 'MERGED in PR #257 — pending Railway/public verification'
   batch_ids:
   - RBATCH-013
   depends_on:
@@ -983,7 +983,7 @@ batches:
   epic_ids:
   - E-014
   title: Bicycle Ownership + Speed Increase
-  status: 'PR #257 — validation complete; pending merge'
+  status: 'MERGED in PR #257 — pending Railway/public verification'
   depends_on:
   - RBATCH-012
   - RBATCH-006
@@ -2009,13 +2009,13 @@ issues:
   milestone_id: M-006
   phase: 1
   type: implementation
-  status: 'PR #257 implementation validated — pending merge'
+  status: 'COMPLETED — merged PR #257; Railway/public verification pending at RBATCH-013 level'
   label_names:
   - type:implementation
   - phase:1
   - batch:rbatch-013
   - epic:bicycle-ownership
-  - status:in-progress
+  - status:done
   description: Use the approved upgrade ownership path instead of an unapproved standalone bicycle-ownership field.
   acceptance_criteria: Ownership is stored through purchased-upgrade state.
 - id: ISSUE-013
@@ -2025,13 +2025,13 @@ issues:
   milestone_id: M-006
   phase: 1
   type: implementation
-  status: 'PR #257 implementation validated — pending merge'
+  status: 'COMPLETED — merged PR #257; Railway/public verification pending at RBATCH-013 level'
   label_names:
   - type:implementation
   - phase:1
   - batch:rbatch-013
   - epic:bicycle-ownership
-  - status:in-progress
+  - status:done
   description: Apply faster movement after bicycle purchase using approved balancing.
   acceptance_criteria: Movement is faster with bicycle ownership.
 - id: ISSUE-014
