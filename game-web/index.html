@@ -26,43 +26,24 @@
         height: 100%;
         margin: 0;
         overflow: hidden;
+        overscroll-behavior: none;
         background: #10151d;
       }
 
-      body {
-        touch-action: manipulation;
+      body,
+      #app,
+      canvas {
+        touch-action: none;
       }
 
       canvas {
         display: block;
-        margin: 0 auto;
-      }
-
-      #rotate-device {
-        position: fixed;
-        inset: 0;
-        display: none;
-        align-items: center;
-        justify-content: center;
-        padding: 24px;
-        text-align: center;
-        background: rgba(16, 21, 29, 0.95);
-        color: #f8fafc;
-        font-size: 20px;
-        font-weight: 700;
-        z-index: 10;
-      }
-
-      @media (orientation: portrait) {
-        #rotate-device {
-          display: flex;
-        }
+        margin: 0;
       }
     </style>
   </head>
   <body>
     <div id="app"></div>
-    <div id="rotate-device">Rotate your phone to landscape for the prototype view.</div>
     <script type="module" src="/src/main.ts"></script>
   </body>
 </html>
