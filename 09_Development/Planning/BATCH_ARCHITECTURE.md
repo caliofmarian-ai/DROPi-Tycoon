@@ -38,8 +38,8 @@ Last Updated: 2026-09-01
 | BATCH-009 | RBATCH-009 | COMPLETED — merged in PR #86 and Railway-verified on 2026-08-02 | M-005 / E-010 | 09_Development/Planning/BATCH_ARCHITECTURE.md | 09_Development/Implementation_Preparation/IMPLEMENTATION_BATCH_PLAN.md |
 | BATCH-010 | RBATCH-010 | MERGED — pending Railway/public verification | M-005 / E-011 | 09_Development/Planning/BATCH_ARCHITECTURE.md | 09_Development/Implementation_Preparation/IMPLEMENTATION_BATCH_PLAN.md |
 | BATCH-010b | RBATCH-011 | MERGED in PR #255 — pending Railway/public verification | M-005 / E-012 | 09_Development/Planning/BATCH_ARCHITECTURE.md | 09_Development/Implementation_Preparation/IMPLEMENTATION_BATCH_PLAN.md |
-| BATCH-011 | RBATCH-012 | PR #256 — validation complete; pending merge | M-006 / E-013 | 09_Development/Planning/BATCH_ARCHITECTURE.md | 09_Development/Implementation_Preparation/IMPLEMENTATION_BATCH_PLAN.md |
-| BATCH-012 | RBATCH-013 | NEVER STARTED | M-006 / E-014 | 09_Development/Planning/BATCH_ARCHITECTURE.md | 09_Development/Implementation_Preparation/IMPLEMENTATION_BATCH_PLAN.md |
+| BATCH-011 | RBATCH-012 | MERGED in PR #256 — pending Railway/public verification | M-006 / E-013 | 09_Development/Planning/BATCH_ARCHITECTURE.md | 09_Development/Implementation_Preparation/IMPLEMENTATION_BATCH_PLAN.md |
+| BATCH-012 | RBATCH-013 | PR #257 — validation complete; pending merge | M-006 / E-014 | 09_Development/Planning/BATCH_ARCHITECTURE.md | 09_Development/Implementation_Preparation/IMPLEMENTATION_BATCH_PLAN.md |
 | BATCH-013 | RBATCH-014 | NEVER STARTED | M-007 / E-015 | 09_Development/Planning/BATCH_ARCHITECTURE.md | 09_Development/Implementation_Preparation/IMPLEMENTATION_BATCH_PLAN.md |
 | BATCH-014 | RBATCH-015 | NEVER STARTED | M-008 / E-016 | 09_Development/Planning/BATCH_ARCHITECTURE.md | 09_Development/Implementation_Preparation/IMPLEMENTATION_BATCH_PLAN.md |
 | BATCH-015 | RBATCH-016 | NEVER STARTED | M-008 / E-017 | 09_Development/Planning/BATCH_ARCHITECTURE.md | 09_Development/Implementation_Preparation/IMPLEMENTATION_BATCH_PLAN.md |
@@ -62,8 +62,8 @@ Legacy numbering is historical only. Execute the mapped `RBATCH-*` identifier; a
 | RBATCH-009 | 1 | M-005 | E-010 | Economy Reward & Failure Consequences | COMPLETED — merged in PR #86 and Railway-verified on 2026-08-02 | RBATCH-008 | BATCH-009 | — |
 | RBATCH-010 | 1 | M-005 | E-011 | HUD + Notifications | MERGED — pending Railway/public verification | RBATCH-007, RBATCH-009 | BATCH-010 | — |
 | RBATCH-011 | 1 | M-005 | E-012 | MainMenu Flow | MERGED in PR #255 — pending Railway/public verification | RBATCH-002 | BATCH-010b | — |
-| RBATCH-012 | 1 | M-006 | E-013 | CompanyManagement + Upgrade Purchase Flow | PR #256 — validation complete; pending merge | RBATCH-009, RBATCH-010 | BATCH-011 | — |
-| RBATCH-013 | 1 | M-006 | E-014 | Bicycle Ownership + Speed Increase | Planned — Not Started | RBATCH-012, RBATCH-006 | BATCH-012 | — |
+| RBATCH-012 | 1 | M-006 | E-013 | CompanyManagement + Upgrade Purchase Flow | MERGED in PR #256 — pending Railway/public verification | RBATCH-009, RBATCH-010 | BATCH-011 | — |
+| RBATCH-013 | 1 | M-006 | E-014 | Bicycle Ownership + Speed Increase | PR #257 — validation complete; pending merge | RBATCH-012, RBATCH-006 | BATCH-012 | — |
 | RBATCH-014 | 1 | M-007 | E-015 | Save/Load Implementation | Planned — Blocked | RBATCH-012, RBATCH-013, RBATCH-011 | BATCH-013 | ODR-001, ODR-003 |
 | RBATCH-015 | 1 | M-008 | E-016 | Mobile Optimization | Planned — Not Started | RBATCH-010, RBATCH-014 | BATCH-014 | — |
 | RBATCH-016 | 1 | M-008 | E-017 | Full-Loop Integration Verification | Planned — Not Started | RBATCH-015 | BATCH-015 | — |
