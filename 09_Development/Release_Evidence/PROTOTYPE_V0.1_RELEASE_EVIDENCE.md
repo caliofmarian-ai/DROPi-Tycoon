@@ -21,6 +21,8 @@ This document evaluates all seven release-checklist sections using the strongest
 - PR #265 CI `33563515533`: SUCCESS.
 - Post-merge RBATCH-016 `main` CI `33563908596`: SUCCESS.
 - Post-RBATCH-016 checkpoint `main` CI `33564613672`: SUCCESS.
+- RBATCH-017 PR #267 CI `33566223185`: SUCCESS.
+- RBATCH-017 post-merge `main` CI `33566313283`: SUCCESS.
 - Full suite covers order lifecycle, HUD, MainMenu, company management, Bicycle, Save/Load, mobile viewport/touch, notifications and connected full-loop integration.
 
 ## 1. Project Stability
@@ -119,6 +121,6 @@ Section 7: **AUTOMATED PASS**.
 
 ## Current release verdict
 
-**EVIDENCE PACKAGE COMPLETE — FINAL RELEASE SIGN-OFF NOT YET RECORDED.**
+**EVIDENCE PACKAGE MERGED — FINAL RELEASE SIGN-OFF NOT YET RECORDED.**
 
 Remaining blockers to a truthful final release declaration are the human/device/public/subjective observations in the owner review package and the final explicit owner decision.

@@ -34,6 +34,24 @@ Description
 
 ---
 
+# [2026-09-01] - RBATCH-017 RELEASE EVIDENCE MERGE CHECKPOINT
+
+## Merged and validated
+
+- PR #267 merged as `e86403f08a9b281808605a959c4a91ab8e376739`.
+- PR CI `33566223185`: SUCCESS.
+- Main post-merge CI `33566313283`: SUCCESS.
+- ISSUE-022/#208 and ISSUE-023/#209 are completed.
+- RBATCH-017 and E-017 implementation/verification workstreams are completed.
+
+## Remaining release gate
+
+- M-008 remains In Progress.
+- Remaining work is human/device/public/subjective owner review only.
+- Final Prototype v0.1 owner sign-off required by REQ-187 is not yet recorded.
+
+---
+
 # [2026-09-01] - RBATCH-017 RELEASE EVIDENCE EXECUTION AUTHORIZED
 
 ## Owner gate

@@ -6,7 +6,7 @@ Version: 1.2.0
 Status: Active Development
 Author: Marian Caliof & OpenAI
 Language: English
-Last Updated: 2026-09-01 (RBATCH-017 owner-authorized; release evidence package active)
+Last Updated: 2026-09-01 (RBATCH-017 merged in PR #267; implementation/verification workstream complete; final owner release review pending)
 
 ---
 
@@ -16,13 +16,13 @@ Last Updated: 2026-09-01 (RBATCH-017 owner-authorized; release evidence package 
 
 Phase:
 
-Prototype v0.1 — RBATCH-010 through RBATCH-016 MERGED; automated integration verified; RBATCH-017 Release-Checklist Verification Package pending human owner approval
+Prototype v0.1 — RBATCH-010 through RBATCH-017 MERGED; automated implementation/integration evidence complete; M-008 remains open only for final human/device/public review and owner release sign-off
 
 ---
 
 # Current Objective
 
-Execute RBATCH-017 release-checklist verification and deliver the owner review package while keeping automated evidence separate from human/device/public observations. Final Prototype v0.1 release sign-off remains a separate human owner decision.
+Perform the final Prototype v0.1 owner review on the public build/Android device using `09_Development/Release_Evidence/PROTOTYPE_V0.1_OWNER_REVIEW_PACKAGE.md`. Do not declare the release complete until the remaining human/device/public/subjective checks are satisfactory and the owner explicitly signs off.
 
 ---
 

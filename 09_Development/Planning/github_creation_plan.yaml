@@ -132,7 +132,7 @@ milestones:
   - RBATCH-017
   depends_on:
   - M-007
-  owner_gates: Human owner approval for RBATCH-017 closure
+  owner_gates: 'Final Prototype v0.1 owner release sign-off required after human/device/public review (REQ-187)'
 - id: M-009
   title: Employee & Financial Systems
   phase: 2
@@ -456,7 +456,7 @@ epics:
   title: Full-Loop Integration Verification
   phase: 1
   milestone_id: M-008
-  status: 'In Progress — RBATCH-016 merged; RBATCH-017 release evidence package under review'
+  status: 'COMPLETED — RBATCH-016 and RBATCH-017 merged and validated; M-008 final owner release sign-off pending'
   batch_ids:
   - RBATCH-016
   - RBATCH-017
@@ -1044,10 +1044,10 @@ batches:
   epic_ids:
   - E-017
   title: Release-Checklist Verification Package
-  status: 'In Progress — owner execution gate resolved; release evidence package under review'
+  status: 'MERGED in PR #267 — release evidence package complete; final Prototype v0.1 owner release sign-off pending'
   depends_on:
   - RBATCH-016
-  owner_gates: 'RESOLVED 2026-09-01 — human owner explicitly approved RBATCH-017 execution; final Prototype v0.1 release approval remains separate'
+  owner_gates: 'RESOLVED 2026-09-01 — human owner approved RBATCH-017 execution; final release approval remains separate'
   legacy_id: BATCH-016
   legacy_status: NEVER STARTED
   authoritative_planning_source: 09_Development/Planning/BATCH_ARCHITECTURE.md
@@ -2173,14 +2173,14 @@ issues:
   milestone_id: M-008
   phase: 1
   type: verification
-  status: 'In Progress — RBATCH-017 release evidence package active'
+  status: 'COMPLETED — merged PR #267; PR CI 33566223185 and main CI 33566313283 succeeded'
   label_names:
   - type:verification
   - phase:1
   - batch:rbatch-017
   - epic:integration-verification
-  - status:in-progress
-  blocked_or_owner_gate: 'RESOLVED 2026-09-01 — human owner explicitly approved RBATCH-017 execution; final Prototype v0.1 release approval remains separate'
+  - status:done
+  blocked_or_owner_gate: 'RESOLVED 2026-09-01 — human owner approved RBATCH-017 execution; final release approval remains separate'
   description: Assemble release-checklist evidence for owner review.
   acceptance_criteria: Evidence is complete with no self-approval claim.
 - id: ISSUE-023
@@ -2190,14 +2190,14 @@ issues:
   milestone_id: M-008
   phase: 1
   type: documentation
-  status: 'In Progress — RBATCH-017 release evidence package active'
+  status: 'COMPLETED — merged PR #267; PR CI 33566223185 and main CI 33566313283 succeeded'
   label_names:
   - type:documentation
   - phase:1
   - batch:rbatch-017
   - epic:integration-verification
-  - status:in-progress
-  blocked_or_owner_gate: 'RESOLVED 2026-09-01 — human owner explicitly approved RBATCH-017 execution; final Prototype v0.1 release approval remains separate'
+  - status:done
+  blocked_or_owner_gate: 'RESOLVED 2026-09-01 — human owner approved RBATCH-017 execution; final release approval remains separate'
   description: Package review artifacts for the owner.
   acceptance_criteria: Artifacts and review instructions are included.
 - id: ISSUE-024
