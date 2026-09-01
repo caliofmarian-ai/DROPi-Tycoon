@@ -1,5 +1,5 @@
 import { BALANCING } from '../config/balancing'
-import type { CompanyState, WorldState } from '../types/game'
+import type { CompanyState, GameSettingsState, WorldState } from '../types/game'
 
 export const WORLD_WIDTH = 800
 export const WORLD_HEIGHT = 600
@@ -15,6 +15,10 @@ export const createInitialCompanyState = (): CompanyState => ({
     Efficiency: 0,
     Bicycle: 0,
   },
+})
+
+export const createInitialGameSettingsState = (): GameSettingsState => ({
+  tutorialCompleted: false,
 })
 
 export const createInitialWorldState = (): WorldState => ({
