@@ -11,7 +11,9 @@ export const createGameConfig = (parent: string): Phaser.Types.Core.GameConfig =
   width: appConfig.width,
   height: appConfig.height,
   scale: {
-    mode: Phaser.Scale.FIT,
+    // RBATCH-015: keep game coordinates in actual canvas/CSS pixels so touch
+    // targets do not shrink when a fixed logical canvas is fitted to a phone.
+    mode: Phaser.Scale.RESIZE,
     autoCenter: Phaser.Scale.CENTER_BOTH,
   },
   input: {
