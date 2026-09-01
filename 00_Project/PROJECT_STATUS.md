@@ -6,7 +6,7 @@ Version: 1.2.0
 Status: Active Development
 Author: Marian Caliof & OpenAI
 Language: English
-Last Updated: 2026-09-01 (RBATCH-015 Mobile Optimization validated on PR #263; pending merge)
+Last Updated: 2026-09-01 (RBATCH-015 merged in PR #263; RBATCH-016 Full-Loop Integration Verification next)
 
 ---
 
@@ -16,13 +16,13 @@ Last Updated: 2026-09-01 (RBATCH-015 Mobile Optimization validated on PR #263; p
 
 Phase:
 
-Prototype v0.1 — RBATCH-010/011/012/013/014 MERGED pending Railway/public verification; RBATCH-015 Mobile Optimization validated on PR #263 pending merge
+Prototype v0.1 — RBATCH-010/011/012/013/014/015 MERGED pending Railway/public verification; RBATCH-016 Full-Loop Integration Verification is next
 
 ---
 
 # Current Objective
 
-Complete final validation and merge of PR #263 (RBATCH-015 Mobile Optimization), then perform public/mobile verification before advancing its merged checkpoint. Preserve viewport/rendering independence so later high-fidelity visual evolution remains unconstrained.
+Execute RBATCH-016 Full-Loop Integration Verification after RBATCH-015 merged successfully, while keeping Railway/public mobile verification explicitly pending until observed.
 
 ---
 
@@ -243,9 +243,9 @@ Implementation Preparation Status:
 - Current prototype visuals are explicitly temporary; persistence and gameplay state remain decoupled from rendering/assets so later high-fidelity visual evolution does not require Save/Load rewrites
 
 - M-008 status: In Progress
-- E-016 status: PR #263 — validation complete; pending merge
-- RBATCH-015 status: PR #263 — validation complete; pending merge
-- ISSUE-018/ISSUE-019 status: PR #263 implementation validated — pending merge
+- E-016 status: MERGED in PR #263 — pending Railway/public mobile verification
+- RBATCH-015 status: MERGED in PR #263 — pending Railway/public mobile verification
+- ISSUE-018/ISSUE-019 status: COMPLETED — merged PR #263; Railway/public verification pending at RBATCH-015 level
 - RBATCH-015 validation run `33562041087`: 274/274 tests passed across 9 files, including 32/32 mobile viewport/touch tests; TypeScript/Vite build, HTTP smoke, whitespace, archived `Game/` guard, YAML syntax/counts and planning crosswalk passed
 - Mobile implementation supports representative portrait and landscape Android viewports without declaring either orientation permanent canon
 - Touch comfort is enforced in actual screen-space canvas pixels through an implementation-level threshold; the threshold is not canonical gameplay design
