@@ -122,13 +122,13 @@ jobs:
           assert issues['ISSUE-008']['batch_id'] == 'RBATCH-011'
           assert issues['ISSUE-008']['epic_id'] == 'E-012'
           assert issues['ISSUE-008']['milestone_id'] == 'M-005'
-          assert 'status:in-progress' in issues['ISSUE-008']['labels']
+          assert 'status:in-progress' in issues['ISSUE-008']['label_names']
 
           assert issues['ISSUE-009']['batch_id'] == 'RBATCH-014'
           assert issues['ISSUE-009']['epic_id'] == 'E-015'
           assert issues['ISSUE-009']['milestone_id'] == 'M-007'
           assert issues['ISSUE-009']['blocked_or_owner_gate'] == 'ODR-001, ODR-003'
-          assert 'status:blocked' in issues['ISSUE-009']['labels']
+          assert 'status:blocked' in issues['ISSUE-009']['label_names']
 
           print('Active planning crosswalk validation: PASS')
           PY
