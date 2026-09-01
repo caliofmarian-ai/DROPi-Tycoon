@@ -4,7 +4,7 @@
 metadata:
   project: DROPi Tycoon
   repository: caliofmarian-ai/DROPi-Tycoon
-  plan_version: 1.2.0
+  plan_version: 1.3.0
   created_date: '2026-08-01'
   execution_status: INVENTORY_MATERIALIZED — GitHub inventory independently materialized and verified 2026-08-02; creation plan script was not run (inventory already exists)
   counts:
@@ -398,7 +398,7 @@ epics:
   title: HUD & Notifications
   phase: 1
   milestone_id: M-005
-  status: Draft PR implementation exists — pending independent review
+  status: MERGED — pending Railway/public verification
   batch_ids:
   - RBATCH-010
   depends_on:
@@ -407,7 +407,7 @@ epics:
   title: MainMenu & Game Flow
   phase: 1
   milestone_id: M-005
-  status: Planned — Not Started
+  status: 'PR #255 — validation/review in progress'
   batch_ids:
   - RBATCH-011
   depends_on:
@@ -939,7 +939,7 @@ batches:
   epic_ids:
   - E-011
   title: HUD + Notifications
-  status: Draft PR — Pending Independent Review
+  status: MERGED — pending Railway/public verification
   depends_on:
   - RBATCH-007
   - RBATCH-009
@@ -954,7 +954,7 @@ batches:
   epic_ids:
   - E-012
   title: MainMenu Flow
-  status: Planned — Not Started
+  status: 'PR #255 — validation/review in progress'
   depends_on:
   - RBATCH-002
   legacy_id: BATCH-010b
@@ -1453,13 +1453,13 @@ legacy_crosswalk:
   execution_rule: Historical numbering only; execute the mapped RBATCH identifier and never ambiguous legacy numbering.
 - legacy_id: BATCH-010
   rbatch_id: RBATCH-010
-  historical_status: Draft PR — Pending Independent Review
+  historical_status: MERGED — pending Railway/public verification
   authoritative_planning_source: 09_Development/Planning/BATCH_ARCHITECTURE.md
   historical_lineage_source: 09_Development/Implementation_Preparation/IMPLEMENTATION_BATCH_PLAN.md
   execution_rule: Historical numbering only; execute the mapped RBATCH identifier and never ambiguous legacy numbering.
 - legacy_id: BATCH-010b
   rbatch_id: RBATCH-011
-  historical_status: NEVER STARTED
+  historical_status: 'PR #255 — validation/review in progress'
   authoritative_planning_source: 09_Development/Planning/BATCH_ARCHITECTURE.md
   historical_lineage_source: 09_Development/Implementation_Preparation/IMPLEMENTATION_BATCH_PLAN.md
   execution_rule: Historical numbering only; execute the mapped RBATCH identifier and never ambiguous legacy numbering.
@@ -1896,7 +1896,7 @@ issues:
   milestone_id: M-005
   phase: 1
   type: implementation
-  status: Draft PR implementation exists — pending independent review
+  status: MERGED in PR #253 — pending Railway/public verification
   label_names:
   - type:implementation
   - phase:1
@@ -1912,7 +1912,7 @@ issues:
   milestone_id: M-005
   phase: 1
   type: implementation
-  status: Draft PR implementation exists — pending independent review
+  status: MERGED in PR #253 — pending Railway/public verification
   label_names:
   - type:implementation
   - phase:1
@@ -1928,7 +1928,7 @@ issues:
   milestone_id: M-005
   phase: 1
   type: implementation
-  status: Draft PR implementation exists — pending independent review
+  status: MERGED in PR #253 — pending Railway/public verification
   label_names:
   - type:implementation
   - phase:1
@@ -1938,37 +1938,38 @@ issues:
   description: Show notifications for Accepted/PickedUp/Completed/Failed.
   acceptance_criteria: Notification appears on each state change.
 - id: ISSUE-008
-  title: Implement Start/Continue main menu flow
+  title: Implement required MainMenu flow
   batch_id: RBATCH-011
   epic_id: E-012
   milestone_id: M-005
   phase: 1
   type: implementation
-  status: Ready for implementation
+  status: 'PR #255 implementation exists — validation/review in progress'
   label_names:
   - type:implementation
   - phase:1
   - batch:rbatch-011
   - epic:mainmenu-gameflow
-  - status:ready
-  description: Show Start and Continue with valid-save checks.
-  acceptance_criteria: Continue unavailable when no valid save exists.
+  - status:in-progress
+  description: Implement Start Game, Settings and Information without save-dependent behavior.
+  acceptance_criteria: MainMenu actions are mobile-friendly, deterministic and persistence-independent.
 - id: ISSUE-009
   title: Implement new-game overwrite guard
-  batch_id: RBATCH-011
-  epic_id: E-012
-  milestone_id: M-005
+  batch_id: RBATCH-014
+  epic_id: E-015
+  milestone_id: M-007
   phase: 1
   type: implementation
-  status: Ready for implementation
+  status: Blocked with RBATCH-014
   label_names:
   - type:implementation
   - phase:1
-  - batch:rbatch-011
-  - epic:mainmenu-gameflow
-  - status:ready
-  description: Require confirmation before replacing an existing save.
-  acceptance_criteria: No silent overwrite occurs.
+  - batch:rbatch-014
+  - epic:save-load
+  - status:blocked
+  blocked_or_owner_gate: ODR-001, ODR-003
+  description: Require confirmation before replacing an existing valid save as part of the canonical save/load path.
+  acceptance_criteria: No valid save is silently overwritten.
 - id: ISSUE-010
   title: Implement upgrade purchase flow
   batch_id: RBATCH-012

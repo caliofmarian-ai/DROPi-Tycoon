@@ -157,13 +157,13 @@ Define a dependency-ordered, scope-safe implementation plan for Prototype v0.1.
 - Acceptance criteria: HUD supports full loop execution.
 
 ### BATCH-010b
-- Objective: Implement MainMenu Start/Continue/new-game guard flow.
-- Requirements: REQ-088, REQ-111, REQ-118, REQ-119, REQ-120.
-- Artifacts: scene entry flow, overwrite confirmation guard.
+- Objective: Implement MainMenu Start Game, Settings and Information flow without save-dependent behavior.
+- Requirements: REQ-088 flow completion only. REQ-111 and REQ-118..REQ-120 remain owned by BATCH-013 per the canonical traceability matrix.
+- Artifacts: scene entry flow, Settings/Information surfaces, mobile input isolation.
 - Dependencies: BATCH-002.
 - Owner-decision gate: none.
-- Non-goals: no save serializer implementation.
-- Validation: Continue and Start rules align with save policy.
+- Non-goals: no Continue/load behavior, valid-save detection, overwrite confirmation, save serializer, or save validation implementation.
+- Validation: Start/Settings/Information flow is deterministic, mobile-friendly, and does not implement BATCH-013 persistence semantics.
 - Acceptance criteria: menu flow is canonically compliant and isolated.
 
 ### BATCH-011

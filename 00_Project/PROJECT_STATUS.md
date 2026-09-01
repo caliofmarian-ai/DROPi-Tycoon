@@ -6,7 +6,7 @@ Version: 1.2.0
 Status: Active Development
 Author: Marian Caliof & OpenAI
 Language: English
-Last Updated: 2026-08-02 (RBATCH-010 HUD + NOTIFICATIONS — CORRECTION PASS 4)
+Last Updated: 2026-09-01 (RBATCH-010 merged; RBATCH-011 MainMenu Flow draft PR)
 
 ---
 
@@ -16,13 +16,13 @@ Last Updated: 2026-08-02 (RBATCH-010 HUD + NOTIFICATIONS — CORRECTION PASS 4)
 
 Phase:
 
-Prototype v0.1 — RBATCH-009 Economy and Reputation Outcomes COMPLETED (merged PR #86, Railway-verified 2026-08-02); RBATCH-010 HUD + Notifications Implemented on Draft PR Pending Independent Review
+Prototype v0.1 — RBATCH-010 HUD + Notifications MERGED in PR #253 pending Railway/public verification; RBATCH-011 MainMenu Flow implemented on PR #255 pending independent review
 
 ---
 
 # Current Objective
 
-Keep the verified public web runtime stable, preserve all merged batch evidence, and complete the correction and independent review of PR #253 (RBATCH-010 HUD + Notifications — existing draft implementation) before merging.
+Keep the merged RBATCH-010 runtime stable while completing independent review of PR #254 (RBATCH-011 MainMenu Flow) without entering RBATCH-014 Save/Load scope early.
 
 ---
 
@@ -186,7 +186,7 @@ READY
 
 Implementation:
 
-STARTED — BATCH-001 FOUNDATION COMPLETE; BATCH-002 SCAFFOLD COMPLETE; BATCH-003 PLACEHOLDER ASSETS COMPLETE; BATCH-004 WORLD SETUP COMPLETE; BATCH-005 ORDER LIFECYCLE CORE COMPLETE; BATCH-006 TAP-TO-MOVE + CAMERA COMPLETE; BATCH-007 PICKUP PROXIMITY + ACCEPTED→PICKEDUP CORE IMPLEMENTED AND RAILWAY-VERIFIED (2026-08-01); BATCH-008 DELIVERY OUTCOMES COMPLETE; PR #84 MERGED; RAILWAY REDEPLOYED; PUBLIC COMPLETED/FAILED VERIFICATION PASSED; RBATCH-009 ECONOMY AND REPUTATION OUTCOMES COMPLETED — MERGED IN PR #86, RAILWAY-VERIFIED 2026-08-02, 73/73 TESTS (implementation head: `10c1b4df1703015367bd68e504d5713656681289`, merge commit: `b449769f2cfdfcf915ad2680e68960dc902d8796`); RBATCH-010 HUD + NOTIFICATIONS DRAFT PR #253 OPEN — PENDING INDEPENDENT REVIEW
+STARTED — BATCH-001 FOUNDATION COMPLETE; BATCH-002 SCAFFOLD COMPLETE; BATCH-003 PLACEHOLDER ASSETS COMPLETE; BATCH-004 WORLD SETUP COMPLETE; BATCH-005 ORDER LIFECYCLE CORE COMPLETE; BATCH-006 TAP-TO-MOVE + CAMERA COMPLETE; BATCH-007 PICKUP PROXIMITY + ACCEPTED→PICKEDUP CORE IMPLEMENTED AND RAILWAY-VERIFIED (2026-08-01); BATCH-008 DELIVERY OUTCOMES COMPLETE; PR #84 MERGED; RAILWAY REDEPLOYED; PUBLIC COMPLETED/FAILED VERIFICATION PASSED; RBATCH-009 ECONOMY AND REPUTATION OUTCOMES COMPLETED — MERGED IN PR #86, RAILWAY-VERIFIED 2026-08-02, 73/73 TESTS (implementation head: `10c1b4df1703015367bd68e504d5713656681289`, merge commit: `b449769f2cfdfcf915ad2680e68960dc902d8796`); RBATCH-010 HUD + NOTIFICATIONS MERGED IN PR #253 — PENDING RAILWAY/PUBLIC VERIFICATION; RBATCH-011 MAINMENU FLOW PR #255 OPEN — VALIDATION/REVIEW IN PROGRESS
 
 Implementation Preparation Status:
 
@@ -222,9 +222,13 @@ Implementation Preparation Status:
 - Planning materialization reconciliation verified on 2026-08-02: labels 122/122; milestones 21/21; epics 46/46; batch issues 54/54; executable issues 34/34; planning placeholders 32/32; total canonical planning issues 166/166
 - M-005 status: In Progress
 - E-010 status: COMPLETED through merged and Railway-verified RBATCH-009
-- E-011 status: Draft PR implementation exists — pending independent review
-- RBATCH-010 status: Draft PR — Pending Independent Review
-- ISSUE-005/ISSUE-006/ISSUE-007 status: Draft PR implementation exists — pending independent review
+- E-011 status: MERGED in PR #253 — pending Railway/public verification
+- E-012 status: PR #255 — validation/review in progress
+- RBATCH-010 status: MERGED — pending Railway/public verification
+- RBATCH-011 status: PR #255 — validation/review in progress
+- ISSUE-005/ISSUE-006/ISSUE-007 status: merged through PR #253; GitHub issues closed; Railway/public verification still pending at RBATCH-010 level
+- ISSUE-008 status: PR #255 implementation exists — validation/review in progress
+- ISSUE-009 moved to RBATCH-014 / E-015 / M-007 and remains blocked with Save/Load
 - Active owner decisions: ODR-001 (player position persistence), ODR-003 (GameSettings persistence scope)
 - ODR-002 reclassified (not an owner decision)
 - ODR-004 reclassified 2026-08-01: resolved by canonical documents; wrong-destination interaction triggers Failed; no longer an active owner decision

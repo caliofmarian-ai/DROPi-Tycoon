@@ -6,7 +6,7 @@ Version: 1.0.0
 Status: Development Log
 Author: Marian Caliof & OpenAI
 Language: English
-Last Updated: 2026-08-02 (RBATCH-010 HUD + NOTIFICATIONS IMPLEMENTATION)
+Last Updated: 2026-09-01 (RBATCH-010 MERGE + RBATCH-011 MAINMENU FLOW)
 
 ---
 
@@ -33,6 +33,25 @@ Category
 Description
 
 ---
+
+# [2026-09-01] - RBATCH-010 MERGE AND RBATCH-011 MAINMENU FLOW
+
+## Added
+
+- PR #253 / RBATCH-010 merged into `main` as `2ee6b60000aa0729c1795c51ce4764043ad59fac` after final-head GitHub Actions validation succeeded. Railway/public gameplay verification remains pending and is not claimed.
+- RBATCH-011 implementation branch `openai/rbatch-011-mainmenu-flow` and PR #255.
+- `game-web/src/ui/MainMenuViewModel.ts` pure MainMenu modal-state model and player-facing Settings/Information content.
+- `game-web/tests/mainmenu.test.ts` deterministic MainMenu and RBATCH-014 exclusion coverage.
+
+## Changed
+
+- `MainMenuScene.ts` now exposes the canonical first-launch actions Start Game, Settings and Information with mobile-friendly modal interaction and single input ownership.
+- Planning scope corrected so save-dependent Continue/load and overwrite requirements remain in RBATCH-014; ISSUE-009 moved intact to the Save & Load batch.
+
+## Verified
+
+- PR #254 CI after strict-TypeScript correction: 182/182 automated tests passed; TypeScript/Vite build, production HTTP smoke, CRLF-aware diff check and archived `Game/` guard passed in GitHub Actions run `33551889000`.
+- No localStorage, Continue loading, overwrite confirmation, save serialization or save validation was implemented by RBATCH-011.
 
 # [2026-08-02] - RBATCH-009 ECONOMY AND REPUTATION OUTCOMES IMPLEMENTATION
 
