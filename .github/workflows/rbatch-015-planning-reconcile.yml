@@ -1,0 +1,75 @@
+name: RBATCH-015 Planning Reconcile
+
+on:
+  push:
+    branches:
+      - openai/rbatch-015-mobile-optimization
+
+permissions:
+  contents: write
+
+jobs:
+  reconcile:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: openai/rbatch-015-mobile-optimization
+          fetch-depth: 0
+
+      - name: Apply deterministic RBATCH-015 reconciliation
+        run: python3 scripts/reconcile_rbatch_015_planning.py
+
+      - name: Verify validated planning state
+        shell: bash
+        run: |
+          set -euo pipefail
+          grep -F '| M-008 | 1 | Prototype v0.1 Verification & Release | In Progress |' 09_Development/Planning/MILESTONE_ARCHITECTURE.md
+          grep -F '| RBATCH-015 | 1 | M-008 | E-016 | Mobile Optimization | PR #263 — validation complete; pending merge |' 09_Development/Planning/BATCH_ARCHITECTURE.md
+          grep -F '| E-016 | 1 | M-008 | Mobile Optimization | PR #263 — validation complete; pending merge |' 09_Development/Planning/EPIC_CATALOG.md
+          for id in ISSUE-018 ISSUE-019; do
+            grep -F "| $id |" 09_Development/Planning/ISSUE_CATALOG.md | grep -F 'PR #263 implementation validated — pending merge' | grep -F 'status:in-progress'
+          done
+          python3 -m pip install --quiet pyyaml
+          python3 - <<'PY'
+          import yaml
+          with open('09_Development/Planning/github_creation_plan.yaml', encoding='utf-8') as handle:
+              data = yaml.safe_load(handle)
+          milestones = {x['id']: x for x in data['milestones']}
+          batches = {x['id']: x for x in data['batches']}
+          epics = {x['id']: x for x in data['epics']}
+          issues = {x['id']: x for x in data['issues']}
+          assert milestones['M-008']['status'] == 'In Progress'
+          assert batches['RBATCH-015']['status'].startswith('PR #263')
+          assert epics['E-016']['status'].startswith('PR #263')
+          for issue_id in ('ISSUE-018', 'ISSUE-019'):
+              assert issues[issue_id]['status'].startswith('PR #263')
+              assert 'status:in-progress' in issues[issue_id]['label_names']
+          assert batches['RBATCH-016']['status'] == 'Planned — Not Started'
+          assert epics['E-017']['status'] == 'Planned — Not Started'
+          print('RBATCH-015 YAML reconciliation: PASS')
+          PY
+
+      - name: Commit reconciled ordinary files
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add \
+            00_Project/PROJECT_STATUS.md \
+            00_Project/ROADMAP.md \
+            09_Development/CHANGELOG.md \
+            09_Development/Planning/MILESTONE_ARCHITECTURE.md \
+            09_Development/Planning/BATCH_ARCHITECTURE.md \
+            09_Development/Planning/EPIC_CATALOG.md \
+            09_Development/Planning/ISSUE_CATALOG.md \
+            09_Development/Planning/github_creation_plan.yaml
+          if git diff --cached --quiet; then
+            echo 'No reconciliation changes to commit.'
+            exit 0
+          fi
+          git commit -m 'docs: reconcile RBATCH-015 validated planning state'
+          git push origin HEAD:openai/rbatch-015-mobile-optimization
