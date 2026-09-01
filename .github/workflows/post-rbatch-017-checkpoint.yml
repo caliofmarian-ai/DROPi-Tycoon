@@ -1,0 +1,134 @@
+name: RBATCH-017 Post-Merge Checkpoint
+
+on:
+  push:
+    branches:
+      - openai/post-rbatch-017-checkpoint
+
+permissions:
+  contents: write
+
+jobs:
+  reconcile:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    timeout-minutes: 6
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: openai/post-rbatch-017-checkpoint
+          fetch-depth: 0
+
+      - name: Reconcile post-merge canonical state
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          from pathlib import Path
+          import re
+
+          ROOT = Path('.')
+          merged = 'MERGED in PR #267 — release evidence package complete; final Prototype v0.1 owner release sign-off pending'
+          epic_done = 'COMPLETED — RBATCH-016 and RBATCH-017 merged and validated; M-008 final owner release sign-off pending'
+          issue_done = 'COMPLETED — merged PR #267; PR CI 33566223185 and main CI 33566313283 succeeded'
+          exec_gate = 'RESOLVED 2026-09-01 — human owner approved RBATCH-017 execution; final release approval remains separate'
+          milestone_gate = 'Final Prototype v0.1 owner release sign-off required after human/device/public review (REQ-187)'
+
+          def load(p):
+              path=ROOT/p; raw=path.read_bytes().decode('utf-8'); nl='\r\n' if '\r\n' in raw else '\n'; return path,raw.replace('\r\n','\n'),nl
+          def save(path,text,nl): path.write_bytes(text.replace('\n',nl).encode('utf-8'))
+          def row(text,prefix,fn):
+              lines=text.splitlines(); ix=[i for i,x in enumerate(lines) if x.startswith(prefix)]
+              if len(ix)!=1: raise RuntimeError(f'{prefix}: {len(ix)} matches')
+              i=ix[0]; cells=[c.strip() for c in lines[i].strip().strip('|').split('|')]; fn(cells); lines[i]='| '+' | '.join(cells)+' |'; return '\n'.join(lines)+('\n' if text.endswith('\n') else '')
+          def block(text,item):
+              marker=f'- id: {item}\n'; s=text.find(marker)
+              if s<0: raise RuntimeError(f'missing {item}')
+              n=text.find('\n- id: ',s+len(marker)); e=len(text) if n<0 else n+1; return s,e,text[s:e]
+          def field(text,item,key,value):
+              s,e,b=block(text,item); p=rf'(^  {re.escape(key)}: ).+$'; u,c=re.subn(p,lambda m:m.group(1)+repr(value),b,count=1,flags=re.MULTILINE)
+              if c==0:
+                  anchor='  description:'; pos=b.find(anchor)
+                  if pos<0: raise RuntimeError(f'{item}.{key}')
+                  u=b[:pos]+f'  {key}: {value!r}\n'+b[pos:]
+              return text[:s]+u+text[e:]
+          def label(text,item,old,new):
+              s,e,b=block(text,item); b=b.replace(old,new,1) if old in b else b
+              if new not in b: raise RuntimeError(f'{item} label')
+              return text[:s]+b+text[e:]
+
+          p,t,n=load('09_Development/Planning/BATCH_ARCHITECTURE.md')
+          t=row(t,'| BATCH-016 | RBATCH-017 |',lambda c:c.__setitem__(2,merged))
+          def rb(c): c[5]=merged; c[8]=exec_gate
+          t=row(t,'| RBATCH-017 |',rb); save(p,t,n)
+
+          p,t,n=load('09_Development/Planning/EPIC_CATALOG.md'); t=row(t,'| E-017 |',lambda c:c.__setitem__(4,epic_done)); save(p,t,n)
+
+          p,t,n=load('09_Development/Planning/ISSUE_CATALOG.md')
+          for iid in ('ISSUE-022','ISSUE-023'):
+              def fi(c): c[6]=issue_done; c[7]=c[7].replace('status:in-progress','status:done'); c[8]=exec_gate
+              t=row(t,f'| {iid} |',fi)
+          save(p,t,n)
+
+          p,t,n=load('09_Development/Planning/MILESTONE_ARCHITECTURE.md')
+          def m8(c): c[3]='In Progress'; c[7]=milestone_gate
+          t=row(t,'| M-008 |',m8); save(p,t,n)
+
+          p,t,n=load('09_Development/Planning/github_creation_plan.yaml')
+          t=field(t,'M-008','status','In Progress'); t=field(t,'M-008','owner_gates',milestone_gate)
+          t=field(t,'RBATCH-017','status',merged); t=field(t,'RBATCH-017','owner_gates',exec_gate)
+          t=field(t,'E-017','status',epic_done)
+          for iid in ('ISSUE-022','ISSUE-023'):
+              t=field(t,iid,'status',issue_done); t=field(t,iid,'blocked_or_owner_gate',exec_gate); t=label(t,iid,'status:in-progress','status:done')
+          save(p,t,n)
+
+          p,t,n=load('00_Project/PROJECT_STATUS.md')
+          t=re.sub(r'Last Updated: .*','Last Updated: 2026-09-01 (RBATCH-017 merged in PR #267; implementation/verification workstream complete; final owner release review pending)',t,count=1)
+          t=re.sub(r'Prototype v0\.1 — .*?\n\n---','Prototype v0.1 — RBATCH-010 through RBATCH-017 MERGED; automated implementation/integration evidence complete; M-008 remains open only for final human/device/public review and owner release sign-off\n\n---',t,count=1,flags=re.DOTALL)
+          t=re.sub(r'# Current Objective\n\n.*?\n\n---','# Current Objective\n\nPerform the final Prototype v0.1 owner review on the public build/Android device using `09_Development/Release_Evidence/PROTOTYPE_V0.1_OWNER_REVIEW_PACKAGE.md`. Do not declare the release complete until the remaining human/device/public/subjective checks are satisfactory and the owner explicitly signs off.\n\n---',t,count=1,flags=re.DOTALL); save(p,t,n)
+
+          p,t,n=load('09_Development/Release_Evidence/PROTOTYPE_V0.1_RELEASE_EVIDENCE.md')
+          anchor='- Post-RBATCH-016 checkpoint `main` CI `33564613672`: SUCCESS.\n'
+          extra='- RBATCH-017 PR #267 CI `33566223185`: SUCCESS.\n- RBATCH-017 post-merge `main` CI `33566313283`: SUCCESS.\n'
+          if '33566223185' not in t:
+              if anchor not in t: raise RuntimeError('release evidence baseline anchor missing')
+              t=t.replace(anchor,anchor+extra,1)
+          t=t.replace('**EVIDENCE PACKAGE COMPLETE — FINAL RELEASE SIGN-OFF NOT YET RECORDED.**','**EVIDENCE PACKAGE MERGED — FINAL RELEASE SIGN-OFF NOT YET RECORDED.**',1)
+          save(p,t,n)
+
+          p,t,n=load('09_Development/CHANGELOG.md'); marker='# [2026-09-01] - RBATCH-017 RELEASE EVIDENCE EXECUTION AUTHORIZED'
+          section='''# [2026-09-01] - RBATCH-017 RELEASE EVIDENCE MERGE CHECKPOINT\n\n## Merged and validated\n\n- PR #267 merged as `e86403f08a9b281808605a959c4a91ab8e376739`.\n- PR CI `33566223185`: SUCCESS.\n- Main post-merge CI `33566313283`: SUCCESS.\n- ISSUE-022/#208 and ISSUE-023/#209 are completed.\n- RBATCH-017 and E-017 implementation/verification workstreams are completed.\n\n## Remaining release gate\n\n- M-008 remains In Progress.\n- Remaining work is human/device/public/subjective owner review only.\n- Final Prototype v0.1 owner sign-off required by REQ-187 is not yet recorded.\n\n---\n\n'''
+          if '# [2026-09-01] - RBATCH-017 RELEASE EVIDENCE MERGE CHECKPOINT' not in t:
+              if marker not in t: raise RuntimeError('changelog marker missing')
+              t=t.replace(marker,section+marker,1)
+          save(p,t,n)
+
+          report=ROOT/'09_Development/AI_Reports/2026-09-01_098_RBATCH_017_POST_MERGE_CLOSURE_CHECKPOINT.md'
+          report.write_text('''# RBATCH-017 — Post-Merge Closure Checkpoint\n\nDate: 2026-09-01\nPR: #267\nMerge commit: `e86403f08a9b281808605a959c4a91ab8e376739`\n\n## Validation\n\n- PR head CI `33566223185`: SUCCESS.\n- Post-merge `main` CI `33566313283`: SUCCESS.\n- ISSUE-022/#208 and ISSUE-023/#209 closed completed.\n- RBATCH-017/#149 closed completed.\n- E-017/#103 closed completed.\n\n## Canonical boundary\n\nRBATCH-017 and E-017 are complete as implementation/verification workstreams. M-008 remains In Progress because the authoritative Prototype v0.1 completion gate still requires human/device/public/subjective review and a separate explicit owner release sign-off under REQ-187.\n\nNo Railway/public/physical-device or subjective observation is invented by this checkpoint.\n''',encoding='utf-8')
+          print('Post-RBATCH-017 reconciliation: PASS')
+          PY
+
+      - name: Verify and commit ordinary checkpoint files
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 -m pip install --quiet pyyaml
+          python3 - <<'PY'
+          import yaml
+          from pathlib import Path
+          with open('09_Development/Planning/github_creation_plan.yaml',encoding='utf-8') as f:data=yaml.safe_load(f)
+          m={x['id']:x for x in data['milestones']}; b={x['id']:x for x in data['batches']}; e={x['id']:x for x in data['epics']}; i={x['id']:x for x in data['issues']}
+          assert m['M-008']['status']=='In Progress' and m['M-008']['owner_gates'].startswith('Final Prototype v0.1 owner release sign-off')
+          assert 'MERGED' in b['RBATCH-017']['status'] and b['RBATCH-017']['owner_gates'].startswith('RESOLVED 2026-09-01')
+          assert e['E-017']['status'].startswith('COMPLETED')
+          for iid in ('ISSUE-022','ISSUE-023'): assert i[iid]['status'].startswith('COMPLETED') and 'status:done' in i[iid]['label_names']
+          ev=Path('09_Development/Release_Evidence/PROTOTYPE_V0.1_RELEASE_EVIDENCE.md').read_text(encoding='utf-8')
+          assert 'EVIDENCE PACKAGE MERGED — FINAL RELEASE SIGN-OFF NOT YET RECORDED' in ev
+          print('Post-RBATCH-017 checkpoint validation: PASS')
+          PY
+          git -c core.whitespace=cr-at-eol diff --check
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add 00_Project/PROJECT_STATUS.md 09_Development/CHANGELOG.md 09_Development/Planning/BATCH_ARCHITECTURE.md 09_Development/Planning/EPIC_CATALOG.md 09_Development/Planning/ISSUE_CATALOG.md 09_Development/Planning/MILESTONE_ARCHITECTURE.md 09_Development/Planning/github_creation_plan.yaml 09_Development/Release_Evidence/PROTOTYPE_V0.1_RELEASE_EVIDENCE.md 09_Development/AI_Reports/2026-09-01_098_RBATCH_017_POST_MERGE_CLOSURE_CHECKPOINT.md
+          git commit -m 'docs: close RBATCH-017 workstream and preserve final owner gate'
+          git push origin HEAD:openai/post-rbatch-017-checkpoint
