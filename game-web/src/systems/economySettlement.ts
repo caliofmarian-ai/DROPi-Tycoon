@@ -14,6 +14,7 @@ export type SettlementOutcome =
  * - Any other transition: rejected, company unchanged
  * - Cannot settle a terminal order more than once (no repeated pay)
  * - Never produces negative money
+ * - Preserves unrelated company progression fields
  * - No Phaser dependency
  */
 export const settleDeliveryOutcome = (
@@ -73,7 +74,7 @@ export const settleDeliveryOutcome = (
     )
     return {
       applied: true,
-      company: { money, reputation },
+      company: { ...company, money, reputation },
       order: { ...nextOrder, economySettled: true },
     }
   }
@@ -86,7 +87,7 @@ export const settleDeliveryOutcome = (
   )
   return {
     applied: true,
-    company: { money: company.money, reputation },
+    company: { ...company, money: company.money, reputation },
     order: { ...nextOrder, economySettled: true },
   }
 }
