@@ -1,5 +1,6 @@
 import Phaser from 'phaser'
-import { createInitialCompanyState, createInitialWorldState, WORLD_HEIGHT, WORLD_WIDTH } from '../state/gameState'
+import { WORLD_HEIGHT, WORLD_WIDTH } from '../state/gameState'
+import { getOrCreateGameSession, replaceGameSession } from '../state/gameSession'
 import {
   attemptDelivery,
   attemptPickup,
@@ -80,8 +81,9 @@ export class GameWorldScene extends Phaser.Scene {
   }
 
   create(): void {
-    this.worldState = createInitialWorldState()
-    this.companyState = createInitialCompanyState()
+    const session = getOrCreateGameSession()
+    this.worldState = session.world
+    this.companyState = session.company
 
     this.cameras.main.setBackgroundColor('#91d0ff')
     this.cameras.main.setBounds(0, 0, WORLD_WIDTH, WORLD_HEIGHT)
@@ -298,8 +300,8 @@ export class GameWorldScene extends Phaser.Scene {
 
   /**
    * Check whether the order status has changed since the notification controller
-   * last observed it.  If a canonical notification message exists for the
-   * transition, display it once.  Safe to call after any state update — idempotent
+   * last observed it. If a canonical notification message exists for the
+   * transition, display it once. Safe to call after any state update — idempotent
    * when the status has not changed.
    */
   private emitNotificationIfTransitioned(
@@ -318,8 +320,22 @@ export class GameWorldScene extends Phaser.Scene {
   }
 
   private createNavigationButtons(): void {
-    this.createMenuButton(110, 548, 'Main Menu', () => this.scene.start('MainMenu'))
-    this.createMenuButton(290, 548, 'Company', () => this.scene.start('CompanyManagement'))
+    this.createMenuButton(110, 548, 'Main Menu', () => this.openMainMenu())
+    this.createMenuButton(290, 548, 'Company', () => this.openCompanyManagement())
+  }
+
+  private openMainMenu(): void {
+    this.syncRuntimeSession()
+    this.scene.start('MainMenu')
+  }
+
+  private openCompanyManagement(): void {
+    this.syncRuntimeSession()
+    this.scene.start('CompanyManagement')
+  }
+
+  private syncRuntimeSession(): void {
+    replaceGameSession(this.worldState, this.companyState)
   }
 
   private createMenuButton(x: number, y: number, label: string, onTap: () => void): void {
@@ -340,9 +356,8 @@ export class GameWorldScene extends Phaser.Scene {
       .setOrigin(0.5)
       .setScrollFactor(0)
       .setDepth(21)
-      .setInteractive({ useHandCursor: true })
-      .on('pointerdown', onTap)
 
+    // Single input owner: the label is intentionally non-interactive.
     button.on('pointerdown', onTap)
     this.menuButtons.push(button)
     this.menuButtonBounds.push({
