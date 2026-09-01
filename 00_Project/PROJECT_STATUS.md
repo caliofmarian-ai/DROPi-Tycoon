@@ -6,7 +6,7 @@ Version: 1.2.0
 Status: Active Development
 Author: Marian Caliof & OpenAI
 Language: English
-Last Updated: 2026-09-01 (RBATCH-015 merged in PR #263; RBATCH-016 Full-Loop Integration Verification next)
+Last Updated: 2026-09-01 (RBATCH-016 merged in PR #265; RBATCH-017 release checklist pending human owner approval)
 
 ---
 
@@ -16,13 +16,13 @@ Last Updated: 2026-09-01 (RBATCH-015 merged in PR #263; RBATCH-016 Full-Loop Int
 
 Phase:
 
-Prototype v0.1 — RBATCH-010/011/012/013/014/015 MERGED pending Railway/public verification; RBATCH-016 Full-Loop Integration Verification is next
+Prototype v0.1 — RBATCH-010 through RBATCH-016 MERGED; automated integration verified; RBATCH-017 Release-Checklist Verification Package pending human owner approval
 
 ---
 
 # Current Objective
 
-Execute RBATCH-016 Full-Loop Integration Verification after RBATCH-015 merged successfully, while keeping Railway/public mobile verification explicitly pending until observed.
+Await explicit human owner approval for RBATCH-017, then assemble the release-checklist evidence and owner review package without self-approval claims. Railway/public/physical-device evidence remains distinct from automated CI evidence.
 
 ---
 
