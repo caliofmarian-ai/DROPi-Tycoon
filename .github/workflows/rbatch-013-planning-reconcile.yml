@@ -82,10 +82,6 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          if git diff --quiet; then
-            echo "No reconciliation changes to commit."
-            exit 0
-          fi
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add \
@@ -94,7 +90,10 @@ jobs:
             09_Development/Planning/BATCH_ARCHITECTURE.md \
             09_Development/Planning/EPIC_CATALOG.md \
             09_Development/Planning/ISSUE_CATALOG.md \
-            09_Development/Planning/github_creation_plan.yaml \
-            .github/workflows/rbatch-010-ci.yml
+            09_Development/Planning/github_creation_plan.yaml
+          if git diff --cached --quiet; then
+            echo "No planning reconciliation changes to commit."
+            exit 0
+          fi
           git commit -m "docs: reconcile RBATCH-012 merge and RBATCH-013 validation"
           git push origin HEAD:openai/rbatch-013-bicycle-speed
