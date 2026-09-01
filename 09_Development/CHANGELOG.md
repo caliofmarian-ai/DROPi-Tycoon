@@ -58,6 +58,27 @@ Description
 - Bicycle movement-speed effect is not implemented in RBATCH-012; it remains RBATCH-013.
 - No localStorage, save serialization, autosave, or persistence across app restarts is introduced; persistent Save/Load remains RBATCH-014.
 
+# [2026-09-01] - RBATCH-012 MERGE AND RBATCH-013 BICYCLE SPEED
+
+## Added
+
+- PR #256 / RBATCH-012 merged into `main` as `1b61399a4f169397d3a1525f50948a76ca84b1e5`; main post-merge CI run `33555819803` succeeded. Railway/public gameplay verification remains pending and is not claimed.
+- RBATCH-013 branch `openai/rbatch-013-bicycle-speed` and PR #257.
+- `game-web/src/systems/bicycleSystem.ts` pure Bicycle ownership and movement-speed resolution through purchased-upgrade state.
+- `game-web/tests/bicycle.test.ts` deterministic ownership, speed and scope-boundary coverage.
+
+## Changed
+
+- Walking baseline is centralized at 150 px/s and Bicycle movement speed at 225 px/s as replaceable implementation balancing values.
+- GameWorld synchronizes `player.movementSpeed` from `purchasedUpgradeLevels.Bicycle` when the active runtime session is entered/resumed.
+- Bicycle ownership remains exclusively in purchased-upgrade state; no parallel ownership field was introduced.
+
+## Verified
+
+- PR #257 initial code validation run `33556490775`: 221/221 automated tests passed across 7 test files, including 17/17 RBATCH-013 tests.
+- TypeScript/Vite build, production HTTP smoke, PR-range whitespace check, archived `Game/` guard, planning YAML validation and active crosswalk passed.
+- Save/Load, localStorage and advanced vehicle mechanics remain excluded from RBATCH-013.
+
 # [2026-09-01] - RBATCH-010 MERGE AND RBATCH-011 MAINMENU FLOW
 
 ## Added

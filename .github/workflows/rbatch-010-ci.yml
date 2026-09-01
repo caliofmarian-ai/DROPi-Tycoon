@@ -119,11 +119,13 @@ jobs:
 
           assert 'MERGED' in batches['RBATCH-010']['status']
           assert 'MERGED' in batches['RBATCH-011']['status']
-          assert batches['RBATCH-012']['status'].startswith('PR #256')
+          assert 'MERGED' in batches['RBATCH-012']['status']
+          assert batches['RBATCH-013']['status'].startswith('PR #257')
 
           assert 'MERGED' in epics['E-011']['status']
           assert 'MERGED' in epics['E-012']['status']
-          assert epics['E-013']['status'].startswith('PR #256')
+          assert 'MERGED' in epics['E-013']['status']
+          assert epics['E-014']['status'].startswith('PR #257')
 
           assert issues['ISSUE-008']['batch_id'] == 'RBATCH-011'
           assert issues['ISSUE-008']['epic_id'] == 'E-012'
@@ -140,11 +142,15 @@ jobs:
               assert issues[issue_id]['batch_id'] == 'RBATCH-012'
               assert issues[issue_id]['epic_id'] == 'E-013'
               assert issues[issue_id]['milestone_id'] == 'M-006'
-              assert issues[issue_id]['status'].startswith('PR #256')
-              assert 'status:in-progress' in issues[issue_id]['label_names']
+              assert issues[issue_id]['status'].startswith('COMPLETED')
+              assert 'status:done' in issues[issue_id]['label_names']
 
-          assert issues['ISSUE-012']['batch_id'] == 'RBATCH-013'
-          assert issues['ISSUE-013']['batch_id'] == 'RBATCH-013'
+          for issue_id in ('ISSUE-012', 'ISSUE-013'):
+              assert issues[issue_id]['batch_id'] == 'RBATCH-013'
+              assert issues[issue_id]['epic_id'] == 'E-014'
+              assert issues[issue_id]['milestone_id'] == 'M-006'
+              assert issues[issue_id]['status'].startswith('PR #257')
+              assert 'status:in-progress' in issues[issue_id]['label_names']
 
           print('Active planning crosswalk validation: PASS')
           PY

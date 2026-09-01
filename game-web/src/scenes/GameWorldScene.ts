@@ -7,6 +7,7 @@ import {
 } from '../systems/orderSystem'
 import { applyOrderAcceptanceRequest } from '../systems/orderAcceptance'
 import { settleDeliveryOutcome } from '../systems/economySettlement'
+import { synchronizePlayerMovementSpeed } from '../systems/bicycleSystem'
 import type { CompanyState, WorldState } from '../types/game'
 import { GameHUD } from '../ui/GameHUD'
 import { NotificationDisplay } from '../ui/NotificationDisplay'
@@ -82,8 +83,9 @@ export class GameWorldScene extends Phaser.Scene {
 
   create(): void {
     const session = getOrCreateGameSession()
-    this.worldState = session.world
     this.companyState = session.company
+    this.worldState = synchronizePlayerMovementSpeed(session.world, this.companyState)
+    replaceGameSession(this.worldState, this.companyState)
 
     this.cameras.main.setBackgroundColor('#91d0ff')
     this.cameras.main.setBounds(0, 0, WORLD_WIDTH, WORLD_HEIGHT)

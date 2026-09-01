@@ -6,7 +6,7 @@ Version: 1.2.0
 Status: Active Development
 Author: Marian Caliof & OpenAI
 Language: English
-Last Updated: 2026-09-01 (RBATCH-011 merged; RBATCH-012 CompanyManagement validated on PR #256)
+Last Updated: 2026-09-01 (RBATCH-012 merged; RBATCH-013 Bicycle ownership/speed validated on PR #257)
 
 ---
 
@@ -16,13 +16,13 @@ Last Updated: 2026-09-01 (RBATCH-011 merged; RBATCH-012 CompanyManagement valida
 
 Phase:
 
-Prototype v0.1 — RBATCH-010 HUD + Notifications and RBATCH-011 MainMenu Flow MERGED pending Railway/public verification; RBATCH-012 CompanyManagement + Upgrade Purchase Flow validated on PR #256 pending merge
+Prototype v0.1 — RBATCH-010/011/012 MERGED pending Railway/public verification; RBATCH-013 Bicycle Ownership + Speed Increase validated on PR #257 pending merge
 
 ---
 
 # Current Objective
 
-Complete final review and merge of PR #256 (RBATCH-012 CompanyManagement + Upgrade Purchase Flow), preserving the merged RBATCH-010/011 runtime and excluding RBATCH-013 speed effects and RBATCH-014 persistent Save/Load.
+Complete final review and merge of PR #257 (RBATCH-013 Bicycle Ownership + Speed Increase), preserving the merged RBATCH-010/011/012 runtime and excluding RBATCH-014 persistent Save/Load.
 
 ---
 
@@ -224,13 +224,13 @@ Implementation Preparation Status:
 - E-010 status: COMPLETED through merged and Railway-verified RBATCH-009
 - E-011 status: MERGED in PR #253 — pending Railway/public verification
 - E-012 status: MERGED in PR #255 — pending Railway/public verification
-- E-013 status: PR #256 — validation complete; pending merge
+- E-013 status: MERGED in PR #256 — pending Railway/public verification
 - RBATCH-010 status: MERGED — pending Railway/public verification
 - RBATCH-011 status: MERGED in PR #255 — pending Railway/public verification
-- RBATCH-012 status: PR #256 — validation complete; pending merge
+- RBATCH-012 status: MERGED in PR #256 — pending Railway/public verification
 - ISSUE-005/ISSUE-006/ISSUE-007 status: merged through PR #253; GitHub issues closed; Railway/public verification still pending at RBATCH-010 level
 - ISSUE-008 status: completed and merged through PR #255; GitHub issue closed; Railway/public verification remains at RBATCH-011 level
-- ISSUE-010/ISSUE-011 status: PR #256 implementation validated — pending merge
+- ISSUE-010/ISSUE-011 status: COMPLETED — merged PR #256; Railway/public verification pending at RBATCH-012 level
 - ISSUE-009 moved to RBATCH-014 / E-015 / M-007 and remains blocked with Save/Load
 - Active owner decisions: ODR-001 (player position persistence), ODR-003 (GameSettings persistence scope)
 - ODR-002 reclassified (not an owner decision)

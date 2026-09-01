@@ -39,7 +39,7 @@ export const UPGRADE_CATALOG: readonly UpgradeDefinition[] = [
   {
     id: 'Bicycle',
     name: 'Bicycle',
-    description: 'First purchasable vehicle. Movement-speed effect is applied in RBATCH-013.',
+    description: 'First purchasable vehicle. Increases player movement speed after purchase.',
     cost: BALANCING.BICYCLE_COST,
     maxLevel: 1,
     availableForPurchase: true,
