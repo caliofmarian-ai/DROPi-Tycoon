@@ -116,27 +116,30 @@ jobs:
           issues = {item['id']: item for item in data['issues']}
 
           assert milestones['M-006']['status'] == 'In Progress'
-          assert 'Blocked' in milestones['M-007']['status']
+          assert milestones['M-007']['status'] == 'In Progress'
+          assert milestones['M-007']['owner_gates'].startswith('RESOLVED')
 
           for batch_id in ('RBATCH-010', 'RBATCH-011', 'RBATCH-012', 'RBATCH-013'):
               assert 'MERGED' in batches[batch_id]['status']
-          assert 'Blocked' in batches['RBATCH-014']['status']
-          assert batches['RBATCH-014']['owner_gates'] == 'ODR-001, ODR-003'
+          assert batches['RBATCH-014']['status'].startswith('PR #259')
+          assert batches['RBATCH-014']['owner_gates'].startswith('RESOLVED')
 
           for epic_id in ('E-011', 'E-012', 'E-013', 'E-014'):
               assert 'MERGED' in epics[epic_id]['status']
-          assert 'Blocked' in epics['E-015']['status']
+          assert epics['E-015']['status'].startswith('PR #259')
 
           assert issues['ISSUE-008']['batch_id'] == 'RBATCH-011'
           assert issues['ISSUE-008']['epic_id'] == 'E-012'
           assert issues['ISSUE-008']['milestone_id'] == 'M-005'
           assert 'status:done' in issues['ISSUE-008']['label_names']
 
-          assert issues['ISSUE-009']['batch_id'] == 'RBATCH-014'
-          assert issues['ISSUE-009']['epic_id'] == 'E-015'
-          assert issues['ISSUE-009']['milestone_id'] == 'M-007'
-          assert issues['ISSUE-009']['blocked_or_owner_gate'] == 'ODR-001, ODR-003'
-          assert 'status:blocked' in issues['ISSUE-009']['label_names']
+          for issue_id in ('ISSUE-009', 'ISSUE-014', 'ISSUE-015', 'ISSUE-016', 'ISSUE-017'):
+              assert issues[issue_id]['batch_id'] == 'RBATCH-014'
+              assert issues[issue_id]['epic_id'] == 'E-015'
+              assert issues[issue_id]['milestone_id'] == 'M-007'
+              assert issues[issue_id]['status'].startswith('PR #259')
+              assert issues[issue_id]['blocked_or_owner_gate'].startswith('RESOLVED')
+              assert 'status:in-progress' in issues[issue_id]['label_names']
 
           for issue_id in ('ISSUE-010', 'ISSUE-011'):
               assert issues[issue_id]['batch_id'] == 'RBATCH-012'
@@ -151,13 +154,6 @@ jobs:
               assert issues[issue_id]['milestone_id'] == 'M-006'
               assert issues[issue_id]['status'].startswith('COMPLETED')
               assert 'status:done' in issues[issue_id]['label_names']
-
-          for issue_id in ('ISSUE-014', 'ISSUE-015', 'ISSUE-016', 'ISSUE-017'):
-              assert issues[issue_id]['batch_id'] == 'RBATCH-014'
-              assert issues[issue_id]['epic_id'] == 'E-015'
-              assert issues[issue_id]['milestone_id'] == 'M-007'
-              assert issues[issue_id]['blocked_or_owner_gate'] == 'ODR-001, ODR-003'
-              assert 'status:blocked' in issues[issue_id]['label_names']
 
           print('Active planning crosswalk validation: PASS')
           PY

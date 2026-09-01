@@ -1,4 +1,6 @@
 import Phaser from 'phaser'
+import { getBrowserSaveStorage } from '../persistence/browserSaveStorage'
+import { autosaveIfApproved } from '../persistence/saveSystem'
 import { WORLD_HEIGHT, WORLD_WIDTH } from '../state/gameState'
 import { getOrCreateGameSession, replaceGameSession } from '../state/gameSession'
 import {
@@ -297,6 +299,18 @@ export class GameWorldScene extends Phaser.Scene {
       this.worldState.player = deliveryResult.player
       this.worldState.pendingDeliveryDestination = ''
       this.emitNotificationIfTransitioned(previousOrder.status, this.worldState.activeOrder.status)
+
+      if (settlement.applied) {
+        const session = replaceGameSession(this.worldState, this.companyState)
+        const storage = getBrowserSaveStorage()
+        if (storage) {
+          const autosaveEvent =
+            this.worldState.activeOrder.status === 'Completed'
+              ? 'delivery-completed'
+              : 'progression-changed'
+          autosaveIfApproved(storage, session, autosaveEvent)
+        }
+      }
     }
   }
 

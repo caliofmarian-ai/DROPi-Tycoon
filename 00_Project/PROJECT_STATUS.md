@@ -6,7 +6,7 @@ Version: 1.2.0
 Status: Active Development
 Author: Marian Caliof & OpenAI
 Language: English
-Last Updated: 2026-09-01 (RBATCH-012 merged; RBATCH-013 Bicycle ownership/speed validated on PR #257)
+Last Updated: 2026-09-01 (RBATCH-014 Save/Load validated on PR #259; owner gates resolved)
 
 ---
 
@@ -16,13 +16,13 @@ Last Updated: 2026-09-01 (RBATCH-012 merged; RBATCH-013 Bicycle ownership/speed 
 
 Phase:
 
-Prototype v0.1 — RBATCH-010/011/012 MERGED pending Railway/public verification; RBATCH-013 Bicycle Ownership + Speed Increase validated on PR #257 pending merge
+Prototype v0.1 — RBATCH-010/011/012/013 MERGED pending Railway/public verification; RBATCH-014 Save/Load validated on PR #259 pending merge
 
 ---
 
 # Current Objective
 
-Complete final review and merge of PR #257 (RBATCH-013 Bicycle Ownership + Speed Increase), preserving the merged RBATCH-010/011/012 runtime and excluding RBATCH-014 persistent Save/Load.
+Complete final review and merge of PR #259 (RBATCH-014 Save/Load), preserving engine-independent persistence and the resolved ODR-001=A / ODR-003=B scope.
 
 ---
 
@@ -231,8 +231,16 @@ Implementation Preparation Status:
 - ISSUE-005/ISSUE-006/ISSUE-007 status: merged through PR #253; GitHub issues closed; Railway/public verification still pending at RBATCH-010 level
 - ISSUE-008 status: completed and merged through PR #255; GitHub issue closed; Railway/public verification remains at RBATCH-011 level
 - ISSUE-010/ISSUE-011 status: COMPLETED — merged PR #256; Railway/public verification pending at RBATCH-012 level
-- ISSUE-009 moved to RBATCH-014 / E-015 / M-007 and remains blocked with Save/Load
-- Active owner decisions: ODR-001 (player position persistence), ODR-003 (GameSettings persistence scope)
+- ISSUE-009 is implemented on PR #259 with an explicit in-game overwrite confirmation guard
+- Owner decisions resolved 2026-09-01: ODR-001=A (do not persist player position); ODR-003=B (persist only TutorialStatus from GameSettings)
+
+- M-007 status: In Progress
+- E-015 status: PR #259 — validation complete; pending merge
+- RBATCH-014 status: PR #259 — validation complete; pending merge
+- ISSUE-009/ISSUE-014/ISSUE-015/ISSUE-016/ISSUE-017 status: PR #259 implementation validated — pending merge
+- RBATCH-014 validation run `33559283892`: 242/242 tests passed across 8 files; TypeScript/Vite build, HTTP smoke, whitespace, archived `Game/` guard, YAML syntax/counts and pre-reconciliation planning crosswalk passed
+- Save/Load v1 persists company progression and TutorialStatus only; player position, active order, WorldData and other GameSettings are excluded by the resolved owner decisions
+- Current prototype visuals are explicitly temporary; persistence and gameplay state remain decoupled from rendering/assets so later high-fidelity visual evolution does not require Save/Load rewrites
 - ODR-002 reclassified (not an owner decision)
 - ODR-004 reclassified 2026-08-01: resolved by canonical documents; wrong-destination interaction triggers Failed; no longer an active owner decision
 - PR #84 merged into `main`; Railway redeployed successfully; public `PickedUp → Completed` verification passed; public wrong-destination `PickedUp → Failed` verification passed

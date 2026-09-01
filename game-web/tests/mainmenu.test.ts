@@ -63,22 +63,31 @@ describe('RBATCH-011 — MainMenu pure view model', () => {
   })
 })
 
-describe('ISSUE-008 — MainMenu scene contract and RBATCH-014 exclusion', () => {
-  it('contains the three canonical first-launch actions', () => {
+describe('RBATCH-014 — save-aware MainMenu extension', () => {
+  it('preserves the first-launch Start Game, Settings and Information actions', () => {
     expect(mainMenuSource).toContain("'Start Game'")
     expect(mainMenuSource).toContain("'Settings'")
     expect(mainMenuSource).toContain("'Information'")
   })
 
-  it('has exactly one Start Game transition into GameWorld', () => {
-    const matches = mainMenuSource.match(/scene\.start\('GameWorld'\)/g) ?? []
-    expect(matches).toHaveLength(1)
+  it('adds Continue and explicit Start New Game actions for persisted progress', () => {
+    expect(mainMenuSource).toContain("'Continue Game'")
+    expect(mainMenuSource).toContain("'Start New Game'")
+    expect(mainMenuSource).toContain('inspectSaveSlot')
+    expect(mainMenuSource).toContain('restoreGameSessionFromSave')
   })
 
-  it('does not implement Continue or persistence in RBATCH-011', () => {
-    expect(mainMenuSource).not.toContain('Continue Game')
-    expect(mainMenuSource).not.toContain('localStorage')
+  it('requires an in-game confirmation before replacing an existing save', () => {
+    expect(mainMenuSource).toContain('showConfirmation')
+    expect(mainMenuSource).toContain('confirmNewGameReplacement')
+    expect(mainMenuSource).toContain('preserveInvalidSaveBeforeReplacement')
+    expect(mainMenuSource).toContain("'Confirm'")
+    expect(mainMenuSource).toContain("'Cancel'")
+  })
+
+  it('does not use sessionStorage or a generic browser confirm dialog', () => {
     expect(mainMenuSource).not.toContain('sessionStorage')
+    expect(mainMenuSource).not.toContain('window.confirm')
   })
 
   it('keeps menu labels non-interactive so one tap has one action owner', () => {

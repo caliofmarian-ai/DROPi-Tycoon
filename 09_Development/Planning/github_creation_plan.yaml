@@ -111,14 +111,14 @@ milestones:
 - id: M-007
   title: Save & Load System
   phase: 1
-  status: Planned — Blocked
+  status: 'In Progress'
   epic_ids:
   - E-015
   batch_ids:
   - RBATCH-014
   depends_on:
   - M-006
-  owner_gates: ODR-001, ODR-003
+  owner_gates: 'RESOLVED 2026-09-01 — ODR-001=A; ODR-003=B'
 - id: M-008
   title: Prototype v0.1 Verification & Release
   phase: 1
@@ -436,7 +436,7 @@ epics:
   title: Save & Load System
   phase: 1
   milestone_id: M-007
-  status: Planned — Blocked
+  status: 'PR #259 — validation complete; pending merge'
   batch_ids:
   - RBATCH-014
   depends_on:
@@ -998,12 +998,12 @@ batches:
   epic_ids:
   - E-015
   title: Save/Load Implementation
-  status: Planned — Blocked
+  status: 'PR #259 — validation complete; pending merge'
   depends_on:
   - RBATCH-012
   - RBATCH-013
   - RBATCH-011
-  owner_gates: ODR-001, ODR-003
+  owner_gates: 'RESOLVED 2026-09-01 — ODR-001=A; ODR-003=B'
   legacy_id: BATCH-013
   legacy_status: NEVER STARTED
   authoritative_planning_source: 09_Development/Planning/BATCH_ARCHITECTURE.md
@@ -1960,14 +1960,14 @@ issues:
   milestone_id: M-007
   phase: 1
   type: implementation
-  status: Blocked with RBATCH-014
+  status: 'PR #259 implementation validated — pending merge'
   label_names:
   - type:implementation
   - phase:1
   - batch:rbatch-014
   - epic:save-load
-  - status:blocked
-  blocked_or_owner_gate: ODR-001, ODR-003
+  - status:in-progress
+  blocked_or_owner_gate: 'RESOLVED 2026-09-01 — ODR-001=A; ODR-003=B'
   description: Require confirmation before replacing an existing valid save as part of the canonical save/load path.
   acceptance_criteria: No valid save is silently overwritten.
 - id: ISSUE-010
@@ -2041,14 +2041,14 @@ issues:
   milestone_id: M-007
   phase: 1
   type: implementation
-  status: Blocked by owner decision
+  status: 'PR #259 implementation validated — pending merge'
   label_names:
   - type:implementation
   - phase:1
   - batch:rbatch-014
   - epic:save-load
-  - status:blocked
-  blocked_or_owner_gate: ODR-001, ODR-003
+  - status:in-progress
+  blocked_or_owner_gate: 'RESOLVED 2026-09-01 — ODR-001=A; ODR-003=B'
   description: Serialize canonical save fields only.
   acceptance_criteria: Required save fields persist and excluded fields do not.
 - id: ISSUE-015
@@ -2058,14 +2058,14 @@ issues:
   milestone_id: M-007
   phase: 1
   type: implementation
-  status: Blocked by owner decision
+  status: 'PR #259 implementation validated — pending merge'
   label_names:
   - type:implementation
   - phase:1
   - batch:rbatch-014
   - epic:save-load
-  - status:blocked
-  blocked_or_owner_gate: ODR-001, ODR-003
+  - status:in-progress
+  blocked_or_owner_gate: 'RESOLVED 2026-09-01 — ODR-001=A; ODR-003=B'
   description: Handle missing/corrupted/incompatible saves per SAVE_SYSTEM.md.
   acceptance_criteria: Missing save starts new game; corrupted data informs player and requires confirmation.
 - id: ISSUE-016
@@ -2075,14 +2075,14 @@ issues:
   milestone_id: M-007
   phase: 1
   type: implementation
-  status: Blocked by owner decision
+  status: 'PR #259 implementation validated — pending merge'
   label_names:
   - type:implementation
   - phase:1
   - batch:rbatch-014
   - epic:save-load
-  - status:blocked
-  blocked_or_owner_gate: ODR-001, ODR-003
+  - status:in-progress
+  blocked_or_owner_gate: 'RESOLVED 2026-09-01 — ODR-001=A; ODR-003=B'
   description: Use only delivery completion, upgrade purchase, progression change, and tutorial-step completion if present.
   acceptance_criteria: No unapproved generic scene-exit trigger is used.
 - id: ISSUE-017
@@ -2092,14 +2092,14 @@ issues:
   milestone_id: M-007
   phase: 1
   type: implementation
-  status: Blocked by owner decision
+  status: 'PR #259 implementation validated — pending merge'
   label_names:
   - type:implementation
   - phase:1
   - batch:rbatch-014
   - epic:save-load
-  - status:blocked
-  blocked_or_owner_gate: ODR-001, ODR-003
+  - status:in-progress
+  blocked_or_owner_gate: 'RESOLVED 2026-09-01 — ODR-001=A; ODR-003=B'
   description: Validate version/schema integrity without silent overwrite.
   acceptance_criteria: Invalid saves fail gracefully.
 - id: ISSUE-018
