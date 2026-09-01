@@ -16,7 +16,7 @@ Last Updated: 2026-09-01 (RBATCH-010 merged; RBATCH-011 MainMenu Flow draft PR)
 
 Phase:
 
-Prototype v0.1 — RBATCH-010 HUD + Notifications MERGED in PR #253 pending Railway/public verification; RBATCH-011 MainMenu Flow implemented on Draft PR #254 pending independent review
+Prototype v0.1 — RBATCH-010 HUD + Notifications MERGED in PR #253 pending Railway/public verification; RBATCH-011 MainMenu Flow implemented on PR #255 pending independent review
 
 ---
 
@@ -186,7 +186,7 @@ READY
 
 Implementation:
 
-STARTED — BATCH-001 FOUNDATION COMPLETE; BATCH-002 SCAFFOLD COMPLETE; BATCH-003 PLACEHOLDER ASSETS COMPLETE; BATCH-004 WORLD SETUP COMPLETE; BATCH-005 ORDER LIFECYCLE CORE COMPLETE; BATCH-006 TAP-TO-MOVE + CAMERA COMPLETE; BATCH-007 PICKUP PROXIMITY + ACCEPTED→PICKEDUP CORE IMPLEMENTED AND RAILWAY-VERIFIED (2026-08-01); BATCH-008 DELIVERY OUTCOMES COMPLETE; PR #84 MERGED; RAILWAY REDEPLOYED; PUBLIC COMPLETED/FAILED VERIFICATION PASSED; RBATCH-009 ECONOMY AND REPUTATION OUTCOMES COMPLETED — MERGED IN PR #86, RAILWAY-VERIFIED 2026-08-02, 73/73 TESTS (implementation head: `10c1b4df1703015367bd68e504d5713656681289`, merge commit: `b449769f2cfdfcf915ad2680e68960dc902d8796`); RBATCH-010 HUD + NOTIFICATIONS MERGED IN PR #253 — PENDING RAILWAY/PUBLIC VERIFICATION; RBATCH-011 MAINMENU FLOW DRAFT PR #254 OPEN — PENDING INDEPENDENT REVIEW
+STARTED — BATCH-001 FOUNDATION COMPLETE; BATCH-002 SCAFFOLD COMPLETE; BATCH-003 PLACEHOLDER ASSETS COMPLETE; BATCH-004 WORLD SETUP COMPLETE; BATCH-005 ORDER LIFECYCLE CORE COMPLETE; BATCH-006 TAP-TO-MOVE + CAMERA COMPLETE; BATCH-007 PICKUP PROXIMITY + ACCEPTED→PICKEDUP CORE IMPLEMENTED AND RAILWAY-VERIFIED (2026-08-01); BATCH-008 DELIVERY OUTCOMES COMPLETE; PR #84 MERGED; RAILWAY REDEPLOYED; PUBLIC COMPLETED/FAILED VERIFICATION PASSED; RBATCH-009 ECONOMY AND REPUTATION OUTCOMES COMPLETED — MERGED IN PR #86, RAILWAY-VERIFIED 2026-08-02, 73/73 TESTS (implementation head: `10c1b4df1703015367bd68e504d5713656681289`, merge commit: `b449769f2cfdfcf915ad2680e68960dc902d8796`); RBATCH-010 HUD + NOTIFICATIONS MERGED IN PR #253 — PENDING RAILWAY/PUBLIC VERIFICATION; RBATCH-011 MAINMENU FLOW PR #255 OPEN — VALIDATION/REVIEW IN PROGRESS
 
 Implementation Preparation Status:
 
@@ -223,11 +223,11 @@ Implementation Preparation Status:
 - M-005 status: In Progress
 - E-010 status: COMPLETED through merged and Railway-verified RBATCH-009
 - E-011 status: MERGED in PR #253 — pending Railway/public verification
-- E-012 status: Draft PR #254 — pending independent review
+- E-012 status: PR #255 — validation/review in progress
 - RBATCH-010 status: MERGED — pending Railway/public verification
-- RBATCH-011 status: Draft PR #254 — pending independent review
+- RBATCH-011 status: PR #255 — validation/review in progress
 - ISSUE-005/ISSUE-006/ISSUE-007 status: merged through PR #253; GitHub issues closed; Railway/public verification still pending at RBATCH-010 level
-- ISSUE-008 status: Draft PR #254 implementation exists — pending independent review
+- ISSUE-008 status: PR #255 implementation exists — validation/review in progress
 - ISSUE-009 moved to RBATCH-014 / E-015 / M-007 and remains blocked with Save/Load
 - Active owner decisions: ODR-001 (player position persistence), ODR-003 (GameSettings persistence scope)
 - ODR-002 reclassified (not an owner decision)

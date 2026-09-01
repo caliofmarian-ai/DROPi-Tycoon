@@ -39,7 +39,7 @@ Description
 ## Added
 
 - PR #253 / RBATCH-010 merged into `main` as `2ee6b60000aa0729c1795c51ce4764043ad59fac` after final-head GitHub Actions validation succeeded. Railway/public gameplay verification remains pending and is not claimed.
-- RBATCH-011 implementation branch `openai/rbatch-011-mainmenu-flow` and Draft PR #254.
+- RBATCH-011 implementation branch `openai/rbatch-011-mainmenu-flow` and PR #255.
 - `game-web/src/ui/MainMenuViewModel.ts` pure MainMenu modal-state model and player-facing Settings/Information content.
 - `game-web/tests/mainmenu.test.ts` deterministic MainMenu and RBATCH-014 exclusion coverage.
 

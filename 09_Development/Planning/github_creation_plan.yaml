@@ -407,7 +407,7 @@ epics:
   title: MainMenu & Game Flow
   phase: 1
   milestone_id: M-005
-  status: 'Draft PR #254 — pending independent review'
+  status: 'PR #255 — validation/review in progress'
   batch_ids:
   - RBATCH-011
   depends_on:
@@ -954,7 +954,7 @@ batches:
   epic_ids:
   - E-012
   title: MainMenu Flow
-  status: 'Draft PR #254 — pending independent review'
+  status: 'PR #255 — validation/review in progress'
   depends_on:
   - RBATCH-002
   legacy_id: BATCH-010b
@@ -1459,7 +1459,7 @@ legacy_crosswalk:
   execution_rule: Historical numbering only; execute the mapped RBATCH identifier and never ambiguous legacy numbering.
 - legacy_id: BATCH-010b
   rbatch_id: RBATCH-011
-  historical_status: 'Draft PR #254 — pending independent review'
+  historical_status: 'PR #255 — validation/review in progress'
   authoritative_planning_source: 09_Development/Planning/BATCH_ARCHITECTURE.md
   historical_lineage_source: 09_Development/Implementation_Preparation/IMPLEMENTATION_BATCH_PLAN.md
   execution_rule: Historical numbering only; execute the mapped RBATCH identifier and never ambiguous legacy numbering.
@@ -1944,7 +1944,7 @@ issues:
   milestone_id: M-005
   phase: 1
   type: implementation
-  status: 'Draft PR #254 implementation exists — pending independent review'
+  status: 'PR #255 implementation exists — validation/review in progress'
   label_names:
   - type:implementation
   - phase:1
