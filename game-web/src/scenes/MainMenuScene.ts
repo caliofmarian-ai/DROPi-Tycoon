@@ -28,7 +28,7 @@ export class MainMenuScene extends Phaser.Scene {
   }
 
   create(): void {
-    const { width, height } = this.scale
+    const { width } = this.scale
     this.menuState = createMainMenuState()
 
     this.cameras.main.setBackgroundColor('#10151d')
@@ -131,10 +131,18 @@ export class MainMenuScene extends Phaser.Scene {
       .setDepth(MODAL_DEPTH + 3)
       .setInteractive({ useHandCursor: true })
       .setVisible(false)
-      .on('pointerdown', (_pointer, _localX, _localY, event: Phaser.Types.Input.EventData) => {
-        event.stopPropagation()
-        this.hidePanel()
-      })
+      .on(
+        'pointerdown',
+        (
+          _pointer: Phaser.Input.Pointer,
+          _localX: number,
+          _localY: number,
+          event: Phaser.Types.Input.EventData,
+        ) => {
+          event.stopPropagation()
+          this.hidePanel()
+        },
+      )
 
     this.modalCloseLabel = this.add
       .text(centerX, closeY, 'Close', {
@@ -151,7 +159,7 @@ export class MainMenuScene extends Phaser.Scene {
   private showPanel(panel: Exclude<MainMenuPanel, 'none'>): void {
     this.menuState = openMainMenuPanel(this.menuState, panel)
     const lines = panel === 'settings' ? SETTINGS_PANEL_LINES : INFORMATION_PANEL_LINES
-    this.modalText.setText(lines)
+    this.modalText.setText([...lines])
     this.setModalVisible(true)
   }
 
