@@ -6,7 +6,7 @@ Version: 1.2.0
 Status: Active Development
 Author: Marian Caliof & OpenAI
 Language: English
-Last Updated: 2026-09-01 (RBATCH-010 merged; RBATCH-011 MainMenu Flow draft PR)
+Last Updated: 2026-09-01 (RBATCH-011 merged; RBATCH-012 CompanyManagement validated on PR #256)
 
 ---
 
@@ -16,13 +16,13 @@ Last Updated: 2026-09-01 (RBATCH-010 merged; RBATCH-011 MainMenu Flow draft PR)
 
 Phase:
 
-Prototype v0.1 — RBATCH-010 HUD + Notifications MERGED in PR #253 pending Railway/public verification; RBATCH-011 MainMenu Flow implemented on PR #255 pending independent review
+Prototype v0.1 — RBATCH-010 HUD + Notifications and RBATCH-011 MainMenu Flow MERGED pending Railway/public verification; RBATCH-012 CompanyManagement + Upgrade Purchase Flow validated on PR #256 pending merge
 
 ---
 
 # Current Objective
 
-Keep the merged RBATCH-010 runtime stable while completing independent review of PR #254 (RBATCH-011 MainMenu Flow) without entering RBATCH-014 Save/Load scope early.
+Complete final review and merge of PR #256 (RBATCH-012 CompanyManagement + Upgrade Purchase Flow), preserving the merged RBATCH-010/011 runtime and excluding RBATCH-013 speed effects and RBATCH-014 persistent Save/Load.
 
 ---
 
@@ -164,9 +164,9 @@ The prototype must prove the core idea before expansion.
 
 # Next Steps
 
-1. Correct and independently review PR #253 (RBATCH-010 HUD + Notifications) on branch `copilot/rbatch-010-hud-notifications`.
-2. Preserve the public Railway-verified BATCH-008 and RBATCH-009 runtime evidence in documentation and reports.
-3. Proceed to merge/deploy/public verification of PR #253 only after independent approval; no RBATCH-011+ behavior exists.
+1. Complete final-head validation and merge PR #256 for RBATCH-012 CompanyManagement + Upgrade Purchase Flow.
+2. After merge, verify the public Railway runtime without claiming visual/touch acceptance until observed.
+3. Proceed to RBATCH-013 Bicycle Ownership + Speed Increase; keep persistent Save/Load blocked behind ODR-001 and ODR-003.
 
 ---
 
@@ -186,7 +186,7 @@ READY
 
 Implementation:
 
-STARTED — BATCH-001 FOUNDATION COMPLETE; BATCH-002 SCAFFOLD COMPLETE; BATCH-003 PLACEHOLDER ASSETS COMPLETE; BATCH-004 WORLD SETUP COMPLETE; BATCH-005 ORDER LIFECYCLE CORE COMPLETE; BATCH-006 TAP-TO-MOVE + CAMERA COMPLETE; BATCH-007 PICKUP PROXIMITY + ACCEPTED→PICKEDUP CORE IMPLEMENTED AND RAILWAY-VERIFIED (2026-08-01); BATCH-008 DELIVERY OUTCOMES COMPLETE; PR #84 MERGED; RAILWAY REDEPLOYED; PUBLIC COMPLETED/FAILED VERIFICATION PASSED; RBATCH-009 ECONOMY AND REPUTATION OUTCOMES COMPLETED — MERGED IN PR #86, RAILWAY-VERIFIED 2026-08-02, 73/73 TESTS (implementation head: `10c1b4df1703015367bd68e504d5713656681289`, merge commit: `b449769f2cfdfcf915ad2680e68960dc902d8796`); RBATCH-010 HUD + NOTIFICATIONS MERGED IN PR #253 — PENDING RAILWAY/PUBLIC VERIFICATION; RBATCH-011 MAINMENU FLOW PR #255 OPEN — VALIDATION/REVIEW IN PROGRESS
+STARTED — BATCH-001 FOUNDATION COMPLETE; BATCH-002 SCAFFOLD COMPLETE; BATCH-003 PLACEHOLDER ASSETS COMPLETE; BATCH-004 WORLD SETUP COMPLETE; BATCH-005 ORDER LIFECYCLE CORE COMPLETE; BATCH-006 TAP-TO-MOVE + CAMERA COMPLETE; BATCH-007 PICKUP PROXIMITY + ACCEPTED→PICKEDUP CORE IMPLEMENTED AND RAILWAY-VERIFIED (2026-08-01); BATCH-008 DELIVERY OUTCOMES COMPLETE; PR #84 MERGED; RAILWAY REDEPLOYED; PUBLIC COMPLETED/FAILED VERIFICATION PASSED; RBATCH-009 ECONOMY AND REPUTATION OUTCOMES COMPLETED — MERGED IN PR #86, RAILWAY-VERIFIED 2026-08-02, 73/73 TESTS (implementation head: `10c1b4df1703015367bd68e504d5713656681289`, merge commit: `b449769f2cfdfcf915ad2680e68960dc902d8796`); RBATCH-010 HUD + NOTIFICATIONS MERGED IN PR #253 — PENDING RAILWAY/PUBLIC VERIFICATION; RBATCH-011 MAINMENU FLOW MERGED IN PR #255 — PENDING RAILWAY/PUBLIC VERIFICATION; RBATCH-012 COMPANYMANAGEMENT + UPGRADE PURCHASE FLOW PR #256 VALIDATED — PENDING MERGE
 
 Implementation Preparation Status:
 
@@ -214,7 +214,7 @@ Implementation Preparation Status:
 - BATCH-006 is complete — Tap-to-Move implemented; touch input (primary/Android-first) and mouse fallback (desktop); Player movement toward tapped target; camera follows Player; arrival stops movement; Idle/Move animation switching; movement speed and arrival threshold are configurable scene variables; no pickup/delivery/economy/HUD/AI/save-load logic implemented; no playable prototype exists
 - BATCH-007 is implemented — minimal Android-first order acceptance trigger exists on Package touch while order status is Available; automatic pickup proximity exists with configurable `PickupRadius` = 32; Accepted→PickedUp transition sets `PlayerData.CarryingPackage` and `Player.CarryingPackage` true; no delivery completion, failure, reward, economy, HUD, notification, AI, or save/load logic implemented
 - BATCH-008 is complete — delivery completion (PickedUp→Completed on correct destination) and failure (PickedUp→Failed on wrong destination) are merged; terminal states have no outbound transitions; CarryingPackage and currentOrder clear in both outcomes; delivery radius = 48; touch-first tap-on-marker intent registration; no reward, Money, or reputation effects; 30 automated tests pass; TypeScript build passes; HTTP 200 smoke test passes
-- RBATCH-009 is COMPLETED and merged — CompanyState (money=0, reputation=50) and OrderState.reward (100) added; pure settleDeliveryOutcome and canAfford domain functions created in economySettlement.ts; balancing constants in config/balancing.ts; settlement integrated once on PickedUp→terminal transition in GameWorldScene; DebugPanel shows Money, Reputation, order status, guidance; 73 automated tests passed (final independently verified result); TypeScript build passes; HTTP 200 smoke test passes; merged in PR #86, Railway-verified 2026-08-02; implementation head: `10c1b4df1703015367bd68e504d5713656681289`; merge commit: `b449769f2cfdfcf915ad2680e68960dc902d8796`; no upgrade UI, no save/load; RBATCH-010 HUD + Notifications draft PR #253 exists — pending independent review
+- RBATCH-009 is COMPLETED and merged — CompanyState (money=0, reputation=50) and OrderState.reward (100) added; pure settleDeliveryOutcome and canAfford domain functions created in economySettlement.ts; balancing constants in config/balancing.ts; settlement integrated once on PickedUp→terminal transition in GameWorldScene; DebugPanel shows Money, Reputation, order status, guidance; 73 automated tests passed (final independently verified result); TypeScript build passes; HTTP 200 smoke test passes; merged in PR #86, Railway-verified 2026-08-02; implementation head: `10c1b4df1703015367bd68e504d5713656681289`; merge commit: `b449769f2cfdfcf915ad2680e68960dc902d8796`; no upgrade UI, no save/load; RBATCH-010 HUD + Notifications merged in PR #253 — Railway/public verification pending
 - Web Runtime Migration Milestone 001 is implemented — `game-web/` now builds, tests, produces `dist/`, and starts on a production Node server compatible with Railway root-directory deployment
 - Public Railway browser verification of BATCH-007 flow completed on 2026-08-01: Available→Accepted, player travels to package, Accepted→PickedUp, CarryingPackage: true confirmed
 - BATCH-008 delivery outcomes merged in `main` and publicly verified in `game-web/`: PickedUp→Completed (correct destination) and wrong-destination PickedUp→Failed both passed; CarryingPackage cleared in both outcomes; no economy/reward/reputation effects introduced
@@ -223,18 +223,21 @@ Implementation Preparation Status:
 - M-005 status: In Progress
 - E-010 status: COMPLETED through merged and Railway-verified RBATCH-009
 - E-011 status: MERGED in PR #253 — pending Railway/public verification
-- E-012 status: PR #255 — validation/review in progress
+- E-012 status: MERGED in PR #255 — pending Railway/public verification
+- E-013 status: PR #256 — validation complete; pending merge
 - RBATCH-010 status: MERGED — pending Railway/public verification
-- RBATCH-011 status: PR #255 — validation/review in progress
+- RBATCH-011 status: MERGED in PR #255 — pending Railway/public verification
+- RBATCH-012 status: PR #256 — validation complete; pending merge
 - ISSUE-005/ISSUE-006/ISSUE-007 status: merged through PR #253; GitHub issues closed; Railway/public verification still pending at RBATCH-010 level
-- ISSUE-008 status: PR #255 implementation exists — validation/review in progress
+- ISSUE-008 status: completed and merged through PR #255; GitHub issue closed; Railway/public verification remains at RBATCH-011 level
+- ISSUE-010/ISSUE-011 status: PR #256 implementation validated — pending merge
 - ISSUE-009 moved to RBATCH-014 / E-015 / M-007 and remains blocked with Save/Load
 - Active owner decisions: ODR-001 (player position persistence), ODR-003 (GameSettings persistence scope)
 - ODR-002 reclassified (not an owner decision)
 - ODR-004 reclassified 2026-08-01: resolved by canonical documents; wrong-destination interaction triggers Failed; no longer an active owner decision
 - PR #84 merged into `main`; Railway redeployed successfully; public `PickedUp → Completed` verification passed; public wrong-destination `PickedUp → Failed` verification passed
 - CarryingPackage clears in both BATCH-008 terminal outcomes
-- RBATCH-009 economy and reputation settlement implemented; approved balancing values applied; RBATCH-010 HUD + Notifications draft PR #253 exists — pending independent review; no RBATCH-011+ implementation exists
+- RBATCH-009 economy and reputation settlement implemented; approved balancing values applied; RBATCH-010 HUD + Notifications merged in PR #253 — Railway/public verification pending; no RBATCH-011+ implementation exists
 - PR #85 was merged into `main` as merge commit `ec76860b362a3ec1a5bdecbb81ebc254e95f5b08`; no residual PR #85 correction branch remains active
 
 ---

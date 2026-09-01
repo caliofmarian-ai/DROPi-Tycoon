@@ -32,8 +32,8 @@ Last Updated: 2026-09-01
 | E-009 | 1 | M-004 | Delivery Completion & Failure | COMPLETED | RBATCH-008 | E-008 |
 | E-010 | 1 | M-005 | Economy & Reputation Core | COMPLETED — merged PR #86 and Railway-verified 2026-08-02 | RBATCH-009 | E-009 |
 | E-011 | 1 | M-005 | HUD & Notifications | MERGED — pending Railway/public verification | RBATCH-010 | E-010 |
-| E-012 | 1 | M-005 | MainMenu & Game Flow | PR #255 — validation/review in progress | RBATCH-011 | E-003 |
-| E-013 | 1 | M-006 | Company Management Scene | Planned — Not Started | RBATCH-012 | E-010, E-011 |
+| E-012 | 1 | M-005 | MainMenu & Game Flow | MERGED in PR #255 — pending Railway/public verification | RBATCH-011 | E-003 |
+| E-013 | 1 | M-006 | Company Management Scene | PR #256 — validation complete; pending merge | RBATCH-012 | E-010, E-011 |
 | E-014 | 1 | M-006 | Bicycle Ownership System | Planned — Not Started | RBATCH-013 | E-013, E-006 |
 | E-015 | 1 | M-007 | Save & Load System | Planned — Blocked | RBATCH-014 | E-013, E-014, E-012 |
 | E-016 | 1 | M-008 | Mobile Optimization | Planned — Not Started | RBATCH-015 | E-015 |

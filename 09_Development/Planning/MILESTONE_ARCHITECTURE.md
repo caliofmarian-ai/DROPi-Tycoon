@@ -27,7 +27,7 @@ Last Updated: 2026-08-02
 | M-003 | 1 | World Navigation | COMPLETED | E-005, E-006 | RBATCH-004, RBATCH-006 | M-002 | — |
 | M-004 | 1 | Order Lifecycle Core | COMPLETED | E-007, E-008, E-009 | RBATCH-005, RBATCH-007, RBATCH-008 | M-003 | — |
 | M-005 | 1 | Economy, HUD & Game Flow | In Progress | E-010, E-011, E-012 | RBATCH-009, RBATCH-010, RBATCH-011 | M-004 | — |
-| M-006 | 1 | Company Management & Bicycle | Planned — Not Started | E-013, E-014 | RBATCH-012, RBATCH-013 | M-005 | — |
+| M-006 | 1 | Company Management & Bicycle | In Progress | E-013, E-014 | RBATCH-012, RBATCH-013 | M-005 | — |
 | M-007 | 1 | Save & Load System | Planned — Blocked | E-015 | RBATCH-014 | M-006 | ODR-001, ODR-003 |
 | M-008 | 1 | Prototype v0.1 Verification & Release | Planned — Not Started | E-016, E-017 | RBATCH-015, RBATCH-016, RBATCH-017 | M-007 | Human owner approval for RBATCH-017 closure |
 | M-009 | 2 | Employee & Financial Systems | Planned — Future | E-018, E-019, E-020 | RBATCH-018, RBATCH-019, RBATCH-020, RBATCH-021 | M-008 | — |
