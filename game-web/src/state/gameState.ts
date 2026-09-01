@@ -23,7 +23,7 @@ export const createInitialWorldState = (): WorldState => ({
     y: 270,
     currentOrder: '',
     carryingPackage: false,
-    movementSpeed: 150,
+    movementSpeed: BALANCING.WALKING_MOVEMENT_SPEED,
   },
   activeOrder: {
     orderId: 'ORDER-001',
