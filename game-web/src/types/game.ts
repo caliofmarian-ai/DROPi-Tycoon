@@ -37,6 +37,15 @@ export interface CompanyState {
   purchasedUpgradeLevels: PurchasedUpgradeLevels
 }
 
+export interface GameSettingsState {
+  /**
+   * Prototype v0.1 persists only tutorial completion from GameSettings.
+   * Language, sound, music and difficulty intentionally remain outside the
+   * v0.1 save contract per ODR-003 = B.
+   */
+  tutorialCompleted: boolean
+}
+
 export interface PlayerState {
   x: number
   y: number
@@ -63,6 +72,7 @@ export interface WorldState {
 export interface GameSessionState {
   world: WorldState
   company: CompanyState
+  settings: GameSettingsState
 }
 
 export interface PickupContext {
