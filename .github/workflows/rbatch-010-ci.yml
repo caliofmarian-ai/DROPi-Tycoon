@@ -1,9 +1,9 @@
-name: RBATCH-010 Independent Validation
+name: DROPi Tycoon Prototype CI
 
 on:
   push:
     branches:
-      - copilot/rbatch-010-hud-notifications
+      - main
   pull_request:
     branches:
       - main
@@ -14,7 +14,7 @@ permissions:
 jobs:
   validate:
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 12
     defaults:
       run:
         working-directory: game-web
@@ -60,6 +60,7 @@ jobs:
           exit 1
 
       - name: PR-range whitespace validation
+        if: github.event_name == 'pull_request'
         working-directory: .
         shell: bash
         run: |
@@ -67,6 +68,7 @@ jobs:
           git -c core.whitespace=cr-at-eol diff --check origin/main...HEAD
 
       - name: Confirm archived Game runtime unchanged
+        if: github.event_name == 'pull_request'
         working-directory: .
         shell: bash
         run: |
@@ -77,3 +79,56 @@ jobs:
             exit 1
           fi
           echo 'Archived Game/ unchanged: PASS'
+
+      - name: Validate canonical planning YAML syntax
+        working-directory: .
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 -m pip install --quiet pyyaml
+          python3 - <<'PY'
+          import yaml
+          path = '09_Development/Planning/github_creation_plan.yaml'
+          with open(path, encoding='utf-8') as handle:
+              data = yaml.safe_load(handle)
+          assert isinstance(data, dict)
+          assert data['metadata']['counts']['milestones'] == 21
+          assert data['metadata']['counts']['epics'] == 46
+          assert data['metadata']['counts']['batches'] == 54
+          assert data['metadata']['counts']['executable_issues'] == 34
+          print('Planning YAML syntax/count validation: PASS')
+          PY
+
+      - name: Validate active planning crosswalk
+        working-directory: .
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import yaml
+          path = '09_Development/Planning/github_creation_plan.yaml'
+          with open(path, encoding='utf-8') as handle:
+              data = yaml.safe_load(handle)
+
+          batches = {item['id']: item for item in data['batches']}
+          epics = {item['id']: item for item in data['epics']}
+          issues = {item['id']: item for item in data['issues']}
+
+          assert 'MERGED' in batches['RBATCH-010']['status']
+          assert batches['RBATCH-011']['status'].startswith('Draft PR #254')
+          assert 'MERGED' in epics['E-011']['status']
+          assert epics['E-012']['status'].startswith('Draft PR #254')
+
+          assert issues['ISSUE-008']['batch_id'] == 'RBATCH-011'
+          assert issues['ISSUE-008']['epic_id'] == 'E-012'
+          assert issues['ISSUE-008']['milestone_id'] == 'M-005'
+          assert 'status:in-progress' in issues['ISSUE-008']['labels']
+
+          assert issues['ISSUE-009']['batch_id'] == 'RBATCH-014'
+          assert issues['ISSUE-009']['epic_id'] == 'E-015'
+          assert issues['ISSUE-009']['milestone_id'] == 'M-007'
+          assert issues['ISSUE-009']['blocked_or_owner_gate'] == 'ODR-001, ODR-003'
+          assert 'status:blocked' in issues['ISSUE-009']['labels']
+
+          print('Active planning crosswalk validation: PASS')
+          PY
