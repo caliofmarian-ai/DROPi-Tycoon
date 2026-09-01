@@ -99,7 +99,7 @@ milestones:
 - id: M-006
   title: Company Management & Bicycle
   phase: 1
-  status: Planned — Not Started
+  status: In Progress
   epic_ids:
   - E-013
   - E-014
@@ -407,7 +407,7 @@ epics:
   title: MainMenu & Game Flow
   phase: 1
   milestone_id: M-005
-  status: 'PR #255 — validation/review in progress'
+  status: 'MERGED in PR #255 — pending Railway/public verification'
   batch_ids:
   - RBATCH-011
   depends_on:
@@ -416,7 +416,7 @@ epics:
   title: Company Management Scene
   phase: 1
   milestone_id: M-006
-  status: Planned — Not Started
+  status: 'PR #256 — validation complete; pending merge'
   batch_ids:
   - RBATCH-012
   depends_on:
@@ -954,7 +954,7 @@ batches:
   epic_ids:
   - E-012
   title: MainMenu Flow
-  status: 'PR #255 — validation/review in progress'
+  status: 'MERGED in PR #255 — pending Railway/public verification'
   depends_on:
   - RBATCH-002
   legacy_id: BATCH-010b
@@ -968,7 +968,7 @@ batches:
   epic_ids:
   - E-013
   title: CompanyManagement + Upgrade Purchase Flow
-  status: Planned — Not Started
+  status: 'PR #256 — validation complete; pending merge'
   depends_on:
   - RBATCH-009
   - RBATCH-010
@@ -1459,13 +1459,13 @@ legacy_crosswalk:
   execution_rule: Historical numbering only; execute the mapped RBATCH identifier and never ambiguous legacy numbering.
 - legacy_id: BATCH-010b
   rbatch_id: RBATCH-011
-  historical_status: 'PR #255 — validation/review in progress'
+  historical_status: 'MERGED in PR #255 — pending Railway/public verification'
   authoritative_planning_source: 09_Development/Planning/BATCH_ARCHITECTURE.md
   historical_lineage_source: 09_Development/Implementation_Preparation/IMPLEMENTATION_BATCH_PLAN.md
   execution_rule: Historical numbering only; execute the mapped RBATCH identifier and never ambiguous legacy numbering.
 - legacy_id: BATCH-011
   rbatch_id: RBATCH-012
-  historical_status: NEVER STARTED
+  historical_status: 'PR #256 — validation complete; pending merge'
   authoritative_planning_source: 09_Development/Planning/BATCH_ARCHITECTURE.md
   historical_lineage_source: 09_Development/Implementation_Preparation/IMPLEMENTATION_BATCH_PLAN.md
   execution_rule: Historical numbering only; execute the mapped RBATCH identifier and never ambiguous legacy numbering.
@@ -1896,13 +1896,13 @@ issues:
   milestone_id: M-005
   phase: 1
   type: implementation
-  status: MERGED in PR #253 — pending Railway/public verification
+  status: 'COMPLETED — merged PR #253; Railway/public verification pending at RBATCH-010 level'
   label_names:
   - type:implementation
   - phase:1
   - batch:rbatch-010
   - epic:hud-notifications
-  - status:in-progress
+  - status:done
   description: Show destination/status/package state in HUD.
   acceptance_criteria: HUD appears only when order active.
 - id: ISSUE-006
@@ -1912,13 +1912,13 @@ issues:
   milestone_id: M-005
   phase: 1
   type: implementation
-  status: MERGED in PR #253 — pending Railway/public verification
+  status: 'COMPLETED — merged PR #253; Railway/public verification pending at RBATCH-010 level'
   label_names:
   - type:implementation
   - phase:1
   - batch:rbatch-010
   - epic:hud-notifications
-  - status:in-progress
+  - status:done
   description: Connect HUD button to AcceptRequested flow.
   acceptance_criteria: Available orders can be accepted from HUD.
 - id: ISSUE-007
@@ -1928,13 +1928,13 @@ issues:
   milestone_id: M-005
   phase: 1
   type: implementation
-  status: MERGED in PR #253 — pending Railway/public verification
+  status: 'COMPLETED — merged PR #253; Railway/public verification pending at RBATCH-010 level'
   label_names:
   - type:implementation
   - phase:1
   - batch:rbatch-010
   - epic:hud-notifications
-  - status:in-progress
+  - status:done
   description: Show notifications for Accepted/PickedUp/Completed/Failed.
   acceptance_criteria: Notification appears on each state change.
 - id: ISSUE-008
@@ -1944,13 +1944,13 @@ issues:
   milestone_id: M-005
   phase: 1
   type: implementation
-  status: 'PR #255 implementation exists — validation/review in progress'
+  status: 'COMPLETED — merged PR #255; Railway/public verification pending at RBATCH-011 level'
   label_names:
   - type:implementation
   - phase:1
   - batch:rbatch-011
   - epic:mainmenu-gameflow
-  - status:in-progress
+  - status:done
   description: Implement Start Game, Settings and Information without save-dependent behavior.
   acceptance_criteria: MainMenu actions are mobile-friendly, deterministic and persistence-independent.
 - id: ISSUE-009
@@ -1977,13 +1977,13 @@ issues:
   milestone_id: M-006
   phase: 1
   type: implementation
-  status: Ready for implementation
+  status: 'PR #256 implementation validated — pending merge'
   label_names:
   - type:implementation
   - phase:1
   - batch:rbatch-012
   - epic:company-management
-  - status:ready
+  - status:in-progress
   description: Purchase upgrades with affordability enforcement.
   acceptance_criteria: Player cannot buy unaffordable upgrades.
 - id: ISSUE-011
@@ -1993,13 +1993,13 @@ issues:
   milestone_id: M-006
   phase: 1
   type: implementation
-  status: Ready for implementation
+  status: 'PR #256 implementation validated — pending merge'
   label_names:
   - type:implementation
   - phase:1
   - batch:rbatch-012
   - epic:company-management
-  - status:ready
+  - status:in-progress
   description: Move between GameWorld and CompanyManagement safely.
   acceptance_criteria: Scene transitions preserve game state.
 - id: ISSUE-012

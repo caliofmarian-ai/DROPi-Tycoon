@@ -1,5 +1,6 @@
 import Phaser from 'phaser'
 import { appConfig } from '../config/env'
+import { startNewGameSession } from '../state/gameSession'
 import {
   closeMainMenuPanel,
   createMainMenuState,
@@ -64,11 +65,16 @@ export class MainMenuScene extends Phaser.Scene {
       )
       .setOrigin(0.5)
 
-    this.createButton(width / 2, 330, 'Start Game', () => this.scene.start('GameWorld'))
+    this.createButton(width / 2, 330, 'Start Game', () => this.startGame())
     this.createButton(width / 2, 420, 'Settings', () => this.showPanel('settings'))
     this.createButton(width / 2, 510, 'Information', () => this.showPanel('information'))
 
     this.createModal()
+  }
+
+  private startGame(): void {
+    startNewGameSession()
+    this.scene.start('GameWorld')
   }
 
   private createButton(x: number, y: number, label: string, onTap: () => void): void {

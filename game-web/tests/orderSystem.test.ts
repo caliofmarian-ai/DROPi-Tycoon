@@ -626,7 +626,7 @@ describe('RBATCH-009 — clamping and canonical outcomes', () => {
     const result = settleDeliveryOutcome(previousOrder, nextOrder, freshCompany())
     expect(result.applied).toBe(true)
     if (result.applied) {
-      expect(result.company).toEqual({ money: 100, reputation: 52 })
+      expect(result.company).toMatchObject({ money: 100, reputation: 52 })
     }
   })
 
@@ -636,7 +636,7 @@ describe('RBATCH-009 — clamping and canonical outcomes', () => {
     const result = settleDeliveryOutcome(previousOrder, nextOrder, freshCompany())
     expect(result.applied).toBe(true)
     if (result.applied) {
-      expect(result.company).toEqual({ money: 0, reputation: 45 })
+      expect(result.company).toMatchObject({ money: 0, reputation: 45 })
     }
   })
 
@@ -644,8 +644,8 @@ describe('RBATCH-009 — clamping and canonical outcomes', () => {
     const previousOrder = buildPickedUpOrder()
     const successOrder = buildCompletedOrder(previousOrder)
     const failOrder = buildFailedOrder(previousOrder)
-    const successResult = settleDeliveryOutcome(previousOrder, successOrder, { money: 0, reputation: 99 })
-    const failResult = settleDeliveryOutcome(previousOrder, failOrder, { money: 0, reputation: 3 })
+    const successResult = settleDeliveryOutcome(previousOrder, successOrder, { ...freshCompany(), reputation: 99 })
+    const failResult = settleDeliveryOutcome(previousOrder, failOrder, { ...freshCompany(), reputation: 3 })
     expect(successResult.applied).toBe(true)
     expect(failResult.applied).toBe(true)
     if (successResult.applied) {

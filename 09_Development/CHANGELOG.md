@@ -6,7 +6,7 @@ Version: 1.0.0
 Status: Development Log
 Author: Marian Caliof & OpenAI
 Language: English
-Last Updated: 2026-09-01 (RBATCH-010 MERGE + RBATCH-011 MAINMENU FLOW)
+Last Updated: 2026-09-01 (RBATCH-011 MERGE + RBATCH-012 COMPANY MANAGEMENT)
 
 ---
 
@@ -33,6 +33,30 @@ Category
 Description
 
 ---
+
+# [2026-09-01] - RBATCH-011 MERGE AND RBATCH-012 COMPANY MANAGEMENT
+
+## Added
+
+- PR #255 / RBATCH-011 merged into `main` as `34a8383f85e9bf45fd7680dfc26ad48b5fa56e27`; Railway/public gameplay verification remains pending and is not claimed.
+- RBATCH-012 branch `openai/rbatch-012-company-management-upgrades` and PR #256.
+- Expanded canonical runtime `CompanyState` fields for company name, level, and purchased upgrade levels.
+- Pure upgrade catalog/purchase domain logic and in-memory `gameSession` scene-transition state.
+- CompanyManagement economy overview, Bicycle purchase path, purchase feedback, and safe return-to-world navigation.
+- `company-management.test.ts` with 22 deterministic RBATCH-012 tests.
+
+## Changed
+
+- GameWorld and CompanyManagement navigation now use one input owner per action and preserve the same in-memory runtime state.
+- Delivery settlement now preserves unrelated company progression fields.
+- Bicycle cost is centralized at 100 money as a replaceable Prototype v0.1 balancing value so the current single-order runtime can reach the first purchase after one successful 100-money delivery.
+- Legacy RBATCH-009 tests now validate money/reputation without incorrectly forbidding newly added canonical company fields.
+
+## Verified
+
+- PR #256 clean-head GitHub Actions run `33554869280`: **204/204 tests PASS**; TypeScript/Vite build, HTTP smoke, CRLF-aware diff check, archived `Game/` guard, planning YAML syntax/count and active crosswalk all PASS.
+- Bicycle movement-speed effect is not implemented in RBATCH-012; it remains RBATCH-013.
+- No localStorage, save serialization, autosave, or persistence across app restarts is introduced; persistent Save/Load remains RBATCH-014.
 
 # [2026-09-01] - RBATCH-010 MERGE AND RBATCH-011 MAINMENU FLOW
 

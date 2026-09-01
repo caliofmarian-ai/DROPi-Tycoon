@@ -9,6 +9,16 @@ export const ORDER_STATUSES = [
 
 export type OrderStatus = (typeof ORDER_STATUSES)[number]
 
+export const UPGRADE_IDS = [
+  'DeliverySpeed',
+  'Capacity',
+  'Efficiency',
+  'Bicycle',
+] as const
+
+export type UpgradeId = (typeof UPGRADE_IDS)[number]
+export type PurchasedUpgradeLevels = Record<UpgradeId, number>
+
 export interface OrderState {
   orderId: string
   pickupLocation: string
@@ -20,8 +30,11 @@ export interface OrderState {
 }
 
 export interface CompanyState {
+  companyName: string
   money: number
+  level: number
   reputation: number
+  purchasedUpgradeLevels: PurchasedUpgradeLevels
 }
 
 export interface PlayerState {
@@ -45,6 +58,11 @@ export interface WorldState {
   pickupRadius: number
   deliveryRadius: number
   pendingDeliveryDestination: string
+}
+
+export interface GameSessionState {
+  world: WorldState
+  company: CompanyState
 }
 
 export interface PickupContext {
