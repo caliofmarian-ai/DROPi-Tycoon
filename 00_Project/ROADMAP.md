@@ -250,7 +250,7 @@ Development is considered successful when every milestone results in a complete,
 | M-005 | 1 | Economy, HUD & Game Flow | In Progress |
 | M-006 | 1 | Company Management & Bicycle | In Progress |
 | M-007 | 1 | Save & Load System | In Progress |
-| M-008 | 1 | Prototype v0.1 Verification & Release | Planned — Not Started |
+| M-008 | 1 | Prototype v0.1 Verification & Release | In Progress |
 | M-009 | 2 | Employee & Financial Systems | Planned — Future |
 | M-010 | 2 | Vehicle Fleet Management | Planned — Future |
 | M-011 | 3 | Warehouse & District System | Planned — Future |

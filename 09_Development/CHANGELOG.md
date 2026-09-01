@@ -6,7 +6,7 @@ Version: 1.0.0
 Status: Development Log
 Author: Marian Caliof & OpenAI
 Language: English
-Last Updated: 2026-09-01 (RBATCH-014 SAVE/LOAD VALIDATION)
+Last Updated: 2026-09-01 (RBATCH-015 MOBILE OPTIMIZATION VALIDATION)
 
 ---
 
@@ -31,6 +31,33 @@ Date
 Category
 
 Description
+
+---
+
+# [2026-09-01] - RBATCH-015 MOBILE OPTIMIZATION VALIDATION
+
+## Added
+
+- Responsive viewport layout primitives for representative Android portrait and landscape sizes.
+- Screen-space touch-comfort enforcement for Main Menu, modal, Company Management, GameWorld navigation and HUD acceptance controls.
+- 32 deterministic mobile viewport/touch tests.
+
+## Changed
+
+- Active runtime scaling moved from fixed-canvas FIT to viewport-sized RESIZE so touch targets remain physical screen-space pixels.
+- Prototype-only portrait rotation blocker removed; orientation remains an implementation target matrix rather than permanent canon.
+- Main Menu, Company Management, GameWorld navigation, HUD and notifications now derive layout from the active viewport.
+- M-008 advanced to In Progress; E-016/RBATCH-015 and ISSUE-018/019 advanced to PR #263 validated state.
+
+## Verified
+
+- GitHub Actions run `33562041087`: 274/274 tests passed across 9 files.
+- New mobile viewport/touch suite: 32/32 passed.
+- TypeScript + Vite production build: PASS.
+- Production HTTP smoke: PASS.
+- PR-range whitespace validation: PASS.
+- Archived `Game/` guard: PASS.
+- Canonical planning YAML syntax/count validation: PASS.
 
 ---
 
