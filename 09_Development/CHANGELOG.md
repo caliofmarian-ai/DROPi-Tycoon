@@ -34,6 +34,22 @@ Description
 
 ---
 
+# [2026-09-01] - RBATCH-015 MERGE CHECKPOINT
+
+## Merged
+
+- PR #263 / RBATCH-015 merged into `main` as `28d09e10fcdfef878d1763e3a5b006a83ed46bdc`.
+- Main post-merge CI run `33562955059` succeeded.
+- ISSUE-018/#204 and ISSUE-019/#205 closed as completed and synchronized to `status:done`.
+
+## Planning
+
+- RBATCH-015 / E-016 now record merged status pending Railway/public mobile verification.
+- M-008 remains In Progress for RBATCH-016 and RBATCH-017.
+- RBATCH-016 Full-Loop Integration Verification is the next implementation batch.
+
+---
+
 # [2026-09-01] - RBATCH-015 MOBILE OPTIMIZATION VALIDATION
 
 ## Added
