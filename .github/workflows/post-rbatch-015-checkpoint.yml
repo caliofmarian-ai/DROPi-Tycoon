@@ -1,0 +1,182 @@
+name: RBATCH-015 Post-Merge Checkpoint
+
+on:
+  push:
+    branches:
+      - openai/post-rbatch-015-checkpoint
+
+permissions:
+  contents: write
+
+jobs:
+  reconcile:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: openai/post-rbatch-015-checkpoint
+          fetch-depth: 0
+
+      - name: Reconcile canonical planning after PR 263 merge
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          from pathlib import Path
+          import re
+
+          ROOT = Path('.')
+          ISSUE_IDS = ('ISSUE-018','ISSUE-019')
+
+          def load(path_str):
+              path = ROOT / path_str
+              raw = path.read_bytes().decode('utf-8')
+              nl = '\r\n' if '\r\n' in raw else '\n'
+              return path, raw.replace('\r\n','\n'), nl
+
+          def save(path, text, nl):
+              path.write_bytes(text.replace('\n', nl).encode('utf-8'))
+
+          def one(text, old, new):
+              count = text.count(old)
+              if count != 1:
+                  raise RuntimeError(f'Expected one occurrence of {old!r}, found {count}')
+              return text.replace(old, new, 1)
+
+          def update_row(text, prefix, updater):
+              lines = text.splitlines()
+              matches = [i for i, line in enumerate(lines) if line.startswith(prefix)]
+              if len(matches) != 1:
+                  raise RuntimeError(f'Expected one row {prefix!r}, found {len(matches)}')
+              idx = matches[0]
+              cells = [c.strip() for c in lines[idx].strip().strip('|').split('|')]
+              updater(cells)
+              lines[idx] = '| ' + ' | '.join(cells) + ' |'
+              return '\n'.join(lines) + ('\n' if text.endswith('\n') else '')
+
+          def yaml_block(text, item_id):
+              marker = f'- id: {item_id}\n'
+              start = text.find(marker)
+              if start < 0:
+                  raise RuntimeError(f'Missing YAML block {item_id}')
+              nxt = text.find('\n- id: ', start + len(marker))
+              end = len(text) if nxt < 0 else nxt + 1
+              return start, end, text[start:end]
+
+          def yaml_field(text, item_id, field, value):
+              start, end, block = yaml_block(text, item_id)
+              pattern = rf'(^  {re.escape(field)}: ).+$'
+              updated, count = re.subn(pattern, rf"\1'{value}'", block, count=1, flags=re.MULTILINE)
+              if count != 1:
+                  raise RuntimeError(f'Cannot update {field} in {item_id}')
+              return text[:start] + updated + text[end:]
+
+          def yaml_label(text, item_id, old, new):
+              start, end, block = yaml_block(text, item_id)
+              if block.count(old) != 1:
+                  raise RuntimeError(f'Expected one {old} in {item_id}, found {block.count(old)}')
+              return text[:start] + block.replace(old, new, 1) + text[end:]
+
+          merged = 'MERGED in PR #263 — pending Railway/public mobile verification'
+          issue_done = 'COMPLETED — merged PR #263; Railway/public verification pending at RBATCH-015 level'
+
+          path, text, nl = load('09_Development/Planning/BATCH_ARCHITECTURE.md')
+          text = update_row(text, '| BATCH-014 | RBATCH-015 |', lambda cells: cells.__setitem__(2, merged))
+          text = update_row(text, '| RBATCH-015 |', lambda cells: cells.__setitem__(5, merged))
+          save(path, text, nl)
+
+          path, text, nl = load('09_Development/Planning/EPIC_CATALOG.md')
+          text = update_row(text, '| E-016 |', lambda cells: cells.__setitem__(4, merged))
+          save(path, text, nl)
+
+          path, text, nl = load('09_Development/Planning/ISSUE_CATALOG.md')
+          for issue_id in ISSUE_IDS:
+              def updater(cells):
+                  cells[6] = issue_done
+                  cells[7] = cells[7].replace('status:in-progress','status:done')
+              text = update_row(text, f'| {issue_id} |', updater)
+          save(path, text, nl)
+
+          path, text, nl = load('09_Development/Planning/github_creation_plan.yaml')
+          text = yaml_field(text, 'RBATCH-015', 'status', merged)
+          text = yaml_field(text, 'E-016', 'status', merged)
+          for issue_id in ISSUE_IDS:
+              text = yaml_field(text, issue_id, 'status', issue_done)
+              text = yaml_label(text, issue_id, 'status:in-progress', 'status:done')
+          save(path, text, nl)
+
+          path, text, nl = load('00_Project/PROJECT_STATUS.md')
+          text = re.sub(r'Last Updated: .*', 'Last Updated: 2026-09-01 (RBATCH-015 merged in PR #263; RBATCH-016 Full-Loop Integration Verification next)', text, count=1)
+          text = re.sub(
+              r'Prototype v0\.1 — .*?\n\n---',
+              'Prototype v0.1 — RBATCH-010/011/012/013/014/015 MERGED pending Railway/public verification; RBATCH-016 Full-Loop Integration Verification is next\n\n---',
+              text, count=1, flags=re.DOTALL)
+          text = re.sub(
+              r'# Current Objective\n\n.*?\n\n---',
+              '# Current Objective\n\nExecute RBATCH-016 Full-Loop Integration Verification after RBATCH-015 merged successfully, while keeping Railway/public mobile verification explicitly pending until observed.\n\n---',
+              text, count=1, flags=re.DOTALL)
+          text = text.replace('E-016 status: PR #263 — validation complete; pending merge', 'E-016 status: MERGED in PR #263 — pending Railway/public mobile verification')
+          text = text.replace('RBATCH-015 status: PR #263 — validation complete; pending merge', 'RBATCH-015 status: MERGED in PR #263 — pending Railway/public mobile verification')
+          text = text.replace('ISSUE-018/ISSUE-019 status: PR #263 implementation validated — pending merge', 'ISSUE-018/ISSUE-019 status: COMPLETED — merged PR #263; Railway/public verification pending at RBATCH-015 level')
+          save(path, text, nl)
+
+          path, text, nl = load('09_Development/CHANGELOG.md')
+          marker = '# [2026-09-01] - RBATCH-015 MOBILE OPTIMIZATION VALIDATION'
+          section = '''# [2026-09-01] - RBATCH-015 MERGE CHECKPOINT\n\n## Merged\n\n- PR #263 / RBATCH-015 merged into `main` as `28d09e10fcdfef878d1763e3a5b006a83ed46bdc`.\n- Main post-merge CI run `33562955059` succeeded.\n- ISSUE-018/#204 and ISSUE-019/#205 closed as completed and synchronized to `status:done`.\n\n## Planning\n\n- RBATCH-015 / E-016 now record merged status pending Railway/public mobile verification.\n- M-008 remains In Progress for RBATCH-016 and RBATCH-017.\n- RBATCH-016 Full-Loop Integration Verification is the next implementation batch.\n\n---\n\n'''
+          if section.strip() not in text:
+              text = one(text, marker, section + marker)
+          save(path, text, nl)
+
+          print('Post-RBATCH-015 planning reconciliation prepared: PASS')
+          PY
+
+      - name: Verify checkpoint
+        shell: bash
+        run: |
+          set -euo pipefail
+          grep -F 'RBATCH-015 | 1 | M-008 | E-016 | Mobile Optimization | MERGED in PR #263' 09_Development/Planning/BATCH_ARCHITECTURE.md
+          grep -F 'E-016 | 1 | M-008 | Mobile Optimization | MERGED in PR #263' 09_Development/Planning/EPIC_CATALOG.md
+          for id in ISSUE-018 ISSUE-019; do
+            grep -F "| $id |" 09_Development/Planning/ISSUE_CATALOG.md | grep -F 'COMPLETED — merged PR #263' | grep -F 'status:done'
+          done
+          python3 -m pip install --quiet pyyaml
+          python3 - <<'PY'
+          import yaml
+          with open('09_Development/Planning/github_creation_plan.yaml', encoding='utf-8') as handle:
+              data = yaml.safe_load(handle)
+          batches = {x['id']:x for x in data['batches']}
+          epics = {x['id']:x for x in data['epics']}
+          issues = {x['id']:x for x in data['issues']}
+          milestones = {x['id']:x for x in data['milestones']}
+          assert milestones['M-008']['status'] == 'In Progress'
+          assert 'MERGED' in batches['RBATCH-015']['status']
+          assert 'MERGED' in epics['E-016']['status']
+          for issue_id in ('ISSUE-018','ISSUE-019'):
+              assert issues[issue_id]['status'].startswith('COMPLETED')
+              assert 'status:done' in issues[issue_id]['label_names']
+          assert batches['RBATCH-016']['status'] == 'Planned — Not Started'
+          assert epics['E-017']['status'] == 'Planned — Not Started'
+          print('Post-RBATCH-015 YAML checkpoint: PASS')
+          PY
+
+      - name: Commit checkpoint ordinary files
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add \
+            00_Project/PROJECT_STATUS.md \
+            09_Development/CHANGELOG.md \
+            09_Development/Planning/BATCH_ARCHITECTURE.md \
+            09_Development/Planning/EPIC_CATALOG.md \
+            09_Development/Planning/ISSUE_CATALOG.md \
+            09_Development/Planning/github_creation_plan.yaml
+          if git diff --cached --quiet; then
+            echo 'No checkpoint changes to commit.'
+            exit 0
+          fi
+          git commit -m 'docs: reconcile RBATCH-015 merge checkpoint'
+          git push origin HEAD:openai/post-rbatch-015-checkpoint
