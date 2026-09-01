@@ -6,7 +6,7 @@ Version: 1.0.0
 Status: Development Log
 Author: Marian Caliof & OpenAI
 Language: English
-Last Updated: 2026-09-01 (RBATCH-011 MERGE + RBATCH-012 COMPANY MANAGEMENT)
+Last Updated: 2026-09-01 (RBATCH-014 SAVE/LOAD VALIDATION)
 
 ---
 
@@ -31,6 +31,39 @@ Date
 Category
 
 Description
+
+---
+
+# [2026-09-01] - RBATCH-014 SAVE/LOAD VALIDATION
+
+## Owner Decisions
+
+- ODR-001 resolved as A: Prototype v0.1 does not persist player position.
+- ODR-003 resolved as B: Prototype v0.1 persists only TutorialStatus from GameSettings.
+- The owner clarified that current prototype visuals are temporary and are not the final quality target; core persistence remains decoupled from rendering/assets for later high-fidelity evolution.
+
+## Added
+
+- Versioned one-slot local save contract with staging-first write recovery.
+- Pure Save/Load serializer, decoder, schema validation and session restoration independent from Phaser.
+- Save-aware MainMenu Continue / Start New Game behavior with in-game overwrite confirmation.
+- Best-effort unreadable-save backup before confirmed replacement.
+- Canonical autosave enforcement for delivery completion, upgrade purchase, progression change and tutorial-step completion.
+- 20 deterministic Save/Load tests plus save-aware MainMenu coverage.
+
+## Changed
+
+- Canonical `SAVE_SYSTEM.md` platform boundary updated from archived GDevelop-specific wording to a replaceable platform-local storage adapter while preserving the same save semantics.
+- M-007 / E-015 / RBATCH-014 and ISSUE-009/014/015/016/017 advanced from owner-blocked to PR #259 validated state.
+
+## Verified
+
+- GitHub Actions run `33559283892`: 242/242 tests passed across 8 files.
+- TypeScript + Vite production build: PASS.
+- Production HTTP smoke: PASS.
+- PR-range whitespace validation: PASS.
+- Archived `Game/` guard: PASS.
+- Canonical planning YAML syntax/count validation: PASS.
 
 ---
 

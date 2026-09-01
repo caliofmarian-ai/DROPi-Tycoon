@@ -191,15 +191,15 @@ Do not use unvalidated values directly from save data.
 # Mobile Considerations
 
 - Save data is stored on local device storage.
-- GDevelop local storage APIs are used for persistence.
+- The active web runtime uses browser-local storage through a replaceable adapter; future packaged mobile runtimes must provide equivalent device-local storage behind the same canonical save contract.
 - The system must tolerate interrupted saves caused by incoming calls, OS interruptions, or low battery.
 - Do not assume save operations are atomic; design save data to be recoverable even if a write is interrupted.
 
 ---
 
-# GDevelop Implementation Boundary
+# Platform-Local Implementation Boundary
 
-The Save System is implemented using GDevelop's built-in local storage or variable persistence mechanisms.
+The Save System is implemented through a replaceable platform-local storage adapter. The active web runtime uses browser-local storage; future Android packaging may substitute an equivalent device-local adapter without changing the save schema or domain logic.
 
 No external backend, server, or cloud API is used.
 
