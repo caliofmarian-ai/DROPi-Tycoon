@@ -1,4 +1,6 @@
 import Phaser from 'phaser'
+import { getBrowserSaveStorage } from '../persistence/browserSaveStorage'
+import { autosaveIfApproved } from '../persistence/saveSystem'
 import { getOrCreateGameSession, replaceGameSession } from '../state/gameSession'
 import {
   getAvailableUpgrades,
@@ -138,7 +140,14 @@ export class CompanyManagementScene extends Phaser.Scene {
 
     if (result.purchased) {
       this.companyState = result.company
-      replaceGameSession(this.worldState, this.companyState)
+      const session = replaceGameSession(this.worldState, this.companyState)
+      const storage = getBrowserSaveStorage()
+      if (storage) {
+        const autosave = autosaveIfApproved(storage, session, 'upgrade-purchased')
+        if (!autosave.saved && autosave.reason === 'write-failed') {
+          this.feedbackText.setText(`${result.message}\nLocal autosave failed: ${autosave.message ?? 'unknown error'}`)
+        }
+      }
     }
 
     this.refreshView()
