@@ -120,14 +120,15 @@ jobs:
           assert milestones['M-007']['owner_gates'].startswith('RESOLVED')
           assert milestones['M-008']['status'] == 'In Progress'
 
-          for batch_id in ('RBATCH-010', 'RBATCH-011', 'RBATCH-012', 'RBATCH-013', 'RBATCH-014', 'RBATCH-015'):
+          for batch_id in ('RBATCH-010', 'RBATCH-011', 'RBATCH-012', 'RBATCH-013', 'RBATCH-014', 'RBATCH-015', 'RBATCH-016'):
               assert 'MERGED' in batches[batch_id]['status']
           assert batches['RBATCH-014']['owner_gates'].startswith('RESOLVED')
-          assert batches['RBATCH-016']['status'] == 'Planned — Not Started'
+          assert batches['RBATCH-017']['status'] == 'Planned — Not Started'
+          assert batches['RBATCH-017']['owner_gates'] == 'Human owner approval required'
 
           for epic_id in ('E-011', 'E-012', 'E-013', 'E-014', 'E-015', 'E-016'):
               assert 'MERGED' in epics[epic_id]['status']
-          assert epics['E-017']['status'] == 'Planned — Not Started'
+          assert epics['E-017']['status'].startswith('In Progress')
 
           assert issues['ISSUE-008']['batch_id'] == 'RBATCH-011'
           assert issues['ISSUE-008']['epic_id'] == 'E-012'
@@ -159,6 +160,13 @@ jobs:
           for issue_id in ('ISSUE-018', 'ISSUE-019'):
               assert issues[issue_id]['batch_id'] == 'RBATCH-015'
               assert issues[issue_id]['epic_id'] == 'E-016'
+              assert issues[issue_id]['milestone_id'] == 'M-008'
+              assert issues[issue_id]['status'].startswith('COMPLETED')
+              assert 'status:done' in issues[issue_id]['label_names']
+
+          for issue_id in ('ISSUE-020', 'ISSUE-021'):
+              assert issues[issue_id]['batch_id'] == 'RBATCH-016'
+              assert issues[issue_id]['epic_id'] == 'E-017'
               assert issues[issue_id]['milestone_id'] == 'M-008'
               assert issues[issue_id]['status'].startswith('COMPLETED')
               assert 'status:done' in issues[issue_id]['label_names']

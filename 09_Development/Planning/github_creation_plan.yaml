@@ -456,7 +456,7 @@ epics:
   title: Full-Loop Integration Verification
   phase: 1
   milestone_id: M-008
-  status: Planned — Not Started
+  status: 'In Progress — RBATCH-016 merged; RBATCH-017 pending human owner approval'
   batch_ids:
   - RBATCH-016
   - RBATCH-017
@@ -1030,7 +1030,7 @@ batches:
   epic_ids:
   - E-017
   title: Full-Loop Integration Verification
-  status: Planned — Not Started
+  status: 'MERGED in PR #265 — automated integration verified; release evidence pending RBATCH-017 owner review'
   depends_on:
   - RBATCH-015
   legacy_id: BATCH-015
@@ -2141,13 +2141,13 @@ issues:
   milestone_id: M-008
   phase: 1
   type: verification
-  status: Ready for implementation
+  status: 'COMPLETED — merged PR #265; PR CI 33563515533 and main CI 33563908596 succeeded'
   label_names:
   - type:verification
   - phase:1
   - batch:rbatch-016
   - epic:integration-verification
-  - status:ready
+  - status:done
   description: Run startup→completion/failure loop coverage.
   acceptance_criteria: All P0/P1 behaviors verified.
 - id: ISSUE-021
@@ -2157,13 +2157,13 @@ issues:
   milestone_id: M-008
   phase: 1
   type: documentation
-  status: Ready for implementation
+  status: 'COMPLETED — merged PR #265; PR CI 33563515533 and main CI 33563908596 succeeded'
   label_names:
   - type:documentation
   - phase:1
   - batch:rbatch-016
   - epic:integration-verification
-  - status:ready
+  - status:done
   description: Record integration evidence.
   acceptance_criteria: Results are documented accurately.
 - id: ISSUE-022
