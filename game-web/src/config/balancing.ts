@@ -13,5 +13,7 @@ export const BALANCING = {
   REPUTATION_ON_FAILURE: -5,
   REPUTATION_MIN: 0,
   REPUTATION_MAX: 100,
-  BICYCLE_COST: 200,
+  // Reachable after the current prototype's first successful delivery.
+  // This is a replaceable balancing value, not a canonical fixed price.
+  BICYCLE_COST: 100,
 } as const
