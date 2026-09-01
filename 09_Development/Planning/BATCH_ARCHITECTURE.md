@@ -2,11 +2,11 @@
 
 Document: BATCH_ARCHITECTURE.md
 Project: DROPi Tycoon
-Version: 1.2.0
+Version: 1.3.0
 Status: Planning — Canonical
 Author: AI Agent (Report 087)
 Language: English
-Last Updated: 2026-08-02
+Last Updated: 2026-09-01
 
 ---
 
@@ -36,8 +36,8 @@ Last Updated: 2026-08-02
 | BATCH-007 | RBATCH-007 | COMPLETED | M-004 / E-008 | 09_Development/Planning/BATCH_ARCHITECTURE.md | 09_Development/Implementation_Preparation/IMPLEMENTATION_BATCH_PLAN.md |
 | BATCH-008 | RBATCH-008 | COMPLETED | M-004 / E-009 | 09_Development/Planning/BATCH_ARCHITECTURE.md | 09_Development/Implementation_Preparation/IMPLEMENTATION_BATCH_PLAN.md |
 | BATCH-009 | RBATCH-009 | COMPLETED — merged in PR #86 and Railway-verified on 2026-08-02 | M-005 / E-010 | 09_Development/Planning/BATCH_ARCHITECTURE.md | 09_Development/Implementation_Preparation/IMPLEMENTATION_BATCH_PLAN.md |
-| BATCH-010 | RBATCH-010 | DRAFT PR OPEN — PENDING INDEPENDENT REVIEW | M-005 / E-011 | 09_Development/Planning/BATCH_ARCHITECTURE.md | 09_Development/Implementation_Preparation/IMPLEMENTATION_BATCH_PLAN.md |
-| BATCH-010b | RBATCH-011 | NEVER STARTED | M-005 / E-012 | 09_Development/Planning/BATCH_ARCHITECTURE.md | 09_Development/Implementation_Preparation/IMPLEMENTATION_BATCH_PLAN.md |
+| BATCH-010 | RBATCH-010 | MERGED — pending Railway/public verification | M-005 / E-011 | 09_Development/Planning/BATCH_ARCHITECTURE.md | 09_Development/Implementation_Preparation/IMPLEMENTATION_BATCH_PLAN.md |
+| BATCH-010b | RBATCH-011 | Draft PR #254 — pending independent review | M-005 / E-012 | 09_Development/Planning/BATCH_ARCHITECTURE.md | 09_Development/Implementation_Preparation/IMPLEMENTATION_BATCH_PLAN.md |
 | BATCH-011 | RBATCH-012 | NEVER STARTED | M-006 / E-013 | 09_Development/Planning/BATCH_ARCHITECTURE.md | 09_Development/Implementation_Preparation/IMPLEMENTATION_BATCH_PLAN.md |
 | BATCH-012 | RBATCH-013 | NEVER STARTED | M-006 / E-014 | 09_Development/Planning/BATCH_ARCHITECTURE.md | 09_Development/Implementation_Preparation/IMPLEMENTATION_BATCH_PLAN.md |
 | BATCH-013 | RBATCH-014 | NEVER STARTED | M-007 / E-015 | 09_Development/Planning/BATCH_ARCHITECTURE.md | 09_Development/Implementation_Preparation/IMPLEMENTATION_BATCH_PLAN.md |
@@ -60,8 +60,8 @@ Legacy numbering is historical only. Execute the mapped `RBATCH-*` identifier; a
 | RBATCH-007 | 1 | M-004 | E-008 | Pickup Proximity Core | COMPLETED | RBATCH-005, RBATCH-006 | BATCH-007 | — |
 | RBATCH-008 | 1 | M-004 | E-009 | Delivery Completion + Failure Path | COMPLETED | RBATCH-007 | BATCH-008 | — |
 | RBATCH-009 | 1 | M-005 | E-010 | Economy Reward & Failure Consequences | COMPLETED — merged in PR #86 and Railway-verified on 2026-08-02 | RBATCH-008 | BATCH-009 | — |
-| RBATCH-010 | 1 | M-005 | E-011 | HUD + Notifications | Draft PR — Pending Independent Review | RBATCH-007, RBATCH-009 | BATCH-010 | — |
-| RBATCH-011 | 1 | M-005 | E-012 | MainMenu Flow | Planned — Not Started | RBATCH-002 | BATCH-010b | — |
+| RBATCH-010 | 1 | M-005 | E-011 | HUD + Notifications | MERGED — pending Railway/public verification | RBATCH-007, RBATCH-009 | BATCH-010 | — |
+| RBATCH-011 | 1 | M-005 | E-012 | MainMenu Flow | Draft PR #254 — pending independent review | RBATCH-002 | BATCH-010b | — |
 | RBATCH-012 | 1 | M-006 | E-013 | CompanyManagement + Upgrade Purchase Flow | Planned — Not Started | RBATCH-009, RBATCH-010 | BATCH-011 | — |
 | RBATCH-013 | 1 | M-006 | E-014 | Bicycle Ownership + Speed Increase | Planned — Not Started | RBATCH-012, RBATCH-006 | BATCH-012 | — |
 | RBATCH-014 | 1 | M-007 | E-015 | Save/Load Implementation | Planned — Blocked | RBATCH-012, RBATCH-013, RBATCH-011 | BATCH-013 | ODR-001, ODR-003 |
