@@ -16,6 +16,7 @@ export interface CameraGestureCallbacks {
   setRotation: (rotation: number) => void
   panByScreenDelta: (dx: number, dy: number) => void
   onManualCameraControl: () => void
+  shouldIgnorePointer?: (point: TouchPoint) => boolean
 }
 
 interface PointerState extends TouchPoint {
@@ -27,11 +28,12 @@ interface PointerState extends TouchPoint {
  *
  * One-pointer drag pans the map once cumulative movement crosses the threshold.
  * Two pointers combine centroid pan + pinch zoom + twist rotation.
- * The controller exposes whether the active pointer sequence moved enough to
- * count as a camera gesture so GameWorld can suppress tap-to-move.
+ * Pointer sequences that begin over fixed screen UI are ignored completely so
+ * UI interaction can never become a world-camera gesture.
  */
 export class CameraGestureController {
   private readonly pointers = new Map<number, PointerState>()
+  private readonly ignoredPointerIds = new Set<number>()
   private readonly canvas: HTMLCanvasElement
   private readonly callbacks: CameraGestureCallbacks
   private previousSinglePoint: TouchPoint | null = null
@@ -42,7 +44,23 @@ export class CameraGestureController {
   private sequenceMoved = false
   private attached = false
 
+  private readonly toCanvasPoint = (event: PointerEvent): TouchPoint => {
+    const rect = this.canvas.getBoundingClientRect()
+    const widthScale = rect.width > 0 ? this.canvas.width / rect.width : 1
+    const heightScale = rect.height > 0 ? this.canvas.height / rect.height : 1
+    return {
+      x: (event.clientX - rect.left) * widthScale,
+      y: (event.clientY - rect.top) * heightScale,
+    }
+  }
+
   private readonly handlePointerDown = (event: PointerEvent): void => {
+    const canvasPoint = this.toCanvasPoint(event)
+    if (this.callbacks.shouldIgnorePointer?.(canvasPoint)) {
+      this.ignoredPointerIds.add(event.pointerId)
+      return
+    }
+
     if (this.pointers.size === 0) {
       this.sequenceMoved = false
       this.singleStartPoint = { x: event.clientX, y: event.clientY }
@@ -64,6 +82,10 @@ export class CameraGestureController {
   }
 
   private readonly handlePointerMove = (event: PointerEvent): void => {
+    if (this.ignoredPointerIds.has(event.pointerId)) {
+      return
+    }
+
     const existing = this.pointers.get(event.pointerId)
     if (!existing) {
       return
@@ -137,6 +159,10 @@ export class CameraGestureController {
   }
 
   private readonly handlePointerUp = (event: PointerEvent): void => {
+    if (this.ignoredPointerIds.delete(event.pointerId)) {
+      return
+    }
+
     this.pointers.delete(event.pointerId)
     try {
       this.canvas.releasePointerCapture(event.pointerId)
@@ -147,6 +173,10 @@ export class CameraGestureController {
   }
 
   private readonly handlePointerCancel = (event: PointerEvent): void => {
+    if (this.ignoredPointerIds.delete(event.pointerId)) {
+      return
+    }
+
     this.pointers.delete(event.pointerId)
     this.sequenceMoved = true
     this.singleStartPoint = null
@@ -180,6 +210,7 @@ export class CameraGestureController {
     this.canvas.removeEventListener('pointerup', this.handlePointerUp)
     this.canvas.removeEventListener('pointercancel', this.handlePointerCancel)
     this.pointers.clear()
+    this.ignoredPointerIds.clear()
     this.previousSinglePoint = null
     this.singleStartPoint = null
     this.previousCentroid = null
