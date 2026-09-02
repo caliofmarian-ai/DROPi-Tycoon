@@ -73,3 +73,14 @@ Automated evidence does not replace physical-device observation.
 ## Roadmap dependency
 
 Canonical `MILESTONE_ARCHITECTURE.md` defines M-009 — Employee & Financial Systems as depending on M-008. Therefore RBATCH-018 and later Phase 2 execution must not begin while this final M-008 owner gate remains HOLD.
+
+
+---
+
+## Final owner progression sign-off — 2026-09-02
+
+**FINAL OWNER PROGRESSION SIGN-OFF — RECORDED 2026-09-02**
+
+Following PR #282 and the Railway redeploy, the Project Owner confirmed the corrected Android build works and requested that development move on to the evolution of the game. This supersedes the earlier HOLD state for M-008 progression purposes.
+
+M-009 / RBATCH-018 may now be activated. This is acceptance of Prototype v0.1 as a Phase-2 foundation, not acceptance of the prototype graphics as final product quality.

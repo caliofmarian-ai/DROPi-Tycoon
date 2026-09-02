@@ -811,3 +811,10 @@ The changelog represents the history of DROPi Tycoon development and protects th
 ---
 
 End of Document
+
+## 2026-09-02 — M-008 owner progression sign-off / M-009 activation
+
+- Owner confirmed the corrected Android/Railway build works after PR #282.
+- Prototype v0.1 accepted as the Phase-2 foundation; current temporary graphics remain below the final quality target.
+- M-009 activated and RBATCH-018 / E-018 / ISSUE-024 / ISSUE-026 / ISSUE-032 prepared for execution.
+- No unobserved historical manual verification is fabricated; residual regression debt remains non-blocking.

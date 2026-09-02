@@ -36,9 +36,9 @@ Last Updated: 2026-09-01
 | E-013 | 1 | M-006 | Company Management Scene | MERGED in PR #256 — pending Railway/public verification | RBATCH-012 | E-010, E-011 |
 | E-014 | 1 | M-006 | Bicycle Ownership System | MERGED in PR #257 — pending Railway/public verification | RBATCH-013 | E-013, E-006 |
 | E-015 | 1 | M-007 | Save & Load System | MERGED in PR #259 — pending Railway/public verification | RBATCH-014 | E-013, E-014, E-012 |
-| E-016 | 1 | M-008 | Mobile Optimization | MERGED in PR #263 — pending Railway/public mobile verification | RBATCH-015 | E-015 |
-| E-017 | 1 | M-008 | Full-Loop Integration Verification | COMPLETED — RBATCH-016 and RBATCH-017 merged and validated; M-008 final owner release sign-off pending | RBATCH-016, RBATCH-017 | E-016 |
-| E-018 | 2 | M-009 | Employee Management System | Planned — Future | RBATCH-018 | E-017 |
+| E-016 | 1 | M-008 | Mobile Optimization | COMPLETED — merged PR #263; Android/public acceptance recorded 2026-09-02 | RBATCH-015 | E-015 |
+| E-017 | 1 | M-008 | Full-Loop Integration Verification | COMPLETED — RBATCH-016/RBATCH-017 merged; final owner progression sign-off recorded 2026-09-02 | RBATCH-016, RBATCH-017 | E-016 |
+| E-018 | 2 | M-009 | Employee Management System | READY — M-009 activated by owner progression authorization 2026-09-02 | RBATCH-018 | E-017 |
 | E-019 | 2 | M-009 | Financial Reporting & Daily Costs | Planned — Future | RBATCH-019 | E-018 |
 | E-020 | 2 | M-009 | Customer Review & Reputation System | Planned — Future | RBATCH-020, RBATCH-021 | E-010 |
 | E-021 | 2 | M-010 | Vehicle Fleet Management | Planned — Future | RBATCH-022, RBATCH-023, RBATCH-024 | E-018, E-019, E-020 |
