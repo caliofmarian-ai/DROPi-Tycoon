@@ -42,10 +42,11 @@ import {
   type TouchPoint,
 } from '../ui/cameraControls'
 import { boundsContainPoint, type RectBounds } from '../ui/hudLayout'
+import { type LayoutRect } from '../ui/mobileViewport'
 import {
-  buildNavigationButtonBounds,
-  type LayoutRect,
-} from '../ui/mobileViewport'
+  buildGameWorldTopBarLayout,
+  GAMEWORLD_TOP_BAR_VISUAL_BUTTON_PX,
+} from '../ui/gameWorldTopBar'
 import { selectDeliveryIntentFromTap } from '../utils/deliveryIntent'
 
 const DELIVERY_MARKER_TAP_RADIUS = 36
@@ -75,7 +76,13 @@ export class GameWorldScene extends Phaser.Scene {
   private notificationState!: NotificationState
 
   private readonly menuButtons: Phaser.GameObjects.Rectangle[] = []
+  private readonly menuDropdownButtons: Phaser.GameObjects.Rectangle[] = []
+  private readonly menuDropdownLabels: Phaser.GameObjects.Text[] = []
+  private readonly menuDropdownBounds: RectBounds[] = []
   private readonly menuButtonBounds: RectBounds[] = []
+  private menuToggleBounds: RectBounds | null = null
+  private topControlBarBounds: RectBounds | null = null
+  private navigationMenuOpen = false
   private readonly cameraControlButtons: Phaser.GameObjects.Rectangle[] = []
   private readonly cameraControlBounds: RectBounds[] = []
   private cameraGestureController: CameraGestureController | null = null
@@ -168,7 +175,13 @@ export class GameWorldScene extends Phaser.Scene {
         return
       }
 
+      if (this.navigationMenuOpen && !this.isPointOnNavigationMenu(pointer.x, pointer.y)) {
+        this.setNavigationMenuOpen(false)
+        return
+      }
+
       const fixedHudBounds = [
+        ...(this.topControlBarBounds ? [this.topControlBarBounds] : []),
         ...this.gameHUD.getScreenBlockingBounds(),
         ...(this.notificationDisplay.isVisible()
           ? [this.notificationDisplay.getScreenBounds()]
@@ -468,36 +481,48 @@ export class GameWorldScene extends Phaser.Scene {
   }
 
   private createNavigationButtons(): void {
-    const bounds = buildNavigationButtonBounds(this.scale.width, this.scale.height)
-    this.createMenuButton(bounds[0], 'Main Menu', () => this.openMainMenu())
-    this.createMenuButton(bounds[1], 'Company', () => this.openCompanyManagement())
+    const layout = buildGameWorldTopBarLayout(this.scale.width, this.scale.height)
+    this.topControlBarBounds = { ...layout.controlBar }
+
+    const controlBarBg = this.add
+      .rectangle(
+        rectCenterX(layout.controlBar),
+        rectCenterY(layout.controlBar),
+        layout.controlBar.width,
+        layout.controlBar.height,
+        0x0f172a,
+        0.78,
+      )
+      .setScrollFactor(0)
+      .setDepth(18)
+    this.fixedUiLayer.add(controlBarBg)
+
+    const menuToggle = this.createTopIconButton(layout.menuToggle, '☰', () => {
+      this.setNavigationMenuOpen(!this.navigationMenuOpen)
+    })
+    this.menuButtons.push(menuToggle)
+    this.menuToggleBounds = { ...layout.menuToggle }
+
+    const dropdownActions: ReadonlyArray<readonly [LayoutRect, string, () => void]> = [
+      [layout.dropdownItems[0], 'Main Menu', () => this.openMainMenu()],
+      [layout.dropdownItems[1], 'Company', () => this.openCompanyManagement()],
+    ]
+
+    dropdownActions.forEach(([bounds, label, onTap]) => {
+      const created = this.createMenuButton(bounds, label, onTap)
+      this.menuButtons.push(created.button)
+      this.menuDropdownButtons.push(created.button)
+      this.menuDropdownLabels.push(created.label)
+      this.menuDropdownBounds.push({ ...bounds })
+    })
+
+    this.setNavigationMenuOpen(false)
   }
 
   private createCameraControlButtons(): void {
     const controls = buildCameraControlButtons(this.scale.width, this.scale.height)
     controls.forEach(({ action, label, bounds }) => {
-      const x = rectCenterX(bounds)
-      const y = rectCenterY(bounds)
-      const button = this.add
-        .rectangle(x, y, bounds.width, bounds.height, 0x0f172a, 0.88)
-        .setStrokeStyle(2, 0xe2e8f0)
-        .setScrollFactor(0)
-        .setDepth(30)
-        .setInteractive({ useHandCursor: true })
-
-      const labelText = this.add
-        .text(x, y, label, {
-          fontFamily: 'Arial',
-          fontSize: '27px',
-          color: '#f8fafc',
-          fontStyle: 'bold',
-        })
-        .setOrigin(0.5)
-        .setScrollFactor(0)
-        .setDepth(31)
-
-      this.fixedUiLayer.add([button, labelText])
-      button.on('pointerdown', () => this.applyCameraControl(action))
+      const button = this.createTopIconButton(bounds, label, () => this.applyCameraControl(action))
       this.cameraControlButtons.push(button)
       this.cameraControlBounds.push({ ...bounds })
     })
@@ -552,6 +577,7 @@ export class GameWorldScene extends Phaser.Scene {
 
   private isPointOnFixedScreenUI(x: number, y: number): boolean {
     const bounds = [
+      ...(this.topControlBarBounds ? [this.topControlBarBounds] : []),
       ...this.menuButtonBounds,
       ...this.cameraControlBounds,
       ...this.gameHUD.getScreenBlockingBounds(),
@@ -560,6 +586,31 @@ export class GameWorldScene extends Phaser.Scene {
         : []),
     ]
     return bounds.some((rect) => boundsContainPoint(rect, x, y))
+  }
+
+  private isPointOnNavigationMenu(x: number, y: number): boolean {
+    return this.menuButtonBounds.some((rect) => boundsContainPoint(rect, x, y))
+  }
+
+  private setNavigationMenuOpen(open: boolean): void {
+    this.navigationMenuOpen = open
+    this.menuDropdownButtons.forEach((button) => {
+      button.setVisible(open)
+      if (open) {
+        button.setInteractive({ useHandCursor: true })
+      } else {
+        button.disableInteractive()
+      }
+    })
+    this.menuDropdownLabels.forEach((label) => label.setVisible(open))
+
+    this.menuButtonBounds.length = 0
+    if (this.menuToggleBounds) {
+      this.menuButtonBounds.push({ ...this.menuToggleBounds })
+    }
+    if (open) {
+      this.menuButtonBounds.push(...this.menuDropdownBounds.map((bounds) => ({ ...bounds })))
+    }
   }
 
   private setCameraZoom(zoom: number, focalPoint: TouchPoint): void {
@@ -595,34 +646,76 @@ export class GameWorldScene extends Phaser.Scene {
     replaceGameSession(this.worldState, this.companyState)
   }
 
-  private createMenuButton(bounds: LayoutRect, label: string, onTap: () => void): void {
+  private createTopIconButton(
+    bounds: LayoutRect,
+    label: string,
+    onTap: () => void,
+  ): Phaser.GameObjects.Rectangle {
     const x = rectCenterX(bounds)
     const y = rectCenterY(bounds)
-    const fontSize = bounds.height <= 50 ? 17 : 20
-    const button = this.add
-      .rectangle(x, y, bounds.width, bounds.height, 0x1d4ed8, 0.95)
-      .setStrokeStyle(2, 0xbfdbfe)
+    const visualSize = Math.min(
+      GAMEWORLD_TOP_BAR_VISUAL_BUTTON_PX,
+      bounds.width - 4,
+      bounds.height - 4,
+    )
+
+    const hitButton = this.add
+      .rectangle(x, y, bounds.width, bounds.height, 0x0f172a, 0.001)
       .setScrollFactor(0)
-      .setDepth(20)
+      .setDepth(29)
+      .setInteractive({ useHandCursor: true })
+
+    const visualButton = this.add
+      .rectangle(x, y, visualSize, visualSize, 0x1e293b, 0.96)
+      .setStrokeStyle(1, 0x94a3b8, 0.85)
+      .setScrollFactor(0)
+      .setDepth(30)
+
+    const labelText = this.add
+      .text(x, y, label, {
+        fontFamily: 'Arial',
+        fontSize: label === '☰' ? '19px' : '18px',
+        color: '#f8fafc',
+        fontStyle: 'bold',
+      })
+      .setOrigin(0.5)
+      .setScrollFactor(0)
+      .setDepth(31)
+
+    this.fixedUiLayer.add([hitButton, visualButton, labelText])
+    hitButton.on('pointerdown', onTap)
+    return hitButton
+  }
+
+  private createMenuButton(
+    bounds: LayoutRect,
+    label: string,
+    onTap: () => void,
+  ): { button: Phaser.GameObjects.Rectangle; label: Phaser.GameObjects.Text } {
+    const x = rectCenterX(bounds)
+    const y = rectCenterY(bounds)
+    const button = this.add
+      .rectangle(x, y, bounds.width, bounds.height, 0x1e293b, 0.97)
+      .setStrokeStyle(1, 0x94a3b8, 0.9)
+      .setScrollFactor(0)
+      .setDepth(40)
       .setInteractive({ useHandCursor: true })
 
     const labelText = this.add
       .text(x, y, label, {
         fontFamily: 'Arial',
-        fontSize: `${fontSize}px`,
-        color: '#eff6ff',
+        fontSize: '15px',
+        color: '#f8fafc',
         fontStyle: 'bold',
         align: 'center',
-        wordWrap: { width: Math.max(80, bounds.width - 10) },
       })
       .setOrigin(0.5)
       .setScrollFactor(0)
-      .setDepth(21)
+      .setDepth(41)
 
     this.fixedUiLayer.add([button, labelText])
     button.on('pointerdown', onTap)
-    this.menuButtons.push(button)
-    this.menuButtonBounds.push({ ...bounds })
+    return { button, label: labelText }
   }
 
   private handleSceneShutdown(): void {
@@ -635,7 +728,13 @@ export class GameWorldScene extends Phaser.Scene {
     this.scale.off(Phaser.Scale.Events.RESIZE, this.handleResize)
     this.notificationDisplay.destroy()
     this.menuButtons.length = 0
+    this.menuDropdownButtons.length = 0
+    this.menuDropdownLabels.length = 0
+    this.menuDropdownBounds.length = 0
     this.menuButtonBounds.length = 0
+    this.menuToggleBounds = null
+    this.topControlBarBounds = null
+    this.navigationMenuOpen = false
     this.cameraControlButtons.length = 0
     this.cameraControlBounds.length = 0
   }
