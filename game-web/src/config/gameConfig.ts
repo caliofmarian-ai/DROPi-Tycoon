@@ -1,6 +1,7 @@
 import Phaser from 'phaser'
 import { appConfig } from './env'
 import { CompanyManagementScene } from '../scenes/CompanyManagementScene'
+import { EmployeeManagementScene } from '../scenes/EmployeeManagementScene'
 import { GameWorldScene } from '../scenes/GameWorldScene'
 import { MainMenuScene } from '../scenes/MainMenuScene'
 
@@ -19,5 +20,5 @@ export const createGameConfig = (parent: string): Phaser.Types.Core.GameConfig =
   input: {
     activePointers: 3,
   },
-  scene: [MainMenuScene, GameWorldScene, CompanyManagementScene],
+  scene: [MainMenuScene, GameWorldScene, CompanyManagementScene, EmployeeManagementScene],
 })

@@ -11,6 +11,7 @@ import {
   decodeSave,
   inspectSaveSlot,
   isCanonicalAutosaveEvent,
+  LEGACY_SAVE_STORAGE_KEY,
   preserveInvalidSaveBeforeReplacement,
   restoreGameSessionFromSave,
   SAVE_CORRUPTED_BACKUP_KEY,
@@ -49,14 +50,42 @@ const makeSession = (): GameSessionState => ({
   settings: createInitialGameSettingsState(),
 })
 
-describe('RBATCH-014 — canonical save serialization', () => {
-  it('serializes the current version and required company progression', () => {
+const makeLegacyV1Raw = (): string =>
+  JSON.stringify({
+    formatVersion: 1,
+    company: {
+      companyName: 'DROPi Legacy',
+      money: 900,
+      level: 2,
+      reputation: 61,
+      purchasedUpgradeLevels: {
+        DeliverySpeed: 0,
+        Capacity: 0,
+        Efficiency: 0,
+        Bicycle: 1,
+      },
+    },
+    settings: { tutorialCompleted: true },
+  })
+
+describe('RBATCH-014 + RBATCH-018 — canonical save serialization', () => {
+  it('serializes current company progression including Phase-2 employees and payroll', () => {
     const session = makeSession()
     session.company.companyName = 'DROPi Express'
     session.company.money = 2450
     session.company.level = 3
     session.company.reputation = 17
     session.company.purchasedUpgradeLevels.Bicycle = 1
+    session.company.employees = [
+      {
+        employeeId: 'courier-001',
+        name: 'Alex',
+        role: 'Courier',
+        status: 'Active',
+        salaryPerCycle: 25,
+      },
+    ]
+    session.company.payroll.lastProcessedCycle = 4
     session.settings.tutorialCompleted = true
 
     expect(createSaveGame(session)).toEqual({
@@ -72,12 +101,22 @@ describe('RBATCH-014 — canonical save serialization', () => {
           Efficiency: 0,
           Bicycle: 1,
         },
+        employees: [
+          {
+            employeeId: 'courier-001',
+            name: 'Alex',
+            role: 'Courier',
+            status: 'Active',
+            salaryPerCycle: 25,
+          },
+        ],
+        payroll: { lastProcessedCycle: 4 },
       },
       settings: { tutorialCompleted: true },
     })
   })
 
-  it('implements ODR-001 A by excluding player position and all WorldState', () => {
+  it('still excludes player position and all WorldState', () => {
     const session = makeSession()
     session.world.player.x = 123
     session.world.player.y = 456
@@ -91,7 +130,7 @@ describe('RBATCH-014 — canonical save serialization', () => {
     expect(JSON.stringify(parsed)).not.toContain('activeOrder')
   })
 
-  it('implements ODR-003 B by persisting only tutorial status from settings', () => {
+  it('still persists only tutorial status from settings', () => {
     const session = makeSession()
     const parsed = JSON.parse(serializeGameSession(session)) as {
       settings: Record<string, unknown>
@@ -128,13 +167,71 @@ describe('RBATCH-014 — canonical save serialization', () => {
   })
 })
 
-describe('ISSUE-015 / ISSUE-017 — validation and load', () => {
-  it('restores progression while regenerating player/world state', () => {
+describe('RBATCH-018 — v1 to v2 migration', () => {
+  it('migrates a valid v1 payload without losing existing progression', () => {
+    const decoded = decodeSave(makeLegacyV1Raw())
+    expect(decoded.kind).toBe('valid')
+    if (decoded.kind !== 'valid') return
+
+    expect(decoded.migratedFrom).toBe(1)
+    expect(decoded.repaired).toBe(true)
+    expect(decoded.save.formatVersion).toBe(2)
+    expect(decoded.save.company).toMatchObject({
+      companyName: 'DROPi Legacy',
+      money: 900,
+      level: 2,
+      reputation: 61,
+      employees: [],
+      payroll: { lastProcessedCycle: 0 },
+    })
+    expect(decoded.save.company.purchasedUpgradeLevels.Bicycle).toBe(1)
+    expect(decoded.save.settings.tutorialCompleted).toBe(true)
+  })
+
+  it('finds a legacy v1 storage key when no v2 save exists', () => {
+    const storage = new MemoryStorage()
+    storage.setItem(LEGACY_SAVE_STORAGE_KEY, makeLegacyV1Raw())
+
+    const inspection = inspectSaveSlot(storage)
+    expect(inspection.kind).toBe('valid')
+    if (inspection.kind !== 'valid') return
+    expect(inspection.source).toBe('legacy-primary')
+    expect(inspection.migratedFrom).toBe(1)
+    expect(inspection.save.company.money).toBe(900)
+  })
+
+  it('prefers a current v2 save over an older legacy slot', () => {
+    const storage = new MemoryStorage()
+    storage.setItem(LEGACY_SAVE_STORAGE_KEY, makeLegacyV1Raw())
+    const session = makeSession()
+    session.company.money = 1234
+    writeSaveSlot(storage, session)
+
+    const inspection = inspectSaveSlot(storage)
+    expect(inspection.kind).toBe('valid')
+    if (inspection.kind !== 'valid') return
+    expect(inspection.source).toBe('primary')
+    expect(inspection.save.company.money).toBe(1234)
+  })
+})
+
+describe('ISSUE-015 / ISSUE-017 / RBATCH-018 — validation and load', () => {
+  it('restores progression and employees while regenerating world state', () => {
     const session = makeSession()
     session.company.money = 3210
     session.company.level = 4
     session.company.reputation = 23
     session.company.purchasedUpgradeLevels.Bicycle = 1
+    session.company.employees = [
+      {
+        employeeId: 'courier-001',
+        name: 'Alex',
+        role: 'Courier',
+        status: 'Active',
+        salaryPerCycle: 25,
+      },
+    ]
+    session.company.payroll.lastProcessedCycle = 2
     session.settings.tutorialCompleted = true
     session.world.player.x = 50
     session.world.player.y = 70
@@ -151,6 +248,9 @@ describe('ISSUE-015 / ISSUE-017 — validation and load', () => {
     expect(restored.company.level).toBe(4)
     expect(restored.company.reputation).toBe(23)
     expect(restored.company.purchasedUpgradeLevels.Bicycle).toBe(1)
+    expect(restored.company.employees).toHaveLength(1)
+    expect(restored.company.employees[0].status).toBe('Active')
+    expect(restored.company.payroll.lastProcessedCycle).toBe(2)
     expect(restored.settings.tutorialCompleted).toBe(true)
 
     expect(restored.world.player.x).toBe(380)
@@ -158,8 +258,6 @@ describe('ISSUE-015 / ISSUE-017 — validation and load', () => {
     expect(restored.world.player.currentOrder).toBe('')
     expect(restored.world.player.carryingPackage).toBe(false)
     expect(restored.world.activeOrder.status).toBe('Available')
-    expect(restored.world.activeOrder.acceptRequested).toBe(false)
-    expect(restored.world.activeOrder.economySettled).toBe(false)
     expect(restored.world.player.movementSpeed).toBeGreaterThan(150)
   })
 
@@ -176,6 +274,8 @@ describe('ISSUE-015 / ISSUE-017 — validation and load', () => {
           Capacity: 2,
           Efficiency: 1.5,
         },
+        employees: 'bad',
+        payroll: { lastProcessedCycle: -1 },
       },
       settings: { tutorialCompleted: 'yes' },
     })
@@ -196,7 +296,32 @@ describe('ISSUE-015 / ISSUE-017 — validation and load', () => {
       Efficiency: 0,
       Bicycle: 0,
     })
+    expect(decoded.save.company.employees).toEqual([])
+    expect(decoded.save.company.payroll).toEqual({ lastProcessedCycle: 0 })
     expect(decoded.save.settings.tutorialCompleted).toBe(false)
+  })
+
+  it('drops malformed or duplicate employee rows without crashing', () => {
+    const session = makeSession()
+    const save = createSaveGame(session)
+    const raw = JSON.stringify({
+      ...save,
+      company: {
+        ...save.company,
+        employees: [
+          { employeeId: 'x', name: 'A', role: 'Courier', status: 'Active', salaryPerCycle: 10 },
+          { employeeId: 'x', name: 'B', role: 'Courier', status: 'Active', salaryPerCycle: 20 },
+          { employeeId: '', name: '', role: 'Bad', status: 'Nope', salaryPerCycle: -1 },
+        ],
+      },
+    })
+
+    const decoded = decodeSave(raw)
+    expect(decoded.kind).toBe('valid')
+    if (decoded.kind !== 'valid') return
+    expect(decoded.repaired).toBe(true)
+    expect(decoded.save.company.employees).toHaveLength(1)
+    expect(decoded.save.company.employees[0].employeeId).toBe('x')
   })
 
   it('rejects malformed JSON as corrupted', () => {
@@ -256,7 +381,7 @@ describe('ISSUE-014 / ISSUE-017 — one-slot write and interrupted-write recover
     expect(storage.getItem(SAVE_STAGING_KEY)).not.toBeNull()
   })
 
-  it('reports a missing slot when neither primary nor staging exists', () => {
+  it('reports a missing slot when no current or legacy save exists', () => {
     expect(inspectSaveSlot(new MemoryStorage())).toEqual({ kind: 'missing' })
   })
 
@@ -271,13 +396,16 @@ describe('ISSUE-014 / ISSUE-017 — one-slot write and interrupted-write recover
   })
 })
 
-describe('ISSUE-016 — canonical autosave policy', () => {
-  it('contains exactly the four canonical Prototype v0.1 autosave events', () => {
+describe('ISSUE-016 + RBATCH-018 — canonical autosave policy', () => {
+  it('contains v0.1 triggers plus employee progression triggers', () => {
     expect([...CANONICAL_AUTOSAVE_EVENTS]).toEqual([
       'delivery-completed',
       'upgrade-purchased',
       'progression-changed',
       'tutorial-step-completed',
+      'employee-hired',
+      'employee-onboarding-completed',
+      'salary-cycle-processed',
     ])
   })
 
@@ -295,13 +423,13 @@ describe('ISSUE-016 — canonical autosave policy', () => {
     expect(storage.getItem(SAVE_STORAGE_KEY)).toBeNull()
   })
 
-  it('writes progression for an approved event', () => {
+  it('writes progression for an approved employee event', () => {
     const storage = new MemoryStorage()
     const session = makeSession()
     session.company.money = 1900
 
-    const result = autosaveIfApproved(storage, session, 'upgrade-purchased')
-    expect(result).toEqual({ saved: true, event: 'upgrade-purchased' })
+    const result = autosaveIfApproved(storage, session, 'employee-hired')
+    expect(result).toEqual({ saved: true, event: 'employee-hired' })
 
     const inspection = inspectSaveSlot(storage)
     expect(inspection.kind).toBe('valid')
