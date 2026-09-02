@@ -1,0 +1,65 @@
+name: M-009 Activation Reconciliation
+
+on:
+  push:
+    branches:
+      - openai/m008-release-m009-activation
+    paths:
+      - scripts/m009_activation_patch.py
+      - .github/workflows/m009-activation-patch.yml
+
+permissions:
+  contents: write
+
+jobs:
+  reconcile:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: openai/m008-release-m009-activation
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install YAML validator
+        run: python -m pip install --quiet pyyaml
+      - name: Apply canonical transition
+        run: python scripts/m009_activation_patch.py
+      - name: Validate planning and release markers
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          from pathlib import Path
+          import yaml
+
+          data = yaml.safe_load(Path('09_Development/Planning/github_creation_plan.yaml').read_text(encoding='utf-8'))
+          milestones = {x['id']: x for x in data['milestones']}
+          batches = {x['id']: x for x in data['batches']}
+          epics = {x['id']: x for x in data['epics']}
+          issues = {x['id']: x for x in data['issues']}
+
+          assert milestones['M-008']['status'].startswith('COMPLETED')
+          assert milestones['M-009']['status'] == 'In Progress'
+          assert batches['RBATCH-018']['status'].startswith('READY FOR IMPLEMENTATION')
+          assert epics['E-018']['status'].startswith('READY')
+          for issue_id in ('ISSUE-024', 'ISSUE-026', 'ISSUE-032'):
+              assert issues[issue_id]['status'].startswith('READY')
+              assert 'status:ready' in issues[issue_id]['label_names']
+
+          assert 'FINAL OWNER SIGN-OFF RECORDED — PHASE-2 PROGRESSION AUTHORIZED' in Path('09_Development/PROTOTYPE_RELEASE_CHECKLIST.md').read_text(encoding='utf-8')
+          assert 'FINAL OWNER PROGRESSION SIGN-OFF — RECORDED 2026-09-02' in Path('09_Development/Release_Evidence/PROTOTYPE_V0.1_OWNER_REVIEW_PACKAGE.md').read_text(encoding='utf-8')
+          assert Path('09_Development/AI_Reports/2026-09-02_099_M008_OWNER_SIGNOFF_M009_ACTIVATION.md').is_file()
+          print('M-009 activation reconciliation: PASS')
+          PY
+          git -c core.whitespace=cr-at-eol diff --check
+      - name: Commit reconciled canonical state
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add .github/workflows/rbatch-010-ci.yml 00_Project/PROJECT_STATUS.md 09_Development scripts/m009_activation_patch.py
+          git reset scripts/m009_activation_patch.py
+          git diff --cached --quiet && { echo 'No canonical changes to commit'; exit 1; }
+          git commit -m "[Planning] Record M-008 owner sign-off and activate M-009"
+          git push origin HEAD:openai/m008-release-m009-activation
