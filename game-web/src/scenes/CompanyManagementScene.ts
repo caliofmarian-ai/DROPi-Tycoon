@@ -154,6 +154,12 @@ export class CompanyManagementScene extends Phaser.Scene {
       })
       .setOrigin(0.5)
 
+    const employeeButtonBounds: LayoutRect = {
+      ...layout.returnButton,
+      top: Math.max(8, layout.returnButton.top - layout.returnButton.height - 10),
+    }
+
+    this.createButton(employeeButtonBounds, 'Employees', () => this.openEmployeeManagement(), layout.navFontSize)
     this.createButton(layout.returnButton, 'Return to Game World', () => this.returnToGameWorld(), layout.navFontSize)
     this.createButton(layout.menuButton, 'Main Menu', () => this.returnToMainMenu(), layout.navFontSize)
 
@@ -185,9 +191,11 @@ export class CompanyManagementScene extends Phaser.Scene {
   }
 
   private refreshView(): void {
+    const activeEmployees = this.companyState.employees.filter((employee) => employee.status === 'Active').length
     this.companyInfoText.setText([
       this.companyState.companyName,
       `Money: ${this.companyState.money}   Level: ${this.companyState.level}   Reputation: ${this.companyState.reputation}`,
+      `Employees: ${this.companyState.employees.length} (${activeEmployees} active)`,
     ])
 
     const currentLevel = this.companyState.purchasedUpgradeLevels[this.selectedUpgrade.id]
@@ -204,6 +212,11 @@ export class CompanyManagementScene extends Phaser.Scene {
     } else {
       this.purchaseButton.setInteractive({ useHandCursor: true }).setAlpha(1)
     }
+  }
+
+  private openEmployeeManagement(): void {
+    replaceGameSession(this.worldState, this.companyState)
+    this.scene.start('EmployeeManagement')
   }
 
   private returnToGameWorld(): void {

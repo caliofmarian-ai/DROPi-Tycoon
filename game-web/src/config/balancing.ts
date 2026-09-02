@@ -1,8 +1,8 @@
 /**
- * Canonical prototype v0.1 balancing values.
- * Owner-approved RBATCH-009 values remain unchanged.
- * Upgrade costs and movement values introduced later are replaceable
- * implementation details centralized here rather than embedded in scenes.
+ * Canonical prototype v0.1 balancing values plus replaceable Phase-2
+ * implementation values. Numeric values introduced by runtime batches remain
+ * centralized here and are not promoted to permanent game-design canon unless
+ * explicitly approved later.
  */
 export const BALANCING = {
   INITIAL_COMPANY_NAME: 'DROPi Local',
@@ -19,11 +19,15 @@ export const BALANCING = {
   WALKING_MOVEMENT_SPEED: 150,
 
   // RBATCH-013 implementation balancing: clearly faster than walking while
-  // remaining a replaceable prototype value. Canon requires an increase but
-  // does not prescribe an exact numeric Bicycle speed.
+  // remaining a replaceable prototype value.
   BICYCLE_MOVEMENT_SPEED: 225,
 
   // Reachable after the current prototype's first successful delivery.
-  // This is a replaceable balancing value, not a canonical fixed price.
   BICYCLE_COST: 100,
+
+  // RBATCH-018 implementation balancing. Hiring intentionally competes with
+  // an early vehicle purchase so company growth begins to require choices.
+  // These are tuning values, not permanent canonical prices.
+  FIRST_COURIER_HIRE_COST: 100,
+  FIRST_COURIER_SALARY_PER_CYCLE: 25,
 } as const

@@ -19,6 +19,25 @@ export const UPGRADE_IDS = [
 export type UpgradeId = (typeof UPGRADE_IDS)[number]
 export type PurchasedUpgradeLevels = Record<UpgradeId, number>
 
+export const EMPLOYEE_ROLES = ['Courier'] as const
+export type EmployeeRole = (typeof EMPLOYEE_ROLES)[number]
+
+export const EMPLOYMENT_STATUSES = ['Onboarding', 'Active'] as const
+export type EmploymentStatus = (typeof EMPLOYMENT_STATUSES)[number]
+
+export interface EmployeeState {
+  employeeId: string
+  name: string
+  role: EmployeeRole
+  status: EmploymentStatus
+  salaryPerCycle: number
+}
+
+export interface PayrollState {
+  /** Last salary cycle that completed successfully. Zero means none yet. */
+  lastProcessedCycle: number
+}
+
 export interface OrderState {
   orderId: string
   pickupLocation: string
@@ -35,6 +54,8 @@ export interface CompanyState {
   level: number
   reputation: number
   purchasedUpgradeLevels: PurchasedUpgradeLevels
+  employees: EmployeeState[]
+  payroll: PayrollState
 }
 
 export interface GameSettingsState {

@@ -5,23 +5,36 @@ import {
 } from '../state/gameState'
 import { synchronizePlayerMovementSpeed } from '../systems/bicycleSystem'
 import {
+  EMPLOYEE_ROLES,
+  EMPLOYMENT_STATUSES,
   UPGRADE_IDS,
   type CompanyState,
+  type EmployeeRole,
+  type EmployeeState,
+  type EmploymentStatus,
   type GameSessionState,
   type GameSettingsState,
+  type PayrollState,
   type PurchasedUpgradeLevels,
 } from '../types/game'
 
-export const SAVE_FORMAT_VERSION = 1 as const
-export const SAVE_STORAGE_KEY = 'dropi.tycoon.save.v1'
-export const SAVE_STAGING_KEY = 'dropi.tycoon.save.staging.v1'
-export const SAVE_CORRUPTED_BACKUP_KEY = 'dropi.tycoon.save.corrupted-backup.v1'
+export const SAVE_FORMAT_VERSION = 2 as const
+export const SAVE_STORAGE_KEY = 'dropi.tycoon.save.v2'
+export const SAVE_STAGING_KEY = 'dropi.tycoon.save.staging.v2'
+export const SAVE_CORRUPTED_BACKUP_KEY = 'dropi.tycoon.save.corrupted-backup.v2'
+
+export const LEGACY_SAVE_FORMAT_VERSION = 1 as const
+export const LEGACY_SAVE_STORAGE_KEY = 'dropi.tycoon.save.v1'
+export const LEGACY_SAVE_STAGING_KEY = 'dropi.tycoon.save.staging.v1'
 
 export const CANONICAL_AUTOSAVE_EVENTS = [
   'delivery-completed',
   'upgrade-purchased',
   'progression-changed',
   'tutorial-step-completed',
+  'employee-hired',
+  'employee-onboarding-completed',
+  'salary-cycle-processed',
 ] as const
 
 export type CanonicalAutosaveEvent = (typeof CANONICAL_AUTOSAVE_EVENTS)[number]
@@ -32,14 +45,14 @@ export interface SaveStorage {
   removeItem(key: string): void
 }
 
-export interface SaveGameV1 {
+export interface SaveGameV2 {
   formatVersion: typeof SAVE_FORMAT_VERSION
   company: CompanyState
   settings: GameSettingsState
 }
 
 export type SaveDecodeResult =
-  | { kind: 'valid'; save: SaveGameV1; repaired: boolean }
+  | { kind: 'valid'; save: SaveGameV2; repaired: boolean; migratedFrom?: 1 }
   | { kind: 'corrupted'; reason: string; raw: string }
   | { kind: 'incompatible'; reason: string; raw: string; foundVersion: unknown }
 
@@ -48,9 +61,10 @@ export type SaveSlotInspection =
   | { kind: 'unavailable'; reason: string }
   | {
       kind: 'valid'
-      save: SaveGameV1
+      save: SaveGameV2
       repaired: boolean
-      source: 'primary' | 'staging'
+      migratedFrom?: 1
+      source: 'primary' | 'staging' | 'legacy-primary' | 'legacy-staging'
     }
   | { kind: 'corrupted'; reason: string; raw: string }
   | { kind: 'incompatible'; reason: string; raw: string; foundVersion: unknown }
@@ -69,8 +83,89 @@ const isRecord = (value: unknown): value is Record<string, unknown> =>
 const normalizeError = (error: unknown): string =>
   error instanceof Error ? error.message : String(error)
 
+const isEmployeeRole = (value: unknown): value is EmployeeRole =>
+  typeof value === 'string' && EMPLOYEE_ROLES.some((role) => role === value)
+
+const isEmploymentStatus = (value: unknown): value is EmploymentStatus =>
+  typeof value === 'string' && EMPLOYMENT_STATUSES.some((status) => status === value)
+
+const sanitizeEmployees = (
+  value: unknown,
+): { employees: EmployeeState[]; repaired: boolean } => {
+  if (!Array.isArray(value)) {
+    return { employees: [], repaired: true }
+  }
+
+  let repaired = false
+  const employees: EmployeeState[] = []
+  const seenIds = new Set<string>()
+
+  value.forEach((entry) => {
+    if (!isRecord(entry)) {
+      repaired = true
+      return
+    }
+
+    const employeeId =
+      typeof entry.employeeId === 'string' && entry.employeeId.trim().length > 0
+        ? entry.employeeId.trim()
+        : null
+    const name =
+      typeof entry.name === 'string' && entry.name.trim().length > 0
+        ? entry.name.trim()
+        : null
+    const role = isEmployeeRole(entry.role) ? entry.role : null
+    const status = isEmploymentStatus(entry.status) ? entry.status : null
+    const salaryPerCycle =
+      typeof entry.salaryPerCycle === 'number' &&
+      Number.isSafeInteger(entry.salaryPerCycle) &&
+      entry.salaryPerCycle >= 0
+        ? entry.salaryPerCycle
+        : null
+
+    if (
+      employeeId === null ||
+      name === null ||
+      role === null ||
+      status === null ||
+      salaryPerCycle === null ||
+      seenIds.has(employeeId)
+    ) {
+      repaired = true
+      return
+    }
+
+    seenIds.add(employeeId)
+    employees.push({ employeeId, name, role, status, salaryPerCycle })
+  })
+
+  return { employees, repaired }
+}
+
+const sanitizePayroll = (
+  value: unknown,
+): { payroll: PayrollState; repaired: boolean } => {
+  if (!isRecord(value)) {
+    return { payroll: { lastProcessedCycle: 0 }, repaired: true }
+  }
+
+  if (
+    typeof value.lastProcessedCycle !== 'number' ||
+    !Number.isSafeInteger(value.lastProcessedCycle) ||
+    value.lastProcessedCycle < 0
+  ) {
+    return { payroll: { lastProcessedCycle: 0 }, repaired: true }
+  }
+
+  return {
+    payroll: { lastProcessedCycle: value.lastProcessedCycle },
+    repaired: false,
+  }
+}
+
 const sanitizeCompany = (
   value: Record<string, unknown>,
+  requirePhase2Fields: boolean,
 ): { company: CompanyState; repaired: boolean } => {
   const defaults = createInitialCompanyState()
   let repaired = false
@@ -117,6 +212,17 @@ const sanitizeCompany = (
     { ...defaults.purchasedUpgradeLevels },
   )
 
+  let employees: EmployeeState[] = []
+  let payroll: PayrollState = { lastProcessedCycle: 0 }
+
+  if (requirePhase2Fields) {
+    const employeeResult = sanitizeEmployees(value.employees)
+    const payrollResult = sanitizePayroll(value.payroll)
+    employees = employeeResult.employees
+    payroll = payrollResult.payroll
+    repaired = repaired || employeeResult.repaired || payrollResult.repaired
+  }
+
   return {
     company: {
       companyName,
@@ -124,6 +230,8 @@ const sanitizeCompany = (
       level,
       reputation,
       purchasedUpgradeLevels,
+      employees,
+      payroll,
     },
     repaired,
   }
@@ -147,7 +255,7 @@ const sanitizeSettings = (
   }
 }
 
-export const createSaveGame = (session: GameSessionState): SaveGameV1 => ({
+export const createSaveGame = (session: GameSessionState): SaveGameV2 => ({
   formatVersion: SAVE_FORMAT_VERSION,
   company: {
     companyName: session.company.companyName,
@@ -155,6 +263,8 @@ export const createSaveGame = (session: GameSessionState): SaveGameV1 => ({
     level: session.company.level,
     reputation: session.company.reputation,
     purchasedUpgradeLevels: { ...session.company.purchasedUpgradeLevels },
+    employees: session.company.employees.map((employee) => ({ ...employee })),
+    payroll: { ...session.company.payroll },
   },
   settings: {
     tutorialCompleted: session.settings.tutorialCompleted,
@@ -192,7 +302,10 @@ export const decodeSave = (raw: string): SaveDecodeResult => {
     }
   }
 
-  if (parsed.formatVersion !== SAVE_FORMAT_VERSION) {
+  if (
+    parsed.formatVersion !== SAVE_FORMAT_VERSION &&
+    parsed.formatVersion !== LEGACY_SAVE_FORMAT_VERSION
+  ) {
     return {
       kind: 'incompatible',
       reason: `Unsupported save format version: ${String(parsed.formatVersion)}.`,
@@ -209,7 +322,8 @@ export const decodeSave = (raw: string): SaveDecodeResult => {
     }
   }
 
-  const companyResult = sanitizeCompany(parsed.company)
+  const migratingV1 = parsed.formatVersion === LEGACY_SAVE_FORMAT_VERSION
+  const companyResult = sanitizeCompany(parsed.company, !migratingV1)
   const settingsResult = sanitizeSettings(parsed.settings)
 
   return {
@@ -219,14 +333,18 @@ export const decodeSave = (raw: string): SaveDecodeResult => {
       company: companyResult.company,
       settings: settingsResult.settings,
     },
-    repaired: companyResult.repaired || settingsResult.repaired,
+    // Migration is a normalization write even when every v1 field was valid.
+    repaired: migratingV1 || companyResult.repaired || settingsResult.repaired,
+    ...(migratingV1 ? { migratedFrom: 1 as const } : {}),
   }
 }
 
-export const restoreGameSessionFromSave = (save: SaveGameV1): GameSessionState => {
+export const restoreGameSessionFromSave = (save: SaveGameV2): GameSessionState => {
   const company: CompanyState = {
     ...save.company,
     purchasedUpgradeLevels: { ...save.company.purchasedUpgradeLevels },
+    employees: save.company.employees.map((employee) => ({ ...employee })),
+    payroll: { ...save.company.payroll },
   }
   const world = synchronizePlayerMovementSpeed(createInitialWorldState(), company)
 
@@ -239,7 +357,7 @@ export const restoreGameSessionFromSave = (save: SaveGameV1): GameSessionState =
 
 const inspectRaw = (
   raw: string,
-  source: 'primary' | 'staging',
+  source: 'primary' | 'staging' | 'legacy-primary' | 'legacy-staging',
 ): SaveSlotInspection => {
   const decoded = decodeSave(raw)
   if (decoded.kind === 'valid') {
@@ -248,30 +366,26 @@ const inspectRaw = (
       save: decoded.save,
       repaired: decoded.repaired,
       source,
+      ...(decoded.migratedFrom ? { migratedFrom: decoded.migratedFrom } : {}),
     }
   }
   return decoded
 }
 
-export const inspectSaveSlot = (storage: SaveStorage): SaveSlotInspection => {
-  let primary: string | null
-  let staging: string | null
-
-  try {
-    primary = storage.getItem(SAVE_STORAGE_KEY)
-    staging = storage.getItem(SAVE_STAGING_KEY)
-  } catch (error) {
-    return { kind: 'unavailable', reason: normalizeError(error) }
-  }
-
+const inspectPair = (
+  primary: string | null,
+  staging: string | null,
+  primarySource: 'primary' | 'legacy-primary',
+  stagingSource: 'staging' | 'legacy-staging',
+): SaveSlotInspection | null => {
   if (primary !== null) {
-    const primaryResult = inspectRaw(primary, 'primary')
+    const primaryResult = inspectRaw(primary, primarySource)
     if (primaryResult.kind === 'valid') {
       return primaryResult
     }
 
     if (staging !== null) {
-      const stagingResult = inspectRaw(staging, 'staging')
+      const stagingResult = inspectRaw(staging, stagingSource)
       if (stagingResult.kind === 'valid') {
         return stagingResult
       }
@@ -281,8 +395,37 @@ export const inspectSaveSlot = (storage: SaveStorage): SaveSlotInspection => {
   }
 
   if (staging !== null) {
-    return inspectRaw(staging, 'staging')
+    return inspectRaw(staging, stagingSource)
   }
+
+  return null
+}
+
+export const inspectSaveSlot = (storage: SaveStorage): SaveSlotInspection => {
+  let primary: string | null
+  let staging: string | null
+  let legacyPrimary: string | null
+  let legacyStaging: string | null
+
+  try {
+    primary = storage.getItem(SAVE_STORAGE_KEY)
+    staging = storage.getItem(SAVE_STAGING_KEY)
+    legacyPrimary = storage.getItem(LEGACY_SAVE_STORAGE_KEY)
+    legacyStaging = storage.getItem(LEGACY_SAVE_STAGING_KEY)
+  } catch (error) {
+    return { kind: 'unavailable', reason: normalizeError(error) }
+  }
+
+  const current = inspectPair(primary, staging, 'primary', 'staging')
+  if (current) return current
+
+  const legacy = inspectPair(
+    legacyPrimary,
+    legacyStaging,
+    'legacy-primary',
+    'legacy-staging',
+  )
+  if (legacy) return legacy
 
   return { kind: 'missing' }
 }
