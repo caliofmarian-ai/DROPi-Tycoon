@@ -6,7 +6,10 @@ import {
   boundsIntersect,
   isBoundsInsideCanvas,
 } from '../src/ui/hudLayout'
-import { buildGameWorldTopBarLayout } from '../src/ui/gameWorldTopBar'
+import {
+  buildGameWorldTopBarLayout,
+  GAMEWORLD_TOP_BAR_TOUCH_TARGET_PX,
+} from '../src/ui/gameWorldTopBar'
 import {
   buildCompanyManagementLayout,
   buildMainMenuLayout,
@@ -86,7 +89,7 @@ describe('ISSUE-018 — responsive Android viewport fit', () => {
 
       expect(hud.companyPanel.top).toBe(topBar.hudRowTop)
       expect(hud.orderPanel.top).toBe(topBar.hudRowTop)
-      expect(hud.acceptButton.top).toBe(topBar.hudRowTop)
+      expect(hud.acceptButton.top).toBe(topBar.menuToggle.top)
       expect(boundsIntersect(notification, topBar.dropdownItems[0])).toBe(false)
       expect(boundsIntersect(notification, topBar.dropdownItems[1])).toBe(false)
     })
@@ -109,11 +112,16 @@ describe('ISSUE-019 — touch comfort in actual viewport pixels', () => {
       assertTouchRect(company.menuButton)
 
       const hud = buildHUDLayout(viewport.width, viewport.height)
-      assertTouchRect(hud.acceptButton)
+      expect(hud.acceptButton.width).toBeGreaterThanOrEqual(GAMEWORLD_TOP_BAR_TOUCH_TARGET_PX)
+      expect(hud.acceptButton.height).toBeGreaterThanOrEqual(GAMEWORLD_TOP_BAR_TOUCH_TARGET_PX)
 
       const topBar = buildGameWorldTopBarLayout(viewport.width, viewport.height)
-      assertTouchRect(topBar.menuToggle)
-      topBar.dropdownItems.forEach(assertTouchRect)
+      expect(topBar.menuToggle.width).toBeGreaterThanOrEqual(GAMEWORLD_TOP_BAR_TOUCH_TARGET_PX)
+      expect(topBar.menuToggle.height).toBeGreaterThanOrEqual(GAMEWORLD_TOP_BAR_TOUCH_TARGET_PX)
+      topBar.dropdownItems.forEach((rect) => {
+        expect(rect.width).toBeGreaterThanOrEqual(GAMEWORLD_TOP_BAR_TOUCH_TARGET_PX)
+        expect(rect.height).toBeGreaterThanOrEqual(GAMEWORLD_TOP_BAR_TOUCH_TARGET_PX)
+      })
     })
   }
 

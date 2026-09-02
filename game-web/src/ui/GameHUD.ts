@@ -147,12 +147,9 @@ export class GameHUD {
     this.orderText.setVisible(showOrder)
 
     if (showOrder) {
-      this.orderText.setText([
-        `${compactOrderId(data.orderId)} ${data.orderStatus} · +${data.reward}`,
-        `${compactLocationLabel(data.pickupLocation)}→${compactLocationLabel(data.destination)} · ${
-          data.carryingPackage ? 'Carry' : 'Empty'
-        }`,
-      ])
+      this.orderText.setText(
+        `${compactOrderId(data.orderId)} ${data.orderStatus} +${data.reward} · ${compactLocationLabel(data.pickupLocation)}→${compactLocationLabel(data.destination)} · ${data.carryingPackage ? 'Carry' : 'Empty'}`,
+      )
     }
 
     this.acceptButton.setVisible(data.showAcceptButton)

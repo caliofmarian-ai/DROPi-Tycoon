@@ -3,7 +3,10 @@ import {
   MIN_TOUCH_TARGET_PX,
   isCompactLandscape,
 } from './mobileViewport'
-import { buildGameWorldTopBarLayout } from './gameWorldTopBar'
+import {
+  buildGameWorldTopBarLayout,
+  GAMEWORLD_TOP_BAR_TOUCH_TARGET_PX,
+} from './gameWorldTopBar'
 
 export interface RectBounds {
   left: number
@@ -52,27 +55,16 @@ export const buildHUDLayout = (canvasWidth: number, canvasHeight: number): HUDLa
   const topBar = buildGameWorldTopBarLayout(width, height)
   const margin = topBar.menuToggle.left
   const compactLandscape = isCompactLandscape(width, height)
-  const gap = 4
+  const gap = 3
   const rightEdge = width - margin
   const rowTop = topBar.hudRowTop
   const rowHeight = topBar.hudRowHeight
 
-  const companyWidth = compactLandscape ? 78 : 72
-  const acceptWidth = compactLandscape ? 72 : 68
-  const availableOrderWidth = Math.max(
-    120,
-    width - margin * 2 - companyWidth - acceptWidth - gap * 2,
-  )
+  const companyWidth = compactLandscape ? 68 : 62
+  const availableOrderWidth = Math.max(120, width - margin * 2 - companyWidth - gap)
   const orderWidth = Math.min(compactLandscape ? 240 : 198, availableOrderWidth)
-
-  const acceptButton: RectBounds = {
-    left: rightEdge - acceptWidth,
-    top: rowTop,
-    width: acceptWidth,
-    height: rowHeight,
-  }
   const orderPanel: RectBounds = {
-    left: acceptButton.left - gap - orderWidth,
+    left: rightEdge - orderWidth,
     top: rowTop,
     width: orderWidth,
     height: rowHeight,
@@ -84,14 +76,24 @@ export const buildHUDLayout = (canvasWidth: number, canvasHeight: number): HUDLa
     height: rowHeight,
   }
 
+  // Accept is an action, so it shares the toolbar row rather than increasing
+  // persistent dock height. It is hidden by GameHUD whenever not applicable.
+  const acceptWidth = compactLandscape ? 58 : 56
+  const acceptButton: RectBounds = {
+    left: rightEdge - acceptWidth,
+    top: topBar.menuToggle.top,
+    width: acceptWidth,
+    height: GAMEWORLD_TOP_BAR_TOUCH_TARGET_PX,
+  }
+
   return {
     companyPanel,
     orderPanel,
     acceptButton,
     orderTextWidth: Math.max(108, orderPanel.width - 12),
-    companyFontSize: compactLandscape ? 11 : 10,
-    orderFontSize: compactLandscape ? 10 : 10,
-    acceptFontSize: 12,
+    companyFontSize: 10,
+    orderFontSize: 10,
+    acceptFontSize: 11,
   }
 }
 
