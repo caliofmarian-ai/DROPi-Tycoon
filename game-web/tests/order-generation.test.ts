@@ -10,6 +10,7 @@ import {
   pickupPointForOrder,
   routeForSequence,
 } from '../src/systems/orderGeneration'
+import { findWorldRoutePoint } from '../src/world/worldLayout'
 
 const gameStateSource = readFileSync(
   new URL('../src/state/gameState.ts', import.meta.url),
@@ -69,11 +70,13 @@ describe('release blocker #271 — order sequence generation', () => {
     expect(afterFailed.status).toBe('Available')
   })
 
-  it('resolves the visible pickup point from the generated route', () => {
+  it('resolves the visible pickup point from centralized world layout data', () => {
     for (let sequence = 1; sequence <= ORDER_ROUTE_TEMPLATES.length; sequence += 1) {
       const route = routeForSequence(sequence)
       const order = createOrderForSequence(sequence)
-      expect(pickupPointForOrder(order)).toEqual(route.pickupPoint)
+      const point = findWorldRoutePoint(route.pickupLocation)
+      expect(point?.kind).toBe('pickup')
+      expect(pickupPointForOrder(order)).toEqual({ x: point?.x, y: point?.y })
     }
   })
 })
