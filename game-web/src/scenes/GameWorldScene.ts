@@ -41,7 +41,7 @@ import {
   type CameraControlAction,
   type TouchPoint,
 } from '../ui/cameraControls'
-import type { RectBounds } from '../ui/hudLayout'
+import { boundsContainPoint, type RectBounds } from '../ui/hudLayout'
 import {
   buildNavigationButtonBounds,
   type LayoutRect,
@@ -63,6 +63,10 @@ export class GameWorldScene extends Phaser.Scene {
   private readonly packagePosition = new Phaser.Math.Vector2(0, 0)
 
   private packageSprite!: Phaser.GameObjects.Image
+
+  private fixedUiLayer!: Phaser.GameObjects.Layer
+
+  private fixedUiCamera!: Phaser.Cameras.Scene2D.Camera
 
   private gameHUD!: GameHUD
 
@@ -128,39 +132,72 @@ export class GameWorldScene extends Phaser.Scene {
     this.cameras.main.setZoom(CAMERA_DEFAULT_ZOOM)
     this.cameras.main.startFollow(this.player, false, 1, 1)
 
+    // Capture every world object before adding UI. The extra camera renders only
+    // the UI layer at zoom=1 / rotation=0, while the world camera ignores it.
+    // This is the hard screen-space boundary required by Android owner review.
+    const worldRenderObjects = [...this.children.list]
+    this.fixedUiLayer = this.add.layer()
+    this.fixedUiCamera = this.cameras.add(
+      0,
+      0,
+      this.scale.width,
+      this.scale.height,
+      false,
+      'FixedScreenUI',
+    )
+    this.fixedUiCamera.setScroll(0, 0)
+    this.fixedUiCamera.setZoom(1)
+    this.fixedUiCamera.setRotation(0)
+    this.fixedUiCamera.setBackgroundColor('rgba(0,0,0,0)')
+    this.fixedUiCamera.ignore(worldRenderObjects)
+    this.cameras.main.ignore(this.fixedUiLayer)
+
     this.notificationState = createNotificationState(this.worldState.activeOrder.status)
     this.createNavigationButtons()
     this.createCameraControlButtons()
-    this.attachCameraGestures()
-    this.gameHUD = new GameHUD(this, () => this.onAcceptButtonPressed())
-    this.notificationDisplay = new NotificationDisplay(this, () => {
-      this.notificationState = clearNotification(this.notificationState)
-    })
+    this.gameHUD = new GameHUD(this, () => this.onAcceptButtonPressed(), this.fixedUiLayer)
+    this.notificationDisplay = new NotificationDisplay(
+      this,
+      () => {
+        this.notificationState = clearNotification(this.notificationState)
+      },
+      this.fixedUiLayer,
+    )
     this.gameHUD.update(buildHUDData(this.worldState, this.companyState))
+    this.attachCameraGestures()
 
     this.pointerUpHandler = (pointer: Phaser.Input.Pointer) => {
       if (this.cameraGestureController?.didCameraGestureMove()) {
         return
       }
 
+      const fixedHudBounds = [
+        ...this.gameHUD.getScreenBlockingBounds(),
+        ...(this.notificationDisplay.isVisible()
+          ? [this.notificationDisplay.getScreenBounds()]
+          : []),
+      ]
       if (
         isPointerOnInteractiveUI(pointer.x, pointer.y, {
           menuButtonBounds: this.menuButtonBounds,
-          hudControlBounds: this.gameHUD.getInteractiveBounds(),
+          hudControlBounds: fixedHudBounds,
           cameraControlBounds: this.cameraControlBounds,
         })
       ) {
         return
       }
 
-      this.worldState.tapTarget = { x: pointer.worldX, y: pointer.worldY }
+      // Never depend on pointer.worldX/worldY once a screen-space camera exists.
+      // Convert the screen coordinate explicitly through the transformable world camera.
+      const worldPoint = this.cameras.main.getWorldPoint(pointer.x, pointer.y)
+      this.worldState.tapTarget = { x: worldPoint.x, y: worldPoint.y }
       this.worldState.isMoving = true
 
       if (
         this.worldState.activeOrder.status === 'Available' &&
         Phaser.Math.Distance.Between(
-          pointer.worldX,
-          pointer.worldY,
+          worldPoint.x,
+          worldPoint.y,
           this.packagePosition.x,
           this.packagePosition.y,
         ) <= 28
@@ -170,8 +207,8 @@ export class GameWorldScene extends Phaser.Scene {
 
       if (this.worldState.activeOrder.status === 'PickedUp' && this.worldState.player.carryingPackage) {
         this.worldState.pendingDeliveryDestination = selectDeliveryIntentFromTap(
-          pointer.worldX,
-          pointer.worldY,
+          worldPoint.x,
+          worldPoint.y,
           DELIVERY_ROUTE_POINTS,
           DELIVERY_MARKER_TAP_RADIUS,
         )
@@ -453,7 +490,7 @@ export class GameWorldScene extends Phaser.Scene {
         .setDepth(30)
         .setInteractive({ useHandCursor: true })
 
-      this.add
+      const labelText = this.add
         .text(x, y, label, {
           fontFamily: 'Arial',
           fontSize: '27px',
@@ -464,6 +501,7 @@ export class GameWorldScene extends Phaser.Scene {
         .setScrollFactor(0)
         .setDepth(31)
 
+      this.fixedUiLayer.add([button, labelText])
       button.on('pointerdown', () => this.applyCameraControl(action))
       this.cameraControlButtons.push(button)
       this.cameraControlBounds.push({ ...bounds })
@@ -512,8 +550,21 @@ export class GameWorldScene extends Phaser.Scene {
       },
       panByScreenDelta: (dx, dy) => this.panCameraByScreenDelta(dx, dy),
       onManualCameraControl: () => this.cameras.main.stopFollow(),
+      shouldIgnorePointer: (point) => this.isPointOnFixedScreenUI(point.x, point.y),
     })
     this.cameraGestureController.attach()
+  }
+
+  private isPointOnFixedScreenUI(x: number, y: number): boolean {
+    const bounds = [
+      ...this.menuButtonBounds,
+      ...this.cameraControlBounds,
+      ...this.gameHUD.getScreenBlockingBounds(),
+      ...(this.notificationDisplay.isVisible()
+        ? [this.notificationDisplay.getScreenBounds()]
+        : []),
+    ]
+    return bounds.some((rect) => boundsContainPoint(rect, x, y))
   }
 
   private setCameraZoom(zoom: number, focalPoint: TouchPoint): void {
@@ -560,7 +611,7 @@ export class GameWorldScene extends Phaser.Scene {
       .setDepth(20)
       .setInteractive({ useHandCursor: true })
 
-    this.add
+    const labelText = this.add
       .text(x, y, label, {
         fontFamily: 'Arial',
         fontSize: `${fontSize}px`,
@@ -573,6 +624,7 @@ export class GameWorldScene extends Phaser.Scene {
       .setScrollFactor(0)
       .setDepth(21)
 
+    this.fixedUiLayer.add([button, labelText])
     button.on('pointerdown', onTap)
     this.menuButtons.push(button)
     this.menuButtonBounds.push({ ...bounds })
