@@ -1,9 +1,8 @@
+import { MIN_TOUCH_TARGET_PX, type LayoutRect } from './mobileViewport'
 import {
-  MIN_TOUCH_TARGET_PX,
-  normalizeViewport,
-  viewportEdgeInset,
-  type LayoutRect,
-} from './mobileViewport'
+  buildGameWorldTopBarLayout,
+  GAMEWORLD_TOP_BAR_GAP_PX,
+} from './gameWorldTopBar'
 
 export const CAMERA_MIN_ZOOM = 0.65
 export const CAMERA_MAX_ZOOM = 2
@@ -103,14 +102,17 @@ export const rotationFromTwist = (
 export const shouldPanCamera = (distancePx: number): boolean =>
   Number.isFinite(distancePx) && distancePx >= CAMERA_PAN_THRESHOLD_PX
 
+/**
+ * M-008 owner-review layout: all explicit camera controls live in one horizontal
+ * top toolbar immediately after the navbar toggle. Touch targets remain 48 px;
+ * the scene renders a smaller visual button inside each target.
+ */
 export const buildCameraControlButtons = (
   width: number,
   height: number,
 ): readonly CameraControlButtonLayout[] => {
-  const viewport = normalizeViewport(width, height)
-  const edge = viewportEdgeInset(viewport.width, viewport.height)
+  const topBar = buildGameWorldTopBarLayout(width, height)
   const size = MIN_TOUCH_TARGET_PX
-  const gap = 7
   const actions: ReadonlyArray<readonly [CameraControlAction, string]> = [
     ['zoom-in', '+'],
     ['zoom-out', '−'],
@@ -118,22 +120,15 @@ export const buildCameraControlButtons = (
     ['rotate-right', '↻'],
     ['recenter', '⌖'],
   ]
-
-  const totalHeight = actions.length * size + (actions.length - 1) * gap
-  const maxTop = Math.max(edge, viewport.height - edge - totalHeight)
-  const preferredTop = Math.round(viewport.height * 0.18)
-  const top = clamp(preferredTop, edge, maxTop)
-
-  // M-008 second owner-review remediation: reserve the upper-right corner for the
-  // compact status/order HUD and keep the camera fallback column on the left edge.
-  const left = edge
+  const startLeft =
+    topBar.menuToggle.left + topBar.menuToggle.width + GAMEWORLD_TOP_BAR_GAP_PX
 
   return actions.map(([action, label], index) => ({
     action,
     label,
     bounds: {
-      left,
-      top: top + index * (size + gap),
+      left: startLeft + index * (size + GAMEWORLD_TOP_BAR_GAP_PX),
+      top: topBar.menuToggle.top,
       width: size,
       height: size,
     },

@@ -6,10 +6,10 @@ import {
   boundsIntersect,
   isBoundsInsideCanvas,
 } from '../src/ui/hudLayout'
+import { buildGameWorldTopBarLayout } from '../src/ui/gameWorldTopBar'
 import {
   buildCompanyManagementLayout,
   buildMainMenuLayout,
-  buildNavigationButtonBounds,
   MIN_TOUCH_TARGET_PX,
   rectInsideViewport,
   SUPPORTED_ANDROID_VIEWPORTS,
@@ -69,20 +69,26 @@ describe('ISSUE-018 — responsive Android viewport fit', () => {
       expect(rectInsideViewport(layout.menuButton, viewport.width, viewport.height)).toBe(true)
     })
 
-    it(`keeps GameWorld HUD, notification and navigation inside ${viewport.width}x${viewport.height}`, () => {
+    it(`keeps GameWorld top dock, HUD and notification inside ${viewport.width}x${viewport.height}`, () => {
+      const topBar = buildGameWorldTopBarLayout(viewport.width, viewport.height)
       const hud = buildHUDLayout(viewport.width, viewport.height)
       const notification = buildNotificationLayout(viewport.width, viewport.height)
-      const navigation = buildNavigationButtonBounds(viewport.width, viewport.height)
+      const navigation = [topBar.menuToggle, ...topBar.dropdownItems]
 
+      expect(rectInsideViewport(topBar.controlBar, viewport.width, viewport.height)).toBe(true)
       expect(isBoundsInsideCanvas(hud.companyPanel, viewport.width, viewport.height)).toBe(true)
       expect(isBoundsInsideCanvas(hud.orderPanel, viewport.width, viewport.height)).toBe(true)
       expect(isBoundsInsideCanvas(hud.acceptButton, viewport.width, viewport.height)).toBe(true)
       expect(isBoundsInsideCanvas(notification, viewport.width, viewport.height)).toBe(true)
       navigation.forEach((rect) => {
         expect(rectInsideViewport(rect, viewport.width, viewport.height)).toBe(true)
-        expect(boundsIntersect(hud.orderPanel, rect)).toBe(false)
-        expect(boundsIntersect(notification, rect)).toBe(false)
       })
+
+      expect(hud.companyPanel.top).toBe(topBar.hudRowTop)
+      expect(hud.orderPanel.top).toBe(topBar.hudRowTop)
+      expect(hud.acceptButton.top).toBe(topBar.hudRowTop)
+      expect(boundsIntersect(notification, topBar.dropdownItems[0])).toBe(false)
+      expect(boundsIntersect(notification, topBar.dropdownItems[1])).toBe(false)
     })
   }
 })
@@ -105,7 +111,9 @@ describe('ISSUE-019 — touch comfort in actual viewport pixels', () => {
       const hud = buildHUDLayout(viewport.width, viewport.height)
       assertTouchRect(hud.acceptButton)
 
-      buildNavigationButtonBounds(viewport.width, viewport.height).forEach(assertTouchRect)
+      const topBar = buildGameWorldTopBarLayout(viewport.width, viewport.height)
+      assertTouchRect(topBar.menuToggle)
+      topBar.dropdownItems.forEach(assertTouchRect)
     })
   }
 
