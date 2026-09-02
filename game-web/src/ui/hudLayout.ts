@@ -115,7 +115,7 @@ export const buildNotificationLayout = (canvasWidth: number, canvasHeight: numbe
   const margin = 10
   const notifWidth = Math.max(
     MIN_TOUCH_TARGET_PX,
-    Math.min(width - 24, Math.floor(width * 0.72), 520),
+    Math.min(width - 24, Math.floor(width * 0.62), 620),
   )
   const desiredTop = bottom(hud.orderPanel) + margin
   const navTop = Math.min(...navBounds.map((bounds) => bounds.top))
