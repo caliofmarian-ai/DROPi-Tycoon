@@ -40,3 +40,5 @@ jobs:
           git diff --cached --check
           git commit -m "[M-008] Reserve map viewport below compact top dock"
           git push origin HEAD:openai/m008-nonoverlap-compact-topdock
+
+# v2: reconcile owner-review geometry with non-overlap viewport reservation.
