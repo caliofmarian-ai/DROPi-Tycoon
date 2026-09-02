@@ -132,9 +132,6 @@ export class GameWorldScene extends Phaser.Scene {
     this.cameras.main.setZoom(CAMERA_DEFAULT_ZOOM)
     this.cameras.main.startFollow(this.player, false, 1, 1)
 
-    // Capture every world object before adding UI. The extra camera renders only
-    // the UI layer at zoom=1 / rotation=0, while the world camera ignores it.
-    // This is the hard screen-space boundary required by Android owner review.
     const worldRenderObjects = [...this.children.list]
     this.fixedUiLayer = this.add.layer()
     this.fixedUiCamera = this.cameras.add(
@@ -187,8 +184,7 @@ export class GameWorldScene extends Phaser.Scene {
         return
       }
 
-      // Never depend on pointer.worldX/worldY once a screen-space camera exists.
-      // Convert the screen coordinate explicitly through the transformable world camera.
+      // Resolve gameplay coordinates explicitly through the transformable world camera.
       const worldPoint = this.cameras.main.getWorldPoint(pointer.x, pointer.y)
       this.worldState.tapTarget = { x: worldPoint.x, y: worldPoint.y }
       this.worldState.isMoving = true
@@ -396,7 +392,6 @@ export class GameWorldScene extends Phaser.Scene {
   ): void {
     const result = updateNotification(
       this.notificationState,
-      // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
       currentStatus as import('../types/game').OrderStatus,
       this.worldState.activeOrder,
     )
