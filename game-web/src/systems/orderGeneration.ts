@@ -1,10 +1,10 @@
 import { BALANCING } from '../config/balancing'
 import type { OrderState } from '../types/game'
+import { findWorldRoutePoint, WORLD_ROUTE_POINTS } from '../world/worldLayout'
 
 export interface OrderRouteTemplate {
   routeId: string
   pickupLocation: string
-  pickupPoint: { x: number; y: number }
   destination: string
 }
 
@@ -12,25 +12,25 @@ export interface OrderRouteTemplate {
  * Prototype route pool. Rewards intentionally remain at the owner-approved
  * Prototype v0.1 value; route-based reward scaling belongs to a later economy
  * pass rather than being smuggled into this release remediation.
+ *
+ * Coordinates are owned by worldLayout.ts so map expansion and later art
+ * replacement do not require rewriting order lifecycle logic.
  */
 export const ORDER_ROUTE_TEMPLATES: readonly OrderRouteTemplate[] = [
   {
-    routeId: 'local-west-east',
-    pickupLocation: 'PickupZone',
-    pickupPoint: { x: 120, y: 440 },
+    routeId: 'company-to-residential',
+    pickupLocation: 'CompanyPickup',
     destination: 'DeliveryZone',
   },
   {
-    routeId: 'commercial-south',
+    routeId: 'commercial-to-company',
     pickupLocation: 'CommercialPickup',
-    pickupPoint: { x: 580, y: 120 },
-    destination: 'DeliveryPoint',
+    destination: 'CompanyDelivery',
   },
   {
-    routeId: 'residential-cross-town',
+    routeId: 'residential-to-business',
     pickupLocation: 'ResidentialPickup',
-    pickupPoint: { x: 160, y: 120 },
-    destination: 'DeliveryZone',
+    destination: 'DeliveryPoint',
   },
 ] as const
 
@@ -73,10 +73,9 @@ export const createNextOrder = (previousOrder: OrderState): OrderState => {
 }
 
 export const pickupPointForOrder = (order: OrderState): { x: number; y: number } => {
-  const route = ORDER_ROUTE_TEMPLATES.find(
-    (candidate) =>
-      candidate.pickupLocation === order.pickupLocation &&
-      candidate.destination === order.destination,
-  )
-  return route ? { ...route.pickupPoint } : { ...ORDER_ROUTE_TEMPLATES[0].pickupPoint }
+  const point = findWorldRoutePoint(order.pickupLocation)
+  const fallback = WORLD_ROUTE_POINTS.find((candidate) => candidate.kind === 'pickup')
+  if (point?.kind === 'pickup') return { x: point.x, y: point.y }
+  if (fallback) return { x: fallback.x, y: fallback.y }
+  return { x: 0, y: 0 }
 }
