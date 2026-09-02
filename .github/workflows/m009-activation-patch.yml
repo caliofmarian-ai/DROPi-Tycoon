@@ -72,8 +72,8 @@ jobs:
           set -euo pipefail
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add .github/workflows/rbatch-010-ci.yml 00_Project/PROJECT_STATUS.md 09_Development scripts/m009_activation_patch.py
-          git reset scripts/m009_activation_patch.py
+          git add 00_Project/PROJECT_STATUS.md 09_Development
+          git checkout -- .github/workflows/rbatch-010-ci.yml scripts/m009_activation_patch.py
           git diff --cached --quiet && { echo 'No canonical changes to commit'; exit 1; }
           git commit -m "[Planning] Record M-008 owner sign-off and activate M-009"
           git push origin HEAD:openai/m008-release-m009-activation
