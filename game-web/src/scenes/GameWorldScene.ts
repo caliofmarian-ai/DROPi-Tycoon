@@ -9,6 +9,7 @@ import {
 } from '../systems/orderSystem'
 import { applyOrderAcceptanceRequest } from '../systems/orderAcceptance'
 import { settleDeliveryOutcome } from '../systems/economySettlement'
+import { createNextOrder, pickupPointForOrder } from '../systems/orderGeneration'
 import { synchronizePlayerMovementSpeed } from '../systems/bicycleSystem'
 import type { CompanyState, WorldState } from '../types/game'
 import { GameHUD } from '../ui/GameHUD'
@@ -74,6 +75,8 @@ export class GameWorldScene extends Phaser.Scene {
 
   private readonly packagePosition = new Phaser.Math.Vector2(120, 440)
 
+  private packageSprite!: Phaser.GameObjects.Image
+
   private gameHUD!: GameHUD
 
   private notificationDisplay!: NotificationDisplay
@@ -116,6 +119,9 @@ export class GameWorldScene extends Phaser.Scene {
     this.worldState = synchronizePlayerMovementSpeed(session.world, this.companyState)
     replaceGameSession(this.worldState, this.companyState)
 
+    const initialPickupPoint = pickupPointForOrder(this.worldState.activeOrder)
+    this.packagePosition.set(initialPickupPoint.x, initialPickupPoint.y)
+
     this.cameras.main.setBackgroundColor('#91d0ff')
     this.cameras.main.setBounds(0, 0, WORLD_WIDTH, WORLD_HEIGHT)
 
@@ -129,7 +135,11 @@ export class GameWorldScene extends Phaser.Scene {
       this.add.image(x, y, texture)
     })
 
-    this.add.image(this.packagePosition.x, this.packagePosition.y, 'package_delivery')
+    this.packageSprite = this.add.image(
+      this.packagePosition.x,
+      this.packagePosition.y,
+      'package_delivery',
+    )
 
     DELIVERY_POINTS.forEach(({ x, y, label }) => {
       this.add.image(x, y, 'delivery_point_marker')
@@ -272,12 +282,15 @@ export class GameWorldScene extends Phaser.Scene {
         this.packagePosition.x,
         this.packagePosition.y,
       ),
-      expectedPickupLocation: 'PickupZone',
+      expectedPickupLocation: this.worldState.activeOrder.pickupLocation,
       pickupRadius: this.worldState.pickupRadius,
     })
 
     this.worldState.activeOrder = pickupAttempt.order
     this.worldState.player = pickupAttempt.player
+    if (previousStatus !== 'PickedUp' && this.worldState.activeOrder.status === 'PickedUp') {
+      this.packageSprite.setVisible(false)
+    }
     this.emitNotificationIfTransitioned(previousStatus, this.worldState.activeOrder.status)
   }
 
@@ -341,8 +354,36 @@ export class GameWorldScene extends Phaser.Scene {
               : 'progression-changed'
           autosaveIfApproved(storage, session, autosaveEvent)
         }
+        this.spawnNextAvailableOrder()
       }
     }
+  }
+
+  private spawnNextAvailableOrder(): void {
+    const terminalOrder = this.worldState.activeOrder
+    if (
+      (terminalOrder.status !== 'Completed' && terminalOrder.status !== 'Failed') ||
+      !terminalOrder.economySettled
+    ) {
+      return
+    }
+
+    const nextOrder = createNextOrder(terminalOrder)
+    const pickupPoint = pickupPointForOrder(nextOrder)
+    this.worldState.activeOrder = nextOrder
+    this.worldState.player = {
+      ...this.worldState.player,
+      currentOrder: '',
+      carryingPackage: false,
+    }
+    this.worldState.pendingDeliveryDestination = ''
+    this.packagePosition.set(pickupPoint.x, pickupPoint.y)
+    this.packageSprite.setPosition(pickupPoint.x, pickupPoint.y).setVisible(true)
+
+    const notificationReset = updateNotification(this.notificationState, 'Available')
+    this.notificationState = notificationReset.state
+    replaceGameSession(this.worldState, this.companyState)
+    this.gameHUD.update(buildHUDData(this.worldState, this.companyState))
   }
 
   private emitNotificationIfTransitioned(
@@ -353,6 +394,7 @@ export class GameWorldScene extends Phaser.Scene {
       this.notificationState,
       // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
       currentStatus as import('../types/game').OrderStatus,
+      this.worldState.activeOrder,
     )
     this.notificationState = result.state
     if (result.newMessage !== null) {
