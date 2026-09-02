@@ -25,7 +25,7 @@ interface PointerState extends TouchPoint {
 /**
  * Browser-pointer gesture adapter kept separate from game/domain state.
  *
- * One-pointer drag pans the map once the movement threshold is crossed.
+ * One-pointer drag pans the map once cumulative movement crosses the threshold.
  * Two pointers combine centroid pan + pinch zoom + twist rotation.
  * The controller exposes whether the active pointer sequence moved enough to
  * count as a camera gesture so GameWorld can suppress tap-to-move.
@@ -33,6 +33,7 @@ interface PointerState extends TouchPoint {
 export class CameraGestureController {
   private readonly pointers = new Map<number, PointerState>()
   private previousSinglePoint: TouchPoint | null = null
+  private singleStartPoint: TouchPoint | null = null
   private previousCentroid: TouchPoint | null = null
   private previousDistance = 0
   private previousAngle = 0
@@ -42,6 +43,7 @@ export class CameraGestureController {
   private readonly handlePointerDown = (event: PointerEvent): void => {
     if (this.pointers.size === 0) {
       this.sequenceMoved = false
+      this.singleStartPoint = { x: event.clientX, y: event.clientY }
     }
 
     this.pointers.set(event.pointerId, {
@@ -78,8 +80,10 @@ export class CameraGestureController {
       if (previous) {
         const dx = next.x - previous.x
         const dy = next.y - previous.y
-        const movement = Math.hypot(dx, dy)
-        if (this.sequenceMoved || shouldPanCamera(movement)) {
+        const cumulativeDistance = this.singleStartPoint
+          ? Math.hypot(next.x - this.singleStartPoint.x, next.y - this.singleStartPoint.y)
+          : Math.hypot(dx, dy)
+        if (this.sequenceMoved || shouldPanCamera(cumulativeDistance)) {
           this.sequenceMoved = true
           this.callbacks.onManualCameraControl()
           this.callbacks.panByScreenDelta(dx, dy)
@@ -106,24 +110,23 @@ export class CameraGestureController {
       }
 
       if (this.previousDistance > 0 && distance > 0) {
-        const nextZoom = zoomFromPinch(this.callbacks.getZoom(), this.previousDistance, distance)
-        if (nextZoom !== this.callbacks.getZoom()) {
+        const currentZoom = this.callbacks.getZoom()
+        const nextZoom = zoomFromPinch(currentZoom, this.previousDistance, distance)
+        if (nextZoom !== currentZoom) {
           this.callbacks.onManualCameraControl()
           this.callbacks.setZoom(nextZoom, centroid)
         }
       }
 
-      const nextRotation = rotationFromTwist(
-        this.callbacks.getRotation(),
-        this.previousAngle,
-        angle,
-      )
-      if (Math.abs(normalizeCameraRotation(nextRotation - this.callbacks.getRotation())) > 0.001) {
+      const currentRotation = this.callbacks.getRotation()
+      const nextRotation = rotationFromTwist(currentRotation, this.previousAngle, angle)
+      if (Math.abs(normalizeCameraRotation(nextRotation - currentRotation)) > 0.001) {
         this.callbacks.onManualCameraControl()
         this.callbacks.setRotation(nextRotation)
       }
 
       this.sequenceMoved = true
+      this.singleStartPoint = null
       this.previousCentroid = centroid
       this.previousDistance = distance
       this.previousAngle = angle
@@ -144,6 +147,7 @@ export class CameraGestureController {
   private readonly handlePointerCancel = (event: PointerEvent): void => {
     this.pointers.delete(event.pointerId)
     this.sequenceMoved = true
+    this.singleStartPoint = null
     this.rebaseline()
   }
 
@@ -175,6 +179,7 @@ export class CameraGestureController {
     this.canvas.removeEventListener('pointercancel', this.handlePointerCancel)
     this.pointers.clear()
     this.previousSinglePoint = null
+    this.singleStartPoint = null
     this.previousCentroid = null
   }
 
@@ -186,6 +191,9 @@ export class CameraGestureController {
     const active = [...this.pointers.values()]
     if (active.length === 1) {
       this.previousSinglePoint = { x: active[0].x, y: active[0].y }
+      if (!this.singleStartPoint) {
+        this.singleStartPoint = { x: active[0].x, y: active[0].y }
+      }
       this.previousCentroid = null
       this.previousDistance = 0
       this.previousAngle = 0
@@ -196,6 +204,7 @@ export class CameraGestureController {
       const first = active[0]
       const second = active[1]
       this.previousSinglePoint = null
+      this.singleStartPoint = null
       this.previousCentroid = touchCentroid(first, second)
       this.previousDistance = touchDistance(first, second)
       this.previousAngle = touchAngle(first, second)
@@ -203,6 +212,7 @@ export class CameraGestureController {
     }
 
     this.previousSinglePoint = null
+    this.singleStartPoint = null
     this.previousCentroid = null
     this.previousDistance = 0
     this.previousAngle = 0
