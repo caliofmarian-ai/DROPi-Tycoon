@@ -5,15 +5,25 @@ import { boundsContainPoint, buildHUDLayout, type RectBounds } from './hudLayout
 /** z-depth for all HUD elements — sits above game world and navigation buttons. */
 const HUD_DEPTH = 30
 
+const compactLocationLabel = (value: string): string => {
+  const canonicalAliases: Record<string, string> = {
+    PickupZone: 'Pickup',
+    DeliveryZone: 'Delivery',
+    CommercialPickup: 'Commercial',
+    ResidentialPickup: 'Residential',
+    DeliveryPoint: 'Drop-off',
+  }
+  const aliased = canonicalAliases[value] ?? value
+  return aliased.length > 13 ? `${aliased.slice(0, 12)}…` : aliased
+}
+
+const compactOrderId = (value: string): string => value.replace(/^ORDER-/, '#')
+
 /**
  * Player-facing GameWorld HUD.
  *
- * Layout is derived from the active Phaser scale size (scene.scale.width/height),
- * with all elements fixed to camera (scrollFactor = 0).
- *
- * Pointer exclusion: call `containsPoint(pointer.x, pointer.y)` from the scene's
- * pointerdown handler. Returns true when the pointer is over any interactive HUD
- * element, preventing world movement or delivery intent registration.
+ * The persistent cluster is intentionally compact and upper-right anchored so
+ * the map center remains available for exploration on Android.
  */
 export class GameHUD {
   private readonly companyText: Phaser.GameObjects.Text
@@ -36,18 +46,17 @@ export class GameHUD {
         layout.companyPanel.width,
         layout.companyPanel.height,
         0x0f172a,
-        0.82,
+        0.78,
       )
-      .setStrokeStyle(2, 0x38bdf8, 0.55)
+      .setStrokeStyle(1, 0x38bdf8, 0.5)
       .setScrollFactor(0)
       .setDepth(HUD_DEPTH)
 
     this.companyText = scene.add
-      .text(layout.companyPanel.left + 8, layout.companyPanel.top + 6, '', {
+      .text(layout.companyPanel.left + 6, layout.companyPanel.top + 7, '', {
         fontFamily: 'Arial',
         fontSize: `${layout.companyFontSize}px`,
         color: '#f8fafc',
-        lineSpacing: 1,
       })
       .setScrollFactor(0)
       .setDepth(HUD_DEPTH + 1)
@@ -62,14 +71,14 @@ export class GameHUD {
         layout.orderPanel.width,
         layout.orderPanel.height,
         0x0f172a,
-        0.78,
+        0.74,
       )
-      .setStrokeStyle(2, 0x38bdf8, 0.55)
+      .setStrokeStyle(1, 0x38bdf8, 0.5)
       .setScrollFactor(0)
       .setDepth(HUD_DEPTH)
 
     this.orderText = scene.add
-      .text(layout.orderPanel.left + 9, layout.orderPanel.top + 8, '', {
+      .text(layout.orderPanel.left + 7, layout.orderPanel.top + 7, '', {
         fontFamily: 'Arial',
         fontSize: `${layout.orderFontSize}px`,
         color: '#f8fafc',
@@ -83,8 +92,8 @@ export class GameHUD {
     const acceptCY = layout.acceptButton.top + layout.acceptButton.height / 2
 
     this.acceptButton = scene.add
-      .rectangle(acceptCX, acceptCY, layout.acceptButton.width, layout.acceptButton.height, 0x16a34a, 1)
-      .setStrokeStyle(2, 0x86efac)
+      .rectangle(acceptCX, acceptCY, layout.acceptButton.width, layout.acceptButton.height, 0x16a34a, 0.95)
+      .setStrokeStyle(1, 0x86efac)
       .setScrollFactor(0)
       .setDepth(HUD_DEPTH + 1)
       .setInteractive({ useHandCursor: true })
@@ -113,7 +122,7 @@ export class GameHUD {
   }
 
   update(data: HUDData): void {
-    this.companyText.setText([`Money: ${data.money}`, `Rep: ${data.reputation}`])
+    this.companyText.setText(`M ${data.money} · R ${data.reputation}`)
 
     const showOrder = data.showActiveOrder
     this.orderBg.setVisible(showOrder)
@@ -121,9 +130,10 @@ export class GameHUD {
 
     if (showOrder) {
       this.orderText.setText([
-        `${data.orderId} · ${data.orderStatus}`,
-        `${data.pickupLocation} → ${data.destination}`,
-        `Reward ${data.reward} · ${data.carryingPackage ? 'Carrying' : 'Not carrying'}`,
+        `${compactOrderId(data.orderId)} ${data.orderStatus} · +${data.reward}`,
+        `${compactLocationLabel(data.pickupLocation)}→${compactLocationLabel(data.destination)} · ${
+          data.carryingPackage ? 'Carry' : 'Empty'
+        }`,
       ])
     }
 
