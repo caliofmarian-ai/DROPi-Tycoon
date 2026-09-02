@@ -13,24 +13,25 @@ export interface OrderRouteTemplate {
  * Prototype v0.1 value; route-based reward scaling belongs to a later economy
  * pass rather than being smuggled into this release remediation.
  *
- * Coordinates are owned by worldLayout.ts so map expansion and later art
- * replacement do not require rewriting order lifecycle logic.
+ * Semantic route identifiers and sequence are preserved from #271. Physical
+ * coordinates are owned by worldLayout.ts so the M-008 map remediation does
+ * not rewrite already-validated order behavior.
  */
 export const ORDER_ROUTE_TEMPLATES: readonly OrderRouteTemplate[] = [
   {
-    routeId: 'company-to-residential',
-    pickupLocation: 'CompanyPickup',
+    routeId: 'local-west-east',
+    pickupLocation: 'PickupZone',
     destination: 'DeliveryZone',
   },
   {
-    routeId: 'commercial-to-company',
+    routeId: 'commercial-south',
     pickupLocation: 'CommercialPickup',
-    destination: 'CompanyDelivery',
+    destination: 'DeliveryPoint',
   },
   {
-    routeId: 'residential-to-business',
+    routeId: 'residential-cross-town',
     pickupLocation: 'ResidentialPickup',
-    destination: 'DeliveryPoint',
+    destination: 'DeliveryZone',
   },
 ] as const
 
