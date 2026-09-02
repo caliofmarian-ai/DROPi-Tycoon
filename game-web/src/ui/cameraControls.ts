@@ -123,7 +123,10 @@ export const buildCameraControlButtons = (
   const maxTop = Math.max(edge, viewport.height - edge - totalHeight)
   const preferredTop = Math.round(viewport.height * 0.18)
   const top = clamp(preferredTop, edge, maxTop)
-  const left = viewport.width - edge - size
+
+  // M-008 second owner-review remediation: reserve the upper-right corner for the
+  // compact status/order HUD and keep the camera fallback column on the left edge.
+  const left = edge
 
   return actions.map(([action, label], index) => ({
     action,
