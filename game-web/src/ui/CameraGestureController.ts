@@ -32,6 +32,8 @@ interface PointerState extends TouchPoint {
  */
 export class CameraGestureController {
   private readonly pointers = new Map<number, PointerState>()
+  private readonly canvas: HTMLCanvasElement
+  private readonly callbacks: CameraGestureCallbacks
   private previousSinglePoint: TouchPoint | null = null
   private singleStartPoint: TouchPoint | null = null
   private previousCentroid: TouchPoint | null = null
@@ -151,10 +153,10 @@ export class CameraGestureController {
     this.rebaseline()
   }
 
-  constructor(
-    private readonly canvas: HTMLCanvasElement,
-    private readonly callbacks: CameraGestureCallbacks,
-  ) {}
+  constructor(canvas: HTMLCanvasElement, callbacks: CameraGestureCallbacks) {
+    this.canvas = canvas
+    this.callbacks = callbacks
+  }
 
   attach(): void {
     if (this.attached) {
