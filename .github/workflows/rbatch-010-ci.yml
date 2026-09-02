@@ -88,9 +88,11 @@ jobs:
           python3 -m pip install --quiet pyyaml
           python3 - <<'PY'
           import yaml
+
           path = '09_Development/Planning/github_creation_plan.yaml'
           with open(path, encoding='utf-8') as handle:
               data = yaml.safe_load(handle)
+
           assert isinstance(data, dict)
           assert data['metadata']['counts']['milestones'] == 21
           assert data['metadata']['counts']['epics'] == 46
@@ -106,6 +108,7 @@ jobs:
           set -euo pipefail
           python3 - <<'PY'
           import yaml
+
           path = '09_Development/Planning/github_creation_plan.yaml'
           with open(path, encoding='utf-8') as handle:
               data = yaml.safe_load(handle)
@@ -118,71 +121,47 @@ jobs:
           assert milestones['M-006']['status'] == 'In Progress'
           assert milestones['M-007']['status'] == 'In Progress'
           assert milestones['M-007']['owner_gates'].startswith('RESOLVED')
-          assert milestones['M-008']['status'] == 'In Progress'
-          assert milestones['M-008']['owner_gates'].startswith('Final Prototype v0.1 owner release sign-off')
+          assert milestones['M-008']['status'].startswith('COMPLETED')
+          assert milestones['M-008']['owner_gates'].startswith('RESOLVED 2026-09-02')
+          assert milestones['M-009']['status'] == 'In Progress'
+          assert milestones['M-009']['owner_gates'].startswith('RESOLVED 2026-09-02')
 
-          for batch_id in ('RBATCH-010', 'RBATCH-011', 'RBATCH-012', 'RBATCH-013', 'RBATCH-014', 'RBATCH-015', 'RBATCH-016', 'RBATCH-017'):
+          for batch_id in ('RBATCH-010', 'RBATCH-011', 'RBATCH-012', 'RBATCH-013', 'RBATCH-014', 'RBATCH-016'):
               assert 'MERGED' in batches[batch_id]['status']
           assert batches['RBATCH-014']['owner_gates'].startswith('RESOLVED')
-          assert batches['RBATCH-017']['owner_gates'].startswith('RESOLVED 2026-09-01')
+          assert batches['RBATCH-015']['status'].startswith('COMPLETED')
+          assert batches['RBATCH-017']['status'].startswith('COMPLETED')
+          assert batches['RBATCH-017']['owner_gates'].startswith('RESOLVED 2026-09-02')
+          assert batches['RBATCH-018']['status'].startswith('READY FOR IMPLEMENTATION')
+          assert batches['RBATCH-018']['owner_gates'].startswith('RESOLVED 2026-09-02')
 
-          for epic_id in ('E-011', 'E-012', 'E-013', 'E-014', 'E-015', 'E-016'):
+          for epic_id in ('E-011', 'E-012', 'E-013', 'E-014', 'E-015'):
               assert 'MERGED' in epics[epic_id]['status']
+          assert epics['E-016']['status'].startswith('COMPLETED')
           assert epics['E-017']['status'].startswith('COMPLETED')
+          assert epics['E-018']['status'].startswith('READY')
 
-          assert issues['ISSUE-008']['batch_id'] == 'RBATCH-011'
-          assert issues['ISSUE-008']['epic_id'] == 'E-012'
-          assert issues['ISSUE-008']['milestone_id'] == 'M-005'
-          assert 'status:done' in issues['ISSUE-008']['label_names']
-
-          for issue_id in ('ISSUE-009', 'ISSUE-014', 'ISSUE-015', 'ISSUE-016', 'ISSUE-017'):
-              assert issues[issue_id]['batch_id'] == 'RBATCH-014'
-              assert issues[issue_id]['epic_id'] == 'E-015'
-              assert issues[issue_id]['milestone_id'] == 'M-007'
-              assert issues[issue_id]['status'].startswith('COMPLETED')
-              assert issues[issue_id]['blocked_or_owner_gate'].startswith('RESOLVED')
-              assert 'status:done' in issues[issue_id]['label_names']
-
-          for issue_id in ('ISSUE-010', 'ISSUE-011'):
-              assert issues[issue_id]['batch_id'] == 'RBATCH-012'
-              assert issues[issue_id]['epic_id'] == 'E-013'
-              assert issues[issue_id]['milestone_id'] == 'M-006'
+          done_issue_ids = (
+              'ISSUE-008', 'ISSUE-009', 'ISSUE-010', 'ISSUE-011', 'ISSUE-012', 'ISSUE-013',
+              'ISSUE-014', 'ISSUE-015', 'ISSUE-016', 'ISSUE-017', 'ISSUE-018', 'ISSUE-019',
+              'ISSUE-020', 'ISSUE-021', 'ISSUE-022', 'ISSUE-023',
+          )
+          for issue_id in done_issue_ids:
               assert issues[issue_id]['status'].startswith('COMPLETED')
               assert 'status:done' in issues[issue_id]['label_names']
 
-          for issue_id in ('ISSUE-012', 'ISSUE-013'):
-              assert issues[issue_id]['batch_id'] == 'RBATCH-013'
-              assert issues[issue_id]['epic_id'] == 'E-014'
-              assert issues[issue_id]['milestone_id'] == 'M-006'
-              assert issues[issue_id]['status'].startswith('COMPLETED')
-              assert 'status:done' in issues[issue_id]['label_names']
-
-          for issue_id in ('ISSUE-018', 'ISSUE-019'):
-              assert issues[issue_id]['batch_id'] == 'RBATCH-015'
-              assert issues[issue_id]['epic_id'] == 'E-016'
-              assert issues[issue_id]['milestone_id'] == 'M-008'
-              assert issues[issue_id]['status'].startswith('COMPLETED')
-              assert 'status:done' in issues[issue_id]['label_names']
-
-          for issue_id in ('ISSUE-020', 'ISSUE-021'):
-              assert issues[issue_id]['batch_id'] == 'RBATCH-016'
-              assert issues[issue_id]['epic_id'] == 'E-017'
-              assert issues[issue_id]['milestone_id'] == 'M-008'
-              assert issues[issue_id]['status'].startswith('COMPLETED')
-              assert 'status:done' in issues[issue_id]['label_names']
-
-          for issue_id in ('ISSUE-022', 'ISSUE-023'):
-              assert issues[issue_id]['batch_id'] == 'RBATCH-017'
-              assert issues[issue_id]['epic_id'] == 'E-017'
-              assert issues[issue_id]['milestone_id'] == 'M-008'
-              assert issues[issue_id]['status'].startswith('COMPLETED')
-              assert issues[issue_id]['blocked_or_owner_gate'].startswith('RESOLVED 2026-09-01')
-              assert 'status:done' in issues[issue_id]['label_names']
+          for issue_id in ('ISSUE-024', 'ISSUE-026', 'ISSUE-032'):
+              assert issues[issue_id]['batch_id'] == 'RBATCH-018'
+              assert issues[issue_id]['epic_id'] == 'E-018'
+              assert issues[issue_id]['milestone_id'] == 'M-009'
+              assert issues[issue_id]['status'].startswith('READY')
+              assert issues[issue_id]['blocked_or_owner_gate'].startswith('RESOLVED 2026-09-02')
+              assert 'status:ready' in issues[issue_id]['label_names']
 
           print('Active planning crosswalk validation: PASS')
           PY
 
-      - name: Validate Prototype v0.1 final owner gate
+      - name: Validate Prototype v0.1 owner progression gate
         working-directory: .
         shell: bash
         run: |
@@ -193,24 +172,15 @@ jobs:
           checklist = Path('09_Development/PROTOTYPE_RELEASE_CHECKLIST.md').read_text(encoding='utf-8')
           evidence = Path('09_Development/Release_Evidence/PROTOTYPE_V0.1_RELEASE_EVIDENCE.md').read_text(encoding='utf-8')
           owner = Path('09_Development/Release_Evidence/PROTOTYPE_V0.1_OWNER_REVIEW_PACKAGE.md').read_text(encoding='utf-8')
-          report = Path('09_Development/AI_Reports/2026-09-01_098_RBATCH_017_POST_MERGE_CLOSURE_CHECKPOINT.md').read_text(encoding='utf-8')
+          report = Path('09_Development/AI_Reports/2026-09-02_099_M008_OWNER_SIGNOFF_M009_ACTIVATION.md').read_text(encoding='utf-8')
 
           assert 'Project opens correctly in GDevelop' not in checklist
           assert 'Deployable web runtime opens correctly' in checklist
-          assert 'FINAL OWNER SIGN-OFF PENDING' in checklist
-          assert '- [x]' not in checklist.lower()
-
-          for section in range(1, 8):
-              assert f'## {section}.' in evidence
-          for req in range(185, 189):
-              assert f'REQ-{req}' in evidence
-          assert 'EVIDENCE PACKAGE MERGED — FINAL RELEASE SIGN-OFF NOT YET RECORDED' in evidence
-          assert '33566223185' in evidence and '33566313283' in evidence
-
-          assert 'APPROVE PROTOTYPE v0.1 RELEASE' in owner
-          assert 'HOLD PROTOTYPE v0.1 RELEASE' in owner
-          assert 'did **not** automatically' in owner
-          assert 'M-008 remains In Progress' in report
-          assert 'No Railway/public/physical-device or subjective observation is invented' in report
-          print('Prototype v0.1 final owner gate: PASS')
+          assert 'FINAL OWNER SIGN-OFF RECORDED — PHASE-2 PROGRESSION AUTHORIZED' in checklist
+          assert 'FINAL OWNER SIGN-OFF RECORDED — PHASE-2 PROGRESSION AUTHORIZED' in evidence
+          assert 'FINAL OWNER PROGRESSION SIGN-OFF — RECORDED 2026-09-02' in owner
+          assert 'M-009 is activated' in report
+          assert 'No unobserved historical manual check is fabricated' in report
+          assert 'not the final product-quality target' in report
+          print('Prototype v0.1 owner progression gate: PASS')
           PY
