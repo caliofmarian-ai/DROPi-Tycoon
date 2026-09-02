@@ -121,6 +121,13 @@ export class GameWorldScene extends Phaser.Scene {
 
     this.cameras.main.setBackgroundColor('#91d0ff')
     this.cameras.main.setBounds(0, 0, WORLD_WIDTH, WORLD_HEIGHT)
+    const topDockLayout = buildGameWorldTopBarLayout(this.scale.width, this.scale.height)
+    this.cameras.main.setViewport(
+      0,
+      topDockLayout.worldViewportTop,
+      this.scale.width,
+      Math.max(1, this.scale.height - topDockLayout.worldViewportTop),
+    )
 
     this.renderWorldLayout()
 

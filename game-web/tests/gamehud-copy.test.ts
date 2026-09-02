@@ -4,11 +4,12 @@ import { describe, expect, it } from 'vitest'
 const hudSource = readFileSync(new URL('../src/ui/GameHUD.ts', import.meta.url), 'utf8')
 
 describe('M-008 compact HUD copy', () => {
-  it('uses an abbreviated two-line active-order presentation', () => {
+  it('uses an abbreviated one-line active-order presentation', () => {
     expect(hudSource).toContain('compactOrderId(data.orderId)')
     expect(hudSource).toContain('compactLocationLabel(data.pickupLocation)')
     expect(hudSource).toContain('compactLocationLabel(data.destination)')
     expect(hudSource).toContain("data.carryingPackage ? 'Carry' : 'Empty'")
+    expect(hudSource).not.toContain('this.orderText.setText([')
   })
 
   it('uses a one-line compact company status', () => {

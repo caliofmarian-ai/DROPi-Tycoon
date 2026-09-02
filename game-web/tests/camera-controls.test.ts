@@ -17,11 +17,8 @@ import {
   zoomByStep,
   zoomFromPinch,
 } from '../src/ui/cameraControls'
-import {
-  MIN_TOUCH_TARGET_PX,
-  rectInsideViewport,
-  SUPPORTED_ANDROID_VIEWPORTS,
-} from '../src/ui/mobileViewport'
+import { rectInsideViewport, SUPPORTED_ANDROID_VIEWPORTS } from '../src/ui/mobileViewport'
+import { GAMEWORLD_TOP_BAR_TOUCH_TARGET_PX } from '../src/ui/gameWorldTopBar'
 
 const sceneSource = readFileSync(
   new URL('../src/scenes/GameWorldScene.ts', import.meta.url),
@@ -90,8 +87,8 @@ describe('release blocker #269 — mobile camera fallback controls', () => {
         'recenter',
       ])
       controls.forEach(({ bounds }) => {
-        expect(bounds.width).toBeGreaterThanOrEqual(MIN_TOUCH_TARGET_PX)
-        expect(bounds.height).toBeGreaterThanOrEqual(MIN_TOUCH_TARGET_PX)
+        expect(bounds.width).toBeGreaterThanOrEqual(GAMEWORLD_TOP_BAR_TOUCH_TARGET_PX)
+        expect(bounds.height).toBeGreaterThanOrEqual(GAMEWORLD_TOP_BAR_TOUCH_TARGET_PX)
         expect(rectInsideViewport(bounds, viewport.width, viewport.height)).toBe(true)
       })
     })

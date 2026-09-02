@@ -18,6 +18,7 @@ import { attemptDelivery, attemptPickup } from '../src/systems/orderSystem'
 import { purchaseUpgrade } from '../src/systems/upgradeSystem'
 import type { CompanyState, GameSessionState, WorldState } from '../src/types/game'
 import { buildHUDLayout, buildNotificationLayout, boundsIntersect } from '../src/ui/hudLayout'
+import { GAMEWORLD_TOP_BAR_TOUCH_TARGET_PX } from '../src/ui/gameWorldTopBar'
 import {
   buildCompanyManagementLayout,
   buildMainMenuLayout,
@@ -270,7 +271,7 @@ describe('RBATCH-016 — full-loop integration verification', () => {
       const hud = buildHUDLayout(viewport.width, viewport.height)
       const notification = buildNotificationLayout(viewport.width, viewport.height)
       const navigation = buildNavigationButtonBounds(viewport.width, viewport.height)
-      expect(hud.acceptButton.height).toBeGreaterThanOrEqual(MIN_TOUCH_TARGET_PX)
+      expect(hud.acceptButton.height).toBeGreaterThanOrEqual(GAMEWORLD_TOP_BAR_TOUCH_TARGET_PX)
       navigation.forEach((rect) => {
         expect(rectInsideViewport(rect, viewport.width, viewport.height)).toBe(true)
         expect(boundsIntersect(hud.orderPanel, rect)).toBe(false)
