@@ -1,7 +1,8 @@
-import { MIN_TOUCH_TARGET_PX, type LayoutRect } from './mobileViewport'
+import { type LayoutRect } from './mobileViewport'
 import {
   buildGameWorldTopBarLayout,
   GAMEWORLD_TOP_BAR_GAP_PX,
+  GAMEWORLD_TOP_BAR_TOUCH_TARGET_PX,
 } from './gameWorldTopBar'
 
 export const CAMERA_MIN_ZOOM = 0.65
@@ -104,15 +105,16 @@ export const shouldPanCamera = (distancePx: number): boolean =>
 
 /**
  * M-008 owner-review layout: all explicit camera controls live in one horizontal
- * top toolbar immediately after the navbar toggle. Touch targets remain 48 px;
- * the scene renders a smaller visual button inside each target.
+ * top toolbar immediately after the navbar toggle. Real Android review showed the
+ * former 48 px GameWorld toolbar targets were visually oversized, so this dock uses
+ * a smaller local target while the rest of RBATCH-015 touch sizing remains unchanged.
  */
 export const buildCameraControlButtons = (
   width: number,
   height: number,
 ): readonly CameraControlButtonLayout[] => {
   const topBar = buildGameWorldTopBarLayout(width, height)
-  const size = MIN_TOUCH_TARGET_PX
+  const size = GAMEWORLD_TOP_BAR_TOUCH_TARGET_PX
   const actions: ReadonlyArray<readonly [CameraControlAction, string]> = [
     ['zoom-in', '+'],
     ['zoom-out', '−'],
