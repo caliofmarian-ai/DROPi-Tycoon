@@ -1,9 +1,7 @@
 import { BALANCING } from '../config/balancing'
 import { createOrderForSequence } from '../systems/orderGeneration'
 import type { CompanyState, GameSettingsState, WorldState } from '../types/game'
-
-export const WORLD_WIDTH = 800
-export const WORLD_HEIGHT = 600
+import { PLAYER_START } from '../world/worldLayout'
 
 export const createInitialCompanyState = (): CompanyState => ({
   companyName: BALANCING.INITIAL_COMPANY_NAME,
@@ -24,16 +22,16 @@ export const createInitialGameSettingsState = (): GameSettingsState => ({
 
 export const createInitialWorldState = (): WorldState => ({
   player: {
-    x: 380,
-    y: 270,
+    x: PLAYER_START.x,
+    y: PLAYER_START.y,
     currentOrder: '',
     carryingPackage: false,
     movementSpeed: BALANCING.WALKING_MOVEMENT_SPEED,
   },
   activeOrder: createOrderForSequence(1),
   tapTarget: {
-    x: 380,
-    y: 270,
+    x: PLAYER_START.x,
+    y: PLAYER_START.y,
   },
   isMoving: false,
   distanceToTarget: 0,

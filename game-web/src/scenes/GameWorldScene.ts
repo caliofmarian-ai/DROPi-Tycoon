@@ -1,7 +1,17 @@
 import Phaser from 'phaser'
 import { getBrowserSaveStorage } from '../persistence/browserSaveStorage'
 import { autosaveIfApproved } from '../persistence/saveSystem'
-import { WORLD_HEIGHT, WORLD_WIDTH } from '../state/gameState'
+import {
+  DELIVERY_ROUTE_POINTS,
+  WORLD_BUILDINGS,
+  WORLD_DECORATIONS,
+  WORLD_HEIGHT,
+  WORLD_ROADS,
+  WORLD_ROUTE_POINTS,
+  WORLD_SIDEWALKS,
+  WORLD_WIDTH,
+  WORLD_ZONES,
+} from '../world/worldLayout'
 import { getOrCreateGameSession, replaceGameSession } from '../state/gameSession'
 import {
   attemptDelivery,
@@ -38,29 +48,6 @@ import {
 } from '../ui/mobileViewport'
 import { selectDeliveryIntentFromTap } from '../utils/deliveryIntent'
 
-const ROAD_POSITIONS = [
-  { x: 240, y: 200 },
-  { x: 272, y: 200 },
-  { x: 304, y: 200 },
-  { x: 336, y: 200 },
-  { x: 432, y: 200 },
-  { x: 464, y: 200 },
-]
-
-const BUILDINGS = [
-  { x: 368, y: 182, texture: 'building_company_small' },
-  { x: 80, y: 60, texture: 'building_residential' },
-  { x: 160, y: 60, texture: 'building_residential' },
-  { x: 580, y: 60, texture: 'building_commercial' },
-  { x: 660, y: 60, texture: 'building_commercial' },
-]
-
-const DELIVERY_POINTS = [
-  { x: 120, y: 490, label: 'PickupZone' },
-  { x: 580, y: 470, label: 'DeliveryZone' },
-  { x: 660, y: 510, label: 'DeliveryPoint' },
-]
-
 const DELIVERY_MARKER_TAP_RADIUS = 36
 
 const rectCenterX = (rect: LayoutRect): number => rect.left + rect.width / 2
@@ -73,7 +60,7 @@ export class GameWorldScene extends Phaser.Scene {
 
   private player!: Phaser.GameObjects.Sprite
 
-  private readonly packagePosition = new Phaser.Math.Vector2(120, 440)
+  private readonly packagePosition = new Phaser.Math.Vector2(0, 0)
 
   private packageSprite!: Phaser.GameObjects.Image
 
@@ -107,7 +94,6 @@ export class GameWorldScene extends Phaser.Scene {
     this.load.image('building_residential', '/assets/sprites/building_residential.png')
     this.load.image('building_commercial', '/assets/sprites/building_commercial.png')
     this.load.image('delivery_point_marker', '/assets/sprites/delivery_point_marker.png')
-    this.load.image('environment_road_tile', '/assets/sprites/environment_road_tile.png')
     this.load.image('package_delivery', '/assets/sprites/package_delivery.png')
     this.load.image('player_character_idle', '/assets/sprites/player_character_idle.png')
     this.load.image('player_character_move', '/assets/sprites/player_character_move.png')
@@ -125,32 +111,13 @@ export class GameWorldScene extends Phaser.Scene {
     this.cameras.main.setBackgroundColor('#91d0ff')
     this.cameras.main.setBounds(0, 0, WORLD_WIDTH, WORLD_HEIGHT)
 
-    this.add.rectangle(WORLD_WIDTH / 2, WORLD_HEIGHT / 2, WORLD_WIDTH, WORLD_HEIGHT, 0xa7f3d0)
-
-    ROAD_POSITIONS.forEach(({ x, y }) => {
-      this.add.image(x, y, 'environment_road_tile')
-    })
-
-    BUILDINGS.forEach(({ x, y, texture }) => {
-      this.add.image(x, y, texture)
-    })
+    this.renderWorldLayout()
 
     this.packageSprite = this.add.image(
       this.packagePosition.x,
       this.packagePosition.y,
       'package_delivery',
     )
-
-    DELIVERY_POINTS.forEach(({ x, y, label }) => {
-      this.add.image(x, y, 'delivery_point_marker')
-      this.add
-        .text(x, y + 28, label, {
-          fontFamily: 'Arial',
-          fontSize: '16px',
-          color: '#0f172a',
-        })
-        .setOrigin(0.5, 0)
-    })
 
     this.player = this.add.sprite(
       this.worldState.player.x,
@@ -205,7 +172,7 @@ export class GameWorldScene extends Phaser.Scene {
         this.worldState.pendingDeliveryDestination = selectDeliveryIntentFromTap(
           pointer.worldX,
           pointer.worldY,
-          DELIVERY_POINTS,
+          DELIVERY_ROUTE_POINTS,
           DELIVERY_MARKER_TAP_RADIUS,
         )
       }
@@ -302,7 +269,7 @@ export class GameWorldScene extends Phaser.Scene {
       return
     }
 
-    const targetPoint = DELIVERY_POINTS.find(
+    const targetPoint = DELIVERY_ROUTE_POINTS.find(
       (pt) => pt.label === this.worldState.pendingDeliveryDestination,
     )
     if (!targetPoint) {
@@ -400,6 +367,72 @@ export class GameWorldScene extends Phaser.Scene {
     if (result.newMessage !== null) {
       this.notificationDisplay.show(result.newMessage)
     }
+  }
+
+  private renderWorldLayout(): void {
+    this.add.rectangle(
+      WORLD_WIDTH / 2,
+      WORLD_HEIGHT / 2,
+      WORLD_WIDTH,
+      WORLD_HEIGHT,
+      0xa7f3d0,
+    )
+
+    WORLD_ZONES.forEach((zone) => {
+      this.add
+        .rectangle(
+          zone.x + zone.width / 2,
+          zone.y + zone.height / 2,
+          zone.width,
+          zone.height,
+          zone.fillColor,
+          0.45,
+        )
+        .setStrokeStyle(3, 0x475569, 0.45)
+
+      this.add.text(zone.x + 18, zone.y + 14, zone.label, {
+        fontFamily: 'Arial',
+        fontSize: '22px',
+        color: '#0f172a',
+        fontStyle: 'bold',
+      })
+    })
+
+    WORLD_ROADS.forEach((road) => {
+      this.add.rectangle(road.x, road.y, road.width, road.height, 0x64748b)
+    })
+
+    WORLD_SIDEWALKS.forEach((sidewalk) => {
+      this.add.rectangle(
+        sidewalk.x,
+        sidewalk.y,
+        sidewalk.width,
+        sidewalk.height,
+        0xe2e8f0,
+      )
+    })
+
+    WORLD_BUILDINGS.forEach(({ x, y, texture }) => {
+      this.add.image(x, y, texture).setScale(1.4)
+    })
+
+    WORLD_DECORATIONS.forEach(({ x, y, radius }) => {
+      this.add.rectangle(x, y + radius, 7, radius * 1.4, 0x7c4a21)
+      this.add.circle(x, y, radius, 0x15803d)
+    })
+
+    WORLD_ROUTE_POINTS.forEach(({ x, y, label, kind }) => {
+      this.add.image(x, y, 'delivery_point_marker')
+      this.add
+        .text(x, y + 28, `${kind === 'pickup' ? 'Pickup' : 'Delivery'}: ${label}`, {
+          fontFamily: 'Arial',
+          fontSize: '15px',
+          color: '#0f172a',
+          backgroundColor: '#f8fafccc',
+          padding: { x: 4, y: 2 },
+        })
+        .setOrigin(0.5, 0)
+    })
   }
 
   private createNavigationButtons(): void {

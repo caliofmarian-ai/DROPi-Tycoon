@@ -1,10 +1,10 @@
 import { BALANCING } from '../config/balancing'
 import type { OrderState } from '../types/game'
+import { findWorldRoutePoint, WORLD_ROUTE_POINTS } from '../world/worldLayout'
 
 export interface OrderRouteTemplate {
   routeId: string
   pickupLocation: string
-  pickupPoint: { x: number; y: number }
   destination: string
 }
 
@@ -12,24 +12,25 @@ export interface OrderRouteTemplate {
  * Prototype route pool. Rewards intentionally remain at the owner-approved
  * Prototype v0.1 value; route-based reward scaling belongs to a later economy
  * pass rather than being smuggled into this release remediation.
+ *
+ * Semantic route identifiers and sequence are preserved from #271. Physical
+ * coordinates are owned by worldLayout.ts so the M-008 map remediation does
+ * not rewrite already-validated order behavior.
  */
 export const ORDER_ROUTE_TEMPLATES: readonly OrderRouteTemplate[] = [
   {
     routeId: 'local-west-east',
     pickupLocation: 'PickupZone',
-    pickupPoint: { x: 120, y: 440 },
     destination: 'DeliveryZone',
   },
   {
     routeId: 'commercial-south',
     pickupLocation: 'CommercialPickup',
-    pickupPoint: { x: 580, y: 120 },
     destination: 'DeliveryPoint',
   },
   {
     routeId: 'residential-cross-town',
     pickupLocation: 'ResidentialPickup',
-    pickupPoint: { x: 160, y: 120 },
     destination: 'DeliveryZone',
   },
 ] as const
@@ -73,10 +74,9 @@ export const createNextOrder = (previousOrder: OrderState): OrderState => {
 }
 
 export const pickupPointForOrder = (order: OrderState): { x: number; y: number } => {
-  const route = ORDER_ROUTE_TEMPLATES.find(
-    (candidate) =>
-      candidate.pickupLocation === order.pickupLocation &&
-      candidate.destination === order.destination,
-  )
-  return route ? { ...route.pickupPoint } : { ...ORDER_ROUTE_TEMPLATES[0].pickupPoint }
+  const point = findWorldRoutePoint(order.pickupLocation)
+  const fallback = WORLD_ROUTE_POINTS.find((candidate) => candidate.kind === 'pickup')
+  if (point?.kind === 'pickup') return { x: point.x, y: point.y }
+  if (fallback) return { x: fallback.x, y: fallback.y }
+  return { x: 0, y: 0 }
 }
