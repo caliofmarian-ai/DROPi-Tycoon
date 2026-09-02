@@ -21,6 +21,15 @@ import {
   type NotificationState,
 } from '../ui/NotificationController'
 import { isPointerOnInteractiveUI } from '../ui/pointerIsolation'
+import { CameraGestureController } from '../ui/CameraGestureController'
+import {
+  CAMERA_DEFAULT_ZOOM,
+  buildCameraControlButtons,
+  rotateByStep,
+  zoomByStep,
+  type CameraControlAction,
+  type TouchPoint,
+} from '../ui/cameraControls'
 import type { RectBounds } from '../ui/hudLayout'
 import {
   buildNavigationButtonBounds,
@@ -73,7 +82,10 @@ export class GameWorldScene extends Phaser.Scene {
 
   private readonly menuButtons: Phaser.GameObjects.Rectangle[] = []
   private readonly menuButtonBounds: RectBounds[] = []
-  private pointerDownHandler: ((pointer: Phaser.Input.Pointer) => void) | null = null
+  private readonly cameraControlButtons: Phaser.GameObjects.Rectangle[] = []
+  private readonly cameraControlBounds: RectBounds[] = []
+  private cameraGestureController: CameraGestureController | null = null
+  private pointerUpHandler: ((pointer: Phaser.Input.Pointer) => void) | null = null
 
   private readonly handleResize = (): void => {
     if (this.worldState && this.companyState) {
@@ -135,21 +147,29 @@ export class GameWorldScene extends Phaser.Scene {
       'player_character_idle',
     )
 
+    this.cameras.main.setZoom(CAMERA_DEFAULT_ZOOM)
     this.cameras.main.startFollow(this.player, false, 1, 1)
 
     this.notificationState = createNotificationState(this.worldState.activeOrder.status)
     this.createNavigationButtons()
+    this.createCameraControlButtons()
+    this.attachCameraGestures()
     this.gameHUD = new GameHUD(this, () => this.onAcceptButtonPressed())
     this.notificationDisplay = new NotificationDisplay(this, () => {
       this.notificationState = clearNotification(this.notificationState)
     })
     this.gameHUD.update(buildHUDData(this.worldState, this.companyState))
 
-    this.pointerDownHandler = (pointer: Phaser.Input.Pointer) => {
+    this.pointerUpHandler = (pointer: Phaser.Input.Pointer) => {
+      if (this.cameraGestureController?.didCameraGestureMove()) {
+        return
+      }
+
       if (
         isPointerOnInteractiveUI(pointer.x, pointer.y, {
           menuButtonBounds: this.menuButtonBounds,
           hudControlBounds: this.gameHUD.getInteractiveBounds(),
+          cameraControlBounds: this.cameraControlBounds,
         })
       ) {
         return
@@ -181,7 +201,7 @@ export class GameWorldScene extends Phaser.Scene {
 
       this.gameHUD.update(buildHUDData(this.worldState, this.companyState))
     }
-    this.input.on('pointerdown', this.pointerDownHandler)
+    this.input.on('pointerup', this.pointerUpHandler)
     this.scale.on(Phaser.Scale.Events.RESIZE, this.handleResize)
     this.events.once(Phaser.Scenes.Events.SHUTDOWN, this.handleSceneShutdown, this)
   }
@@ -345,6 +365,94 @@ export class GameWorldScene extends Phaser.Scene {
     this.createMenuButton(bounds[1], 'Company', () => this.openCompanyManagement())
   }
 
+  private createCameraControlButtons(): void {
+    const controls = buildCameraControlButtons(this.scale.width, this.scale.height)
+    controls.forEach(({ action, label, bounds }) => {
+      const x = rectCenterX(bounds)
+      const y = rectCenterY(bounds)
+      const button = this.add
+        .rectangle(x, y, bounds.width, bounds.height, 0x0f172a, 0.88)
+        .setStrokeStyle(2, 0xe2e8f0)
+        .setScrollFactor(0)
+        .setDepth(30)
+        .setInteractive({ useHandCursor: true })
+
+      this.add
+        .text(x, y, label, {
+          fontFamily: 'Arial',
+          fontSize: '27px',
+          color: '#f8fafc',
+          fontStyle: 'bold',
+        })
+        .setOrigin(0.5)
+        .setScrollFactor(0)
+        .setDepth(31)
+
+      button.on('pointerdown', () => this.applyCameraControl(action))
+      this.cameraControlButtons.push(button)
+      this.cameraControlBounds.push({ ...bounds })
+    })
+  }
+
+  private applyCameraControl(action: CameraControlAction): void {
+    const camera = this.cameras.main
+    switch (action) {
+      case 'zoom-in':
+        this.setCameraZoom(zoomByStep(camera.zoom, 'in'), {
+          x: this.scale.width / 2,
+          y: this.scale.height / 2,
+        })
+        return
+      case 'zoom-out':
+        this.setCameraZoom(zoomByStep(camera.zoom, 'out'), {
+          x: this.scale.width / 2,
+          y: this.scale.height / 2,
+        })
+        return
+      case 'rotate-left':
+        camera.setRotation(rotateByStep(camera.rotation, 'left'))
+        return
+      case 'rotate-right':
+        camera.setRotation(rotateByStep(camera.rotation, 'right'))
+        return
+      case 'recenter':
+        camera.setRotation(0)
+        camera.startFollow(this.player, false, 1, 1)
+        return
+    }
+  }
+
+  private attachCameraGestures(): void {
+    this.cameraGestureController = new CameraGestureController(this.game.canvas, {
+      getZoom: () => this.cameras.main.zoom,
+      setZoom: (zoom, focalPoint) => this.setCameraZoom(zoom, focalPoint),
+      getRotation: () => this.cameras.main.rotation,
+      setRotation: (rotation) => this.cameras.main.setRotation(rotation),
+      panByScreenDelta: (dx, dy) => this.panCameraByScreenDelta(dx, dy),
+      onManualCameraControl: () => this.cameras.main.stopFollow(),
+    })
+    this.cameraGestureController.attach()
+  }
+
+  private setCameraZoom(zoom: number, focalPoint: TouchPoint): void {
+    const camera = this.cameras.main
+    const before = camera.getWorldPoint(focalPoint.x, focalPoint.y)
+    camera.setZoom(zoom)
+    const after = camera.getWorldPoint(focalPoint.x, focalPoint.y)
+    camera.scrollX += before.x - after.x
+    camera.scrollY += before.y - after.y
+  }
+
+  private panCameraByScreenDelta(dx: number, dy: number): void {
+    const camera = this.cameras.main
+    const cos = Math.cos(camera.rotation)
+    const sin = Math.sin(camera.rotation)
+    const worldDx = (dx * cos + dy * sin) / camera.zoom
+    const worldDy = (-dx * sin + dy * cos) / camera.zoom
+    camera.scrollX -= worldDx
+    camera.scrollY -= worldDy
+  }
+
   private openMainMenu(): void {
     this.syncRuntimeSession()
     this.scene.start('MainMenu')
@@ -389,13 +497,17 @@ export class GameWorldScene extends Phaser.Scene {
   }
 
   private handleSceneShutdown(): void {
-    if (this.pointerDownHandler) {
-      this.input.off('pointerdown', this.pointerDownHandler)
-      this.pointerDownHandler = null
+    if (this.pointerUpHandler) {
+      this.input.off('pointerup', this.pointerUpHandler)
+      this.pointerUpHandler = null
     }
+    this.cameraGestureController?.destroy()
+    this.cameraGestureController = null
     this.scale.off(Phaser.Scale.Events.RESIZE, this.handleResize)
     this.notificationDisplay.destroy()
     this.menuButtons.length = 0
     this.menuButtonBounds.length = 0
+    this.cameraControlButtons.length = 0
+    this.cameraControlBounds.length = 0
   }
 }
