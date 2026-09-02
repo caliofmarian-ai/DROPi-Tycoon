@@ -39,54 +39,44 @@ export const isBoundsInsideCanvas = (rect: RectBounds, width: number, height: nu
   rect.left >= 0 && rect.top >= 0 && right(rect) <= width && bottom(rect) <= height
 
 /**
- * Responsive HUD layout for the playable world.
+ * Second M-008 owner-review HUD remediation.
  *
- * The order panel deliberately avoids the historical full-width layout. On compact
- * landscape phones it occupies only the left side while company status remains in
- * the top-right. On portrait/narrow screens it stays compact and is stacked below
- * company status so the map remains visible.
+ * The persistent company/order cluster is deliberately small and anchored to the
+ * upper-right edge in both orientations. The Accept button sits directly below the
+ * order card instead of consuming horizontal map space inside the card.
  */
 export const buildHUDLayout = (canvasWidth: number, canvasHeight: number): HUDLayout => {
   const width = Math.max(1, Math.floor(canvasWidth))
   const height = Math.max(1, Math.floor(canvasHeight))
   const margin = clamp(Math.round(Math.min(width, height) * 0.02), 6, 10)
   const compactLandscape = isCompactLandscape(width, height)
+  const rightEdge = width - margin
 
-  const companyWidth = compactLandscape
-    ? clamp(Math.floor(width * 0.19), 150, 190)
-    : clamp(Math.floor(width * 0.42), 145, 200)
-  const companyHeight = compactLandscape ? 50 : 54
+  const orderWidth = compactLandscape
+    ? clamp(Math.floor(width * 0.22), 150, 200)
+    : clamp(Math.floor(width * 0.4), 144, 168)
+  const companyWidth = Math.min(orderWidth, compactLandscape ? 126 : 132)
+  const companyHeight = compactLandscape ? 32 : 36
   const companyPanel: RectBounds = {
-    left: Math.max(margin, width - companyWidth - margin),
+    left: rightEdge - companyWidth,
     top: margin,
-    width: Math.min(companyWidth, width - margin * 2),
+    width: companyWidth,
     height: companyHeight,
   }
 
-  const availableLeftWidth = Math.max(
-    MIN_TOUCH_TARGET_PX,
-    companyPanel.left - margin * 2,
-  )
-  const portraitOrderWidth = Math.min(330, width - margin * 2)
-  const landscapeOrderWidth = Math.min(380, availableLeftWidth)
-  const orderWidth = compactLandscape ? landscapeOrderWidth : portraitOrderWidth
-  const orderHeight = compactLandscape ? 88 : 98
+  const orderHeight = compactLandscape ? 58 : 62
   const orderPanel: RectBounds = {
-    left: margin,
-    top: compactLandscape ? margin : companyPanel.top + companyPanel.height + 8,
-    width: Math.max(MIN_TOUCH_TARGET_PX, orderWidth),
+    left: rightEdge - orderWidth,
+    top: bottom(companyPanel) + 4,
+    width: orderWidth,
     height: orderHeight,
   }
 
-  const acceptWidth = clamp(
-    Math.floor(orderPanel.width * 0.3),
-    MIN_TOUCH_TARGET_PX,
-    112,
-  )
+  const acceptWidth = compactLandscape ? 74 : 78
   const acceptHeight = MIN_TOUCH_TARGET_PX
   const acceptButton: RectBounds = {
-    left: orderPanel.left + orderPanel.width - acceptWidth - 6,
-    top: orderPanel.top + Math.floor((orderPanel.height - acceptHeight) / 2),
+    left: rightEdge - acceptWidth,
+    top: bottom(orderPanel) + 4,
     width: acceptWidth,
     height: acceptHeight,
   }
@@ -95,16 +85,17 @@ export const buildHUDLayout = (canvasWidth: number, canvasHeight: number): HUDLa
     companyPanel,
     orderPanel,
     acceptButton,
-    orderTextWidth: Math.max(118, orderPanel.width - acceptButton.width - 26),
-    companyFontSize: compactLandscape ? 15 : 16,
-    orderFontSize: compactLandscape ? 14 : 15,
-    acceptFontSize: compactLandscape ? 15 : 16,
+    orderTextWidth: Math.max(120, orderPanel.width - 14),
+    companyFontSize: compactLandscape ? 12 : 13,
+    orderFontSize: compactLandscape ? 11 : 12,
+    acceptFontSize: 13,
   }
 }
 
 /**
  * Derives notification panel layout from runtime canvas and HUD dimensions.
- * The notification stays below the order panel and above bottom navigation.
+ * The notification stays below the complete upper-right HUD cluster and above
+ * bottom navigation while preserving the existing responsive-width contract.
  */
 export const buildNotificationLayout = (canvasWidth: number, canvasHeight: number): RectBounds => {
   const width = Math.max(1, Math.floor(canvasWidth))
@@ -117,7 +108,7 @@ export const buildNotificationLayout = (canvasWidth: number, canvasHeight: numbe
     MIN_TOUCH_TARGET_PX,
     Math.min(width - 24, Math.floor(width * 0.62), 620),
   )
-  const desiredTop = bottom(hud.orderPanel) + margin
+  const desiredTop = bottom(hud.acceptButton) + margin
   const navTop = Math.min(...navBounds.map((bounds) => bounds.top))
   const latestTop = navTop - margin - notifHeight
   const top = Math.max(hud.orderPanel.top, Math.min(desiredTop, latestTop))
