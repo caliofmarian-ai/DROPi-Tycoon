@@ -3,6 +3,7 @@ import { boundsContainPoint, type RectBounds } from './hudLayout'
 export interface UIHitTestState {
   menuButtonBounds: ReadonlyArray<RectBounds>
   hudControlBounds: ReadonlyArray<RectBounds>
+  cameraControlBounds?: ReadonlyArray<RectBounds>
 }
 
 /**
@@ -14,4 +15,5 @@ export const isPointerOnInteractiveUI = (
   state: UIHitTestState,
 ): boolean =>
   state.menuButtonBounds.some((bounds) => boundsContainPoint(bounds, x, y)) ||
-  state.hudControlBounds.some((bounds) => boundsContainPoint(bounds, x, y))
+  state.hudControlBounds.some((bounds) => boundsContainPoint(bounds, x, y)) ||
+  (state.cameraControlBounds ?? []).some((bounds) => boundsContainPoint(bounds, x, y))
