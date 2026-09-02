@@ -23,9 +23,15 @@ const compactOrderId = (value: string): string => value.replace(/^ORDER-/, '#')
  * Player-facing GameWorld HUD.
  *
  * The persistent cluster is intentionally compact and upper-right anchored so
- * the map center remains available for exploration on Android.
+ * the map center remains available for exploration on Android. When a UI layer
+ * is supplied, every HUD object is moved into that layer so it can be rendered
+ * by a screen-space camera that is independent from world pan/zoom/rotation.
  */
 export class GameHUD {
+  private readonly companyPanelBounds: RectBounds
+  private readonly orderPanelBounds: RectBounds
+  private readonly acceptButtonBounds: RectBounds
+
   private readonly companyText: Phaser.GameObjects.Text
 
   private readonly orderBg: Phaser.GameObjects.Rectangle
@@ -34,12 +40,15 @@ export class GameHUD {
   private readonly acceptButton: Phaser.GameObjects.Rectangle
   private readonly acceptLabel: Phaser.GameObjects.Text
 
-  constructor(scene: Phaser.Scene, onAccept: () => void) {
+  constructor(scene: Phaser.Scene, onAccept: () => void, uiLayer?: Phaser.GameObjects.Layer) {
     const layout = buildHUDLayout(scene.scale.width, scene.scale.height)
+    this.companyPanelBounds = { ...layout.companyPanel }
+    this.orderPanelBounds = { ...layout.orderPanel }
+    this.acceptButtonBounds = { ...layout.acceptButton }
 
     const companyPanelCX = layout.companyPanel.left + layout.companyPanel.width / 2
     const companyPanelCY = layout.companyPanel.top + layout.companyPanel.height / 2
-    scene.add
+    const companyBg = scene.add
       .rectangle(
         companyPanelCX,
         companyPanelCY,
@@ -109,6 +118,15 @@ export class GameHUD {
       .setScrollFactor(0)
       .setDepth(HUD_DEPTH + 2)
 
+    uiLayer?.add([
+      companyBg,
+      this.companyText,
+      this.orderBg,
+      this.orderText,
+      this.acceptButton,
+      this.acceptLabel,
+    ])
+
     const handleAccept = (
       _pointer: Phaser.Input.Pointer,
       _localX: number,
@@ -143,21 +161,28 @@ export class GameHUD {
 
   containsPoint(x: number, y: number): boolean {
     if (!this.acceptButton.visible) return false
-    const bounds = this.getAcceptButtonBounds()
-    return boundsContainPoint(bounds, x, y)
+    return boundsContainPoint(this.acceptButtonBounds, x, y)
   }
 
   getAcceptButtonBounds(): RectBounds {
-    const bounds = this.acceptButton.getBounds()
-    return {
-      left: bounds.x,
-      top: bounds.y,
-      width: bounds.width,
-      height: bounds.height,
-    }
+    return { ...this.acceptButtonBounds }
   }
 
   getInteractiveBounds(): RectBounds[] {
     return this.acceptButton.visible ? [this.getAcceptButtonBounds()] : []
+  }
+
+  /**
+   * Persistent screen-space region that should never start a map gesture.
+   */
+  getScreenBlockingBounds(): RectBounds[] {
+    const bounds = [{ ...this.companyPanelBounds }]
+    if (this.orderBg.visible) {
+      bounds.push({ ...this.orderPanelBounds })
+    }
+    if (this.acceptButton.visible) {
+      bounds.push({ ...this.acceptButtonBounds })
+    }
+    return bounds
   }
 }
