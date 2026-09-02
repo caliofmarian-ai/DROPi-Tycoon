@@ -114,7 +114,7 @@ export const buildNotificationLayout = (canvasWidth: number, canvasHeight: numbe
   const notifWidth = clamp(
     Math.min(Math.floor(width * 0.46), availableRightWidth),
     MIN_TOUCH_TARGET_PX,
-    Math.min(320, availableRightWidth),
+    Math.min(420, availableRightWidth),
   )
 
   return {
