@@ -1,15 +1,11 @@
-import {
-  normalizeViewport,
-  viewportEdgeInset,
-  type LayoutRect,
-} from './mobileViewport'
+import { normalizeViewport, type LayoutRect } from './mobileViewport'
 
 /**
  * M-008 owner-review implementation details for the fixed GameWorld top dock.
  * These values are deliberately not gameplay canon and can be tuned later.
  */
 export const GAMEWORLD_TOP_BAR_GAP_PX = 3
-export const GAMEWORLD_TOP_BAR_TOUCH_TARGET_PX = 40
+export const GAMEWORLD_TOP_BAR_TOUCH_TARGET_PX = 44
 export const GAMEWORLD_TOP_BAR_VISUAL_BUTTON_PX = 28
 export const GAMEWORLD_STATUS_ROW_HEIGHT_PX = 28
 
@@ -28,16 +24,16 @@ const clamp = (value: number, min: number, max: number): number =>
 /**
  * Consolidates persistent GameWorld controls into a compact reserved top dock.
  *
- * Row 1 is the fixed navigation/camera toolbar. Row 2 is a shallow, non-interactive
- * status strip. The world camera begins below `worldViewportTop`, so persistent UI
- * never covers the explorable map. Main Menu and Company remain hidden in a dropdown.
+ * Row 1 is the fixed navigation/camera toolbar. Row 2 is a shallow status strip.
+ * The world camera begins below `worldViewportTop`, so persistent UI never covers
+ * the explorable map. Main Menu and Company remain hidden in a dropdown.
  */
 export const buildGameWorldTopBarLayout = (
   width: number,
   height: number,
 ): GameWorldTopBarLayout => {
   const viewport = normalizeViewport(width, height)
-  const edge = clamp(viewportEdgeInset(viewport.width, viewport.height), 4, 6)
+  const edge = 4
   const controlSize = GAMEWORLD_TOP_BAR_TOUCH_TARGET_PX
   const controlBarHeight = edge * 2 + controlSize
   const hudRowTop = controlBarHeight + 2
