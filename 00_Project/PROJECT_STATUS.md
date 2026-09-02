@@ -6,7 +6,7 @@ Version: 1.2.0
 Status: Active Development
 Author: Marian Caliof & OpenAI
 Language: English
-Last Updated: 2026-09-01 (RBATCH-017 merged in PR #267; implementation/verification workstream complete; final owner release review pending)
+Last Updated: 2026-09-02 (M-008 owner progression sign-off recorded; M-009/RBATCH-018 activated)
 
 ---
 
@@ -16,13 +16,13 @@ Last Updated: 2026-09-01 (RBATCH-017 merged in PR #267; implementation/verificat
 
 Phase:
 
-Prototype v0.1 — RBATCH-010 through RBATCH-017 MERGED; automated implementation/integration evidence complete; M-008 remains open only for final human/device/public review and owner release sign-off
+Phase 2 — M-009 Employee & Financial Systems activated; RBATCH-018 Employee Hiring & Onboarding is next
 
 ---
 
 # Current Objective
 
-Perform the final Prototype v0.1 owner review on the public build/Android device using `09_Development/Release_Evidence/PROTOTYPE_V0.1_OWNER_REVIEW_PACKAGE.md`. Do not declare the release complete until the remaining human/device/public/subjective checks are satisfactory and the owner explicitly signs off.
+Implement RBATCH-018 Employee Hiring & Onboarding, beginning with the canonical employee data model, then hiring/onboarding and salary-cycle integration.
 
 ---
 

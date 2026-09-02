@@ -2,11 +2,11 @@
 
 Document: MILESTONE_ARCHITECTURE.md
 Project: DROPi Tycoon
-Version: 1.2.0
+Version: 1.3.0
 Status: Planning — Canonical
 Author: AI Agent (Report 087)
 Language: English
-Last Updated: 2026-08-02
+Last Updated: 2026-09-02
 
 ---
 
@@ -29,8 +29,8 @@ Last Updated: 2026-08-02
 | M-005 | 1 | Economy, HUD & Game Flow | In Progress | E-010, E-011, E-012 | RBATCH-009, RBATCH-010, RBATCH-011 | M-004 | — |
 | M-006 | 1 | Company Management & Bicycle | In Progress | E-013, E-014 | RBATCH-012, RBATCH-013 | M-005 | — |
 | M-007 | 1 | Save & Load System | In Progress | E-015 | RBATCH-014 | M-006 | Resolved 2026-09-01 — ODR-001=A; ODR-003=B |
-| M-008 | 1 | Prototype v0.1 Verification & Release | In Progress | E-016, E-017 | RBATCH-015, RBATCH-016, RBATCH-017 | M-007 | Final Prototype v0.1 owner release sign-off required after human/device/public review (REQ-187) |
-| M-009 | 2 | Employee & Financial Systems | Planned — Future | E-018, E-019, E-020 | RBATCH-018, RBATCH-019, RBATCH-020, RBATCH-021 | M-008 | — |
+| M-008 | 1 | Prototype v0.1 Verification & Release | COMPLETED — owner accepted Prototype v0.1 as the Phase-2 foundation on 2026-09-02 | E-016, E-017 | RBATCH-015, RBATCH-016, RBATCH-017 | M-007 | RESOLVED 2026-09-02 — corrected Android/Railway build accepted; game evolution authorized |
+| M-009 | 2 | Employee & Financial Systems | In Progress | E-018, E-019, E-020 | RBATCH-018, RBATCH-019, RBATCH-020, RBATCH-021 | M-008 | RESOLVED 2026-09-02 — owner authorized Phase-2 progression |
 | M-010 | 2 | Vehicle Fleet Management | Planned — Future | E-021 | RBATCH-022, RBATCH-023, RBATCH-024 | M-009 | — |
 | M-011 | 3 | Warehouse & District System | Planned — Future | E-022, E-023 | RBATCH-025, RBATCH-026, RBATCH-027 | M-010 | — |
 | M-012 | 3 | Advanced Fleet & Route Optimization | Planned — Future | E-024, E-025 | RBATCH-028, RBATCH-029, RBATCH-030, RBATCH-031 | M-011 | — |

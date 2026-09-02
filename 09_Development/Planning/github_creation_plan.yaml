@@ -122,7 +122,7 @@ milestones:
 - id: M-008
   title: Prototype v0.1 Verification & Release
   phase: 1
-  status: 'In Progress'
+  status: 'COMPLETED — owner accepted Prototype v0.1 as Phase-2 foundation 2026-09-02'
   epic_ids:
   - E-016
   - E-017
@@ -132,11 +132,12 @@ milestones:
   - RBATCH-017
   depends_on:
   - M-007
-  owner_gates: 'Final Prototype v0.1 owner release sign-off required after human/device/public review (REQ-187)'
+  owner_gates: 'RESOLVED 2026-09-02 — corrected Android/Railway build accepted; game evolution authorized'
 - id: M-009
   title: Employee & Financial Systems
   phase: 2
-  status: Planned — Future
+  status: 'In Progress'
+  owner_gates: 'RESOLVED 2026-09-02 — owner authorized Phase-2 progression'
   epic_ids:
   - E-018
   - E-019
@@ -447,7 +448,7 @@ epics:
   title: Mobile Optimization
   phase: 1
   milestone_id: M-008
-  status: 'MERGED in PR #263 — pending Railway/public mobile verification'
+  status: 'COMPLETED — Android/public acceptance recorded 2026-09-02'
   batch_ids:
   - RBATCH-015
   depends_on:
@@ -456,7 +457,7 @@ epics:
   title: Full-Loop Integration Verification
   phase: 1
   milestone_id: M-008
-  status: 'COMPLETED — RBATCH-016 and RBATCH-017 merged and validated; M-008 final owner release sign-off pending'
+  status: 'COMPLETED — final owner progression sign-off recorded 2026-09-02'
   batch_ids:
   - RBATCH-016
   - RBATCH-017
@@ -466,7 +467,7 @@ epics:
   title: Employee Management System
   phase: 2
   milestone_id: M-009
-  status: Planned — Future
+  status: 'READY — M-009 activated by owner progression authorization 2026-09-02'
   batch_ids:
   - RBATCH-018
   depends_on:
@@ -1015,7 +1016,8 @@ batches:
   epic_ids:
   - E-016
   title: Mobile Optimization
-  status: 'MERGED in PR #263 — pending Railway/public mobile verification'
+  status: 'COMPLETED — merged PR #263 and accepted on Android/public runtime 2026-09-02'
+  owner_gates: 'RESOLVED 2026-09-02 — owner mobile/public acceptance'
   depends_on:
   - RBATCH-010
   - RBATCH-014
@@ -1044,10 +1046,10 @@ batches:
   epic_ids:
   - E-017
   title: Release-Checklist Verification Package
-  status: 'MERGED in PR #267 — release evidence package complete; final Prototype v0.1 owner release sign-off pending'
+  status: 'COMPLETED — release evidence plus final owner progression sign-off recorded 2026-09-02'
   depends_on:
   - RBATCH-016
-  owner_gates: 'RESOLVED 2026-09-01 — human owner approved RBATCH-017 execution; final release approval remains separate'
+  owner_gates: 'RESOLVED 2026-09-02 — owner accepted Prototype v0.1 as Phase-2 foundation'
   legacy_id: BATCH-016
   legacy_status: NEVER STARTED
   authoritative_planning_source: 09_Development/Planning/BATCH_ARCHITECTURE.md
@@ -1059,7 +1061,8 @@ batches:
   epic_ids:
   - E-018
   title: Employee Hiring & Onboarding
-  status: Planned — Future
+  status: 'READY FOR IMPLEMENTATION — M-009 activated 2026-09-02'
+  owner_gates: 'RESOLVED 2026-09-02 — owner authorized game evolution / Phase-2 progression'
   depends_on:
   - RBATCH-017
 - id: RBATCH-019
@@ -2109,7 +2112,7 @@ issues:
   milestone_id: M-008
   phase: 1
   type: implementation
-  status: 'COMPLETED — merged PR #263; Railway/public verification pending at RBATCH-015 level'
+  status: 'COMPLETED — Android/public acceptance recorded 2026-09-02'
   label_names:
   - type:implementation
   - phase:1
@@ -2125,7 +2128,7 @@ issues:
   milestone_id: M-008
   phase: 1
   type: implementation
-  status: 'COMPLETED — merged PR #263; Railway/public verification pending at RBATCH-015 level'
+  status: 'COMPLETED — Android/public acceptance recorded 2026-09-02'
   label_names:
   - type:implementation
   - phase:1
@@ -2207,13 +2210,14 @@ issues:
   milestone_id: M-009
   phase: 2
   type: design
-  status: Needs design / canonical detailing
+  status: 'READY — canonical detailing authorized 2026-09-02'
+  blocked_or_owner_gate: 'RESOLVED 2026-09-02 — M-009 activated by owner progression authorization'
   label_names:
   - type:design
   - phase:2
   - batch:rbatch-018
   - epic:employee-management
-  - status:needs-design
+  - status:ready
   description: Define employee attributes, salary fields, and onboarding state.
   acceptance_criteria: Employee model is documented before deeper implementation.
 - id: ISSUE-025
@@ -2241,13 +2245,14 @@ issues:
   milestone_id: M-009
   phase: 2
   type: implementation
-  status: Specification prepared — future implementation only
+  status: 'READY — implementation authorized after ISSUE-024 model 2026-09-02'
+  blocked_or_owner_gate: 'RESOLVED 2026-09-02 — M-009/RBATCH-018 activated'
   label_names:
   - type:implementation
   - phase:2
   - batch:rbatch-018
   - epic:employee-management
-  - status:future
+  - status:ready
   description: Deduct salaries on each salary cycle.
   acceptance_criteria: Salary deductions are accurate.
   blocked_by: Parent milestone and batch are Planned — Future
@@ -2349,13 +2354,14 @@ issues:
   milestone_id: M-009
   phase: 2
   type: implementation
-  status: Specification prepared — future implementation only
+  status: 'READY — implementation authorized after ISSUE-024 model 2026-09-02'
+  blocked_or_owner_gate: 'RESOLVED 2026-09-02 — M-009/RBATCH-018 activated'
   label_names:
   - type:implementation
   - phase:2
   - batch:rbatch-018
   - epic:employee-management
-  - status:future
+  - status:ready
   description: Implement hiring flow and onboarding state transitions.
   acceptance_criteria: Employees can be hired and become active.
   blocked_by: Parent milestone and batch are Planned — Future
