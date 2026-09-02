@@ -92,7 +92,6 @@ export const buildEmployeeManagementLayout = (
   }
 
   const navHeight = 58
-  const navGap = 10
   const navWidth = Math.max(
     MIN_TOUCH_TARGET_PX,
     Math.floor((viewport.width - edge * 3) / 2),
