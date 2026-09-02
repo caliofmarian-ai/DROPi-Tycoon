@@ -45,7 +45,12 @@ export interface WorldRoutePoint {
 export const WORLD_WIDTH = 1600
 export const WORLD_HEIGHT = 1200
 
-export const PLAYER_START = { x: 1120, y: 900 } as const
+/**
+ * ODR-001=A means player position is regenerated rather than persisted.
+ * Preserve the established Prototype v0.1 reset position while expanding the
+ * surrounding map; the owner-review remediation does not redefine Save/Load.
+ */
+export const PLAYER_START = { x: 380, y: 270 } as const
 
 export const WORLD_ZONES: readonly WorldZoneLayout[] = [
   {
@@ -174,8 +179,12 @@ export const WORLD_DECORATIONS: readonly WorldDecorationLayout[] = [
   { id: 'tree-c-4', x: 1480, y: 1080, radius: 15, zoneId: 'company' },
 ] as const
 
+/**
+ * Established Prototype v0.1 route identifiers are preserved. Only their
+ * physical coordinates are relocated into the expanded map.
+ */
 export const WORLD_ROUTE_POINTS: readonly WorldRoutePoint[] = [
-  { label: 'CompanyPickup', x: 960, y: 850, zoneId: 'company', kind: 'pickup' },
+  { label: 'PickupZone', x: 620, y: 820, zoneId: 'storage', kind: 'pickup' },
   { label: 'CommercialPickup', x: 980, y: 430, zoneId: 'business', kind: 'pickup' },
   { label: 'ResidentialPickup', x: 620, y: 430, zoneId: 'residential', kind: 'pickup' },
   { label: 'DeliveryZone', x: 560, y: 390, zoneId: 'residential', kind: 'delivery' },
