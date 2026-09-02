@@ -1,4 +1,5 @@
 import { BALANCING } from '../config/balancing'
+import { createOrderForSequence } from '../systems/orderGeneration'
 import type { CompanyState, GameSettingsState, WorldState } from '../types/game'
 
 export const WORLD_WIDTH = 800
@@ -29,15 +30,7 @@ export const createInitialWorldState = (): WorldState => ({
     carryingPackage: false,
     movementSpeed: BALANCING.WALKING_MOVEMENT_SPEED,
   },
-  activeOrder: {
-    orderId: 'ORDER-001',
-    pickupLocation: 'PickupZone',
-    destination: 'DeliveryZone',
-    status: 'Available',
-    acceptRequested: false,
-    reward: BALANCING.ORDER_REWARD,
-    economySettled: false,
-  },
+  activeOrder: createOrderForSequence(1),
   tapTarget: {
     x: 380,
     y: 270,
