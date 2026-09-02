@@ -85,6 +85,7 @@ export class GameWorldScene extends Phaser.Scene {
   private readonly cameraControlButtons: Phaser.GameObjects.Rectangle[] = []
   private readonly cameraControlBounds: RectBounds[] = []
   private cameraGestureController: CameraGestureController | null = null
+  private cameraRotation = 0
   private pointerUpHandler: ((pointer: Phaser.Input.Pointer) => void) | null = null
 
   private readonly handleResize = (): void => {
@@ -410,12 +411,15 @@ export class GameWorldScene extends Phaser.Scene {
         })
         return
       case 'rotate-left':
-        camera.setRotation(rotateByStep(camera.rotation, 'left'))
+        this.cameraRotation = rotateByStep(this.cameraRotation, 'left')
+        camera.setRotation(this.cameraRotation)
         return
       case 'rotate-right':
-        camera.setRotation(rotateByStep(camera.rotation, 'right'))
+        this.cameraRotation = rotateByStep(this.cameraRotation, 'right')
+        camera.setRotation(this.cameraRotation)
         return
       case 'recenter':
+        this.cameraRotation = 0
         camera.setRotation(0)
         camera.startFollow(this.player, false, 1, 1)
         return
@@ -426,8 +430,11 @@ export class GameWorldScene extends Phaser.Scene {
     this.cameraGestureController = new CameraGestureController(this.game.canvas, {
       getZoom: () => this.cameras.main.zoom,
       setZoom: (zoom, focalPoint) => this.setCameraZoom(zoom, focalPoint),
-      getRotation: () => this.cameras.main.rotation,
-      setRotation: (rotation) => this.cameras.main.setRotation(rotation),
+      getRotation: () => this.cameraRotation,
+      setRotation: (rotation) => {
+        this.cameraRotation = rotation
+        this.cameras.main.setRotation(rotation)
+      },
       panByScreenDelta: (dx, dy) => this.panCameraByScreenDelta(dx, dy),
       onManualCameraControl: () => this.cameras.main.stopFollow(),
     })
@@ -445,8 +452,8 @@ export class GameWorldScene extends Phaser.Scene {
 
   private panCameraByScreenDelta(dx: number, dy: number): void {
     const camera = this.cameras.main
-    const cos = Math.cos(camera.rotation)
-    const sin = Math.sin(camera.rotation)
+    const cos = Math.cos(this.cameraRotation)
+    const sin = Math.sin(this.cameraRotation)
     const worldDx = (dx * cos + dy * sin) / camera.zoom
     const worldDy = (-dx * sin + dy * cos) / camera.zoom
     camera.scrollX -= worldDx
