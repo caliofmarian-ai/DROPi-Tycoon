@@ -1,0 +1,26 @@
+name: Fix Camera Rotation State
+
+on:
+  push:
+    branches:
+      - openai/release-blocker-interactive-camera
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: openai/release-blocker-interactive-camera
+          fetch-depth: 0
+      - run: python3 scripts/fix_camera_rotation_state.py
+      - run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add game-web/src/scenes/GameWorldScene.ts
+          git commit -m "fix: track camera rotation in scene state"
+          git push origin HEAD:openai/release-blocker-interactive-camera
