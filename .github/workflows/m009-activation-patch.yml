@@ -1,56 +1,34 @@
-name: M-009 Activation Reconciliation
+name: M-009 Activation Cleanup
 
 on:
   push:
     branches:
       - openai/m008-release-m009-activation
     paths:
-      - scripts/m009_activation_patch.py
       - .github/workflows/m009-activation-patch.yml
 
 permissions:
   contents: write
 
 jobs:
-  reconcile:
+  cleanup:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
         with:
           ref: openai/m008-release-m009-activation
           fetch-depth: 0
-      - uses: actions/setup-python@v5
-        with:
-          python-version: '3.12'
-      - name: Install YAML validator
-        run: python -m pip install --quiet pyyaml
-      - name: Make YAML-field updates insertion-safe
-        run: |
-          python - <<'PY'
-          from pathlib import Path
 
-          path = Path('scripts/m009_activation_patch.py')
-          text = path.read_text(encoding='utf-8')
-          old = '''        block, count = re.subn(pattern, replacement, block, count=1)\n        if count != 1:\n            raise SystemExit(f'Field {key} not found in YAML item {item_id}')'''
-          new = '''        if re.search(pattern, block):\n            block = re.sub(pattern, replacement, block, count=1)\n        else:\n            lines = block.splitlines()\n            insert_after = next((index for index, line in enumerate(lines) if line.startswith('  status:')), None)\n            if insert_after is None:\n                insert_after = next((index for index, line in enumerate(lines) if line.startswith('  title:')), 0)\n            lines.insert(insert_after + 1, replacement)\n            trailing_newline = '\\n' if block.endswith('\\n') else ''\n            block = '\\n'.join(lines) + trailing_newline'''
-          if old not in text:
-              raise SystemExit('Expected strict YAML-field update block not found')
-          path.write_text(text.replace(old, new, 1), encoding='utf-8')
-          PY
-      - name: Apply canonical transition
-        run: python scripts/m009_activation_patch.py
-      - name: Restore CRLF documents and apply minimal patches
+      - name: Restore legacy line endings and keep only semantic changes
         run: |
           set -euo pipefail
           git checkout origin/main -- 00_Project/PROJECT_STATUS.md 09_Development/CHANGELOG.md 09_Development/PROTOTYPE_RELEASE_CHECKLIST.md
           python - <<'PY'
-          from pathlib import Path
-
-          def read_raw(path: str) -> str:
+          def read_raw(path):
               with open(path, 'r', encoding='utf-8', newline='') as handle:
                   return handle.read()
 
-          def write_raw(path: str, text: str) -> None:
+          def write_raw(path, text):
               with open(path, 'w', encoding='utf-8', newline='') as handle:
                   handle.write(text)
 
@@ -76,75 +54,54 @@ jobs:
           checklist_path = '09_Development/PROTOTYPE_RELEASE_CHECKLIST.md'
           checklist = read_raw(checklist_path)
           nl = '\r\n' if '\r\n' in checklist else '\n'
-          section = '''
-
----
-
-# Final Owner Progression Decision — 2026-09-02
-
-**FINAL OWNER SIGN-OFF RECORDED — PHASE-2 PROGRESSION AUTHORIZED**
-
-After the focused M-008 Android/Railway remediation cycle, the Project Owner confirmed the corrected public build works and explicitly requested progression to the evolution of the game. Prototype v0.1 is accepted as the technical/gameplay foundation for Phase 2.
-
-This acceptance does **not** assert that every historical manual regression checkbox was individually re-observed in the final session. Any such residual verification is retained as regression debt and must not be fabricated. It is no longer a blocker to M-009 execution.
-
-The current placeholder visual quality is explicitly not the final quality target.
-'''.replace('\n', nl)
+          section_lines = [
+              '---',
+              '',
+              '# Final Owner Progression Decision — 2026-09-02',
+              '',
+              '**FINAL OWNER SIGN-OFF RECORDED — PHASE-2 PROGRESSION AUTHORIZED**',
+              '',
+              'After the focused M-008 Android/Railway remediation cycle, the Project Owner confirmed the corrected public build works and explicitly requested progression to the evolution of the game. Prototype v0.1 is accepted as the technical/gameplay foundation for Phase 2.',
+              '',
+              'This acceptance does **not** assert that every historical manual regression checkbox was individually re-observed in the final session. Any such residual verification is retained as regression debt and must not be fabricated. It is no longer a blocker to M-009 execution.',
+              '',
+              'The current placeholder visual quality is explicitly not the final quality target.',
+          ]
           if 'FINAL OWNER SIGN-OFF RECORDED — PHASE-2 PROGRESSION AUTHORIZED' not in checklist:
-              checklist += section
+              checklist += nl + nl + nl.join(section_lines) + nl
           write_raw(checklist_path, checklist)
 
           changelog_path = '09_Development/CHANGELOG.md'
           changelog = read_raw(changelog_path)
           nl = '\r\n' if '\r\n' in changelog else '\n'
-          entry = '''
-
-## 2026-09-02 — M-008 owner progression sign-off / M-009 activation
-
-- Owner confirmed the corrected Android/Railway build works after PR #282.
-- Prototype v0.1 accepted as the Phase-2 foundation; current temporary graphics remain below the final quality target.
-- M-009 activated and RBATCH-018 / E-018 / ISSUE-024 / ISSUE-026 / ISSUE-032 prepared for execution.
-- No unobserved historical manual verification is fabricated; residual regression debt remains non-blocking.
-'''.replace('\n', nl)
+          entry_lines = [
+              '## 2026-09-02 — M-008 owner progression sign-off / M-009 activation',
+              '',
+              '- Owner confirmed the corrected Android/Railway build works after PR #282.',
+              '- Prototype v0.1 accepted as the Phase-2 foundation; current temporary graphics remain below the final quality target.',
+              '- M-009 activated and RBATCH-018 / E-018 / ISSUE-024 / ISSUE-026 / ISSUE-032 prepared for execution.',
+              '- No unobserved historical manual verification is fabricated; residual regression debt remains non-blocking.',
+          ]
           if 'M-008 owner progression sign-off / M-009 activation' not in changelog:
-              changelog += entry
+              changelog += nl + nl + nl.join(entry_lines) + nl
           write_raw(changelog_path, changelog)
           PY
-      - name: Validate planning and release markers
+
+          git -c core.whitespace=cr-at-eol diff --check
+
+      - name: Validate transition markers
         run: |
           set -euo pipefail
-          python - <<'PY'
-          from pathlib import Path
-          import yaml
+          grep -F 'M-009 Employee & Financial Systems activated' 00_Project/PROJECT_STATUS.md
+          grep -F 'FINAL OWNER SIGN-OFF RECORDED — PHASE-2 PROGRESSION AUTHORIZED' 09_Development/PROTOTYPE_RELEASE_CHECKLIST.md
+          grep -F 'M-008 owner progression sign-off / M-009 activation' 09_Development/CHANGELOG.md
 
-          data = yaml.safe_load(Path('09_Development/Planning/github_creation_plan.yaml').read_text(encoding='utf-8'))
-          milestones = {x['id']: x for x in data['milestones']}
-          batches = {x['id']: x for x in data['batches']}
-          epics = {x['id']: x for x in data['epics']}
-          issues = {x['id']: x for x in data['issues']}
-
-          assert milestones['M-008']['status'].startswith('COMPLETED')
-          assert milestones['M-009']['status'] == 'In Progress'
-          assert milestones['M-009']['owner_gates'].startswith('RESOLVED 2026-09-02')
-          assert batches['RBATCH-018']['status'].startswith('READY FOR IMPLEMENTATION')
-          assert epics['E-018']['status'].startswith('READY')
-          for issue_id in ('ISSUE-024', 'ISSUE-026', 'ISSUE-032'):
-              assert issues[issue_id]['status'].startswith('READY')
-              assert 'status:ready' in issues[issue_id]['label_names']
-
-          assert 'FINAL OWNER SIGN-OFF RECORDED — PHASE-2 PROGRESSION AUTHORIZED' in Path('09_Development/PROTOTYPE_RELEASE_CHECKLIST.md').read_text(encoding='utf-8')
-          assert 'FINAL OWNER PROGRESSION SIGN-OFF — RECORDED 2026-09-02' in Path('09_Development/Release_Evidence/PROTOTYPE_V0.1_OWNER_REVIEW_PACKAGE.md').read_text(encoding='utf-8')
-          assert Path('09_Development/AI_Reports/2026-09-02_099_M008_OWNER_SIGNOFF_M009_ACTIVATION.md').is_file()
-          print('M-009 activation reconciliation: PASS')
-          PY
-          git -c core.whitespace=cr-at-eol diff --check
-      - name: Commit reconciled canonical state
+      - name: Commit cleanup
         run: |
           set -euo pipefail
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add 00_Project/PROJECT_STATUS.md 09_Development
-          git checkout -- .github/workflows/rbatch-010-ci.yml scripts/m009_activation_patch.py
-          git diff --cached --quiet && { echo 'No canonical changes to commit'; exit 1; }
-          git commit -m "[Planning] Record M-008 owner sign-off and activate M-009"
+          git add 00_Project/PROJECT_STATUS.md 09_Development/CHANGELOG.md 09_Development/PROTOTYPE_RELEASE_CHECKLIST.md
+          git diff --cached --quiet && { echo 'No cleanup required'; exit 0; }
+          git commit -m "[Planning] Preserve canonical document line endings"
           git push origin HEAD:openai/m008-release-m009-activation
