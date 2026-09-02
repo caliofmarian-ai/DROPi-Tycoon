@@ -394,6 +394,7 @@ export class GameWorldScene extends Phaser.Scene {
       this.notificationState,
       // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
       currentStatus as import('../types/game').OrderStatus,
+      this.worldState.activeOrder,
     )
     this.notificationState = result.state
     if (result.newMessage !== null) {
