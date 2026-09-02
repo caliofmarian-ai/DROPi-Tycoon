@@ -24,6 +24,19 @@ jobs:
           python-version: '3.12'
       - name: Install YAML validator
         run: python -m pip install --quiet pyyaml
+      - name: Make YAML-field updates insertion-safe
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+
+          path = Path('scripts/m009_activation_patch.py')
+          text = path.read_text(encoding='utf-8')
+          old = '''        block, count = re.subn(pattern, replacement, block, count=1)\n        if count != 1:\n            raise SystemExit(f'Field {key} not found in YAML item {item_id}')'''
+          new = '''        if re.search(pattern, block):\n            block = re.sub(pattern, replacement, block, count=1)\n        else:\n            lines = block.splitlines()\n            insert_after = next((index for index, line in enumerate(lines) if line.startswith('  status:')), None)\n            if insert_after is None:\n                insert_after = next((index for index, line in enumerate(lines) if line.startswith('  title:')), 0)\n            lines.insert(insert_after + 1, replacement)\n            trailing_newline = '\\n' if block.endswith('\\n') else ''\n            block = '\\n'.join(lines) + trailing_newline'''
+          if old not in text:
+              raise SystemExit('Expected strict YAML-field update block not found')
+          path.write_text(text.replace(old, new, 1), encoding='utf-8')
+          PY
       - name: Apply canonical transition
         run: python scripts/m009_activation_patch.py
       - name: Validate planning and release markers
@@ -41,6 +54,7 @@ jobs:
 
           assert milestones['M-008']['status'].startswith('COMPLETED')
           assert milestones['M-009']['status'] == 'In Progress'
+          assert milestones['M-009']['owner_gates'].startswith('RESOLVED 2026-09-02')
           assert batches['RBATCH-018']['status'].startswith('READY FOR IMPLEMENTATION')
           assert epics['E-018']['status'].startswith('READY')
           for issue_id in ('ISSUE-024', 'ISSUE-026', 'ISSUE-032'):
