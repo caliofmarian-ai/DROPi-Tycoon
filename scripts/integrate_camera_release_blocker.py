@@ -1,0 +1,266 @@
+from pathlib import Path
+
+path = Path('game-web/src/scenes/GameWorldScene.ts')
+text = path.read_text()
+
+
+def replace_once(old: str, new: str) -> None:
+    global text
+    count = text.count(old)
+    if count != 1:
+        raise RuntimeError(f'Expected exactly one match, found {count}: {old[:100]!r}')
+    text = text.replace(old, new, 1)
+
+
+replace_once(
+    "import { isPointerOnInteractiveUI } from '../ui/pointerIsolation'\n",
+    "import { isPointerOnInteractiveUI } from '../ui/pointerIsolation'\n"
+    "import { CameraGestureController } from '../ui/CameraGestureController'\n"
+    "import {\n"
+    "  CAMERA_DEFAULT_ZOOM,\n"
+    "  buildCameraControlButtons,\n"
+    "  rotateByStep,\n"
+    "  zoomByStep,\n"
+    "  type CameraControlAction,\n"
+    "  type TouchPoint,\n"
+    "} from '../ui/cameraControls'\n",
+)
+
+replace_once(
+    "  private readonly menuButtons: Phaser.GameObjects.Rectangle[] = []\n"
+    "  private readonly menuButtonBounds: RectBounds[] = []\n"
+    "  private pointerDownHandler: ((pointer: Phaser.Input.Pointer) => void) | null = null\n",
+    "  private readonly menuButtons: Phaser.GameObjects.Rectangle[] = []\n"
+    "  private readonly menuButtonBounds: RectBounds[] = []\n"
+    "  private readonly cameraControlButtons: Phaser.GameObjects.Rectangle[] = []\n"
+    "  private readonly cameraControlBounds: RectBounds[] = []\n"
+    "  private cameraGestureController: CameraGestureController | null = null\n"
+    "  private pointerUpHandler: ((pointer: Phaser.Input.Pointer) => void) | null = null\n",
+)
+
+replace_once(
+    "    this.cameras.main.startFollow(this.player, false, 1, 1)\n\n"
+    "    this.notificationState = createNotificationState(this.worldState.activeOrder.status)\n"
+    "    this.createNavigationButtons()\n",
+    "    this.cameras.main.setZoom(CAMERA_DEFAULT_ZOOM)\n"
+    "    this.cameras.main.startFollow(this.player, false, 1, 1)\n\n"
+    "    this.notificationState = createNotificationState(this.worldState.activeOrder.status)\n"
+    "    this.createNavigationButtons()\n"
+    "    this.createCameraControlButtons()\n"
+    "    this.attachCameraGestures()\n",
+)
+
+old_handler = """    this.pointerDownHandler = (pointer: Phaser.Input.Pointer) => {
+      if (
+        isPointerOnInteractiveUI(pointer.x, pointer.y, {
+          menuButtonBounds: this.menuButtonBounds,
+          hudControlBounds: this.gameHUD.getInteractiveBounds(),
+        })
+      ) {
+        return
+      }
+
+      this.worldState.tapTarget = { x: pointer.worldX, y: pointer.worldY }
+      this.worldState.isMoving = true
+
+      if (
+        this.worldState.activeOrder.status === 'Available' &&
+        Phaser.Math.Distance.Between(
+          pointer.worldX,
+          pointer.worldY,
+          this.packagePosition.x,
+          this.packagePosition.y,
+        ) <= 28
+      ) {
+        this.applyAcceptance(this.worldState.activeOrder.orderId)
+      }
+
+      if (this.worldState.activeOrder.status === 'PickedUp' && this.worldState.player.carryingPackage) {
+        this.worldState.pendingDeliveryDestination = selectDeliveryIntentFromTap(
+          pointer.worldX,
+          pointer.worldY,
+          DELIVERY_POINTS,
+          DELIVERY_MARKER_TAP_RADIUS,
+        )
+      }
+
+      this.gameHUD.update(buildHUDData(this.worldState, this.companyState))
+    }
+    this.input.on('pointerdown', this.pointerDownHandler)
+"""
+
+new_handler = """    this.pointerUpHandler = (pointer: Phaser.Input.Pointer) => {
+      if (this.cameraGestureController?.didCameraGestureMove()) {
+        return
+      }
+
+      if (
+        isPointerOnInteractiveUI(pointer.x, pointer.y, {
+          menuButtonBounds: this.menuButtonBounds,
+          hudControlBounds: this.gameHUD.getInteractiveBounds(),
+          cameraControlBounds: this.cameraControlBounds,
+        })
+      ) {
+        return
+      }
+
+      this.worldState.tapTarget = { x: pointer.worldX, y: pointer.worldY }
+      this.worldState.isMoving = true
+
+      if (
+        this.worldState.activeOrder.status === 'Available' &&
+        Phaser.Math.Distance.Between(
+          pointer.worldX,
+          pointer.worldY,
+          this.packagePosition.x,
+          this.packagePosition.y,
+        ) <= 28
+      ) {
+        this.applyAcceptance(this.worldState.activeOrder.orderId)
+      }
+
+      if (this.worldState.activeOrder.status === 'PickedUp' && this.worldState.player.carryingPackage) {
+        this.worldState.pendingDeliveryDestination = selectDeliveryIntentFromTap(
+          pointer.worldX,
+          pointer.worldY,
+          DELIVERY_POINTS,
+          DELIVERY_MARKER_TAP_RADIUS,
+        )
+      }
+
+      this.gameHUD.update(buildHUDData(this.worldState, this.companyState))
+    }
+    this.input.on('pointerup', this.pointerUpHandler)
+"""
+replace_once(old_handler, new_handler)
+
+anchor = """  private createNavigationButtons(): void {
+    const bounds = buildNavigationButtonBounds(this.scale.width, this.scale.height)
+    this.createMenuButton(bounds[0], 'Main Menu', () => this.openMainMenu())
+    this.createMenuButton(bounds[1], 'Company', () => this.openCompanyManagement())
+  }
+
+"""
+
+camera_methods = anchor + """  private createCameraControlButtons(): void {
+    const controls = buildCameraControlButtons(this.scale.width, this.scale.height)
+    controls.forEach(({ action, label, bounds }) => {
+      const x = rectCenterX(bounds)
+      const y = rectCenterY(bounds)
+      const button = this.add
+        .rectangle(x, y, bounds.width, bounds.height, 0x0f172a, 0.88)
+        .setStrokeStyle(2, 0xe2e8f0)
+        .setScrollFactor(0)
+        .setDepth(30)
+        .setInteractive({ useHandCursor: true })
+
+      this.add
+        .text(x, y, label, {
+          fontFamily: 'Arial',
+          fontSize: '27px',
+          color: '#f8fafc',
+          fontStyle: 'bold',
+        })
+        .setOrigin(0.5)
+        .setScrollFactor(0)
+        .setDepth(31)
+
+      button.on('pointerdown', () => this.applyCameraControl(action))
+      this.cameraControlButtons.push(button)
+      this.cameraControlBounds.push({ ...bounds })
+    })
+  }
+
+  private applyCameraControl(action: CameraControlAction): void {
+    const camera = this.cameras.main
+    switch (action) {
+      case 'zoom-in':
+        this.setCameraZoom(zoomByStep(camera.zoom, 'in'), {
+          x: this.scale.width / 2,
+          y: this.scale.height / 2,
+        })
+        return
+      case 'zoom-out':
+        this.setCameraZoom(zoomByStep(camera.zoom, 'out'), {
+          x: this.scale.width / 2,
+          y: this.scale.height / 2,
+        })
+        return
+      case 'rotate-left':
+        camera.setRotation(rotateByStep(camera.rotation, 'left'))
+        return
+      case 'rotate-right':
+        camera.setRotation(rotateByStep(camera.rotation, 'right'))
+        return
+      case 'recenter':
+        camera.setRotation(0)
+        camera.startFollow(this.player, false, 1, 1)
+        return
+    }
+  }
+
+  private attachCameraGestures(): void {
+    this.cameraGestureController = new CameraGestureController(this.game.canvas, {
+      getZoom: () => this.cameras.main.zoom,
+      setZoom: (zoom, focalPoint) => this.setCameraZoom(zoom, focalPoint),
+      getRotation: () => this.cameras.main.rotation,
+      setRotation: (rotation) => this.cameras.main.setRotation(rotation),
+      panByScreenDelta: (dx, dy) => this.panCameraByScreenDelta(dx, dy),
+      onManualCameraControl: () => this.cameras.main.stopFollow(),
+    })
+    this.cameraGestureController.attach()
+  }
+
+  private setCameraZoom(zoom: number, focalPoint: TouchPoint): void {
+    const camera = this.cameras.main
+    const before = camera.getWorldPoint(focalPoint.x, focalPoint.y)
+    camera.setZoom(zoom)
+    const after = camera.getWorldPoint(focalPoint.x, focalPoint.y)
+    camera.scrollX += before.x - after.x
+    camera.scrollY += before.y - after.y
+  }
+
+  private panCameraByScreenDelta(dx: number, dy: number): void {
+    const camera = this.cameras.main
+    const cos = Math.cos(camera.rotation)
+    const sin = Math.sin(camera.rotation)
+    const worldDx = (dx * cos + dy * sin) / camera.zoom
+    const worldDy = (-dx * sin + dy * cos) / camera.zoom
+    camera.scrollX -= worldDx
+    camera.scrollY -= worldDy
+  }
+
+"""
+replace_once(anchor, camera_methods)
+
+replace_once(
+    """  private handleSceneShutdown(): void {
+    if (this.pointerDownHandler) {
+      this.input.off('pointerdown', this.pointerDownHandler)
+      this.pointerDownHandler = null
+    }
+    this.scale.off(Phaser.Scale.Events.RESIZE, this.handleResize)
+    this.notificationDisplay.destroy()
+    this.menuButtons.length = 0
+    this.menuButtonBounds.length = 0
+  }
+""",
+    """  private handleSceneShutdown(): void {
+    if (this.pointerUpHandler) {
+      this.input.off('pointerup', this.pointerUpHandler)
+      this.pointerUpHandler = null
+    }
+    this.cameraGestureController?.destroy()
+    this.cameraGestureController = null
+    this.scale.off(Phaser.Scale.Events.RESIZE, this.handleResize)
+    this.notificationDisplay.destroy()
+    this.menuButtons.length = 0
+    this.menuButtonBounds.length = 0
+    this.cameraControlButtons.length = 0
+    this.cameraControlBounds.length = 0
+  }
+""",
+)
+
+path.write_text(text)
+print('Camera integration patch complete')
