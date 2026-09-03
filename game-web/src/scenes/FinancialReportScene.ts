@@ -130,7 +130,7 @@ export class FinancialReportScene extends Phaser.Scene {
       const session = replaceGameSession(this.worldState, this.companyState)
       const storage = getBrowserSaveStorage()
       if (storage) {
-        const autosave = autosaveIfApproved(storage, session, 'daily-operating-expense-processed')
+        const autosave = autosaveIfApproved(storage, session, 'progression-changed')
         if (!autosave.saved && autosave.reason === 'write-failed') {
           this.feedbackText.setText(`${result.message}\nLocal autosave failed: ${autosave.message ?? 'unknown error'}`)
         }
