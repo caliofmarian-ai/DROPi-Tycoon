@@ -36,7 +36,6 @@ export const CANONICAL_AUTOSAVE_EVENTS = [
   'employee-hired',
   'employee-onboarding-completed',
   'salary-cycle-processed',
-  'daily-operating-expense-processed',
 ] as const
 
 export type CanonicalAutosaveEvent = (typeof CANONICAL_AUTOSAVE_EVENTS)[number]
@@ -47,9 +46,11 @@ export interface SaveStorage {
   removeItem(key: string): void
 }
 
+type SaveCompanyV2 = Omit<CompanyState, 'financials'> & { financials?: FinancialState }
+
 export interface SaveGameV2 {
   formatVersion: typeof SAVE_FORMAT_VERSION
-  company: CompanyState
+  company: SaveCompanyV2
   settings: GameSettingsState
 }
 
@@ -91,36 +92,26 @@ const isEmployeeRole = (value: unknown): value is EmployeeRole =>
 const isEmploymentStatus = (value: unknown): value is EmploymentStatus =>
   typeof value === 'string' && EMPLOYMENT_STATUSES.some((status) => status === value)
 
-const sanitizeEmployees = (
-  value: unknown,
-): { employees: EmployeeState[]; repaired: boolean } => {
+const sanitizeEmployees = (value: unknown): { employees: EmployeeState[]; repaired: boolean } => {
   if (!Array.isArray(value)) return { employees: [], repaired: true }
-
   let repaired = false
   const employees: EmployeeState[] = []
   const seenIds = new Set<string>()
 
   value.forEach((entry) => {
-    if (!isRecord(entry)) {
-      repaired = true
-      return
-    }
-
+    if (!isRecord(entry)) { repaired = true; return }
     const employeeId = typeof entry.employeeId === 'string' && entry.employeeId.trim().length > 0 ? entry.employeeId.trim() : null
     const name = typeof entry.name === 'string' && entry.name.trim().length > 0 ? entry.name.trim() : null
     const role = isEmployeeRole(entry.role) ? entry.role : null
     const status = isEmploymentStatus(entry.status) ? entry.status : null
     const salaryPerCycle = typeof entry.salaryPerCycle === 'number' && Number.isSafeInteger(entry.salaryPerCycle) && entry.salaryPerCycle >= 0 ? entry.salaryPerCycle : null
-
     if (employeeId === null || name === null || role === null || status === null || salaryPerCycle === null || seenIds.has(employeeId)) {
       repaired = true
       return
     }
-
     seenIds.add(employeeId)
     employees.push({ employeeId, name, role, status, salaryPerCycle })
   })
-
   return { employees, repaired }
 }
 
@@ -135,19 +126,15 @@ const sanitizePayroll = (value: unknown): { payroll: PayrollState; repaired: boo
 const sanitizeFinancials = (value: unknown): { financials: FinancialState; repaired: boolean } => {
   const defaults = createInitialCompanyState().financials
   if (!isRecord(value)) return { financials: { ...defaults }, repaired: true }
-
   const fields = ['lastProcessedDay', 'totalRevenue', 'totalOperatingExpenses', 'totalSalaryExpenses'] as const
   let repaired = false
-  const result: FinancialState = { ...defaults }
+  const financials: FinancialState = { ...defaults }
   fields.forEach((field) => {
     const raw = value[field]
-    if (typeof raw === 'number' && Number.isSafeInteger(raw) && raw >= 0) {
-      result[field] = raw
-    } else {
-      repaired = true
-    }
+    if (typeof raw === 'number' && Number.isSafeInteger(raw) && raw >= 0) financials[field] = raw
+    else repaired = true
   })
-  return { financials: result, repaired }
+  return { financials, repaired }
 }
 
 const sanitizeCompany = (
@@ -156,7 +143,6 @@ const sanitizeCompany = (
 ): { company: CompanyState; repaired: boolean } => {
   const defaults = createInitialCompanyState()
   let repaired = false
-
   const companyName = typeof value.companyName === 'string' && value.companyName.trim().length > 0 ? value.companyName : (repaired = true, defaults.companyName)
   const money = typeof value.money === 'number' && Number.isFinite(value.money) && value.money >= 0 ? value.money : (repaired = true, defaults.money)
   const level = typeof value.level === 'number' && Number.isInteger(value.level) && value.level > 0 ? value.level : (repaired = true, defaults.level)
@@ -165,12 +151,8 @@ const sanitizeCompany = (
   const rawLevels = isRecord(value.purchasedUpgradeLevels) ? value.purchasedUpgradeLevels : (repaired = true, {})
   const purchasedUpgradeLevels = UPGRADE_IDS.reduce<PurchasedUpgradeLevels>((levels, upgradeId) => {
     const rawLevel = rawLevels[upgradeId]
-    if (typeof rawLevel === 'number' && Number.isSafeInteger(rawLevel) && rawLevel >= 0) {
-      levels[upgradeId] = rawLevel
-    } else {
-      levels[upgradeId] = defaults.purchasedUpgradeLevels[upgradeId]
-      repaired = true
-    }
+    if (typeof rawLevel === 'number' && Number.isSafeInteger(rawLevel) && rawLevel >= 0) levels[upgradeId] = rawLevel
+    else { levels[upgradeId] = defaults.purchasedUpgradeLevels[upgradeId]; repaired = true }
     return levels
   }, { ...defaults.purchasedUpgradeLevels })
 
@@ -201,6 +183,12 @@ const sanitizeSettings = (value: unknown): { settings: GameSettingsState; repair
   return { settings: { tutorialCompleted: value.tutorialCompleted }, repaired: false }
 }
 
+const hasFinancialActivity = (financials: FinancialState): boolean =>
+  financials.lastProcessedDay !== 0 ||
+  financials.totalRevenue !== 0 ||
+  financials.totalOperatingExpenses !== 0 ||
+  financials.totalSalaryExpenses !== 0
+
 export const createSaveGame = (session: GameSessionState): SaveGameV2 => ({
   formatVersion: SAVE_FORMAT_VERSION,
   company: {
@@ -211,7 +199,9 @@ export const createSaveGame = (session: GameSessionState): SaveGameV2 => ({
     purchasedUpgradeLevels: { ...session.company.purchasedUpgradeLevels },
     employees: session.company.employees.map((employee) => ({ ...employee })),
     payroll: { ...session.company.payroll },
-    financials: { ...session.company.financials },
+    ...(hasFinancialActivity(session.company.financials)
+      ? { financials: { ...session.company.financials } }
+      : {}),
   },
   settings: { tutorialCompleted: session.settings.tutorialCompleted },
 })
@@ -231,22 +221,37 @@ export const decodeSave = (raw: string): SaveDecodeResult => {
   const migratingV1 = parsed.formatVersion === LEGACY_SAVE_FORMAT_VERSION
   const companyResult = sanitizeCompany(parsed.company, !migratingV1)
   const settingsResult = sanitizeSettings(parsed.settings)
+  const company = companyResult.company
 
   return {
     kind: 'valid',
-    save: { formatVersion: SAVE_FORMAT_VERSION, company: companyResult.company, settings: settingsResult.settings },
+    save: {
+      formatVersion: SAVE_FORMAT_VERSION,
+      company: {
+        companyName: company.companyName,
+        money: company.money,
+        level: company.level,
+        reputation: company.reputation,
+        purchasedUpgradeLevels: { ...company.purchasedUpgradeLevels },
+        employees: company.employees.map((employee) => ({ ...employee })),
+        payroll: { ...company.payroll },
+        financials: { ...company.financials },
+      },
+      settings: settingsResult.settings,
+    },
     repaired: migratingV1 || companyResult.repaired || settingsResult.repaired,
     ...(migratingV1 ? { migratedFrom: 1 as const } : {}),
   }
 }
 
 export const restoreGameSessionFromSave = (save: SaveGameV2): GameSessionState => {
+  const financials = save.company.financials ?? createInitialCompanyState().financials
   const company: CompanyState = {
     ...save.company,
     purchasedUpgradeLevels: { ...save.company.purchasedUpgradeLevels },
     employees: save.company.employees.map((employee) => ({ ...employee })),
     payroll: { ...save.company.payroll },
-    financials: { ...save.company.financials },
+    financials: { ...financials },
   }
   const world = synchronizePlayerMovementSpeed(createInitialWorldState(), company)
   return { world, company, settings: { ...save.settings } }
