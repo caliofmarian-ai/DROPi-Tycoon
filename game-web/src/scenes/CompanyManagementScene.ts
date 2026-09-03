@@ -154,12 +154,38 @@ export class CompanyManagementScene extends Phaser.Scene {
       })
       .setOrigin(0.5)
 
-    const employeeButtonBounds: LayoutRect = {
-      ...layout.returnButton,
-      top: Math.max(8, layout.returnButton.top - layout.returnButton.height - 10),
+    const managementTop = Math.max(8, layout.returnButton.top - layout.returnButton.height - 10)
+    let employeeButtonBounds: LayoutRect
+    let financialButtonBounds: LayoutRect
+
+    if (layout.compactLandscape) {
+      employeeButtonBounds = { ...layout.returnButton, top: managementTop }
+      financialButtonBounds = {
+        ...layout.menuButton,
+        top: Math.min(
+          height - layout.menuButton.height - 8,
+          layout.menuButton.top + layout.menuButton.height + 10,
+        ),
+      }
+    } else {
+      const gap = 10
+      const halfWidth = Math.max(48, Math.floor((layout.returnButton.width - gap) / 2))
+      employeeButtonBounds = {
+        left: layout.returnButton.left,
+        top: managementTop,
+        width: halfWidth,
+        height: layout.returnButton.height,
+      }
+      financialButtonBounds = {
+        left: layout.returnButton.left + halfWidth + gap,
+        top: managementTop,
+        width: Math.max(48, layout.returnButton.width - halfWidth - gap),
+        height: layout.returnButton.height,
+      }
     }
 
     this.createButton(employeeButtonBounds, 'Employees', () => this.openEmployeeManagement(), layout.navFontSize)
+    this.createButton(financialButtonBounds, 'Finances', () => this.openFinancialReport(), layout.navFontSize)
     this.createButton(layout.returnButton, 'Return to Game World', () => this.returnToGameWorld(), layout.navFontSize)
     this.createButton(layout.menuButton, 'Main Menu', () => this.returnToMainMenu(), layout.navFontSize)
 
@@ -217,6 +243,11 @@ export class CompanyManagementScene extends Phaser.Scene {
   private openEmployeeManagement(): void {
     replaceGameSession(this.worldState, this.companyState)
     this.scene.start('EmployeeManagement')
+  }
+
+  private openFinancialReport(): void {
+    replaceGameSession(this.worldState, this.companyState)
+    this.scene.start('FinancialReport')
   }
 
   private returnToGameWorld(): void {
