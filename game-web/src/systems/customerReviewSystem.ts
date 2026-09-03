@@ -62,11 +62,12 @@ export const appendCustomerReview = (
     }
   }
 
-  const existing = company.reviews.find((review) => review.orderId === order.orderId) ?? null
+  const reviews = company.reviews ?? []
+  const existing = reviews.find((review) => review.orderId === order.orderId) ?? null
   if (existing) {
     return {
       generated: false,
-      company,
+      company: { ...company, reviews: [...reviews] },
       review: existing,
       reason: 'already-reviewed',
     }
@@ -87,7 +88,7 @@ export const appendCustomerReview = (
     review,
     company: {
       ...company,
-      reviews: [...company.reviews, review],
+      reviews: [...reviews, review],
     },
   }
 }
