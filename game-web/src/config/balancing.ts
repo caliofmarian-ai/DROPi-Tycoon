@@ -30,4 +30,10 @@ export const BALANCING = {
   // These are tuning values, not permanent canonical prices.
   FIRST_COURIER_HIRE_COST: 100,
   FIRST_COURIER_SALARY_PER_CYCLE: 25,
+
+  // RBATCH-019 implementation balancing. Daily operating cost is deliberately
+  // simple and derived from authoritative company state. These values remain
+  // replaceable tuning details; no real-time day cadence is implied here.
+  DAILY_BASE_OPERATING_EXPENSE: 10,
+  DAILY_ACTIVE_EMPLOYEE_OPERATING_EXPENSE: 5,
 } as const

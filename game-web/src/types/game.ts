@@ -38,6 +38,17 @@ export interface PayrollState {
   lastProcessedCycle: number
 }
 
+export interface FinancialState {
+  /** Last deterministic operating-day identifier processed. Zero means none yet. */
+  lastProcessedDay: number
+  /** Cumulative delivery revenue settled by the authoritative economy system. */
+  totalRevenue: number
+  /** Cumulative non-salary operating expenses processed by RBATCH-019. */
+  totalOperatingExpenses: number
+  /** Cumulative salary expense produced by the RBATCH-018 payroll system. */
+  totalSalaryExpenses: number
+}
+
 export interface OrderState {
   orderId: string
   pickupLocation: string
@@ -56,6 +67,7 @@ export interface CompanyState {
   purchasedUpgradeLevels: PurchasedUpgradeLevels
   employees: EmployeeState[]
   payroll: PayrollState
+  financials: FinancialState
 }
 
 export interface GameSettingsState {

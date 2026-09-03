@@ -18,6 +18,12 @@ export const createInitialCompanyState = (): CompanyState => ({
   payroll: {
     lastProcessedCycle: 0,
   },
+  financials: {
+    lastProcessedDay: 0,
+    totalRevenue: 0,
+    totalOperatingExpenses: 0,
+    totalSalaryExpenses: 0,
+  },
 })
 
 export const createInitialGameSettingsState = (): GameSettingsState => ({
