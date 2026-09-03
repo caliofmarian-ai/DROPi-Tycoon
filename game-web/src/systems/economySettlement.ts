@@ -1,9 +1,22 @@
 import { BALANCING } from '../config/balancing'
-import type { CompanyState, OrderState } from '../types/game'
+import type { CompanyState, FinancialState, OrderState } from '../types/game'
 
 export type SettlementOutcome =
   | { applied: true; company: CompanyState; order: OrderState }
   | { applied: false; reason: string }
+
+const emptyFinancialState = (): FinancialState => ({
+  lastProcessedDay: 0,
+  totalRevenue: 0,
+  totalOperatingExpenses: 0,
+  totalSalaryExpenses: 0,
+})
+
+const readFinancials = (company: CompanyState): FinancialState =>
+  company.financials ?? emptyFinancialState()
+
+const isValidFinancialAmount = (value: number): boolean =>
+  Number.isSafeInteger(value) && value >= 0
 
 /**
  * Apply the economic outcome of a delivery transition.
@@ -15,6 +28,7 @@ export type SettlementOutcome =
  * - Cannot settle a terminal order more than once (no repeated pay)
  * - Never produces negative money
  * - Preserves unrelated company progression fields
+ * - Successful delivery revenue is recorded exactly once in Phase-2 financial state
  * - No Phaser dependency
  */
 export const settleDeliveryOutcome = (
@@ -62,9 +76,21 @@ export const settleDeliveryOutcome = (
     return { applied: false, reason: 'Company reputation must be a safe integer' }
   }
 
+  const financials = readFinancials(company)
+  if (
+    !Number.isSafeInteger(financials.lastProcessedDay) ||
+    financials.lastProcessedDay < 0 ||
+    !isValidFinancialAmount(financials.totalRevenue) ||
+    !isValidFinancialAmount(financials.totalOperatingExpenses) ||
+    !isValidFinancialAmount(financials.totalSalaryExpenses)
+  ) {
+    return { applied: false, reason: 'Company financial state is invalid' }
+  }
+
   if (nextOrder.status === 'Completed') {
     const money = company.money + nextOrder.reward
-    if (!Number.isSafeInteger(money) || money < 0) {
+    const totalRevenue = financials.totalRevenue + nextOrder.reward
+    if (!Number.isSafeInteger(money) || money < 0 || !isValidFinancialAmount(totalRevenue)) {
       return { applied: false, reason: 'Settlement money result is invalid' }
     }
     const rawReputation = company.reputation + BALANCING.REPUTATION_ON_SUCCESS
@@ -74,12 +100,16 @@ export const settleDeliveryOutcome = (
     )
     return {
       applied: true,
-      company: { ...company, money, reputation },
+      company: {
+        ...company,
+        money,
+        reputation,
+        financials: { ...financials, totalRevenue },
+      },
       order: { ...nextOrder, economySettled: true },
     }
   }
 
-  // nextOrder.status === 'Failed'
   const rawReputation = company.reputation + BALANCING.REPUTATION_ON_FAILURE
   const reputation = Math.min(
     BALANCING.REPUTATION_MAX,
@@ -87,17 +117,16 @@ export const settleDeliveryOutcome = (
   )
   return {
     applied: true,
-    company: { ...company, money: company.money, reputation },
+    company: {
+      ...company,
+      money: company.money,
+      reputation,
+      financials: { ...financials },
+    },
     order: { ...nextOrder, economySettled: true },
   }
 }
 
-/**
- * Returns true only when `money` is a finite, non-negative number that is
- * greater than or equal to `cost`, which must also be finite and non-negative.
- *
- * Does not purchase anything, deduct money, or implement upgrade UI.
- */
 export const canAfford = (money: number, cost: number): boolean => {
   if (!Number.isFinite(money) || money < 0) return false
   if (!Number.isFinite(cost) || cost < 0) return false
