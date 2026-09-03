@@ -1,4 +1,5 @@
 import { BALANCING } from '../config/balancing'
+import { appendCustomerReview } from './customerReviewSystem'
 import type { CompanyState, FinancialState, OrderState } from '../types/game'
 
 export type SettlementOutcome =
@@ -18,18 +19,17 @@ const readFinancials = (company: CompanyState): FinancialState =>
 const isValidFinancialAmount = (value: number): boolean =>
   Number.isSafeInteger(value) && value >= 0
 
+const attachReview = (company: CompanyState, order: OrderState): CompanyState => {
+  const result = appendCustomerReview(company, order)
+  return result.company
+}
+
 /**
- * Apply the economic outcome of a delivery transition.
+ * Apply the authoritative economic/reputation outcome of a delivery transition.
  *
- * Rules (owner-approved for Prototype v0.1):
- * - PickedUp → Completed: adds order reward to money; reputation +2 (clamped 0..100)
- * - PickedUp → Failed: no money change; reputation -5 (clamped 0..100)
- * - Any other transition: rejected, company unchanged
- * - Cannot settle a terminal order more than once (no repeated pay)
- * - Never produces negative money
- * - Preserves unrelated company progression fields
- * - Successful delivery revenue is recorded exactly once in Phase-2 financial state
- * - No Phaser dependency
+ * RBATCH-020 generates the customer review inside this same exactly-once
+ * settlement. The review records the RBATCH-009 reputation impact; it does not
+ * apply a second reputation mutation.
  */
 export const settleDeliveryOutcome = (
   previousOrder: OrderState,
@@ -87,6 +87,8 @@ export const settleDeliveryOutcome = (
     return { applied: false, reason: 'Company financial state is invalid' }
   }
 
+  const settledOrder: OrderState = { ...nextOrder, economySettled: true }
+
   if (nextOrder.status === 'Completed') {
     const money = company.money + nextOrder.reward
     const totalRevenue = financials.totalRevenue + nextOrder.reward
@@ -98,15 +100,17 @@ export const settleDeliveryOutcome = (
       BALANCING.REPUTATION_MAX,
       Math.max(BALANCING.REPUTATION_MIN, rawReputation),
     )
+    const settledCompany: CompanyState = {
+      ...company,
+      money,
+      reputation,
+      financials: { ...financials, totalRevenue },
+      reviews: [...(company.reviews ?? [])],
+    }
     return {
       applied: true,
-      company: {
-        ...company,
-        money,
-        reputation,
-        financials: { ...financials, totalRevenue },
-      },
-      order: { ...nextOrder, economySettled: true },
+      company: attachReview(settledCompany, settledOrder),
+      order: settledOrder,
     }
   }
 
@@ -115,15 +119,17 @@ export const settleDeliveryOutcome = (
     BALANCING.REPUTATION_MAX,
     Math.max(BALANCING.REPUTATION_MIN, rawReputation),
   )
+  const settledCompany: CompanyState = {
+    ...company,
+    money: company.money,
+    reputation,
+    financials: { ...financials },
+    reviews: [...(company.reviews ?? [])],
+  }
   return {
     applied: true,
-    company: {
-      ...company,
-      money: company.money,
-      reputation,
-      financials: { ...financials },
-    },
-    order: { ...nextOrder, economySettled: true },
+    company: attachReview(settledCompany, settledOrder),
+    order: settledOrder,
   }
 }
 

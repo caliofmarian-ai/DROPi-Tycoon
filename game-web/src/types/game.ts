@@ -49,6 +49,18 @@ export interface FinancialState {
   totalSalaryExpenses: number
 }
 
+export const CUSTOMER_REVIEW_SENTIMENTS = ['Positive', 'Negative'] as const
+export type CustomerReviewSentiment = (typeof CUSTOMER_REVIEW_SENTIMENTS)[number]
+
+export interface CustomerReview {
+  orderId: string
+  rating: number
+  sentiment: CustomerReviewSentiment
+  message: string
+  /** Reputation delta applied by the authoritative RBATCH-009 settlement. */
+  reputationImpact: number
+}
+
 export interface OrderState {
   orderId: string
   pickupLocation: string
@@ -68,6 +80,7 @@ export interface CompanyState {
   employees: EmployeeState[]
   payroll: PayrollState
   financials: FinancialState
+  reviews: CustomerReview[]
 }
 
 export interface GameSettingsState {

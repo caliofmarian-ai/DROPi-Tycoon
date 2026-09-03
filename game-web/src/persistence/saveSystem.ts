@@ -5,10 +5,13 @@ import {
 } from '../state/gameState'
 import { synchronizePlayerMovementSpeed } from '../systems/bicycleSystem'
 import {
+  CUSTOMER_REVIEW_SENTIMENTS,
   EMPLOYEE_ROLES,
   EMPLOYMENT_STATUSES,
   UPGRADE_IDS,
   type CompanyState,
+  type CustomerReview,
+  type CustomerReviewSentiment,
   type EmployeeRole,
   type EmployeeState,
   type EmploymentStatus,
@@ -46,7 +49,10 @@ export interface SaveStorage {
   removeItem(key: string): void
 }
 
-type SaveCompanyV2 = Omit<CompanyState, 'financials'> & { financials?: FinancialState }
+type SaveCompanyV2 = Omit<CompanyState, 'financials' | 'reviews'> & {
+  financials?: FinancialState
+  reviews?: CustomerReview[]
+}
 
 export interface SaveGameV2 {
   formatVersion: typeof SAVE_FORMAT_VERSION
@@ -91,6 +97,9 @@ const isEmployeeRole = (value: unknown): value is EmployeeRole =>
 
 const isEmploymentStatus = (value: unknown): value is EmploymentStatus =>
   typeof value === 'string' && EMPLOYMENT_STATUSES.some((status) => status === value)
+
+const isReviewSentiment = (value: unknown): value is CustomerReviewSentiment =>
+  typeof value === 'string' && CUSTOMER_REVIEW_SENTIMENTS.some((sentiment) => sentiment === value)
 
 const sanitizeEmployees = (value: unknown): { employees: EmployeeState[]; repaired: boolean } => {
   if (!Array.isArray(value)) return { employees: [], repaired: true }
@@ -137,6 +146,32 @@ const sanitizeFinancials = (value: unknown): { financials: FinancialState; repai
   return { financials, repaired }
 }
 
+const sanitizeReviews = (value: unknown): { reviews: CustomerReview[]; repaired: boolean } => {
+  if (!Array.isArray(value)) return { reviews: [], repaired: true }
+  const reviews: CustomerReview[] = []
+  const seenOrderIds = new Set<string>()
+  let repaired = false
+
+  value.forEach((entry) => {
+    if (!isRecord(entry)) { repaired = true; return }
+    const orderId = typeof entry.orderId === 'string' && entry.orderId.trim().length > 0 ? entry.orderId.trim() : null
+    const rating = typeof entry.rating === 'number' && Number.isSafeInteger(entry.rating) && entry.rating >= 1 && entry.rating <= 5 ? entry.rating : null
+    const sentiment = isReviewSentiment(entry.sentiment) ? entry.sentiment : null
+    const message = typeof entry.message === 'string' && entry.message.trim().length > 0 ? entry.message.trim() : null
+    const reputationImpact = typeof entry.reputationImpact === 'number' && Number.isSafeInteger(entry.reputationImpact) ? entry.reputationImpact : null
+
+    if (orderId === null || rating === null || sentiment === null || message === null || reputationImpact === null || seenOrderIds.has(orderId)) {
+      repaired = true
+      return
+    }
+
+    seenOrderIds.add(orderId)
+    reviews.push({ orderId, rating, sentiment, message, reputationImpact })
+  })
+
+  return { reviews, repaired }
+}
+
 const sanitizeCompany = (
   value: Record<string, unknown>,
   requirePhase2Fields: boolean,
@@ -159,19 +194,22 @@ const sanitizeCompany = (
   let employees: EmployeeState[] = []
   let payroll: PayrollState = { lastProcessedCycle: 0 }
   let financials: FinancialState = { ...defaults.financials }
+  let reviews: CustomerReview[] = []
 
   if (requirePhase2Fields) {
     const employeeResult = sanitizeEmployees(value.employees)
     const payrollResult = sanitizePayroll(value.payroll)
     const financialResult = sanitizeFinancials(value.financials)
+    const reviewResult = sanitizeReviews(value.reviews)
     employees = employeeResult.employees
     payroll = payrollResult.payroll
     financials = financialResult.financials
-    repaired = repaired || employeeResult.repaired || payrollResult.repaired || financialResult.repaired
+    reviews = reviewResult.reviews
+    repaired = repaired || employeeResult.repaired || payrollResult.repaired || financialResult.repaired || reviewResult.repaired
   }
 
   return {
-    company: { companyName, money, level, reputation, purchasedUpgradeLevels, employees, payroll, financials },
+    company: { companyName, money, level, reputation, purchasedUpgradeLevels, employees, payroll, financials, reviews },
     repaired,
   }
 }
@@ -201,6 +239,9 @@ export const createSaveGame = (session: GameSessionState): SaveGameV2 => ({
     payroll: { ...session.company.payroll },
     ...(hasFinancialActivity(session.company.financials)
       ? { financials: { ...session.company.financials } }
+      : {}),
+    ...(session.company.reviews.length > 0
+      ? { reviews: session.company.reviews.map((review) => ({ ...review })) }
       : {}),
   },
   settings: { tutorialCompleted: session.settings.tutorialCompleted },
@@ -236,6 +277,7 @@ export const decodeSave = (raw: string): SaveDecodeResult => {
         employees: company.employees.map((employee) => ({ ...employee })),
         payroll: { ...company.payroll },
         financials: { ...company.financials },
+        reviews: company.reviews.map((review) => ({ ...review })),
       },
       settings: settingsResult.settings,
     },
@@ -245,13 +287,16 @@ export const decodeSave = (raw: string): SaveDecodeResult => {
 }
 
 export const restoreGameSessionFromSave = (save: SaveGameV2): GameSessionState => {
-  const financials = save.company.financials ?? createInitialCompanyState().financials
+  const defaults = createInitialCompanyState()
+  const financials = save.company.financials ?? defaults.financials
+  const reviews = save.company.reviews ?? defaults.reviews
   const company: CompanyState = {
     ...save.company,
     purchasedUpgradeLevels: { ...save.company.purchasedUpgradeLevels },
     employees: save.company.employees.map((employee) => ({ ...employee })),
     payroll: { ...save.company.payroll },
     financials: { ...financials },
+    reviews: reviews.map((review) => ({ ...review })),
   }
   const world = synchronizePlayerMovementSpeed(createInitialWorldState(), company)
   return { world, company, settings: { ...save.settings } }
