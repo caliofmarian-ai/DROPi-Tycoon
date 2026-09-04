@@ -1,5 +1,6 @@
 import { BALANCING } from '../config/balancing'
 import { canAfford } from './economySettlement'
+import { addBicycleOwnershipForUpgrade } from './vehicleSystem'
 import type { CompanyState, UpgradeId } from '../types/game'
 
 export interface UpgradeDefinition {
@@ -139,17 +140,19 @@ export const purchaseUpgrade = (
     }
   }
 
+  const updated: CompanyState = {
+    ...company,
+    money,
+    purchasedUpgradeLevels: {
+      ...company.purchasedUpgradeLevels,
+      [upgradeId]: currentLevel + 1,
+    },
+  }
+
   return {
     purchased: true,
     upgrade,
-    company: {
-      ...company,
-      money,
-      purchasedUpgradeLevels: {
-        ...company.purchasedUpgradeLevels,
-        [upgradeId]: currentLevel + 1,
-      },
-    },
+    company: upgradeId === 'Bicycle' ? addBicycleOwnershipForUpgrade(updated) : updated,
     message: 'Company improved! Bicycle purchased.',
   }
 }
