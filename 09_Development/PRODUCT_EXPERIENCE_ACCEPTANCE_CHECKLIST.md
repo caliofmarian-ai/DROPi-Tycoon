@@ -37,4 +37,3 @@ Use this checklist for player-visible management UI work introduced after the Pr
 - What changed is stated explicitly.
 - Portrait and landscape checks are requested when relevant.
 - Functional PASS/HOLD is recorded separately from Visual PASS/HOLD.
-
