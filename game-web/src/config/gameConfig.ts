@@ -1,6 +1,7 @@
 import Phaser from 'phaser'
 import { appConfig } from './env'
 import { CompanyManagementScene } from '../scenes/CompanyManagementScene'
+import { CustomerReviewsScene } from '../scenes/CustomerReviewsScene'
 import { EmployeeManagementScene } from '../scenes/EmployeeManagementScene'
 import { FinancialReportScene } from '../scenes/FinancialReportScene'
 import { GameWorldScene } from '../scenes/GameWorldScene'
@@ -27,5 +28,6 @@ export const createGameConfig = (parent: string): Phaser.Types.Core.GameConfig =
     CompanyManagementScene,
     EmployeeManagementScene,
     FinancialReportScene,
+    CustomerReviewsScene,
   ],
 })

@@ -14,6 +14,35 @@ export type CustomerReviewResult =
       reason: 'order-not-settled' | 'non-terminal-order' | 'already-reviewed'
     }
 
+export interface CustomerReviewSummary {
+  count: number
+  positiveCount: number
+  negativeCount: number
+  averageRating: number
+  totalReputationImpact: number
+}
+
+export const buildCustomerReviewSummary = (
+  reviews: readonly CustomerReview[],
+): CustomerReviewSummary => {
+  const count = reviews.length
+  const positiveCount = reviews.filter((review) => review.sentiment === 'Positive').length
+  const negativeCount = reviews.filter((review) => review.sentiment === 'Negative').length
+  const totalRating = reviews.reduce((total, review) => total + review.rating, 0)
+  const totalReputationImpact = reviews.reduce(
+    (total, review) => total + review.reputationImpact,
+    0,
+  )
+
+  return {
+    count,
+    positiveCount,
+    negativeCount,
+    averageRating: count === 0 ? 0 : totalRating / count,
+    totalReputationImpact,
+  }
+}
+
 export const buildCustomerReviewForOrder = (order: OrderState): CustomerReview | null => {
   if (!order.economySettled) return null
 
