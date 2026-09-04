@@ -25,6 +25,7 @@ export const createInitialCompanyState = (): CompanyState => ({
     totalSalaryExpenses: 0,
   },
   reviews: [],
+  vehicles: [],
 })
 
 export const createInitialGameSettingsState = (): GameSettingsState => ({
