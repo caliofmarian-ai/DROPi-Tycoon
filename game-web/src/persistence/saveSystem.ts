@@ -4,11 +4,13 @@ import {
   createInitialWorldState,
 } from '../state/gameState'
 import { synchronizePlayerMovementSpeed } from '../systems/bicycleSystem'
+import { reconcileLegacyBicycleOwnership } from '../systems/vehicleSystem'
 import {
   CUSTOMER_REVIEW_SENTIMENTS,
   EMPLOYEE_ROLES,
   EMPLOYMENT_STATUSES,
   UPGRADE_IDS,
+  VEHICLE_TYPE_IDS,
   type CompanyState,
   type CustomerReview,
   type CustomerReviewSentiment,
@@ -18,8 +20,10 @@ import {
   type FinancialState,
   type GameSessionState,
   type GameSettingsState,
+  type OwnedVehicleState,
   type PayrollState,
   type PurchasedUpgradeLevels,
+  type VehicleTypeId,
 } from '../types/game'
 
 export const SAVE_FORMAT_VERSION = 2 as const
@@ -39,6 +43,7 @@ export const CANONICAL_AUTOSAVE_EVENTS = [
   'employee-hired',
   'employee-onboarding-completed',
   'salary-cycle-processed',
+  'vehicle-purchased',
 ] as const
 
 export type CanonicalAutosaveEvent = (typeof CANONICAL_AUTOSAVE_EVENTS)[number]
@@ -49,9 +54,10 @@ export interface SaveStorage {
   removeItem(key: string): void
 }
 
-type SaveCompanyV2 = Omit<CompanyState, 'financials' | 'reviews'> & {
+type SaveCompanyV2 = Omit<CompanyState, 'financials' | 'reviews' | 'vehicles'> & {
   financials?: FinancialState
   reviews?: CustomerReview[]
+  vehicles?: OwnedVehicleState[]
 }
 
 export interface SaveGameV2 {
@@ -100,6 +106,9 @@ const isEmploymentStatus = (value: unknown): value is EmploymentStatus =>
 
 const isReviewSentiment = (value: unknown): value is CustomerReviewSentiment =>
   typeof value === 'string' && CUSTOMER_REVIEW_SENTIMENTS.some((sentiment) => sentiment === value)
+
+const isVehicleTypeId = (value: unknown): value is VehicleTypeId =>
+  typeof value === 'string' && VEHICLE_TYPE_IDS.some((typeId) => typeId === value)
 
 const sanitizeEmployees = (value: unknown): { employees: EmployeeState[]; repaired: boolean } => {
   if (!Array.isArray(value)) return { employees: [], repaired: true }
@@ -172,6 +181,53 @@ const sanitizeReviews = (value: unknown): { reviews: CustomerReview[]; repaired:
   return { reviews, repaired }
 }
 
+const sanitizeVehicles = (
+  value: unknown,
+  purchasedUpgradeLevels: PurchasedUpgradeLevels,
+): { vehicles: OwnedVehicleState[]; repaired: boolean } => {
+  let repaired = false
+  const vehicles: OwnedVehicleState[] = []
+  const seenVehicleIds = new Set<string>()
+  const seenTypes = new Set<VehicleTypeId>()
+
+  if (!Array.isArray(value)) {
+    repaired = true
+  } else {
+    value.forEach((entry) => {
+      if (!isRecord(entry)) { repaired = true; return }
+      const vehicleId = typeof entry.vehicleId === 'string' && entry.vehicleId.trim().length > 0
+        ? entry.vehicleId.trim()
+        : null
+      const typeId = isVehicleTypeId(entry.typeId) ? entry.typeId : null
+
+      if (
+        vehicleId === null ||
+        typeId === null ||
+        seenVehicleIds.has(vehicleId) ||
+        seenTypes.has(typeId)
+      ) {
+        repaired = true
+        return
+      }
+
+      seenVehicleIds.add(vehicleId)
+      seenTypes.add(typeId)
+      vehicles.push({ vehicleId, typeId })
+    })
+  }
+
+  const reconciled = reconcileLegacyBicycleOwnership({
+    ...createInitialCompanyState(),
+    purchasedUpgradeLevels: { ...purchasedUpgradeLevels },
+    vehicles,
+  })
+
+  if (reconciled.vehicles.length !== vehicles.length) repaired = true
+  if (reconciled.purchasedUpgradeLevels.Bicycle !== purchasedUpgradeLevels.Bicycle) repaired = true
+
+  return { vehicles: reconciled.vehicles.map((vehicle) => ({ ...vehicle })), repaired }
+}
+
 const sanitizeCompany = (
   value: Record<string, unknown>,
   requirePhase2Fields: boolean,
@@ -195,23 +251,40 @@ const sanitizeCompany = (
   let payroll: PayrollState = { lastProcessedCycle: 0 }
   let financials: FinancialState = { ...defaults.financials }
   let reviews: CustomerReview[] = []
+  let vehicles: OwnedVehicleState[] = []
 
   if (requirePhase2Fields) {
     const employeeResult = sanitizeEmployees(value.employees)
     const payrollResult = sanitizePayroll(value.payroll)
     const financialResult = sanitizeFinancials(value.financials)
     const reviewResult = sanitizeReviews(value.reviews)
+    const vehicleResult = sanitizeVehicles(value.vehicles, purchasedUpgradeLevels)
     employees = employeeResult.employees
     payroll = payrollResult.payroll
     financials = financialResult.financials
     reviews = reviewResult.reviews
-    repaired = repaired || employeeResult.repaired || payrollResult.repaired || financialResult.repaired || reviewResult.repaired
+    vehicles = vehicleResult.vehicles
+    repaired = repaired || employeeResult.repaired || payrollResult.repaired || financialResult.repaired || reviewResult.repaired || vehicleResult.repaired
+  } else if (purchasedUpgradeLevels.Bicycle > 0) {
+    vehicles = [{ vehicleId: 'VEHICLE-BICYCLE-001', typeId: 'Bicycle' }]
+    repaired = true
   }
 
-  return {
-    company: { companyName, money, level, reputation, purchasedUpgradeLevels, employees, payroll, financials, reviews },
-    repaired,
+  let company: CompanyState = {
+    companyName,
+    money,
+    level,
+    reputation,
+    purchasedUpgradeLevels,
+    employees,
+    payroll,
+    financials,
+    reviews,
+    vehicles,
   }
+  company = reconcileLegacyBicycleOwnership(company)
+
+  return { company, repaired }
 }
 
 const sanitizeSettings = (value: unknown): { settings: GameSettingsState; repaired: boolean } => {
@@ -242,6 +315,9 @@ export const createSaveGame = (session: GameSessionState): SaveGameV2 => ({
       : {}),
     ...(session.company.reviews.length > 0
       ? { reviews: session.company.reviews.map((review) => ({ ...review })) }
+      : {}),
+    ...(session.company.vehicles.length > 0
+      ? { vehicles: session.company.vehicles.map((vehicle) => ({ ...vehicle })) }
       : {}),
   },
   settings: { tutorialCompleted: session.settings.tutorialCompleted },
@@ -278,6 +354,7 @@ export const decodeSave = (raw: string): SaveDecodeResult => {
         payroll: { ...company.payroll },
         financials: { ...company.financials },
         reviews: company.reviews.map((review) => ({ ...review })),
+        vehicles: company.vehicles.map((vehicle) => ({ ...vehicle })),
       },
       settings: settingsResult.settings,
     },
@@ -290,14 +367,17 @@ export const restoreGameSessionFromSave = (save: SaveGameV2): GameSessionState =
   const defaults = createInitialCompanyState()
   const financials = save.company.financials ?? defaults.financials
   const reviews = save.company.reviews ?? defaults.reviews
-  const company: CompanyState = {
+  const vehicles = save.company.vehicles ?? defaults.vehicles
+  let company: CompanyState = {
     ...save.company,
     purchasedUpgradeLevels: { ...save.company.purchasedUpgradeLevels },
     employees: save.company.employees.map((employee) => ({ ...employee })),
     payroll: { ...save.company.payroll },
     financials: { ...financials },
     reviews: reviews.map((review) => ({ ...review })),
+    vehicles: vehicles.map((vehicle) => ({ ...vehicle })),
   }
+  company = reconcileLegacyBicycleOwnership(company)
   const world = synchronizePlayerMovementSpeed(createInitialWorldState(), company)
   return { world, company, settings: { ...save.settings } }
 }
