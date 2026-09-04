@@ -23,6 +23,10 @@ export class EmployeeManagementScene extends Phaser.Scene {
   private layout!: EmployeeManagementLayout
 
   private summaryText!: Phaser.GameObjects.Text
+  private nameText!: Phaser.GameObjects.Text
+  private roleText!: Phaser.GameObjects.Text
+  private statusChip!: Phaser.GameObjects.Rectangle
+  private statusLabel!: Phaser.GameObjects.Text
   private detailsText!: Phaser.GameObjects.Text
   private feedbackText!: Phaser.GameObjects.Text
   private actionButton!: Phaser.GameObjects.Rectangle
@@ -51,7 +55,7 @@ export class EmployeeManagementScene extends Phaser.Scene {
       throw new Error('RBATCH-018 requires at least one employee candidate')
     }
 
-    this.cameras.main.setBackgroundColor('#111827')
+    this.cameras.main.setBackgroundColor('#08111f')
 
     this.add
       .text(this.layout.title.x, this.layout.title.y, 'Employees', {
@@ -66,8 +70,10 @@ export class EmployeeManagementScene extends Phaser.Scene {
       .text(this.layout.summary.x, this.layout.summary.y, '', {
         fontFamily: 'Arial',
         fontSize: `${this.layout.summary.fontSize}px`,
-        color: '#dbeafe',
+        color: '#b9d8ff',
         align: 'center',
+        lineSpacing: 2,
+        wordWrap: { width: this.layout.summary.wrapWidth },
       })
       .setOrigin(0.5)
 
@@ -77,31 +83,83 @@ export class EmployeeManagementScene extends Phaser.Scene {
         rectCenterY(this.layout.panel),
         this.layout.panel.width,
         this.layout.panel.height,
-        0x0f172a,
-        0.97,
+        0x101b2d,
+        0.98,
       )
-      .setStrokeStyle(3, 0x22c55e, 0.75)
+      .setStrokeStyle(2, 0x2dd4bf, 0.78)
+
+    this.add
+      .rectangle(
+        this.layout.panel.left + 3,
+        rectCenterY(this.layout.panel),
+        6,
+        Math.max(28, this.layout.panel.height - 22),
+        0x22c55e,
+        0.92,
+      )
+
+    this.createCandidateAvatar(candidate.name)
+
+    this.nameText = this.add
+      .text(this.layout.identity.x, this.layout.identity.y, candidate.name, {
+        fontFamily: 'Arial',
+        fontSize: `${this.layout.identity.fontSize}px`,
+        color: '#f8fafc',
+        fontStyle: 'bold',
+        wordWrap: { width: this.layout.identity.wrapWidth },
+      })
+      .setOrigin(0, 0)
+
+    this.roleText = this.add
+      .text(this.layout.identity.x, this.layout.identity.y + 28, candidate.role, {
+        fontFamily: 'Arial',
+        fontSize: `${Math.max(13, this.layout.identity.fontSize - 4)}px`,
+        color: '#93c5fd',
+        wordWrap: { width: this.layout.identity.wrapWidth },
+      })
+      .setOrigin(0, 0)
+
+    this.statusChip = this.add
+      .rectangle(
+        rectCenterX(this.layout.statusChip),
+        rectCenterY(this.layout.statusChip),
+        this.layout.statusChip.width,
+        this.layout.statusChip.height,
+        0x1d4ed8,
+        0.95,
+      )
+      .setStrokeStyle(1, 0x93c5fd, 0.9)
+
+    this.statusLabel = this.add
+      .text(rectCenterX(this.layout.statusChip), rectCenterY(this.layout.statusChip), '', {
+        fontFamily: 'Arial',
+        fontSize: '13px',
+        color: '#eff6ff',
+        fontStyle: 'bold',
+      })
+      .setOrigin(0.5)
 
     this.detailsText = this.add
       .text(this.layout.details.x, this.layout.details.y, '', {
         fontFamily: 'Arial',
         fontSize: `${this.layout.details.fontSize}px`,
-        color: '#e2e8f0',
-        align: 'center',
+        color: '#dbe6f5',
+        align: 'left',
         lineSpacing: 5,
         wordWrap: { width: this.layout.details.wrapWidth },
       })
-      .setOrigin(0.5)
+      .setOrigin(0, 0)
 
     this.feedbackText = this.add
       .text(this.layout.feedback.x, this.layout.feedback.y, '', {
         fontFamily: 'Arial',
         fontSize: `${this.layout.feedback.fontSize}px`,
-        color: '#fef3c7',
-        align: 'center',
+        color: '#fde68a',
+        align: 'left',
+        lineSpacing: 2,
         wordWrap: { width: this.layout.feedback.wrapWidth },
       })
-      .setOrigin(0.5)
+      .setOrigin(0, 0.5)
 
     this.actionButton = this.add
       .rectangle(
@@ -117,18 +175,13 @@ export class EmployeeManagementScene extends Phaser.Scene {
       .on('pointerdown', () => this.performPrimaryAction())
 
     this.actionLabel = this.add
-      .text(
-        rectCenterX(this.layout.actionButton),
-        rectCenterY(this.layout.actionButton),
-        '',
-        {
-          fontFamily: 'Arial',
-          fontSize: `${this.layout.actionFontSize}px`,
-          color: '#f0fdf4',
-          fontStyle: 'bold',
-          align: 'center',
-        },
-      )
+      .text(rectCenterX(this.layout.actionButton), rectCenterY(this.layout.actionButton), '', {
+        fontFamily: 'Arial',
+        fontSize: `${this.layout.actionFontSize}px`,
+        color: '#f0fdf4',
+        fontStyle: 'bold',
+        align: 'center',
+      })
       .setOrigin(0.5)
 
     this.createButton(this.layout.returnButton, 'Company', () => this.returnToCompany(), this.layout.navFontSize)
@@ -140,6 +193,39 @@ export class EmployeeManagementScene extends Phaser.Scene {
     this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => {
       this.scale.off(Phaser.Scale.Events.RESIZE, this.handleResize)
     })
+  }
+
+  private createCandidateAvatar(name: string): void {
+    const avatar = this.layout.avatar
+    const centerX = rectCenterX(avatar)
+    const centerY = rectCenterY(avatar)
+
+    this.add
+      .rectangle(centerX, centerY, avatar.width, avatar.height, 0x17304a, 1)
+      .setStrokeStyle(2, 0x67e8f9, 0.86)
+
+    this.add.circle(centerX, avatar.top + avatar.height * 0.34, avatar.width * 0.19, 0xdbeafe, 1)
+    this.add.ellipse(
+      centerX,
+      avatar.top + avatar.height * 0.73,
+      avatar.width * 0.56,
+      avatar.height * 0.34,
+      0x60a5fa,
+      1,
+    )
+
+    this.add
+      .circle(avatar.left + avatar.width - 14, avatar.top + 14, 11, 0x0f766e, 1)
+      .setStrokeStyle(1, 0x99f6e4, 0.9)
+
+    this.add
+      .text(avatar.left + avatar.width - 14, avatar.top + 14, name.slice(0, 1).toUpperCase(), {
+        fontFamily: 'Arial',
+        fontSize: '12px',
+        color: '#ecfeff',
+        fontStyle: 'bold',
+      })
+      .setOrigin(0.5)
   }
 
   private getManagedEmployee(): EmployeeState | null {
@@ -197,43 +283,63 @@ export class EmployeeManagementScene extends Phaser.Scene {
 
     const employee = this.getManagedEmployee()
     const activeCount = this.companyState.employees.filter((item) => item.status === 'Active').length
+    const summary = this.layout.compactLandscape
+      ? `${this.companyState.companyName}   Money: ${this.companyState.money}   ${this.companyState.employees.length} employees • ${activeCount} active`
+      : `${this.companyState.companyName}   •   Money: ${this.companyState.money}\n${this.companyState.employees.length} employees   •   ${activeCount} active`
 
-    this.summaryText.setText(
-      `${this.companyState.companyName}   Money: ${this.companyState.money}   Employees: ${this.companyState.employees.length} (${activeCount} active)`,
-    )
+    this.summaryText.setText(summary)
 
     if (!employee) {
+      this.nameText.setText(candidate.name)
+      this.roleText.setText(`${candidate.role} candidate`)
+      this.setStatus('Candidate')
       this.detailsText.setText([
-        `Candidate: ${candidate.name}`,
-        `Role: ${candidate.role}`,
-        `Hire cost: ${candidate.hireCost}`,
-        `Salary: ${candidate.salaryPerCycle} / salary cycle`,
+        `Hire cost     ${candidate.hireCost}`,
+        `Salary        ${candidate.salaryPerCycle} / salary cycle`,
         '',
-        'Hiring starts onboarding. Salary eligibility begins only after onboarding is completed.',
+        'Hiring begins onboarding. Salary eligibility starts only after onboarding is completed.',
       ])
       this.actionLabel.setText(`Hire ${candidate.name} — ${candidate.hireCost}`)
+      this.actionButton.setFillStyle(0x15803d, 1).setStrokeStyle(2, 0x86efac)
       this.actionButton.setInteractive({ useHandCursor: true }).setAlpha(1)
       return
     }
 
+    this.nameText.setText(employee.name)
+    this.roleText.setText(employee.role)
+    this.setStatus(employee.status)
     this.detailsText.setText([
-      `${employee.name} — ${employee.role}`,
-      `Status: ${employee.status}`,
-      `Salary: ${employee.salaryPerCycle} / salary cycle`,
-      `Last processed salary cycle: ${this.companyState.payroll.lastProcessedCycle}`,
+      `Salary        ${employee.salaryPerCycle} / salary cycle`,
+      `Payroll       last processed cycle ${this.companyState.payroll.lastProcessedCycle}`,
       '',
       employee.status === 'Active'
-        ? 'Employee is salary-eligible and ready for future assigned-work systems.'
-        : 'Complete onboarding before this employee becomes salary-eligible.',
+        ? 'Active and salary-eligible. Future assigned-work systems can build on this employee.'
+        : 'Onboarding is the next step before salary eligibility and active status.',
     ])
 
     if (employee.status === 'Onboarding') {
       this.actionLabel.setText('Complete Onboarding')
+      this.actionButton.setFillStyle(0x1d4ed8, 1).setStrokeStyle(2, 0x93c5fd)
       this.actionButton.setInteractive({ useHandCursor: true }).setAlpha(1)
     } else {
       this.actionLabel.setText('Active Employee')
-      this.actionButton.disableInteractive().setAlpha(0.55)
+      this.actionButton.setFillStyle(0x334155, 1).setStrokeStyle(2, 0x64748b)
+      this.actionButton.disableInteractive().setAlpha(0.72)
     }
+  }
+
+  private setStatus(status: string): void {
+    if (status === 'Active') {
+      this.statusChip.setFillStyle(0x166534, 0.96).setStrokeStyle(1, 0x86efac, 0.95)
+      this.statusLabel.setColor('#f0fdf4')
+    } else if (status === 'Onboarding') {
+      this.statusChip.setFillStyle(0x1d4ed8, 0.96).setStrokeStyle(1, 0x93c5fd, 0.95)
+      this.statusLabel.setColor('#eff6ff')
+    } else {
+      this.statusChip.setFillStyle(0x7c3aed, 0.94).setStrokeStyle(1, 0xc4b5fd, 0.95)
+      this.statusLabel.setColor('#f5f3ff')
+    }
+    this.statusLabel.setText(status)
   }
 
   private returnToCompany(): void {
