@@ -6,6 +6,7 @@ import {
   getUrbanRouteDistance, isUrbanRouteWithinTransportRange, performUrbanInteraction, URBAN_MERCHANT_PROFILES,
 } from '../src/systems/urbanInteractions'
 import { isCargoLoad, isDeliveryMission } from '../src/systems/urbanLogistics'
+import { LOCAL_LISTING, LOCAL_MERCHANT, prepareMarketplaceOrder } from '../src/systems/urbanMarketplace'
 import { findWorldRoutePoint } from '../src/world/worldLayout'
 import { inInteractionRange, isUrbanWalkable, moveUrbanPlayer, URBAN_HQ, URBAN_MERCHANT } from '../src/world/urbanWorld'
 import { getHQGrowth, HQ_EXPANSION_POINT } from '../src/world/urbanPresentation'
@@ -44,7 +45,8 @@ describe('pure urban merchant listings and physical logistics', () => {
     expect(getHQGrowth(company).ownsBicycle).toBe(true)
   })
 
-  it('places the locked droneport expansion by HQ with a reachable pavement sign', () => {
+  it('anchors the future droneport marker at HQ without claiming another building footprint', () => {
+    expect(HQ_EXPANSION_POINT).toEqual(URBAN_HQ)
     expect(inInteractionRange(HQ_EXPANSION_POINT, URBAN_HQ, 160)).toBe(true)
     expect(isUrbanWalkable(HQ_EXPANSION_POINT.x, HQ_EXPANSION_POINT.y)).toBe(true)
     const reached = walkTo(createInitialWorldState(), HQ_EXPANSION_POINT)
@@ -61,7 +63,8 @@ describe('pure urban merchant listings and physical logistics', () => {
     )
     const listing = getUrbanOrderListing(introduced.world)!
     expect(listing.merchantProfileId).toBe('mara-market')
-    expect(listing.merchant.worldActorId).toBe('merchant:PickupZone')
+    expect(listing.merchant.worldActorId).toBe(LOCAL_MERCHANT.npcId)
+    expect(listing.listingId).toBe(LOCAL_LISTING.listingId)
     expect(listing.orderId).toBe(world.activeOrder.orderId)
     expect(listing.pickupLocation).toBe(listing.merchant.pickupLocation)
     expect(listing.reward).toBe(world.activeOrder.reward)
@@ -69,29 +72,37 @@ describe('pure urban merchant listings and physical logistics', () => {
     expect(introduced.world.activeOrder.status).toBe('Available')
   })
 
-  it.each([1, 2, 3])('links route %i to its physical merchant profile without changing route IDs', sequence => {
+  it.each([1, 2, 3])('links offer %i to the onboarded merchant while preserving its identity and destination', sequence => {
     const world = createInitialWorldState()
     world.urban = { merchantOnboarded: true, activeTransport: 'walking' }
     world.activeOrder = createOrderForSequence(sequence)
+    const original = structuredClone(world.activeOrder)
     const listing = getUrbanOrderListing(world)!
     expect(URBAN_MERCHANT_PROFILES).toContain(listing.merchant)
-    expect(listing.pickupLocation).toBe(world.activeOrder.pickupLocation)
+    expect(listing.pickupLocation).toBe(LOCAL_MERCHANT.pickupLocation)
     expect(listing.destination).toBe(world.activeOrder.destination)
-    expect(listing.merchant.worldActorId).toBe(`merchant:${world.activeOrder.pickupLocation}`)
-    expect(getUrbanRouteDistance(world)).toBe([1040, 260, 60][sequence - 1])
+    expect(listing.merchant.worldActorId).toBe(LOCAL_MERCHANT.npcId)
+    expect(world.activeOrder).toEqual(original)
+    expect(prepareMarketplaceOrder(world)).toMatchObject({
+      orderId: original.orderId, reward: original.reward, destination: original.destination,
+      pickupLocation: LOCAL_MERCHANT.pickupLocation,
+    })
+    expect(getUrbanRouteDistance(world)).toBe([1040, 1360, 1040][sequence - 1])
     expect(isUrbanRouteWithinTransportRange(world)).toBe(true)
   })
 
-  it('does not publish or accept an order disconnected from a real merchant profile', () => {
+  it('replaces stale offer pickup templates with the real merchant and rejects invalid destinations', () => {
     const world = createInitialWorldState()
     world.urban = { merchantOnboarded: true, activeTransport: 'walking' }
     world.activeOrder.pickupLocation = 'DigitalOnlyMerchant'
+    expect(getUrbanOrderListing(world)?.pickupLocation).toBe(LOCAL_MERCHANT.pickupLocation)
+    const accepted = performUrbanInteraction(world, createInitialCompanyState())
+    expect(accepted.world.activeOrder.status).toBe('Accepted')
+    expect(accepted.world.activeOrder.pickupLocation).toBe(LOCAL_MERCHANT.pickupLocation)
+    world.activeOrder.destination = 'CommercialPickup'
     expect(getUrbanOrderListing(world)).toBeNull()
     expect(isUrbanRouteWithinTransportRange(world)).toBe(false)
     expect(performUrbanInteraction(world, createInitialCompanyState()).world.activeOrder.status).toBe('Available')
-    world.activeOrder.pickupLocation = 'PickupZone'
-    world.activeOrder.destination = 'CommercialPickup'
-    expect(getUrbanOrderListing(world)).toBeNull()
   })
 
   it('does not turn fallback map coordinates or another order identity into a valid pickup', () => {

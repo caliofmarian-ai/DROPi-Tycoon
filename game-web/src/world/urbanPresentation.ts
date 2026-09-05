@@ -5,7 +5,7 @@ import { URBAN_MERCHANT_PROFILES } from '../systems/urbanInteractions'
 import { URBAN_BUILDINGS, URBAN_HQ, URBAN_ROADS, URBAN_SIDEWALKS } from './urbanWorld'
 import { WORLD_DECORATIONS, WORLD_HEIGHT, WORLD_ROUTE_POINTS, WORLD_WIDTH } from './worldLayout'
 
-export const HQ_EXPANSION_POINT = { x: URBAN_HQ.x - 120, y: URBAN_HQ.y - 24 } as const
+export const HQ_EXPANSION_POINT = URBAN_HQ
 
 export const getHQGrowth = (company?: CompanyState) => ({
   tier: Math.min(3, Math.max(1, Math.floor(company?.level ?? 1))),
@@ -122,6 +122,7 @@ export const renderUrbanNeighborhood = (
         g.lineStyle(2, 0xffedc7).lineBetween(b.x + 47, top + 15, b.x + 47, top + 28)
       }
     }
+    if (isHQ) label(scene, b.x, bottom - 13, 'Future Main DronePort', '#f1d9a5', 9)
   })
 
   WORLD_DECORATIONS.forEach((tree, index) => {
@@ -168,19 +169,6 @@ export const renderUrbanNeighborhood = (
   }
   label(scene, URBAN_HQ.x + 44, 255, 'P · TRANSPORT', '#fff4da', 10)
   label(scene, URBAN_HQ.x - 66, 292, 'PARCEL STAGING', '#fff4da', 9)
-  // The locked reserve adjoins HQ; its sign is reachable from the front pavement.
-  const reserve = scene.add.graphics()
-  const reserveLeft = HQ_EXPANSION_POINT.x - 33
-  const reserveTop = HQ_EXPANSION_POINT.y - 116
-  reserve.fillStyle(0xc5b998).fillRoundedRect(reserveLeft, reserveTop, 66, 102, 5)
-  reserve.lineStyle(3, 0x7e7964).strokeRect(reserveLeft, reserveTop, 66, 102)
-  for (let x = reserveLeft; x <= reserveLeft + 66; x += 11) {
-    reserve.lineBetween(x, reserveTop - 4, x, reserveTop + 9)
-      .lineBetween(x, reserveTop + 94, x, reserveTop + 108)
-  }
-  reserve.lineStyle(2, 0xf0dfaa).strokeCircle(HQ_EXPANSION_POINT.x, reserveTop + 47, 22)
-  label(scene, HQ_EXPANSION_POINT.x, HQ_EXPANSION_POINT.y, 'HQ DRONEPORT\nLocked expansion', '#fff4da', 10)
-
   WORLD_ROUTE_POINTS.forEach((point, index) => {
     const merchant = point.kind === 'pickup'
     const profile = URBAN_MERCHANT_PROFILES.find(candidate => candidate.pickupLocation === point.label)

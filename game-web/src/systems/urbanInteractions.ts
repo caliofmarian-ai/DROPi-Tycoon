@@ -6,8 +6,11 @@ import { settleDeliveryOutcome } from './economySettlement'
 import { createNextOrder, pickupPointForOrder } from './orderGeneration'
 import {
   isDeliveryMission, loadParcel, resolveActiveTransport, TRANSPORT_PROFILES, unloadParcel,
-  type CargoLoad, type DeliveryMission, type Parcel,
+  type CargoLoad, type DeliveryMission,
 } from './urbanLogistics'
+import {
+  cargoForPlayer, LOCAL_LISTING, LOCAL_MERCHANT, missionForOrder, parcelForOrder, prepareMarketplaceOrder,
+} from './urbanMarketplace'
 import { URBAN_HQ, URBAN_MERCHANT, URBAN_ROADS, inInteractionRange } from '../world/urbanWorld'
 import { findWorldRoutePoint } from '../world/worldLayout'
 
@@ -20,7 +23,10 @@ export interface UrbanMerchantProfile {
 
 /** Digital profiles are tied to physical merchants, not anonymous remote pickup buttons. */
 export const URBAN_MERCHANT_PROFILES: readonly UrbanMerchantProfile[] = [
-  { profileId: 'mara-market', worldActorId: 'merchant:PickupZone', businessName: 'Mara’s Market', pickupLocation: 'PickupZone' },
+  {
+    profileId: LOCAL_MERCHANT.merchantId, worldActorId: LOCAL_MERCHANT.npcId,
+    businessName: LOCAL_MERCHANT.name, pickupLocation: LOCAL_MERCHANT.pickupLocation,
+  },
   { profileId: 'cedar-bakery', worldActorId: 'merchant:CommercialPickup', businessName: 'Cedar Bakery', pickupLocation: 'CommercialPickup' },
   { profileId: 'neighborhood-coop', worldActorId: 'merchant:ResidentialPickup', businessName: 'Neighborhood Co-op', pickupLocation: 'ResidentialPickup' },
 ]
@@ -36,14 +42,13 @@ export interface UrbanOrderListing {
 }
 
 export const getUrbanOrderListing = (world: WorldState): UrbanOrderListing | null => {
-  const order = world.activeOrder
-  const existingWork = order.status === 'Accepted' || order.status === 'PickedUp'
-  if ((!world.urban?.merchantOnboarded && !existingWork) ||
-      (!existingWork && order.status !== 'Available')) return null
+  const existingWork = world.activeOrder.status === 'Accepted' || world.activeOrder.status === 'PickedUp'
+  const order = existingWork ? world.activeOrder : prepareMarketplaceOrder(world, world.urban?.activeTransport ?? 'walking')
+  if (!order) return null
   const merchant = URBAN_MERCHANT_PROFILES.find(profile => profile.pickupLocation === order.pickupLocation)
   if (!merchant || findWorldRoutePoint(order.destination)?.kind !== 'delivery') return null
   return {
-    listingId: `local-listing:${order.orderId}`,
+    listingId: merchant.profileId === LOCAL_MERCHANT.merchantId ? LOCAL_LISTING.listingId : `legacy-listing:${order.orderId}`,
     merchantProfileId: merchant.profileId,
     merchant,
     orderId: order.orderId,
@@ -53,38 +58,19 @@ export const getUrbanOrderListing = (world: WorldState): UrbanOrderListing | nul
   }
 }
 
-const parcelFor = (world: WorldState): Parcel => ({
-  parcelId: `${world.activeOrder.orderId}:parcel`,
-  orderId: world.activeOrder.orderId,
-  cargoUnits: 1,
-})
+export const getUrbanCargo = (world: WorldState): CargoLoad =>
+  cargoForPlayer(world, world.urban?.activeTransport ?? 'walking')
 
-export const getUrbanCargo = (world: WorldState): CargoLoad => ({
-  capacity: TRANSPORT_PROFILES[world.urban?.activeTransport ?? 'walking'].cargoCapacity,
-  parcels: world.player.carryingPackage ? [parcelFor(world)] : [],
-})
-
-export const getUrbanDeliveryMission = (world: WorldState): DeliveryMission => {
-  const parcel = parcelFor(world)
-  return {
-    missionId: `mission:${world.activeOrder.orderId}`,
-    orderId: world.activeOrder.orderId,
-    parcels: [parcel],
-    legs: [{
-      legId: 'merchant-to-customer',
-      from: world.activeOrder.pickupLocation,
-      to: world.activeOrder.destination,
-      parcelIds: [parcel.parcelId],
-      mode: 'terrestrial',
-      carrier: { kind: 'player', playerId: 'local-courier' },
-      transport: world.urban?.activeTransport ?? 'walking',
-    }],
-  }
-}
+export const getUrbanDeliveryMission = (world: WorldState): DeliveryMission =>
+  missionForOrder(world.activeOrder, world.urban?.activeTransport ?? 'walking')
 
 export const getUrbanRouteDistance = (world: WorldState): number => {
-  const pickup = findWorldRoutePoint(world.activeOrder.pickupLocation)
-  const destination = findWorldRoutePoint(world.activeOrder.destination)
+  const order = world.activeOrder.status === 'Available'
+    ? prepareMarketplaceOrder(world, world.urban?.activeTransport ?? 'walking')
+    : world.activeOrder
+  if (!order) return Infinity
+  const pickup = findWorldRoutePoint(order.pickupLocation)
+  const destination = findWorldRoutePoint(order.destination)
   if (pickup?.kind !== 'pickup' || destination?.kind !== 'delivery') return Infinity
   if (pickup.y === destination.y) return Math.abs(pickup.x - destination.x)
   // The current route pool's two horizontal lanes meet at the central avenue.
@@ -158,7 +144,7 @@ export const performUrbanInteraction = (
   if (order.status === 'Accepted' && inInteractionRange(world.player, objective.point)) {
     if (findWorldRoutePoint(order.pickupLocation)?.kind !== 'pickup' ||
         world.player.currentOrder !== order.orderId) return result('HQ needs to verify this order before pickup.')
-    const cargo = loadParcel(getUrbanCargo(world), parcelFor(world))
+    const cargo = loadParcel(getUrbanCargo(world), parcelForOrder(order))
     if (!cargo.ok || !isDeliveryMission(getUrbanDeliveryMission(world))) {
       return result('No cargo space. Finish your current parcel first.')
     }
@@ -174,7 +160,7 @@ export const performUrbanInteraction = (
     return result('Parcel collected! Follow the gold marker to your customer.', 'positive')
   }
   if (order.status === 'PickedUp' && inInteractionRange(world.player, objective.point)) {
-    const cargo = unloadParcel(getUrbanCargo(world), parcelFor(world).parcelId)
+    const cargo = unloadParcel(getUrbanCargo(world), parcelForOrder(order).parcelId)
     if (!cargo.ok) return result('Collect your parcel from the merchant first.')
     const delivered = attemptDelivery(order, world.player, {
       selectedDestination: order.destination,
@@ -201,13 +187,12 @@ export const performUrbanInteraction = (
   if (inInteractionRange(world.player, URBAN_HQ)) {
     if (!world.urban!.merchantOnboarded) return result('HQ: Meet Mara at the corner shop first. Follow the marker.')
     if (order.status === 'Available') {
-      const listing = getUrbanOrderListing(world)
-      if (!listing) return result('HQ: This order has no linked local merchant listing.')
-      if (!isUrbanRouteWithinTransportRange(world)) return result('HQ: Choose transport with enough range for this route.')
-      const accepted = applyOrderAcceptanceRequest(world, listing.orderId)
+      const prepared = prepareMarketplaceOrder(world, world.urban!.activeTransport)
+      if (!prepared) return result('HQ: No eligible listing. Check the route, transport range and cargo capacity.')
+      const accepted = applyOrderAcceptanceRequest({ ...world, activeOrder: prepared }, prepared.orderId)
       return {
         world: accepted.worldState, company, settled: false,
-        message: accepted.accepted ? `Job accepted from ${listing.merchant.businessName}! Collect the parcel in person.` : 'Finish your current job first.',
+        message: accepted.accepted ? `Job accepted from ${LOCAL_MERCHANT.name}! Collect the parcel in person.` : 'Finish your current job first.',
         cue: accepted.accepted ? 'order-accepted' : undefined,
       }
     }

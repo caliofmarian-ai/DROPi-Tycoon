@@ -3,6 +3,7 @@ import { createInitialCompanyState, createInitialGameSettingsState, createInitia
 import { createSaveGame, restoreGameSessionFromSave } from '../src/persistence/saveSystem'
 import { getOrCreateGameSession, replaceGameSession } from '../src/state/gameSession'
 import { createOrderForSequence } from '../src/systems/orderGeneration'
+import * as marketplace from '../src/systems/urbanMarketplace'
 import { findWorldRoutePoint } from '../src/world/worldLayout'
 import { URBAN_HQ, URBAN_MERCHANT } from '../src/world/urbanWorld'
 import { UrbanDPadInput, urbanHUDLayout, urbanStatusText } from '../src/ui/UrbanHUD'
@@ -154,7 +155,10 @@ describe('urban physical delivery scene', () => {
     world.activeOrder = createOrderForSequence(sequence)
     world.urban = { merchantOnboarded: true, activeTransport: 'walking' }
     const accepted = performUrbanInteraction(at(world, URBAN_HQ), company)
-    const pickup = findWorldRoutePoint(world.activeOrder.pickupLocation)!
+    expect(accepted.world.activeOrder.pickupLocation).toBe(marketplace.LOCAL_MERCHANT.pickupLocation)
+    expect(accepted.world.activeOrder.orderId).toBe(world.activeOrder.orderId)
+    expect(accepted.world.activeOrder.destination).toBe(world.activeOrder.destination)
+    const pickup = findWorldRoutePoint(accepted.world.activeOrder.pickupLocation)!
     const destination = findWorldRoutePoint(world.activeOrder.destination)!
     const remotePickup = performUrbanInteraction(accepted.world, company)
     expect(remotePickup.world.activeOrder.status).toBe('Accepted')
@@ -195,6 +199,26 @@ describe('urban physical delivery scene', () => {
     const delivered = performUrbanInteraction(at(picked.world, destination), company)
     expect(delivered.settled).toBe(true)
     expect(getUrbanObjective(delivered.world).point).toEqual(URBAN_MERCHANT)
+  })
+
+  it('blocks physical pickup when the shared cargo projection has no spare capacity', () => {
+    const world = createInitialWorldState()
+    world.activeOrder.status = 'Accepted'
+    world.player.currentOrder = world.activeOrder.orderId
+    Object.assign(world.player, URBAN_MERCHANT)
+    const projectedCargo = vi.spyOn(marketplace, 'cargoForPlayer').mockReturnValue({
+      capacity: 1,
+      parcels: [{ parcelId: 'existing-parcel', orderId: 'ORDER-999', cargoUnits: 1 }],
+    })
+    try {
+      const result = performUrbanInteraction(world, createInitialCompanyState())
+      expect(projectedCargo).toHaveBeenCalledWith(expect.any(Object), 'walking')
+      expect(result.world.activeOrder.status).toBe('Accepted')
+      expect(result.world.player.carryingPackage).toBe(false)
+      expect(result.message).toContain('No cargo space')
+    } finally {
+      projectedCargo.mockRestore()
+    }
   })
 
   it('uses the displayed interaction boundary and rejects remote actions', () => {
@@ -294,6 +318,14 @@ describe('urban touch controls and compact HUD', () => {
       expect(layout.pad.size - 2).toBeGreaterThanOrEqual(44)
       expect(layout.transport.height).toBeGreaterThanOrEqual(44)
       expect(layout.menu.rowHeight).toBeGreaterThanOrEqual(44)
+      expect(layout.toast.y).toBeGreaterThan(height / 2 + 40)
+      expect(layout.toast.y + layout.toast.height).toBeLessThan(height - 14)
+      if (width > height) {
+        expect(layout.toast.x - layout.toast.width / 2).toBeGreaterThan(padRight)
+        expect(layout.toast.x + layout.toast.width / 2).toBeLessThan(actionLeft)
+      } else {
+        expect(layout.toast.y + layout.toast.height).toBeLessThan(layout.pad.y)
+      }
     },
   )
 })

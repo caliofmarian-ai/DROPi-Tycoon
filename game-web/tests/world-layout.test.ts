@@ -114,7 +114,7 @@ describe('Workstream E — world uplift removes developer-style debug labels', (
 
   it('draws readable neighborhood signs and landmark identities without image assets', () => {
     const presentationSource = readFileSync(new URL('../src/world/urbanPresentation.ts', import.meta.url), 'utf8')
-    for (const sign of ['DROPi · HQ', 'MARA’S MARKET', 'DRONEPORT', 'CEDAR AVENUE']) {
+    for (const sign of ['DROPi · HQ', 'MARA’S MARKET', 'Future Main DronePort', 'CEDAR AVENUE']) {
       expect(presentationSource).toContain(sign)
     }
     expect(presentationSource).not.toContain('.add.image(')

@@ -17,14 +17,27 @@ interface HUDCallbacks {
   audio: () => void
 }
 
-export const urbanHUDLayout = (width: number, height: number) => ({
-  pad: { x: 14, y: height - 158, size: 48 },
-  action: { x: width - 90, y: height - 42, width: 156, height: 56 },
-  transport: { x: width - 90, y: height - 104, width: 156, height: 48 },
-  minimap: { x: width - 132, y: 54, width: 116, height: 87 },
-  objective: { x: 16, y: 52, width: Math.max(130, width - 166) },
-  menu: { x: width - 106, y: 74, width: 184, rowHeight: 44 },
-})
+export const urbanHUDLayout = (width: number, height: number) => {
+  const pad = { x: 14, y: height - 158, size: 48 }
+  const action = { x: width - 90, y: height - 42, width: 156, height: 56 }
+  const gapLeft = pad.x + 3 * pad.size + 12
+  const gapRight = action.x - action.width / 2 - 12
+  const useBottomGap = gapRight - gapLeft >= 180
+  return {
+    pad,
+    action,
+    transport: { x: width - 90, y: height - 104, width: 156, height: 48 },
+    minimap: { x: width - 132, y: 54, width: 116, height: 87 },
+    objective: { x: 16, y: 52, width: Math.max(130, width - 166) },
+    menu: { x: width - 106, y: 74, width: 184, rowHeight: 44 },
+    toast: {
+      x: useBottomGap ? (gapLeft + gapRight) / 2 : width / 2,
+      y: height - (useBottomGap ? 94 : 240),
+      width: useBottomGap ? Math.min(430, gapRight - gapLeft) : width - 32,
+      height: 72,
+    },
+  }
+}
 
 export const urbanStatusText = (world: WorldState, company: CompanyState): string => {
   const transport = world.urban?.activeTransport === 'bicycle' ? 'Bicycle' : 'Walking'
@@ -100,10 +113,10 @@ export class UrbanHUD {
     const transport = this.button(t.x, t.y, t.width, t.height, 'T · Transport', callbacks.transport)
     this.transportButton = transport.button
     this.transportLabel = transport.label
-    const toastY = height < 480 ? 124 : height - 184
-    this.toast = this.text(width / 2, toastY, '', 13, '#fff6dc')
+    const toast = this.layout.toast
+    this.toast = this.text(toast.x, toast.y, '', 12, '#fff6dc')
       .setOrigin(0.5, 0).setAlign('center')
-      .setWordWrapWidth(Math.min(width - 36, 430))
+      .setWordWrapWidth(toast.width - 20).setFixedSize(toast.width, toast.height)
       .setBackgroundColor('#183b40').setPadding(10, 7).setVisible(false)
     const rows: [string, () => void][] = [
       ['Company', callbacks.company],
@@ -195,7 +208,7 @@ export class UrbanHUD {
       this.text(x + p.x, y + p.y - 9, label, 9, '#183b40').setOrigin(0.5)
     }
     const expansion = minimapPoint(HQ_EXPANSION_POINT, width, height)
-    this.text(x + expansion.x - 4, y + expansion.y, 'D', 9, '#604175').setOrigin(0.5)
+    this.text(x + expansion.x - 8, y + expansion.y, 'D', 9, '#604175').setOrigin(0.5)
   }
 
   update(world: WorldState, company: CompanyState, objective: UrbanObjective): void {
