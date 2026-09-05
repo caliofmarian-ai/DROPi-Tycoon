@@ -39,3 +39,8 @@ jobs:
         env:
           EXPO_PUBLIC_DROPITYCOON_GAME_URL: https://example.com/
         run: npx expo config --type public >/tmp/dropi-tycoon-expo-config.json
+
+      - name: Expo Doctor validation
+        env:
+          EXPO_PUBLIC_DROPITYCOON_GAME_URL: https://example.com/
+        run: npm run doctor
