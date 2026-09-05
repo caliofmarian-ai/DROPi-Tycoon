@@ -7,13 +7,17 @@ import { getAudioController } from '../systems/audioSystem'
 import { resolveActiveTransport, TRANSPORT_PROFILES } from '../systems/urbanLogistics'
 import { getUrbanObjective, performUrbanInteraction } from '../systems/urbanInteractions'
 import type { CompanyState, WorldState } from '../types/game'
-import { UrbanHUD } from '../ui/UrbanHUD'
+import { UrbanHUD, isUrbanHUDPoint } from '../ui/UrbanHUD'
+import { UrbanZoomGesture, urbanZoomStep } from '../ui/urbanZoom'
+import { clampCameraZoom } from '../ui/cameraControls'
+import { CITY_COLORS, COLORS } from '../ui/theme'
 import { createPlayerVisual, type PlayerVisual } from '../world/playerVisual'
 import { renderUrbanNeighborhood } from '../world/urbanPresentation'
 import {
   URBAN_HQ, inInteractionRange, moveUrbanPlayer, movementFacing, repairUrbanPosition, type UrbanFacing,
 } from '../world/urbanWorld'
 import { WORLD_HEIGHT, WORLD_WIDTH } from '../world/worldLayout'
+import { AmbientCity } from '../world/ambientCity'
 
 export class GameWorldScene extends Phaser.Scene {
   private worldState!: WorldState
@@ -28,6 +32,8 @@ export class GameWorldScene extends Phaser.Scene {
   private keys: Record<string, Phaser.Input.Keyboard.Key> = {}
   private lastHudUpdate = 0
   private facing: UrbanFacing = 'down'
+  private readonly zoomGesture = new UrbanZoomGesture()
+  private ambient?: AmbientCity
 
   constructor() {
     super('GameWorld')
@@ -51,19 +57,20 @@ export class GameWorldScene extends Phaser.Scene {
     }
     this.syncRuntimeSession()
     getAudioController().setEnabled(session.settings.soundEnabled)
-    this.cameras.main.setBackgroundColor('#a9ca93').setBounds(0, 0, WORLD_WIDTH, WORLD_HEIGHT)
+    this.cameras.main.setBackgroundColor(CITY_COLORS.grass).setBounds(0, 0, WORLD_WIDTH, WORLD_HEIGHT)
     this.parkedBicycle = renderUrbanNeighborhood(this, this.companyState)
 
-    const ring = this.add.circle(0, 0, 30, 0xffcf66, 0.16).setStrokeStyle(3, 0xffcf66)
-    const pin = this.add.triangle(0, -41, 0, 0, 18, 0, 9, 12, 0xffcf66)
+    const ring = this.add.circle(0, 0, 30, COLORS.gold, 0.16).setStrokeStyle(3, COLORS.gold)
+    const pin = this.add.triangle(0, -41, 0, 0, 18, 0, 9, 12, COLORS.gold)
     this.objectiveMarker = this.add.container(0, 0, [ring, pin]).setDepth(8)
-    const box = this.add.rectangle(0, 0, 17, 14, 0xc99054).setStrokeStyle(2, 0x684627)
-    const tape = this.add.rectangle(0, 0, 4, 14, 0xffe7b0)
+    const box = this.add.rectangle(0, 0, 17, 14, CITY_COLORS.parcel).setStrokeStyle(2, CITY_COLORS.trunk)
+    const tape = this.add.rectangle(0, 0, 4, 14, CITY_COLORS.tape)
     this.parcel = this.add.container(0, 0, [box, tape]).setDepth(9)
     this.playerVisual = createPlayerVisual(this, this.worldState.player.x, this.worldState.player.y)
     this.playerVisual.container.setDepth(20)
     this.cameras.main.setRotation(0).setZoom(1)
     this.cameras.main.startFollow(this.playerVisual.container, false, 1, 1)
+    this.ambient = new AmbientCity(this)
 
     const worldRenderObjects = [...this.children.list]
     this.fixedUiLayer = this.add.layer()
@@ -81,10 +88,16 @@ export class GameWorldScene extends Phaser.Scene {
       menu: () => this.navigate('MainMenu'),
       save: () => this.saveProgress(),
       audio: () => this.toggleAudio(),
+      zoom: direction => this.setWorldZoom(urbanZoomStep(this.cameras.main.zoom, direction)),
     })
     this.input.addPointer(Math.max(0, 4 - this.input.manager.pointers.length))
     this.keys = (this.input.keyboard?.addKeys('W,A,S,D,UP,DOWN,LEFT,RIGHT,E,T,ESC') ?? {}) as typeof this.keys
     this.input.on('pointerdown', this.unlockAudio)
+    this.input.on('pointerdown', this.beginZoom)
+    this.input.on('pointermove', this.moveZoom)
+    this.input.on('pointerup', this.endZoom)
+    this.input.on('pointerupoutside', this.endZoom)
+    this.input.on('gameout', this.clearInput)
     this.input.keyboard?.on('keydown', this.unlockAudio)
     this.scale.on(Phaser.Scale.Events.RESIZE, this.handleResize)
     this.game.events.on(Phaser.Core.Events.BLUR, this.clearInput)
@@ -99,7 +112,7 @@ export class GameWorldScene extends Phaser.Scene {
     if (!this.hud) return
     const down = (key: string): number => this.keys[key]?.isDown ? 1 : 0
     const touch = this.hud.movement()
-    const input = this.hud.isMenuOpen() ? { x: 0, y: 0 } : {
+    const input = this.hud.isMenuOpen() || this.zoomGesture.isPinching() ? { x: 0, y: 0 } : {
       x: touch.x + down('D') + down('RIGHT') - down('A') - down('LEFT'),
       y: touch.y + down('S') + down('DOWN') - down('W') - down('UP'),
     }
@@ -108,16 +121,18 @@ export class GameWorldScene extends Phaser.Scene {
     const before = this.worldState.player
     const next = moveUrbanPlayer(before, input, Math.min(delta / 1000, 0.05), profile.speed, profile.roadOnly)
     const moving = next.x !== before.x || next.y !== before.y
+    const displacement = { x: next.x - before.x, y: next.y - before.y }
     Object.assign(this.worldState.player, next, { movementSpeed: profile.speed })
     this.worldState.isMoving = moving
     this.worldState.tapTarget = { ...next }
     this.playerVisual.container.setPosition(next.x, next.y)
-    if (input.x !== 0 || input.y !== 0) {
-      this.facing = movementFacing(input, this.facing)
+    if (moving) {
+      this.facing = movementFacing(displacement, this.facing)
       this.playerVisual.setFacing(this.facing)
     }
     this.playerVisual.setMoving(moving)
     this.playerVisual.update(delta)
+    this.ambient?.update(delta, this.cameras.main.worldView)
     if (this.keys.ESC && Phaser.Input.Keyboard.JustDown(this.keys.ESC)) this.hud.toggleMenu()
     if (this.keys.E && Phaser.Input.Keyboard.JustDown(this.keys.E) && !this.hud.isMenuOpen()) this.onAction()
     if (this.keys.T && Phaser.Input.Keyboard.JustDown(this.keys.T) && !this.hud.isMenuOpen()) this.switchTransport()
@@ -198,7 +213,25 @@ export class GameWorldScene extends Phaser.Scene {
   private readonly clearInput = (): void => {
     this.hud?.clearMovement()
     this.input.keyboard?.resetKeys()
+    this.zoomGesture.clear()
   }
+  private setWorldZoom(zoom: number): void {
+    if (this.hud.isMenuOpen()) return
+    this.cameras.main.setZoom(clampCameraZoom(zoom))
+  }
+  private readonly beginZoom = (pointer: Phaser.Input.Pointer): void => {
+    if (!this.hud.isMenuOpen() && !isUrbanHUDPoint(this.scale.width, this.scale.height, pointer.x, pointer.y)) {
+      this.zoomGesture.press(pointer.id, pointer)
+    }
+  }
+  private readonly moveZoom = (pointer: Phaser.Input.Pointer): void => {
+    if (this.hud.isMenuOpen() || isUrbanHUDPoint(this.scale.width, this.scale.height, pointer.x, pointer.y)) {
+      this.zoomGesture.release(pointer.id)
+      return
+    }
+    if (pointer.isDown) this.setWorldZoom(this.zoomGesture.move(pointer.id, pointer, this.cameras.main.zoom))
+  }
+  private readonly endZoom = (pointer: Phaser.Input.Pointer): void => { this.zoomGesture.release(pointer.id) }
   private readonly handleResize = (): void => {
     this.syncRuntimeSession()
     this.scene.restart()
@@ -209,6 +242,12 @@ export class GameWorldScene extends Phaser.Scene {
     this.scale.off(Phaser.Scale.Events.RESIZE, this.handleResize)
     this.game.events.off(Phaser.Core.Events.BLUR, this.clearInput)
     this.input.off('pointerdown', this.unlockAudio)
+    this.input.off('pointerdown', this.beginZoom)
+    this.input.off('pointermove', this.moveZoom)
+    this.input.off('pointerup', this.endZoom)
+    this.input.off('pointerupoutside', this.endZoom)
+    this.input.off('gameout', this.clearInput)
     this.input.keyboard?.off('keydown', this.unlockAudio)
+    this.ambient = undefined
   }
 }

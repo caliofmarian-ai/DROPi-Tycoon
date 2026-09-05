@@ -9,27 +9,25 @@ import {
   type CargoLoad, type DeliveryMission,
 } from './urbanLogistics'
 import {
-  cargoForPlayer, LOCAL_LISTING, LOCAL_MERCHANT, missionForOrder, parcelForOrder, prepareMarketplaceOrder,
+  cargoForPlayer, MARKETPLACE_LISTINGS, missionForOrder, parcelForOrder, prepareMarketplaceOrder,
 } from './urbanMarketplace'
-import { URBAN_HQ, URBAN_MERCHANT, URBAN_ROADS, inInteractionRange } from '../world/urbanWorld'
+import { URBAN_HQ, URBAN_MERCHANT, inInteractionRange } from '../world/urbanWorld'
 import { findWorldRoutePoint } from '../world/worldLayout'
+import { CITY_MERCHANTS, getCityRouteDistance } from '../world/city'
 
 export interface UrbanMerchantProfile {
   profileId: string
   worldActorId: string
   businessName: string
   pickupLocation: string
+  buildingId: string
 }
 
 /** Digital profiles are tied to physical merchants, not anonymous remote pickup buttons. */
-export const URBAN_MERCHANT_PROFILES: readonly UrbanMerchantProfile[] = [
-  {
-    profileId: LOCAL_MERCHANT.merchantId, worldActorId: LOCAL_MERCHANT.npcId,
-    businessName: LOCAL_MERCHANT.name, pickupLocation: LOCAL_MERCHANT.pickupLocation,
-  },
-  { profileId: 'cedar-bakery', worldActorId: 'merchant:CommercialPickup', businessName: 'Cedar Bakery', pickupLocation: 'CommercialPickup' },
-  { profileId: 'neighborhood-coop', worldActorId: 'merchant:ResidentialPickup', businessName: 'Neighborhood Co-op', pickupLocation: 'ResidentialPickup' },
-]
+export const URBAN_MERCHANT_PROFILES: readonly UrbanMerchantProfile[] = CITY_MERCHANTS.map(merchant => ({
+  profileId: merchant.merchantId, worldActorId: merchant.npcId, businessName: merchant.name,
+  pickupLocation: merchant.pickupLocation, buildingId: merchant.buildingId,
+}))
 
 export interface UrbanOrderListing {
   listingId: string
@@ -46,9 +44,10 @@ export const getUrbanOrderListing = (world: WorldState): UrbanOrderListing | nul
   const order = existingWork ? world.activeOrder : prepareMarketplaceOrder(world, world.urban?.activeTransport ?? 'walking')
   if (!order) return null
   const merchant = URBAN_MERCHANT_PROFILES.find(profile => profile.pickupLocation === order.pickupLocation)
-  if (!merchant || findWorldRoutePoint(order.destination)?.kind !== 'delivery') return null
+  if (!merchant || findWorldRoutePoint(order.destination)?.kind !== 'delivery' ||
+      !Number.isFinite(getCityRouteDistance(order.pickupLocation, order.destination))) return null
   return {
-    listingId: merchant.profileId === LOCAL_MERCHANT.merchantId ? LOCAL_LISTING.listingId : `legacy-listing:${order.orderId}`,
+    listingId: MARKETPLACE_LISTINGS.find(listing => listing.merchantId === merchant.profileId)!.listingId,
     merchantProfileId: merchant.profileId,
     merchant,
     orderId: order.orderId,
@@ -72,11 +71,7 @@ export const getUrbanRouteDistance = (world: WorldState): number => {
   const pickup = findWorldRoutePoint(order.pickupLocation)
   const destination = findWorldRoutePoint(order.destination)
   if (pickup?.kind !== 'pickup' || destination?.kind !== 'delivery') return Infinity
-  if (pickup.y === destination.y) return Math.abs(pickup.x - destination.x)
-  // The current route pool's two horizontal lanes meet at the central avenue.
-  const avenue = URBAN_ROADS.find(road => road.id === 'central-vertical')
-  if (!avenue) return Infinity
-  return Math.abs(pickup.x - avenue.x) + Math.abs(pickup.y - destination.y) + Math.abs(destination.x - avenue.x)
+  return getCityRouteDistance(pickup.label, destination.label)
 }
 
 export const isUrbanRouteWithinTransportRange = (world: WorldState): boolean =>
@@ -170,7 +165,7 @@ export const performUrbanInteraction = (
     })
     const settlement = settleDeliveryOutcome(order, delivered.order, company)
     if (!settlement.applied) return result('Bring your parcel to the marked customer.')
-    world.activeOrder = createNextOrder(settlement.order)
+    world.activeOrder = createNextOrder(settlement.order, world.urban!.activeTransport)
     world.player = delivered.player
     return {
       world,
@@ -192,7 +187,9 @@ export const performUrbanInteraction = (
       const accepted = applyOrderAcceptanceRequest({ ...world, activeOrder: prepared }, prepared.orderId)
       return {
         world: accepted.worldState, company, settled: false,
-        message: accepted.accepted ? `Job accepted from ${LOCAL_MERCHANT.name}! Collect the parcel in person.` : 'Finish your current job first.',
+        message: accepted.accepted
+          ? `Job accepted from ${URBAN_MERCHANT_PROFILES.find(profile => profile.pickupLocation === prepared.pickupLocation)!.businessName}! Collect the parcel in person.`
+          : 'Finish your current job first.',
         cue: accepted.accepted ? 'order-accepted' : undefined,
       }
     }

@@ -1,0 +1,142 @@
+[
+  {
+    "scene": "CompanyManagement",
+    "width": 360,
+    "height": 740,
+    "overflow": [],
+    "collisions": []
+  },
+  {
+    "scene": "VehicleFleet",
+    "width": 360,
+    "height": 740,
+    "overflow": [],
+    "collisions": []
+  },
+  {
+    "scene": "EmployeeManagement",
+    "width": 360,
+    "height": 740,
+    "overflow": [],
+    "collisions": []
+  },
+  {
+    "scene": "CustomerReviews",
+    "width": 360,
+    "height": 740,
+    "overflow": [],
+    "collisions": []
+  },
+  {
+    "scene": "FinancialReport",
+    "width": 360,
+    "height": 740,
+    "overflow": [],
+    "collisions": []
+  },
+  {
+    "scene": "CompanyManagement",
+    "width": 740,
+    "height": 360,
+    "overflow": [],
+    "collisions": []
+  },
+  {
+    "scene": "VehicleFleet",
+    "width": 740,
+    "height": 360,
+    "overflow": [],
+    "collisions": []
+  },
+  {
+    "scene": "EmployeeManagement",
+    "width": 740,
+    "height": 360,
+    "overflow": [],
+    "collisions": []
+  },
+  {
+    "scene": "CustomerReviews",
+    "width": 740,
+    "height": 360,
+    "overflow": [],
+    "collisions": []
+  },
+  {
+    "scene": "FinancialReport",
+    "width": 740,
+    "height": 360,
+    "overflow": [],
+    "collisions": []
+  },
+  {
+    "scene": "CompanyManagement",
+    "width": 640,
+    "height": 360,
+    "overflow": [],
+    "collisions": []
+  },
+  {
+    "scene": "VehicleFleet",
+    "width": 640,
+    "height": 360,
+    "overflow": [],
+    "collisions": []
+  },
+  {
+    "scene": "EmployeeManagement",
+    "width": 640,
+    "height": 360,
+    "overflow": [],
+    "collisions": []
+  },
+  {
+    "scene": "CustomerReviews",
+    "width": 640,
+    "height": 360,
+    "overflow": [],
+    "collisions": []
+  },
+  {
+    "scene": "FinancialReport",
+    "width": 640,
+    "height": 360,
+    "overflow": [],
+    "collisions": []
+  },
+  {
+    "scene": "CompanyManagement",
+    "width": 360,
+    "height": 640,
+    "overflow": [],
+    "collisions": []
+  },
+  {
+    "scene": "VehicleFleet",
+    "width": 360,
+    "height": 640,
+    "overflow": [],
+    "collisions": []
+  },
+  {
+    "scene": "EmployeeManagement",
+    "width": 360,
+    "height": 640,
+    "overflow": [],
+    "collisions": []
+  },
+  {
+    "scene": "CustomerReviews",
+    "width": 360,
+    "height": 640,
+    "overflow": [],
+    "collisions": []
+  },
+  {
+    "scene": "FinancialReport",
+    "width": 360,
+    "height": 640,
+    "overflow": [],
+    "collisions": []
+  }
+]

@@ -3,6 +3,8 @@ import {
   buttonPalette,
   chipPalette,
   COLORS,
+  CITY_COLORS,
+  TYPOGRAPHY,
   panelBorderColor,
   rectCenterX,
   rectCenterY,
@@ -39,13 +41,15 @@ export const drawPanel = (
   }
 
   // Soft drop shadow for depth/hierarchy.
-  graphics.fillStyle(0x000000, 0.28)
-  graphics.fillRoundedRect(rect.left + 3, rect.top + 5, rect.width, rect.height, radius)
+  graphics.fillStyle(0x00172c, 0.35)
+  graphics.fillRoundedRect(rect.left, rect.top + 4, rect.width, rect.height, radius)
 
   graphics.fillStyle(COLORS.surface, fillAlpha)
   graphics.fillRoundedRect(rect.left, rect.top, rect.width, rect.height, radius)
 
-  graphics.lineStyle(2, panelBorderColor(tone), tone === 'default' ? 0.6 : 0.85)
+  graphics.fillStyle(COLORS.surfaceRaised, 0.45)
+  graphics.fillRoundedRect(rect.left + 2, rect.top + 2, rect.width - 4, Math.min(45, rect.height - 4), radius)
+  graphics.lineStyle(1.5, panelBorderColor(tone), tone === 'default' ? 0.8 : 0.95)
   graphics.strokeRoundedRect(rect.left, rect.top, rect.width, rect.height, radius)
 
   return graphics
@@ -74,6 +78,7 @@ export const createThemedButton = (
   const palette = buttonPalette(tone)
   const radius = options.radius ?? Math.min(16, rect.height / 2.4)
   const fontSize = options.fontSize ?? 16
+  let enabled = true
 
   const background = scene.add.graphics()
   const paint = (fill: number, alpha: number) => {
@@ -94,7 +99,7 @@ export const createThemedButton = (
 
   const label = scene.add
     .text(rectCenterX(rect), rectCenterY(rect), text, {
-      fontFamily: 'Arial',
+      fontFamily: TYPOGRAPHY.family,
       fontSize: `${fontSize}px`,
       color: palette.text,
       fontStyle: 'bold',
@@ -108,8 +113,15 @@ export const createThemedButton = (
     options.container.add(label)
   }
 
-  background.on('pointerover', () => paint(palette.fillHover, 1))
-  background.on('pointerout', () => paint(palette.fill, 1))
+  const fitLabel = () => {
+    label.setFontSize(fontSize)
+    while ((label.width > rect.width - 16 || label.height > rect.height - 12) && parseInt(String(label.style.fontSize)) > 12) {
+      label.setFontSize(parseInt(String(label.style.fontSize)) - 1)
+    }
+  }
+  fitLabel()
+  background.on('pointerover', () => { if (enabled) paint(palette.fillHover, 1) })
+  background.on('pointerout', () => { if (enabled) paint(palette.fill, 1) })
   background.on(
     'pointerdown',
     (
@@ -119,15 +131,17 @@ export const createThemedButton = (
       event: Phaser.Types.Input.EventData,
     ) => {
       event.stopPropagation()
-      onTap()
+      if (enabled) onTap()
     },
   )
 
   return {
     background,
     label,
-    setEnabled: (enabled: boolean) => {
-      if (enabled) {
+    setEnabled: (nextEnabled: boolean) => {
+      enabled = nextEnabled
+      paint(enabled ? palette.fill : COLORS.surfaceRaised, 1)
+      if (nextEnabled) {
         background.setInteractive(
           new Phaser.Geom.Rectangle(rect.left, rect.top, rect.width, rect.height),
           Phaser.Geom.Rectangle.Contains,
@@ -136,11 +150,11 @@ export const createThemedButton = (
         label.setAlpha(1)
       } else {
         background.disableInteractive()
-        background.setAlpha(0.5)
+        background.setAlpha(0.7)
         label.setAlpha(0.75)
       }
     },
-    setLabel: (nextText: string) => label.setText(nextText),
+    setLabel: (nextText: string) => { label.setText(nextText); fitLabel() },
   }
 }
 
@@ -234,6 +248,110 @@ export const paintBackdrop = (scene: Phaser.Scene, width: number, height: number
     1,
   )
   graphics.fillRect(0, 0, width, height)
+  graphics.fillStyle(COLORS.accent, 0.035)
+  for (let x = 20; x < width; x += 64) {
+    for (let y = 20; y < height; y += 64) graphics.fillCircle(x, y, 2)
+  }
+}
+
+/** Text is measured by Phaser, so long saved names and large balances stay in their boxes. */
+export const fitText = (
+  scene: Phaser.Scene,
+  rect: RectShape,
+  value: string,
+  size = 16,
+  color: string = COLORS.textPrimary,
+  bold = false,
+  align: 'left' | 'center' | 'right' = 'left',
+): Phaser.GameObjects.Text => {
+  const text = scene.add.text(rect.left, rect.top, value, {
+    fontFamily: TYPOGRAPHY.family, fontSize: `${size}px`, color,
+    fontStyle: bold ? 'bold' : 'normal', align, wordWrap: { width: rect.width, useAdvancedWrap: true },
+  })
+  while ((text.height > rect.height || text.width > rect.width) && size > 12) {
+    size -= 1
+    text.setFontSize(size)
+  }
+  let shortened = value
+  while ((text.height > rect.height || text.width > rect.width) && shortened.length > 0) {
+    shortened = shortened.slice(0, -1)
+    text.setText(`${shortened.trimEnd()}…`)
+  }
+  text.setPosition(
+    align === 'center' ? rect.left + rect.width / 2 : align === 'right' ? rect.left + rect.width : rect.left,
+    rect.top + rect.height / 2,
+  ).setOrigin(align === 'center' ? 0.5 : align === 'right' ? 1 : 0, 0.5)
+  return text
+}
+
+/** Original miniature headquarters, drawn locally without asset requests. */
+export const drawHeadquarters = (scene: Phaser.Scene, rect: RectShape): void => {
+  const g = scene.add.graphics()
+  const scale = Math.min(rect.width / 240, rect.height / 132)
+  g.setPosition(rectCenterX(rect), rectCenterY(rect)).setScale(scale)
+  g.fillStyle(CITY_COLORS.shadow, 0.3)
+  g.fillEllipse(0, 49, 210, 24)
+  g.fillStyle(CITY_COLORS.lawn)
+  g.fillRoundedRect(-116, 22, 232, 32, 12)
+  g.fillStyle(CITY_COLORS.sidewalk)
+  g.fillRoundedRect(-94, 32, 188, 16, 5)
+  g.fillStyle(CITY_COLORS.wallShade)
+  g.fillRect(-72, -30, 145, 66)
+  g.fillStyle(CITY_COLORS.cream)
+  g.fillRect(-72, -30, 124, 66)
+  g.fillStyle(CITY_COLORS.roofBlue)
+  g.fillRoundedRect(-80, -45, 163, 22, 5)
+  g.fillStyle(COLORS.accent)
+  g.fillRect(-75, -30, 153, 5)
+  g.fillStyle(CITY_COLORS.glassShade)
+  for (let x = -58; x < 30; x += 28) g.fillRoundedRect(x, -12, 19, 22, 2)
+  g.fillStyle(CITY_COLORS.glass)
+  for (let x = -56; x < 30; x += 28) g.fillRect(x, -10, 6, 18)
+  g.fillStyle(CITY_COLORS.metal)
+  g.fillRoundedRect(-18, 13, 28, 23, 2)
+  g.fillStyle(CITY_COLORS.glass)
+  g.fillRect(-14, 16, 9, 19)
+  g.fillRect(-2, 16, 9, 19)
+  g.fillStyle(CITY_COLORS.parcel)
+  g.fillRect(35, 19, 19, 17)
+  g.fillStyle(CITY_COLORS.tape)
+  g.fillRect(42, 19, 4, 17)
+  for (const x of [-100, 101]) {
+    g.fillStyle(CITY_COLORS.trunk)
+    g.fillRect(x - 3, 11, 6, 26)
+    g.fillStyle(CITY_COLORS.leafDark)
+    g.fillCircle(x, 7, 17)
+    g.fillStyle(CITY_COLORS.leafLight)
+    g.fillCircle(x - 4, 0, 14)
+  }
+  fitText(scene, { left: rectCenterX(rect) - 62 * scale, top: rectCenterY(rect) - 44 * scale,
+    width: 124 * scale, height: 18 * scale }, 'DROPi HQ', Math.max(12, 14 * scale), '#ffffff', true, 'center')
+}
+
+export const drawEmployeePortrait = (scene: Phaser.Scene, rect: RectShape): void => {
+  drawPanel(scene, rect, { tone: 'accent', radius: 14 })
+  const g = scene.add.graphics()
+  const s = Math.min(rect.width, rect.height) / 90
+  g.setPosition(rectCenterX(rect), rectCenterY(rect)).setScale(s)
+  g.fillStyle(COLORS.accentStrong)
+  g.fillEllipse(0, 26, 65, 36)
+  g.fillStyle(CITY_COLORS.skinShade)
+  g.fillRoundedRect(-6, 10, 12, 13, 3)
+  g.fillStyle(CITY_COLORS.hair)
+  g.fillEllipse(0, -12, 39, 47)
+  g.fillStyle(CITY_COLORS.skin)
+  g.fillEllipse(0, -6, 33, 37)
+  g.fillStyle(CITY_COLORS.hair)
+  g.fillRoundedRect(-20, -28, 39, 16, 8)
+  g.fillStyle(CITY_COLORS.metal)
+  g.fillCircle(-7, -7, 2)
+  g.fillCircle(7, -7, 2)
+  g.lineStyle(2, 0xac643d)
+  g.beginPath()
+  g.arc(0, 0, 6, 0.2, Math.PI - 0.2)
+  g.strokePath()
+  g.fillStyle(COLORS.gold)
+  g.fillRoundedRect(9, 22, 12, 8, 2)
 }
 
 export type VehicleGlyphType = 'Bicycle' | 'ElectricScooter' | 'Motorcycle' | 'DeliveryVan'

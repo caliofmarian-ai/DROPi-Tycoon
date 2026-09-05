@@ -1,38 +1,26 @@
 import {
-  PLAYER_START, WORLD_BUILDINGS, WORLD_DECORATIONS, WORLD_HEIGHT, WORLD_ROADS, WORLD_WIDTH,
-  type WorldRectLayout,
+  PLAYER_START, WORLD_BUILDINGS, WORLD_DECORATIONS, WORLD_HEIGHT, WORLD_ROADS,
+  WORLD_ROUTE_POINTS, WORLD_SIDEWALKS, WORLD_WIDTH, type WorldBuildingLayout, type WorldRectLayout,
 } from './worldLayout'
 
 export interface UrbanPoint { x: number; y: number }
 export type UrbanFacing = 'up' | 'down' | 'left' | 'right'
-export interface UrbanBuilding extends WorldRectLayout {
-  kind: 'home' | 'shop' | 'hq' | 'depot'
-}
+export type UrbanBuilding = WorldBuildingLayout
 
 export const URBAN_HQ: Readonly<UrbanPoint> = PLAYER_START
 export const URBAN_MERCHANT: Readonly<UrbanPoint> = { x: 620, y: 910 }
 export const URBAN_CUSTOMER: Readonly<UrbanPoint> = { x: 560, y: 290 }
 export const URBAN_ROADS = WORLD_ROADS
 
-// Pavement slabs run underneath roads, closing gaps at every intersection.
-export const URBAN_SIDEWALKS: readonly WorldRectLayout[] = URBAN_ROADS.map(road => ({
-  ...road, id: `${road.id}-pavement`, width: road.width + 48, height: road.height + 48,
-}))
-
-export const URBAN_BUILDINGS: readonly UrbanBuilding[] = [
-  ...WORLD_BUILDINGS.filter(building =>
-    building.id !== 'residential-2' && building.id !== 'residential-3',
-  ).map(building => ({
-    id: building.id,
-    x: building.x,
-    y: building.y,
-    width: building.zoneId === 'storage' || building.zoneId === 'company' ? 116 : 90,
-    height: 108,
-    kind: (building.zoneId === 'residential' ? 'home' :
-      building.zoneId === 'business' ? 'shop' : 'depot') as UrbanBuilding['kind'],
-  })),
-  { id: 'main-hq', x: 380, y: 170, width: 160, height: 128, kind: 'hq' },
-]
+export const URBAN_BUILDINGS: readonly UrbanBuilding[] = WORLD_BUILDINGS
+export const URBAN_ENTRANCE_PATHS: readonly WorldRectLayout[] = WORLD_ROUTE_POINTS.map(point => {
+  const building = WORLD_BUILDINGS.find(entry => entry.id === point.buildingId)!
+  return {
+    id: `${point.label}-entrance`, x: point.x, y: (point.y + building.door.y) / 2,
+    width: 28, height: Math.abs(point.y - building.door.y),
+  }
+})
+export const URBAN_SIDEWALKS: readonly WorldRectLayout[] = [...WORLD_SIDEWALKS, ...URBAN_ENTRANCE_PATHS]
 
 const finitePoint = (point: UrbanPoint): boolean =>
   Number.isFinite(point.x) && Number.isFinite(point.y)

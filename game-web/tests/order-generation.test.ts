@@ -9,11 +9,15 @@ import {
   parseOrderSequence,
   pickupPointForOrder,
   routeForSequence,
+  BICYCLE_ORDER_ROUTE_TEMPLATES,
+  orderRoutesForTransport,
 } from '../src/systems/orderGeneration'
 import { findWorldRoutePoint } from '../src/world/worldLayout'
 import { createInitialCompanyState, createInitialWorldState } from '../src/state/gameState'
 
 import { getUrbanObjective, performUrbanInteraction } from '../src/systems/urbanInteractions'
+import { CITY_LOCATIONS, findCityRoute, getCityRouteDistance } from '../src/world/city'
+import { TRANSPORT_PROFILES } from '../src/systems/urbanLogistics'
 
 const gameStateSource = readFileSync(
   new URL('../src/state/gameState.ts', import.meta.url),
@@ -37,11 +41,12 @@ describe('release blocker #271 — order sequence generation', () => {
   })
 
   it('rotates routes deterministically without immediate identical repetition', () => {
-    const routes = [1, 2, 3, 4].map(routeForSequence)
+    const routes = [1, 2, 3, 4].map(sequence => routeForSequence(sequence))
     expect(routes[0].routeId).not.toBe(routes[1].routeId)
     expect(routes[1].routeId).not.toBe(routes[2].routeId)
     expect(routes[2].routeId).not.toBe(routes[3].routeId)
-    expect(routes[3].routeId).toBe(routes[0].routeId)
+    expect(routes[3].routeId).not.toBe(routes[0].routeId)
+    expect(routeForSequence(ORDER_ROUTE_TEMPLATES.length + 1)).toEqual(routes[0])
   })
 
   it('creates a fresh Available order with owner-approved reward', () => {
@@ -77,6 +82,60 @@ describe('release blocker #271 — order sequence generation', () => {
       expect(point?.kind).toBe('pickup')
       expect(pickupPointForOrder(order)).toEqual({ x: point?.x, y: point?.y })
     }
+  })
+
+  it('varies real merchants and customers early instead of waiting for a catalog cycle', () => {
+    const opening = Array.from({ length: 24 }, (_, index) => createOrderForSequence(index + 1))
+    expect(new Set(opening.map(order => order.pickupLocation)).size).toBeGreaterThanOrEqual(6)
+    expect(new Set(opening.map(order => order.destination)).size).toBeGreaterThanOrEqual(12)
+    expect(new Set(ORDER_ROUTE_TEMPLATES.map(route => route.pickupLocation)).size).toBe(8)
+    expect(new Set(ORDER_ROUTE_TEMPLATES.map(route => route.destination)).size).toBe(21)
+    expect(ORDER_ROUTE_TEMPLATES.length).toBeGreaterThanOrEqual(40)
+  })
+
+  it.each(['walking', 'bicycle'] as const)('generates only connected %s jobs, with varied distances and no adjacent endpoint repeats', transport => {
+    const routes = orderRoutesForTransport(transport)
+    const distances = new Set<number>()
+    for (let index = 0; index < routes.length; index++) {
+      const order = createOrderForSequence(index + 1, transport)
+      const again = createOrderForSequence(index + 1, transport)
+      const next = createOrderForSequence(index + 2, transport)
+      expect(order).toEqual(again)
+      expect(order.pickupLocation).not.toBe(next.pickupLocation)
+      expect(order.destination).not.toBe(next.destination)
+      expect(findCityRoute(order.pickupLocation, order.destination)).not.toBeNull()
+      const distance = getCityRouteDistance(order.pickupLocation, order.destination)
+      expect(distance).toBeGreaterThan(48)
+      expect(distance).toBeLessThanOrEqual(TRANSPORT_PROFILES[transport].range)
+      expect(order.reward).toBe(BALANCING.ORDER_REWARD)
+      distances.add(distance)
+    }
+    expect(distances.size).toBeGreaterThan(12)
+    expect(Math.min(...distances)).toBeLessThan(300)
+    expect(Math.max(...distances)).toBeGreaterThan(1500)
+  })
+
+  it('adds bicycle-range work without handing walking couriers an impossible listing', () => {
+    expect(BICYCLE_ORDER_ROUTE_TEMPLATES.length).toBeGreaterThan(ORDER_ROUTE_TEMPLATES.length)
+    expect(BICYCLE_ORDER_ROUTE_TEMPLATES.some(route =>
+      getCityRouteDistance(route.pickupLocation, route.destination) > TRANSPORT_PROFILES.walking.range)).toBe(true)
+    expect(CITY_LOCATIONS.filter(location => location.kind === 'pickup')).toHaveLength(8)
+  })
+
+  it('avoids repeated origins and customers after legacy jobs or a transport change without changing IDs', () => {
+    const nextTemplate = createOrderForSequence(2)
+    const previous = { ...nextTemplate, orderId: 'ORDER-001', status: 'Completed' as const }
+    const next = createNextOrder(previous)
+    expect(next.orderId).toBe('ORDER-002')
+    expect(next.pickupLocation).not.toBe(previous.pickupLocation)
+    expect(next.destination).not.toBe(previous.destination)
+    expect(createNextOrder(previous)).toEqual(next)
+    const cycling = createNextOrder({ ...previous, ...createOrderForSequence(14), status: 'Completed' }, 'bicycle')
+    expect(getCityRouteDistance(cycling.pickupLocation, cycling.destination)).toBeLessThanOrEqual(3200)
+  })
+
+  it.each([NaN, Infinity, -1, 0, 1.5])('sanitizes invalid sequence %s deterministically', sequence => {
+    expect(createOrderForSequence(sequence)).toEqual(createOrderForSequence(1))
   })
 })
 

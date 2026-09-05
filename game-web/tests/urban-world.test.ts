@@ -4,7 +4,7 @@ import {
   inInteractionRange, isUrbanWalkable, minimapPoint, movementFacing,
   moveUrbanPlayer, repairUrbanPosition,
 } from '../src/world/urbanWorld'
-import { WORLD_ROUTE_POINTS } from '../src/world/worldLayout'
+import { WORLD_HEIGHT, WORLD_ROUTE_POINTS, WORLD_WIDTH } from '../src/world/worldLayout'
 
 describe('urban district navigation', () => {
   it('spawns on accessible ground outside a physical HQ building', () => {
@@ -18,7 +18,7 @@ describe('urban district navigation', () => {
     for (const building of URBAN_BUILDINGS) {
       expect(isUrbanWalkable(building.x, building.y)).toBe(false)
     }
-    for (const point of [{ x: 0, y: 0 }, { x: -1, y: 290 }, { x: 1601, y: 290 },
+    for (const point of [{ x: 0, y: 0 }, { x: -1, y: 290 }, { x: WORLD_WIDTH + 1, y: 290 },
       { x: 500, y: 480 }, { x: NaN, y: 290 }]) {
       expect(isUrbanWalkable(point.x, point.y)).toBe(false)
     }
@@ -81,8 +81,8 @@ describe('urban district navigation', () => {
 describe('navigation support', () => {
   it('maps world corners, center and invalid coordinates to a bounded minimap', () => {
     expect(minimapPoint({ x: 0, y: 0 }, 160, 120)).toEqual({ x: 0, y: 0 })
-    expect(minimapPoint({ x: 1600, y: 1200 }, 160, 120)).toEqual({ x: 160, y: 120 })
-    expect(minimapPoint({ x: 800, y: 600 }, 160, 120)).toEqual({ x: 80, y: 60 })
+    expect(minimapPoint({ x: WORLD_WIDTH, y: WORLD_HEIGHT }, 160, 120)).toEqual({ x: 160, y: 120 })
+    expect(minimapPoint({ x: WORLD_WIDTH / 2, y: WORLD_HEIGHT / 2 }, 160, 120)).toEqual({ x: 80, y: 60 })
     expect(minimapPoint({ x: -100, y: 3000 }, 160, 120)).toEqual({ x: 0, y: 120 })
     expect(minimapPoint({ x: NaN, y: Infinity }, 160, 120)).toEqual({ x: 0, y: 0 })
   })

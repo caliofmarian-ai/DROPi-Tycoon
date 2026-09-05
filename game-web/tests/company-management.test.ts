@@ -261,12 +261,11 @@ describe('RBATCH-012 — scene integration boundaries', () => {
     expect(companyManagementSource).toContain('purchaseUpgrade(')
     expect(companyManagementSource).toContain('replaceGameSession(')
     expect(companyManagementSource).toContain("this.scene.start('GameWorld')")
-    const navigationButtonBody = companyManagementSource.slice(
-      companyManagementSource.indexOf('private createButton'),
-    )
-    const interactiveCalls = navigationButtonBody.match(/\.setInteractive/g) ?? []
-    expect(interactiveCalls).toHaveLength(1)
-    expect(navigationButtonBody).not.toContain('text.setInteractive')
+    expect(companyManagementSource).toContain('drawManagementFooter(')
+    expect(companyManagementSource).toContain('createThemedButton(')
+    const controls = readFileSync(new URL('../src/ui/themeControls.ts', import.meta.url), 'utf8')
+    expect(controls).toContain('background.setInteractive(')
+    expect(controls).not.toContain('label.setInteractive')
   })
 
   it('does not implement persistent Save/Load storage in RBATCH-012 scenes or session state', () => {

@@ -1,171 +1,75 @@
-import Phaser from 'phaser'
-import { COLORS } from '../ui/theme'
-import { drawVehicleGlyph, type VehicleGlyphType } from '../ui/themeControls'
+import type Phaser from 'phaser'
 import type { UrbanFacing } from './urbanWorld'
+import { courierAnimationFrame, getCourierPose, type CourierFrame, type CourierState } from './courierPose'
+import { COURIER_ANCHOR, COURIER_CELL, ensureCourierAtlas } from './courierArt'
 
-/**
- * Workstream D — replaces the permanent placeholder cube with a recognizable
- * code-drawn player/operator representation. No bitmap assets: everything is
- * built from Phaser Graphics primitives. The person silhouette is drawn once
- * and only redrawn when its walking stance actually changes; the vehicle
- * glyph is (re)created only when the presentation state changes, not per
- * frame, to keep this cheap on Android.
- */
-export type PlayerVisualState = 'Walking' | VehicleGlyphType
-
-const PLAYER_ACCENT = COLORS.accent
-const SKIN_TONE = 0xf2c9a0
-const HAIR_TONE = 0x2a2a2a
-
-/** Draws the walking human silhouette (head, torso, legs) used for every state. */
-const drawPersonSilhouette = (
-  graphics: Phaser.GameObjects.Graphics, legPhase: 0 | 1, facing: UrbanFacing,
-): void => {
-  graphics.clear()
-
-  // Legs — alternate stance gives a readable walking cue without per-frame rebuilds.
-  graphics.fillStyle(0x1e293b, 1)
-  if (legPhase === 0) {
-    graphics.fillRoundedRect(-6, 6, 4, 12, 2)
-    graphics.fillRoundedRect(2, 6, 4, 12, 2)
-  } else {
-    graphics.fillRoundedRect(-7, 6, 4, 11, 2)
-    graphics.fillRoundedRect(3, 7, 4, 11, 2)
-  }
-
-  // Torso with a DROPi-associated accent vest.
-  graphics.fillStyle(PLAYER_ACCENT, 1)
-  graphics.fillRoundedRect(-8, -8, 16, 16, 5)
-  graphics.lineStyle(1.5, 0x0c2436, 0.9)
-  graphics.strokeRoundedRect(-8, -8, 16, 16, 5)
-
-  // Head.
-  graphics.fillStyle(SKIN_TONE, 1)
-  graphics.fillCircle(0, -16, 6)
-  graphics.fillStyle(HAIR_TONE, 1)
-  graphics.fillRect(-6, -21, 12, facing === 'up' ? 9 : 4)
-  if (facing !== 'up') {
-    graphics.fillStyle(0x203c38)
-    graphics.fillCircle(3, -15, 1)
-    if (facing === 'down') graphics.fillCircle(-3, -15, 1)
-    graphics.fillStyle(0xfff1cb).fillRect(-3, -6, 6, 3)
-  } else {
-    graphics.fillStyle(0x23675d).fillRoundedRect(-5, -6, 10, 11, 2)
-  }
-}
+export type PlayerVisualState = CourierState
 
 export interface PlayerVisual {
   container: Phaser.GameObjects.Container
-  /** Sets the presentation state (walking or riding a specific vehicle type). */
   setState: (state: PlayerVisualState) => void
-  /** Four-way facing; booleans remain accepted for legacy callers. */
+  /** Booleans remain accepted for legacy callers. */
   setFacing: (facing: UrbanFacing | boolean) => void
-  /** Cheap walking-stance toggle; never rebuilds the whole silhouette. */
   setMoving: (moving: boolean) => void
   setCarrying: (carrying: boolean) => void
   update: (delta: number) => void
   destroy: () => void
 }
 
-/**
- * Creates the player's visual representation as a single Container so the
- * scene can treat it like the previous Sprite (position/camera-follow) while
- * swapping between walking and vehicle presentation states.
- */
-export const createPlayerVisual = (
-  scene: Phaser.Scene,
-  x: number,
-  y: number,
-): PlayerVisual => {
+export const createPlayerVisual = (scene: Phaser.Scene, x: number, y: number): PlayerVisual => {
   const container = scene.add.container(x, y)
-  container.add(scene.add.ellipse(0, 17, 30, 10, 0x183b40, 0.24))
-
-  const personGraphics = scene.add.graphics()
-  personGraphics.setDepth(1)
-  container.add(personGraphics)
-
-  let vehicleGraphics: Phaser.GameObjects.Graphics | null = null
-  let currentState: PlayerVisualState = 'Walking'
-  let currentLegPhase: 0 | 1 = 0
-  let currentFacing: UrbanFacing = 'down'
-  let isMoving = false
+  let state: CourierState = 'Walking'
+  let facing: UrbanFacing = 'down'
+  let frame: CourierFrame = 0
+  let carrying = false
+  let moving = false
   let elapsed = 0
-  const parcel = scene.add.graphics()
-  parcel.fillStyle(0xc99054).fillRoundedRect(-16, -6, 11, 14, 2)
-  parcel.lineStyle(1.5, 0x684627).strokeRoundedRect(-16, -6, 11, 14, 2)
-  parcel.fillStyle(0xffe7b0).fillRect(-12, -6, 3, 14)
-  parcel.setVisible(false)
-  container.add(parcel)
-  drawPersonSilhouette(personGraphics, currentLegPhase, currentFacing)
+  const image = scene.add.image(0, 0, ensureCourierAtlas(scene, state), 0)
+    .setOrigin(COURIER_ANCHOR.x / COURIER_CELL, COURIER_ANCHOR.y / COURIER_CELL)
+  container.add(image)
 
-  const redraw = (): void => {
-    if (vehicleGraphics) {
-      vehicleGraphics.destroy()
-      vehicleGraphics = null
-    }
-
-    if (currentState === 'Walking') {
-      personGraphics.setVisible(true)
-      return
-    }
-
-    // Riding a vehicle: draw the vehicle glyph slightly below the person so
-    // the rider silhouette still reads as a person on transport. A van fully
-    // represents the player (no separate rider silhouette needed).
-    const isVan = currentState === 'DeliveryVan'
-    personGraphics.setVisible(!isVan)
-    vehicleGraphics = drawVehicleGlyph(
-      scene,
-      0,
-      isVan ? 0 : 8,
-      isVan ? 1.6 : 1.2,
-      currentState as VehicleGlyphType,
-      PLAYER_ACCENT,
-    )
-    vehicleGraphics.setDepth(0)
-    container.add(vehicleGraphics)
-    container.bringToTop(personGraphics)
-    container.bringToTop(parcel)
+  const show = (): void => {
+    const pose = getCourierPose(state, facing, frame, carrying)
+    image.setFrame(pose.atlasFrame)
   }
-
-  const setState = (state: PlayerVisualState): void => {
-    if (state === currentState) return
-    currentState = state
-    redraw()
-  }
-
-  const setFacing = (facing: UrbanFacing | boolean): void => {
-    const nextFacing = typeof facing === 'boolean' ? facing ? 'left' : 'right' : facing
-    if (nextFacing === currentFacing) return
-    currentFacing = nextFacing
-    container.setScale(currentFacing === 'left' ? -1 : 1, 1)
-    drawPersonSilhouette(personGraphics, currentLegPhase, currentFacing)
-  }
-
-  const setMoving = (moving: boolean): void => {
-    isMoving = moving
-    if (!moving) {
+  return {
+    container,
+    setState: next => {
+      if (state === next) return
+      state = next
+      frame = 0
       elapsed = 0
-      personGraphics.y = 0
-    }
+      image.setTexture(ensureCourierAtlas(scene, state))
+      show()
+    },
+    setFacing: next => {
+      const direction = typeof next === 'boolean' ? next ? 'left' : 'right' : next
+      if (direction === facing) return
+      facing = direction
+      show()
+    },
+    setMoving: next => {
+      if (moving === next) return
+      moving = next
+      if (!moving) {
+        elapsed = 0
+        frame = 0
+        show()
+      }
+    },
+    setCarrying: next => {
+      if (carrying === next) return
+      carrying = next
+      show()
+    },
+    update: delta => {
+      if (!moving || !Number.isFinite(delta) || delta <= 0) return
+      elapsed = (elapsed + Math.min(delta, 100)) % 460
+      const nextFrame = courierAnimationFrame(elapsed, moving)
+      if (nextFrame === frame) return
+      frame = nextFrame
+      show()
+    },
+    destroy: () => container.destroy(true),
   }
-
-  const update = (delta: number): void => {
-    elapsed += isMoving ? Math.min(delta, 100) : 0
-    const nextPhase: 0 | 1 = isMoving ? Math.floor(elapsed / 130) % 2 as 0 | 1 : 0
-    personGraphics.y = isMoving ? -nextPhase : 0
-    if (nextPhase === currentLegPhase) return
-    currentLegPhase = nextPhase
-    if (currentState === 'Walking') {
-      drawPersonSilhouette(personGraphics, currentLegPhase, currentFacing)
-    }
-  }
-
-  const destroy = (): void => {
-    container.destroy(true)
-  }
-
-  const setCarrying = (carrying: boolean): void => { parcel.setVisible(carrying) }
-
-  return { container, setState, setFacing, setMoving, setCarrying, update, destroy }
 }

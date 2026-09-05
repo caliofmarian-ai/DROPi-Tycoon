@@ -155,7 +155,7 @@ describe('urban physical delivery scene', () => {
     world.activeOrder = createOrderForSequence(sequence)
     world.urban = { merchantOnboarded: true, activeTransport: 'walking' }
     const accepted = performUrbanInteraction(at(world, URBAN_HQ), company)
-    expect(accepted.world.activeOrder.pickupLocation).toBe(marketplace.LOCAL_MERCHANT.pickupLocation)
+    expect(accepted.world.activeOrder.pickupLocation).toBe(world.activeOrder.pickupLocation)
     expect(accepted.world.activeOrder.orderId).toBe(world.activeOrder.orderId)
     expect(accepted.world.activeOrder.destination).toBe(world.activeOrder.destination)
     const pickup = findWorldRoutePoint(accepted.world.activeOrder.pickupLocation)!

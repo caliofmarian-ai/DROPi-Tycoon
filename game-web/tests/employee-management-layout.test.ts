@@ -1,6 +1,6 @@
 import { readFileSync } from 'node:fs'
 import { describe, expect, it } from 'vitest'
-import { buildEmployeeManagementLayout } from '../src/ui/employeeManagementLayout'
+import { buildManagementLayout, buildStaffCardLayout } from '../src/ui/managementLayout'
 import {
   MIN_TOUCH_TARGET_PX,
   rectInsideViewport,
@@ -18,24 +18,26 @@ describe('RBATCH-018 / Product Experience — employee management mobile layout'
   it.each(SUPPORTED_ANDROID_VIEWPORTS)(
     'keeps employee controls and identity surfaces inside $width x $height',
     ({ width, height }) => {
-      const layout = buildEmployeeManagementLayout(width, height)
+      const shell = buildManagementLayout(width, height, true)
+      const layout = buildStaffCardLayout(shell.body)
 
       expect(rectInsideViewport(layout.panel, width, height)).toBe(true)
       expect(rectInsideViewport(layout.avatar, width, height)).toBe(true)
-      expect(rectInsideViewport(layout.statusChip, width, height)).toBe(true)
-      expect(rectInsideViewport(layout.actionButton, width, height)).toBe(true)
-      expect(rectInsideViewport(layout.returnButton, width, height)).toBe(true)
-      expect(rectInsideViewport(layout.menuButton, width, height)).toBe(true)
+      expect(rectInsideViewport(layout.identity, width, height)).toBe(true)
+      expect(rectInsideViewport(layout.action, width, height)).toBe(true)
+      for (const nav of shell.navigation) expect(rectInsideViewport(nav, width, height)).toBe(true)
       expect(rectInsideRect(layout.avatar, layout.panel)).toBe(true)
-      expect(rectInsideRect(layout.statusChip, layout.panel)).toBe(true)
+      expect(rectInsideRect(layout.identity, layout.panel)).toBe(true)
+      expect(layout.salary.top + layout.salary.height).toBeLessThan(layout.action.top)
     },
   )
 
   it.each(SUPPORTED_ANDROID_VIEWPORTS)(
     'keeps touch actions comfortable on $width x $height',
     ({ width, height }) => {
-      const layout = buildEmployeeManagementLayout(width, height)
-      for (const rect of [layout.actionButton, layout.returnButton, layout.menuButton]) {
+      const shell = buildManagementLayout(width, height, true)
+      const layout = buildStaffCardLayout(shell.body)
+      for (const rect of [layout.action, ...shell.navigation]) {
         expect(rect.width).toBeGreaterThanOrEqual(MIN_TOUCH_TARGET_PX)
         expect(rect.height).toBeGreaterThanOrEqual(MIN_TOUCH_TARGET_PX)
       }
@@ -43,23 +45,25 @@ describe('RBATCH-018 / Product Experience — employee management mobile layout'
   )
 
   it('uses a compact content-driven portrait card instead of filling the screen', () => {
-    const layout = buildEmployeeManagementLayout(360, 800)
-    expect(layout.compactLandscape).toBe(false)
+    const shell = buildManagementLayout(360, 800, true)
+    const layout = buildStaffCardLayout(shell.body)
+    expect(shell.compactLandscape).toBe(false)
     expect(layout.panel.height).toBeLessThan(800 * 0.55)
     expect(layout.avatar.width).toBeGreaterThanOrEqual(82)
-    expect(layout.summary.wrapWidth).toBeLessThanOrEqual(360)
+    expect(layout.identity.width).toBeLessThan(360)
   })
 
-  it('uses the available width in compact landscape while keeping a separate navigation column', () => {
-    const layout = buildEmployeeManagementLayout(800, 360)
-    expect(layout.compactLandscape).toBe(true)
+  it('uses available landscape width with a separate touch-sized footer', () => {
+    const shell = buildManagementLayout(800, 360, true)
+    const layout = buildStaffCardLayout(shell.body)
+    expect(shell.compactLandscape).toBe(true)
     expect(layout.panel.width).toBeGreaterThan(400)
-    expect(layout.menuButton.left).toBeGreaterThan(layout.panel.left + layout.panel.width)
+    expect(shell.footer.top).toBeGreaterThan(layout.panel.top + layout.panel.height)
   })
 
   it('does not encode one permanent orientation as canon', () => {
-    expect(buildEmployeeManagementLayout(360, 800).compactLandscape).toBe(false)
-    expect(buildEmployeeManagementLayout(800, 360).compactLandscape).toBe(true)
+    expect(buildManagementLayout(360, 800).compactLandscape).toBe(false)
+    expect(buildManagementLayout(800, 360).compactLandscape).toBe(true)
   })
 })
 

@@ -43,8 +43,10 @@ describe('M-008 owner review — fixed screen-space UI architecture', () => {
     expect(layout.menu.y + 3.5 * layout.menu.rowHeight).toBeLessThan(layout.action.y - layout.action.height / 2)
   })
 
-  it('keeps both cameras unrotated and removes dynamic zoom/rotation from the main RPG scene', () => {
+  it('keeps both cameras unrotated and applies bounded zoom only to the world', () => {
     expect(sceneSource).toContain('this.cameras.main.setRotation(0).setZoom(1)')
+    expect(sceneSource).toContain('this.cameras.main.setZoom(clampCameraZoom(zoom))')
+    expect(sceneSource).toContain("this.input.off('pointermove', this.moveZoom)")
     expect(sceneSource).not.toContain('applyCameraControl(')
     expect(sceneSource).not.toContain('this.fixedUiCamera.setZoom(zoom)')
     expect(sceneSource).not.toContain('this.fixedUiCamera.setRotation(rotation)')

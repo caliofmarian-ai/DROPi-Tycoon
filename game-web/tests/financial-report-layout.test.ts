@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { buildFinancialReportLayout } from '../src/ui/financialReportLayout'
+import { buildFinanceDashboardLayout } from '../src/ui/managementLayout'
 import {
   MIN_TOUCH_TARGET_PX,
   SUPPORTED_ANDROID_VIEWPORTS,
@@ -9,39 +9,37 @@ import {
 describe('RBATCH-019 / Product Experience — financial report Android layout', () => {
   for (const viewport of SUPPORTED_ANDROID_VIEWPORTS) {
     it(`keeps financial cards and controls usable at ${viewport.width}x${viewport.height}`, () => {
-      const layout = buildFinancialReportLayout(viewport.width, viewport.height)
+      const layout = buildFinanceDashboardLayout(viewport.width, viewport.height)
 
-      expect(rectInsideViewport(layout.panel, viewport.width, viewport.height)).toBe(true)
-      expect(rectInsideViewport(layout.operationsCard, viewport.width, viewport.height)).toBe(true)
-      expect(rectInsideViewport(layout.actionButton, viewport.width, viewport.height)).toBe(true)
-      expect(rectInsideViewport(layout.returnButton, viewport.width, viewport.height)).toBe(true)
-      expect(rectInsideViewport(layout.menuButton, viewport.width, viewport.height)).toBe(true)
-      expect(layout.metricRects).toHaveLength(4)
+      expect(rectInsideViewport(layout.body, viewport.width, viewport.height)).toBe(true)
+      expect(rectInsideViewport(layout.operations, viewport.width, viewport.height)).toBe(true)
+      expect(rectInsideViewport(layout.action, viewport.width, viewport.height)).toBe(true)
+      for (const nav of layout.navigation) expect(rectInsideViewport(nav, viewport.width, viewport.height)).toBe(true)
+      expect(layout.metrics).toHaveLength(4)
 
-      for (const rect of layout.metricRects) {
+      for (const rect of layout.metrics) {
         expect(rectInsideViewport(rect, viewport.width, viewport.height)).toBe(true)
-        expect(rect.left).toBeGreaterThanOrEqual(layout.panel.left)
-        expect(rect.left + rect.width).toBeLessThanOrEqual(layout.panel.left + layout.panel.width)
+        expect(rect.left).toBeGreaterThanOrEqual(layout.body.left)
+        expect(rect.left + rect.width).toBeLessThanOrEqual(layout.body.left + layout.body.width)
       }
 
-      expect(layout.actionButton.height).toBeGreaterThanOrEqual(MIN_TOUCH_TARGET_PX)
-      expect(layout.returnButton.height).toBeGreaterThanOrEqual(MIN_TOUCH_TARGET_PX)
-      expect(layout.menuButton.height).toBeGreaterThanOrEqual(MIN_TOUCH_TARGET_PX)
-      expect(layout.actionButton.width).toBeGreaterThanOrEqual(MIN_TOUCH_TARGET_PX)
-      expect(layout.summary.wrapWidth).toBeLessThanOrEqual(viewport.width)
+      for (const rect of [layout.action, ...layout.navigation]) {
+        expect(rect.height).toBeGreaterThanOrEqual(MIN_TOUCH_TARGET_PX)
+        expect(rect.width).toBeGreaterThanOrEqual(MIN_TOUCH_TARGET_PX)
+      }
     })
   }
 
   it('uses a compact content-driven portrait dashboard instead of a full-height report box', () => {
-    const layout = buildFinancialReportLayout(360, 800)
+    const layout = buildFinanceDashboardLayout(360, 800)
     expect(layout.compactLandscape).toBe(false)
-    expect(layout.panel.height).toBeLessThan(800 * 0.56)
-    expect(layout.metricRects[0]?.top).toBeLessThan(layout.operationsCard.top)
-    expect(layout.operationsCard.top + layout.operationsCard.height).toBeLessThan(layout.actionButton.top)
+    expect(layout.operations.height).toBeLessThan(160)
+    expect(layout.metrics[0]?.top).toBeLessThan(layout.operations.top)
+    expect(layout.operations.top + layout.operations.height).toBeLessThan(layout.action.top)
   })
 
   it('uses the compact landscape contract on short Android landscape viewports', () => {
-    expect(buildFinancialReportLayout(800, 360).compactLandscape).toBe(true)
-    expect(buildFinancialReportLayout(360, 800).compactLandscape).toBe(false)
+    expect(buildFinanceDashboardLayout(800, 360).compactLandscape).toBe(true)
+    expect(buildFinanceDashboardLayout(360, 800).compactLandscape).toBe(false)
   })
 })

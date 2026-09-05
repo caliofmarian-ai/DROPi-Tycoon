@@ -1,0 +1,32 @@
+[6851:6868:0905/222242.290447:ERROR:dbus/bus.cc:405] Failed to connect to the bus: Failed to connect to socket /run/user/0/bus: Permission denied
+[6851:6868:0905/222242.291578:ERROR:dbus/bus.cc:405] Failed to connect to the bus: Failed to connect to socket /run/user/0/bus: Permission denied
+[6851:6868:0905/222242.312035:ERROR:dbus/bus.cc:405] Failed to connect to the bus: Failed to connect to socket /run/user/0/bus: Permission denied
+[6851:6868:0905/222242.387739:ERROR:dbus/bus.cc:405] Failed to connect to the bus: Failed to connect to socket /run/user/0/bus: Permission denied
+
+DevTools listening on ws://127.0.0.1:9225/devtools/browser/c3782141-6920-457f-8f7b-ea02c54dcc6c
+[6851:6851:0905/222242.443184:ERROR:dbus/object_proxy.cc:572] Failed to call method: org.freedesktop.DBus.NameHasOwner: object_path= /org/freedesktop/DBus: unknown error type: 
+[6851:6851:0905/222242.443282:ERROR:dbus/object_proxy.cc:572] Failed to call method: org.freedesktop.DBus.NameHasOwner: object_path= /org/freedesktop/DBus: unknown error type: 
+[6851:6868:0905/222242.447147:ERROR:dbus/bus.cc:405] Failed to connect to the bus: Failed to connect to socket /run/user/0/bus: Permission denied
+[6851:6868:0905/222242.447203:ERROR:dbus/bus.cc:405] Failed to connect to the bus: Failed to connect to socket /run/user/0/bus: Permission denied
+[6851:6851:0905/222242.458371:ERROR:dbus/object_proxy.cc:572] Failed to call method: org.freedesktop.DBus.NameHasOwner: object_path= /org/freedesktop/DBus: unknown error type: 
+[6851:6851:0905/222242.458949:ERROR:dbus/object_proxy.cc:572] Failed to call method: org.freedesktop.DBus.NameHasOwner: object_path= /org/freedesktop/DBus: unknown error type: 
+[6851:6851:0905/222242.781013:ERROR:dbus/object_proxy.cc:572] Failed to call method: org.freedesktop.DBus.NameHasOwner: object_path= /org/freedesktop/DBus: unknown error type: 
+[6851:6851:0905/222242.782896:ERROR:dbus/object_proxy.cc:572] Failed to call method: org.freedesktop.DBus.NameHasOwner: object_path= /org/freedesktop/DBus: unknown error type: 
+[6851:6868:0905/222242.783799:ERROR:dbus/bus.cc:405] Failed to connect to the bus: Failed to connect to socket /run/user/0/bus: Permission denied
+[6851:6851:0905/222242.846154:ERROR:dbus/object_proxy.cc:572] Failed to call method: org.freedesktop.DBus.NameHasOwner: object_path= /org/freedesktop/DBus: unknown error type: 
+[6851:6851:0905/222242.846227:ERROR:dbus/object_proxy.cc:572] Failed to call method: org.freedesktop.DBus.Properties.GetAll: object_path= /org/freedesktop/UPower/devices/DisplayDevice: org.freedesktop.DBus.Error.ServiceUnknown: The name org.freedesktop.UPower was not provided by any .service files
+[6851:6868:0905/222242.848322:ERROR:dbus/bus.cc:405] Failed to connect to the bus: Failed to connect to socket /run/user/0/bus: Permission denied
+[6851:6851:0905/222242.900445:ERROR:dbus/object_proxy.cc:572] Failed to call method: org.freedesktop.DBus.NameHasOwner: object_path= /org/freedesktop/DBus: unknown error type: 
+[6851:6868:0905/222242.902746:ERROR:dbus/bus.cc:405] Failed to connect to the bus: Failed to connect to socket /run/user/0/bus: Permission denied
+[6851:6851:0905/222242.921534:ERROR:dbus/object_proxy.cc:572] Failed to call method: org.freedesktop.DBus.NameHasOwner: object_path= /org/freedesktop/DBus: unknown error type: 
+[6851:6851:0905/222243.083468:ERROR:chrome/browser/component_updater/optimization_guide_on_device_model_installer.cc:666] Failed to update on-device model component with error 5
+[6851:6851:0905/222243.114479:ERROR:chrome/browser/component_updater/soda_component_installer.cc:96] On demand update of the SODA component failed with error: 5
+[6851:6851:0905/222243.131275:ERROR:chrome/browser/component_updater/soda_language_pack_component_installer.cc:84] On demand update of the SODA language component failed with error: 5
+[6886:6886:0905/222243.538926:ERROR:gpu/command_buffer/service/gles2_cmd_decoder_passthrough.cc:1211] []Automatic fallback to software WebGL has been deprecated. Please use the --enable-unsafe-swiftshader flag to opt in to lower security guarantees for trusted content.
+[6886:6886:0905/222243.963743:ERROR:gpu/command_buffer/service/gles2_cmd_decoder_passthrough.cc:1211] []Automatic fallback to software WebGL has been deprecated. Please use the --enable-unsafe-swiftshader flag to opt in to lower security guarantees for trusted content.
+[6886:6886:0905/222244.009174:ERROR:gpu/command_buffer/service/gl_utils.cc:430] [.WebGL-0x35640019e000]GL Driver Message (OpenGL, Performance, GL_CLOSE_PATH_NV, High): GPU stall due to ReadPixels
+[6886:6886:0905/222244.510639:ERROR:gpu/command_buffer/service/gl_utils.cc:430] [.WebGL-0x35640019e000]GL Driver Message (OpenGL, Performance, GL_CLOSE_PATH_NV, High): GPU stall due to ReadPixels
+[6886:6886:0905/222244.589329:ERROR:gpu/command_buffer/service/gl_utils.cc:430] [.WebGL-0x35640019e000]GL Driver Message (OpenGL, Performance, GL_CLOSE_PATH_NV, High): GPU stall due to ReadPixels
+[6886:6886:0905/222244.677508:ERROR:gpu/command_buffer/service/gl_utils.cc:430] [.WebGL-0x35640019e000]GL Driver Message (OpenGL, Performance, GL_CLOSE_PATH_NV, High): GPU stall due to ReadPixels (this message will no longer repeat)
+[6886:6886:0905/222316.471870:ERROR:gpu/command_buffer/service/gles2_cmd_decoder_passthrough.cc:1211] []Automatic fallback to software WebGL has been deprecated. Please use the --enable-unsafe-swiftshader flag to opt in to lower security guarantees for trusted content.
+[6886:6886:0905/222316.624119:ERROR:gpu/command_buffer/service/gles2_cmd_decoder_passthrough.cc:1211] []Automatic fallback to software WebGL has been deprecated. Please use the --enable-unsafe-swiftshader flag to opt in to lower security guarantees for trusted content.

@@ -23,21 +23,23 @@ const sceneSource = readFileSync(
 )
 
 describe('release blocker #273 — explorable first-map structure', () => {
-  it('materially exceeds the old 800x600 scaffold', () => {
-    expect(WORLD_WIDTH).toBeGreaterThan(800)
-    expect(WORLD_HEIGHT).toBeGreaterThan(600)
-    expect(WORLD_WIDTH * WORLD_HEIGHT).toBeGreaterThan(800 * 600 * 2)
+  it('quadruples the former 1600x1200 neighborhood footprint', () => {
+    expect(WORLD_WIDTH).toBe(3200)
+    expect(WORLD_HEIGHT).toBe(2400)
+    expect(WORLD_WIDTH * WORLD_HEIGHT).toBe(1600 * 1200 * 4)
   })
 
-  it('defines exactly the four canonical prototype gameplay zones inside world bounds', () => {
+  it('retains the four legacy zone IDs and adds two distinct districts inside world bounds', () => {
     expect(WORLD_ZONES.map(({ id }) => id).sort()).toEqual([
       'business',
       'company',
+      'garden',
       'residential',
       'storage',
+      'waterfront',
     ])
     expect(WORLD_ZONES.every(isZoneInsideWorld)).toBe(true)
-    expect(new Set(WORLD_ZONES.map(({ label }) => label)).size).toBe(4)
+    expect(new Set(WORLD_ZONES.map(({ label }) => label)).size).toBe(6)
   })
 
   it('contains a meaningful road and sidewalk network', () => {
@@ -47,17 +49,17 @@ describe('release blocker #273 — explorable first-map structure', () => {
     expect(WORLD_SIDEWALKS.every(({ x, y }) => isPointInsideWorld(x, y))).toBe(true)
   })
 
-  it('populates at least twenty lightweight structures across all four zones', () => {
-    expect(WORLD_BUILDINGS.length).toBeGreaterThanOrEqual(20)
+  it('populates at least eighty lightweight structures across all six districts', () => {
+    expect(WORLD_BUILDINGS.length).toBeGreaterThanOrEqual(80)
     const representedZones = new Set(WORLD_BUILDINGS.map(({ zoneId }) => zoneId))
-    expect(representedZones).toEqual(new Set(['residential', 'business', 'storage', 'company']))
+    expect(representedZones).toEqual(new Set(WORLD_ZONES.map(zone => zone.id)))
     expect(WORLD_BUILDINGS.every(({ x, y }) => isPointInsideWorld(x, y))).toBe(true)
   })
 
-  it('includes lightweight decorative elements across all four zones', () => {
+  it('includes lightweight decorative elements across all six districts', () => {
     expect(WORLD_DECORATIONS.length).toBeGreaterThanOrEqual(12)
     expect(new Set(WORLD_DECORATIONS.map(({ zoneId }) => zoneId))).toEqual(
-      new Set(['residential', 'business', 'storage', 'company']),
+      new Set(WORLD_ZONES.map(zone => zone.id)),
     )
     expect(WORLD_DECORATIONS.every(({ x, y }) => isPointInsideWorld(x, y))).toBe(true)
   })

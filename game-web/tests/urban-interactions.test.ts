@@ -72,33 +72,34 @@ describe('pure urban merchant listings and physical logistics', () => {
     expect(introduced.world.activeOrder.status).toBe('Available')
   })
 
-  it.each([1, 2, 3])('links offer %i to the onboarded merchant while preserving its identity and destination', sequence => {
+  it.each([1, 2, 3])('links offer %i to its physical merchant while preserving both endpoints', sequence => {
     const world = createInitialWorldState()
     world.urban = { merchantOnboarded: true, activeTransport: 'walking' }
     world.activeOrder = createOrderForSequence(sequence)
     const original = structuredClone(world.activeOrder)
     const listing = getUrbanOrderListing(world)!
     expect(URBAN_MERCHANT_PROFILES).toContain(listing.merchant)
-    expect(listing.pickupLocation).toBe(LOCAL_MERCHANT.pickupLocation)
+    expect(listing.pickupLocation).toBe(original.pickupLocation)
     expect(listing.destination).toBe(world.activeOrder.destination)
-    expect(listing.merchant.worldActorId).toBe(LOCAL_MERCHANT.npcId)
+    expect(listing.merchant.worldActorId).toBe(sequence === 1 ? LOCAL_MERCHANT.npcId : `merchant:${original.pickupLocation}`)
     expect(world.activeOrder).toEqual(original)
     expect(prepareMarketplaceOrder(world)).toMatchObject({
       orderId: original.orderId, reward: original.reward, destination: original.destination,
-      pickupLocation: LOCAL_MERCHANT.pickupLocation,
+      pickupLocation: original.pickupLocation,
     })
-    expect(getUrbanRouteDistance(world)).toBe([1040, 1360, 1040][sequence - 1])
+    expect(getUrbanRouteDistance(world)).toBe([1040, 260, 60][sequence - 1])
     expect(isUrbanRouteWithinTransportRange(world)).toBe(true)
   })
 
-  it('replaces stale offer pickup templates with the real merchant and rejects invalid destinations', () => {
+  it('rejects unknown merchants rather than silently replacing them, and rejects invalid destinations', () => {
     const world = createInitialWorldState()
     world.urban = { merchantOnboarded: true, activeTransport: 'walking' }
     world.activeOrder.pickupLocation = 'DigitalOnlyMerchant'
-    expect(getUrbanOrderListing(world)?.pickupLocation).toBe(LOCAL_MERCHANT.pickupLocation)
+    expect(getUrbanOrderListing(world)).toBeNull()
     const accepted = performUrbanInteraction(world, createInitialCompanyState())
-    expect(accepted.world.activeOrder.status).toBe('Accepted')
-    expect(accepted.world.activeOrder.pickupLocation).toBe(LOCAL_MERCHANT.pickupLocation)
+    expect(accepted.world.activeOrder.status).toBe('Available')
+    expect(accepted.world.activeOrder.pickupLocation).toBe('DigitalOnlyMerchant')
+    world.activeOrder.pickupLocation = LOCAL_MERCHANT.pickupLocation
     world.activeOrder.destination = 'CommercialPickup'
     expect(getUrbanOrderListing(world)).toBeNull()
     expect(isUrbanRouteWithinTransportRange(world)).toBe(false)
