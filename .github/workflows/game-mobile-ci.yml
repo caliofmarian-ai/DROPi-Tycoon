@@ -1,0 +1,41 @@
+name: DROPi Tycoon Mobile Shell CI
+
+on:
+  pull_request:
+    paths:
+      - 'game-mobile/**'
+      - '.github/workflows/game-mobile-ci.yml'
+  push:
+    branches:
+      - main
+    paths:
+      - 'game-mobile/**'
+      - '.github/workflows/game-mobile-ci.yml'
+
+jobs:
+  validate-mobile-shell:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: game-mobile
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node 22.13
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22.13.0
+          cache: npm
+          cache-dependency-path: game-mobile/package.json
+
+      - name: Install mobile dependencies
+        run: npm install --package-lock=false
+
+      - name: TypeScript validation
+        run: npm run typecheck
+
+      - name: Expo configuration validation
+        env:
+          EXPO_PUBLIC_DROPITYCOON_GAME_URL: https://example.com/
+        run: npx expo config --type public >/tmp/dropi-tycoon-expo-config.json

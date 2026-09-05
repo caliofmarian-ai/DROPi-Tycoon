@@ -1,0 +1,31 @@
+{
+  "expo": {
+    "name": "DROPi Tycoon",
+    "slug": "dropi-tycoon",
+    "version": "0.1.0",
+    "orientation": "landscape",
+    "scheme": "dropitycoon",
+    "platforms": ["android"],
+    "userInterfaceStyle": "dark",
+    "backgroundColor": "#08121f",
+    "primaryColor": "#08121f",
+    "developmentClient": {
+      "silentLaunch": true
+    },
+    "android": {
+      "package": "com.dropi.tycoon",
+      "versionCode": 1,
+      "edgeToEdgeEnabled": true,
+      "predictiveBackGestureEnabled": false
+    },
+    "plugins": [
+      [
+        "expo-status-bar",
+        {
+          "hidden": true,
+          "style": "light"
+        }
+      ]
+    ]
+  }
+}
