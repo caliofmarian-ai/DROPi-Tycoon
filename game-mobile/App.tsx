@@ -18,6 +18,7 @@ import { getRuntimeConfiguration } from './src/runtimeConfig'
 
 const runtime = getRuntimeConfiguration()
 const brandLogo = require('./assets/branding/dropi-tycoon-logo.png')
+const brandSplash = require('./assets/branding/dropi-tycoon-splash.jpg')
 
 const PHASER_VIEWPORT_BOOTSTRAP = `
 (() => {
@@ -133,8 +134,10 @@ export default function App() {
       />
       {!loaded ? (
         <View pointerEvents="none" style={styles.loadingOverlay}>
-          <Image source={brandLogo} style={styles.loadingLogo} resizeMode="contain" />
-          <Text style={styles.loadingText}>Loading your city…</Text>
+          <Image source={brandSplash} style={styles.loadingSplash} resizeMode="contain" />
+          <View style={styles.loadingCaption}>
+            <Text style={styles.loadingText}>Loading your city…</Text>
+          </View>
         </View>
       ) : null}
     </View>
@@ -160,15 +163,21 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     backgroundColor: '#06162d',
   },
-  loadingLogo: {
-    width: '42%',
-    maxWidth: 360,
-    height: 210,
+  loadingSplash: {
+    width: '100%',
+    height: '100%',
+  },
+  loadingCaption: {
+    position: 'absolute',
+    bottom: 12,
+    paddingHorizontal: 18,
+    paddingVertical: 8,
+    borderRadius: 14,
+    backgroundColor: 'rgba(6, 22, 45, 0.86)',
   },
   loadingText: {
-    marginTop: 4,
     color: '#d8f7ff',
-    fontSize: 18,
+    fontSize: 16,
     fontWeight: '600',
   },
   errorScreen: {
