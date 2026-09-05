@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import {
   BackHandler,
+  Image,
   Platform,
   StyleSheet,
   Text,
@@ -12,6 +13,7 @@ import { WebView, type WebViewNavigation } from 'react-native-webview'
 import { getRuntimeConfiguration } from './src/runtimeConfig'
 
 const runtime = getRuntimeConfiguration()
+const brandLogo = require('./assets/branding/dropi-tycoon-logo.png')
 
 const PHASER_VIEWPORT_BOOTSTRAP = `
 (() => {
@@ -79,7 +81,7 @@ export default function App() {
     return (
       <View style={styles.errorScreen}>
         <StatusBar hidden />
-        <Text style={styles.errorTitle}>DROPi Tycoon</Text>
+        <Image source={brandLogo} style={styles.errorLogo} resizeMode="contain" />
         <Text style={styles.errorBody}>{runtime.configurationError}</Text>
       </View>
     )
@@ -114,7 +116,8 @@ export default function App() {
       />
       {!loaded ? (
         <View pointerEvents="none" style={styles.loadingOverlay}>
-          <Text style={styles.loadingText}>Loading DROPi Tycoon…</Text>
+          <Image source={brandLogo} style={styles.loadingLogo} resizeMode="contain" />
+          <Text style={styles.loadingText}>Loading your city…</Text>
         </View>
       ) : null}
     </View>
@@ -124,25 +127,31 @@ export default function App() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#08121f',
+    backgroundColor: '#06162d',
   },
   webViewContainer: {
     flex: 1,
-    backgroundColor: '#08121f',
+    backgroundColor: '#06162d',
   },
   webView: {
     flex: 1,
-    backgroundColor: '#08121f',
+    backgroundColor: '#06162d',
   },
   loadingOverlay: {
     ...StyleSheet.absoluteFill,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: '#08121f',
+    backgroundColor: '#06162d',
+  },
+  loadingLogo: {
+    width: '42%',
+    maxWidth: 360,
+    height: 210,
   },
   loadingText: {
-    color: '#ffffff',
-    fontSize: 20,
+    marginTop: 4,
+    color: '#d8f7ff',
+    fontSize: 18,
     fontWeight: '600',
   },
   errorScreen: {
@@ -150,13 +159,13 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     paddingHorizontal: 32,
-    backgroundColor: '#08121f',
+    backgroundColor: '#06162d',
   },
-  errorTitle: {
-    marginBottom: 16,
-    color: '#ffffff',
-    fontSize: 30,
-    fontWeight: '700',
+  errorLogo: {
+    width: '38%',
+    maxWidth: 320,
+    height: 190,
+    marginBottom: 12,
   },
   errorBody: {
     maxWidth: 720,

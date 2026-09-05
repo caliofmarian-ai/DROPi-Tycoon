@@ -42,6 +42,22 @@ EXPO_PUBLIC_DROPITYCOON_GAME_URL=https://dropi-tycoon-production.up.railway.app/
 
 The shell intentionally refuses to start the remote game if this variable is missing or not HTTPS.
 
+## Approved installed-app identity
+
+Owner-approved branding sources live under:
+
+```text
+assets/branding/
+```
+
+Current wiring:
+
+- `dropi-tycoon-app-icon.png` is the Expo application icon source;
+- `dropi-tycoon-logo.png` is used by the native loading/error surface;
+- the approved portrait `dropi-tycoon-splash.jpg` remains preserved as a source/reference and is not blindly promoted to the landscape loading surface because its composition is portrait-oriented and includes future-token wording that requires a separate owner review before public runtime use.
+
+No replacement image generation is authorized unless the Project Owner explicitly changes the visual direction.
+
 ## Canonical release versioning
 
 Every controlled Android build uses numeric semantic versioning:
@@ -125,3 +141,4 @@ Every installed-build review must confirm the release-specific scope plus the st
 6. Existing economy, employees, reviews and save semantics remain valid unless intentionally changed by the release.
 7. Camera fit/follow/pan/zoom remains usable on the physical device.
 8. The tested semantic version and Android versionCode are recorded in this ledger.
+9. App icon and loading identity match the owner-approved DROPi Tycoon brand when those native surfaces are part of the release scope.

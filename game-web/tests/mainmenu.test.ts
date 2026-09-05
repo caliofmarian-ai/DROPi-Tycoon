@@ -56,10 +56,10 @@ describe('RBATCH-011 — MainMenu pure view model', () => {
     expect(SETTINGS_PANEL_LINES.join(' ')).toContain('tap the world to move')
   })
 
-  it('provides Information content that explains the company-growth loop', () => {
+  it('provides Information content that explains broader company growth', () => {
     expect(INFORMATION_PANEL_LINES[0]).toBe('Information')
-    expect(INFORMATION_PANEL_LINES.join(' ')).toContain('delivery company')
-    expect(INFORMATION_PANEL_LINES.join(' ')).toContain('earn rewards')
+    expect(INFORMATION_PANEL_LINES.join(' ')).toContain('local operation')
+    expect(INFORMATION_PANEL_LINES.join(' ')).toContain('marketplace and drone ecosystem')
   })
 })
 
@@ -97,5 +97,19 @@ describe('RBATCH-014 — save-aware MainMenu extension', () => {
     )
     expect(createButtonBody).toContain("button.on('pointerdown', onTap)")
     expect(createButtonBody).not.toContain('text.setInteractive')
+  })
+})
+
+describe('ISSUE-307 — approved product identity on MainMenu', () => {
+  it('loads and displays the approved DROPi Tycoon logo', () => {
+    expect(mainMenuSource).toContain("const BRAND_LOGO_URL = '/assets/branding/dropi-tycoon-logo.png'")
+    expect(mainMenuSource).toContain('this.load.image(BRAND_LOGO_KEY, BRAND_LOGO_URL)')
+    expect(mainMenuSource).toContain('.image(layout.title.x, logoCenterY, BRAND_LOGO_KEY)')
+  })
+
+  it('removes developer-facing runtime-candidate copy while retaining semantic version visibility', () => {
+    expect(mainMenuSource).not.toContain('Web Runtime Candidate')
+    expect(mainMenuSource).toContain('`v${appConfig.appVersion}`')
+    expect(mainMenuSource).toContain('Play. Deliver. Trade. Grow.')
   })
 })
