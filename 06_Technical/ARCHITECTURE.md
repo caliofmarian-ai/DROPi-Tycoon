@@ -99,6 +99,31 @@ Examples:
 
 # World Layer
 
+## Urban district foundation
+
+`game-web/src/world/urbanWorld.ts` owns the playable roads, pavement slabs,
+building footprints, HQ/merchant locations and deterministic collision queries.
+The old route identifiers are preserved in `worldLayout.ts`, with endpoints
+relocated onto connected roads. Rendering and collision use the same urban
+geometry; static geometry is built once, not per frame.
+
+Directional input is normalized and bounded, then integrated in short substeps
+with axis sliding. This prevents diagonal speed boosts and building tunnelling.
+Only roads/pavements are accessible; motor-mode contracts restrict traversal to
+roads. The main camera follows the ground actor with fixed orientation. The
+minimap transforms bounded world coordinates independently of camera movement.
+
+`systems/urbanLogistics.ts` separates transport/cargo/mission legs, infrastructure,
+employee assignments and drone/operator contracts from Phaser rendering.
+Headquarters, fixed DronePort and mobile DronePort are distinct simulation types;
+mobile infrastructure is not required to be a building. Coverage and capacities
+are validated game values. Future aerial entities cannot replace the ground player.
+
+The current runtime retains existing order lifecycle, economy settlement,
+company-management and procedural-audio services. The world layer must not award
+rewards independently of the exactly-once settlement path. Future multi-leg
+execution extends the domain without implying that drone AI is playable today.
+
 ## Purpose
 
 Controls the game environment.

@@ -34,6 +34,25 @@ No feature should require rewriting the core architecture.
 
 ## Long-Term Visual Quality Direction
 
+### Active owner pivot — Urban RPG / multimodal foundation
+
+The current product combines Urban RPG, Business Tycoon, Local Marketplace,
+Multimodal Logistics and a future Drone Network Simulation. This direction
+supersedes abstract unrestricted map traversal, not already-merged company,
+fleet, employee, audio or financial systems. See `01_GameDesign/GAMEPLAY.md`.
+
+The playable foundation prioritizes one walkable district, an embodied courier,
+direct Android-landscape controls, bounded follow camera, minimap, proximity NPC
+interaction, physical deliveries, an owned bicycle and a modest HQ. The HQ later
+becomes the Main DronePort. Fixed/mobile DronePorts, cargo/legs, fallback, lockers
+and separate operator/drone actors receive domain foundations before full automation.
+
+Existing issue #317 remains the cross-cutting owner quality gate; the M-010 fleet
+milestone and infrastructure/network placeholders remain relevant rather than
+being replaced with dozens of micro-issues. PR #318 is the merged baseline, not
+work to repeat. One implementation PR requires owner Android review and must not
+be automatically merged.
+
 The minimal visual presentation of Prototype v0.1 is a temporary development stage, not the intended final quality bar for DROPi Tycoon.
 
 The long-term product is expected to evolve toward a substantially richer, polished, and visually impressive game experience. Later phases may improve or replace prototype presentation through higher-fidelity art, environments, buildings, vehicles, characters, animation, lighting, visual effects, UI presentation, audio-visual feedback, and other production-quality assets.

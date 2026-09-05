@@ -24,11 +24,15 @@ This document is considered the highest-level gameplay specification for the pro
 
 # Game Identity
 
-DROPi Tycoon is a real-time logistics and business simulation game focused on building, managing, and expanding a delivery company.
+DROPi Tycoon is an **Urban RPG + Business Tycoon + Local Marketplace + Multimodal Logistics + Future Drone Network Simulation**.
 
 The game combines strategic planning, economic management, technological progression, and operational optimization into a single living ecosystem.
 
-Rather than controlling a single character, the player manages an evolving organization whose complexity increases over time.
+The player is a person physically inhabiting the city, initially walking deliveries from a small headquarters and later managing an evolving organization. Game first; ecosystem second. The game must be enjoyable without knowledge of the real DROPi company.
+
+The former abstract marker and unrestricted straight-line map traversal are deprecated prototype behavior. Human movement follows accessible streets, sidewalks and entrances; buildings and blocked terrain cannot be crossed. Terrestrial vehicles use compatible paths, with cars and vans restricted to roads. The human operator never becomes an aerial drone.
+
+The company headquarters begins before drone unlock and evolves into the integrated Main Multimodal Operations Hub / Main DronePort. Fixed and mobile DronePorts, fallback storage and future Smart Parcel Lockers expand that network; drones complement rather than replace terrestrial delivery. See `GAMEPLAY.md` for source authority, deliberate simulation abstractions and current scope.
 
 ---
 
