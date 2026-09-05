@@ -138,9 +138,10 @@ describe('Workstream D — GameWorldScene binds the drawn player visual, not a p
     expect(gameWorldSource).not.toContain('player_character_move')
   })
 
-  it('creates the code-drawn player visual and binds the active-vehicle presentation', () => {
+  it('creates the code-drawn player visual and binds the explicitly selected owned transport', () => {
     expect(gameWorldSource).toContain('createPlayerVisual(')
-    expect(gameWorldSource).toContain('selectActiveVehiclePresentation(this.companyState)')
+    expect(gameWorldSource).toContain('resolveActiveTransport(this.companyState')
+    expect(gameWorldSource).toContain("activeTransport === 'bicycle' ? 'Bicycle' : 'Walking'")
     expect(gameWorldSource).toContain('this.playerVisual.setState(')
   })
 
@@ -158,15 +159,16 @@ describe('Workstream F — GameWorldScene plays procedural audio cues for order 
   )
 
   it('imports the shared audio controller and unlocks it on the first tap', () => {
-    expect(gameWorldSource).toContain("import { getAudioController, type AudioCue } from '../systems/audioSystem'")
+    expect(gameWorldSource).toContain("import { getAudioController } from '../systems/audioSystem'")
     expect(gameWorldSource).toContain('getAudioController().unlock()')
   })
 
-  it('maps order status transitions to order-accepted/delivery-success/delivery-failure cues', () => {
-    expect(gameWorldSource).toContain("'order-accepted'")
-    expect(gameWorldSource).toContain("'delivery-success'")
-    expect(gameWorldSource).toContain("'delivery-failure'")
-    expect(gameWorldSource).toContain('getAudioController().play(cue)')
+  it('plays accepted and successful physical delivery cues from the shared transaction result', () => {
+    const interactionsSource = readFileSync(new URL('../src/systems/urbanInteractions.ts', import.meta.url), 'utf8')
+    expect(interactionsSource).toContain("'order-accepted'")
+    expect(interactionsSource).toContain("'delivery-success'")
+    expect(gameWorldSource).toContain('performUrbanInteraction(this.worldState, this.companyState)')
+    expect(gameWorldSource).toContain('if (result.cue) getAudioController().play(result.cue)')
   })
 
   it('syncs the controller enabled state from the persisted sound setting on scene create', () => {

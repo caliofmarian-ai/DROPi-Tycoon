@@ -1,6 +1,7 @@
 import Phaser from 'phaser'
 import { COLORS } from '../ui/theme'
 import { drawVehicleGlyph, type VehicleGlyphType } from '../ui/themeControls'
+import type { UrbanFacing } from './urbanWorld'
 
 /**
  * Workstream D — replaces the permanent placeholder cube with a recognizable
@@ -17,7 +18,9 @@ const SKIN_TONE = 0xf2c9a0
 const HAIR_TONE = 0x2a2a2a
 
 /** Draws the walking human silhouette (head, torso, legs) used for every state. */
-const drawPersonSilhouette = (graphics: Phaser.GameObjects.Graphics, legPhase: 0 | 1): void => {
+const drawPersonSilhouette = (
+  graphics: Phaser.GameObjects.Graphics, legPhase: 0 | 1, facing: UrbanFacing,
+): void => {
   graphics.clear()
 
   // Legs — alternate stance gives a readable walking cue without per-frame rebuilds.
@@ -40,17 +43,27 @@ const drawPersonSilhouette = (graphics: Phaser.GameObjects.Graphics, legPhase: 0
   graphics.fillStyle(SKIN_TONE, 1)
   graphics.fillCircle(0, -16, 6)
   graphics.fillStyle(HAIR_TONE, 1)
-  graphics.fillRect(-6, -21, 12, 4)
+  graphics.fillRect(-6, -21, 12, facing === 'up' ? 9 : 4)
+  if (facing !== 'up') {
+    graphics.fillStyle(0x203c38)
+    graphics.fillCircle(3, -15, 1)
+    if (facing === 'down') graphics.fillCircle(-3, -15, 1)
+    graphics.fillStyle(0xfff1cb).fillRect(-3, -6, 6, 3)
+  } else {
+    graphics.fillStyle(0x23675d).fillRoundedRect(-5, -6, 10, 11, 2)
+  }
 }
 
 export interface PlayerVisual {
   container: Phaser.GameObjects.Container
   /** Sets the presentation state (walking or riding a specific vehicle type). */
   setState: (state: PlayerVisualState) => void
-  /** Sets left/right facing so movement direction reads clearly. */
-  setFacing: (facingLeft: boolean) => void
+  /** Four-way facing; booleans remain accepted for legacy callers. */
+  setFacing: (facing: UrbanFacing | boolean) => void
   /** Cheap walking-stance toggle; never rebuilds the whole silhouette. */
   setMoving: (moving: boolean) => void
+  setCarrying: (carrying: boolean) => void
+  update: (delta: number) => void
   destroy: () => void
 }
 
@@ -65,6 +78,7 @@ export const createPlayerVisual = (
   y: number,
 ): PlayerVisual => {
   const container = scene.add.container(x, y)
+  container.add(scene.add.ellipse(0, 17, 30, 10, 0x183b40, 0.24))
 
   const personGraphics = scene.add.graphics()
   personGraphics.setDepth(1)
@@ -73,7 +87,16 @@ export const createPlayerVisual = (
   let vehicleGraphics: Phaser.GameObjects.Graphics | null = null
   let currentState: PlayerVisualState = 'Walking'
   let currentLegPhase: 0 | 1 = 0
-  drawPersonSilhouette(personGraphics, currentLegPhase)
+  let currentFacing: UrbanFacing = 'down'
+  let isMoving = false
+  let elapsed = 0
+  const parcel = scene.add.graphics()
+  parcel.fillStyle(0xc99054).fillRoundedRect(-16, -6, 11, 14, 2)
+  parcel.lineStyle(1.5, 0x684627).strokeRoundedRect(-16, -6, 11, 14, 2)
+  parcel.fillStyle(0xffe7b0).fillRect(-12, -6, 3, 14)
+  parcel.setVisible(false)
+  container.add(parcel)
+  drawPersonSilhouette(personGraphics, currentLegPhase, currentFacing)
 
   const redraw = (): void => {
     if (vehicleGraphics) {
@@ -101,6 +124,8 @@ export const createPlayerVisual = (
     )
     vehicleGraphics.setDepth(0)
     container.add(vehicleGraphics)
+    container.bringToTop(personGraphics)
+    container.bringToTop(parcel)
   }
 
   const setState = (state: PlayerVisualState): void => {
@@ -109,16 +134,30 @@ export const createPlayerVisual = (
     redraw()
   }
 
-  const setFacing = (facingLeft: boolean): void => {
-    container.setScale(facingLeft ? -1 : 1, 1)
+  const setFacing = (facing: UrbanFacing | boolean): void => {
+    const nextFacing = typeof facing === 'boolean' ? facing ? 'left' : 'right' : facing
+    if (nextFacing === currentFacing) return
+    currentFacing = nextFacing
+    container.setScale(currentFacing === 'left' ? -1 : 1, 1)
+    drawPersonSilhouette(personGraphics, currentLegPhase, currentFacing)
   }
 
   const setMoving = (moving: boolean): void => {
-    const nextPhase: 0 | 1 = moving ? 1 : 0
+    isMoving = moving
+    if (!moving) {
+      elapsed = 0
+      personGraphics.y = 0
+    }
+  }
+
+  const update = (delta: number): void => {
+    elapsed += isMoving ? Math.min(delta, 100) : 0
+    const nextPhase: 0 | 1 = isMoving ? Math.floor(elapsed / 130) % 2 as 0 | 1 : 0
+    personGraphics.y = isMoving ? -nextPhase : 0
     if (nextPhase === currentLegPhase) return
     currentLegPhase = nextPhase
     if (currentState === 'Walking') {
-      drawPersonSilhouette(personGraphics, currentLegPhase)
+      drawPersonSilhouette(personGraphics, currentLegPhase, currentFacing)
     }
   }
 
@@ -126,5 +165,7 @@ export const createPlayerVisual = (
     container.destroy(true)
   }
 
-  return { container, setState, setFacing, setMoving, destroy }
+  const setCarrying = (carrying: boolean): void => { parcel.setVisible(carrying) }
+
+  return { container, setState, setFacing, setMoving, setCarrying, update, destroy }
 }

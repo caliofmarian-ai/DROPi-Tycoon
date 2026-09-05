@@ -96,29 +96,27 @@ describe('release blocker #269 — mobile camera fallback controls', () => {
 })
 
 describe('release blocker #269 — GameWorld integration contract', () => {
-  it('integrates gesture input and explicit zoom/rotate/recenter controls', () => {
-    expect(sceneSource).toContain('CameraGestureController')
-    expect(sceneSource).toContain('buildCameraControlButtons')
-    expect(sceneSource).toContain("case 'zoom-in'")
-    expect(sceneSource).toContain("case 'zoom-out'")
-    expect(sceneSource).toContain("case 'rotate-left'")
-    expect(sceneSource).toContain("case 'rotate-right'")
-    expect(sceneSource).toContain("case 'recenter'")
+  it('replaces free-camera gestures with a stable unrotated direct-control camera', () => {
+    expect(sceneSource).not.toContain('CameraGestureController')
+    expect(sceneSource).not.toContain('buildCameraControlButtons')
+    expect(sceneSource).toContain('this.cameras.main.setRotation(0).setZoom(1)')
   })
 
-  it('moves gameplay tap intent to pointer-up and suppresses camera gestures', () => {
-    expect(sceneSource).toContain("this.input.on('pointerup'")
-    expect(sceneSource).not.toContain("this.input.on('pointerdown', this.pointerDownHandler)")
-    expect(sceneSource).toContain('didCameraGestureMove()')
+  it('removes free-tap movement and consumes held direction input instead', () => {
+    expect(sceneSource).not.toContain('getWorldPoint(pointer.x, pointer.y)')
+    expect(sceneSource).toContain('const touch = this.hud.movement()')
+    expect(sceneSource).toContain('moveUrbanPlayer(before, input')
   })
 
-  it('keeps camera controls inside shared UI pointer isolation', () => {
+  it('retains legacy pointer isolation while the playable scene blocks movement under its menu', () => {
     expect(pointerIsolationSource).toContain('cameraControlBounds')
-    expect(sceneSource).toContain('cameraControlBounds: this.cameraControlBounds')
+    expect(sceneSource).toContain('this.hud.isMenuOpen() ? { x: 0, y: 0 }')
+    expect(sceneSource).not.toContain('cameraControlBounds:')
   })
 
-  it('preserves follow as an explicit recenterable state instead of forcing it during manual pan', () => {
-    expect(sceneSource).toContain('stopFollow()')
+  it('keeps following the player without manual pan or rotation', () => {
+    expect(sceneSource).not.toContain('stopFollow()')
+    expect(sceneSource).not.toContain('panCameraByScreenDelta')
     expect(sceneSource).toContain('startFollow(this.player')
     expect(sceneSource).toContain('setRotation(0)')
   })

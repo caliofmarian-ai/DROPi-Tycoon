@@ -237,17 +237,20 @@ describe('RBATCH-012 — scene integration boundaries', () => {
 
   it('GameWorld synchronizes runtime state before opening CompanyManagement', () => {
     const body = gameWorldSource.slice(
-      gameWorldSource.indexOf('private openCompanyManagement'),
+      gameWorldSource.indexOf('private navigate('),
       gameWorldSource.indexOf('private syncRuntimeSession'),
     )
-    expect(body).toContain('this.syncRuntimeSession()')
-    expect(body).toContain("this.scene.start('CompanyManagement')")
+    expect(gameWorldSource).toContain("company: () => this.navigate('CompanyManagement')")
+    expect(body).toContain("this.persist('progression-changed')")
+    expect(body).toContain('this.scene.start(scene)')
+    expect(body.indexOf('this.persist(')).toBeLessThan(body.indexOf('this.scene.start('))
   })
 
   it('GameWorld navigation labels are non-interactive with one input owner per button', () => {
-    const body = gameWorldSource.slice(
-      gameWorldSource.indexOf('private createMenuButton'),
-      gameWorldSource.indexOf('private handleSceneShutdown'),
+    const hudSource = readFileSync(new URL('../src/ui/UrbanHUD.ts', import.meta.url), 'utf8')
+    const body = hudSource.slice(
+      hudSource.indexOf('private button('),
+      hudSource.indexOf('private createDPad'),
     )
     const interactiveCalls = body.match(/\.setInteractive/g) ?? []
     expect(interactiveCalls).toHaveLength(1)

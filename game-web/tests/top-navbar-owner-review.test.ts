@@ -8,6 +8,7 @@ import {
 } from '../src/ui/gameWorldTopBar'
 import { buildHUDLayout, boundsIntersect } from '../src/ui/hudLayout'
 import { SUPPORTED_ANDROID_VIEWPORTS } from '../src/ui/mobileViewport'
+import { urbanHUDLayout } from '../src/ui/UrbanHUD'
 
 const sceneSource = readFileSync(
   new URL('../src/scenes/GameWorldScene.ts', import.meta.url),
@@ -41,21 +42,25 @@ describe('M-008 owner review — compact non-overlapping top dock', () => {
     expect(GAMEWORLD_TOP_BAR_VISUAL_BUTTON_PX).toBeLessThan(GAMEWORLD_TOP_BAR_TOUCH_TARGET_PX)
   })
 
-  it('reserves the world camera below the dock instead of drawing the map beneath it', () => {
-    expect(sceneSource).toContain('topDockLayout.worldViewportTop')
-    expect(sceneSource).toContain('this.cameras.main.setViewport(')
-    expect(sceneSource).toContain('this.scale.height - topDockLayout.worldViewportTop')
+  it('keeps compact urban objectives and minimap above the direct controls', () => {
+    const layout = urbanHUDLayout(740, 360)
+    expect(layout.objective.y).toBeGreaterThanOrEqual(44)
+    expect(layout.objective.y + 72).toBeLessThan(layout.pad.y)
+    expect(layout.minimap.y + layout.minimap.height).toBeLessThan(layout.pad.y)
+    expect(sceneSource).toContain('this.cameras.main.ignore(this.fixedUiLayer)')
   })
 
   it('keeps Main Menu and Company behind the single navbar toggle', () => {
-    expect(sceneSource).toContain("this.createTopIconButton(layout.menuToggle, '☰'")
-    expect(sceneSource).toContain("[layout.dropdownItems[0], 'Main Menu'")
-    expect(sceneSource).toContain("[layout.dropdownItems[1], 'Company'")
-    expect(sceneSource).toContain('this.setNavigationMenuOpen(false)')
+    const hudSource = readFileSync(new URL('../src/ui/UrbanHUD.ts', import.meta.url), 'utf8')
+    expect(hudSource).toContain("'Menu', () => this.toggleMenu()")
+    expect(hudSource).toContain("['Main menu', callbacks.menu]")
+    expect(hudSource).toContain("['Company', callbacks.company]")
+    expect(hudSource).toContain('entry.button.setVisible(false).disableInteractive()')
   })
 
-  it('prevents the fixed dock from becoming a map gesture/tap surface', () => {
-    expect(sceneSource).toContain('...(this.topControlBarBounds ? [this.topControlBarBounds] : [])')
-    expect(sceneSource).toContain('shouldIgnorePointer: (point) => this.isPointOnFixedScreenUI')
+  it('does not let tapping the fixed dock create movement or a delivery target', () => {
+    expect(sceneSource).not.toContain('getWorldPoint(pointer.x, pointer.y)')
+    expect(sceneSource).not.toContain('selectDeliveryIntentFromTap')
+    expect(sceneSource).toContain('this.hud.isMenuOpen() ? { x: 0, y: 0 }')
   })
 })
