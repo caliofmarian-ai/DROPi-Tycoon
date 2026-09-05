@@ -30,7 +30,7 @@ jobs:
           cache-dependency-path: game-mobile/package.json
 
       - name: Install mobile dependencies
-        run: npm install --package-lock=false
+        run: npm install
 
       - name: TypeScript validation
         run: npm run typecheck
