@@ -142,8 +142,20 @@ describe('Workstream F — Settings sound toggle wires the audio system', () => 
   it('creates a sound toggle button that flips GameSettingsState.soundEnabled', () => {
     expect(mainMenuSource).toContain("import { getAudioController } from '../systems/audioSystem'")
     expect(mainMenuSource).toContain('private toggleSound(): void')
-    expect(mainMenuSource).toContain('session.settings.soundEnabled = nextEnabled')
+    expect(mainMenuSource).toContain('activeSession.settings.soundEnabled = nextEnabled')
     expect(mainMenuSource).toContain('getAudioController().setEnabled(nextEnabled)')
+  })
+
+  it('never fabricates a new game session when toggling sound with an existing valid save', () => {
+    expect(mainMenuSource).not.toContain('const session = getOrCreateGameSession()')
+    expect(mainMenuSource).toContain("} else if (this.saveSlot.kind === 'valid' && this.saveStorage) {")
+    expect(mainMenuSource).toContain('restoreGameSessionFromSave(this.saveSlot.save)')
+    expect(mainMenuSource).toContain('writeSaveSlot(this.saveStorage, restoredSession)')
+  })
+
+  it('respects the persisted sound setting on cold startup, before Continue Game is pressed', () => {
+    expect(mainMenuSource).toContain('this.saveSlot.kind === \'valid\'')
+    expect(mainMenuSource).toContain('? this.saveSlot.save.settings.soundEnabled')
   })
 
   it('only shows the sound toggle while the Settings panel is open', () => {

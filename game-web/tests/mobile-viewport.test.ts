@@ -149,3 +149,56 @@ describe('ISSUE-019 — touch comfort in actual viewport pixels', () => {
     expect(MIN_TOUCH_TARGET_PX).toBe(48)
   })
 })
+
+describe('Settings modal — sound toggle and Close never overlap', () => {
+  const REQUIRED_VIEWPORTS = [
+    { width: 640, height: 360 },
+    { width: 800, height: 360 },
+    { width: 915, height: 412 },
+    { width: 1280, height: 720 },
+  ]
+
+  const buildRect = (
+    centerX: number,
+    centerY: number,
+    width: number,
+    height: number,
+  ) => ({
+    left: centerX - width / 2,
+    top: centerY - height / 2,
+    width,
+    height,
+  })
+
+  for (const viewport of REQUIRED_VIEWPORTS) {
+    it(`positions the sound toggle in a distinct, non-overlapping row at ${viewport.width}x${viewport.height}`, () => {
+      const menu = buildMainMenuLayout(viewport.width, viewport.height, 5, false)
+      const { modal } = menu
+      const centerX = modal.panel.left + modal.panel.width / 2
+
+      const closeRect = buildRect(centerX, modal.actionY, modal.closeWidth, modal.actionHeight)
+      const soundRect = buildRect(
+        centerX,
+        modal.secondaryActionY,
+        modal.secondaryActionWidth,
+        modal.actionHeight,
+      )
+
+      expect(boundsIntersect(closeRect, soundRect)).toBe(false)
+      expect(modal.secondaryActionWidth).toBeGreaterThanOrEqual(MIN_TOUCH_TARGET_PX)
+      expect(rectInsideViewport(soundRect, viewport.width, viewport.height)).toBe(true)
+
+      // The dual confirm/cancel row shares actionY with Close, so the sound
+      // row must also stay clear of that row for confirmation-style modals.
+      const confirmRect = buildRect(modal.confirmX, modal.actionY, modal.dualWidth, modal.actionHeight)
+      const cancelRect = buildRect(modal.cancelX, modal.actionY, modal.dualWidth, modal.actionHeight)
+      expect(boundsIntersect(confirmRect, soundRect)).toBe(false)
+      expect(boundsIntersect(cancelRect, soundRect)).toBe(false)
+
+      // The modal copy area must not encroach into either action row.
+      expect(modal.textCenter.y + modal.textFontSize).toBeLessThan(
+        modal.secondaryActionY - modal.actionHeight / 2,
+      )
+    })
+  }
+})

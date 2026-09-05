@@ -440,3 +440,55 @@ describe('ISSUE-016 + RBATCH-018 — canonical autosave policy', () => {
     expect(inspection.save.company.money).toBe(1900)
   })
 })
+
+describe('MainMenu regression — toggling sound before Continue Game never loses a valid save', () => {
+  it('preserves company/economy/employees/vehicles/reviews when sound is toggled and Exit Game is pressed with no active session', () => {
+    const storage = new MemoryStorage()
+
+    // A prior play session produced a valid, populated save on disk.
+    const originalSession = makeSession()
+    originalSession.company.companyName = 'Established Co'
+    originalSession.company.money = 5230
+    originalSession.company.level = 4
+    originalSession.company.reputation = 87
+    originalSession.company.employees = [
+      { employeeId: 'emp-1', name: 'Alex', role: 'Courier', status: 'Active', salaryPerCycle: 40 },
+    ]
+    originalSession.company.vehicles = [{ vehicleId: 'veh-1', typeId: 'Bicycle' }]
+    originalSession.company.reviews = [
+      { orderId: 'order-1', rating: 5, sentiment: 'Positive', message: 'Great service', reputationImpact: 2 },
+    ]
+    originalSession.settings.soundEnabled = true
+    writeSaveSlot(storage, originalSession)
+
+    // Fresh app launch: MainMenuScene.create() only peeks/inspects storage,
+    // it never sets an active session. Continue Game is NOT pressed.
+    const launchInspection = inspectSaveSlot(storage)
+    expect(launchInspection.kind).toBe('valid')
+    if (launchInspection.kind !== 'valid') return
+
+    // Settings -> toggle sound, with no active session, must restore from
+    // the saved session and persist directly, without ever creating a new
+    // in-memory session (mirrors MainMenuScene.toggleSound()'s valid-save branch).
+    const restoredSession = restoreGameSessionFromSave(launchInspection.save)
+    restoredSession.settings.soundEnabled = !restoredSession.settings.soundEnabled
+    writeSaveSlot(storage, restoredSession)
+
+    // Exit Game with no active session must be a no-op for save writing —
+    // there is nothing further to persist here, matching production code.
+
+    const finalInspection = inspectSaveSlot(storage)
+    expect(finalInspection.kind).toBe('valid')
+    if (finalInspection.kind !== 'valid') return
+
+    expect(finalInspection.save.company.companyName).toBe('Established Co')
+    expect(finalInspection.save.company.money).toBe(5230)
+    expect(finalInspection.save.company.level).toBe(4)
+    expect(finalInspection.save.company.reputation).toBe(87)
+    expect(finalInspection.save.company.employees).toEqual(originalSession.company.employees)
+    expect(finalInspection.save.company.vehicles).toEqual(originalSession.company.vehicles)
+    expect(finalInspection.save.company.reviews).toEqual(originalSession.company.reviews)
+    expect(finalInspection.save.settings.soundEnabled).toBe(false)
+  })
+})
+

@@ -76,6 +76,8 @@ export interface MainMenuLayout {
     dualWidth: number
     confirmX: number
     cancelX: number
+    secondaryActionY: number
+    secondaryActionWidth: number
   }
 }
 
@@ -198,6 +200,17 @@ export const buildMainMenuLayout = (
   )
   const actionY = panel.top + panel.height - edge - actionHeight / 2
 
+  // A dedicated row above the primary Close/Confirm/Cancel row so the
+  // Settings sound toggle never shares a touch target with Close.
+  const secondaryActionY = actionY - actionHeight - modalGap
+  const secondaryActionWidth = Math.min(220, panelWidth - edge * 2)
+
+  // Reserve the text area strictly above the secondary action row so the
+  // modal copy can never overlap either button row, at any viewport size.
+  const textAreaTop = panel.top + edge
+  const textAreaBottom = secondaryActionY - actionHeight / 2 - modalGap
+  const textCenterY = (textAreaTop + textAreaBottom) / 2
+
   return {
     title,
     subtitle,
@@ -209,7 +222,7 @@ export const buildMainMenuLayout = (
     actionCenters,
     modal: {
       panel,
-      textCenter: { x: centerX, y: viewport.height / 2 - actionHeight / 2 },
+      textCenter: { x: centerX, y: textCenterY },
       textFontSize: compact ? 16 : 22,
       textWrapWidth: Math.max(160, panelWidth - edge * 4),
       actionY,
@@ -218,6 +231,8 @@ export const buildMainMenuLayout = (
       dualWidth,
       confirmX: centerX - dualWidth / 2 - modalGap / 2,
       cancelX: centerX + dualWidth / 2 + modalGap / 2,
+      secondaryActionY,
+      secondaryActionWidth,
     },
   }
 }

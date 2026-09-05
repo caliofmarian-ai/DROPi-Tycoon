@@ -2,6 +2,7 @@ import Phaser from 'phaser'
 import { appConfig } from '../config/env'
 import { getBrowserSaveStorage } from '../persistence/browserSaveStorage'
 import {
+  autosaveIfApproved,
   inspectSaveSlot,
   preserveInvalidSaveBeforeReplacement,
   restoreGameSessionFromSave,
@@ -10,7 +11,6 @@ import {
   type SaveStorage,
 } from '../persistence/saveSystem'
 import {
-  getOrCreateGameSession,
   peekGameSession,
   replaceEntireGameSession,
   startNewGameSession,
@@ -80,7 +80,12 @@ export class MainMenuScene extends Phaser.Scene {
       : { kind: 'unavailable', reason: 'Local storage is unavailable.' }
 
     const session = peekGameSession()
-    getAudioController().setEnabled(session ? session.settings.soundEnabled : true)
+    const initialSoundEnabled = session
+      ? session.settings.soundEnabled
+      : this.saveSlot.kind === 'valid'
+        ? this.saveSlot.save.settings.soundEnabled
+        : true
+    getAudioController().setEnabled(initialSoundEnabled)
 
     const actionCount = this.saveSlot.kind === 'valid' ? 5 : 4
     const hasNotice =
@@ -209,7 +214,8 @@ export class MainMenuScene extends Phaser.Scene {
   }
 
   private startGame(): void {
-    startNewGameSession()
+    const session = startNewGameSession()
+    session.settings.soundEnabled = getAudioController().isEnabled()
     this.scene.start('GameWorld')
   }
 
@@ -255,6 +261,7 @@ export class MainMenuScene extends Phaser.Scene {
 
   private confirmNewGameReplacement(): void {
     const session = startNewGameSession()
+    session.settings.soundEnabled = getAudioController().isEnabled()
 
     if (this.saveStorage) {
       const currentInspection = inspectSaveSlot(this.saveStorage)
@@ -421,14 +428,14 @@ export class MainMenuScene extends Phaser.Scene {
     )
 
     this.soundToggleButton = this.createModalActionButton(
-      modal.confirmX,
-      modal.actionY,
-      modal.dualWidth,
+      centerX,
+      modal.secondaryActionY,
+      modal.secondaryActionWidth,
       modal.actionHeight,
     ).on('pointerdown', this.stopAnd(() => this.toggleSound()))
     this.soundToggleLabel = this.createModalActionLabel(
-      modal.confirmX,
-      modal.actionY,
+      centerX,
+      modal.secondaryActionY,
       this.soundToggleText(),
       modal.textFontSize,
     )
@@ -537,12 +544,42 @@ export class MainMenuScene extends Phaser.Scene {
   }
 
   private toggleSound(): void {
-    const session = getOrCreateGameSession()
-    const nextEnabled = !session.settings.soundEnabled
-    session.settings.soundEnabled = nextEnabled
-    getAudioController().setEnabled(nextEnabled)
+    const activeSession = peekGameSession()
+
+    if (activeSession) {
+      const nextEnabled = !activeSession.settings.soundEnabled
+      activeSession.settings.soundEnabled = nextEnabled
+      getAudioController().setEnabled(nextEnabled)
+      if (this.saveStorage) {
+        autosaveIfApproved(this.saveStorage, activeSession, 'settings-changed')
+      }
+    } else if (this.saveSlot.kind === 'valid' && this.saveStorage) {
+      // No gameplay session has started yet (e.g. before Continue Game is
+      // pressed). Never fabricate a new game session here — that would risk
+      // Exit Game overwriting the existing save. Instead flip the setting
+      // directly against the persisted save data.
+      const nextEnabled = !this.saveSlot.save.settings.soundEnabled
+      const restoredSession = restoreGameSessionFromSave(this.saveSlot.save)
+      restoredSession.settings.soundEnabled = nextEnabled
+      const write = writeSaveSlot(this.saveStorage, restoredSession)
+      if (write.ok) {
+        this.saveSlot = {
+          ...this.saveSlot,
+          save: {
+            ...this.saveSlot.save,
+            settings: { ...this.saveSlot.save.settings, soundEnabled: nextEnabled },
+          },
+        }
+      }
+      getAudioController().setEnabled(nextEnabled)
+    } else {
+      // Nothing safe to persist to yet (no save, or storage unavailable):
+      // only the in-memory audio preference changes for this menu visit.
+      getAudioController().setEnabled(!getAudioController().isEnabled())
+    }
+
     getAudioController().unlock()
-    if (nextEnabled) {
+    if (getAudioController().isEnabled()) {
       getAudioController().play('positive')
     }
     this.soundToggleLabel.setText(this.soundToggleText())
