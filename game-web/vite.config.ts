@@ -1,6 +1,14 @@
+import { readFileSync } from 'node:fs'
 import { defineConfig } from 'vitest/config'
 
+const packageConfig = JSON.parse(
+  readFileSync(new URL('./package.json', import.meta.url), 'utf8'),
+) as { version: string }
+
 export default defineConfig({
+  define: {
+    __DROPITYCOON_VERSION__: JSON.stringify(packageConfig.version),
+  },
   build: {
     outDir: 'dist',
     sourcemap: false,
