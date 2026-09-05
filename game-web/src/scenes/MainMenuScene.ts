@@ -28,6 +28,8 @@ import {
 } from '../ui/mobileViewport'
 
 const MODAL_DEPTH = 90
+const BRAND_LOGO_KEY = 'dropi-tycoon-logo'
+const BRAND_LOGO_URL = '/assets/branding/dropi-tycoon-logo.png'
 
 export class MainMenuScene extends Phaser.Scene {
   private menuState: MainMenuState = createMainMenuState()
@@ -53,6 +55,10 @@ export class MainMenuScene extends Phaser.Scene {
     super('MainMenu')
   }
 
+  preload(): void {
+    this.load.image(BRAND_LOGO_KEY, BRAND_LOGO_URL)
+  }
+
   create(): void {
     const { width, height } = this.scale
     this.menuState = createMainMenuState()
@@ -67,44 +73,44 @@ export class MainMenuScene extends Phaser.Scene {
       this.saveSlot.kind === 'incompatible' ||
       this.saveSlot.kind === 'unavailable'
     const layout = buildMainMenuLayout(width, height, actionCount, hasNotice)
+    const compactLandscape = width > height && height <= 440
+    const logoSize = compactLandscape
+      ? 60
+      : Math.min(140, Math.max(104, Math.round(Math.min(width, height) * 0.22)))
+    const logoCenterY = compactLandscape
+      ? layout.title.y + 10
+      : logoSize / 2 + Math.max(8, Math.round(height * 0.015))
+    const versionY = logoCenterY + logoSize / 2 + (compactLandscape ? 4 : 6)
+    const taglineY = versionY + (compactLandscape ? 17 : 24)
 
-    this.cameras.main.setBackgroundColor('#10151d')
+    this.cameras.main.setBackgroundColor('#06162d')
+
+    const glowRadius = Math.max(80, Math.round(Math.min(width, height) * 0.34))
+    this.add.circle(width * 0.18, height * 0.18, glowRadius, 0x0b6cff, 0.08)
+    this.add.circle(width * 0.86, height * 0.8, glowRadius * 0.8, 0x22c55e, 0.045)
 
     this.add
-      .text(layout.title.x, layout.title.y, appConfig.appName, {
+      .image(layout.title.x, logoCenterY, BRAND_LOGO_KEY)
+      .setDisplaySize(logoSize, logoSize)
+
+    this.add
+      .text(layout.subtitle.x, versionY, `v${appConfig.appVersion}`, {
         fontFamily: 'Arial',
-        fontSize: `${layout.title.fontSize}px`,
-        color: '#f8fafc',
+        fontSize: `${compactLandscape ? 12 : 14}px`,
+        color: '#8bdcff',
         fontStyle: 'bold',
       })
       .setOrigin(0.5)
 
     this.add
-      .text(
-        layout.subtitle.x,
-        layout.subtitle.y,
-        `Web Runtime Candidate v${appConfig.appVersion}`,
-        {
-          fontFamily: 'Arial',
-          fontSize: `${layout.subtitle.fontSize}px`,
-          color: '#cbd5e1',
-        },
-      )
-      .setOrigin(0.5)
-
-    this.add
-      .text(
-        layout.tagline.x,
-        layout.tagline.y,
-        'Start small. Deliver locally. Grow your company.',
-        {
-          fontFamily: 'Arial',
-          fontSize: `${layout.tagline.fontSize}px`,
-          color: '#e2e8f0',
-          align: 'center',
-          wordWrap: { width: Math.max(180, width - 28) },
-        },
-      )
+      .text(layout.tagline.x, taglineY, 'Play. Deliver. Trade. Grow.', {
+        fontFamily: 'Arial',
+        fontSize: `${layout.tagline.fontSize}px`,
+        color: '#f6c445',
+        fontStyle: 'bold',
+        align: 'center',
+        wordWrap: { width: Math.max(180, width - 28) },
+      })
       .setOrigin(0.5)
 
     this.createModal(layout)
@@ -267,15 +273,15 @@ export class MainMenuScene extends Phaser.Scene {
     layout: MainMenuLayout,
   ): void {
     const button = this.add
-      .rectangle(x, y, layout.buttonWidth, layout.buttonHeight, 0x2563eb, 1)
-      .setStrokeStyle(3, 0x93c5fd)
+      .rectangle(x, y, layout.buttonWidth, layout.buttonHeight, 0x0b6cff, 1)
+      .setStrokeStyle(3, 0x67e8f9)
       .setInteractive({ useHandCursor: true })
 
     this.add
       .text(x, y, label, {
         fontFamily: 'Arial',
         fontSize: `${layout.buttonFontSize}px`,
-        color: '#eff6ff',
+        color: '#f8fbff',
         fontStyle: 'bold',
       })
       .setOrigin(0.5)
@@ -302,10 +308,10 @@ export class MainMenuScene extends Phaser.Scene {
         modal.panel.top + modal.panel.height / 2,
         modal.panel.width,
         modal.panel.height,
-        0x0f172a,
+        0x071a33,
         0.98,
       )
-      .setStrokeStyle(3, 0x38bdf8, 0.8)
+      .setStrokeStyle(3, 0x38bdf8, 0.9)
       .setDepth(MODAL_DEPTH + 1)
       .setVisible(false)
 
@@ -369,8 +375,8 @@ export class MainMenuScene extends Phaser.Scene {
     height: number,
   ): Phaser.GameObjects.Rectangle {
     return this.add
-      .rectangle(x, y, width, height, 0x2563eb, 1)
-      .setStrokeStyle(2, 0x93c5fd)
+      .rectangle(x, y, width, height, 0x0b6cff, 1)
+      .setStrokeStyle(2, 0x67e8f9)
       .setDepth(MODAL_DEPTH + 3)
       .setInteractive({ useHandCursor: true })
       .setVisible(false)
@@ -386,7 +392,7 @@ export class MainMenuScene extends Phaser.Scene {
       .text(x, y, label, {
         fontFamily: 'Arial',
         fontSize: `${fontSize}px`,
-        color: '#eff6ff',
+        color: '#f8fbff',
         fontStyle: 'bold',
       })
       .setOrigin(0.5)
