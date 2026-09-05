@@ -2,6 +2,7 @@ import Phaser from 'phaser'
 import { getBrowserSaveStorage } from '../persistence/browserSaveStorage'
 import { autosaveIfApproved } from '../persistence/saveSystem'
 import { getOrCreateGameSession, replaceGameSession } from '../state/gameSession'
+import { getAudioController } from '../systems/audioSystem'
 import {
   completeEmployeeOnboarding,
   EMPLOYEE_CANDIDATES,
@@ -259,6 +260,7 @@ export class EmployeeManagementScene extends Phaser.Scene {
     if (!employee) {
       const result = hireEmployee(this.companyState, candidate.employeeId)
       this.feedbackText.setText(result.message)
+      getAudioController().play(result.hired ? 'employee-hired' : 'negative')
       if (result.hired) {
         this.companyState = result.company
         this.persistMeaningfulChange('employee-hired', result.message)
@@ -270,6 +272,7 @@ export class EmployeeManagementScene extends Phaser.Scene {
     if (employee.status === 'Onboarding') {
       const result = completeEmployeeOnboarding(this.companyState, employee.employeeId)
       this.feedbackText.setText(result.message)
+      getAudioController().play(result.activated ? 'positive' : 'negative')
       if (result.activated) {
         this.companyState = result.company
         this.persistMeaningfulChange('employee-onboarding-completed', result.message)

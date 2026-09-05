@@ -1,3 +1,4 @@
+import { readFileSync } from 'node:fs'
 import { describe, expect, it } from 'vitest'
 import { buildEmployeeManagementLayout } from '../src/ui/employeeManagementLayout'
 import {
@@ -59,5 +60,24 @@ describe('RBATCH-018 / Product Experience — employee management mobile layout'
   it('does not encode one permanent orientation as canon', () => {
     expect(buildEmployeeManagementLayout(360, 800).compactLandscape).toBe(false)
     expect(buildEmployeeManagementLayout(800, 360).compactLandscape).toBe(true)
+  })
+})
+
+describe('Workstream F — EmployeeManagementScene plays hire/onboarding audio cues', () => {
+  const employeeManagementSource = readFileSync(
+    new URL('../src/scenes/EmployeeManagementScene.ts', import.meta.url),
+    'utf8',
+  )
+
+  it('imports the shared audio controller', () => {
+    expect(employeeManagementSource).toContain("import { getAudioController } from '../systems/audioSystem'")
+  })
+
+  it('plays an employee-hired cue on successful hire and negative on failure', () => {
+    expect(employeeManagementSource).toContain("getAudioController().play(result.hired ? 'employee-hired' : 'negative')")
+  })
+
+  it('plays a positive cue when onboarding completes and negative otherwise', () => {
+    expect(employeeManagementSource).toContain("getAudioController().play(result.activated ? 'positive' : 'negative')")
   })
 })

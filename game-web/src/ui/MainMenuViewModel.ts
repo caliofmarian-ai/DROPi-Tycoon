@@ -29,7 +29,7 @@ export const SETTINGS_PANEL_LINES: ReadonlyArray<string> = [
   'Controls: tap the world to move.',
   'HUD controls are touch-first.',
   '',
-  'Save-backed preferences are added with Save & Load.',
+  'Sound effects can be toggled below.',
 ]
 
 export const INFORMATION_PANEL_LINES: ReadonlyArray<string> = [

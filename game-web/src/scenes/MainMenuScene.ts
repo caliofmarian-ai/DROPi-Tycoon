@@ -2,6 +2,7 @@ import Phaser from 'phaser'
 import { appConfig } from '../config/env'
 import { getBrowserSaveStorage } from '../persistence/browserSaveStorage'
 import {
+  autosaveIfApproved,
   inspectSaveSlot,
   preserveInvalidSaveBeforeReplacement,
   restoreGameSessionFromSave,
@@ -14,6 +15,7 @@ import {
   replaceEntireGameSession,
   startNewGameSession,
 } from '../state/gameSession'
+import { getAudioController } from '../systems/audioSystem'
 import {
   closeMainMenuPanel,
   createMainMenuState,
@@ -54,6 +56,8 @@ export class MainMenuScene extends Phaser.Scene {
   private modalConfirmLabel!: Phaser.GameObjects.Text
   private modalCancelButton!: Phaser.GameObjects.Rectangle
   private modalCancelLabel!: Phaser.GameObjects.Text
+  private soundToggleButton!: Phaser.GameObjects.Rectangle
+  private soundToggleLabel!: Phaser.GameObjects.Text
 
   private readonly handleResize = (): void => {
     this.scene.restart()
@@ -74,6 +78,14 @@ export class MainMenuScene extends Phaser.Scene {
     this.saveSlot = this.saveStorage
       ? inspectSaveSlot(this.saveStorage)
       : { kind: 'unavailable', reason: 'Local storage is unavailable.' }
+
+    const session = peekGameSession()
+    const initialSoundEnabled = session
+      ? session.settings.soundEnabled
+      : this.saveSlot.kind === 'valid'
+        ? this.saveSlot.save.settings.soundEnabled
+        : true
+    getAudioController().setEnabled(initialSoundEnabled)
 
     const actionCount = this.saveSlot.kind === 'valid' ? 5 : 4
     const hasNotice =
@@ -202,7 +214,8 @@ export class MainMenuScene extends Phaser.Scene {
   }
 
   private startGame(): void {
-    startNewGameSession()
+    const session = startNewGameSession()
+    session.settings.soundEnabled = getAudioController().isEnabled()
     this.scene.start('GameWorld')
   }
 
@@ -248,6 +261,7 @@ export class MainMenuScene extends Phaser.Scene {
 
   private confirmNewGameReplacement(): void {
     const session = startNewGameSession()
+    session.settings.soundEnabled = getAudioController().isEnabled()
 
     if (this.saveStorage) {
       const currentInspection = inspectSaveSlot(this.saveStorage)
@@ -328,7 +342,11 @@ export class MainMenuScene extends Phaser.Scene {
       })
       .setOrigin(0.5)
 
-    button.on('pointerdown', onTap)
+    button.on('pointerdown', () => {
+      getAudioController().unlock()
+      getAudioController().play('ui-tap')
+      onTap()
+    })
   }
 
   private createModal(layout: MainMenuLayout): void {
@@ -408,6 +426,19 @@ export class MainMenuScene extends Phaser.Scene {
       'Cancel',
       modal.textFontSize,
     )
+
+    this.soundToggleButton = this.createModalActionButton(
+      centerX,
+      modal.secondaryActionY,
+      modal.secondaryActionWidth,
+      modal.actionHeight,
+    ).on('pointerdown', this.stopAnd(() => this.toggleSound()))
+    this.soundToggleLabel = this.createModalActionLabel(
+      centerX,
+      modal.secondaryActionY,
+      this.soundToggleText(),
+      modal.textFontSize,
+    )
   }
 
   private createModalActionButton(
@@ -460,18 +491,21 @@ export class MainMenuScene extends Phaser.Scene {
     const lines = panel === 'settings' ? SETTINGS_PANEL_LINES : INFORMATION_PANEL_LINES
     this.modalText.setText([...lines])
     this.setModalVisible(true, false)
+    this.setSoundToggleVisible(panel === 'settings')
   }
 
   private showMessage(message: string): void {
     this.pendingConfirmation = null
     this.modalText.setText(message)
     this.setModalVisible(true, false)
+    this.setSoundToggleVisible(false)
   }
 
   private showConfirmation(message: string, onConfirm: () => void): void {
     this.pendingConfirmation = onConfirm
     this.modalText.setText(message)
     this.setModalVisible(true, true)
+    this.setSoundToggleVisible(false)
   }
 
   private confirmPendingAction(): void {
@@ -484,6 +518,7 @@ export class MainMenuScene extends Phaser.Scene {
     this.menuState = closeMainMenuPanel(this.menuState)
     this.pendingConfirmation = null
     this.setModalVisible(false, false)
+    this.setSoundToggleVisible(false)
   }
 
   private setModalVisible(visible: boolean, confirmation: boolean): void {
@@ -496,5 +531,57 @@ export class MainMenuScene extends Phaser.Scene {
     this.modalConfirmLabel.setVisible(visible && confirmation)
     this.modalCancelButton.setVisible(visible && confirmation)
     this.modalCancelLabel.setVisible(visible && confirmation)
+  }
+
+  private soundToggleText(): string {
+    return getAudioController().isEnabled() ? 'Sound: ON' : 'Sound: OFF'
+  }
+
+  private setSoundToggleVisible(visible: boolean): void {
+    this.soundToggleLabel.setText(this.soundToggleText())
+    this.soundToggleButton.setVisible(visible)
+    this.soundToggleLabel.setVisible(visible)
+  }
+
+  private toggleSound(): void {
+    const activeSession = peekGameSession()
+
+    if (activeSession) {
+      const nextEnabled = !activeSession.settings.soundEnabled
+      activeSession.settings.soundEnabled = nextEnabled
+      getAudioController().setEnabled(nextEnabled)
+      if (this.saveStorage) {
+        autosaveIfApproved(this.saveStorage, activeSession, 'settings-changed')
+      }
+    } else if (this.saveSlot.kind === 'valid' && this.saveStorage) {
+      // No gameplay session has started yet (e.g. before Continue Game is
+      // pressed). Never fabricate a new game session here — that would risk
+      // Exit Game overwriting the existing save. Instead flip the setting
+      // directly against the persisted save data.
+      const nextEnabled = !this.saveSlot.save.settings.soundEnabled
+      const restoredSession = restoreGameSessionFromSave(this.saveSlot.save)
+      restoredSession.settings.soundEnabled = nextEnabled
+      const write = writeSaveSlot(this.saveStorage, restoredSession)
+      if (write.ok) {
+        this.saveSlot = {
+          ...this.saveSlot,
+          save: {
+            ...this.saveSlot.save,
+            settings: { ...this.saveSlot.save.settings, soundEnabled: nextEnabled },
+          },
+        }
+      }
+      getAudioController().setEnabled(nextEnabled)
+    } else {
+      // Nothing safe to persist to yet (no save, or storage unavailable):
+      // only the in-memory audio preference changes for this menu visit.
+      getAudioController().setEnabled(!getAudioController().isEnabled())
+    }
+
+    getAudioController().unlock()
+    if (getAudioController().isEnabled()) {
+      getAudioController().play('positive')
+    }
+    this.soundToggleLabel.setText(this.soundToggleText())
   }
 }

@@ -147,10 +147,10 @@ describe('RBATCH-013 — scene and scope boundaries', () => {
   it('synchronizes speed immediately after loading the active GameWorld session', () => {
     const sessionIndex = gameWorldSource.indexOf('getOrCreateGameSession()')
     const syncIndex = gameWorldSource.indexOf('synchronizePlayerMovementSpeed(')
-    const spriteIndex = gameWorldSource.indexOf('this.player = this.add.sprite(')
+    const playerVisualIndex = gameWorldSource.indexOf('this.playerVisual = createPlayerVisual(')
     expect(sessionIndex).toBeGreaterThan(-1)
     expect(syncIndex).toBeGreaterThan(sessionIndex)
-    expect(spriteIndex).toBeGreaterThan(syncIndex)
+    expect(playerVisualIndex).toBeGreaterThan(syncIndex)
   })
 
   it('continues to move through PlayerState.movementSpeed rather than a scene constant', () => {

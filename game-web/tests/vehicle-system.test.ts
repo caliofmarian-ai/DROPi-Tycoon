@@ -1,3 +1,4 @@
+import { readFileSync } from 'node:fs'
 import { describe, expect, it } from 'vitest'
 import { BALANCING } from '../src/config/balancing'
 import { createInitialCompanyState } from '../src/state/gameState'
@@ -6,6 +7,7 @@ import {
   ownsVehicleType,
   purchaseVehicle,
   reconcileLegacyBicycleOwnership,
+  selectActiveVehiclePresentation,
   VEHICLE_CATALOG,
 } from '../src/systems/vehicleSystem'
 
@@ -94,5 +96,80 @@ describe('RBATCH-022 — vehicle catalog and ownership', () => {
 
     expect(result.company.purchasedUpgradeLevels.Bicycle).toBe(1)
     expect(result.company.vehicles).toHaveLength(1)
+  })
+})
+
+describe('Workstream D — deterministic active-vehicle presentation rule', () => {
+  it('presents walking when no personal delivery vehicle is owned', () => {
+    const company = createInitialCompanyState()
+    expect(selectActiveVehiclePresentation(company)).toBeNull()
+  })
+
+  it('prefers the highest-tier owned vehicle: van over motorcycle over scooter over bicycle', () => {
+    const company = createInitialCompanyState()
+    company.vehicles = [
+      { vehicleId: 'VEHICLE-BICYCLE-001', typeId: 'Bicycle' },
+      { vehicleId: 'VEHICLE-ELECTRICSCOOTER-001', typeId: 'ElectricScooter' },
+    ]
+    expect(selectActiveVehiclePresentation(company)).toBe('ElectricScooter')
+
+    company.vehicles.push({ vehicleId: 'VEHICLE-MOTORCYCLE-001', typeId: 'Motorcycle' })
+    expect(selectActiveVehiclePresentation(company)).toBe('Motorcycle')
+
+    company.vehicles.push({ vehicleId: 'VEHICLE-DELIVERYVAN-001', typeId: 'DeliveryVan' })
+    expect(selectActiveVehiclePresentation(company)).toBe('DeliveryVan')
+  })
+
+  it('presents the Bicycle when it is the only owned vehicle', () => {
+    const company = createInitialCompanyState()
+    company.vehicles = [{ vehicleId: 'VEHICLE-BICYCLE-001', typeId: 'Bicycle' }]
+    expect(selectActiveVehiclePresentation(company)).toBe('Bicycle')
+  })
+})
+
+describe('Workstream D — GameWorldScene binds the drawn player visual, not a placeholder cube', () => {
+  const gameWorldSource = readFileSync(
+    new URL('../src/scenes/GameWorldScene.ts', import.meta.url),
+    'utf8',
+  )
+
+  it('no longer preloads or references the placeholder player cube textures', () => {
+    expect(gameWorldSource).not.toContain('player_character_idle')
+    expect(gameWorldSource).not.toContain('player_character_move')
+  })
+
+  it('creates the code-drawn player visual and binds the active-vehicle presentation', () => {
+    expect(gameWorldSource).toContain('createPlayerVisual(')
+    expect(gameWorldSource).toContain('selectActiveVehiclePresentation(this.companyState)')
+    expect(gameWorldSource).toContain('this.playerVisual.setState(')
+  })
+
+  it('drives facing/moving feedback from the drawn visual instead of texture swaps', () => {
+    expect(gameWorldSource).not.toContain('.setTexture(')
+    expect(gameWorldSource).toContain('this.playerVisual.setFacing(')
+    expect(gameWorldSource).toContain('this.playerVisual.setMoving(')
+  })
+})
+
+describe('Workstream F — GameWorldScene plays procedural audio cues for order lifecycle', () => {
+  const gameWorldSource = readFileSync(
+    new URL('../src/scenes/GameWorldScene.ts', import.meta.url),
+    'utf8',
+  )
+
+  it('imports the shared audio controller and unlocks it on the first tap', () => {
+    expect(gameWorldSource).toContain("import { getAudioController, type AudioCue } from '../systems/audioSystem'")
+    expect(gameWorldSource).toContain('getAudioController().unlock()')
+  })
+
+  it('maps order status transitions to order-accepted/delivery-success/delivery-failure cues', () => {
+    expect(gameWorldSource).toContain("'order-accepted'")
+    expect(gameWorldSource).toContain("'delivery-success'")
+    expect(gameWorldSource).toContain("'delivery-failure'")
+    expect(gameWorldSource).toContain('getAudioController().play(cue)')
+  })
+
+  it('syncs the controller enabled state from the persisted sound setting on scene create', () => {
+    expect(gameWorldSource).toContain('getAudioController().setEnabled(session.settings.soundEnabled)')
   })
 })

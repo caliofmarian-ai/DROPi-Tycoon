@@ -76,6 +76,8 @@ export interface MainMenuLayout {
     dualWidth: number
     confirmX: number
     cancelX: number
+    secondaryActionY: number
+    secondaryActionWidth: number
   }
 }
 
@@ -198,6 +200,17 @@ export const buildMainMenuLayout = (
   )
   const actionY = panel.top + panel.height - edge - actionHeight / 2
 
+  // A dedicated row above the primary Close/Confirm/Cancel row so the
+  // Settings sound toggle never shares a touch target with Close.
+  const secondaryActionY = actionY - actionHeight - modalGap
+  const secondaryActionWidth = Math.min(220, panelWidth - edge * 2)
+
+  // Reserve the text area strictly above the secondary action row so the
+  // modal copy can never overlap either button row, at any viewport size.
+  const textAreaTop = panel.top + edge
+  const textAreaBottom = secondaryActionY - actionHeight / 2 - modalGap
+  const textCenterY = (textAreaTop + textAreaBottom) / 2
+
   return {
     title,
     subtitle,
@@ -209,7 +222,7 @@ export const buildMainMenuLayout = (
     actionCenters,
     modal: {
       panel,
-      textCenter: { x: centerX, y: viewport.height / 2 - actionHeight / 2 },
+      textCenter: { x: centerX, y: textCenterY },
       textFontSize: compact ? 16 : 22,
       textWrapWidth: Math.max(160, panelWidth - edge * 4),
       actionY,
@@ -218,14 +231,20 @@ export const buildMainMenuLayout = (
       dualWidth,
       confirmX: centerX - dualWidth / 2 - modalGap / 2,
       cancelX: centerX + dualWidth / 2 + modalGap / 2,
+      secondaryActionY,
+      secondaryActionWidth,
     },
   }
 }
 
 export interface CompanyManagementLayout {
   compactLandscape: boolean
+  /** Identity dashboard strip spanning the top of the screen (Workstream B). */
+  identityBar: LayoutRect
   title: LayoutPoint & { fontSize: number }
   companyInfo: LayoutPoint & { fontSize: number }
+  /** Compact snapshot row (employees/vehicles/reviews) below the identity bar. */
+  snapshot: LayoutPoint & { fontSize: number }
   card: LayoutRect
   upgradeName: LayoutPoint & { fontSize: number }
   description: LayoutPoint & { fontSize: number; wrapWidth: number }
@@ -255,10 +274,28 @@ export const buildCompanyManagementLayout = (
 
   if (compact) {
     const rightColumnWidth = clamp(Math.floor(viewport.width * 0.31), 190, 250)
+    const titleFontSize = 15
+    const companyInfoFontSize = 14
+    const snapshotFontSize = 12
+    const barPadding = 8
+    const lineGap = 4
+
+    const identityBarTop = edge
+    const titleY = identityBarTop + barPadding + titleFontSize / 2
+    const companyInfoY = titleY + titleFontSize / 2 + lineGap + companyInfoFontSize / 2
+    const snapshotY = companyInfoY + companyInfoFontSize / 2 + lineGap + snapshotFontSize / 2
+    const identityBarBottom = snapshotY + snapshotFontSize / 2 + barPadding
+    const identityBar: LayoutRect = {
+      left: edge,
+      top: identityBarTop,
+      width: viewport.width - edge * 2,
+      height: identityBarBottom - identityBarTop,
+    }
+
     const cardLeft = edge
-    const cardTop = 72
+    const cardTop = Math.round(identityBarBottom + 10)
     const cardWidth = Math.max(250, viewport.width - rightColumnWidth - edge * 3)
-    const cardHeight = Math.max(240, viewport.height - cardTop - edge)
+    const cardHeight = Math.max(160, viewport.height - cardTop - edge)
     const card: LayoutRect = { left: cardLeft, top: cardTop, width: cardWidth, height: cardHeight }
     const cardCenterX = card.left + card.width / 2
     const navCenterX = viewport.width - edge - rightColumnWidth / 2
@@ -267,25 +304,32 @@ export const buildCompanyManagementLayout = (
 
     return {
       compactLandscape: true,
-      title: { x: centerX, y: 24, fontSize: 26 },
-      companyInfo: { x: centerX, y: 52, fontSize: 14 },
+      identityBar,
+      title: { x: centerX, y: titleY, fontSize: titleFontSize },
+      companyInfo: { x: centerX, y: companyInfoY, fontSize: companyInfoFontSize },
+      snapshot: { x: centerX, y: snapshotY, fontSize: snapshotFontSize },
       card,
-      upgradeName: { x: cardCenterX, y: card.top + 34, fontSize: 23 },
+      upgradeName: { x: cardCenterX, y: card.top + 30, fontSize: 20 },
       description: {
         x: cardCenterX,
-        y: card.top + 76,
-        fontSize: 14,
+        y: card.top + 66,
+        fontSize: 13,
         wrapWidth: Math.max(190, card.width - 30),
       },
-      status: { x: cardCenterX, y: card.top + 132, fontSize: 16 },
+      status: { x: cardCenterX, y: card.top + 108, fontSize: 15 },
       purchase: {
-        ...centeredRect(cardCenterX, card.top + 188, Math.min(300, card.width - 28), 54),
-        fontSize: 20,
+        ...centeredRect(
+          cardCenterX,
+          Math.min(card.top + 152, card.top + card.height - 56),
+          Math.min(280, card.width - 28),
+          48,
+        ),
+        fontSize: 18,
       },
       feedback: {
         x: cardCenterX,
-        y: card.top + card.height - 30,
-        fontSize: 14,
+        y: card.top + card.height - 20,
+        fontSize: 12,
         wrapWidth: Math.max(190, card.width - 30),
       },
       returnButton: centeredRect(navCenterX, viewport.height / 2 - 38, navWidth, navHeight),
@@ -296,9 +340,33 @@ export const buildCompanyManagementLayout = (
 
   const navHeight = 58
   const navWidth = Math.max(MIN_TOUCH_TARGET_PX, Math.min(330, viewport.width - edge * 2))
+
+  const titleFontSize = clamp(Math.round(viewport.width * 0.045), 20, 26)
+  const companyInfoFontSize = clamp(Math.round(viewport.width * 0.038), 16, 20)
+  const snapshotFontSize = clamp(Math.round(viewport.width * 0.03), 13, 16)
+  const barPadding = 14
+  const lineGap = 8
+
+  const identityBarTop = edge
+  const titleY = identityBarTop + barPadding + titleFontSize / 2
+  const companyInfoY = titleY + titleFontSize / 2 + lineGap + companyInfoFontSize / 2
+  const snapshotY = companyInfoY + companyInfoFontSize / 2 + lineGap + snapshotFontSize / 2
+  const identityBarBottom = snapshotY + snapshotFontSize / 2 + barPadding
+  const identityBar: LayoutRect = {
+    left: edge,
+    top: identityBarTop,
+    width: viewport.width - edge * 2,
+    height: identityBarBottom - identityBarTop,
+  }
+
   const cardWidth = Math.max(260, viewport.width - edge * 2)
-  const cardHeight = Math.min(280, Math.max(250, viewport.height - 360))
-  const cardTop = clamp(Math.round(viewport.height * 0.22), 132, 170)
+  const cardTop = Math.round(identityBarBottom + 18)
+  const reservedForNavAndManagement = navHeight * 2 + 14 + 66
+  const cardHeight = clamp(
+    viewport.height - cardTop - edge - reservedForNavAndManagement,
+    190,
+    280,
+  )
   const card: LayoutRect = {
     left: centerX - cardWidth / 2,
     top: cardTop,
@@ -309,41 +377,40 @@ export const buildCompanyManagementLayout = (
 
   return {
     compactLandscape: false,
-    title: {
-      x: centerX,
-      y: clamp(Math.round(viewport.height * 0.065), 38, 52),
-      fontSize: clamp(Math.round(viewport.width * 0.09), 30, 42),
-    },
-    companyInfo: {
-      x: centerX,
-      y: clamp(Math.round(viewport.height * 0.14), 82, 112),
-      fontSize: clamp(Math.round(viewport.width * 0.052), 17, 22),
-    },
+    identityBar,
+    title: { x: centerX, y: titleY, fontSize: titleFontSize },
+    companyInfo: { x: centerX, y: companyInfoY, fontSize: companyInfoFontSize },
+    snapshot: { x: centerX, y: snapshotY, fontSize: snapshotFontSize },
     card,
     upgradeName: {
       x: cardCenterX,
-      y: card.top + 38,
-      fontSize: clamp(Math.round(viewport.width * 0.075), 24, 32),
+      y: card.top + 32,
+      fontSize: clamp(Math.round(viewport.width * 0.055), 20, 28),
     },
     description: {
       x: cardCenterX,
-      y: card.top + 82,
-      fontSize: clamp(Math.round(viewport.width * 0.045), 16, 18),
+      y: card.top + 70,
+      fontSize: clamp(Math.round(viewport.width * 0.038), 15, 17),
       wrapWidth: Math.max(220, card.width - 44),
     },
     status: {
       x: cardCenterX,
-      y: card.top + 142,
-      fontSize: clamp(Math.round(viewport.width * 0.05), 17, 21),
+      y: card.top + 118,
+      fontSize: clamp(Math.round(viewport.width * 0.04), 16, 19),
     },
     purchase: {
-      ...centeredRect(cardCenterX, card.top + 198, Math.min(330, card.width - 30), 58),
-      fontSize: 24,
+      ...centeredRect(
+        cardCenterX,
+        Math.min(card.top + 164, card.top + card.height - 42),
+        Math.min(300, card.width - 30),
+        52,
+      ),
+      fontSize: 20,
     },
     feedback: {
       x: cardCenterX,
-      y: card.top + card.height - 24,
-      fontSize: clamp(Math.round(viewport.width * 0.043), 15, 19),
+      y: card.top + card.height - 20,
+      fontSize: clamp(Math.round(viewport.width * 0.032), 13, 16),
       wrapWidth: Math.max(220, card.width - 36),
     },
     returnButton: centeredRect(centerX, viewport.height - 116, navWidth, navHeight),

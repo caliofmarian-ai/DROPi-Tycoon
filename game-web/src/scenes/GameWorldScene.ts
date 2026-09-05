@@ -21,6 +21,7 @@ import { applyOrderAcceptanceRequest } from '../systems/orderAcceptance'
 import { settleDeliveryOutcome } from '../systems/economySettlement'
 import { createNextOrder, pickupPointForOrder } from '../systems/orderGeneration'
 import { synchronizePlayerMovementSpeed } from '../systems/bicycleSystem'
+import { getAudioController, type AudioCue } from '../systems/audioSystem'
 import type { CompanyState, WorldState } from '../types/game'
 import { GameHUD } from '../ui/GameHUD'
 import { NotificationDisplay } from '../ui/NotificationDisplay'
@@ -47,7 +48,11 @@ import {
   buildGameWorldTopBarLayout,
   GAMEWORLD_TOP_BAR_VISUAL_BUTTON_PX,
 } from '../ui/gameWorldTopBar'
+import { selectActiveVehiclePresentation } from '../systems/vehicleSystem'
+import { createPlayerVisual, type PlayerVisual } from '../world/playerVisual'
 import { selectDeliveryIntentFromTap } from '../utils/deliveryIntent'
+import { COLORS } from '../ui/theme'
+import { createStatusChip } from '../ui/themeControls'
 
 const DELIVERY_MARKER_TAP_RADIUS = 36
 
@@ -59,7 +64,8 @@ export class GameWorldScene extends Phaser.Scene {
 
   private companyState!: CompanyState
 
-  private player!: Phaser.GameObjects.Sprite
+  private player!: Phaser.GameObjects.Container
+  private playerVisual!: PlayerVisual
 
   private readonly packagePosition = new Phaser.Math.Vector2(0, 0)
 
@@ -104,10 +110,7 @@ export class GameWorldScene extends Phaser.Scene {
     this.load.image('building_company_small', '/assets/sprites/building_company_small.png')
     this.load.image('building_residential', '/assets/sprites/building_residential.png')
     this.load.image('building_commercial', '/assets/sprites/building_commercial.png')
-    this.load.image('delivery_point_marker', '/assets/sprites/delivery_point_marker.png')
     this.load.image('package_delivery', '/assets/sprites/package_delivery.png')
-    this.load.image('player_character_idle', '/assets/sprites/player_character_idle.png')
-    this.load.image('player_character_move', '/assets/sprites/player_character_move.png')
   }
 
   create(): void {
@@ -115,6 +118,7 @@ export class GameWorldScene extends Phaser.Scene {
     this.companyState = session.company
     this.worldState = synchronizePlayerMovementSpeed(session.world, this.companyState)
     replaceGameSession(this.worldState, this.companyState)
+    getAudioController().setEnabled(session.settings.soundEnabled)
 
     const initialPickupPoint = pickupPointForOrder(this.worldState.activeOrder)
     this.packagePosition.set(initialPickupPoint.x, initialPickupPoint.y)
@@ -137,11 +141,14 @@ export class GameWorldScene extends Phaser.Scene {
       'package_delivery',
     )
 
-    this.player = this.add.sprite(
+    const activeVehiclePresentation = selectActiveVehiclePresentation(this.companyState)
+    this.playerVisual = createPlayerVisual(
+      this,
       this.worldState.player.x,
       this.worldState.player.y,
-      'player_character_idle',
     )
+    this.playerVisual.setState(activeVehiclePresentation ?? 'Walking')
+    this.player = this.playerVisual.container
 
     this.cameras.main.setZoom(CAMERA_DEFAULT_ZOOM)
     this.cameras.main.startFollow(this.player, false, 1, 1)
@@ -178,6 +185,7 @@ export class GameWorldScene extends Phaser.Scene {
     this.attachCameraGestures()
 
     this.pointerUpHandler = (pointer: Phaser.Input.Pointer) => {
+      getAudioController().unlock()
       if (this.cameraGestureController?.didCameraGestureMove()) {
         return
       }
@@ -282,7 +290,8 @@ export class GameWorldScene extends Phaser.Scene {
       this.player.y += Math.sin(angle) * this.worldState.player.movementSpeed * deltaSeconds
       this.worldState.player.x = this.player.x
       this.worldState.player.y = this.player.y
-      this.player.setTexture('player_character_move')
+      this.playerVisual.setFacing(Math.cos(angle) < 0)
+      this.playerVisual.setMoving(true)
       return
     }
 
@@ -290,7 +299,7 @@ export class GameWorldScene extends Phaser.Scene {
     this.worldState.player.x = this.player.x
     this.worldState.player.y = this.player.y
     this.worldState.isMoving = false
-    this.player.setTexture('player_character_idle')
+    this.playerVisual.setMoving(false)
   }
 
   private updatePickupState(): void {
@@ -407,7 +416,7 @@ export class GameWorldScene extends Phaser.Scene {
   }
 
   private emitNotificationIfTransitioned(
-    _previousStatus: string,
+    previousStatus: string,
     currentStatus: string,
   ): void {
     const result = updateNotification(
@@ -419,71 +428,115 @@ export class GameWorldScene extends Phaser.Scene {
     if (result.newMessage !== null) {
       this.notificationDisplay.show(result.newMessage)
     }
+    this.playOrderTransitionCue(previousStatus, currentStatus)
+  }
+
+  private playOrderTransitionCue(previousStatus: string, currentStatus: string): void {
+    const cue: AudioCue | null =
+      previousStatus === 'Available' && currentStatus === 'Accepted'
+        ? 'order-accepted'
+        : previousStatus === 'PickedUp' && currentStatus === 'Completed'
+          ? 'delivery-success'
+          : previousStatus === 'PickedUp' && currentStatus === 'Failed'
+            ? 'delivery-failure'
+            : null
+    if (cue) {
+      getAudioController().play(cue)
+    }
   }
 
   private renderWorldLayout(): void {
-    this.add.rectangle(
-      WORLD_WIDTH / 2,
-      WORLD_HEIGHT / 2,
-      WORLD_WIDTH,
-      WORLD_HEIGHT,
-      0xa7f3d0,
-    )
+    const ground = this.add.graphics()
+    ground.fillGradientStyle(0xbdf3d0, 0xbdf3d0, 0x9fe3bd, 0x9fe3bd, 1)
+    ground.fillRect(0, 0, WORLD_WIDTH, WORLD_HEIGHT)
 
     WORLD_ZONES.forEach((zone) => {
-      this.add
-        .rectangle(
-          zone.x + zone.width / 2,
-          zone.y + zone.height / 2,
-          zone.width,
-          zone.height,
-          zone.fillColor,
-          0.45,
-        )
-        .setStrokeStyle(3, 0x475569, 0.45)
+      const zoneGraphics = this.add.graphics()
+      zoneGraphics.fillStyle(zone.fillColor, 0.5)
+      zoneGraphics.fillRoundedRect(zone.x, zone.y, zone.width, zone.height, 20)
+      zoneGraphics.lineStyle(2, 0x334155, 0.3)
+      zoneGraphics.strokeRoundedRect(zone.x, zone.y, zone.width, zone.height, 20)
 
-      this.add.text(zone.x + 18, zone.y + 14, zone.label, {
-        fontFamily: 'Arial',
-        fontSize: '22px',
-        color: '#0f172a',
-        fontStyle: 'bold',
-      })
+      // Compact rounded label chip instead of a raw text dump pasted over the map.
+      createStatusChip(this, zone.x + 92, zone.y + 24, zone.label, 'neutral', 13)
     })
 
     WORLD_ROADS.forEach((road) => {
-      this.add.rectangle(road.x, road.y, road.width, road.height, 0x64748b)
+      this.add.rectangle(road.x, road.y, road.width, road.height, 0x475569)
+      this.add
+        .rectangle(road.x, road.y, road.width, road.height)
+        .setStrokeStyle(1, 0x1e293b, 0.5)
+
+      // Lane markings communicate "road" without a developer-diagram look.
+      const markings = this.add.graphics()
+      markings.lineStyle(3, 0xf8fafc, 0.55)
+      const horizontal = road.width >= road.height
+      const left = road.x - road.width / 2
+      const top = road.y - road.height / 2
+      if (horizontal) {
+        const dashCount = Math.max(1, Math.floor(road.width / 46))
+        for (let i = 0; i < dashCount; i += 1) {
+          const dashX = left + i * 46 + 10
+          markings.beginPath()
+          markings.moveTo(dashX, road.y)
+          markings.lineTo(Math.min(dashX + 26, left + road.width - 4), road.y)
+          markings.strokePath()
+        }
+      } else {
+        const dashCount = Math.max(1, Math.floor(road.height / 46))
+        for (let i = 0; i < dashCount; i += 1) {
+          const dashY = top + i * 46 + 10
+          markings.beginPath()
+          markings.moveTo(road.x, dashY)
+          markings.lineTo(road.x, Math.min(dashY + 26, top + road.height - 4))
+          markings.strokePath()
+        }
+      }
     })
 
     WORLD_SIDEWALKS.forEach((sidewalk) => {
-      this.add.rectangle(
-        sidewalk.x,
-        sidewalk.y,
-        sidewalk.width,
-        sidewalk.height,
-        0xe2e8f0,
-      )
+      this.add
+        .rectangle(sidewalk.x, sidewalk.y, sidewalk.width, sidewalk.height, 0xe8edf3)
+        .setStrokeStyle(1, 0xb9c4d1, 0.9)
     })
 
     WORLD_BUILDINGS.forEach(({ x, y, texture }) => {
+      // Soft ground shadow for depth instead of a flat pasted sprite.
+      this.add.ellipse(x, y + 34, 74, 18, 0x0f172a, 0.18)
       this.add.image(x, y, texture).setScale(1.4)
     })
 
     WORLD_DECORATIONS.forEach(({ x, y, radius }) => {
       this.add.rectangle(x, y + radius, 7, radius * 1.4, 0x7c4a21)
-      this.add.circle(x, y, radius, 0x15803d)
+      this.add.circle(x, y, radius, 0x166534)
+      this.add.circle(x - radius * 0.28, y - radius * 0.28, radius * 0.42, 0x22c55e, 0.5)
     })
 
-    WORLD_ROUTE_POINTS.forEach(({ x, y, label, kind }) => {
-      this.add.image(x, y, 'delivery_point_marker')
-      this.add
-        .text(x, y + 28, `${kind === 'pickup' ? 'Pickup' : 'Delivery'}: ${label}`, {
-          fontFamily: 'Arial',
-          fontSize: '15px',
-          color: '#0f172a',
-          backgroundColor: '#f8fafccc',
-          padding: { x: 4, y: 2 },
-        })
-        .setOrigin(0.5, 0)
+    WORLD_ROUTE_POINTS.forEach(({ x, y, kind }) => {
+      const tone = kind === 'pickup' ? COLORS.gold : COLORS.success
+      const marker = this.add.graphics()
+      marker.fillStyle(tone, 0.22)
+      marker.fillCircle(x, y, 30)
+      marker.lineStyle(3, tone, 0.9)
+      marker.strokeCircle(x, y, 20)
+
+      // Pickup reads as a package icon, delivery as a checkmark flag — icons
+      // instead of a raw "Pickup: X" / "Delivery: X" debug label.
+      if (kind === 'pickup') {
+        marker.lineStyle(2.2, 0x1f2937, 0.9)
+        marker.strokeRect(x - 8, y - 6, 16, 12)
+        marker.beginPath()
+        marker.moveTo(x - 8, y)
+        marker.lineTo(x + 8, y)
+        marker.strokePath()
+      } else {
+        marker.lineStyle(2.4, 0x1f2937, 0.9)
+        marker.beginPath()
+        marker.moveTo(x - 7, y)
+        marker.lineTo(x - 2, y + 6)
+        marker.lineTo(x + 8, y - 8)
+        marker.strokePath()
+      }
     })
   }
 

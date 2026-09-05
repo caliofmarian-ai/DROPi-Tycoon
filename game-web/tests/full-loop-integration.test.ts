@@ -13,9 +13,16 @@ import {
 } from '../src/state/gameState'
 import { synchronizePlayerMovementSpeed } from '../src/systems/bicycleSystem'
 import { settleDeliveryOutcome } from '../src/systems/economySettlement'
+import { EMPLOYEE_CANDIDATES, hireEmployee, processSalaryCycle } from '../src/systems/employeeSystem'
+import { buildFinancialReport, processDailyOperatingExpense } from '../src/systems/financialSystem'
 import { applyOrderAcceptanceRequest } from '../src/systems/orderAcceptance'
 import { attemptDelivery, attemptPickup } from '../src/systems/orderSystem'
 import { purchaseUpgrade } from '../src/systems/upgradeSystem'
+import {
+  calculateDailyVehicleMaintenanceExpense,
+  ownsVehicleType,
+  purchaseVehicle,
+} from '../src/systems/vehicleSystem'
 import type { CompanyState, GameSessionState, WorldState } from '../src/types/game'
 import { buildHUDLayout, buildNotificationLayout, boundsIntersect } from '../src/ui/hudLayout'
 import { GAMEWORLD_TOP_BAR_TOUCH_TARGET_PX } from '../src/ui/gameWorldTopBar'
@@ -151,7 +158,7 @@ describe('RBATCH-016 — full-loop integration verification', () => {
     const upgradedSession: GameSessionState = {
       world: bicycleWorld,
       company: purchase.company,
-      settings: { tutorialCompleted: true },
+      settings: { tutorialCompleted: true, soundEnabled: true },
     }
     expect(autosaveIfApproved(storage, upgradedSession, 'upgrade-purchased')).toEqual({
       saved: true,
@@ -278,5 +285,90 @@ describe('RBATCH-016 — full-loop integration verification', () => {
         expect(boundsIntersect(notification, rect)).toBe(false)
       })
     }
+  })
+})
+
+describe('RBATCH-024 — Phase 2 integration verification (vehicles, maintenance, payroll, save/load)', () => {
+  it('connects vehicle purchase → maintenance accrual → payroll → financial report → save/restore', () => {
+    const storage = new MemorySaveStorage()
+    const started = initialSession()
+
+    // Earn starting capital via the canonical order loop before any purchases.
+    const carrying = acceptAndPickup(started.world)
+    const completed = deliverAndSettle(carrying, started.company, carrying.activeOrder.destination)
+    expect(completed.company.money).toBeGreaterThan(0)
+
+    // 1. Vehicle purchase (RBATCH-022 semantics) — enough money to afford a Bicycle.
+    const vehiclePurchase = purchaseVehicle(completed.company, 'Bicycle')
+    expect(vehiclePurchase.purchased).toBe(true)
+    if (!vehiclePurchase.purchased) throw new Error(vehiclePurchase.message)
+    let company = vehiclePurchase.company
+    expect(ownsVehicleType(company, 'Bicycle')).toBe(true)
+
+    // 2. Duplicate purchase protection is preserved end to end.
+    const duplicate = purchaseVehicle(company, 'Bicycle')
+    expect(duplicate.purchased).toBe(false)
+
+    // Grant enough operating capital to exercise payroll + operating-day closure
+    // deterministically, independent of the wider delivery-reward economy tuning.
+    company = { ...company, money: 1_000 }
+
+    // 3. Hire an employee so payroll + operating expense scale with headcount.
+    const candidate = EMPLOYEE_CANDIDATES[0]
+    const hire = hireEmployee(company, candidate.employeeId)
+    expect(hire.hired).toBe(true)
+    if (!hire.hired) throw new Error(hire.message)
+    company = hire.company
+
+    // 4. Close operating day 1: base + active-employee expense + vehicle maintenance,
+    //    all in one deterministic, non-duplicated charge.
+    const expectedMaintenance = calculateDailyVehicleMaintenanceExpense(company)
+    expect(expectedMaintenance).toBeGreaterThan(0)
+    const dayResult = processDailyOperatingExpense(company, 1)
+    expect(dayResult.processed).toBe(true)
+    if (!dayResult.processed) throw new Error(dayResult.message)
+    expect(dayResult.maintenanceAmount).toBe(expectedMaintenance)
+    company = dayResult.company
+
+    // Re-processing the same day must not duplicate the charge.
+    const duplicateDay = processDailyOperatingExpense(company, 1)
+    expect(duplicateDay.processed).toBe(false)
+    expect(duplicateDay.reason).toBe('already-processed')
+
+    // 5. Payroll cycle charges salary independently of operating expenses/maintenance.
+    const payroll = processSalaryCycle(company, 1)
+    expect(payroll.processed).toBe(true)
+    if (!payroll.processed) throw new Error(payroll.message)
+    company = payroll.company
+
+    // 6. Financial report surfaces maintenance as a recognizable expense category.
+    const report = buildFinancialReport(company)
+    expect(report.maintenanceExpenses).toBe(expectedMaintenance)
+    expect(report.salaryExpenses).toBe(payroll.totalSalary)
+    expect(report.totalExpenses).toBe(
+      report.operatingExpenses + report.salaryExpenses + report.maintenanceExpenses,
+    )
+    expect(report.cashBalance).toBe(company.money)
+
+    // 7. Save v2 round trip: vehicles, financials and payroll all survive restore.
+    const session: GameSessionState = {
+      world: started.world,
+      company,
+      settings: started.settings,
+    }
+    expect(autosaveIfApproved(storage, session, 'vehicle-purchased')).toEqual({
+      saved: true,
+      event: 'vehicle-purchased',
+    })
+    const slot = inspectSaveSlot(storage)
+    expect(slot.kind).toBe('valid')
+    if (slot.kind !== 'valid') throw new Error(`Expected valid save, received ${slot.kind}`)
+
+    const restored = restoreGameSessionFromSave(slot.save)
+    expect(restored.company.vehicles).toEqual(company.vehicles)
+    expect(restored.company.financials).toEqual(company.financials)
+    expect(restored.company.payroll).toEqual(company.payroll)
+    expect(restored.company.employees).toEqual(company.employees)
+    expect(buildFinancialReport(restored.company)).toEqual(report)
   })
 })

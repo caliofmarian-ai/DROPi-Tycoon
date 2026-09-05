@@ -7,6 +7,7 @@ import {
   calculateDailyOperatingExpense,
   processDailyOperatingExpense,
 } from '../systems/financialSystem'
+import { calculateDailyVehicleMaintenanceExpense } from '../systems/vehicleSystem'
 import type { CompanyState, WorldState } from '../types/game'
 import {
   buildFinancialReportLayout,
@@ -197,7 +198,7 @@ export class FinancialReportScene extends Phaser.Scene {
       const session = replaceGameSession(this.worldState, this.companyState)
       const storage = getBrowserSaveStorage()
       if (storage) {
-        const autosave = autosaveIfApproved(storage, session, 'progression-changed')
+        const autosave = autosaveIfApproved(storage, session, 'operating-day-closed')
         if (!autosave.saved && autosave.reason === 'write-failed') {
           this.feedbackText.setText(`${result.message}\nLocal autosave failed: ${autosave.message ?? 'unknown error'}`)
         }
@@ -209,6 +210,7 @@ export class FinancialReportScene extends Phaser.Scene {
   private refreshView(): void {
     const report = buildFinancialReport(this.companyState)
     const nextExpense = calculateDailyOperatingExpense(this.companyState)
+    const nextMaintenance = calculateDailyVehicleMaintenanceExpense(this.companyState)
 
     this.summaryText.setText(`${this.companyState.companyName}  •  Business finances`)
 
@@ -234,9 +236,12 @@ export class FinancialReportScene extends Phaser.Scene {
     this.operationsText.setText([
       `Closed operating days   ${report.lastProcessedDay}`,
       `Processed salary cycles   ${report.lastSalaryCycle}`,
+      `Vehicle maintenance paid   ${report.maintenanceExpenses}`,
     ])
 
-    this.actionLabel.setText(`Close Day ${report.lastProcessedDay + 1} — Cost ${nextExpense}`)
+    this.actionLabel.setText(
+      `Close Day ${report.lastProcessedDay + 1} — Cost ${nextExpense + nextMaintenance}`,
+    )
   }
 
   private returnToCompany(): void {

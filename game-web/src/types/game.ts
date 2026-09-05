@@ -60,6 +60,8 @@ export interface FinancialState {
   totalOperatingExpenses: number
   /** Cumulative salary expense produced by the RBATCH-018 payroll system. */
   totalSalaryExpenses: number
+  /** Cumulative vehicle maintenance expense produced by the RBATCH-023 system. */
+  totalMaintenanceExpenses: number
 }
 
 export const CUSTOMER_REVIEW_SENTIMENTS = ['Positive', 'Negative'] as const
@@ -101,10 +103,16 @@ export interface CompanyState {
 export interface GameSettingsState {
   /**
    * Prototype v0.1 persists only tutorial completion from GameSettings.
-   * Language, sound, music and difficulty intentionally remain outside the
+   * Language, music and difficulty intentionally remain outside the
    * v0.1 save contract per ODR-003 = B.
    */
   tutorialCompleted: boolean
+  /**
+   * Owner quality gate #317 baseline audio system. Defaults to enabled and
+   * is additive to the existing Save v2 contract; older saves without this
+   * field are migrated to the default value.
+   */
+  soundEnabled: boolean
 }
 
 export interface PlayerState {

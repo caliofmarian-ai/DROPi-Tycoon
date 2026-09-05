@@ -42,4 +42,13 @@ export const BALANCING = {
   ELECTRIC_SCOOTER_COST: 300,
   MOTORCYCLE_COST: 600,
   DELIVERY_VAN_COST: 1200,
+
+  // RBATCH-023 implementation balancing. Maintenance scales with vehicle
+  // capability so the fleet remains a deliberate ongoing cost, not only a
+  // one-time purchase. Values are replaceable implementation tuning, not
+  // permanent canonical pricing.
+  BICYCLE_MAINTENANCE_COST_PER_DAY: 1,
+  ELECTRIC_SCOOTER_MAINTENANCE_COST_PER_DAY: 3,
+  MOTORCYCLE_MAINTENANCE_COST_PER_DAY: 5,
+  DELIVERY_VAN_MAINTENANCE_COST_PER_DAY: 8,
 } as const
