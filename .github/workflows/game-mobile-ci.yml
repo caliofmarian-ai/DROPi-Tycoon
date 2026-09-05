@@ -32,14 +32,6 @@ jobs:
       - name: Install mobile dependencies
         run: npm install
 
-      - name: Export generated lockfile
-        uses: actions/upload-artifact@v4
-        with:
-          name: game-mobile-package-lock
-          path: game-mobile/package-lock.json
-          if-no-files-found: error
-          retention-days: 1
-
       - name: TypeScript validation
         run: npm run typecheck
 
