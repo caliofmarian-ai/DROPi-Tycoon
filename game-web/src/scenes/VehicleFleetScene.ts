@@ -42,6 +42,11 @@ export class VehicleFleetScene extends Phaser.Scene {
   }
 
   create(): void {
+    // Phaser Scene instances survive restart(). Android immersive/WebView viewport
+    // changes can trigger RESIZE immediately after entry, so references from the
+    // previous create cycle must never remain in these indexed collections.
+    this.resetViewReferences()
+
     const { width, height } = this.scale
     this.layout = buildVehicleFleetLayout(width, height, VEHICLE_CATALOG.length)
     const session = getOrCreateGameSession()
@@ -168,7 +173,14 @@ export class VehicleFleetScene extends Phaser.Scene {
     this.scale.on(Phaser.Scale.Events.RESIZE, this.handleResize)
     this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => {
       this.scale.off(Phaser.Scale.Events.RESIZE, this.handleResize)
+      this.resetViewReferences()
     })
+  }
+
+  private resetViewReferences(): void {
+    this.rowTexts = []
+    this.purchaseButtons = []
+    this.purchaseLabels = []
   }
 
   private purchase(typeId: VehicleTypeId): void {
