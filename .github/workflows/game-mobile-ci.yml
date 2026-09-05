@@ -32,6 +32,9 @@ jobs:
       - name: Install mobile dependencies
         run: npm install
 
+      - name: Release version validation
+        run: npm run version:validate
+
       - name: TypeScript validation
         run: npm run typecheck
 
