@@ -56,9 +56,9 @@ describe('RBATCH-021 — customer review display summary', () => {
   })
 })
 
-describe('RBATCH-021 — customer reviews Android layout', () => {
+describe('RBATCH-021 / Product Experience — customer reviews Android layout', () => {
   for (const viewport of SUPPORTED_ANDROID_VIEWPORTS) {
-    it(`keeps review rows and controls usable at ${viewport.width}x${viewport.height}`, () => {
+    it(`keeps review rows, summary and controls usable at ${viewport.width}x${viewport.height}`, () => {
       const layout = buildCustomerReviewsLayout(viewport.width, viewport.height)
 
       expect(rectInsideViewport(layout.panel, viewport.width, viewport.height)).toBe(true)
@@ -67,6 +67,7 @@ describe('RBATCH-021 — customer reviews Android layout', () => {
       expect(rectInsideViewport(layout.returnButton, viewport.width, viewport.height)).toBe(true)
       expect(rectInsideViewport(layout.menuButton, viewport.width, viewport.height)).toBe(true)
       expect(layout.rowRects).toHaveLength(layout.rowsPerPage)
+      expect(layout.summary.wrapWidth).toBeLessThanOrEqual(viewport.width)
 
       for (const row of layout.rowRects) {
         expect(rectInsideViewport(row, viewport.width, viewport.height)).toBe(true)
@@ -83,13 +84,14 @@ describe('RBATCH-021 — customer reviews Android layout', () => {
     })
   }
 
-  it('uses compact landscape paging on short Android landscape viewports', () => {
+  it('uses compact landscape paging and richer four-card portrait paging', () => {
     const landscape = buildCustomerReviewsLayout(800, 360)
     const portrait = buildCustomerReviewsLayout(360, 800)
 
     expect(landscape.compactLandscape).toBe(true)
     expect(landscape.rowsPerPage).toBe(3)
     expect(portrait.compactLandscape).toBe(false)
-    expect(portrait.rowsPerPage).toBe(5)
+    expect(portrait.rowsPerPage).toBe(4)
+    expect(portrait.summary.wrapWidth).toBeLessThan(360)
   })
 })
