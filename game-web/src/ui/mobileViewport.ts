@@ -113,26 +113,35 @@ export const buildMainMenuLayout = (
   }
 
   const count = Math.max(1, Math.floor(actionCount))
+  const denseCompactActions = compact && count >= 5 && !hasNotice
   const topReserve = compact
     ? hasNotice
       ? 132
-      : 108
+      : denseCompactActions
+        ? 96
+        : 108
     : hasNotice
       ? Math.min(270, Math.round(viewport.height * 0.36))
       : Math.min(245, Math.round(viewport.height * 0.31))
   const availableHeight = Math.max(MIN_TOUCH_TARGET_PX, viewport.height - topReserve - edge)
-  const minimumGap = 8
+  const minimumGap = denseCompactActions ? 2 : 8
   const maximumButtonHeight = Math.floor(
     (availableHeight - minimumGap * Math.max(0, count - 1)) / count,
   )
-  const preferredButtonHeight = compact ? 52 : 64
+  const preferredButtonHeight = denseCompactActions ? 48 : compact ? 52 : 64
   const buttonHeight = clamp(
     Math.min(preferredButtonHeight, maximumButtonHeight),
     MIN_TOUCH_TARGET_PX,
     preferredButtonHeight,
   )
   const remaining = Math.max(0, availableHeight - buttonHeight * count)
-  const gap = count > 1 ? clamp(Math.floor(remaining / (count - 1)), minimumGap, 24) : 0
+  const gap = count > 1
+    ? clamp(
+        Math.floor(remaining / (count - 1)),
+        minimumGap,
+        denseCompactActions ? 8 : 24,
+      )
+    : 0
   const totalActionsHeight = buttonHeight * count + gap * Math.max(0, count - 1)
   const startY = topReserve + Math.max(0, Math.floor((availableHeight - totalActionsHeight) / 2))
   const actionCenters = Array.from({ length: count }, (_, index) => ({
