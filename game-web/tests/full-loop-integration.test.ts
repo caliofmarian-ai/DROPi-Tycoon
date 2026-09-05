@@ -151,7 +151,7 @@ describe('RBATCH-016 — full-loop integration verification', () => {
     const upgradedSession: GameSessionState = {
       world: bicycleWorld,
       company: purchase.company,
-      settings: { tutorialCompleted: true },
+      settings: { tutorialCompleted: true, soundEnabled: true },
     }
     expect(autosaveIfApproved(storage, upgradedSession, 'upgrade-purchased')).toEqual({
       saved: true,

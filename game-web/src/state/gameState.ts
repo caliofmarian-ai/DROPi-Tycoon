@@ -23,6 +23,7 @@ export const createInitialCompanyState = (): CompanyState => ({
     totalRevenue: 0,
     totalOperatingExpenses: 0,
     totalSalaryExpenses: 0,
+    totalMaintenanceExpenses: 0,
   },
   reviews: [],
   vehicles: [],
@@ -30,6 +31,7 @@ export const createInitialCompanyState = (): CompanyState => ({
 
 export const createInitialGameSettingsState = (): GameSettingsState => ({
   tutorialCompleted: false,
+  soundEnabled: true,
 })
 
 export const createInitialWorldState = (): WorldState => ({

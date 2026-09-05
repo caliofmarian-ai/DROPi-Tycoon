@@ -8,6 +8,7 @@ import {
   calculateDailyOperatingExpense,
   processDailyOperatingExpense,
 } from '../src/systems/financialSystem'
+import { calculateDailyVehicleMaintenanceExpense } from '../src/systems/vehicleSystem'
 import {
   createSaveGame,
   decodeSave,
@@ -23,6 +24,7 @@ describe('RBATCH-019 — initial financial state', () => {
       totalRevenue: 0,
       totalOperatingExpenses: 0,
       totalSalaryExpenses: 0,
+      totalMaintenanceExpenses: 0,
     })
   })
 
@@ -115,6 +117,7 @@ describe('ISSUE-027 — authoritative financial report', () => {
       totalRevenue: 300,
       totalOperatingExpenses: 30,
       totalSalaryExpenses: 50,
+      totalMaintenanceExpenses: 0,
     }
     company.payroll.lastProcessedCycle = 2
 
@@ -122,6 +125,7 @@ describe('ISSUE-027 — authoritative financial report', () => {
       income: 300,
       operatingExpenses: 30,
       salaryExpenses: 50,
+      maintenanceExpenses: 0,
       totalExpenses: 80,
       netResult: 220,
       cashBalance: 145,
@@ -187,6 +191,7 @@ describe('RBATCH-019 — compatible financial persistence', () => {
       totalRevenue: 300,
       totalOperatingExpenses: 30,
       totalSalaryExpenses: 25,
+      totalMaintenanceExpenses: 0,
     }
 
     const raw = serializeGameSession(session)
@@ -233,6 +238,78 @@ describe('RBATCH-019 — compatible financial persistence', () => {
       totalRevenue: 0,
       totalOperatingExpenses: 0,
       totalSalaryExpenses: 0,
+      totalMaintenanceExpenses: 0,
     })
+  })
+})
+
+describe('RBATCH-023 / ISSUE-029 — vehicle maintenance cost tracking', () => {
+  it('charges no maintenance for a fleet-less company', () => {
+    const company = createInitialCompanyState()
+    expect(calculateDailyVehicleMaintenanceExpense(company)).toBe(0)
+  })
+
+  it('sums centralized per-vehicle maintenance across the owned fleet', () => {
+    const company = createInitialCompanyState()
+    company.vehicles = [
+      { vehicleId: 'VEHICLE-BICYCLE-001', typeId: 'Bicycle' },
+      { vehicleId: 'VEHICLE-MOTORCYCLE-001', typeId: 'Motorcycle' },
+    ]
+    expect(calculateDailyVehicleMaintenanceExpense(company)).toBe(
+      BALANCING.BICYCLE_MAINTENANCE_COST_PER_DAY + BALANCING.MOTORCYCLE_MAINTENANCE_COST_PER_DAY,
+    )
+  })
+
+  it('charges maintenance together with operating expenses in a single day-close, exactly once', () => {
+    const company = createInitialCompanyState()
+    company.money = 100
+    company.vehicles = [{ vehicleId: 'VEHICLE-BICYCLE-001', typeId: 'Bicycle' }]
+
+    const result = processDailyOperatingExpense(company, 1)
+    expect(result.processed).toBe(true)
+    if (!result.processed) return
+
+    expect(result.maintenanceAmount).toBe(BALANCING.BICYCLE_MAINTENANCE_COST_PER_DAY)
+    expect(result.company.money).toBe(
+      100 - BALANCING.DAILY_BASE_OPERATING_EXPENSE - BALANCING.BICYCLE_MAINTENANCE_COST_PER_DAY,
+    )
+    expect(result.company.financials.totalMaintenanceExpenses).toBe(
+      BALANCING.BICYCLE_MAINTENANCE_COST_PER_DAY,
+    )
+
+    const duplicate = processDailyOperatingExpense(result.company, 1)
+    expect(duplicate.processed).toBe(false)
+    if (duplicate.processed) return
+    expect(duplicate.company.financials.totalMaintenanceExpenses).toBe(
+      BALANCING.BICYCLE_MAINTENANCE_COST_PER_DAY,
+    )
+  })
+
+  it('blocks the day close when the combined operating and maintenance cost is unaffordable', () => {
+    const company = createInitialCompanyState()
+    company.vehicles = [{ vehicleId: 'VEHICLE-VAN-001', typeId: 'DeliveryVan' }]
+    company.money = BALANCING.DAILY_BASE_OPERATING_EXPENSE + BALANCING.DELIVERY_VAN_MAINTENANCE_COST_PER_DAY - 1
+    const snapshot = structuredClone(company)
+
+    const result = processDailyOperatingExpense(company, 1)
+    expect(result.processed).toBe(false)
+    if (result.processed) return
+    expect(result.reason).toBe('not-enough-money')
+    expect(company).toEqual(snapshot)
+  })
+
+  it('reports maintenance as a recognizable expense category in the financial report', () => {
+    const company = createInitialCompanyState()
+    company.financials = {
+      lastProcessedDay: 1,
+      totalRevenue: 100,
+      totalOperatingExpenses: 10,
+      totalSalaryExpenses: 0,
+      totalMaintenanceExpenses: 4,
+    }
+    const report = buildFinancialReport(company)
+    expect(report.maintenanceExpenses).toBe(4)
+    expect(report.totalExpenses).toBe(14)
+    expect(report.netResult).toBe(86)
   })
 })

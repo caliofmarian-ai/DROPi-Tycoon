@@ -44,6 +44,8 @@ export const CANONICAL_AUTOSAVE_EVENTS = [
   'employee-onboarding-completed',
   'salary-cycle-processed',
   'vehicle-purchased',
+  'settings-changed',
+  'operating-day-closed',
 ] as const
 
 export type CanonicalAutosaveEvent = (typeof CANONICAL_AUTOSAVE_EVENTS)[number]
@@ -144,7 +146,7 @@ const sanitizePayroll = (value: unknown): { payroll: PayrollState; repaired: boo
 const sanitizeFinancials = (value: unknown): { financials: FinancialState; repaired: boolean } => {
   const defaults = createInitialCompanyState().financials
   if (!isRecord(value)) return { financials: { ...defaults }, repaired: true }
-  const fields = ['lastProcessedDay', 'totalRevenue', 'totalOperatingExpenses', 'totalSalaryExpenses'] as const
+  const fields = ['lastProcessedDay', 'totalRevenue', 'totalOperatingExpenses', 'totalSalaryExpenses', 'totalMaintenanceExpenses'] as const
   let repaired = false
   const financials: FinancialState = { ...defaults }
   fields.forEach((field) => {
@@ -291,14 +293,17 @@ const sanitizeSettings = (value: unknown): { settings: GameSettingsState; repair
   const defaults = createInitialGameSettingsState()
   if (!isRecord(value)) return { settings: defaults, repaired: true }
   if (typeof value.tutorialCompleted !== 'boolean') return { settings: defaults, repaired: true }
-  return { settings: { tutorialCompleted: value.tutorialCompleted }, repaired: false }
+  const soundEnabled = typeof value.soundEnabled === 'boolean' ? value.soundEnabled : defaults.soundEnabled
+  const repaired = typeof value.soundEnabled !== 'boolean'
+  return { settings: { tutorialCompleted: value.tutorialCompleted, soundEnabled }, repaired }
 }
 
 const hasFinancialActivity = (financials: FinancialState): boolean =>
   financials.lastProcessedDay !== 0 ||
   financials.totalRevenue !== 0 ||
   financials.totalOperatingExpenses !== 0 ||
-  financials.totalSalaryExpenses !== 0
+  financials.totalSalaryExpenses !== 0 ||
+  financials.totalMaintenanceExpenses !== 0
 
 export const createSaveGame = (session: GameSessionState): SaveGameV2 => ({
   formatVersion: SAVE_FORMAT_VERSION,
@@ -320,7 +325,7 @@ export const createSaveGame = (session: GameSessionState): SaveGameV2 => ({
       ? { vehicles: session.company.vehicles.map((vehicle) => ({ ...vehicle })) }
       : {}),
   },
-  settings: { tutorialCompleted: session.settings.tutorialCompleted },
+  settings: { tutorialCompleted: session.settings.tutorialCompleted, soundEnabled: session.settings.soundEnabled },
 })
 
 export const serializeGameSession = (session: GameSessionState): string => JSON.stringify(createSaveGame(session))

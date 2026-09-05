@@ -11,6 +11,7 @@ const emptyFinancialState = (): FinancialState => ({
   totalRevenue: 0,
   totalOperatingExpenses: 0,
   totalSalaryExpenses: 0,
+  totalMaintenanceExpenses: 0,
 })
 
 const readFinancials = (company: CompanyState): FinancialState =>

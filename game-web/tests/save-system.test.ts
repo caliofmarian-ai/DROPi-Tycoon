@@ -112,7 +112,7 @@ describe('RBATCH-014 + RBATCH-018 — canonical save serialization', () => {
         ],
         payroll: { lastProcessedCycle: 4 },
       },
-      settings: { tutorialCompleted: true },
+      settings: { tutorialCompleted: true, soundEnabled: true },
     })
   })
 
@@ -136,7 +136,7 @@ describe('RBATCH-014 + RBATCH-018 — canonical save serialization', () => {
       settings: Record<string, unknown>
     }
 
-    expect(parsed.settings).toEqual({ tutorialCompleted: false })
+    expect(parsed.settings).toEqual({ tutorialCompleted: false, soundEnabled: true })
     expect(parsed.settings).not.toHaveProperty('language')
     expect(parsed.settings).not.toHaveProperty('sound')
     expect(parsed.settings).not.toHaveProperty('music')
@@ -161,7 +161,7 @@ describe('RBATCH-014 + RBATCH-018 — canonical save serialization', () => {
     const decoded = decodeSave(raw)
     expect(decoded.kind).toBe('valid')
     if (decoded.kind !== 'valid') return
-    expect(decoded.save.settings).toEqual({ tutorialCompleted: true })
+    expect(decoded.save.settings).toEqual({ tutorialCompleted: true, soundEnabled: true })
     expect(decoded.save).not.toHaveProperty('player')
     expect(decoded.save).not.toHaveProperty('activeOrder')
   })
@@ -407,6 +407,8 @@ describe('ISSUE-016 + RBATCH-018 — canonical autosave policy', () => {
       'employee-onboarding-completed',
       'salary-cycle-processed',
       'vehicle-purchased',
+      'settings-changed',
+      'operating-day-closed',
     ])
   })
 

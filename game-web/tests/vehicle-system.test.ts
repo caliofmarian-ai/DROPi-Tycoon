@@ -6,6 +6,7 @@ import {
   ownsVehicleType,
   purchaseVehicle,
   reconcileLegacyBicycleOwnership,
+  selectActiveVehiclePresentation,
   VEHICLE_CATALOG,
 } from '../src/systems/vehicleSystem'
 
@@ -94,5 +95,33 @@ describe('RBATCH-022 — vehicle catalog and ownership', () => {
 
     expect(result.company.purchasedUpgradeLevels.Bicycle).toBe(1)
     expect(result.company.vehicles).toHaveLength(1)
+  })
+})
+
+describe('Workstream D — deterministic active-vehicle presentation rule', () => {
+  it('presents walking when no personal delivery vehicle is owned', () => {
+    const company = createInitialCompanyState()
+    expect(selectActiveVehiclePresentation(company)).toBeNull()
+  })
+
+  it('prefers the highest-tier owned vehicle: van over motorcycle over scooter over bicycle', () => {
+    const company = createInitialCompanyState()
+    company.vehicles = [
+      { vehicleId: 'VEHICLE-BICYCLE-001', typeId: 'Bicycle' },
+      { vehicleId: 'VEHICLE-ELECTRICSCOOTER-001', typeId: 'ElectricScooter' },
+    ]
+    expect(selectActiveVehiclePresentation(company)).toBe('ElectricScooter')
+
+    company.vehicles.push({ vehicleId: 'VEHICLE-MOTORCYCLE-001', typeId: 'Motorcycle' })
+    expect(selectActiveVehiclePresentation(company)).toBe('Motorcycle')
+
+    company.vehicles.push({ vehicleId: 'VEHICLE-DELIVERYVAN-001', typeId: 'DeliveryVan' })
+    expect(selectActiveVehiclePresentation(company)).toBe('DeliveryVan')
+  })
+
+  it('presents the Bicycle when it is the only owned vehicle', () => {
+    const company = createInitialCompanyState()
+    company.vehicles = [{ vehicleId: 'VEHICLE-BICYCLE-001', typeId: 'Bicycle' }]
+    expect(selectActiveVehiclePresentation(company)).toBe('Bicycle')
   })
 })

@@ -49,6 +49,7 @@ const financialsFor = (company: CompanyState): FinancialState =>
     totalRevenue: 0,
     totalOperatingExpenses: 0,
     totalSalaryExpenses: 0,
+    totalMaintenanceExpenses: 0,
   }
 
 export const getEmployeeCandidate = (employeeId: string): EmployeeCandidate | null =>

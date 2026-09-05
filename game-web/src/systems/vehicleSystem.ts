@@ -19,6 +19,8 @@ export interface VehicleDefinition {
   speedLabel: 'Low' | 'Medium' | 'High'
   capacityLabel: 'Low' | 'Medium' | 'High'
   singleInstance: boolean
+  /** RBATCH-023 daily maintenance cost. Centralized replaceable tuning value. */
+  maintenanceCostPerDay: number
 }
 
 export const VEHICLE_CATALOG: readonly VehicleDefinition[] = [
@@ -31,6 +33,7 @@ export const VEHICLE_CATALOG: readonly VehicleDefinition[] = [
     speedLabel: 'Low',
     capacityLabel: 'Low',
     singleInstance: true,
+    maintenanceCostPerDay: BALANCING.BICYCLE_MAINTENANCE_COST_PER_DAY,
   },
   {
     typeId: 'ElectricScooter',
@@ -41,6 +44,7 @@ export const VEHICLE_CATALOG: readonly VehicleDefinition[] = [
     speedLabel: 'Medium',
     capacityLabel: 'Low',
     singleInstance: true,
+    maintenanceCostPerDay: BALANCING.ELECTRIC_SCOOTER_MAINTENANCE_COST_PER_DAY,
   },
   {
     typeId: 'Motorcycle',
@@ -51,6 +55,7 @@ export const VEHICLE_CATALOG: readonly VehicleDefinition[] = [
     speedLabel: 'High',
     capacityLabel: 'Low',
     singleInstance: true,
+    maintenanceCostPerDay: BALANCING.MOTORCYCLE_MAINTENANCE_COST_PER_DAY,
   },
   {
     typeId: 'DeliveryVan',
@@ -61,6 +66,7 @@ export const VEHICLE_CATALOG: readonly VehicleDefinition[] = [
     speedLabel: 'Medium',
     capacityLabel: 'High',
     singleInstance: true,
+    maintenanceCostPerDay: BALANCING.DELIVERY_VAN_MAINTENANCE_COST_PER_DAY,
   },
 ] as const
 
@@ -218,3 +224,35 @@ export const purchaseVehicle = (
     message: `${definition.name} purchased for the company fleet.`,
   }
 }
+
+/**
+ * RBATCH-023 — total daily maintenance owed for the current owned fleet.
+ * Deterministic, centrally-tuned per VEHICLE_CATALOG.maintenanceCostPerDay.
+ */
+export const calculateDailyVehicleMaintenanceExpense = (company: CompanyState): number =>
+  company.vehicles.reduce((total, vehicle) => {
+    const definition = getVehicleDefinition(vehicle.typeId)
+    return total + (definition?.maintenanceCostPerDay ?? 0)
+  }, 0)
+
+/**
+ * Owner quality-gate presentation rule (Workstream D). There is no canonical
+ * "active vehicle" selection mechanic yet, so the visible player/operator
+ * representation deterministically uses the highest currently-owned
+ * compatible personal delivery vehicle in this fixed progression order:
+ *
+ *   Delivery Van > Motorcycle > Electric Scooter > Bicycle > walking
+ *
+ * This selection is presentation-only. It does not change movement speed,
+ * economy, or any other gameplay semantics, which remain governed solely by
+ * existing systems (see bicycleSystem.ts).
+ */
+export const PLAYER_VISUAL_VEHICLE_PRIORITY: readonly VehicleTypeId[] = [
+  'DeliveryVan',
+  'Motorcycle',
+  'ElectricScooter',
+  'Bicycle',
+]
+
+export const selectActiveVehiclePresentation = (company: CompanyState): VehicleTypeId | null =>
+  PLAYER_VISUAL_VEHICLE_PRIORITY.find((typeId) => ownsVehicleType(company, typeId)) ?? null
