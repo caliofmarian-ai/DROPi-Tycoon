@@ -10,20 +10,20 @@
     "start": "expo start --dev-client",
     "android": "expo start --dev-client --android",
     "typecheck": "tsc --noEmit",
-    "doctor": "expo-doctor"
+    "doctor": "npx -y expo-doctor"
   },
   "dependencies": {
-    "expo": "~57.0.0",
+    "expo": "~57.0.9",
     "expo-dev-client": "~57.0.18",
     "expo-screen-orientation": "~57.0.2",
     "expo-status-bar": "~57.0.1",
     "expo-system-ui": "~57.0.3",
     "react": "19.2.3",
-    "react-native": "0.86.0",
+    "react-native": "0.86.3",
     "react-native-webview": "13.16.1"
   },
   "devDependencies": {
     "@types/react": "^19.2.0",
-    "typescript": "^5.9.2"
+    "typescript": "~6.0.3"
   }
 }
