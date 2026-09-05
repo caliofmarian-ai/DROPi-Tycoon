@@ -1,5 +1,6 @@
 import { readFileSync } from 'node:fs'
 import { describe, expect, it } from 'vitest'
+import { GAME_RELEASE_VERSION } from '../src/config/releaseVersion'
 import {
   closeMainMenuPanel,
   createMainMenuState,
@@ -13,6 +14,13 @@ const mainMenuSource = readFileSync(
   new URL('../src/scenes/MainMenuScene.ts', import.meta.url),
   'utf8',
 )
+const envSource = readFileSync(
+  new URL('../src/config/env.ts', import.meta.url),
+  'utf8',
+)
+const mobileAppConfig = JSON.parse(
+  readFileSync(new URL('../../game-mobile/app.json', import.meta.url), 'utf8'),
+) as { expo: { version: string } }
 
 describe('RBATCH-011 — MainMenu pure view model', () => {
   it('starts with no modal panel open', () => {
@@ -111,5 +119,23 @@ describe('ISSUE-307 — approved product identity on MainMenu', () => {
     expect(mainMenuSource).not.toContain('Web Runtime Candidate')
     expect(mainMenuSource).toContain('`v${appConfig.appVersion}`')
     expect(mainMenuSource).toContain('Play. Deliver. Trade. Grow.')
+  })
+})
+
+describe('ISSUE-309 — controlled version and Save & Exit', () => {
+  it('keeps the player-facing runtime version synchronized with the controlled mobile release', () => {
+    expect(GAME_RELEASE_VERSION).toBe(mobileAppConfig.expo.version)
+    expect(envSource).toContain('appVersion: GAME_RELEASE_VERSION')
+    expect(envSource).not.toContain('VITE_APP_VERSION')
+  })
+
+  it('adds Exit Game with confirmation, save-before-exit and native bridge dispatch', () => {
+    expect(mainMenuSource).toContain("'Exit Game'")
+    expect(mainMenuSource).toContain('requestExitGame')
+    expect(mainMenuSource).toContain('Save current progress and exit DROPi Tycoon?')
+    expect(mainMenuSource).toContain('peekGameSession()')
+    expect(mainMenuSource).toContain('writeSaveSlot(this.saveStorage, session)')
+    expect(mainMenuSource).toContain('requestNativeAppExit()')
+    expect(mainMenuSource).toContain('The game was not closed because progress could not be saved')
   })
 })
