@@ -48,7 +48,7 @@ describe('ISSUE-018 — responsive Android viewport fit', () => {
 
   for (const viewport of SUPPORTED_ANDROID_VIEWPORTS) {
     it(`keeps MainMenu actions and modal inside ${viewport.width}x${viewport.height}`, () => {
-      for (const [count, notice] of [[4, false], [3, false], [3, true]] as const) {
+      for (const [count, notice] of [[5, false], [6, false], [4, true]] as const) {
         const layout = buildMainMenuLayout(viewport.width, viewport.height, count, notice)
         expect(layout.actionCenters).toHaveLength(count)
         layout.actionCenters.forEach((center) => {
@@ -61,6 +61,19 @@ describe('ISSUE-018 — responsive Android viewport fit', () => {
           expect(rectInsideViewport(rect, viewport.width, viewport.height)).toBe(true)
         })
         expect(rectInsideViewport(layout.modal.panel, viewport.width, viewport.height)).toBe(true)
+      }
+    })
+
+    it(`uses a two-column MainMenu for landscape action sets at ${viewport.width}x${viewport.height}`, () => {
+      const layout = buildMainMenuLayout(viewport.width, viewport.height, 5, false)
+      const distinctX = new Set(layout.actionCenters.map(({ x }) => x))
+
+      if (viewport.width > viewport.height) {
+        expect(distinctX.size).toBeGreaterThanOrEqual(2)
+        expect(layout.actionCenters[0].x).not.toBe(layout.actionCenters[1].x)
+        expect(layout.actionCenters[4].x).toBe(viewport.width / 2)
+      } else {
+        expect(distinctX.size).toBe(1)
       }
     })
 
@@ -99,7 +112,7 @@ describe('ISSUE-018 — responsive Android viewport fit', () => {
 describe('ISSUE-019 — touch comfort in actual viewport pixels', () => {
   for (const viewport of SUPPORTED_ANDROID_VIEWPORTS) {
     it(`meets touch floor across primary controls at ${viewport.width}x${viewport.height}`, () => {
-      const menu = buildMainMenuLayout(viewport.width, viewport.height, 4, false)
+      const menu = buildMainMenuLayout(viewport.width, viewport.height, 5, false)
       expect(menu.buttonHeight).toBeGreaterThanOrEqual(MIN_TOUCH_TARGET_PX)
       expect(menu.buttonWidth).toBeGreaterThanOrEqual(MIN_TOUCH_TARGET_PX)
       expect(menu.modal.actionHeight).toBeGreaterThanOrEqual(MIN_TOUCH_TARGET_PX)
