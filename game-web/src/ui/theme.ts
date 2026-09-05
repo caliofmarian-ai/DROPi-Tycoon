@@ -9,16 +9,16 @@
 
 export const COLORS = {
   // Deep navy foundation.
-  backgroundTop: 0x0a1729,
-  backgroundBottom: 0x050b16,
-  surface: 0x0f1f36,
-  surfaceRaised: 0x142a47,
-  surfaceBorder: 0x24405f,
+  backgroundTop: 0x07518a,
+  backgroundBottom: 0x041c38,
+  surface: 0x073354,
+  surfaceRaised: 0x0b4972,
+  surfaceBorder: 0x287dab,
 
   // Bright sky blue / cyan interaction accents.
-  accent: 0x38bdf8,
-  accentStrong: 0x0ea5e9,
-  accentSoft: 0x1e3a5f,
+  accent: 0x55dfff,
+  accentStrong: 0x009ee8,
+  accentSoft: 0x125486,
 
   // Green success/active states.
   success: 0x22c55e,
@@ -31,6 +31,7 @@ export const COLORS = {
   // Danger / exit treatment.
   danger: 0xef4444,
   dangerStrong: 0x991b1b,
+  review: 0xb695ff,
 
   textPrimary: '#f8fafc',
   textSecondary: '#c7d6ec',
@@ -39,6 +40,47 @@ export const COLORS = {
   textDanger: '#fecaca',
   textSuccess: '#bbf7d0',
 } as const
+
+/** Original, code-drawn city art shares the same warm daylight palette. */
+export const CITY_COLORS = {
+  grass: 0x80c95b,
+  lawn: 0xa7df72,
+  grassShade: 0x59aa53,
+  road: 0x4b657e,
+  roadEdge: 0x344e69,
+  lane: 0xfff4ce,
+  sidewalk: 0xf4dfb4,
+  pavingLine: 0xd5ba90,
+  curb: 0xfff5da,
+  shadow: 0x123d55,
+  water: 0x23bce0,
+  waterLight: 0x85ebf5,
+  leafDark: 0x247c48,
+  leaf: 0x42aa4c,
+  leafLight: 0x8fce45,
+  leafSun: 0xc8e864,
+  trunk: 0x855037,
+  cream: 0xffedc5,
+  wall: 0xf8ce92,
+  wallShade: 0xe4a86b,
+  roof: 0xe56848,
+  roofShade: 0xba493b,
+  roofBlue: 0x258acb,
+  glass: 0x57d4e2,
+  glassShade: 0x167ca7,
+  windowLight: 0xffe98c,
+  flower: 0xff8f6b,
+  flowerPink: 0xf370b8,
+  metal: 0x175574,
+  parcel: 0xe6a644,
+  tape: 0xffe1a0,
+  skin: 0xf4c69b,
+  skinShade: 0xd99568,
+  hair: 0x493b36,
+} as const
+
+export const TYPOGRAPHY = { family: 'Arial, sans-serif', caption: 12, body: 16, title: 24, brand: 28 } as const
+export const RADII = { small: 8, panel: 16, button: 14 } as const
 
 export const SPACING = {
   xs: 4,
