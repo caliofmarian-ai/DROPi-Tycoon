@@ -102,3 +102,15 @@ describe('release blocker #273 — scene integration contract', () => {
     expect(sceneSource).not.toContain('const DELIVERY_POINTS')
   })
 })
+
+describe('Workstream E — world uplift removes developer-style debug labels', () => {
+  it('no longer pastes raw "Pickup:"/"Delivery:" text labels over route markers', () => {
+    expect(sceneSource).not.toContain('Pickup: ${label}')
+    expect(sceneSource).not.toContain('Delivery: ${label}')
+    expect(sceneSource).not.toContain("kind === 'pickup' ? 'Pickup' : 'Delivery'")
+  })
+
+  it('draws zone identity as a themed status chip instead of a raw text dump', () => {
+    expect(sceneSource).toContain('createStatusChip(')
+  })
+})
