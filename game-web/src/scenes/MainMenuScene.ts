@@ -10,10 +10,12 @@ import {
   type SaveStorage,
 } from '../persistence/saveSystem'
 import {
+  getOrCreateGameSession,
   peekGameSession,
   replaceEntireGameSession,
   startNewGameSession,
 } from '../state/gameSession'
+import { getAudioController } from '../systems/audioSystem'
 import {
   closeMainMenuPanel,
   createMainMenuState,
@@ -54,6 +56,8 @@ export class MainMenuScene extends Phaser.Scene {
   private modalConfirmLabel!: Phaser.GameObjects.Text
   private modalCancelButton!: Phaser.GameObjects.Rectangle
   private modalCancelLabel!: Phaser.GameObjects.Text
+  private soundToggleButton!: Phaser.GameObjects.Rectangle
+  private soundToggleLabel!: Phaser.GameObjects.Text
 
   private readonly handleResize = (): void => {
     this.scene.restart()
@@ -74,6 +78,9 @@ export class MainMenuScene extends Phaser.Scene {
     this.saveSlot = this.saveStorage
       ? inspectSaveSlot(this.saveStorage)
       : { kind: 'unavailable', reason: 'Local storage is unavailable.' }
+
+    const session = peekGameSession()
+    getAudioController().setEnabled(session ? session.settings.soundEnabled : true)
 
     const actionCount = this.saveSlot.kind === 'valid' ? 5 : 4
     const hasNotice =
@@ -328,7 +335,11 @@ export class MainMenuScene extends Phaser.Scene {
       })
       .setOrigin(0.5)
 
-    button.on('pointerdown', onTap)
+    button.on('pointerdown', () => {
+      getAudioController().unlock()
+      getAudioController().play('ui-tap')
+      onTap()
+    })
   }
 
   private createModal(layout: MainMenuLayout): void {
@@ -408,6 +419,19 @@ export class MainMenuScene extends Phaser.Scene {
       'Cancel',
       modal.textFontSize,
     )
+
+    this.soundToggleButton = this.createModalActionButton(
+      modal.confirmX,
+      modal.actionY,
+      modal.dualWidth,
+      modal.actionHeight,
+    ).on('pointerdown', this.stopAnd(() => this.toggleSound()))
+    this.soundToggleLabel = this.createModalActionLabel(
+      modal.confirmX,
+      modal.actionY,
+      this.soundToggleText(),
+      modal.textFontSize,
+    )
   }
 
   private createModalActionButton(
@@ -460,18 +484,21 @@ export class MainMenuScene extends Phaser.Scene {
     const lines = panel === 'settings' ? SETTINGS_PANEL_LINES : INFORMATION_PANEL_LINES
     this.modalText.setText([...lines])
     this.setModalVisible(true, false)
+    this.setSoundToggleVisible(panel === 'settings')
   }
 
   private showMessage(message: string): void {
     this.pendingConfirmation = null
     this.modalText.setText(message)
     this.setModalVisible(true, false)
+    this.setSoundToggleVisible(false)
   }
 
   private showConfirmation(message: string, onConfirm: () => void): void {
     this.pendingConfirmation = onConfirm
     this.modalText.setText(message)
     this.setModalVisible(true, true)
+    this.setSoundToggleVisible(false)
   }
 
   private confirmPendingAction(): void {
@@ -484,6 +511,7 @@ export class MainMenuScene extends Phaser.Scene {
     this.menuState = closeMainMenuPanel(this.menuState)
     this.pendingConfirmation = null
     this.setModalVisible(false, false)
+    this.setSoundToggleVisible(false)
   }
 
   private setModalVisible(visible: boolean, confirmation: boolean): void {
@@ -496,5 +524,27 @@ export class MainMenuScene extends Phaser.Scene {
     this.modalConfirmLabel.setVisible(visible && confirmation)
     this.modalCancelButton.setVisible(visible && confirmation)
     this.modalCancelLabel.setVisible(visible && confirmation)
+  }
+
+  private soundToggleText(): string {
+    return getAudioController().isEnabled() ? 'Sound: ON' : 'Sound: OFF'
+  }
+
+  private setSoundToggleVisible(visible: boolean): void {
+    this.soundToggleLabel.setText(this.soundToggleText())
+    this.soundToggleButton.setVisible(visible)
+    this.soundToggleLabel.setVisible(visible)
+  }
+
+  private toggleSound(): void {
+    const session = getOrCreateGameSession()
+    const nextEnabled = !session.settings.soundEnabled
+    session.settings.soundEnabled = nextEnabled
+    getAudioController().setEnabled(nextEnabled)
+    getAudioController().unlock()
+    if (nextEnabled) {
+      getAudioController().play('positive')
+    }
+    this.soundToggleLabel.setText(this.soundToggleText())
   }
 }

@@ -100,7 +100,8 @@ describe('RBATCH-014 — save-aware MainMenu extension', () => {
       mainMenuSource.indexOf('private createButton'),
       mainMenuSource.indexOf('private createModal'),
     )
-    expect(createButtonBody).toContain("button.on('pointerdown', onTap)")
+    expect(createButtonBody).toContain("button.on('pointerdown', () => {")
+    expect(createButtonBody).toContain('onTap()')
     expect(createButtonBody).not.toContain('text.setInteractive')
   })
 })
@@ -134,5 +135,28 @@ describe('ISSUE-310 — canonical version and Save & Exit', () => {
     expect(mainMenuSource).toContain('writeSaveSlot(this.saveStorage, activeSession)')
     expect(mainMenuSource).toContain('nativeBridge.postMessage(EXIT_GAME_MESSAGE)')
     expect(mainMenuSource).toContain('progress could not be saved')
+  })
+})
+
+describe('Workstream F — Settings sound toggle wires the audio system', () => {
+  it('creates a sound toggle button that flips GameSettingsState.soundEnabled', () => {
+    expect(mainMenuSource).toContain("import { getAudioController } from '../systems/audioSystem'")
+    expect(mainMenuSource).toContain('private toggleSound(): void')
+    expect(mainMenuSource).toContain('session.settings.soundEnabled = nextEnabled')
+    expect(mainMenuSource).toContain('getAudioController().setEnabled(nextEnabled)')
+  })
+
+  it('only shows the sound toggle while the Settings panel is open', () => {
+    expect(mainMenuSource).toContain('this.setSoundToggleVisible(panel === \'settings\')')
+    expect(mainMenuSource).toContain('this.setSoundToggleVisible(false)')
+  })
+
+  it('unlocks audio and plays a ui-tap cue from the shared menu button handler', () => {
+    const createButtonBody = mainMenuSource.slice(
+      mainMenuSource.indexOf('private createButton'),
+      mainMenuSource.indexOf('private createModal'),
+    )
+    expect(createButtonBody).toContain('getAudioController().unlock()')
+    expect(createButtonBody).toContain("getAudioController().play('ui-tap')")
   })
 })

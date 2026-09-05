@@ -277,3 +277,10 @@ describe('RBATCH-012 — scene integration boundaries', () => {
     }
   })
 })
+
+describe('Workstream F — CompanyManagementScene plays purchase audio cues', () => {
+  it('plays a purchase cue on success and a negative cue on failure', () => {
+    expect(companyManagementSource).toContain("import { getAudioController } from '../systems/audioSystem'")
+    expect(companyManagementSource).toContain("getAudioController().play(result.purchased ? 'purchase' : 'negative')")
+  })
+})

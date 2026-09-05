@@ -2,6 +2,7 @@ import Phaser from 'phaser'
 import { getBrowserSaveStorage } from '../persistence/browserSaveStorage'
 import { autosaveIfApproved } from '../persistence/saveSystem'
 import { getOrCreateGameSession, replaceGameSession } from '../state/gameSession'
+import { getAudioController } from '../systems/audioSystem'
 import {
   getAvailableUpgrades,
   purchaseUpgrade,
@@ -226,6 +227,7 @@ export class CompanyManagementScene extends Phaser.Scene {
   private purchaseSelectedUpgrade(): void {
     const result = purchaseUpgrade(this.companyState, this.selectedUpgrade.id)
     this.feedbackText.setText(result.message)
+    getAudioController().play(result.purchased ? 'purchase' : 'negative')
 
     if (result.purchased) {
       this.companyState = result.company

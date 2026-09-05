@@ -150,3 +150,26 @@ describe('Workstream D — GameWorldScene binds the drawn player visual, not a p
     expect(gameWorldSource).toContain('this.playerVisual.setMoving(')
   })
 })
+
+describe('Workstream F — GameWorldScene plays procedural audio cues for order lifecycle', () => {
+  const gameWorldSource = readFileSync(
+    new URL('../src/scenes/GameWorldScene.ts', import.meta.url),
+    'utf8',
+  )
+
+  it('imports the shared audio controller and unlocks it on the first tap', () => {
+    expect(gameWorldSource).toContain("import { getAudioController, type AudioCue } from '../systems/audioSystem'")
+    expect(gameWorldSource).toContain('getAudioController().unlock()')
+  })
+
+  it('maps order status transitions to order-accepted/delivery-success/delivery-failure cues', () => {
+    expect(gameWorldSource).toContain("'order-accepted'")
+    expect(gameWorldSource).toContain("'delivery-success'")
+    expect(gameWorldSource).toContain("'delivery-failure'")
+    expect(gameWorldSource).toContain('getAudioController().play(cue)')
+  })
+
+  it('syncs the controller enabled state from the persisted sound setting on scene create', () => {
+    expect(gameWorldSource).toContain('getAudioController().setEnabled(session.settings.soundEnabled)')
+  })
+})

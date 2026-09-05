@@ -1,3 +1,4 @@
+import { readFileSync } from 'node:fs'
 import { describe, expect, it } from 'vitest'
 import { buildVehicleFleetLayout } from '../src/ui/vehicleFleetLayout'
 import {
@@ -30,5 +31,16 @@ describe('RBATCH-022 — vehicle fleet Android layout', () => {
   it('uses compact landscape contract on short Android landscape viewports', () => {
     expect(buildVehicleFleetLayout(800, 360, 4).compactLandscape).toBe(true)
     expect(buildVehicleFleetLayout(360, 800, 4).compactLandscape).toBe(false)
+  })
+})
+
+describe('Workstream F — VehicleFleetScene plays purchase audio cues', () => {
+  it('plays a purchase cue on success and a negative cue on failure', () => {
+    const vehicleFleetSource = readFileSync(
+      new URL('../src/scenes/VehicleFleetScene.ts', import.meta.url),
+      'utf8',
+    )
+    expect(vehicleFleetSource).toContain("import { getAudioController } from '../systems/audioSystem'")
+    expect(vehicleFleetSource).toContain("getAudioController().play(result.purchased ? 'purchase' : 'negative')")
   })
 })

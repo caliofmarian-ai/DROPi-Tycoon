@@ -21,6 +21,7 @@ import { applyOrderAcceptanceRequest } from '../systems/orderAcceptance'
 import { settleDeliveryOutcome } from '../systems/economySettlement'
 import { createNextOrder, pickupPointForOrder } from '../systems/orderGeneration'
 import { synchronizePlayerMovementSpeed } from '../systems/bicycleSystem'
+import { getAudioController, type AudioCue } from '../systems/audioSystem'
 import type { CompanyState, WorldState } from '../types/game'
 import { GameHUD } from '../ui/GameHUD'
 import { NotificationDisplay } from '../ui/NotificationDisplay'
@@ -117,6 +118,7 @@ export class GameWorldScene extends Phaser.Scene {
     this.companyState = session.company
     this.worldState = synchronizePlayerMovementSpeed(session.world, this.companyState)
     replaceGameSession(this.worldState, this.companyState)
+    getAudioController().setEnabled(session.settings.soundEnabled)
 
     const initialPickupPoint = pickupPointForOrder(this.worldState.activeOrder)
     this.packagePosition.set(initialPickupPoint.x, initialPickupPoint.y)
@@ -183,6 +185,7 @@ export class GameWorldScene extends Phaser.Scene {
     this.attachCameraGestures()
 
     this.pointerUpHandler = (pointer: Phaser.Input.Pointer) => {
+      getAudioController().unlock()
       if (this.cameraGestureController?.didCameraGestureMove()) {
         return
       }
@@ -413,7 +416,7 @@ export class GameWorldScene extends Phaser.Scene {
   }
 
   private emitNotificationIfTransitioned(
-    _previousStatus: string,
+    previousStatus: string,
     currentStatus: string,
   ): void {
     const result = updateNotification(
@@ -424,6 +427,21 @@ export class GameWorldScene extends Phaser.Scene {
     this.notificationState = result.state
     if (result.newMessage !== null) {
       this.notificationDisplay.show(result.newMessage)
+    }
+    this.playOrderTransitionCue(previousStatus, currentStatus)
+  }
+
+  private playOrderTransitionCue(previousStatus: string, currentStatus: string): void {
+    const cue: AudioCue | null =
+      previousStatus === 'Available' && currentStatus === 'Accepted'
+        ? 'order-accepted'
+        : previousStatus === 'PickedUp' && currentStatus === 'Completed'
+          ? 'delivery-success'
+          : previousStatus === 'PickedUp' && currentStatus === 'Failed'
+            ? 'delivery-failure'
+            : null
+    if (cue) {
+      getAudioController().play(cue)
     }
   }
 

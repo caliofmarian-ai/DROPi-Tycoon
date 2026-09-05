@@ -3,6 +3,7 @@ import { getBrowserSaveStorage } from '../persistence/browserSaveStorage'
 import { autosaveIfApproved } from '../persistence/saveSystem'
 import { getOrCreateGameSession, replaceGameSession } from '../state/gameSession'
 import { synchronizePlayerMovementSpeed } from '../systems/bicycleSystem'
+import { getAudioController } from '../systems/audioSystem'
 import {
   ownsVehicleType,
   purchaseVehicle,
@@ -219,6 +220,7 @@ export class VehicleFleetScene extends Phaser.Scene {
   private purchase(typeId: VehicleTypeId): void {
     const result = purchaseVehicle(this.companyState, typeId)
     this.feedbackText.setText(result.message)
+    getAudioController().play(result.purchased ? 'purchase' : 'negative')
 
     if (result.purchased) {
       this.companyState = result.company
