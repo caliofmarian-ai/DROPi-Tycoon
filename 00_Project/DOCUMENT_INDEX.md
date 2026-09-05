@@ -2,11 +2,11 @@
 
 Document: DOCUMENT_INDEX.md
 Project: DROPi Tycoon
-Version: 1.4.0
+Version: 1.5.0
 Status: Documentation Control
 Author: Marian Caliof & OpenAI
 Language: English
-Last Updated: 2026-08-01
+Last Updated: 2026-09-05
 
 ---
 
@@ -54,6 +54,8 @@ Game/
 Builds/
 game-web/
 ```
+
+The canonical mobile platform architecture defines a future managed `game-mobile/` application-shell root. It must be added to this filesystem map when the directory is materially created by the Android application foundation implementation.
 
 ---
 
@@ -169,12 +171,13 @@ Technical architecture and implementation governance.
 
 Documents:
 
-- `06_Technical/ARCHITECTURE.md`
+- `06_Technical/ARCHITECTURE.md` — canonical global technical architecture.
+- `06_Technical/MOBILE_APPLICATION_PLATFORM.md` — canonical installed-mobile runtime, Android application-shell, Railway role, camera/viewport, owner-review, and AI continuity specification.
 - `06_Technical/SAVE_SYSTEM.md` — canonical in-game Save & Load specification.
 - `06_Technical/SAFE_SYSTEM.md` — development/project safety and stability governance.
 - `06_Technical/TDD.md`
 
-Note: `SAVE_SYSTEM.md` and `SAFE_SYSTEM.md` have distinct responsibilities and remain separate.
+Note: `MOBILE_APPLICATION_PLATFORM.md` owns the mobile application/platform boundary; `SAVE_SYSTEM.md` owns save semantics; `SAFE_SYSTEM.md` owns development/project safety. These responsibilities remain separate.
 
 ---
 
@@ -299,9 +302,10 @@ Stable documents:
 
 Authority note:
 
-- `WEB_RUNTIME_MIGRATION_MILESTONE_001.md` documents deployable runtime migration status.
-- `ENVIRONMENT_VARIABLES.md` documents the active web-runtime configuration contract.
+- `WEB_RUNTIME_MIGRATION_MILESTONE_001.md` documents the historical/deployable web-runtime migration milestone and does not override the current mobile-first platform canon.
+- `ENVIRONMENT_VARIABLES.md` documents the active web-runtime configuration contract where that runtime remains deployed.
 - `FUTURE_SERVER_AUTHORITATIVE_ARCHITECTURE_PREPARATION.md` is explicitly non-canonical preparation content and does not activate backend scope.
+- Current primary-runtime authority is `00_Project/VISION.md`, `06_Technical/ARCHITECTURE.md`, and `06_Technical/MOBILE_APPLICATION_PLATFORM.md`.
 
 ---
 
@@ -444,13 +448,17 @@ Current state:
 
 ## Purpose
 
-Managed root directory for the deployable browser runtime candidate used for Railway deployment.
+Managed root directory containing the active Vite + TypeScript + Phaser game runtime and the secondary Railway/browser deployment surface.
 
 Current state:
 
-- Active Vite + TypeScript + Phaser web runtime
-- Contains the production server, frontend source, test files, and copied runtime assets required for deployment
+- Active authoritative Phaser game/runtime implementation for the current prototype
+- Contains the production web server, frontend source, test files, and runtime assets required for Railway/browser preview and smoke validation
+- Intended to be hosted/consumed by the mobile application shell rather than duplicated in a second gameplay implementation
+- Browser/Railway presentation is secondary to the installed mobile experience under the current platform canon
 - Historical GDevelop source remains separately preserved in `Game/`
+
+See `06_Technical/MOBILE_APPLICATION_PLATFORM.md` for the mobile application ownership boundary and intended future `game-mobile/` root.
 
 ---
 
@@ -459,6 +467,7 @@ Current state:
 - Strategic project/game vision is owned by `00_Project/VISION.md`.
 - Gameplay design authority is owned by `01_GameDesign/`.
 - Economy, logistics, world, in-game AI, technical, UI, and asset domains are owned by their respective numbered folders.
+- Mobile application/runtime platform ownership is defined by `06_Technical/MOBILE_APPLICATION_PLATFORM.md` within the Technical domain.
 - Development process/governance is owned by `09_Development/`.
 - Historical AI reports in `09_Development/AI_Reports/` are non-canonical records unless a canonical document is explicitly updated.
 
