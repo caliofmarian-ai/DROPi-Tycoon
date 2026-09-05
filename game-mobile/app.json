@@ -6,6 +6,7 @@
     "orientation": "landscape",
     "scheme": "dropitycoon",
     "platforms": ["android"],
+    "icon": "./assets/branding/dropi-tycoon-app-icon.png",
     "userInterfaceStyle": "dark",
     "backgroundColor": "#08121f",
     "primaryColor": "#08121f",
