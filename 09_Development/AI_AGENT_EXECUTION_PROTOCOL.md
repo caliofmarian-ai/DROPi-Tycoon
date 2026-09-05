@@ -2,11 +2,11 @@
 
 Document: AI_AGENT_EXECUTION_PROTOCOL.md
 Project: DROPi Tycoon
-Version: 1.1.0
+Version: 1.2.0
 Status: AI Development Operations
 Author: Marian Caliof & OpenAI
 Language: English
-Last Updated: 2026-07-16
+Last Updated: 2026-09-05
 
 ---
 
@@ -102,18 +102,21 @@ Gameplay specifications.
 
 ## Mission
 
-Convert specifications into GDevelop implementation.
+Convert approved specifications into the current approved runtime and application architecture.
 
 ## Responsibilities
 
-- Create scenes
-- Configure objects
-- Build event logic
-- Connect systems
+- Inspect the current canonical platform/runtime documents before choosing tools or targets
+- Create or modify scenes and application surfaces
+- Configure game/runtime objects
+- Build game logic through the authoritative game runtime
+- Connect systems without duplicating canonical domain rules in platform shells
 
 ## Output
 
-Working game components.
+Working game components in the currently approved architecture.
+
+Historical GDevelop, Web-First, or other superseded implementation reports must not be treated as current platform authority.
 
 ---
 
@@ -226,6 +229,31 @@ Owner Directives are authoritative strategic inputs from the Project Owner. They
 
 ---
 
+# Mobile Platform Canon Inspection Rule
+
+Before proposing or implementing any major platform, runtime, Android packaging, Expo/native-shell, deployment, camera, viewport, persistence-adapter, or distribution change, AI agents **must** read and reconcile:
+
+1. `00_Project/VISION.md`;
+2. `06_Technical/ARCHITECTURE.md`;
+3. `06_Technical/MOBILE_APPLICATION_PLATFORM.md`;
+4. `06_Technical/SAVE_SYSTEM.md` when persistence is affected;
+5. `00_Project/PROJECT_STATUS.md` and the active GitHub issue/PR.
+
+Current platform authority explicitly supersedes older historical Web-First or GDevelop implementation reports where they conflict.
+
+Agents must not assume that:
+
+- Chrome/Railway is the primary final gameplay surface;
+- the browser is still the Project Owner acceptance target;
+- adding an Expo/React Native shell means rewriting Phaser gameplay in React Native;
+- fixed browser dimensions or one hardcoded camera zoom are acceptable for all Android devices;
+- a native-shell migration authorizes changes to gameplay, economy, employees, reviews, or other domain rules;
+- Vehicle Fleet PR #288 should resume before the Android application/camera foundation receives Project Owner acceptance.
+
+If the required canonical platform documents disagree, the agent must surface the contradiction before implementation rather than choosing one silently.
+
+---
+
 # Error Handling
 
 If an agent detects:
@@ -290,9 +318,9 @@ Playable Prototype
 
 # Canonical Rule
 
-AI agents build according to the vision.
+AI agents build according to the vision and current canonical architecture.
 
-They do not create a different game.
+They do not create a different game and they do not revive superseded platform assumptions without Project Owner approval.
 
 ---
 
