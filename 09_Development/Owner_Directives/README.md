@@ -2,11 +2,11 @@
 
 Document: README.md
 Project: DROPi Tycoon
-Version: 1.0.0
+Version: 1.1.0
 Status: Active
 Author: Marian Caliof
 Language: English
-Last Updated: 2026-07-16
+Last Updated: 2026-09-05
 
 ---
 
@@ -67,6 +67,7 @@ The date prefix ensures chronological ordering and historical traceability.
 | File | Date | Status | Summary |
 |------|------|--------|---------|
 | [2026-07-16_MASTER_OWNER_DIRECTIVE_001.md](./2026-07-16_MASTER_OWNER_DIRECTIVE_001.md) | 2026-07-16 | Draft – Project Owner Decisions | Master directive for canonical architecture, universe design, documentation structure, web-first continuity, and cross-project alignment. |
+| [2026-09-05_MASTER_OWNER_DIRECTIVE_002_Product_Identity_and_Visible_Operations.md](./2026-09-05_MASTER_OWNER_DIRECTIVE_002_Product_Identity_and_Visible_Operations.md) | 2026-09-05 | Owner Approved — Canonical Integration Required by Domain | Approved DROPi Tycoon identity, use of existing brand assets, visible multimodal progression, drone/operator separation, visible employee activity, DronePort interior direction, audio requirement, and future shared-token direction. |
 
 ---
 
