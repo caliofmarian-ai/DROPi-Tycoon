@@ -10,7 +10,7 @@
     "start": "expo start --dev-client",
     "android": "expo start --dev-client --android",
     "typecheck": "tsc --noEmit",
-    "doctor": "expo-doctor"
+    "doctor": "npx -y expo-doctor"
   },
   "dependencies": {
     "expo": "~57.0.9",
