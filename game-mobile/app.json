@@ -2,7 +2,7 @@
   "expo": {
     "name": "DROPi Tycoon",
     "slug": "dropi-tycoon",
-    "version": "0.1.0",
+    "version": "0.0.0",
     "orientation": "landscape",
     "scheme": "dropitycoon",
     "platforms": ["android"],
