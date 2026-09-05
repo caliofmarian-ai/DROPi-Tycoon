@@ -35,7 +35,8 @@ export const SETTINGS_PANEL_LINES: ReadonlyArray<string> = [
 export const INFORMATION_PANEL_LINES: ReadonlyArray<string> = [
   'Information',
   '',
-  'Build a delivery company from a small local operation.',
-  'Accept orders, collect packages, deliver them,',
-  'earn rewards and improve the company.',
+  'Start with a small local operation and grow the company.',
+  'Serve customers, manage people and logistics,',
+  'and progress toward a broader marketplace and drone ecosystem.',
+  'Build capability step by step as the company grows.',
 ]
