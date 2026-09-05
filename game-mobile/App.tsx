@@ -9,7 +9,11 @@ import {
 } from 'react-native'
 import * as ScreenOrientation from 'expo-screen-orientation'
 import { StatusBar } from 'expo-status-bar'
-import { WebView, type WebViewNavigation } from 'react-native-webview'
+import {
+  WebView,
+  type WebViewMessageEvent,
+  type WebViewNavigation,
+} from 'react-native-webview'
 import { getRuntimeConfiguration } from './src/runtimeConfig'
 
 const runtime = getRuntimeConfiguration()
@@ -40,6 +44,8 @@ const PHASER_NATIVE_BACK_DISPATCH = `
 window.dispatchEvent(new Event('dropi:native-back'));
 true;
 `
+
+const EXIT_GAME_MESSAGE = 'dropi:exit-game'
 
 export default function App() {
   const webViewRef = useRef<WebView>(null)
@@ -91,6 +97,16 @@ export default function App() {
     setCanGoBack(navigation.canGoBack)
   }
 
+  const handleMessage = (event: WebViewMessageEvent) => {
+    if (event.nativeEvent.data !== EXIT_GAME_MESSAGE) {
+      return
+    }
+
+    if (Platform.OS === 'android') {
+      BackHandler.exitApp()
+    }
+  }
+
   return (
     <View style={styles.container}>
       <StatusBar hidden />
@@ -113,6 +129,7 @@ export default function App() {
         injectedJavaScript={PHASER_VIEWPORT_BOOTSTRAP}
         onLoadEnd={() => setLoaded(true)}
         onNavigationStateChange={handleNavigationChange}
+        onMessage={handleMessage}
       />
       {!loaded ? (
         <View pointerEvents="none" style={styles.loadingOverlay}>
