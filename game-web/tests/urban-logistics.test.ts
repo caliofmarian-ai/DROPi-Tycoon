@@ -19,7 +19,7 @@ const leg: DeliveryLeg = {
 const mission: DeliveryMission = { missionId: 'mission-1', orderId: 'order-1', parcels: [parcel], legs: [leg] }
 const port: Droneport = {
   kind: 'fixed', siteId: 'site', droneportId: 'port',
-  position: { x: 0, y: 0 }, coverageRadius: 10, capacity: 2, occupiedSlots: 0, status: 'operational',
+  position: { x: 0, y: 0 }, coverageRadius: 10, capacity: 2, occupiedSlots: 0, status: 'active',
   capabilities: { ...DRONEPORT_DEFAULTS.fixed.capabilities },
 }
 const malformed = [null, undefined, [], '', 1, true, {}, { kind: 'unknown' }]
@@ -137,7 +137,19 @@ describe('delivery routes and disjoint human/drone roles', () => {
 })
 
 describe('droneports, lockers and employee world contracts', () => {
-  it('supports operational fixed, mobile and HQ coverage without requiring a building', () => {
+  it('uses canonical active/maintenance/offline statuses for every port factory', () => {
+    for (const create of [createFixedDroneport, createMobileDroneport, createHqDroneport]) {
+      const candidate = create('port', { x: 0, y: 0 }, 'location')
+      expect(candidate.status).toBe('active')
+      for (const status of ['active', 'maintenance', 'offline']) {
+        expect(isDroneport({ ...candidate, status })).toBe(true)
+      }
+      expect(isDroneport({ ...candidate, status: 'operational' })).toBe(false)
+      expect(canServeDroneport({ ...candidate, status: 'operational' }, { x: 0, y: 0 })).toBe(false)
+    }
+  })
+
+  it('supports active fixed, mobile and HQ coverage without requiring a building', () => {
     const mobile = { ...port, kind: 'mobile', vehicleId: 'van' } as Record<string, unknown>
     delete mobile.siteId
     const hq = { ...port, kind: 'hq', hqId: 'hq' } as Record<string, unknown>

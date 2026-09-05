@@ -12,6 +12,20 @@ Last Updated: 2026-09-05
 
 # Game Architecture
 
+## Future ecosystem asset isolation
+
+FUTURE / NOT YET IMPLEMENTED: `game-web/src/types/ecosystemAsset.ts` is a
+declaration-only optional asset descriptor, not Company/Game Money and not a wallet.
+No production module imports it. Core economy, progression, order eligibility,
+transport, rewards and persistence must remain independent of ecosystem ownership.
+No conversion to Company Money, power advantage or mandatory participation is
+permitted. A regression checks all runtime TypeScript sources for boundary imports
+and verifies normal delivery, purchase and save behavior without ecosystem state.
+
+No blockchain, contracts, tokenomics, real wallets, exchange/payment integration,
+real-money value, KYC or token deployment is implemented. Save v2 is unchanged.
+See `01_GameDesign/GAMEPLAY.md` for the owner boundary and provenance distinctions.
+
 ## Purpose
 
 This document defines the technical architecture of DROPi Tycoon.

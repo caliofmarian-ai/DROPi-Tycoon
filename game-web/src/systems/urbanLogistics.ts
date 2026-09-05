@@ -75,7 +75,7 @@ interface DroneportBase {
   coverageRadius: number
   capacity: number
   occupiedSlots: number
-  status: 'operational' | 'offline' | 'maintenance'
+  status: 'active' | 'maintenance' | 'offline'
   capabilities: DroneportCapabilities
 }
 export type Droneport =
@@ -95,7 +95,7 @@ const droneportDefaults = (kind: Droneport['kind'], droneportId: string, positio
   droneportId,
   position: { ...position },
   occupiedSlots: 0,
-  status: 'operational',
+  status: 'active',
 })
 
 export const createFixedDroneport = (droneportId: string, position: WorldPoint, siteId: string): Droneport =>
@@ -224,7 +224,7 @@ export const isDeliveryMission = (value: unknown): value is DeliveryMission => {
 export const isDroneport = (value: unknown): value is Droneport => {
   if (!record(value) || !id(value.droneportId) || !point(value.position) ||
     !finite(value.coverageRadius) || value.coverageRadius <= 0 || !slots(value) || !isDroneportCapabilities(value.capabilities) ||
-    (value.status !== 'operational' && value.status !== 'offline' && value.status !== 'maintenance')) return false
+    (value.status !== 'active' && value.status !== 'offline' && value.status !== 'maintenance')) return false
   switch (value.kind) {
     case 'fixed': return id(value.siteId) && !('vehicleId' in value) && !('hqId' in value)
     case 'mobile': return id(value.vehicleId) && !('siteId' in value) && !('hqId' in value)
@@ -240,7 +240,7 @@ export const isDroneportCapabilities = (value: unknown): value is DroneportCapab
 
 export const canServeDroneport = (port: unknown, destination: WorldPoint, requiredSlots = 1): port is Droneport =>
   isDroneport(port) && point(destination) && positiveUnits(requiredSlots) &&
-  port.status === 'operational' && port.capacity - port.occupiedSlots >= requiredSlots &&
+  port.status === 'active' && port.capacity - port.occupiedSlots >= requiredSlots &&
   Math.hypot(port.position.x - destination.x, port.position.y - destination.y) <= port.coverageRadius
 
 export const eligibleFallbackDroneports = (

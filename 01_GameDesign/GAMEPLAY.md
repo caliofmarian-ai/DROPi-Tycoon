@@ -52,6 +52,7 @@ Textual sources inspected for this sprint in `caliofmarian-ai/dropi-mobile`:
 - `canonical-structure.md`
 - `app/(tabs)/droneport.tsx`
 - `shared/types.ts`
+- `docs/audits/can-004/canonical_authority_matrix.md` — DronePorts authority section
 - `docs/planning/IMPLEMENTATION_COVERAGE_AUDIT.md`
 - `BLUEPRINT/DROPi_ROADMAP_BY_LAYERS.md` (physical-core planning sections)
 
@@ -60,12 +61,19 @@ merchant → DronePort → client transfers. The multimodal reference defines
 DronePorts as consolidation points, logistics buffers and transfer hubs;
 failed drone reception triggers fallback. Marketplace listings do not guarantee
 drone delivery. App orchestration is distinct from marketplace requests.
+The textual CAN-004 authority matrix's DronePorts section explicitly states:
+"Defines fixed and mobile DronePort roles, custody, storage, landing, collection,
+and handover." These roles are grounded in DROPi reference material, not invented
+Tycoon classifications. This cites the inspected textual authority summary, not
+the contents of the binary sources in its authority chain.
 
 **Authority limits:** historical architecture describes reception, transfer,
 batteries, physical audit and non-drone fallback, not proof of live operation.
 The current DronePort screen contains demo station values; these are not canonical
-capacity limits. Shared types do not establish fixed/mobile taxonomy, lockers or
-complete custody rules. The derived roadmap marks live capacity, waiting-parcel
+capacity limits. Shared types alone do not establish fixed/mobile roles; the
+CAN-004 textual matrix does. Its unresolved ownership/approval/conflict entries
+are not silently resolved here, nor does it prove deployed capabilities or exact
+sizes, tiers, capacities, radii or placement rules. The derived roadmap marks live capacity, waiting-parcel
 buffers and terrestrial fallback automation as planned work.
 
 **NOT DIRECTLY INSPECTED:** all binary source documents and approved images.
@@ -95,8 +103,9 @@ or literal reference-image gameplay backgrounds are required.
   second hidden charge on the same first-sprint delivery.
 - Delivery missions comprise legs, parcels and custody locations. Future transfer,
   customer collection and fallback legs may use HQ, fixed or mobile infrastructure.
-- HQ, fixed and mobile DronePorts are simulation infrastructure types. Capacity,
-  coverage and deterministic fallback selection are game models, not real taxonomy.
+- Fixed/mobile roles follow the textual DROPi authority summary. Exact sizes,
+  tiers, capacities, radii, placement rules, coverage and deterministic fallback
+  selection remain Tycoon balancing and implementation abstractions.
   DronePort factory defaults describe future commissioned facilities; they are
   not automatically installed as working drone infrastructure at the starter HQ.
 - Smart Parcel Lockers are future/simulated capabilities, not claimed live real-app
@@ -108,14 +117,46 @@ The local district is compact and hand-authored. Roads allow simplified pedestri
 crossing without traffic simulation. Merchant onboarding uses one proximity action
 instead of real commercial authorization. Player-employees are a Tycoon company
 mechanic; the real reference describes independent pilots, not DROPi employees.
-The HQ/Main DronePort integration and first-class mobile DronePort direction come
-from the owner's game requirements, not invented contents of binary canon.
+The integrated HQ/Main DronePort facility is an owner-directed game abstraction.
+Fixed/mobile roles themselves come from the textual CAN-004 authority matrix;
+their game progression and placement do not assert unread binary specifications.
+
+DronePort statuses use `active | maintenance | offline`, matching DROPi
+`shared/types.ts`. Only `active` ports are eligible for service/fallback. The
+separate Tycoon launch-control authorization point retains `operational | offline`:
+`operational` means the control point is usable, not an alternate DronePort status.
+DronePorts are not persisted yet, so this terminology correction needs no migration.
 
 The human/operator actor is ground-bound. Drones are separate aerial actors with
 available, in-flight, charging and maintenance states. Only contracts are introduced
 now: launch control, autonomous flights, multi-city networks and locker workflows
 remain future implementation. Final art quality and Android usability require
 physical owner review; automated tests cannot certify those subjective outcomes.
+
+## FUTURE DROPi ECOSYSTEM TOKEN — ARCHITECTURE BOUNDARY ONLY
+
+**FUTURE / NOT YET IMPLEMENTED.** Normal Company/Game Money (`CompanyState.money`)
+is the independent, non-redeemable simulation currency for deliveries, purchases,
+salaries and maintenance. A future optional ecosystem asset is a separate domain,
+never another name, balance field or conversion path for Company Money.
+
+Core gameplay, progression, mission access, transport, capacity, rewards and
+competitive power must work identically without any ecosystem asset. Participation
+must remain optional and non-pay-to-win: no asset ownership gates, paid speed/cargo
+advantages, reward multipliers or exchange into Company Money. Any future use must
+be non-power-affecting and separately reviewed; no such use is implemented now.
+
+`game-web/src/types/ecosystemAsset.ts` declares only an optional asset descriptor,
+with literal invariants prohibiting core-gameplay requirements, power effects and
+Company Money conversion. It is not imported by runtime gameplay or persistence.
+Regression tests enforce that dependency boundary and exercise ordinary delivery,
+purchase and Save v2 without a wallet or asset service.
+
+There is no wallet implementation, balance, token issuance, blockchain, smart
+contract, tokenomics, exchange, crypto payment, real-money value, KYC or deployment.
+There are no speculative wallet/token Save v2 fields, backend calls or runtime
+integration hooks. Future wallet/reward contracts require a concrete approved use
+case; adding them now would imply functionality this sprint does not implement.
 
 ## Purpose
 
