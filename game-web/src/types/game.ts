@@ -123,7 +123,15 @@ export interface PlayerState {
   movementSpeed: number
 }
 
+export type ActiveTransport = 'walking' | 'bicycle'
+
+export interface UrbanProgressState {
+  merchantOnboarded: boolean
+  activeTransport: ActiveTransport
+}
+
 export interface WorldState {
+  urban?: UrbanProgressState
   player: PlayerState
   activeOrder: OrderState
   tapTarget: {

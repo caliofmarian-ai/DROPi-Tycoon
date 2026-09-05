@@ -5,6 +5,7 @@ import {
 } from '../state/gameState'
 import { synchronizePlayerMovementSpeed } from '../systems/bicycleSystem'
 import { reconcileLegacyBicycleOwnership } from '../systems/vehicleSystem'
+import { resolveActiveTransport } from '../systems/urbanLogistics'
 import {
   CUSTOMER_REVIEW_SENTIMENTS,
   EMPLOYEE_ROLES,
@@ -24,6 +25,7 @@ import {
   type PayrollState,
   type PurchasedUpgradeLevels,
   type VehicleTypeId,
+  type UrbanProgressState,
 } from '../types/game'
 
 export const SAVE_FORMAT_VERSION = 2 as const
@@ -66,6 +68,7 @@ export interface SaveGameV2 {
   formatVersion: typeof SAVE_FORMAT_VERSION
   company: SaveCompanyV2
   settings: GameSettingsState
+  urban?: UrbanProgressState
 }
 
 export type SaveDecodeResult =
@@ -305,6 +308,19 @@ const hasFinancialActivity = (financials: FinancialState): boolean =>
   financials.totalSalaryExpenses !== 0 ||
   financials.totalMaintenanceExpenses !== 0
 
+const sanitizeUrban = (
+  value: unknown, company: CompanyState,
+): { urban: UrbanProgressState; repaired: boolean } => {
+  const source = isRecord(value) ? value : {}
+  const merchantOnboarded = typeof source.merchantOnboarded === 'boolean' ? source.merchantOnboarded : false
+  const activeTransport = resolveActiveTransport(company, source.activeTransport)
+  return {
+    urban: { merchantOnboarded, activeTransport },
+    repaired: value !== undefined &&
+      (source.merchantOnboarded !== merchantOnboarded || source.activeTransport !== activeTransport),
+  }
+}
+
 export const createSaveGame = (session: GameSessionState): SaveGameV2 => ({
   formatVersion: SAVE_FORMAT_VERSION,
   company: {
@@ -326,6 +342,7 @@ export const createSaveGame = (session: GameSessionState): SaveGameV2 => ({
       : {}),
   },
   settings: { tutorialCompleted: session.settings.tutorialCompleted, soundEnabled: session.settings.soundEnabled },
+  ...(session.world.urban ? { urban: sanitizeUrban(session.world.urban, session.company).urban } : {}),
 })
 
 export const serializeGameSession = (session: GameSessionState): string => JSON.stringify(createSaveGame(session))
@@ -344,6 +361,7 @@ export const decodeSave = (raw: string): SaveDecodeResult => {
   const companyResult = sanitizeCompany(parsed.company, !migratingV1)
   const settingsResult = sanitizeSettings(parsed.settings)
   const company = companyResult.company
+  const urbanResult = sanitizeUrban(parsed.urban, company)
 
   return {
     kind: 'valid',
@@ -362,8 +380,9 @@ export const decodeSave = (raw: string): SaveDecodeResult => {
         vehicles: company.vehicles.map((vehicle) => ({ ...vehicle })),
       },
       settings: settingsResult.settings,
+      urban: urbanResult.urban,
     },
-    repaired: migratingV1 || companyResult.repaired || settingsResult.repaired,
+    repaired: migratingV1 || companyResult.repaired || settingsResult.repaired || urbanResult.repaired,
     ...(migratingV1 ? { migratedFrom: 1 as const } : {}),
   }
 }
@@ -384,6 +403,7 @@ export const restoreGameSessionFromSave = (save: SaveGameV2): GameSessionState =
   }
   company = reconcileLegacyBicycleOwnership(company)
   const world = synchronizePlayerMovementSpeed(createInitialWorldState(), company)
+  world.urban = sanitizeUrban(save.urban, company).urban
   return { world, company, settings: { ...save.settings } }
 }
 
