@@ -14,8 +14,6 @@
     },
     "android": {
       "package": "com.dropi.tycoon",
-      "versionCode": 1,
-      "edgeToEdgeEnabled": true,
       "predictiveBackGestureEnabled": false
     },
     "plugins": [
