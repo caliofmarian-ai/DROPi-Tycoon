@@ -9,11 +9,16 @@ import {
 } from 'react-native'
 import * as ScreenOrientation from 'expo-screen-orientation'
 import { StatusBar } from 'expo-status-bar'
-import { WebView, type WebViewNavigation } from 'react-native-webview'
+import {
+  WebView,
+  type WebViewMessageEvent,
+  type WebViewNavigation,
+} from 'react-native-webview'
 import { getRuntimeConfiguration } from './src/runtimeConfig'
 
 const runtime = getRuntimeConfiguration()
 const brandLogo = require('./assets/branding/dropi-tycoon-logo.png')
+const DROPi_NATIVE_EXIT_MESSAGE = 'dropi:exit-game'
 
 const PHASER_VIEWPORT_BOOTSTRAP = `
 (() => {
@@ -91,6 +96,11 @@ export default function App() {
     setCanGoBack(navigation.canGoBack)
   }
 
+  const handleMessage = (event: WebViewMessageEvent) => {
+    if (event.nativeEvent.data !== DROPi_NATIVE_EXIT_MESSAGE) return
+    if (Platform.OS === 'android') BackHandler.exitApp()
+  }
+
   return (
     <View style={styles.container}>
       <StatusBar hidden />
@@ -113,6 +123,7 @@ export default function App() {
         injectedJavaScript={PHASER_VIEWPORT_BOOTSTRAP}
         onLoadEnd={() => setLoaded(true)}
         onNavigationStateChange={handleNavigationChange}
+        onMessage={handleMessage}
       />
       {!loaded ? (
         <View pointerEvents="none" style={styles.loadingOverlay}>
