@@ -90,6 +90,9 @@ or literal reference-image gameplay backgrounds are required.
 - Central transport profiles use game-space distances, capacities and costs, not
   asserted real DROPi operating values. Existing vehicle IDs remain stable; car is
   a future domain mode rather than a new purchased fleet item in this sprint.
+  Per-trip operating-cost profile values are future tuning metadata; the existing
+  daily vehicle-maintenance system remains the actual expense path, avoiding a
+  second hidden charge on the same first-sprint delivery.
 - Delivery missions comprise legs, parcels and custody locations. Future transfer,
   customer collection and fallback legs may use HQ, fixed or mobile infrastructure.
 - HQ, fixed and mobile DronePorts are simulation infrastructure types. Capacity,

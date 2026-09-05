@@ -119,6 +119,12 @@ Headquarters, fixed DronePort and mobile DronePort are distinct simulation types
 mobile infrastructure is not required to be a building. Coverage and capacities
 are validated game values. Future aerial entities cannot replace the ground player.
 
+`systems/urbanMarketplace.ts` links the physical merchant, shop and pickup address
+to a stable digital merchant/listing identity. Onboarding activates the listing;
+HQ dispatch validates route, range and mission cargo against central transport
+profiles. Existing runtime order/carrying state projects into parcel arrays and
+delivery legs, leaving multi-parcel route execution as a future extension.
+
 The current runtime retains existing order lifecycle, economy settlement,
 company-management and procedural-audio services. The world layer must not award
 rewards independently of the exactly-once settlement path. Future multi-leg
