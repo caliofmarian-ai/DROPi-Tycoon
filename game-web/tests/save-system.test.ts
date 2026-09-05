@@ -397,7 +397,7 @@ describe('ISSUE-014 / ISSUE-017 — one-slot write and interrupted-write recover
 })
 
 describe('ISSUE-016 + RBATCH-018 — canonical autosave policy', () => {
-  it('contains v0.1 triggers plus employee progression triggers', () => {
+  it('contains v0.1, employee and vehicle progression triggers', () => {
     expect([...CANONICAL_AUTOSAVE_EVENTS]).toEqual([
       'delivery-completed',
       'upgrade-purchased',
@@ -406,6 +406,7 @@ describe('ISSUE-016 + RBATCH-018 — canonical autosave policy', () => {
       'employee-hired',
       'employee-onboarding-completed',
       'salary-cycle-processed',
+      'vehicle-purchased',
     ])
   })
 

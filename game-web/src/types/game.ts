@@ -19,6 +19,19 @@ export const UPGRADE_IDS = [
 export type UpgradeId = (typeof UPGRADE_IDS)[number]
 export type PurchasedUpgradeLevels = Record<UpgradeId, number>
 
+export const VEHICLE_TYPE_IDS = [
+  'Bicycle',
+  'ElectricScooter',
+  'Motorcycle',
+  'DeliveryVan',
+] as const
+export type VehicleTypeId = (typeof VEHICLE_TYPE_IDS)[number]
+
+export interface OwnedVehicleState {
+  vehicleId: string
+  typeId: VehicleTypeId
+}
+
 export const EMPLOYEE_ROLES = ['Courier'] as const
 export type EmployeeRole = (typeof EMPLOYEE_ROLES)[number]
 
@@ -81,6 +94,8 @@ export interface CompanyState {
   payroll: PayrollState
   financials: FinancialState
   reviews: CustomerReview[]
+  /** Explicit Phase-2 fleet ownership. Maintenance remains RBATCH-023 scope. */
+  vehicles: OwnedVehicleState[]
 }
 
 export interface GameSettingsState {

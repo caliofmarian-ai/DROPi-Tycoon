@@ -6,6 +6,7 @@ import { EmployeeManagementScene } from '../scenes/EmployeeManagementScene'
 import { FinancialReportScene } from '../scenes/FinancialReportScene'
 import { GameWorldScene } from '../scenes/GameWorldScene'
 import { MainMenuScene } from '../scenes/MainMenuScene'
+import { VehicleFleetScene } from '../scenes/VehicleFleetScene'
 
 export const createGameConfig = (parent: string): Phaser.Types.Core.GameConfig => ({
   type: Phaser.AUTO,
@@ -29,5 +30,6 @@ export const createGameConfig = (parent: string): Phaser.Types.Core.GameConfig =
     EmployeeManagementScene,
     FinancialReportScene,
     CustomerReviewsScene,
+    VehicleFleetScene,
   ],
 })

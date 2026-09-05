@@ -154,70 +154,50 @@ export class CompanyManagementScene extends Phaser.Scene {
       })
       .setOrigin(0.5)
 
-    let employeeButtonBounds: LayoutRect
-    let financialButtonBounds: LayoutRect
-    let reviewsButtonBounds: LayoutRect
-    let returnButtonBounds = layout.returnButton
-    let menuButtonBounds = layout.menuButton
-
     if (layout.compactLandscape) {
       const gap = 6
-      const top = 70
-      const bottom = height - 8
-      const buttonHeight = Math.max(
-        48,
-        Math.min(
-          layout.returnButton.height,
-          Math.floor((bottom - top - gap * 4) / 5),
-        ),
-      )
-      const makeBounds = (index: number): LayoutRect => ({
-        left: layout.returnButton.left,
-        top: top + index * (buttonHeight + gap),
-        width: layout.returnButton.width,
-        height: buttonHeight,
+      const columnGap = 6
+      const left = layout.returnButton.left
+      const totalWidth = layout.returnButton.width
+      const columnWidth = Math.max(48, Math.floor((totalWidth - columnGap) / 2))
+      const rowHeight = 52
+      const top = 72
+      const grid = (column: number, row: number): LayoutRect => ({
+        left: left + column * (columnWidth + columnGap),
+        top: top + row * (rowHeight + gap),
+        width: column === 0 ? columnWidth : Math.max(48, totalWidth - columnWidth - columnGap),
+        height: rowHeight,
       })
 
-      employeeButtonBounds = makeBounds(0)
-      financialButtonBounds = makeBounds(1)
-      reviewsButtonBounds = makeBounds(2)
-      returnButtonBounds = makeBounds(3)
-      menuButtonBounds = makeBounds(4)
+      this.createButton(grid(0, 0), 'Employees', () => this.openEmployeeManagement(), 14)
+      this.createButton(grid(1, 0), 'Finances', () => this.openFinancialReport(), 14)
+      this.createButton(grid(0, 1), 'Reviews', () => this.openCustomerReviews(), 14)
+      this.createButton(grid(1, 1), 'Vehicles', () => this.openVehicleFleet(), 14)
+      this.createButton(grid(0, 2), 'Game', () => this.returnToGameWorld(), 14)
+      this.createButton(grid(1, 2), 'Menu', () => this.returnToMainMenu(), 14)
     } else {
+      const gap = 6
       const managementTop = Math.max(8, layout.returnButton.top - layout.returnButton.height - 10)
-      const gap = 8
-      const availableWidth = layout.returnButton.width - gap * 2
-      const buttonWidth = Math.max(48, Math.floor(availableWidth / 3))
+      const availableWidth = layout.returnButton.width - gap * 3
+      const buttonWidth = Math.max(48, Math.floor(availableWidth / 4))
+      const managementBounds = Array.from({ length: 4 }, (_, index): LayoutRect => ({
+        left: layout.returnButton.left + index * (buttonWidth + gap),
+        top: managementTop,
+        width: index === 3
+          ? Math.max(48, layout.returnButton.left + layout.returnButton.width -
+              (layout.returnButton.left + index * (buttonWidth + gap)))
+          : buttonWidth,
+        height: layout.returnButton.height,
+      }))
+      const managementFont = Math.min(layout.navFontSize, 15)
 
-      employeeButtonBounds = {
-        left: layout.returnButton.left,
-        top: managementTop,
-        width: buttonWidth,
-        height: layout.returnButton.height,
-      }
-      financialButtonBounds = {
-        left: employeeButtonBounds.left + employeeButtonBounds.width + gap,
-        top: managementTop,
-        width: buttonWidth,
-        height: layout.returnButton.height,
-      }
-      reviewsButtonBounds = {
-        left: financialButtonBounds.left + financialButtonBounds.width + gap,
-        top: managementTop,
-        width: Math.max(
-          48,
-          layout.returnButton.left + layout.returnButton.width -
-            (financialButtonBounds.left + financialButtonBounds.width + gap),
-        ),
-        height: layout.returnButton.height,
-      }
+      this.createButton(managementBounds[0], 'Employees', () => this.openEmployeeManagement(), managementFont)
+      this.createButton(managementBounds[1], 'Finances', () => this.openFinancialReport(), managementFont)
+      this.createButton(managementBounds[2], 'Reviews', () => this.openCustomerReviews(), managementFont)
+      this.createButton(managementBounds[3], 'Vehicles', () => this.openVehicleFleet(), managementFont)
+      this.createButton(layout.returnButton, 'Return to Game World', () => this.returnToGameWorld(), layout.navFontSize)
+      this.createButton(layout.menuButton, 'Main Menu', () => this.returnToMainMenu(), layout.navFontSize)
     }
-
-    this.createButton(employeeButtonBounds, 'Employees', () => this.openEmployeeManagement(), layout.navFontSize)
-    this.createButton(financialButtonBounds, 'Finances', () => this.openFinancialReport(), layout.navFontSize)
-    this.createButton(reviewsButtonBounds, 'Reviews', () => this.openCustomerReviews(), layout.navFontSize)
-    this.createButton(returnButtonBounds, 'Return to Game World', () => this.returnToGameWorld(), layout.navFontSize)
-    this.createButton(menuButtonBounds, 'Main Menu', () => this.returnToMainMenu(), layout.navFontSize)
 
     this.refreshView()
 
@@ -251,7 +231,7 @@ export class CompanyManagementScene extends Phaser.Scene {
     this.companyInfoText.setText([
       this.companyState.companyName,
       `Money: ${this.companyState.money}   Level: ${this.companyState.level}   Reputation: ${this.companyState.reputation}`,
-      `Employees: ${this.companyState.employees.length} (${activeEmployees} active)   Reviews: ${this.companyState.reviews.length}`,
+      `Employees: ${this.companyState.employees.length} (${activeEmployees} active)   Vehicles: ${this.companyState.vehicles.length}   Reviews: ${this.companyState.reviews.length}`,
     ])
 
     const currentLevel = this.companyState.purchasedUpgradeLevels[this.selectedUpgrade.id]
@@ -285,6 +265,11 @@ export class CompanyManagementScene extends Phaser.Scene {
     this.scene.start('CustomerReviews')
   }
 
+  private openVehicleFleet(): void {
+    replaceGameSession(this.worldState, this.companyState)
+    this.scene.start('VehicleFleet')
+  }
+
   private returnToGameWorld(): void {
     replaceGameSession(this.worldState, this.companyState)
     this.scene.start('GameWorld')
@@ -296,11 +281,12 @@ export class CompanyManagementScene extends Phaser.Scene {
   }
 
   private createButton(
-    bounds: LayoutRect,
+    bounds: LayoutRect | undefined,
     label: string,
     onTap: () => void,
     fontSize: number,
   ): void {
+    if (!bounds) return
     const x = rectCenterX(bounds)
     const y = rectCenterY(bounds)
     const button = this.add
@@ -315,7 +301,7 @@ export class CompanyManagementScene extends Phaser.Scene {
         color: '#ecfeff',
         fontStyle: 'bold',
         align: 'center',
-        wordWrap: { width: Math.max(72, bounds.width - 10) },
+        wordWrap: { width: Math.max(46, bounds.width - 8) },
       })
       .setOrigin(0.5)
 

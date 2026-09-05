@@ -36,4 +36,10 @@ export const BALANCING = {
   // replaceable tuning details; no real-time day cadence is implied here.
   DAILY_BASE_OPERATING_EXPENSE: 10,
   DAILY_ACTIVE_EMPLOYEE_OPERATING_EXPENSE: 5,
+
+  // RBATCH-022 fleet purchasing values. VEHICLES.md defines the progression
+  // families; these concrete prices are replaceable implementation tuning.
+  ELECTRIC_SCOOTER_COST: 300,
+  MOTORCYCLE_COST: 600,
+  DELIVERY_VAN_COST: 1200,
 } as const

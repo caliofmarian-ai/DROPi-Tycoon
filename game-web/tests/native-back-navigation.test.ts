@@ -6,7 +6,7 @@ describe('native Android back navigation', () => {
     expect(resolveNativeBackTarget('CompanyManagement')).toBe('GameWorld')
   })
 
-  it.each(['EmployeeManagement', 'FinancialReport', 'CustomerReviews'])(
+  it.each(['EmployeeManagement', 'FinancialReport', 'CustomerReviews', 'VehicleFleet'])(
     'returns from %s to Company Management',
     (sceneKey) => {
       expect(resolveNativeBackTarget(sceneKey)).toBe('CompanyManagement')
