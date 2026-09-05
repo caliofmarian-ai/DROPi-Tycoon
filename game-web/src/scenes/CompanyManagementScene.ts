@@ -12,9 +12,13 @@ import {
   buildCompanyManagementLayout,
   type LayoutRect,
 } from '../ui/mobileViewport'
-
-const rectCenterX = (rect: LayoutRect): number => rect.left + rect.width / 2
-const rectCenterY = (rect: LayoutRect): number => rect.top + rect.height / 2
+import { COLORS, formatMoney, rectCenterX, rectCenterY } from '../ui/theme'
+import {
+  createStatusChip,
+  createThemedButton,
+  drawPanel,
+  paintBackdrop,
+} from '../ui/themeControls'
 
 export class CompanyManagementScene extends Phaser.Scene {
   private worldState!: WorldState
@@ -22,10 +26,13 @@ export class CompanyManagementScene extends Phaser.Scene {
   private selectedUpgrade!: UpgradeDefinition
 
   private companyInfoText!: Phaser.GameObjects.Text
+  private snapshotText!: Phaser.GameObjects.Text
+  private upgradeNameText!: Phaser.GameObjects.Text
+  private descriptionText!: Phaser.GameObjects.Text
   private upgradeStatusText!: Phaser.GameObjects.Text
   private feedbackText!: Phaser.GameObjects.Text
-  private purchaseButton!: Phaser.GameObjects.Rectangle
-  private purchaseLabel!: Phaser.GameObjects.Text
+  private purchaseControl!: ReturnType<typeof createThemedButton>
+  private ownedAssetGroup!: Phaser.GameObjects.Container
 
   private readonly handleResize = (): void => {
     if (this.worldState && this.companyState) {
@@ -52,13 +59,17 @@ export class CompanyManagementScene extends Phaser.Scene {
     }
     this.selectedUpgrade = selectedUpgrade
 
-    this.cameras.main.setBackgroundColor('#162032')
+    this.cameras.main.setBackgroundColor('#050b16')
+    paintBackdrop(this, width, height)
+
+    // TOP: company identity dashboard strip (name, money, level, reputation).
+    drawPanel(this, layout.identityBar, { tone: 'accent', radius: 12 })
 
     this.add
-      .text(layout.title.x, layout.title.y, 'Company Management', {
+      .text(layout.title.x, layout.title.y, 'COMPANY DASHBOARD', {
         fontFamily: 'Arial',
         fontSize: `${layout.title.fontSize}px`,
-        color: '#f8fafc',
+        color: COLORS.textMuted,
         fontStyle: 'bold',
       })
       .setOrigin(0.5)
@@ -67,36 +78,38 @@ export class CompanyManagementScene extends Phaser.Scene {
       .text(layout.companyInfo.x, layout.companyInfo.y, '', {
         fontFamily: 'Arial',
         fontSize: `${layout.companyInfo.fontSize}px`,
-        color: '#dbeafe',
+        color: COLORS.textPrimary,
+        fontStyle: 'bold',
         align: 'center',
       })
       .setOrigin(0.5)
 
-    this.add
-      .rectangle(
-        rectCenterX(layout.card),
-        rectCenterY(layout.card),
-        layout.card.width,
-        layout.card.height,
-        0x0f172a,
-        0.96,
-      )
-      .setStrokeStyle(3, 0x38bdf8, 0.7)
+    this.snapshotText = this.add
+      .text(layout.snapshot.x, layout.snapshot.y, '', {
+        fontFamily: 'Arial',
+        fontSize: `${layout.snapshot.fontSize}px`,
+        color: COLORS.textSecondary,
+        align: 'center',
+      })
+      .setOrigin(0.5)
 
-    this.add
+    // BODY: Bicycle asset card — compact once owned instead of dominating the screen.
+    drawPanel(this, layout.card, { tone: 'default' })
+
+    this.upgradeNameText = this.add
       .text(layout.upgradeName.x, layout.upgradeName.y, this.selectedUpgrade.name, {
         fontFamily: 'Arial',
         fontSize: `${layout.upgradeName.fontSize}px`,
-        color: '#f8fafc',
+        color: COLORS.textPrimary,
         fontStyle: 'bold',
       })
       .setOrigin(0.5)
 
-    this.add
+    this.descriptionText = this.add
       .text(layout.description.x, layout.description.y, this.selectedUpgrade.description, {
         fontFamily: 'Arial',
         fontSize: `${layout.description.fontSize}px`,
-        color: '#cbd5e1',
+        color: COLORS.textSecondary,
         align: 'center',
         wordWrap: { width: layout.description.wrapWidth },
       })
@@ -106,49 +119,52 @@ export class CompanyManagementScene extends Phaser.Scene {
       .text(layout.status.x, layout.status.y, '', {
         fontFamily: 'Arial',
         fontSize: `${layout.status.fontSize}px`,
-        color: '#e2e8f0',
+        color: COLORS.textSecondary,
         align: 'center',
       })
       .setOrigin(0.5)
 
-    this.purchaseButton = this.add
-      .rectangle(
-        rectCenterX(layout.purchase),
-        rectCenterY(layout.purchase),
-        layout.purchase.width,
-        layout.purchase.height,
-        0x2563eb,
-        1,
-      )
-      .setStrokeStyle(2, 0x93c5fd)
-      .setInteractive({ useHandCursor: true })
-      .on(
-        'pointerdown',
-        (
-          _pointer: Phaser.Input.Pointer,
-          _localX: number,
-          _localY: number,
-          event: Phaser.Types.Input.EventData,
-        ) => {
-          event.stopPropagation()
-          this.purchaseSelectedUpgrade()
+    this.purchaseControl = createThemedButton(
+      this,
+      layout.purchase,
+      'Purchase',
+      'primary',
+      () => this.purchaseSelectedUpgrade(),
+      { fontSize: layout.purchase.fontSize },
+    )
+
+    // Compact "already owned" asset-state group, shown instead of the empty
+    // description/status/purchase area once the Bicycle has been purchased.
+    this.ownedAssetGroup = this.add.container(0, 0)
+    const ownedChip = createStatusChip(
+      this,
+      layout.upgradeName.x,
+      layout.description.y,
+      '🚲 Bicycle — Owned',
+      'success',
+      Math.round(layout.upgradeName.fontSize * 0.72),
+    )
+    const ownedCaption = this.add
+      .text(
+        layout.status.x,
+        layout.status.y,
+        'First delivery vehicle unlocked. Manage the full fleet in Vehicles.',
+        {
+          fontFamily: 'Arial',
+          fontSize: `${Math.max(12, layout.status.fontSize - 2)}px`,
+          color: COLORS.textMuted,
+          align: 'center',
+          wordWrap: { width: layout.description.wrapWidth },
         },
       )
-
-    this.purchaseLabel = this.add
-      .text(rectCenterX(layout.purchase), rectCenterY(layout.purchase), 'Purchase', {
-        fontFamily: 'Arial',
-        fontSize: `${layout.purchase.fontSize}px`,
-        color: '#eff6ff',
-        fontStyle: 'bold',
-      })
       .setOrigin(0.5)
+    this.ownedAssetGroup.add([ownedChip.background, ownedChip.label, ownedCaption])
 
     this.feedbackText = this.add
       .text(layout.feedback.x, layout.feedback.y, '', {
         fontFamily: 'Arial',
         fontSize: `${layout.feedback.fontSize}px`,
-        color: '#fef3c7',
+        color: COLORS.textGold,
         align: 'center',
         wordWrap: { width: layout.feedback.wrapWidth },
       })
@@ -228,26 +244,32 @@ export class CompanyManagementScene extends Phaser.Scene {
 
   private refreshView(): void {
     const activeEmployees = this.companyState.employees.filter((employee) => employee.status === 'Active').length
-    this.companyInfoText.setText([
-      this.companyState.companyName,
-      `Money: ${this.companyState.money}   Level: ${this.companyState.level}   Reputation: ${this.companyState.reputation}`,
-      `Employees: ${this.companyState.employees.length} (${activeEmployees} active)   Vehicles: ${this.companyState.vehicles.length}   Reviews: ${this.companyState.reviews.length}`,
-    ])
+    this.companyInfoText.setText(
+      `${this.companyState.companyName}  ·  ${formatMoney(this.companyState.money)}  ·  Level ${this.companyState.level}  ·  ★ ${this.companyState.reputation}`,
+    )
+    this.snapshotText.setText(
+      `Employees ${activeEmployees}/${this.companyState.employees.length}    Vehicles ${this.companyState.vehicles.length}    Reviews ${this.companyState.reviews.length}`,
+    )
 
     const currentLevel = this.companyState.purchasedUpgradeLevels[this.selectedUpgrade.id]
     const owned = currentLevel >= this.selectedUpgrade.maxLevel
     this.upgradeStatusText.setText(
       owned
         ? `Owned — Level ${currentLevel}/${this.selectedUpgrade.maxLevel}`
-        : `Cost: ${this.selectedUpgrade.cost}   Level: ${currentLevel}/${this.selectedUpgrade.maxLevel}`,
+        : `Cost: ${formatMoney(this.selectedUpgrade.cost)}   Level: ${currentLevel}/${this.selectedUpgrade.maxLevel}`,
     )
 
-    this.purchaseLabel.setText(owned ? 'Owned' : 'Purchase')
-    if (owned) {
-      this.purchaseButton.disableInteractive().setAlpha(0.55)
-    } else {
-      this.purchaseButton.setInteractive({ useHandCursor: true }).setAlpha(1)
-    }
+    // Once owned, the Bicycle upgrade collapses to a compact asset-state
+    // group instead of leaving the description/purchase area empty.
+    this.upgradeNameText.setVisible(!owned)
+    this.descriptionText.setVisible(!owned)
+    this.upgradeStatusText.setVisible(!owned)
+    this.purchaseControl.background.setVisible(!owned)
+    this.purchaseControl.label.setVisible(!owned)
+    this.ownedAssetGroup.setVisible(owned)
+
+    this.purchaseControl.setLabel(owned ? 'Owned' : 'Purchase')
+    this.purchaseControl.setEnabled(!owned)
   }
 
   private openEmployeeManagement(): void {
@@ -290,15 +312,15 @@ export class CompanyManagementScene extends Phaser.Scene {
     const x = rectCenterX(bounds)
     const y = rectCenterY(bounds)
     const button = this.add
-      .rectangle(x, y, bounds.width, bounds.height, 0x0f766e, 1)
-      .setStrokeStyle(2, 0x99f6e4)
+      .rectangle(x, y, bounds.width, bounds.height, COLORS.surfaceRaised, 1)
+      .setStrokeStyle(2, COLORS.accent, 0.75)
       .setInteractive({ useHandCursor: true })
 
     this.add
       .text(x, y, label, {
         fontFamily: 'Arial',
         fontSize: `${fontSize}px`,
-        color: '#ecfeff',
+        color: COLORS.textPrimary,
         fontStyle: 'bold',
         align: 'center',
         wordWrap: { width: Math.max(46, bounds.width - 8) },

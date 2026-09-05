@@ -83,6 +83,13 @@ describe('ISSUE-018 — responsive Android viewport fit', () => {
       expect(rectInsideViewport(layout.purchase, viewport.width, viewport.height)).toBe(true)
       expect(rectInsideViewport(layout.returnButton, viewport.width, viewport.height)).toBe(true)
       expect(rectInsideViewport(layout.menuButton, viewport.width, viewport.height)).toBe(true)
+      expect(rectInsideViewport(layout.identityBar, viewport.width, viewport.height)).toBe(true)
+    })
+
+    it(`never overlaps the CompanyManagement identity bar and asset card at ${viewport.width}x${viewport.height}`, () => {
+      const layout = buildCompanyManagementLayout(viewport.width, viewport.height)
+      expect(boundsIntersect(layout.identityBar, layout.card)).toBe(false)
+      expect(layout.card.top).toBeGreaterThanOrEqual(layout.identityBar.top + layout.identityBar.height)
     })
 
     it(`keeps GameWorld top dock, HUD and notification inside ${viewport.width}x${viewport.height}`, () => {
