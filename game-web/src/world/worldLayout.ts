@@ -94,10 +94,10 @@ export const WORLD_ZONES: readonly WorldZoneLayout[] = [
 export const WORLD_ROADS: readonly WorldRectLayout[] = [
   { id: 'central-horizontal', x: 800, y: 600, width: 1440, height: 120 },
   { id: 'central-vertical', x: 800, y: 600, width: 120, height: 1040 },
-  { id: 'residential-lane', x: 400, y: 290, width: 560, height: 64 },
-  { id: 'business-lane', x: 1200, y: 290, width: 560, height: 64 },
-  { id: 'storage-lane', x: 400, y: 910, width: 560, height: 64 },
-  { id: 'company-lane', x: 1200, y: 910, width: 560, height: 64 },
+  { id: 'residential-lane', x: 450, y: 290, width: 700, height: 64 },
+  { id: 'business-lane', x: 1150, y: 290, width: 700, height: 64 },
+  { id: 'storage-lane', x: 450, y: 910, width: 700, height: 64 },
+  { id: 'company-lane', x: 1150, y: 910, width: 700, height: 64 },
 ] as const
 
 export const WORLD_SIDEWALKS: readonly WorldRectLayout[] = [
@@ -184,12 +184,12 @@ export const WORLD_DECORATIONS: readonly WorldDecorationLayout[] = [
  * physical coordinates are relocated into the expanded map.
  */
 export const WORLD_ROUTE_POINTS: readonly WorldRoutePoint[] = [
-  { label: 'PickupZone', x: 620, y: 820, zoneId: 'storage', kind: 'pickup' },
-  { label: 'CommercialPickup', x: 980, y: 430, zoneId: 'business', kind: 'pickup' },
-  { label: 'ResidentialPickup', x: 620, y: 430, zoneId: 'residential', kind: 'pickup' },
-  { label: 'DeliveryZone', x: 560, y: 390, zoneId: 'residential', kind: 'delivery' },
-  { label: 'DeliveryPoint', x: 1360, y: 390, zoneId: 'business', kind: 'delivery' },
-  { label: 'CompanyDelivery', x: 1360, y: 850, zoneId: 'company', kind: 'delivery' },
+  { label: 'PickupZone', x: 620, y: 910, zoneId: 'storage', kind: 'pickup' },
+  { label: 'CommercialPickup', x: 1100, y: 290, zoneId: 'business', kind: 'pickup' },
+  { label: 'ResidentialPickup', x: 620, y: 290, zoneId: 'residential', kind: 'pickup' },
+  { label: 'DeliveryZone', x: 560, y: 290, zoneId: 'residential', kind: 'delivery' },
+  { label: 'DeliveryPoint', x: 1360, y: 290, zoneId: 'business', kind: 'delivery' },
+  { label: 'CompanyDelivery', x: 1360, y: 910, zoneId: 'company', kind: 'delivery' },
 ] as const
 
 export const DELIVERY_ROUTE_POINTS = WORLD_ROUTE_POINTS.filter(
