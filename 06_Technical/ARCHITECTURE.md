@@ -2,11 +2,11 @@
 
 Document: ARCHITECTURE.md
 Project: DROPi Tycoon
-Version: 1.1.0
+Version: 1.2.0
 Status: Canonical
 Author: Marian Caliof & OpenAI
 Language: English
-Last Updated: 2026-07-16
+Last Updated: 2026-09-05
 
 ---
 
@@ -173,6 +173,29 @@ See `06_Technical/SAFE_SYSTEM.md` for development safety rules.
 
 ---
 
+# Mobile Application Layer
+
+## Purpose
+
+Hosts the authoritative game runtime inside the installed mobile product.
+
+Responsibilities include:
+
+- native application startup and lifecycle;
+- device orientation and immersive presentation;
+- safe-area and Android system-bar handling;
+- platform Back behavior;
+- native packaging and distribution;
+- platform integration required by future mobile features.
+
+The Mobile Application Layer must not become a duplicate gameplay implementation.
+
+The authoritative game simulation remains owned by the game runtime and domain systems.
+
+See `06_Technical/MOBILE_APPLICATION_PLATFORM.md` for the canonical platform/runtime specification and current approved implementation baseline.
+
+---
+
 # System Communication
 
 Game systems communicate through defined interfaces.
@@ -282,45 +305,67 @@ Important systems must be easy to verify.
 
 DROPi Tycoon architecture is designed for a simulation game.
 
-Every technical decision must support gameplay, performance, maintainability, and future expansion.
+Every technical decision must support gameplay, performance, maintainability, mobile product quality, and future expansion.
 
 ---
 
-# Web-First Platform Architecture
+# Mobile-First Application Architecture
 
-DROPi Tycoon is a Web-First Application. The browser is the primary runtime.
+DROPi Tycoon is built and judged primarily as an installed mobile game, beginning with Android.
 
-The official platform chain is:
+The primary platform chain is:
 
-```
+```text
 GitHub
-→ Web Application
-→ Railway Deployment
-→ Browser Runtime
-→ Android Packaging
+→ Authoritative Game Runtime
+→ Mobile Application Shell
+→ Android Development / Release Build
+→ Installed Android Game
 → Google Play Distribution
+```
+
+A secondary web chain remains supported:
+
+```text
+GitHub
+→ Web Build
+→ Railway Deployment
+→ Browser Preview / Smoke Test
 ```
 
 **Key decisions:**
 
-- The browser application is the primary deliverable.
-- Railway provides cloud deployment for the web runtime.
-- Android packaging wraps the same web application without a separate native runtime.
-- Google Play is the target distribution channel for the Android package.
+- The installed mobile application is the primary player-facing and Project Owner review surface.
+- The browser is a secondary development, preview, diagnostics, and smoke-test surface rather than the final gameplay quality bar.
+- The authoritative game runtime owns gameplay, rendering, world state, economy, employees, reviews, vehicles, and related simulation rules.
+- The mobile application shell owns native lifecycle, orientation, fullscreen/system UI handling, packaging, and native platform integration.
+- Mobile migration must not silently create a second gameplay implementation.
+- Railway remains valuable infrastructure but is not the permanent primary runtime dependency for normal production game startup.
+- Google Play remains the target Android distribution channel.
 
-**Technology independence:**
+## Current Runtime Baseline
 
-Implementation technologies — libraries, frameworks, build tools, and toolchains — are technical details. They are selected to serve the web-first architecture but are replaceable. No specific library or framework is a non-negotiable canonical dependency.
+The current approved game runtime is Phaser.
 
-See `00_Project/VISION.md` for the strategic Web-First direction and platform rationale.
+The approved mobile migration baseline uses an Expo / React Native shell, Expo development builds, EAS Build, and a first-stage WebView bridge to host the Phaser runtime without rewriting the game.
 
-See `09_Development/Engine_Migration/WEB_RUNTIME_MIGRATION_MILESTONE_001.md` for the current deployable runtime milestone.
+The first development stage may load the Railway-hosted runtime for rapid iteration. The production target is to package the game runtime with the mobile application so the installed game does not depend on browser chrome or the public Railway page for normal startup.
+
+Technology substitutions remain possible, but material replacement of the approved runtime/platform baseline requires explicit Project Owner approval and canonical documentation updates before migration.
+
+See `06_Technical/MOBILE_APPLICATION_PLATFORM.md` for the full ownership boundaries, camera/viewport requirements, AI continuity rules, and change control.
+
+See `00_Project/VISION.md` for the strategic mobile-first direction and the relationship between DROPi Tycoon and the real DROPi ecosystem.
+
+Historical Web-First migration reports remain historical records and must not override the current canonical direction.
 
 ---
 
 # Owner-Maintainability Architecture Principle
 
 The architecture must support project continuity without depending on proprietary tools, single agents, or undocumented knowledge.
+
+Platform decisions that materially affect future sessions must be recorded in canonical repository documentation rather than existing only in chat history.
 
 See `06_Technical/SAFE_SYSTEM.md` for the full Owner-Maintainability principle.
 

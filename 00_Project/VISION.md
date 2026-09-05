@@ -2,11 +2,11 @@
 
 Document: VISION.md
 Project: DROPi Tycoon
-Version: 1.1.0
+Version: 1.2.0
 Status: Canonical
 Author: Marian Caliof & OpenAI
 Language: English
-Last Updated: 2026-07-16
+Last Updated: 2026-09-05
 
 ---
 
@@ -116,9 +116,22 @@ DROPi Tycoon succeeds when players:
 
 # Relationship with the DROPi Ecosystem
 
-DROPi Tycoon is inspired by the vision of the DROPi platform but is designed as an independent game.
+DROPi Tycoon is inspired by the vision of the DROPi platform but is designed as an independent global game.
 
-Whenever possible, gameplay systems should be architected so that concepts, algorithms, balancing ideas, and logistics models can be reused or adapted for future DROPi products.
+The game must be extraordinary, complete, and enjoyable even for a player who never uses the real DROPi application and even in countries or cities where the real DROPi service does not operate.
+
+The real DROPi application is a separate real-world product that may initially operate only in selected cities or regions and expand over time.
+
+The relationship between the products is intentionally complementary:
+
+- DROPi Tycoon lets players experience the dream and challenges of building a logistics company in a simulated world;
+- gameplay systems should be inspired by recognizable real-world human, operational, economic, environmental, and logistics consequences while remaining fun;
+- the game can introduce players to concepts that exist or may later exist in the real DROPi ecosystem;
+- future DROPi employee or partner training may reuse game concepts, terminology, scenarios, or dedicated training modes where appropriate;
+- the entertainment game must not become an advertisement disguised as gameplay and must not require access to the real DROPi service;
+- simulation success must never be presented as a guarantee of real-world financial success.
+
+Whenever possible, gameplay systems should be architected so that concepts, algorithms, balancing ideas, training patterns, and logistics models can be reused or adapted for future DROPi products without coupling the game to the current operational implementation of the real company.
 
 ---
 
@@ -173,26 +186,28 @@ See `00_Project/DOCUMENT_INDEX.md` for the documentation index entry and planned
 
 ---
 
-# Web-First Platform Direction
+# Mobile-First Installed Game Direction
 
-DROPi Tycoon is a Web-First Application.
+DROPi Tycoon is designed and judged primarily as an installed mobile game, beginning with Android.
 
-The official development and distribution chain is:
+The primary product/runtime chain is:
 
-```
+```text
 GitHub
-→ Web Application
-→ Railway Deployment
-→ Browser Runtime
-→ Android Packaging
+→ Authoritative Game Runtime
+→ Mobile Application Shell
+→ Android Development / Release Build
+→ Installed Game
 → Google Play Distribution
 ```
 
-The browser application is the primary runtime. The same web application will later be packaged for Android distribution.
+A web build deployed through Railway remains an important secondary preview, smoke-test, diagnostics, and development surface. The browser is not the final owner-facing quality bar for gameplay composition, camera behavior, orientation, or mobile experience.
 
-Implementation technologies (libraries, toolchains, and frameworks) are technical details. They are replaceable and must not be named as non-negotiable canonical dependencies in vision or design documents.
+The mobile application must preserve the authoritative game simulation rather than create a second independent implementation of gameplay rules.
 
-See `06_Technical/ARCHITECTURE.md` for the canonical Web-First Architecture section.
+Implementation technologies are replaceable technical choices, but the currently approved mobile implementation baseline and change-control rules are recorded canonically in `06_Technical/MOBILE_APPLICATION_PLATFORM.md`.
+
+See `06_Technical/ARCHITECTURE.md` for the technical architecture and `06_Technical/MOBILE_APPLICATION_PLATFORM.md` for the canonical mobile runtime/platform specification.
 
 ---
 
