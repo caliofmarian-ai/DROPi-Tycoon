@@ -37,9 +37,57 @@ Phaser `3.90.0` is the current web-runtime library implementation detail, is rep
 
 ---
 
-# Implemented Prototype Scope
+# Urban RPG / multimodal foundation
 
-This PR branch implements the following prototype behavior:
+The current Game World is a code-drawn neighborhood with collision-constrained
+direct movement, a human courier, follow camera, minimap, NPC interactions, a
+small HQ and a locked future Main DronePort expansion. Walking and an owned
+bicycle can be selected at HQ. No native-shell change or new APK is needed.
+
+- Move with the on-screen directional pad, WASD or arrow keys.
+- Follow the gold objective to meet the merchant and activate local marketplace demand.
+- Return to HQ and use Action / E to accept work.
+- Walk to the marked pickup, use Action / E, then do the same at the customer.
+- Buy a bicycle through Company → Vehicle Fleet; return to HQ to select it.
+- Company management, employees, finances and procedural sound remain available.
+- The ground operator and future aerial drone are separate domain actors.
+- Multi-parcel cargo, mission legs, fixed/mobile DronePorts, coverage, lockers and
+  employee assignments are architecture foundations, not a complete autonomous network.
+
+Save v2 adds validated merchant-onboarding and active-transport preferences.
+Existing company progress and vehicle IDs are retained. As before, position and
+unfinished orders reset on application reload; navigating management screens
+within a live session preserves the current delivery. No Start New Game is required.
+
+## OWNER ANDROID REVIEW REQUIRED
+
+After deployment of the reviewed web runtime, use the existing installed shell:
+
+1. Launch DROPi Tycoon in landscape → Continue Game → Game World.
+2. Confirm a human outside the small HQ, D-pad, minimap and compact HUD.
+3. Hold each direction; try walking into the HQ or another building. Movement must
+   stop at the footprint and continue along roads/pavements, with the camera following.
+4. Follow the gold marker to the merchant; approach until Action becomes available,
+   interact to onboard, then return to HQ to accept a local order.
+5. Follow the pickup marker, interact to collect, follow the destination and
+   interact to deliver. Confirm parcel state, reward and the next HQ objective.
+6. Open Company → Vehicle Fleet, buy/use an owned Bicycle, return to the world and
+   switch transport at HQ. Confirm a visible rider and increased cargo capacity.
+7. Check Company, Employees, Menu and sound controls; look for the locked HQ
+   DronePort expansion and verify it does not launch a human into flight.
+8. Exit Game and reopen → Continue. Company money, ownership, onboarding and chosen
+   owned transport must survive; unfinished jobs and position follow the reset policy above.
+
+Automated checks do not replace physical Android/performance/art-direction review.
+Binary approved references were not inspected, and no screenshot is presented as
+owner acceptance. See `../01_GameDesign/GAMEPLAY.md` for exact canonical sources,
+real facts, game abstractions and deliberate deviations.
+
+# Historical prototype scope (superseded)
+
+The following records the old prototype baseline, not current controls or current
+implementation status. In particular, tap-to-move, automatic pickup, large HUD
+panels and the old "not implemented" list below are historical:
 
 - Main menu (updated to reflect active economy)
 - Game world

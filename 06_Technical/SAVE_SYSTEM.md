@@ -12,6 +12,24 @@ Last Updated: 2026-07-12
 
 # Save System
 
+## Urban foundation additive Save v2 extension
+
+The current runtime extends Save v2 without changing storage keys or fleet IDs.
+An optional `urban` section stores only merchant-onboarding progress and the
+selected walking/bicycle preference. Older v1/v2 saves default to not-onboarded
+and walking; malformed preferences are repaired, and a bicycle selection requires
+legacy upgrade ownership or a compatible owned fleet entry.
+
+Decode, sanitization, serialization and restore apply the same validation.
+Company identity, money, reputation, upgrades, employees, payroll, financials,
+reviews, fleet and settings retain their existing persistence paths.
+
+Position, active orders and runtime cargo remain transient under the established
+reset-on-load policy. The world respawns at accessible HQ ground; the owner does
+not need Start New Game to access the district. Returning from management screens
+within the live session retains the active order. Future DronePort entities,
+coverage, drone state and lockers are not persisted until gameplay requires them.
+
 ## Purpose
 
 This document defines the canonical in-game Save & Load system for DROPi Tycoon.
