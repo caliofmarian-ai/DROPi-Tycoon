@@ -235,3 +235,87 @@ export const paintBackdrop = (scene: Phaser.Scene, width: number, height: number
   )
   graphics.fillRect(0, 0, width, height)
 }
+
+export type VehicleGlyphType = 'Bicycle' | 'ElectricScooter' | 'Motorcycle' | 'DeliveryVan'
+
+/**
+ * Draws a small, code-drawn vehicle silhouette used by Vehicle Fleet cards and
+ * the player world representation (Workstream C/D). No bitmap assets — pure
+ * vector-like Graphics shapes recognisable at small landscape scale.
+ */
+export const drawVehicleGlyph = (
+  scene: Phaser.Scene,
+  centerX: number,
+  centerY: number,
+  scale: number,
+  type: VehicleGlyphType,
+  tone: number = COLORS.accent,
+): Phaser.GameObjects.Graphics => {
+  const graphics = scene.add.graphics()
+  graphics.setPosition(centerX, centerY)
+  const wheelRadius = 6 * scale
+
+  const drawWheels = (spread: number) => {
+    graphics.lineStyle(Math.max(1.5, 1.8 * scale), 0xe2e8f0, 0.9)
+    graphics.fillStyle(0x0f172a, 1)
+    graphics.fillCircle(-spread, wheelRadius * 0.9, wheelRadius)
+    graphics.strokeCircle(-spread, wheelRadius * 0.9, wheelRadius)
+    graphics.fillCircle(spread, wheelRadius * 0.9, wheelRadius)
+    graphics.strokeCircle(spread, wheelRadius * 0.9, wheelRadius)
+  }
+
+  switch (type) {
+    case 'Bicycle': {
+      drawWheels(10 * scale)
+      graphics.lineStyle(Math.max(1.6, 2 * scale), tone, 1)
+      graphics.beginPath()
+      graphics.moveTo(-10 * scale, wheelRadius * 0.9)
+      graphics.lineTo(-2 * scale, -6 * scale)
+      graphics.lineTo(10 * scale, wheelRadius * 0.9)
+      graphics.lineTo(2 * scale, -6 * scale)
+      graphics.lineTo(-10 * scale, wheelRadius * 0.9)
+      graphics.strokePath()
+      graphics.fillStyle(tone, 1)
+      graphics.fillCircle(-2 * scale, -6 * scale, 2.2 * scale)
+      break
+    }
+    case 'ElectricScooter': {
+      drawWheels(9 * scale)
+      graphics.lineStyle(Math.max(1.6, 2 * scale), tone, 1)
+      graphics.beginPath()
+      graphics.moveTo(-9 * scale, wheelRadius * 0.9)
+      graphics.lineTo(8 * scale, wheelRadius * 0.9)
+      graphics.strokePath()
+      graphics.beginPath()
+      graphics.moveTo(8 * scale, wheelRadius * 0.9)
+      graphics.lineTo(8 * scale, -9 * scale)
+      graphics.strokePath()
+      graphics.lineStyle(Math.max(2, 2.4 * scale), tone, 1)
+      graphics.beginPath()
+      graphics.moveTo(4 * scale, -9 * scale)
+      graphics.lineTo(10 * scale, -9 * scale)
+      graphics.strokePath()
+      break
+    }
+    case 'Motorcycle': {
+      drawWheels(11 * scale)
+      graphics.fillStyle(tone, 1)
+      graphics.fillRoundedRect(-11 * scale, -4 * scale, 22 * scale, 8 * scale, 3 * scale)
+      graphics.fillStyle(0x0f172a, 1)
+      graphics.fillRoundedRect(-4 * scale, -10 * scale, 9 * scale, 6 * scale, 2 * scale)
+      break
+    }
+    case 'DeliveryVan':
+    default: {
+      drawWheels(10 * scale)
+      graphics.fillStyle(tone, 1)
+      graphics.fillRoundedRect(-14 * scale, -12 * scale, 28 * scale, 14 * scale, 3 * scale)
+      graphics.fillStyle(0x0c2436, 0.85)
+      graphics.fillRoundedRect(-10 * scale, -9 * scale, 8 * scale, 6 * scale, 1.5 * scale)
+      graphics.fillRoundedRect(1 * scale, -9 * scale, 8 * scale, 6 * scale, 1.5 * scale)
+      break
+    }
+  }
+
+  return graphics
+}
