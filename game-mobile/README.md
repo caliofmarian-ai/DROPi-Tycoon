@@ -53,8 +53,9 @@ assets/branding/
 Current wiring:
 
 - `dropi-tycoon-app-icon.png` is the Expo application icon source;
-- `dropi-tycoon-logo.png` is used by the native loading/error surface;
-- the approved portrait `dropi-tycoon-splash.jpg` remains preserved as a source/reference and is not blindly promoted to the landscape loading surface because its composition is portrait-oriented and includes future-token wording that requires a separate owner review before public runtime use.
+- `dropi-tycoon-logo.png` is used by the Phaser Main Menu and native error surface;
+- `dropi-tycoon-splash.jpg` is now used by the native Android loading overlay for the controlled `0.0.0` APK;
+- the approved delivery-progression, DROPi Port and ecosystem boards remain reference assets for future world/character implementation rather than decorative overlays.
 
 No replacement image generation is authorized unless the Project Owner explicitly changes the visual direction.
 
@@ -89,7 +90,7 @@ This ledger records actual EAS Android build artifacts, not every repository mer
 | Release | Android versionCode | Date | Source commit | EAS build | Status | Scope / evidence |
 |---|---:|---|---|---|---|---|
 | Pre-canonical evaluation build (legacy metadata `0.1.0`) | 1 | 2026-09-05 | `9251702773c1684ad32d003f4d903ae0a5e283b6` | `02b85d59-1dfc-43cf-aea9-43643c0f89a8` | Installed / owner evaluated | First installed Android APK. Confirmed direct app launch, landscape shell, Phaser touch/gameplay, economy/employees/reviews. Exposed Android Back navigation defect later fixed by PR #302. Retained for history but not part of the controlled SemVer release line. |
-| `0.0.0` | next remote value after 1 | Pending | Pending | Pending | Planned | First controlled APK after canonical versioning. Must include a committed lockfile and a release-scope entry before build submission. |
+| `0.0.0` | 2 | 2026-09-05 | `b398ed6138c0b2085c336f719dad7574d646ff24` | `eee548e7-4719-4889-a4e1-7e3675e3beda` | Build finished / physical owner validation pending | First controlled APK. Includes canonical `v0.0.0`, approved launcher icon and splash/loading artwork, adaptive two-column landscape Main Menu, Save & Exit native bridge, Android Back routing, and retained core gameplay/economy/employees/reviews/camera. Detailed provenance: `game-mobile/BUILD_RECORD_0.0.0.md`. |
 
 For every future APK/AAB, add one row with:
 
