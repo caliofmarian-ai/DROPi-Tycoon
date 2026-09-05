@@ -1,0 +1,3 @@
+declare const __DROPITYCOON_VERSION__: string
+
+export const DROPITYCOON_VERSION = __DROPITYCOON_VERSION__
