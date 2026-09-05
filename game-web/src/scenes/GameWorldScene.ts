@@ -47,6 +47,8 @@ import {
   buildGameWorldTopBarLayout,
   GAMEWORLD_TOP_BAR_VISUAL_BUTTON_PX,
 } from '../ui/gameWorldTopBar'
+import { selectActiveVehiclePresentation } from '../systems/vehicleSystem'
+import { createPlayerVisual, type PlayerVisual } from '../world/playerVisual'
 import { selectDeliveryIntentFromTap } from '../utils/deliveryIntent'
 
 const DELIVERY_MARKER_TAP_RADIUS = 36
@@ -59,7 +61,8 @@ export class GameWorldScene extends Phaser.Scene {
 
   private companyState!: CompanyState
 
-  private player!: Phaser.GameObjects.Sprite
+  private player!: Phaser.GameObjects.Container
+  private playerVisual!: PlayerVisual
 
   private readonly packagePosition = new Phaser.Math.Vector2(0, 0)
 
@@ -106,8 +109,6 @@ export class GameWorldScene extends Phaser.Scene {
     this.load.image('building_commercial', '/assets/sprites/building_commercial.png')
     this.load.image('delivery_point_marker', '/assets/sprites/delivery_point_marker.png')
     this.load.image('package_delivery', '/assets/sprites/package_delivery.png')
-    this.load.image('player_character_idle', '/assets/sprites/player_character_idle.png')
-    this.load.image('player_character_move', '/assets/sprites/player_character_move.png')
   }
 
   create(): void {
@@ -137,11 +138,14 @@ export class GameWorldScene extends Phaser.Scene {
       'package_delivery',
     )
 
-    this.player = this.add.sprite(
+    const activeVehiclePresentation = selectActiveVehiclePresentation(this.companyState)
+    this.playerVisual = createPlayerVisual(
+      this,
       this.worldState.player.x,
       this.worldState.player.y,
-      'player_character_idle',
     )
+    this.playerVisual.setState(activeVehiclePresentation ?? 'Walking')
+    this.player = this.playerVisual.container
 
     this.cameras.main.setZoom(CAMERA_DEFAULT_ZOOM)
     this.cameras.main.startFollow(this.player, false, 1, 1)
@@ -282,7 +286,8 @@ export class GameWorldScene extends Phaser.Scene {
       this.player.y += Math.sin(angle) * this.worldState.player.movementSpeed * deltaSeconds
       this.worldState.player.x = this.player.x
       this.worldState.player.y = this.player.y
-      this.player.setTexture('player_character_move')
+      this.playerVisual.setFacing(Math.cos(angle) < 0)
+      this.playerVisual.setMoving(true)
       return
     }
 
@@ -290,7 +295,7 @@ export class GameWorldScene extends Phaser.Scene {
     this.worldState.player.x = this.player.x
     this.worldState.player.y = this.player.y
     this.worldState.isMoving = false
-    this.player.setTexture('player_character_idle')
+    this.playerVisual.setMoving(false)
   }
 
   private updatePickupState(): void {

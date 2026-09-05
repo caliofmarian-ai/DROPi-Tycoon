@@ -1,3 +1,4 @@
+import { readFileSync } from 'node:fs'
 import { describe, expect, it } from 'vitest'
 import { BALANCING } from '../src/config/balancing'
 import { createInitialCompanyState } from '../src/state/gameState'
@@ -123,5 +124,29 @@ describe('Workstream D — deterministic active-vehicle presentation rule', () =
     const company = createInitialCompanyState()
     company.vehicles = [{ vehicleId: 'VEHICLE-BICYCLE-001', typeId: 'Bicycle' }]
     expect(selectActiveVehiclePresentation(company)).toBe('Bicycle')
+  })
+})
+
+describe('Workstream D — GameWorldScene binds the drawn player visual, not a placeholder cube', () => {
+  const gameWorldSource = readFileSync(
+    new URL('../src/scenes/GameWorldScene.ts', import.meta.url),
+    'utf8',
+  )
+
+  it('no longer preloads or references the placeholder player cube textures', () => {
+    expect(gameWorldSource).not.toContain('player_character_idle')
+    expect(gameWorldSource).not.toContain('player_character_move')
+  })
+
+  it('creates the code-drawn player visual and binds the active-vehicle presentation', () => {
+    expect(gameWorldSource).toContain('createPlayerVisual(')
+    expect(gameWorldSource).toContain('selectActiveVehiclePresentation(this.companyState)')
+    expect(gameWorldSource).toContain('this.playerVisual.setState(')
+  })
+
+  it('drives facing/moving feedback from the drawn visual instead of texture swaps', () => {
+    expect(gameWorldSource).not.toContain('.setTexture(')
+    expect(gameWorldSource).toContain('this.playerVisual.setFacing(')
+    expect(gameWorldSource).toContain('this.playerVisual.setMoving(')
   })
 })
