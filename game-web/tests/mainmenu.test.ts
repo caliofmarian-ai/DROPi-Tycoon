@@ -1,6 +1,5 @@
 import { readFileSync } from 'node:fs'
 import { describe, expect, it } from 'vitest'
-import { GAME_RELEASE_VERSION } from '../src/config/releaseVersion'
 import {
   closeMainMenuPanel,
   createMainMenuState,
@@ -18,6 +17,17 @@ const envSource = readFileSync(
   new URL('../src/config/env.ts', import.meta.url),
   'utf8',
 )
+const versionSource = readFileSync(
+  new URL('../src/version.ts', import.meta.url),
+  'utf8',
+)
+const viteConfigSource = readFileSync(
+  new URL('../vite.config.ts', import.meta.url),
+  'utf8',
+)
+const webPackageConfig = JSON.parse(
+  readFileSync(new URL('../package.json', import.meta.url), 'utf8'),
+) as { version: string }
 const mobileAppConfig = JSON.parse(
   readFileSync(new URL('../../game-mobile/app.json', import.meta.url), 'utf8'),
 ) as { expo: { version: string } }
@@ -123,9 +133,13 @@ describe('ISSUE-307 — approved product identity on MainMenu', () => {
 })
 
 describe('ISSUE-309 — controlled version and Save & Exit', () => {
-  it('keeps the player-facing runtime version synchronized with the controlled mobile release', () => {
-    expect(GAME_RELEASE_VERSION).toBe(mobileAppConfig.expo.version)
-    expect(envSource).toContain('appVersion: GAME_RELEASE_VERSION')
+  it('keeps the player-facing web runtime version synchronized with the controlled mobile release', () => {
+    expect(webPackageConfig.version).toBe('0.0.0')
+    expect(webPackageConfig.version).toBe(mobileAppConfig.expo.version)
+    expect(versionSource).toContain('export const DROPITYCOON_VERSION = __DROPITYCOON_VERSION__')
+    expect(viteConfigSource).toContain('__DROPITYCOON_VERSION__: JSON.stringify(packageConfig.version)')
+    expect(envSource).toContain("import { DROPITYCOON_VERSION } from '../version'")
+    expect(envSource).toContain('appVersion: DROPITYCOON_VERSION')
     expect(envSource).not.toContain('VITE_APP_VERSION')
   })
 
