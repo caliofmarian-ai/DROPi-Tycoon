@@ -13,6 +13,11 @@ const mainMenuSource = readFileSync(
   new URL('../src/scenes/MainMenuScene.ts', import.meta.url),
   'utf8',
 )
+const envSource = readFileSync(new URL('../src/config/env.ts', import.meta.url), 'utf8')
+const viteConfigSource = readFileSync(new URL('../vite.config.ts', import.meta.url), 'utf8')
+const packageJson = JSON.parse(
+  readFileSync(new URL('../package.json', import.meta.url), 'utf8'),
+) as { version: string }
 
 describe('RBATCH-011 — MainMenu pure view model', () => {
   it('starts with no modal panel open', () => {
@@ -111,5 +116,23 @@ describe('ISSUE-307 — approved product identity on MainMenu', () => {
     expect(mainMenuSource).not.toContain('Web Runtime Candidate')
     expect(mainMenuSource).toContain('`v${appConfig.appVersion}`')
     expect(mainMenuSource).toContain('Play. Deliver. Trade. Grow.')
+  })
+})
+
+describe('ISSUE-310 — canonical version and Save & Exit', () => {
+  it('sources the player-facing runtime version from committed package metadata', () => {
+    expect(packageJson.version).toBe('0.0.0')
+    expect(envSource).toContain('appVersion: DROPITYCOON_VERSION')
+    expect(envSource).not.toContain('VITE_APP_VERSION')
+    expect(viteConfigSource).toContain('__DROPITYCOON_VERSION__')
+    expect(viteConfigSource).toContain('packageJson.version')
+  })
+
+  it('offers Exit Game and saves an active session before requesting native close', () => {
+    expect(mainMenuSource).toContain("'Exit Game'")
+    expect(mainMenuSource).toContain('peekGameSession()')
+    expect(mainMenuSource).toContain('writeSaveSlot(this.saveStorage, activeSession)')
+    expect(mainMenuSource).toContain('nativeBridge.postMessage(EXIT_GAME_MESSAGE)')
+    expect(mainMenuSource).toContain('progress could not be saved')
   })
 })
