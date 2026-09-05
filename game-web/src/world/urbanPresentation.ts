@@ -1,6 +1,17 @@
 import type Phaser from 'phaser'
+import type { CompanyState } from '../types/game'
+import { resolveActiveTransport } from '../systems/urbanLogistics'
+import { URBAN_MERCHANT_PROFILES } from '../systems/urbanInteractions'
 import { URBAN_BUILDINGS, URBAN_HQ, URBAN_ROADS, URBAN_SIDEWALKS } from './urbanWorld'
 import { WORLD_DECORATIONS, WORLD_HEIGHT, WORLD_ROUTE_POINTS, WORLD_WIDTH } from './worldLayout'
+
+export const HQ_EXPANSION_POINT = { x: URBAN_HQ.x - 120, y: URBAN_HQ.y - 24 } as const
+
+export const getHQGrowth = (company?: CompanyState) => ({
+  tier: Math.min(3, Math.max(1, Math.floor(company?.level ?? 1))),
+  staffCount: company?.employees.length ?? 0,
+  ownsBicycle: company ? resolveActiveTransport(company, 'bicycle') === 'bicycle' : false,
+})
 
 const label = (scene: Phaser.Scene, x: number, y: number, text: string, color = '#fff4da', size = 12) =>
   scene.add.text(x, y, text, {
@@ -24,7 +35,10 @@ export const drawNeighborhoodNPC = (
   return scene.add.container(x, y, [g]).setDepth(12)
 }
 
-export const renderUrbanNeighborhood = (scene: Phaser.Scene): void => {
+export const renderUrbanNeighborhood = (
+  scene: Phaser.Scene, company?: CompanyState,
+): Phaser.GameObjects.Graphics | null => {
+  const growth = getHQGrowth(company)
   const ground = scene.add.graphics()
   ground.fillStyle(0xa9ca93).fillRect(0, 0, WORLD_WIDTH, WORLD_HEIGHT)
   ground.fillStyle(0xb9d6a3).fillRoundedRect(80, 60, 620, 460, 40)
@@ -99,6 +113,15 @@ export const renderUrbanNeighborhood = (scene: Phaser.Scene): void => {
       }
       label(scene, b.x, b.y - 4, isHQ ? 'DROPi · HQ' : cornerShop ? 'MARA’S MARKET' : ['BAKERY', 'CORNER GOODS', 'FLOWERS'][index % 3], '#fff4da', isHQ ? 15 : 10)
     }
+    if (isHQ && growth.tier >= 2) {
+      g.fillStyle(0xd9ba79).fillRect(b.x - 24, bottom - 35, 48, 6)
+      g.fillStyle(0x80654a).fillRect(b.x - 24, bottom - 29, 4, 27).fillRect(b.x + 20, bottom - 29, 4, 27)
+      if (growth.tier >= 3) {
+        g.fillStyle(0xe8d9b1).fillRect(b.x + 35, top + 10, 24, 22)
+        g.fillStyle(0x719d9c).fillRect(b.x + 40, top + 15, 14, 13)
+        g.lineStyle(2, 0xffedc7).lineBetween(b.x + 47, top + 15, b.x + 47, top + 28)
+      }
+    }
   })
 
   WORLD_DECORATIONS.forEach((tree, index) => {
@@ -115,25 +138,59 @@ export const renderUrbanNeighborhood = (scene: Phaser.Scene): void => {
     staging.fillStyle(0xb78958).fillRect(URBAN_HQ.x - 76 + i * 13, 247, 11, 13)
     staging.fillStyle(0xf4dfab).fillRect(URBAN_HQ.x - 72 + i * 13, 247, 3, 13)
   }
+  for (let row = 1; row < growth.tier; row++) {
+    const shelfY = 247 - row * 12
+    staging.fillStyle(0x8a6a4d).fillRect(URBAN_HQ.x - 79, shelfY + 11, 49, 3)
+    for (let i = 0; i < 3; i++) {
+      staging.fillStyle(0xc49a69).fillRect(URBAN_HQ.x - 76 + i * 15, shelfY, 12, 10)
+      staging.fillStyle(0xf4dfab).fillRect(URBAN_HQ.x - 72 + i * 15, shelfY, 3, 10)
+    }
+  }
+  if (growth.tier > 1) {
+    staging.fillStyle(0x8a6a4d).fillRect(URBAN_HQ.x - 79, 217, 3, 46)
+      .fillRect(URBAN_HQ.x - 33, 217, 3, 46)
+  }
+  const parkedBicycle = growth.ownsBicycle
+    ? scene.add.graphics().setPosition(URBAN_HQ.x + 58, URBAN_HQ.y + 16).setDepth(10)
+    : null
+  if (parkedBicycle) {
+    parkedBicycle.lineStyle(3, 0x314947).strokeCircle(-13, 6, 9).strokeCircle(13, 6, 9)
+    parkedBicycle.lineStyle(3, 0xd7ae58).strokeTriangle(-13, 6, 0, 6, -6, -7)
+      .lineBetween(-6, -7, 8, -7).lineBetween(8, -7, 0, 6).lineBetween(8, -7, 13, 6)
+    parkedBicycle.lineStyle(3, 0x314947).lineBetween(-10, -10, -2, -10)
+      .lineBetween(8, -7, 8, -14).lineBetween(8, -14, 14, -14)
+  }
+  if (growth.staffCount > 0) {
+    const worker = drawNeighborhoodNPC(scene, URBAN_HQ.x + 100, URBAN_HQ.y, false, 2)
+      .setName('hq-dispatch-staff')
+    scene.tweens.add({ targets: worker, y: worker.y - 2, duration: 2200, yoyo: true, repeat: -1, ease: 'Sine.easeInOut' })
+    label(scene, worker.x, worker.y - 49, `HQ staff · ${growth.staffCount}`, '#fff4da', 10)
+  }
   label(scene, URBAN_HQ.x + 44, 255, 'P · TRANSPORT', '#fff4da', 10)
   label(scene, URBAN_HQ.x - 66, 292, 'PARCEL STAGING', '#fff4da', 9)
-  // The fenced reserve sits off the traversable pavement, not across a route.
+  // The locked reserve adjoins HQ; its sign is reachable from the front pavement.
   const reserve = scene.add.graphics()
-  reserve.fillStyle(0xc5b998).fillRoundedRect(1250, 1020, 220, 88, 8)
-  reserve.lineStyle(3, 0x7e7964).strokeRect(1250, 1020, 220, 88)
-  for (let x = 1250; x <= 1470; x += 20) {
-    reserve.lineBetween(x, 1015, x, 1031).lineBetween(x, 1100, x, 1116)
+  const reserveLeft = HQ_EXPANSION_POINT.x - 33
+  const reserveTop = HQ_EXPANSION_POINT.y - 116
+  reserve.fillStyle(0xc5b998).fillRoundedRect(reserveLeft, reserveTop, 66, 102, 5)
+  reserve.lineStyle(3, 0x7e7964).strokeRect(reserveLeft, reserveTop, 66, 102)
+  for (let x = reserveLeft; x <= reserveLeft + 66; x += 11) {
+    reserve.lineBetween(x, reserveTop - 4, x, reserveTop + 9)
+      .lineBetween(x, reserveTop + 94, x, reserveTop + 108)
   }
-  reserve.lineStyle(2, 0xf0dfaa).strokeCircle(1290, 1066, 22)
-  label(scene, 1390, 1064, 'DRONEPORT\nFuture expansion', '#fff4da', 11)
+  reserve.lineStyle(2, 0xf0dfaa).strokeCircle(HQ_EXPANSION_POINT.x, reserveTop + 47, 22)
+  label(scene, HQ_EXPANSION_POINT.x, HQ_EXPANSION_POINT.y, 'HQ DRONEPORT\nLocked expansion', '#fff4da', 10)
 
   WORLD_ROUTE_POINTS.forEach((point, index) => {
     const merchant = point.kind === 'pickup'
-    drawNeighborhoodNPC(scene, point.x + 17, point.y - 8, merchant, index)
-    const name = point.label === 'PickupZone' ? 'Mara · Merchant' :
-      merchant ? 'Merchant' : point.label === 'DeliveryZone' ? 'Noah · Customer' : 'Customer'
+    const profile = URBAN_MERCHANT_PROFILES.find(candidate => candidate.pickupLocation === point.label)
+    const npc = drawNeighborhoodNPC(scene, point.x + 17, point.y - 8, merchant, index)
+      .setName(profile?.worldActorId ?? `customer:${point.label}`)
+    scene.tweens.add({ targets: npc, y: npc.y - 2, duration: 1500 + index * 170, yoyo: true, repeat: -1, ease: 'Sine.easeInOut' })
+    const name = profile?.businessName ?? (point.label === 'DeliveryZone' ? 'Noah · Customer' : 'Customer')
     label(scene, point.x, point.y - (point.label === 'ResidentialPickup' ? 83 : 57), name, '#fff4da', 10).setDepth(13)
     const marker = scene.add.graphics().setDepth(2)
     marker.lineStyle(2, merchant ? 0xedc36f : 0x90ccb8, 0.8).strokeCircle(point.x, point.y, 23)
   })
+  return parkedBicycle
 }

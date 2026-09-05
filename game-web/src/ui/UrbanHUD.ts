@@ -1,6 +1,7 @@
 import type Phaser from 'phaser'
 import type { CompanyState, WorldState } from '../types/game'
-import type { UrbanObjective } from '../scenes/GameWorldScene'
+import { getUrbanCargo, type UrbanObjective } from '../systems/urbanInteractions'
+import { HQ_EXPANSION_POINT } from '../world/urbanPresentation'
 import {
   URBAN_BUILDINGS, URBAN_ROADS, URBAN_HQ, URBAN_MERCHANT, minimapPoint, inInteractionRange,
 } from '../world/urbanWorld'
@@ -22,8 +23,14 @@ export const urbanHUDLayout = (width: number, height: number) => ({
   transport: { x: width - 90, y: height - 104, width: 156, height: 48 },
   minimap: { x: width - 132, y: 54, width: 116, height: 87 },
   objective: { x: 16, y: 52, width: Math.max(130, width - 166) },
-  menu: { x: width - 106, y: 70, width: 184, rowHeight: 36 },
+  menu: { x: width - 106, y: 74, width: 184, rowHeight: 44 },
 })
+
+export const urbanStatusText = (world: WorldState, company: CompanyState): string => {
+  const transport = world.urban?.activeTransport === 'bicycle' ? 'Bicycle' : 'Walking'
+  const cargo = getUrbanCargo(world)
+  return `$${company.money}  Rep ${company.reputation}  ${transport}  Cargo ${cargo.parcels.length}/${cargo.capacity}`
+}
 
 /** Pointer ownership keeps releasing one finger from cancelling a second finger. */
 export class UrbanDPadInput {
@@ -57,6 +64,8 @@ export class UrbanHUD {
   private readonly mapTarget: Phaser.GameObjects.Arc
   private readonly menuObjects: Phaser.GameObjects.GameObject[] = []
   private readonly menuButtons: Phaser.GameObjects.Rectangle[] = []
+  private readonly directionButtons: Phaser.GameObjects.Rectangle[] = []
+  private transportAvailable?: boolean
   private open = false
   private toastTimer?: Phaser.Time.TimerEvent
 
@@ -70,9 +79,9 @@ export class UrbanHUD {
     const width = scene.scale.width
     const height = scene.scale.height
     this.layout = urbanHUDLayout(width, height)
-    this.add(scene.add.rectangle(width / 2, 21, width, 42, 0x183b40, 0.98))
-    this.stats = this.text(16, 13, '', 14, '#fff0ca')
-    const menu = this.button(width - 51, 21, 82, 36, 'Menu', () => this.toggleMenu())
+    this.add(scene.add.rectangle(width / 2, 22, width, 44, 0x183b40, 0.98))
+    this.stats = this.text(16, 13, '', width < 500 ? 12 : 14, '#fff0ca')
+    const menu = this.button(width - 51, 22, 82, 44, 'Menu', () => this.toggleMenu())
     menu.label.setFontSize(14)
     const objectiveWidth = Math.min(this.layout.objective.width, 440)
     this.add(scene.add.rectangle(12 + objectiveWidth / 2, 84, objectiveWidth + 8, 72, 0x183b40, 0.90))
@@ -81,7 +90,7 @@ export class UrbanHUD {
     this.drawMinimap()
     this.mapTarget = this.add(scene.add.circle(0, 0, 4, 0xffcf66).setStrokeStyle(1, 0x183b40))
     this.mapPlayer = this.add(scene.add.circle(0, 0, 3, 0xffffff).setStrokeStyle(1, 0x183b40))
-    this.text(width - 132, 146, 'YOU · white   GO · gold', 10, '#183b40')
+    this.text(width - 132, 146, 'White: you · Gold: job\nD: HQ expansion (locked)', 9, '#183b40')
     this.createDPad()
     const a = this.layout.action
     const action = this.button(a.x, a.y, a.width, a.height, 'E · Action', callbacks.action)
@@ -97,14 +106,14 @@ export class UrbanHUD {
       .setWordWrapWidth(Math.min(width - 36, 430))
       .setBackgroundColor('#183b40').setPadding(10, 7).setVisible(false)
     const rows: [string, () => void][] = [
-      ['Company / Fleet', callbacks.company],
+      ['Company', callbacks.company],
       ['Save progress', callbacks.save],
       ['Toggle sound', callbacks.audio],
       ['Main menu', callbacks.menu],
     ]
     rows.forEach(([label, onTap], index) => {
       const m = this.layout.menu
-      const entry = this.button(m.x, m.y + index * m.rowHeight, m.width, m.rowHeight - 2, label, () => {
+      const entry = this.button(m.x, m.y + index * m.rowHeight, m.width, m.rowHeight, label, () => {
         this.toggleMenu()
         onTap()
       })
@@ -144,6 +153,7 @@ export class UrbanHUD {
     ]
     directions.forEach(([direction, col, row, label]) => {
       const b = this.button(x + col * size + size / 2, y + row * size + size / 2, size - 2, size - 2, label, () => {})
+      this.directionButtons.push(b.button)
       b.label.setFontSize(20)
       const press = (pointer: Phaser.Input.Pointer): void => {
         if (!this.open) {
@@ -184,24 +194,29 @@ export class UrbanHUD {
       const p = minimapPoint(point, width, height)
       this.text(x + p.x, y + p.y - 9, label, 9, '#183b40').setOrigin(0.5)
     }
+    const expansion = minimapPoint(HQ_EXPANSION_POINT, width, height)
+    this.text(x + expansion.x - 4, y + expansion.y, 'D', 9, '#604175').setOrigin(0.5)
   }
 
   update(world: WorldState, company: CompanyState, objective: UrbanObjective): void {
-    const transport = world.urban?.activeTransport === 'bicycle' ? 'Bicycle' : 'Walking'
-    this.stats.setText(`$${company.money}   Rep ${company.reputation}   ${transport}${world.player.carryingPackage ? ' · Parcel' : ''}`)
+    this.stats.setText(urbanStatusText(world, company))
     this.objective.setText(objective.title)
     const dx = objective.point.x - world.player.x
     const dy = objective.point.y - world.player.y
     const nearby = inInteractionRange(world.player, objective.point)
     const bearing = `${dy < -35 ? 'N' : dy > 35 ? 'S' : ''}${dx < -35 ? 'W' : dx > 35 ? 'E' : ''}`
-    this.hint.setText(nearby ? 'You are here · Press E / Action' : `${bearing} · ${Math.round(Math.hypot(dx, dy))} m · Follow streets`)
+    this.hint.setText(nearby ? 'You are here · Press E / Action' : `${bearing} · ${Math.round(Math.hypot(dx, dy))} units · Follow streets`)
     this.actionLabel.setText(nearby ? `E · ${objective.action}` : 'E · Action')
     this.actionButton.setFillStyle(nearby ? 0x397b60 : 0x244f52, 0.96)
     const atHQ = inInteractionRange(world.player, URBAN_HQ)
-    this.transportButton.setVisible(atHQ)
-    this.transportLabel.setVisible(atHQ).setText(world.urban?.activeTransport === 'bicycle' ? 'T · Park bicycle' : 'T · Take bicycle')
-    if (atHQ) this.transportButton.setInteractive({ useHandCursor: true })
-    else this.transportButton.disableInteractive()
+    this.transportLabel.setText(world.urban?.activeTransport === 'bicycle' ? 'T · Park bicycle' : 'T · Take bicycle')
+    if (atHQ !== this.transportAvailable) {
+      this.transportAvailable = atHQ
+      this.transportButton.setVisible(atHQ)
+      this.transportLabel.setVisible(atHQ)
+      if (atHQ) this.transportButton.setInteractive({ useHandCursor: true })
+      else this.transportButton.disableInteractive()
+    }
     const map = this.layout.minimap
     const player = minimapPoint(world.player, map.width, map.height)
     const target = minimapPoint(objective.point, map.width, map.height)
@@ -227,7 +242,10 @@ export class UrbanHUD {
 
   isMenuOpen(): boolean { return this.open }
   movement(): { x: number; y: number } { return this.pad.value() }
-  readonly clearMovement = (): void => { this.pad.clear() }
+  readonly clearMovement = (): void => {
+    this.pad.clear()
+    this.directionButtons.forEach(button => button.setFillStyle(0x244f52, 0.96))
+  }
   private readonly releasePointer = (pointer: Phaser.Input.Pointer): void => { this.pad.release(pointer.id) }
 
   destroy(): void {

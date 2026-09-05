@@ -97,6 +97,8 @@ or literal reference-image gameplay backgrounds are required.
   customer collection and fallback legs may use HQ, fixed or mobile infrastructure.
 - HQ, fixed and mobile DronePorts are simulation infrastructure types. Capacity,
   coverage and deterministic fallback selection are game models, not real taxonomy.
+  DronePort factory defaults describe future commissioned facilities; they are
+  not automatically installed as working drone infrastructure at the starter HQ.
 - Smart Parcel Lockers are future/simulated capabilities, not claimed live real-app
   functionality. No real locker security or autonomous drone routing is implemented.
 

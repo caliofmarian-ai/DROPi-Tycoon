@@ -144,17 +144,19 @@ describe('ISSUE-013 — Bicycle movement-speed increase', () => {
 })
 
 describe('RBATCH-013 — scene and scope boundaries', () => {
-  it('synchronizes speed immediately after loading the active GameWorld session', () => {
+  it('resolves owned transport after loading the session and before drawing the player', () => {
     const sessionIndex = gameWorldSource.indexOf('getOrCreateGameSession()')
-    const syncIndex = gameWorldSource.indexOf('synchronizePlayerMovementSpeed(')
+    const syncIndex = gameWorldSource.indexOf('resolveActiveTransport(this.companyState')
     const playerVisualIndex = gameWorldSource.indexOf('this.playerVisual = createPlayerVisual(')
     expect(sessionIndex).toBeGreaterThan(-1)
     expect(syncIndex).toBeGreaterThan(sessionIndex)
     expect(playerVisualIndex).toBeGreaterThan(syncIndex)
   })
 
-  it('continues to move through PlayerState.movementSpeed rather than a scene constant', () => {
-    expect(gameWorldSource).toContain('this.worldState.player.movementSpeed * deltaSeconds')
+  it('uses the selected shared transport profile and synchronizes PlayerState speed', () => {
+    expect(gameWorldSource).toContain('const profile = TRANSPORT_PROFILES[transport]')
+    expect(gameWorldSource).toContain('profile.speed, profile.roadOnly)')
+    expect(gameWorldSource).toContain('movementSpeed: profile.speed')
     expect(gameWorldSource).not.toContain('BALANCING.BICYCLE_MOVEMENT_SPEED * deltaSeconds')
   })
 

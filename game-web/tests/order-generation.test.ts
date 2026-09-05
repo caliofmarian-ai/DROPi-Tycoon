@@ -11,13 +11,12 @@ import {
   routeForSequence,
 } from '../src/systems/orderGeneration'
 import { findWorldRoutePoint } from '../src/world/worldLayout'
+import { createInitialCompanyState, createInitialWorldState } from '../src/state/gameState'
+
+import { getUrbanObjective, performUrbanInteraction } from '../src/systems/urbanInteractions'
 
 const gameStateSource = readFileSync(
   new URL('../src/state/gameState.ts', import.meta.url),
-  'utf8',
-)
-const sceneSource = readFileSync(
-  new URL('../src/scenes/GameWorldScene.ts', import.meta.url),
   'utf8',
 )
 
@@ -88,21 +87,49 @@ describe('release blocker #271 — runtime integration contract', () => {
   })
 
   it('generates a next order only after terminal settlement and updates the package position', () => {
-    expect(sceneSource).toContain('createNextOrder')
-    expect(sceneSource).toContain('spawnNextAvailableOrder')
-    expect(sceneSource).toContain('pickupPointForOrder')
-    expect(sceneSource).toContain('this.packageSprite.setPosition')
+    const world = createInitialWorldState()
+    const company = createInitialCompanyState()
+    world.activeOrder.status = 'PickedUp'
+    world.player.currentOrder = world.activeOrder.orderId
+    world.player.carryingPackage = true
+    Object.assign(world.player, findWorldRoutePoint(world.activeOrder.destination))
+    const result = performUrbanInteraction(world, company)
+    expect(result.settled).toBe(true)
+    expect(result.world.activeOrder.orderId).toBe('ORDER-002')
+    expect(result.company.money).toBe(company.money + world.activeOrder.reward)
+    const next = result.world.activeOrder
+    expect(pickupPointForOrder(next)).toEqual({
+      x: findWorldRoutePoint(next.pickupLocation)!.x,
+      y: findWorldRoutePoint(next.pickupLocation)!.y,
+    })
   })
 
   it('uses the active order pickup location instead of one hardcoded pickup name', () => {
-    expect(sceneSource).toContain('expectedPickupLocation: this.worldState.activeOrder.pickupLocation')
-    expect(sceneSource).not.toContain("expectedPickupLocation: 'PickupZone'")
+    for (let sequence = 1; sequence <= ORDER_ROUTE_TEMPLATES.length; sequence++) {
+      const world = createInitialWorldState()
+      world.activeOrder = { ...createOrderForSequence(sequence), status: 'Accepted' }
+      world.player.currentOrder = world.activeOrder.orderId
+      const objective = getUrbanObjective(world)
+      expect(objective.point).toEqual(pickupPointForOrder(world.activeOrder))
+      Object.assign(world.player, objective.point)
+      const result = performUrbanInteraction(world, createInitialCompanyState())
+      expect(result.world.activeOrder.status).toBe('PickedUp')
+    }
   })
 
   it('preserves exactly-once settlement before replacing the terminal order', () => {
-    const settlementIndex = sceneSource.indexOf('settleDeliveryOutcome(')
-    const nextOrderIndex = sceneSource.indexOf('this.spawnNextAvailableOrder()')
-    expect(settlementIndex).toBeGreaterThan(-1)
-    expect(nextOrderIndex).toBeGreaterThan(settlementIndex)
+    const world = createInitialWorldState()
+    world.activeOrder.status = 'PickedUp'
+    world.player.currentOrder = world.activeOrder.orderId
+    world.player.carryingPackage = true
+    Object.assign(world.player, findWorldRoutePoint(world.activeOrder.destination))
+    const company = createInitialCompanyState()
+    const first = performUrbanInteraction(world, company)
+    const again = performUrbanInteraction(first.world, first.company)
+    expect(first.settled).toBe(true)
+    expect(again.settled).toBe(false)
+    expect(again.company.money).toBe(first.company.money)
+    expect(again.company.reviews).toHaveLength(1)
+    expect(again.world.activeOrder.orderId).toBe(first.world.activeOrder.orderId)
   })
 })

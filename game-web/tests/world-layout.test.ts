@@ -83,17 +83,19 @@ describe('release blocker #273 — explorable first-map structure', () => {
 
 describe('release blocker #273 — scene integration contract', () => {
   it('renders from centralized world-layout collections', () => {
+    const presentationSource = readFileSync(new URL('../src/world/urbanPresentation.ts', import.meta.url), 'utf8')
+    expect(sceneSource).toContain('renderUrbanNeighborhood(this, this.companyState)')
     for (const token of [
-      'WORLD_ZONES',
-      'WORLD_ROADS',
-      'WORLD_SIDEWALKS',
-      'WORLD_BUILDINGS',
+      'URBAN_ROADS',
+      'URBAN_SIDEWALKS',
+      'URBAN_BUILDINGS',
       'WORLD_DECORATIONS',
       'WORLD_ROUTE_POINTS',
-      'DELIVERY_ROUTE_POINTS',
     ]) {
-      expect(sceneSource).toContain(token)
+      expect(presentationSource).toContain(token)
     }
+    expect(presentationSource.indexOf('URBAN_SIDEWALKS.forEach'))
+      .toBeLessThan(presentationSource.indexOf('URBAN_ROADS.forEach'))
   })
 
   it('removes the old scene-local scaffold arrays', () => {
@@ -110,7 +112,12 @@ describe('Workstream E — world uplift removes developer-style debug labels', (
     expect(sceneSource).not.toContain("kind === 'pickup' ? 'Pickup' : 'Delivery'")
   })
 
-  it('draws zone identity as a themed status chip instead of a raw text dump', () => {
-    expect(sceneSource).toContain('createStatusChip(')
+  it('draws readable neighborhood signs and landmark identities without image assets', () => {
+    const presentationSource = readFileSync(new URL('../src/world/urbanPresentation.ts', import.meta.url), 'utf8')
+    for (const sign of ['DROPi · HQ', 'MARA’S MARKET', 'DRONEPORT', 'CEDAR AVENUE']) {
+      expect(presentationSource).toContain(sign)
+    }
+    expect(presentationSource).not.toContain('.add.image(')
+    expect(sceneSource).not.toContain('.load.image(')
   })
 })

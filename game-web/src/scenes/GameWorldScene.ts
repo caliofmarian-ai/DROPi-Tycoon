@@ -2,116 +2,18 @@ import Phaser from 'phaser'
 import { getBrowserSaveStorage } from '../persistence/browserSaveStorage'
 import { autosaveIfApproved } from '../persistence/saveSystem'
 import { getOrCreateGameSession, replaceGameSession } from '../state/gameSession'
-import { attemptDelivery, attemptPickup } from '../systems/orderSystem'
-import { applyOrderAcceptanceRequest } from '../systems/orderAcceptance'
-import { settleDeliveryOutcome } from '../systems/economySettlement'
 import { createNextOrder, pickupPointForOrder } from '../systems/orderGeneration'
-import { getAudioController, type AudioCue } from '../systems/audioSystem'
+import { getAudioController } from '../systems/audioSystem'
 import { resolveActiveTransport, TRANSPORT_PROFILES } from '../systems/urbanLogistics'
+import { getUrbanObjective, performUrbanInteraction } from '../systems/urbanInteractions'
 import type { CompanyState, WorldState } from '../types/game'
 import { UrbanHUD } from '../ui/UrbanHUD'
 import { createPlayerVisual, type PlayerVisual } from '../world/playerVisual'
 import { renderUrbanNeighborhood } from '../world/urbanPresentation'
 import {
-  URBAN_HQ, URBAN_MERCHANT, inInteractionRange, moveUrbanPlayer, repairUrbanPosition,
+  URBAN_HQ, inInteractionRange, moveUrbanPlayer, movementFacing, repairUrbanPosition, type UrbanFacing,
 } from '../world/urbanWorld'
-import { findWorldRoutePoint, WORLD_HEIGHT, WORLD_WIDTH } from '../world/worldLayout'
-
-export interface UrbanObjective {
-  point: { x: number; y: number }
-  title: string
-  action: string
-}
-
-export const getUrbanObjective = (world: WorldState): UrbanObjective => {
-  const order = world.activeOrder
-  // Restored cargo and accepted work take precedence over the new tutorial.
-  if (order.status === 'Accepted') {
-    return { point: pickupPointForOrder(order), title: 'Pick up at the merchant', action: 'Pick up parcel' }
-  }
-  if (order.status === 'PickedUp') {
-    return {
-      point: findWorldRoutePoint(order.destination) ?? URBAN_HQ,
-      title: 'Deliver to the customer',
-      action: 'Deliver parcel',
-    }
-  }
-  if (!world.urban?.merchantOnboarded) {
-    return { point: URBAN_MERCHANT, title: 'Meet Mara at the corner shop', action: 'Meet merchant' }
-  }
-  return { point: URBAN_HQ, title: 'Return to HQ for a local order', action: 'Accept local order' }
-}
-
-export interface UrbanInteractionResult {
-  world: WorldState
-  company: CompanyState
-  message: string
-  cue?: AudioCue
-  settled: boolean
-}
-
-/** The button and keyboard share this proximity-gated, transactional path. */
-export const performUrbanInteraction = (
-  source: WorldState,
-  company: CompanyState,
-): UrbanInteractionResult => {
-  const world: WorldState = {
-    ...source,
-    urban: source.urban ?? { merchantOnboarded: false, activeTransport: 'walking' },
-    pendingDeliveryDestination: '',
-  }
-  const result = (message: string, cue?: AudioCue): UrbanInteractionResult =>
-    ({ world, company, message, cue, settled: false })
-  const order = world.activeOrder
-  const objective = getUrbanObjective(world)
-  if (order.status === 'Accepted' && inInteractionRange(world.player, objective.point)) {
-    const picked = attemptPickup(order, world.player, {
-      expectedPickupLocation: order.pickupLocation,
-      distanceToPackage: Math.hypot(world.player.x - objective.point.x, world.player.y - objective.point.y),
-      pickupRadius: 48.001,
-    })
-    world.activeOrder = picked.order
-    world.player = picked.player
-    if (picked.order.status !== 'PickedUp') return result('Finish carrying your current parcel first.')
-    return result('Parcel collected! Follow the gold marker to your customer.', 'positive')
-  }
-  if (order.status === 'PickedUp' && inInteractionRange(world.player, objective.point)) {
-    const delivered = attemptDelivery(order, world.player, {
-      selectedDestination: order.destination,
-      distanceToDestination: Math.hypot(world.player.x - objective.point.x, world.player.y - objective.point.y),
-      deliveryRadius: 48,
-      orderConditionsMet: !!findWorldRoutePoint(order.destination),
-    })
-    const settlement = settleDeliveryOutcome(order, delivered.order, company)
-    if (!settlement.applied) return result('Bring your parcel to the marked customer.')
-    world.activeOrder = createNextOrder(settlement.order)
-    world.player = delivered.player
-    return {
-      world,
-      company: settlement.company,
-      message: `Delivered! +$${order.reward} · Return to HQ for your next job.`,
-      cue: 'delivery-success',
-      settled: true,
-    }
-  }
-  if (!world.urban!.merchantOnboarded && inInteractionRange(world.player, URBAN_MERCHANT)) {
-    world.urban = { ...world.urban!, merchantOnboarded: true }
-    return result('Mara: Welcome, partner! HQ now has local delivery work.', 'positive')
-  }
-  if (inInteractionRange(world.player, URBAN_HQ)) {
-    if (!world.urban!.merchantOnboarded) return result('HQ: Meet Mara at the corner shop first. Follow the marker.')
-    if (order.status === 'Available') {
-      const accepted = applyOrderAcceptanceRequest(world, order.orderId)
-      return {
-        world: accepted.worldState, company, settled: false,
-        message: accepted.accepted ? 'Job accepted! Visit the merchant to collect the parcel.' : 'Finish your current job first.',
-        cue: accepted.accepted ? 'order-accepted' : undefined,
-      }
-    }
-    return result('HQ: Finish your delivery first. You can change transport here with T.')
-  }
-  return result('Move closer to the gold marker, then use E / Action.')
-}
+import { WORLD_HEIGHT, WORLD_WIDTH } from '../world/worldLayout'
 
 export class GameWorldScene extends Phaser.Scene {
   private worldState!: WorldState
@@ -120,10 +22,12 @@ export class GameWorldScene extends Phaser.Scene {
   private hud!: UrbanHUD
   private objectiveMarker!: Phaser.GameObjects.Container
   private parcel!: Phaser.GameObjects.Container
+  private parkedBicycle: Phaser.GameObjects.Graphics | null = null
   private fixedUiLayer!: Phaser.GameObjects.Layer
   private fixedUiCamera!: Phaser.Cameras.Scene2D.Camera
   private keys: Record<string, Phaser.Input.Keyboard.Key> = {}
   private lastHudUpdate = 0
+  private facing: UrbanFacing = 'down'
 
   constructor() {
     super('GameWorld')
@@ -148,7 +52,7 @@ export class GameWorldScene extends Phaser.Scene {
     this.syncRuntimeSession()
     getAudioController().setEnabled(session.settings.soundEnabled)
     this.cameras.main.setBackgroundColor('#a9ca93').setBounds(0, 0, WORLD_WIDTH, WORLD_HEIGHT)
-    renderUrbanNeighborhood(this)
+    this.parkedBicycle = renderUrbanNeighborhood(this, this.companyState)
 
     const ring = this.add.circle(0, 0, 30, 0xffcf66, 0.16).setStrokeStyle(3, 0xffcf66)
     const pin = this.add.triangle(0, -41, 0, 0, 18, 0, 9, 12, 0xffcf66)
@@ -186,6 +90,7 @@ export class GameWorldScene extends Phaser.Scene {
     this.game.events.on(Phaser.Core.Events.BLUR, this.clearInput)
     this.events.once(Phaser.Scenes.Events.SHUTDOWN, this.shutdown, this)
     this.lastHudUpdate = 0
+    this.facing = 'down'
     this.refreshPresentation()
     this.hud.notify('D-pad / WASD to move · E to interact · Gold = objective')
   }
@@ -207,7 +112,10 @@ export class GameWorldScene extends Phaser.Scene {
     this.worldState.isMoving = moving
     this.worldState.tapTarget = { ...next }
     this.playerVisual.container.setPosition(next.x, next.y)
-    if (input.x !== 0) this.playerVisual.setFacing(input.x < 0)
+    if (input.x !== 0 || input.y !== 0) {
+      this.facing = movementFacing(input, this.facing)
+      this.playerVisual.setFacing(this.facing)
+    }
     this.playerVisual.setMoving(moving)
     this.playerVisual.update(delta)
     if (this.keys.ESC && Phaser.Input.Keyboard.JustDown(this.keys.ESC)) this.hud.toggleMenu()
@@ -238,7 +146,7 @@ export class GameWorldScene extends Phaser.Scene {
     }
     const urban = this.worldState.urban!
     if (urban.activeTransport === 'walking' && resolveActiveTransport(this.companyState, 'bicycle') !== 'bicycle') {
-      this.hud.notify('Buy a Bicycle in Company > Upgrades or Fleet, then collect it here.')
+      this.hud.notify('Buy Bicycle in Company (Purchase or Vehicles), then collect it at HQ.')
       return
     }
     urban.activeTransport = urban.activeTransport === 'walking' ? 'bicycle' : 'walking'
@@ -253,6 +161,7 @@ export class GameWorldScene extends Phaser.Scene {
     const pickup = pickupPointForOrder(this.worldState.activeOrder)
     this.parcel.setPosition(pickup.x, pickup.y).setVisible(this.worldState.activeOrder.status === 'Accepted')
     this.playerVisual.setState(this.worldState.urban!.activeTransport === 'bicycle' ? 'Bicycle' : 'Walking')
+    this.parkedBicycle?.setVisible(this.worldState.urban!.activeTransport === 'walking')
     this.playerVisual.setCarrying(this.worldState.player.carryingPackage)
     this.hud.update(this.worldState, this.companyState, objective)
   }
@@ -264,7 +173,7 @@ export class GameWorldScene extends Phaser.Scene {
   }
 
   private saveProgress(): void {
-    this.hud.notify(this.persist('progression-changed') ? 'Progress saved on this device.' : 'Storage unavailable. Progress remains in this session.')
+    this.hud.notify(this.persist('progression-changed') ? 'Company + preferences saved. Loading starts a fresh job at HQ.' : 'Storage unavailable. Progress remains in this session.')
   }
 
   private toggleAudio(): void {

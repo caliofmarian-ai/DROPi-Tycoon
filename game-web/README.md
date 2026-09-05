@@ -48,7 +48,7 @@ bicycle can be selected at HQ. No native-shell change or new APK is needed.
 - Follow the gold objective to meet the merchant and activate local marketplace demand.
 - Return to HQ and use Action / E to accept work.
 - Walk to the marked pickup, use Action / E, then do the same at the customer.
-- Buy a bicycle through Company → Vehicle Fleet; return to HQ to select it.
+- Buy a bicycle through Menu → Company → Vehicles (Vehicle Fleet); return to HQ to select it.
 - Company management, employees, finances and procedural sound remain available.
 - The ground operator and future aerial drone are separate domain actors.
 - Multi-parcel cargo, mission legs, fixed/mobile DronePorts, coverage, lockers and
@@ -71,7 +71,7 @@ After deployment of the reviewed web runtime, use the existing installed shell:
    interact to onboard, then return to HQ to accept a local order.
 5. Follow the pickup marker, interact to collect, follow the destination and
    interact to deliver. Confirm parcel state, reward and the next HQ objective.
-6. Open Company → Vehicle Fleet, buy/use an owned Bicycle, return to the world and
+6. Open Menu → Company → Vehicles (Vehicle Fleet), buy/use an owned Bicycle, return to the world and
    switch transport at HQ. Confirm a visible rider and increased cargo capacity.
 7. Check Company, Employees, Menu and sound controls; look for the locked HQ
    DronePort expansion and verify it does not launch a human into flight.

@@ -1,20 +1,136 @@
 import { describe, expect, it, vi } from 'vitest'
 import { createInitialCompanyState, createInitialGameSettingsState, createInitialWorldState } from '../src/state/gameState'
 import { createSaveGame, restoreGameSessionFromSave } from '../src/persistence/saveSystem'
+import { getOrCreateGameSession, replaceGameSession } from '../src/state/gameSession'
 import { createOrderForSequence } from '../src/systems/orderGeneration'
 import { findWorldRoutePoint } from '../src/world/worldLayout'
 import { URBAN_HQ, URBAN_MERCHANT } from '../src/world/urbanWorld'
-import { UrbanDPadInput, urbanHUDLayout } from '../src/ui/UrbanHUD'
+import { UrbanDPadInput, urbanHUDLayout, urbanStatusText } from '../src/ui/UrbanHUD'
 import type { WorldState } from '../src/types/game'
 
-vi.mock('phaser', () => ({ default: { Scene: class {} } }))
+vi.mock('phaser', () => ({
+  default: {
+    Scene: class {},
+    Input: { Keyboard: { JustDown: (key: { justDown: boolean }) => {
+      const pressed = key.justDown
+      key.justDown = false
+      return pressed
+    } } },
+  },
+}))
 
-import { getUrbanObjective, performUrbanInteraction } from '../src/scenes/GameWorldScene'
+import { GameWorldScene } from '../src/scenes/GameWorldScene'
+import { getUrbanObjective, performUrbanInteraction } from '../src/systems/urbanInteractions'
 
 const at = (world: WorldState, point: { x: number; y: number }): WorldState =>
   ({ ...world, player: { ...world.player, x: point.x, y: point.y } })
 
 describe('urban physical delivery scene', () => {
+  it.each(['Accepted', 'PickedUp'] as const)('does not auto-interact with a nearby %s job during update', status => {
+    const scene = new GameWorldScene()
+    let world = createInitialWorldState()
+    world.urban = { merchantOnboarded: true, activeTransport: 'walking' }
+    world.activeOrder.status = status
+    world.player.currentOrder = world.activeOrder.orderId
+    world.player.carryingPackage = status === 'PickedUp'
+    world = at(world, getUrbanObjective(world).point)
+    Object.assign(scene, {
+      worldState: world,
+      companyState: createInitialCompanyState(),
+      hud: { movement: () => ({ x: 0, y: 0 }), isMenuOpen: () => false },
+      playerVisual: { container: { setPosition: vi.fn() }, setMoving: vi.fn(), update: vi.fn() },
+    })
+    scene.update(0, 16)
+    expect(world.activeOrder.status).toBe(status)
+  })
+
+  it('moves from held D-pad input, but not from legacy tap targets or an open menu', () => {
+    const scene = new GameWorldScene()
+    const world = createInitialWorldState()
+    world.urban = { merchantOnboarded: true, activeTransport: 'walking' }
+    world.tapTarget = { x: 800, y: 900 }
+    world.isMoving = true
+    let input = { x: 0, y: 0 }
+    let menuOpen = false
+    Object.assign(scene, {
+      worldState: world,
+      companyState: createInitialCompanyState(),
+      hud: { movement: () => input, isMenuOpen: () => menuOpen },
+      playerVisual: {
+        container: { setPosition: vi.fn() }, setMoving: vi.fn(), setFacing: vi.fn(), update: vi.fn(),
+      },
+    })
+    scene.update(0, 16)
+    expect(world.player.x).toBe(URBAN_HQ.x)
+    input = { x: 1, y: 0 }
+    scene.update(0, 16)
+    expect(world.player.x).toBeGreaterThan(URBAN_HQ.x)
+    const stoppedX = world.player.x
+    menuOpen = true
+    scene.update(0, 16)
+    expect(world.player.x).toBe(stoppedX)
+  })
+
+  it.each([
+    ['up', 0, -1], ['down', 0, 1], ['left', -1, 0], ['right', 1, 0],
+  ] as const)('turns the courier %s from direct movement input', (direction, x, y) => {
+    const scene = new GameWorldScene()
+    const world = createInitialWorldState()
+    world.urban = { merchantOnboarded: true, activeTransport: 'walking' }
+    const setFacing = vi.fn()
+    Object.assign(scene, {
+      worldState: world,
+      companyState: createInitialCompanyState(),
+      hud: { movement: () => ({ x, y }), isMenuOpen: () => false },
+      playerVisual: {
+        container: { setPosition: vi.fn() }, setMoving: vi.fn(), setFacing, update: vi.fn(),
+      },
+    })
+    scene.update(0, 16)
+    expect(setFacing).toHaveBeenCalledWith(direction)
+  })
+
+  it('equips an owned bicycle only at HQ and parks it without losing carried cargo', () => {
+    const scene = new GameWorldScene()
+    const world = createInitialWorldState()
+    const company = createInitialCompanyState()
+    world.urban = { merchantOnboarded: true, activeTransport: 'walking' }
+    world.player.carryingPackage = true
+    world.player.currentOrder = world.activeOrder.orderId
+    world.activeOrder.status = 'PickedUp'
+    const key = { justDown: true }
+    const marker = { setPosition: vi.fn() }
+    const parcel = { setPosition: () => parcel, setVisible: vi.fn() }
+    Object.assign(scene, {
+      worldState: world,
+      companyState: company,
+      keys: { T: key },
+      hud: { movement: () => ({ x: 0, y: 0 }), isMenuOpen: () => false, notify: vi.fn(), update: vi.fn() },
+      objectiveMarker: marker,
+      parcel,
+      playerVisual: {
+        container: { setPosition: vi.fn() }, setMoving: vi.fn(), setFacing: vi.fn(),
+        update: vi.fn(), setState: vi.fn(), setCarrying: vi.fn(),
+      },
+    })
+    scene.update(0, 16)
+    expect(world.urban.activeTransport).toBe('walking')
+    company.vehicles.push({ vehicleId: 'owned-bike', typeId: 'Bicycle' })
+    Object.assign(world.player, URBAN_MERCHANT)
+    key.justDown = true
+    scene.update(0, 16)
+    expect(world.urban.activeTransport).toBe('walking')
+    Object.assign(world.player, URBAN_HQ)
+    key.justDown = true
+    scene.update(0, 16)
+    expect(world.urban.activeTransport).toBe('bicycle')
+    expect(world.player.carryingPackage).toBe(true)
+    key.justDown = true
+    scene.update(0, 16)
+    expect(world.urban.activeTransport).toBe('walking')
+    expect(world.player.carryingPackage).toBe(true)
+  })
+
   it('requires merchant onboarding, then a physical visit to HQ before acceptance', () => {
     const company = createInitialCompanyState()
     const initial = createInitialWorldState()
@@ -100,15 +216,23 @@ describe('urban physical delivery scene', () => {
     expect(world).toEqual(before)
   })
 
-  it.each(['Accepted', 'PickedUp'] as const)('finishes a saved %s delivery to the legacy CompanyDelivery endpoint', status => {
+  it.each(['Accepted', 'PickedUp'] as const)('continues %s work during navigation but resets the job on disk load', status => {
     const world = createInitialWorldState()
     const company = createInitialCompanyState()
+    world.urban = { merchantOnboarded: true, activeTransport: 'walking' }
     world.activeOrder.destination = 'CompanyDelivery'
     world.activeOrder.status = status
     world.player.currentOrder = world.activeOrder.orderId
     world.player.carryingPackage = status === 'PickedUp'
     const saved = createSaveGame({ world, company, settings: createInitialGameSettingsState() })
-    let restored = restoreGameSessionFromSave(saved).world
+    const loaded = restoreGameSessionFromSave(saved)
+    expect(loaded.world.activeOrder.status).toBe('Available')
+    expect(loaded.world.player.carryingPackage).toBe(false)
+    expect(loaded.world.player.currentOrder).toBe('')
+    expect(loaded.world.urban?.merchantOnboarded).toBe(true)
+    expect(loaded.company.money).toBe(company.money)
+    replaceGameSession(world, company)
+    let restored = getOrCreateGameSession().world
     expect(restored.activeOrder.status).toBe(status)
     if (status === 'Accepted') {
       restored = performUrbanInteraction(at(restored, getUrbanObjective(restored).point), company).world
@@ -122,6 +246,16 @@ describe('urban physical delivery scene', () => {
 })
 
 describe('urban touch controls and compact HUD', () => {
+  it('shows actual cargo count and selected profile capacity', () => {
+    const world = createInitialWorldState()
+    const company = createInitialCompanyState()
+    expect(urbanStatusText(world, company)).toContain('Walking  Cargo 0/1')
+    world.urban = { merchantOnboarded: true, activeTransport: 'bicycle' }
+    expect(urbanStatusText(world, company)).toContain('Bicycle  Cargo 0/3')
+    world.player.carryingPackage = true
+    expect(urbanStatusText(world, company)).toContain('Bicycle  Cargo 1/3')
+  })
+
   it('supports diagonal multitouch and independent releases', () => {
     const pad = new UrbanDPadInput()
     pad.press(1, 'up')
@@ -152,12 +286,14 @@ describe('urban touch controls and compact HUD', () => {
       const actionLeft = layout.action.x - layout.action.width / 2
       expect(padRight).toBeLessThan(actionLeft)
       expect(layout.pad.y).toBeGreaterThan(120)
+      expect(layout.menu.x - layout.menu.width / 2).toBeGreaterThan(padRight)
       expect(layout.menu.y + 3 * layout.menu.rowHeight + layout.menu.rowHeight / 2)
-        .toBeLessThan(layout.pad.y)
+        .toBeLessThan(layout.transport.y - layout.transport.height / 2)
       expect(layout.minimap.x + layout.minimap.width).toBeLessThan(width)
       expect(layout.action.y + layout.action.height / 2).toBeLessThan(height)
       expect(layout.pad.size - 2).toBeGreaterThanOrEqual(44)
       expect(layout.transport.height).toBeGreaterThanOrEqual(44)
+      expect(layout.menu.rowHeight).toBeGreaterThanOrEqual(44)
     },
   )
 })
