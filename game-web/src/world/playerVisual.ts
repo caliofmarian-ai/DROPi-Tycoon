@@ -51,6 +51,8 @@ export interface PlayerVisual {
   setFacing: (facingLeft: boolean) => void
   /** Cheap walking-stance toggle; never rebuilds the whole silhouette. */
   setMoving: (moving: boolean) => void
+  setCarrying: (carrying: boolean) => void
+  update: (delta: number) => void
   destroy: () => void
 }
 
@@ -65,6 +67,7 @@ export const createPlayerVisual = (
   y: number,
 ): PlayerVisual => {
   const container = scene.add.container(x, y)
+  container.add(scene.add.ellipse(0, 17, 30, 10, 0x183b40, 0.24))
 
   const personGraphics = scene.add.graphics()
   personGraphics.setDepth(1)
@@ -73,6 +76,14 @@ export const createPlayerVisual = (
   let vehicleGraphics: Phaser.GameObjects.Graphics | null = null
   let currentState: PlayerVisualState = 'Walking'
   let currentLegPhase: 0 | 1 = 0
+  let isMoving = false
+  let elapsed = 0
+  const parcel = scene.add.graphics()
+  parcel.fillStyle(0xc99054).fillRoundedRect(-16, -6, 11, 14, 2)
+  parcel.lineStyle(1.5, 0x684627).strokeRoundedRect(-16, -6, 11, 14, 2)
+  parcel.fillStyle(0xffe7b0).fillRect(-12, -6, 3, 14)
+  parcel.setVisible(false)
+  container.add(parcel)
   drawPersonSilhouette(personGraphics, currentLegPhase)
 
   const redraw = (): void => {
@@ -101,6 +112,8 @@ export const createPlayerVisual = (
     )
     vehicleGraphics.setDepth(0)
     container.add(vehicleGraphics)
+    container.bringToTop(personGraphics)
+    container.bringToTop(parcel)
   }
 
   const setState = (state: PlayerVisualState): void => {
@@ -114,7 +127,17 @@ export const createPlayerVisual = (
   }
 
   const setMoving = (moving: boolean): void => {
-    const nextPhase: 0 | 1 = moving ? 1 : 0
+    isMoving = moving
+    if (!moving) {
+      elapsed = 0
+      personGraphics.y = 0
+    }
+  }
+
+  const update = (delta: number): void => {
+    elapsed += isMoving ? Math.min(delta, 100) : 0
+    const nextPhase: 0 | 1 = isMoving ? Math.floor(elapsed / 130) % 2 as 0 | 1 : 0
+    personGraphics.y = isMoving ? -nextPhase : 0
     if (nextPhase === currentLegPhase) return
     currentLegPhase = nextPhase
     if (currentState === 'Walking') {
@@ -126,5 +149,7 @@ export const createPlayerVisual = (
     container.destroy(true)
   }
 
-  return { container, setState, setFacing, setMoving, destroy }
+  const setCarrying = (carrying: boolean): void => { parcel.setVisible(carrying) }
+
+  return { container, setState, setFacing, setMoving, setCarrying, update, destroy }
 }
