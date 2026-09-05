@@ -181,7 +181,7 @@ export class VehicleFleetScene extends Phaser.Scene {
       const session = replaceGameSession(this.worldState, this.companyState)
       const storage = getBrowserSaveStorage()
       if (storage) {
-        const autosave = autosaveIfApproved(storage, session, 'progression-changed')
+        const autosave = autosaveIfApproved(storage, session, 'vehicle-purchased')
         if (!autosave.saved && autosave.reason === 'write-failed') {
           this.feedbackText.setText(
             `${result.message}\nLocal autosave failed: ${autosave.message ?? 'unknown error'}`,
