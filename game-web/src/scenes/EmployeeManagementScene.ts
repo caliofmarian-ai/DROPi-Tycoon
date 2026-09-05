@@ -199,20 +199,37 @@ export class EmployeeManagementScene extends Phaser.Scene {
     const avatar = this.layout.avatar
     const centerX = rectCenterX(avatar)
     const centerY = rectCenterY(avatar)
+    const faceRadius = avatar.width * 0.19
+    const faceY = avatar.top + avatar.height * 0.37
 
     this.add
-      .rectangle(centerX, centerY, avatar.width, avatar.height, 0x17304a, 1)
+      .rectangle(centerX, centerY, avatar.width, avatar.height, 0x16324a, 1)
       .setStrokeStyle(2, 0x67e8f9, 0.86)
 
-    this.add.circle(centerX, avatar.top + avatar.height * 0.34, avatar.width * 0.19, 0xdbeafe, 1)
+    // A compact illustrated portrait keeps Alex visually identifiable without
+    // inventing gameplay attributes that do not yet exist in the employee model.
+    this.add.ellipse(centerX, faceY - faceRadius * 0.42, faceRadius * 2.2, faceRadius * 1.34, 0x3b2f2f, 1)
+    this.add.circle(centerX, faceY, faceRadius, 0xe7b98e, 1)
+    this.add.circle(centerX - faceRadius * 0.37, faceY - faceRadius * 0.06, Math.max(1.5, faceRadius * 0.075), 0x1f2937, 1)
+    this.add.circle(centerX + faceRadius * 0.37, faceY - faceRadius * 0.06, Math.max(1.5, faceRadius * 0.075), 0x1f2937, 1)
+
+    const portraitGraphics = this.add.graphics()
+    portraitGraphics.lineStyle(Math.max(1, avatar.width * 0.018), 0x7c4a2d, 1)
+    portraitGraphics.beginPath()
+    portraitGraphics.arc(centerX, faceY + faceRadius * 0.22, faceRadius * 0.34, 0.15, Math.PI - 0.15, false)
+    portraitGraphics.strokePath()
+
     this.add.ellipse(
       centerX,
-      avatar.top + avatar.height * 0.73,
-      avatar.width * 0.56,
-      avatar.height * 0.34,
-      0x60a5fa,
+      avatar.top + avatar.height * 0.78,
+      avatar.width * 0.72,
+      avatar.height * 0.38,
+      0x0f766e,
       1,
     )
+    this.add
+      .rectangle(centerX, avatar.top + avatar.height * 0.69, avatar.width * 0.16, avatar.height * 0.15, 0xf8fafc, 0.92)
+      .setStrokeStyle(1, 0x99f6e4, 0.8)
 
     this.add
       .circle(avatar.left + avatar.width - 14, avatar.top + 14, 11, 0x0f766e, 1)
@@ -297,7 +314,7 @@ export class EmployeeManagementScene extends Phaser.Scene {
         `Hire cost     ${candidate.hireCost}`,
         `Salary        ${candidate.salaryPerCycle} / salary cycle`,
         '',
-        'Hiring begins onboarding. Salary eligibility starts only after onboarding is completed.',
+        'Hiring begins onboarding. Alex becomes payroll-eligible after onboarding is complete.',
       ])
       this.actionLabel.setText(`Hire ${candidate.name} — ${candidate.hireCost}`)
       this.actionButton.setFillStyle(0x15803d, 1).setStrokeStyle(2, 0x86efac)
@@ -313,8 +330,8 @@ export class EmployeeManagementScene extends Phaser.Scene {
       `Payroll       last processed cycle ${this.companyState.payroll.lastProcessedCycle}`,
       '',
       employee.status === 'Active'
-        ? 'Active and salary-eligible. Future assigned-work systems can build on this employee.'
-        : 'Onboarding is the next step before salary eligibility and active status.',
+        ? 'Ready for work and eligible for payroll.'
+        : 'Onboarding in progress. Complete it to activate Alex and start payroll eligibility.',
     ])
 
     if (employee.status === 'Onboarding') {
