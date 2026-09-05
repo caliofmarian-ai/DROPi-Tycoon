@@ -7,7 +7,7 @@ import { completeEmployeeOnboarding, hireEmployee } from '../systems/employeeSys
 import type { CompanyState, WorldState } from '../types/game'
 import { buildManagementLayout, buildStaffCardLayout } from '../ui/managementLayout'
 import { buildEmployeeCards, buildManagementOverview, pageItems } from '../ui/managementViewModel'
-import { drawManagementFooter, drawManagementHeader } from '../ui/managementControls'
+import { bindManagementPaging, drawManagementFooter, drawManagementHeader } from '../ui/managementControls'
 import { COLORS, formatMoney } from '../ui/theme'
 import { createThemedButton, drawEmployeePortrait, drawPanel, fitText } from '../ui/themeControls'
 
@@ -27,6 +27,8 @@ export class EmployeeManagementScene extends Phaser.Scene {
     this.currentPage = 0
     this.feedback = ''
     this.render()
+    bindManagementPaging(this, () => buildManagementLayout(this.scale.width, this.scale.height).body,
+      (delta) => this.changePage(delta))
     this.scale.on(Phaser.Scale.Events.RESIZE, this.handleResize)
     this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => {
       this.scale.off(Phaser.Scale.Events.RESIZE, this.handleResize)
@@ -67,11 +69,15 @@ export class EmployeeManagementScene extends Phaser.Scene {
         .setEnabled(employee.canAct)
     }
     drawManagementFooter(this, layout, { label: 'Company', action: () => this.returnToCompany() },
-      () => this.returnToMainMenu(), { ...paging, change: (delta) => {
-        this.currentPage += delta
-        this.feedback = ''
-        this.render()
-      } })
+      () => this.returnToMainMenu(), { ...paging, change: (delta) => this.changePage(delta) })
+  }
+
+  private changePage(delta: number): void {
+    const next = pageItems(buildEmployeeCards(this.companyState), this.currentPage + delta, 1).page
+    if (next === this.currentPage) return
+    this.currentPage = next
+    this.feedback = ''
+    this.render()
   }
 
   private performPrimaryAction(employeeId: string): void {

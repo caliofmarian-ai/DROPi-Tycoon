@@ -52,7 +52,7 @@ describe('M-008 owner review — compact non-overlapping top dock', () => {
 
   it('keeps Main Menu and Company behind the single navbar toggle', () => {
     const hudSource = readFileSync(new URL('../src/ui/UrbanHUD.ts', import.meta.url), 'utf8')
-    expect(hudSource).toContain("'Menu', () => this.toggleMenu()")
+    expect(hudSource).toContain("'☰  Menu', () => this.toggleMenu()")
     expect(hudSource).toContain("['Main menu', callbacks.menu]")
     expect(hudSource).toContain("['Company', callbacks.company]")
     expect(hudSource).toContain('entry.button.setVisible(false).disableInteractive()')
@@ -61,6 +61,6 @@ describe('M-008 owner review — compact non-overlapping top dock', () => {
   it('does not let tapping the fixed dock create movement or a delivery target', () => {
     expect(sceneSource).not.toContain('getWorldPoint(pointer.x, pointer.y)')
     expect(sceneSource).not.toContain('selectDeliveryIntentFromTap')
-    expect(sceneSource).toContain('this.hud.isMenuOpen() ? { x: 0, y: 0 }')
+    expect(sceneSource).toContain('this.hud.isMenuOpen() || this.zoomGesture.isPinching() ? { x: 0, y: 0 }')
   })
 })

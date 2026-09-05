@@ -82,6 +82,25 @@ describe('finite city and district catalog', () => {
     expect(new Set(WORLD_DECORATIONS.map(tree => tree.zoneId))).toEqual(new Set(WORLD_ZONES.map(zone => zone.id)))
   })
 
+  it('delivers to physical homes as well as businesses, including the new boroughs', () => {
+    const homeAddresses = [
+      'DeliveryZone', 'CedarApartments', 'WillowCourt', 'BakeryFlats',
+      'CanalHouse', 'MarinaHouse', 'HarborLofts', 'StationFlats',
+      'GardenCourt', 'ParkHouse', 'OrchardHouse', 'SouthCourt',
+    ]
+    for (const label of homeAddresses) {
+      const location = findCityLocation(label)!
+      expect(URBAN_BUILDINGS.find(building => building.id === location.buildingId)?.kind, label).toBe('home')
+    }
+    for (const label of ['ArcadeOffice', 'QuayOffice', 'FoundryOffice']) {
+      const location = findCityLocation(label)!
+      expect(URBAN_BUILDINGS.find(building => building.id === location.buildingId)?.kind, label).toBe('shop')
+    }
+    for (const merchant of CITY_MERCHANTS) {
+      expect(URBAN_BUILDINGS.find(building => building.id === merchant.buildingId)?.kind).not.toBe('home')
+    }
+  })
+
   it('preserves all six legacy route labels and coordinates', () => {
     for (const [label, x, y] of [
       ['PickupZone', 620, 910], ['CommercialPickup', 1100, 290], ['ResidentialPickup', 620, 290],
@@ -149,9 +168,36 @@ describe('connected street distance, not a central-avenue shortcut', () => {
     expect(isCityLocationReachable(valid, { nodes: [], edges: [] })).toBe(false)
     expect(isCityLocationReachable({ ...valid, buildingId: 'missing-shop' })).toBe(false)
     expect(isCityLocationReachable({ ...valid, roadId: 'missing-road' })).toBe(false)
+    expect(isCityLocationReachable({ ...valid, zoneId: 'garden' })).toBe(false)
     expect(isCityLocationReachable({ ...valid, door: { x: 0, y: 0 } })).toBe(false)
     expect(isCityLocationReachable({ ...valid, x: valid.x + 10, y: valid.y + 200 })).toBe(false)
     expect(findCityRoute('unknown-shop', 'DeliveryZone')).toBeNull()
     expect(getCityRouteDistance('PickupZone', 'unknown-customer')).toBe(Infinity)
+  })
+
+  it('does not create reachable self-routes at blocked road endpoints', () => {
+    const navigable = (x: number) => x >= 30
+    const graph = buildRoadNetwork(
+      [{ id: 'partly-blocked', x: 50, y: 100, width: 100, height: 40 }],
+      [{ x: 60, y: 100 }], navigable,
+    )
+    expect(graph.nodes.every(point => navigable(point.x))).toBe(true)
+    expect(findRoadRoute(graph, { x: 10, y: 100 }, { x: 10, y: 100 })).toBeNull()
+    expect(findRoadRoute(graph, { x: 60, y: 100 }, { x: 100, y: 100 })?.distance).toBe(40)
+  })
+
+  it('connects overlapping centerlines and off-center entrances without diagonal shortcuts', () => {
+    const from = { x: 20, y: 105 }
+    const to = { x: 250, y: 250 }
+    const graph = buildRoadNetwork([
+      { id: 'west', x: 100, y: 100, width: 200, height: 40 },
+      { id: 'east', x: 220, y: 100, width: 160, height: 40 },
+      { id: 'south', x: 250, y: 170, width: 40, height: 200 },
+    ], [from, to])
+    const route = findRoadRoute(graph, from, to)!
+    expect(route.distance).toBe(385)
+    expect(route.points[0]).toEqual(from)
+    expect(route.points.at(-1)).toEqual(to)
+    expect(findRoadRoute(graph, to, from)?.distance).toBe(route.distance)
   })
 })

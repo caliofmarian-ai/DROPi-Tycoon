@@ -4,7 +4,7 @@ import { getUrbanCargo, type UrbanObjective } from '../systems/urbanInteractions
 import {
   URBAN_BUILDINGS, URBAN_ROADS, URBAN_HQ, minimapPoint, inInteractionRange,
 } from '../world/urbanWorld'
-import { findWorldRoutePoint, WORLD_HEIGHT, WORLD_WIDTH } from '../world/worldLayout'
+import { findWorldRoutePoint, WORLD_HEIGHT, WORLD_WIDTH, WORLD_ZONES } from '../world/worldLayout'
 import { CITY_COLORS, COLORS, formatMoney, RADII, TYPOGRAPHY } from './theme'
 
 type Direction = 'up' | 'down' | 'left' | 'right'
@@ -71,11 +71,26 @@ export const urbanMapMarkers = (world: WorldState, objective: UrbanObjective, wi
   hq: minimapPoint(URBAN_HQ, width, height),
 })
 
+export const urbanMapViewport = (
+  view: { x: number; y: number; width: number; height: number }, width: number, height: number,
+) => {
+  const topLeft = minimapPoint(view, width, height)
+  const bottomRight = minimapPoint({ x: view.x + view.width, y: view.y + view.height }, width, height)
+  return { ...topLeft, width: Math.max(0, bottomRight.x - topLeft.x), height: Math.max(0, bottomRight.y - topLeft.y) }
+}
+
+export const urbanDistrictCaption = (point: { x: number; y: number }): string =>
+  (WORLD_ZONES.find(zone => point.x >= zone.x && point.x <= zone.x + zone.width &&
+    point.y >= zone.y && point.y <= zone.y + zone.height)?.label ?? 'Cedar City').toUpperCase()
+
 /** Pointer ownership keeps releasing one finger from cancelling a second finger. */
 export class UrbanDPadInput {
   private readonly held = new Map<number, Direction>()
   press(pointer: number, direction: Direction): void { this.held.set(pointer, direction) }
-  release(pointer: number): void { this.held.delete(pointer) }
+  release(pointer: number, direction?: Direction): void {
+    if (direction === undefined || this.held.get(pointer) === direction) this.held.delete(pointer)
+  }
+  isHeld(direction: Direction): boolean { return [...this.held.values()].includes(direction) }
   clear(): void { this.held.clear() }
   value(): { x: number; y: number } {
     const directions = new Set(this.held.values())
@@ -107,8 +122,9 @@ export class UrbanHUD {
   private readonly mapTarget: Phaser.GameObjects.Arc
   private readonly mapPickup: Phaser.GameObjects.Arc
   private readonly mapCaption: Phaser.GameObjects.Text
+  private readonly mapViewport: Phaser.GameObjects.Graphics
   private readonly menuButtons: HUDButton[] = []
-  private readonly directionButtons: HUDButton[] = []
+  private readonly directionButtons: { direction: Direction; control: HUDButton }[] = []
   private transportAvailable?: boolean
   private nearby?: boolean
   private open = false
@@ -140,6 +156,7 @@ export class UrbanHUD {
       .setWordWrapWidth(mission.width - 62)
     this.drawMinimap()
     const map = this.layout.minimap
+    this.mapViewport = this.add(scene.add.graphics())
     this.mapPickup = this.add(scene.add.circle(0, 0, 3, COLORS.accent).setStrokeStyle(1, COLORS.surface))
     this.mapTarget = this.add(scene.add.circle(0, 0, 5, COLORS.gold).setStrokeStyle(2, COLORS.surface))
     this.mapPlayer = this.add(scene.add.circle(0, 0, 4, CITY_COLORS.curb))
@@ -230,15 +247,18 @@ export class UrbanHUD {
     ]
     directions.forEach(([direction, col, row, label]) => {
       const b = this.button(x + col * size + size / 2, y + row * size + size / 2, size - 2, size - 2, label, () => {})
-      this.directionButtons.push(b)
+      this.directionButtons.push({ direction, control: b })
       b.label.setFontSize(23)
       const press = (pointer: Phaser.Input.Pointer): void => {
-        if (!this.open) { this.pad.press(pointer.id, direction); b.paint(true) }
+        if (!this.open) { this.pad.press(pointer.id, direction); this.paintDirections() }
       }
       b.button.on('pointerdown', press)
       b.button.on('pointerover', (pointer: Phaser.Input.Pointer) => { if (pointer.isDown) press(pointer) })
-      b.button.on('pointerout', (pointer: Phaser.Input.Pointer) => { this.pad.release(pointer.id); b.paint() })
-      b.button.on('pointerup', () => b.paint())
+      b.button.on('pointerout', (pointer: Phaser.Input.Pointer) => {
+        this.pad.release(pointer.id, direction)
+        this.paintDirections()
+      })
+      b.button.on('pointerup', this.releasePointer)
     })
     this.add(this.scene.add.circle(x + center, y + center, size * 0.26, COLORS.accent, 0.24))
       .setStrokeStyle(2, CITY_COLORS.curb)
@@ -249,6 +269,11 @@ export class UrbanHUD {
     this.panel(x - 5, y - 5, width + 10, height + 30)
     const g = this.add(this.scene.add.graphics())
     g.fillStyle(CITY_COLORS.grass).fillRect(x, y, width, height)
+    for (const district of WORLD_ZONES) {
+      const p = minimapPoint(district, width, height)
+      g.fillStyle(district.fillColor, 0.5)
+        .fillRect(x + p.x, y + p.y, district.width / WORLD_WIDTH * width, district.height / WORLD_HEIGHT * height)
+    }
     for (const road of URBAN_ROADS) {
       const p = minimapPoint(road, width, height)
       const w = road.width / WORLD_WIDTH * width
@@ -268,7 +293,10 @@ export class UrbanHUD {
     this.text(x + width - 8, y + 3, 'N', 11, COLORS.textPrimary).setOrigin(0.5, 0).setStroke('#073354', 3)
   }
 
-  update(world: WorldState, company: CompanyState, objective: UrbanObjective): void {
+  update(
+    world: WorldState, company: CompanyState, objective: UrbanObjective,
+    cameraView?: { x: number; y: number; width: number; height: number },
+  ): void {
     this.stats.setText(urbanStatusText(world, company))
     const available = this.layout.portrait ? this.scene.scale.width - 28 : this.scene.scale.width - 285
     this.stats.setScale(Math.min(1, available / Math.max(1, this.stats.width)))
@@ -297,7 +325,13 @@ export class UrbanHUD {
     this.mapTarget.setPosition(map.x + markers.target.x, map.y + markers.target.y)
     this.mapPickup.setPosition(map.x + markers.pickup.x, map.y + markers.pickup.y)
       .setVisible(world.activeOrder.status === 'Accepted')
-    this.mapCaption.setText('CEDAR CITY')
+    this.mapCaption.setText(urbanDistrictCaption(world.player))
+    this.mapCaption.setScale(Math.min(1, map.width / Math.max(1, this.mapCaption.width)))
+    if (cameraView) {
+      const view = urbanMapViewport(cameraView, map.width, map.height)
+      this.mapViewport.clear().lineStyle(1, CITY_COLORS.curb, 0.9)
+        .strokeRect(map.x + view.x, map.y + view.y, view.width, view.height)
+    }
   }
 
   notify(message: string): void {
@@ -320,9 +354,15 @@ export class UrbanHUD {
   movement(): { x: number; y: number } { return this.pad.value() }
   readonly clearMovement = (): void => {
     this.pad.clear()
-    this.directionButtons.forEach(button => button.paint())
+    this.paintDirections()
   }
-  private readonly releasePointer = (pointer: Phaser.Input.Pointer): void => { this.pad.release(pointer.id) }
+  private paintDirections(): void {
+    this.directionButtons.forEach(({ direction, control }) => control.paint(this.pad.isHeld(direction)))
+  }
+  private readonly releasePointer = (pointer: Phaser.Input.Pointer): void => {
+    this.pad.release(pointer.id)
+    this.paintDirections()
+  }
 
   destroy(): void {
     this.clearMovement()

@@ -89,7 +89,7 @@ export class MainMenuScene extends Phaser.Scene {
         : true
     getAudioController().setEnabled(initialSoundEnabled)
 
-    const actionCount = this.saveSlot.kind === 'valid' ? 5 : 4
+    const actionCount = session || this.saveSlot.kind === 'valid' ? 5 : 4
     const hasNotice =
       this.saveSlot.kind === 'corrupted' ||
       this.saveSlot.kind === 'incompatible' ||
@@ -152,7 +152,7 @@ export class MainMenuScene extends Phaser.Scene {
   }
 
   private createSaveAwareActions(layout: MainMenuLayout): void {
-    if (this.saveSlot.kind === 'valid') {
+    if (peekGameSession() || this.saveSlot.kind === 'valid') {
       const labels = ['Continue Game', 'Start New Game', 'Settings', 'Information', 'Exit Game']
       const actions = [
         () => this.continueGame(),
@@ -227,6 +227,10 @@ export class MainMenuScene extends Phaser.Scene {
   }
 
   private continueGame(): void {
+    if (peekGameSession()) {
+      this.scene.start('GameWorld')
+      return
+    }
     if (!this.saveStorage) {
       this.showMessage('Local save storage is unavailable, so the saved game cannot be loaded.')
       return
@@ -251,14 +255,17 @@ export class MainMenuScene extends Phaser.Scene {
 
   private requestStartNewGame(): void {
     if (
+      peekGameSession() ||
       this.saveSlot.kind === 'valid' ||
       this.saveSlot.kind === 'corrupted' ||
       this.saveSlot.kind === 'incompatible'
     ) {
       const message =
-        this.saveSlot.kind === 'valid'
-          ? 'A saved game already exists. Start a new game and replace that progress?'
-          : 'The existing save cannot be restored. Start a new game and replace it? A backup of unreadable data will be preserved when possible.'
+        peekGameSession()
+          ? 'A game is already in progress. Start a new game and replace that progress?'
+          : this.saveSlot.kind === 'valid'
+            ? 'A saved game already exists. Start a new game and replace that progress?'
+            : 'The existing save cannot be restored. Start a new game and replace it? A backup of unreadable data will be preserved when possible.'
       this.showConfirmation(message, () => this.confirmNewGameReplacement())
       return
     }

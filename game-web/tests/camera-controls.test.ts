@@ -110,7 +110,7 @@ describe('release blocker #269 — GameWorld integration contract', () => {
 
   it('retains legacy pointer isolation while the playable scene blocks movement under its menu', () => {
     expect(pointerIsolationSource).toContain('cameraControlBounds')
-    expect(sceneSource).toContain('this.hud.isMenuOpen() ? { x: 0, y: 0 }')
+    expect(sceneSource).toContain('this.hud.isMenuOpen() || this.zoomGesture.isPinching() ? { x: 0, y: 0 }')
     expect(sceneSource).not.toContain('cameraControlBounds:')
   })
 

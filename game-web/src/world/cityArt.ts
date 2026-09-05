@@ -2,14 +2,15 @@ import type Phaser from 'phaser'
 import { CITY_COLORS as C, COLORS, RADII, TYPOGRAPHY } from '../ui/theme'
 import type { UrbanBuilding } from './urbanWorld'
 import { drawParcel } from './courierArt'
+import { COURIER_DIRECTIONS, getCourierPose, type CourierPose } from './courierPose'
 
 type Graphics = Phaser.GameObjects.Graphics
 export type StorefrontIdentity = 'market' | 'cafe' | 'pharmacy' | 'bakery' | 'flowers' | 'goods'
 
 export const storefrontIdentity = (name: string): StorefrontIdentity => {
   const value = name.toLowerCase()
-  if (/mara|market/.test(value)) return 'market'
-  if (/caf[eé]|coffee/.test(value)) return 'cafe'
+  if (/mara|market|grocer|pantry|co-op/.test(value)) return 'market'
+  if (/caf[eé]|coffee|kitchen/.test(value)) return 'cafe'
   if (/pharma|health/.test(value)) return 'pharmacy'
   if (/bake|bread/.test(value)) return 'bakery'
   if (/flower|bloom|florist/.test(value)) return 'flowers'
@@ -95,6 +96,18 @@ export interface BuildingArtOptions {
   growthTier?: number
 }
 
+export const cityBuildingSign = (b: UrbanBuilding, options: BuildingArtOptions) => {
+  const identity = options.identity ?? storefrontIdentity(options.name)
+  const hq = b.kind === 'hq'
+  return {
+    signX: b.x,
+    signY: b.y - b.height / 2 + b.height * (b.kind === 'home' ? 0.53 : 0.48) + (hq ? 3 : -10),
+    signWidth: b.width - 29,
+    signColor: hq ? COLORS.accentStrong : identity === 'pharmacy' ? C.leafDark :
+      identity === 'cafe' ? C.metal : C.roofShade,
+  }
+}
+
 /** The masonry outer edges match the model footprint; only light/shadows overhang. */
 export const drawCityBuilding = (
   g: Graphics, shadow: Graphics, b: UrbanBuilding, options: BuildingArtOptions,
@@ -111,8 +124,11 @@ export const drawCityBuilding = (
   const roofBottom = top + b.height * (home ? 0.53 : 0.48)
   const roofColor = hq ? C.roofBlue : depot ? C.metal : [C.roof, C.roofBlue, C.roofShade][variant % 3]
   const side = Math.min(13, b.width * 0.11)
-  const signColor = hq ? COLORS.accentStrong : identity === 'pharmacy' ? C.leafDark :
-    identity === 'cafe' ? C.metal : C.roofShade
+  const { signColor } = cityBuildingSign(b, options)
+  const awningColor = hq ? COLORS.accentStrong : {
+    market: C.roof, cafe: C.metal, pharmacy: C.leafDark,
+    bakery: C.roofShade, flowers: C.flowerPink, goods: C.roofBlue,
+  }[identity]
   shadow.fillStyle(C.shadow, 0.13).fillRoundedRect(left + 9, top + 13, b.width + 4, b.height + 3, RADII.small)
   shadow.fillStyle(C.shadow, 0.08).fillRoundedRect(left + 3, top + 6, b.width + 10, b.height + 10, RADII.small)
   g.fillStyle(C.wallShade).fillRoundedRect(left, top + 5, b.width, b.height - 5, 4)
@@ -144,9 +160,14 @@ export const drawCityBuilding = (
     g.fillStyle(C.shadow, 0.18).fillRect(right - 12, top + 7, 7, roofBottom - top - 9)
     g.lineStyle(2, C.curb, 0.26).lineBetween(left + 9, top + 9, right - 13, top + 9)
     if (hq) {
-      g.fillStyle(COLORS.accent).fillRoundedRect(left + 13, top + 12, b.width - 42, 17, 4)
-      for (let x = left + 20; x < right - 34; x += 22) {
-        g.lineStyle(1, C.glassShade).lineBetween(x, top + 13, x, top + 28)
+      const tier = Math.min(3, Math.max(1, Math.floor(options.growthTier ?? 1)))
+      for (let row = 0; row < tier; row++) {
+        const y = top + 12 + row * 12
+        g.fillStyle(C.glassShade).fillRoundedRect(left + 13, y, b.width - 55, 9, 2)
+        g.lineStyle(1, COLORS.accent).strokeRoundedRect(left + 13, y, b.width - 55, 9, 2)
+        for (let x = left + 20; x < right - 45; x += 19) {
+          g.lineStyle(1, C.glass).lineBetween(x, y + 1, x, y + 8)
+        }
       }
       g.fillStyle(C.cream).fillRoundedRect(right - 35, top + 12, 20, 20, 3)
       g.fillStyle(C.metal).fillCircle(right - 25, top + 22, 6)
@@ -162,8 +183,16 @@ export const drawCityBuilding = (
       g.fillStyle(C.road).fillRoundedRect(right - 30, top + 13, 15, 10, 1)
       g.lineStyle(1, C.curb).lineBetween(right - 27, top + 14, right - 27, top + 22)
         .lineBetween(right - 22, top + 14, right - 22, top + 22)
-      g.fillStyle(C.wallShade).fillRect(left + 14, top + 10, 8, 13)
-      g.fillStyle(C.cream).fillRect(left + 12, top + 9, 12, 4)
+      if (shop) {
+        g.fillStyle(signColor).fillCircle(left + 20, top + 23, 13)
+        g.lineStyle(1.5, C.cream).strokeCircle(left + 20, top + 23, 13)
+        g.save().translateCanvas(left + 20, top + 24).scaleCanvas(0.8, 0.8)
+        drawShopIcon(g, 0, 0, identity)
+        g.restore()
+      } else {
+        g.fillStyle(C.wallShade).fillRect(left + 14, top + 10, 8, 13)
+        g.fillStyle(C.cream).fillRect(left + 12, top + 9, 12, 4)
+      }
     }
   }
   const doorWidth = hq ? 29 : home ? 19 : 24
@@ -193,7 +222,7 @@ export const drawCityBuilding = (
       drawFlowerBox(g, right - side - ww / 2 - 6, bottom - 10, ww + 3)
       g.fillStyle(C.metal).fillRoundedRect(left + 4, bottom - 21, 5, 8, 2)
     } else {
-      drawAwning(g, left + 1, bottom - 49, b.width - side, hq ? COLORS.accentStrong : C.roof)
+      drawAwning(g, left + 1, bottom - 49, b.width - side, awningColor)
       g.fillStyle(C.leafDark).fillEllipse(left + 8, bottom - 12, 11, 21)
       g.fillStyle(C.roof).fillRoundedRect(left + 2, bottom - 12, 13, 10, 2)
       if (identity === 'market') {
@@ -214,12 +243,6 @@ export const drawCityBuilding = (
     g.fillStyle(signColor).fillRoundedRect(b.x - signWidth / 2, signY - 10, signWidth, hq ? 25 : 20, 3)
     g.lineStyle(1.5, hq ? COLORS.accent : C.cream, 0.85).strokeRoundedRect(b.x - signWidth / 2 + 2,
       signY - 8, signWidth - 4, hq ? 21 : 16, 2)
-    if (shop && b.width >= 120) {
-      g.fillStyle(signColor).fillRoundedRect(right - 22, roofBottom + 15, 19, 23, 3)
-      g.save().translateCanvas(right - 12, roofBottom + 27).scaleCanvas(0.65, 0.65)
-      drawShopIcon(g, 0, 0, identity)
-      g.restore()
-    }
   }
   if (b.entranceFacing === 'up') {
     g.fillStyle(C.cream).fillRect(b.x - 15, top, 30, 20)
@@ -228,7 +251,27 @@ export const drawCityBuilding = (
     g.fillStyle(C.wallShade).fillRect(b.x - 16, top - 2, 32, 4)
     g.lineStyle(2, C.cream).lineBetween(b.x, top + 1, b.x, top + 14)
   }
-  return { signX: b.x, signY: signY + (hq ? 2 : 0), signWidth: b.width - 29, signColor }
+  return cityBuildingSign(b, options)
+}
+
+/** Small shared facades avoid replaying the entire city's vector commands each frame. */
+export const ensureBuildingTexture = (
+  scene: Phaser.Scene, building: UrbanBuilding, options: BuildingArtOptions,
+): string => {
+  const variant = building.kind === 'home' ? ((options.variant % 6) + 6) % 6 :
+    building.kind === 'shop' ? ((options.variant % 3) + 3) % 3 : 0
+  const identity = options.identity ?? storefrontIdentity(options.name)
+  const tier = building.kind === 'hq' ? Math.min(3, Math.max(1, Math.floor(options.growthTier ?? 1))) : 1
+  const key = `dropi-original-building-v3-${building.kind}-${building.width}x${building.height}-${building.entranceFacing}-${variant}-${building.kind === 'home' ? '' : identity}-${tier}`
+  if (scene.textures.exists(key)) return key
+  const padding = 24
+  const g = scene.make.graphics({ x: 0, y: 0 })
+  drawCityBuilding(g, g, {
+    ...building, x: building.width / 2 + padding, y: building.height / 2 + padding,
+  }, { ...options, variant, identity, growthTier: tier })
+  g.generateTexture(key, building.width + padding * 2, building.height + padding * 2)
+  g.destroy()
+  return key
 }
 
 export const drawBench = (g: Graphics, x: number, y: number): void => {
@@ -280,49 +323,106 @@ export const ensureTreeTexture = (scene: Phaser.Scene, variant: number): string 
   return key
 }
 
-export const ensureNeighborTexture = (scene: Phaser.Scene, merchant: boolean, index: number): string => {
+export const NEIGHBOR_CELL = 64
+export const NEIGHBOR_ANCHOR = { x: 32, y: 57 } as const
+
+export const drawNeighborFrame = (
+  g: Graphics, merchant: boolean, index: number, pose: CourierPose,
+): void => {
   const variant = ((index % 6) + 6) % 6
-  const key = `dropi-original-neighbor-v2-${merchant ? 'shop' : 'home'}-${variant}`
-  if (scene.textures.exists(key)) return key
-  const g = scene.make.graphics({ x: 0, y: 0 })
-  g.save().translateCanvas(30, 54)
+  const side = pose.projection === 'profile'
+  const back = pose.projection === 'back'
+  const sign = pose.facing === 'left' ? -1 : 1
+  const stride = [0, 1, 0, -1][pose.frame]
+  const bob = pose.bob
   const skin = variant % 3 === 0 ? C.skinShade : C.skin
   const shirt = merchant ? [C.roof, C.metal, C.leafDark][variant % 3]
     : [C.flowerPink, C.roofBlue, C.roof, C.leafDark, C.metal, C.wallShade][variant]
   g.fillStyle(C.shadow, 0.2).fillEllipse(2, 1, 29, 10)
-  g.fillStyle(C.metal).fillRoundedRect(-7, -13, 6, 13, 2).fillRoundedRect(2, -13, 6, 13, 2)
-  g.fillStyle(C.shadow).fillRoundedRect(-9, -3, 9, 5, 2).fillRoundedRect(2, -3, 9, 5, 2)
-  g.fillStyle(C.cream).fillRect(-8, 1, 8, 2).fillRect(3, 1, 8, 2)
-  g.fillStyle(shirt).fillRoundedRect(-11, -31, 23, 23, 6)
-  g.lineStyle(5, skin).lineBetween(-12, -25, -14, -14).lineBetween(12, -25, 14, -14)
-  g.fillStyle(skin).fillCircle(-14, -13, 3).fillCircle(14, -13, 3)
-  if (merchant) {
-    g.fillStyle(C.cream).fillRoundedRect(-7, -25, 14, 18, 2)
-    g.lineStyle(2, C.cream).lineBetween(-5, -30, -5, -24).lineBetween(5, -30, 5, -24)
-    g.fillStyle(C.wallShade).fillRoundedRect(-4, -17, 8, 5, 1)
+  pose.feet.forEach((foot, leg) => {
+    g.lineStyle(6, C.metal).lineBetween(side ? 0 : leg ? 5 : -5, -12, foot.x, foot.y)
+    const shoeX = foot.x - (side && sign < 0 ? 6 : 3)
+    g.fillStyle(C.shadow).fillRoundedRect(shoeX, foot.y - 1, 9, 5, 2)
+    g.fillStyle(C.cream).fillRect(shoeX + 1, foot.y + 2, 7, 2)
+  })
+  g.fillStyle(shirt).fillRoundedRect(side ? -8 : -11, -31 + bob, side ? 16 : 23, 23, 6)
+  const arms = side ? [sign] : [-1, 1]
+  for (const arm of arms) {
+    const handY = -13 + bob + arm * stride * 3
+    const handX = side ? sign * 4 + stride * 3 : arm * 14
+    g.lineStyle(5, skin).lineBetween(arm * (side ? 2 : 12), -25 + bob, handX, handY)
+    g.fillStyle(skin).fillCircle(handX, handY, 3)
+  }
+  if (merchant && !back) {
+    g.fillStyle(C.cream).fillRoundedRect(side ? sign * 4 - 3 : -7, -25 + bob, side ? 6 : 14, 18, 2)
+    if (!side) {
+      g.lineStyle(2, C.cream).lineBetween(-5, -30 + bob, -5, -24 + bob).lineBetween(5, -30 + bob, 5, -24 + bob)
+      g.fillStyle(C.wallShade).fillRoundedRect(-4, -17 + bob, 8, 5, 1)
+    }
   } else {
-    g.lineStyle(2, C.cream, 0.8).lineBetween(-7, -18, 8, -18)
+    g.lineStyle(2, C.cream, 0.8).lineBetween(side ? -6 : -7, -18 + bob, side ? 6 : 8, -18 + bob)
     if (variant % 2) {
-      g.lineStyle(2, C.trunk).lineBetween(8, -29, -7, -11)
-      g.fillStyle(C.parcel).fillRoundedRect(-13, -17, 10, 11, 3)
+      const bagX = side ? -sign * 10 - 5 : -13
+      g.lineStyle(2, C.trunk).lineBetween(side ? sign * 4 : 8, -29 + bob, bagX + 5, -11 + bob)
+      g.fillStyle(C.parcel).fillRoundedRect(bagX, -17 + bob, 10, 11, 3)
     }
   }
-  g.fillStyle(C.hair).fillEllipse(0, -39, 22, 22)
-  g.fillStyle(skin).fillRoundedRect(-9, -44, 18, 19, 7)
-  g.fillCircle(-9, -35, 3).fillCircle(9, -35, 3)
-  g.fillStyle(C.hair).fillRoundedRect(-10, -47, 21, 8, 4)
-  if (variant % 2) g.fillRoundedRect(6, -44, 5, 14, 2)
-  else g.fillTriangle(-8, -43, 4, -43, -8, -36)
-  g.fillStyle(C.shadow).fillCircle(-3, -35, 1.2).fillCircle(4, -35, 1.2)
-  g.lineStyle(1, C.hair).lineBetween(-2, -29, 3, -29)
-  g.fillStyle(C.flower, 0.35).fillEllipse(-6, -31, 4, 2).fillEllipse(7, -31, 4, 2)
-  if (merchant) {
-    g.fillStyle(C.cream).fillRoundedRect(-12, -49, 25, 6, 3)
-    g.fillRoundedRect(-8, -55, 17, 9, 4)
-    g.fillStyle(C.wall).fillRect(-8, -48, 17, 2)
+  const hx = side ? sign * 2 : 0
+  g.fillStyle(C.hair).fillEllipse(hx, -39 + bob, side ? 19 : 22, 22)
+  g.fillStyle(back ? C.hair : skin).fillRoundedRect(hx - 9, -44 + bob, 18, 19, 7)
+  if (!back) {
+    g.fillCircle(hx + (side ? sign * 9 : -9), -35 + bob, 3)
+    if (!side) g.fillCircle(hx + 9, -35 + bob, 3)
   }
+  g.fillStyle(C.hair).fillRoundedRect(hx - 10, -47 + bob, 21, 8, 4)
+  if (variant % 2) g.fillRoundedRect(hx + (side ? -sign * 7 - 2 : 6), -44 + bob, 5, 14, 2)
+  else g.fillTriangle(hx - 8, -43 + bob, hx + 4, -43 + bob, hx - 8, -36 + bob)
+  if (!back) {
+    g.fillStyle(C.shadow).fillCircle(hx + (side ? sign * 5 : -3), -35 + bob, 1.2)
+    if (!side) g.fillCircle(hx + 4, -35 + bob, 1.2)
+    g.lineStyle(1, C.hair).lineBetween(hx + (side ? sign * 2 : -2), -29 + bob,
+      hx + (side ? sign * 5 : 3), -29 + bob)
+    g.fillStyle(C.flower, 0.35).fillEllipse(hx + (side ? sign * 3 : -6), -31 + bob, 4, 2)
+  }
+  if (merchant) {
+    g.fillStyle(C.cream).fillRoundedRect(hx - 12, -49 + bob, 25, 6, 3)
+    g.fillRoundedRect(hx - 8, -55 + bob, 17, 9, 4)
+    g.fillStyle(C.wall).fillRect(hx - 8, -48 + bob, 17, 2)
+  }
+}
+
+export const ensureNeighborTexture = (scene: Phaser.Scene, merchant: boolean, index: number): string => {
+  const variant = ((index % 6) + 6) % 6
+  const key = `dropi-original-neighbor-v3-${merchant ? 'shop' : 'home'}-${variant}`
+  if (scene.textures.exists(key)) return key
+  const g = scene.make.graphics({ x: 0, y: 0 })
+  g.save().translateCanvas(NEIGHBOR_ANCHOR.x, NEIGHBOR_ANCHOR.y)
+  drawNeighborFrame(g, merchant, variant, getCourierPose('Walking', 'down'))
   g.restore()
-  g.generateTexture(key, 60, 62)
+  g.generateTexture(key, NEIGHBOR_CELL, NEIGHBOR_CELL)
   g.destroy()
+  return key
+}
+
+/** Six reusable 256×256 walking atlases; no per-pedestrian animation objects. */
+export const ensureNeighborAtlas = (scene: Phaser.Scene, index: number): string => {
+  const variant = ((index % 6) + 6) % 6
+  const key = `dropi-original-neighbor-walk-v3-${variant}`
+  if (scene.textures.exists(key)) return key
+  const g = scene.make.graphics({ x: 0, y: 0 })
+  for (const direction of COURIER_DIRECTIONS) for (const frame of [0, 1, 2, 3] as const) {
+    const pose = getCourierPose('Walking', direction, frame)
+    g.save().translateCanvas(frame * NEIGHBOR_CELL + NEIGHBOR_ANCHOR.x,
+      Math.floor(pose.atlasFrame / 4) * NEIGHBOR_CELL + NEIGHBOR_ANCHOR.y)
+    drawNeighborFrame(g, false, variant, pose)
+    g.restore()
+  }
+  g.generateTexture(key, NEIGHBOR_CELL * 4, NEIGHBOR_CELL * 4)
+  g.destroy()
+  const texture = scene.textures.get(key)
+  for (let frame = 0; frame < 16; frame++) {
+    texture.add(frame, 0, frame % 4 * NEIGHBOR_CELL,
+      Math.floor(frame / 4) * NEIGHBOR_CELL, NEIGHBOR_CELL, NEIGHBOR_CELL)
+  }
   return key
 }

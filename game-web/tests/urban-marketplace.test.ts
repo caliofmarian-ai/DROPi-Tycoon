@@ -45,6 +45,24 @@ describe('physical merchant to digital marketplace', () => {
     expect(prepareMarketplaceOrder(world)).toBeNull()
   })
 
+  it('does not advertise an offer while another order owns the courier', () => {
+    const world = createInitialWorldState()
+    world.urban = { merchantOnboarded: true, activeTransport: 'walking' }
+    world.player.currentOrder = 'ORDER-999'
+    const before = structuredClone(world)
+    expect(prepareMarketplaceOrder(world)).toBeNull()
+    expect(world).toEqual(before)
+    world.player.currentOrder = world.activeOrder.orderId
+    expect(prepareMarketplaceOrder(world)).toEqual(world.activeOrder)
+  })
+
+  it.each([NaN, Infinity, -10, 0])('rejects invalid connected distance %s', distance => {
+    const world = createInitialWorldState()
+    world.urban = { merchantOnboarded: true, activeTransport: 'walking' }
+    const invalid = vi.spyOn(city, 'getCityRouteDistance').mockReturnValue(distance)
+    try { expect(prepareMarketplaceOrder(world)).toBeNull() } finally { invalid.mockRestore() }
+  })
+
   it('loads and unloads a mission parcel through transport capacity instead of a fixed boolean limit', () => {
     const world = createInitialWorldState()
     const walking = cargoForPlayer(world, 'walking')

@@ -19,6 +19,8 @@ export interface CourierPose {
   readonly wheels: readonly PosePoint[]
   readonly head: PosePoint
   readonly feet: readonly [PosePoint, PosePoint]
+  readonly hands: readonly [PosePoint, PosePoint]
+  readonly backpack: PosePoint
   readonly cargo: PosePoint
   readonly faceVisible: boolean
   readonly backpackVisible: boolean
@@ -37,7 +39,7 @@ const makePose = (
   const walking = state === 'Walking'
   const enclosed = state === 'Car' || state === 'DeliveryVan'
   const stride = [0, 1, 0, -1][frame]
-  const bob = walking && frame % 2 ? -1.5 : 0
+  const bob = !enclosed && frame % 2 ? walking ? -1.5 : -0.5 : 0
   const wheelbase = state === 'ElectricScooter' ? 16 : state === 'Motorcycle' ? 23 : 21
   const wheels = walking ? [] : enclosed
     ? (profile
@@ -54,11 +56,20 @@ const makePose = (
     wheels: Object.freeze(wheels),
     head: point(profile ? sign * (walking ? 2 : 7) : 0, (walking ? -39 : -45) + bob),
     feet: Object.freeze([
-      point(profile ? -stride * 7 : -5, -2 + (profile ? 0 : stride * 3)),
-      point(profile ? stride * 7 : 5, -2 - (profile ? 0 : stride * 3)),
+      point(profile ? walking ? -stride * 7 : sign * 5 + stride * 5 : walking ? -5 : -8,
+        walking ? -2 + (profile ? 0 : stride * 3) : -3 - stride * 5),
+      point(profile ? walking ? stride * 7 : sign * 5 - stride * 5 : walking ? 5 : 8,
+        walking ? -2 - (profile ? 0 : stride * 3) : -3 + stride * 5),
     ]) as readonly [PosePoint, PosePoint],
-    cargo: point(profile ? -sign * (walking ? 11 : 20) : 0,
-      walking ? -25 + bob : facing === 'up' ? -4 : -28),
+    hands: Object.freeze([
+      point(profile ? sign * (walking ? 5 : 18) + (walking ? stride * 3 : 0) : -14,
+        walking ? -9 + bob + stride * 3 : profile ? -26 : facing === 'up' ? -29 : -7),
+      point(profile ? sign * (walking ? 5 : 18) - (walking ? stride * 3 : 0) : 14,
+        walking ? -9 + bob - stride * 3 : profile ? -26 : facing === 'up' ? -29 : -7),
+    ]) as readonly [PosePoint, PosePoint],
+    backpack: point(profile ? -sign * (walking ? 11 : 12) : 0, (walking ? -25 : -27) + bob),
+    cargo: point(profile ? -sign * (walking ? 11 : 25) : walking || facing === 'up' ? 0 : -17,
+      walking ? -25 + bob : facing === 'up' ? 12 : -25),
     faceVisible: facing !== 'up' && !enclosed,
     backpackVisible: facing !== 'down' && !enclosed,
     riderVisible: !enclosed,

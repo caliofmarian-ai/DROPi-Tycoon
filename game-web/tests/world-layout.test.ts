@@ -86,6 +86,7 @@ describe('release blocker #273 — explorable first-map structure', () => {
 describe('release blocker #273 — scene integration contract', () => {
   it('renders from centralized world-layout collections', () => {
     const presentationSource = readFileSync(new URL('../src/world/urbanPresentation.ts', import.meta.url), 'utf8')
+    const pavementSource = readFileSync(new URL('../src/world/cityGround.ts', import.meta.url), 'utf8')
     expect(sceneSource).toContain('renderUrbanNeighborhood(this, this.companyState)')
     for (const token of [
       'URBAN_ROADS',
@@ -96,8 +97,11 @@ describe('release blocker #273 — scene integration contract', () => {
     ]) {
       expect(presentationSource).toContain(token)
     }
-    expect(presentationSource.indexOf('URBAN_SIDEWALKS.forEach'))
-      .toBeLessThan(presentationSource.indexOf('URBAN_ROADS.forEach'))
+    expect(presentationSource).toContain('drawCityPavement(pavement, URBAN_ROADS, URBAN_SIDEWALKS)')
+    const sidewalks = pavementSource.indexOf('for (const sidewalk of sidewalks)')
+    const roads = pavementSource.indexOf('for (const road of roads)')
+    expect(sidewalks).toBeGreaterThanOrEqual(0)
+    expect(roads).toBeGreaterThan(sidewalks)
   })
 
   it('removes the old scene-local scaffold arrays', () => {
@@ -114,12 +118,15 @@ describe('Workstream E — world uplift removes developer-style debug labels', (
     expect(sceneSource).not.toContain("kind === 'pickup' ? 'Pickup' : 'Delivery'")
   })
 
-  it('draws readable neighborhood signs and landmark identities without image assets', () => {
+  it('draws catalog-backed signs and landmarks without downloading image assets', () => {
     const presentationSource = readFileSync(new URL('../src/world/urbanPresentation.ts', import.meta.url), 'utf8')
-    for (const sign of ['DROPi · HQ', 'MARA’S MARKET', 'Future Main DronePort', 'CEDAR AVENUE']) {
+    for (const sign of ["'DROPi'", 'HEADQUARTERS', 'MAIN DRONEPORT', 'FUTURE · LOCKED']) {
       expect(presentationSource).toContain(sign)
     }
-    expect(presentationSource).not.toContain('.add.image(')
+    expect(presentationSource).toContain('location.displayName')
+    expect(presentationSource).toContain('zone.label.toUpperCase()')
+    expect(findWorldRoutePoint('PickupZone')?.displayName).toBe("Mara's Market")
+    expect(presentationSource).not.toContain('.load.image(')
     expect(sceneSource).not.toContain('.load.image(')
   })
 })

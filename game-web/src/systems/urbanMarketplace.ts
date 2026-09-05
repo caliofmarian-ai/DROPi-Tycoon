@@ -1,6 +1,7 @@
 import type { OrderState, WorldState } from '../types/game'
 import { findWorldRoutePoint } from '../world/worldLayout'
 import { CITY_MERCHANTS, getCityRouteDistance } from '../world/city'
+import { isOrderAcceptanceEligible } from './orderSystem'
 import {
   isDeliveryMission, loadParcel, TRANSPORT_PROFILES,
   type CargoLoad, type DeliveryMission, type GroundTransport, type Parcel,
@@ -69,14 +70,14 @@ export const cargoForPlayer = (world: WorldState, transport: GroundTransport): C
 export const prepareMarketplaceOrder = (
   world: WorldState, transport: GroundTransport = 'walking',
 ): OrderState | null => {
-  if (!world.urban?.merchantOnboarded || world.activeOrder.status !== 'Available') return null
   const order = world.activeOrder
+  if (!world.urban?.merchantOnboarded || !isOrderAcceptanceEligible(order, world.player, order.orderId)) return null
   const merchant = CITY_MERCHANTS.find(candidate => candidate.pickupLocation === order.pickupLocation)
   const pickup = findWorldRoutePoint(order.pickupLocation)
   const destination = findWorldRoutePoint(order.destination)
   if (!merchant || pickup?.kind !== 'pickup' || destination?.kind !== 'delivery') return null
   const distance = getCityRouteDistance(pickup.label, destination.label)
-  if (distance > TRANSPORT_PROFILES[transport].range) return null
+  if (!Number.isFinite(distance) || distance <= 0 || distance > TRANSPORT_PROFILES[transport].range) return null
   if (!loadParcel(cargoForPlayer(world, transport), parcelForOrder(order)).ok) return null
   return isDeliveryMission(missionForOrder(order, transport)) ? { ...order } : null
 }

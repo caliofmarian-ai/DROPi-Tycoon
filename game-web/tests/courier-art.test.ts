@@ -105,6 +105,16 @@ describe('original courier directional pose contract', () => {
     expect(courierAnimationFrame(-20, true)).toBe(0)
     expect(getCourierPose('Walking', 'down', 1).feet).not.toEqual(getCourierPose('Walking', 'down', 3).feet)
   })
+
+  it.each(COURIER_DIRECTIONS)('separates the %s rider backpack from loaded bicycle cargo', facing => {
+    const pose = getCourierPose('Bicycle', facing, 1, true)
+    expect(pose.backpack).not.toEqual(pose.cargo)
+    expect(pose.backpack.y).toBeLessThan(-20)
+    expect(Object.isFrozen(pose.hands)).toBe(true)
+    expect(getCourierPose('Bicycle', facing, 1).feet).not.toEqual(getCourierPose('Bicycle', facing, 3).feet)
+    if (facing === 'up') expect(pose.cargo.y).toBeGreaterThan(0)
+    if (facing === 'down') expect(Math.abs(pose.cargo.x)).toBeGreaterThan(15)
+  })
 })
 
 describe('real Graphics character art and atlas lifecycle', () => {
@@ -130,6 +140,32 @@ describe('real Graphics character art and atlas lifecycle', () => {
       expect(mock.calls.some(call => call.method === 'fillCircle' &&
         call.args[0] === wheel.x && call.args[1] === wheel.y && call.args[2] === 12)).toBe(false)
     }
+  })
+
+  it.each(COURIER_DIRECTIONS)('connects %s cycling hands to the actual handlebar', facing => {
+    const mock = artScene()
+    const pose = getCourierPose('Bicycle', facing)
+    drawCourierFrame(mock.graphics() as unknown as Phaser.GameObjects.Graphics, pose)
+    const hands = pose.projection === 'profile' ? [pose.hands[0]] : pose.hands
+    for (const hand of hands) {
+      expect(mock.calls.some(call => call.method === 'fillCircle' &&
+        call.args[0] === hand.x && call.args[1] === hand.y && call.args[2] === 3)).toBe(true)
+      expect(mock.calls.some(call => call.method === 'lineBetween' &&
+        ((call.args[0] === hand.x && call.args[1] === hand.y) ||
+         (call.args[2] === hand.x && call.args[3] === hand.y)))).toBe(true)
+    }
+  })
+
+  it('draws loaded rear cargo in front of the northbound rider, not behind their legs', () => {
+    const mock = artScene()
+    const pose = getCourierPose('Bicycle', 'up', 0, true)
+    drawCourierFrame(mock.graphics() as unknown as Phaser.GameObjects.Graphics, pose)
+    const parcel = mock.calls.findIndex(call => call.method === 'fillRoundedRect' &&
+      call.args[0] === pose.cargo.x - 9 && call.args[1] === pose.cargo.y - 9 && call.args[2] === 18)
+    const cap = mock.calls.findIndex(call => call.method === 'fillRoundedRect' &&
+      call.args[0] === pose.head.x - 9 && call.args[1] === pose.head.y - 10 && call.args[2] === 18)
+    expect(parcel).toBeGreaterThan(cap)
+    expect(cap).toBeGreaterThan(0)
   })
 
   it('builds exactly 32 small frames once per transport, shared across scene/player recreation', () => {

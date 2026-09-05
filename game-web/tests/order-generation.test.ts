@@ -122,6 +122,14 @@ describe('release blocker #271 — order sequence generation', () => {
     expect(CITY_LOCATIONS.filter(location => location.kind === 'pickup')).toHaveLength(8)
   })
 
+  it.each(['scooter', 'motorcycle', 'car', 'van'] as const)('respects the existing %s profile instead of capping it to bicycle range', transport => {
+    const routes = orderRoutesForTransport(transport)
+    const distances = routes.map(route => getCityRouteDistance(route.pickupLocation, route.destination))
+    expect(Math.max(...distances)).toBeGreaterThan(TRANSPORT_PROFILES.bicycle.range)
+    expect(distances.every(distance => distance > 48 && distance <= TRANSPORT_PROFILES[transport].range)).toBe(true)
+    expect(orderRoutesForTransport(transport)).toBe(routes)
+  })
+
   it('avoids repeated origins and customers after legacy jobs or a transport change without changing IDs', () => {
     const nextTemplate = createOrderForSequence(2)
     const previous = { ...nextTemplate, orderId: 'ORDER-001', status: 'Completed' as const }
@@ -132,6 +140,35 @@ describe('release blocker #271 — order sequence generation', () => {
     expect(createNextOrder(previous)).toEqual(next)
     const cycling = createNextOrder({ ...previous, ...createOrderForSequence(14), status: 'Completed' }, 'bicycle')
     expect(getCityRouteDistance(cycling.pickupLocation, cycling.destination)).toBeLessThanOrEqual(3200)
+  })
+
+  it.each(['walking', 'bicycle'] as const)('supports reproducible seeded %s schedules without new saved state', transport => {
+    const routes = orderRoutesForTransport(transport)
+    const seeds = [1, 7, 42, 2026, -9]
+    expect(new Set(seeds.map(seed => routeForSequence(1, transport, seed).routeId)).size).toBeGreaterThan(2)
+    for (const seed of seeds) {
+      const generated = Array.from({ length: routes.length }, (_, index) =>
+        createOrderForSequence(index + 1, transport, seed))
+      expect(generated).toEqual(Array.from({ length: routes.length }, (_, index) =>
+        createOrderForSequence(index + 1, transport, seed)))
+      expect(new Set(generated.map(order => `${order.pickupLocation}:${order.destination}`)).size).toBe(routes.length)
+      expect(new Set(generated.map(order => order.pickupLocation)).size).toBe(8)
+      expect(new Set(generated.map(order => order.destination)).size).toBe(21)
+      for (let index = 0; index < generated.length; index++) {
+        const order = generated[index]
+        const next = generated[(index + 1) % generated.length]
+        expect(order.orderId).toBe(formatOrderId(index + 1))
+        expect(order.pickupLocation).not.toBe(next.pickupLocation)
+        expect(order.destination).not.toBe(next.destination)
+        expect(createNextOrder({ ...order, status: 'Completed' }, transport, seed))
+          .toEqual({ ...next, orderId: formatOrderId(index + 2) })
+      }
+    }
+    expect(createOrderForSequence(1, transport, 0)).toEqual(createOrderForSequence(1, transport))
+  })
+
+  it.each([NaN, Infinity, 1.5])('falls back to the original schedule for invalid seed %s', seed => {
+    expect(createOrderForSequence(10, 'walking', seed)).toEqual(createOrderForSequence(10))
   })
 
   it.each([NaN, Infinity, -1, 0, 1.5])('sanitizes invalid sequence %s deterministically', sequence => {

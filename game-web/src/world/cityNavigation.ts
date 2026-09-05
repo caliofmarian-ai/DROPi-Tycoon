@@ -88,7 +88,7 @@ export const buildRoadNetwork = (
   for (const segment of segments) {
     const sorted = [...new Map(segment.points.map(point => [key(point), point])).values()]
       .sort((a, b) => segment.horizontal ? a.x - b.x : a.y - b.y)
-    sorted.forEach(addNode)
+    sorted.filter(point => isNavigable(point.x, point.y)).forEach(addNode)
     for (let i = 1; i < sorted.length; i++) addEdge(sorted[i - 1], sorted[i], segment.road.id)
   }
   return { nodes: [...nodes.values()], edges }

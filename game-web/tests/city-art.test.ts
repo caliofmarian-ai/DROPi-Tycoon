@@ -1,11 +1,14 @@
 import type Phaser from 'phaser'
 import { describe, expect, it, vi } from 'vitest'
 import { CITY_COLORS, COLORS } from '../src/ui/theme'
-import { drawCityBuilding, ensureNeighborTexture, ensureTreeTexture, storefrontIdentity } from '../src/world/cityArt'
-import { drawCityPavement, roadCrossings } from '../src/world/cityGround'
+import {
+  cityBuildingSign, drawCityBuilding, ensureBuildingTexture, ensureNeighborTexture, ensureTreeTexture, storefrontIdentity,
+  NEIGHBOR_ANCHOR, NEIGHBOR_CELL,
+} from '../src/world/cityArt'
+import { cityDistrictAccents, drawCityDistrictAccents, drawCityPavement, roadCrossings } from '../src/world/cityGround'
 import { drawNeighborhoodNPC, getHQGrowth, renderUrbanNeighborhood } from '../src/world/urbanPresentation'
-import { URBAN_BUILDINGS, URBAN_ROADS, URBAN_SIDEWALKS } from '../src/world/urbanWorld'
-import { WORLD_ROUTE_POINTS } from '../src/world/worldLayout'
+import { isUrbanWalkable, URBAN_BUILDINGS, URBAN_ROADS, URBAN_SIDEWALKS } from '../src/world/urbanWorld'
+import { WORLD_DECORATIONS, WORLD_ROUTE_POINTS, WORLD_ZONES } from '../src/world/worldLayout'
 import { createInitialCompanyState } from '../src/state/gameState'
 
 const mockCityScene = () => {
@@ -43,6 +46,7 @@ describe('original dimensional city architecture', () => {
   it.each([
     ["Mara's Market", 'market'], ['SUNBEAM CAFÉ', 'cafe'], ['CITY PHARMACY', 'pharmacy'],
     ['Cedar Bakery', 'bakery'], ['Garden Florist', 'flowers'], ['BLOOM & STEM', 'flowers'],
+    ['Canal Grocers', 'market'], ['Neighborhood Co-op', 'market'], ['Quayside Kitchen', 'cafe'],
   ])('identifies the %s storefront', (name, expected) => {
     expect(storefrontIdentity(name)).toBe(expected)
   })
@@ -87,7 +91,53 @@ describe('original dimensional city architecture', () => {
     drawNeighborhoodNPC(mock.scene, 300, 400, true, 7)
     expect(mock.raw.make.graphics).toHaveBeenCalledTimes(1)
     expect(mock.raw.add.container).toHaveBeenCalledWith(300, 400, expect.any(Array))
-    expect(mock.raw.add.image).toHaveBeenCalledWith(0, 0, 'dropi-original-neighbor-v2-shop-1')
+    expect(mock.raw.add.image).toHaveBeenCalledWith(0, 0, 'dropi-original-neighbor-v3-shop-1')
+    expect(mock.raw.add.image.mock.results[0].value.setOrigin).toHaveBeenCalledWith(
+      NEIGHBOR_ANCHOR.x / NEIGHBOR_CELL, NEIGHBOR_ANCHOR.y / NEIGHBOR_CELL)
+  })
+
+  it('gives every small shop a rooftop identity badge and a category-specific awning', () => {
+    const building = URBAN_BUILDINGS.find(entry => entry.kind === 'shop')!
+    for (const [identity, color] of [
+      ['pharmacy', CITY_COLORS.leafDark], ['flowers', CITY_COLORS.flowerPink], ['goods', CITY_COLORS.roofBlue],
+    ] as const) {
+      const mock = mockCityScene()
+      drawCityBuilding(mock.graphics() as Phaser.GameObjects.Graphics,
+        mock.graphics() as Phaser.GameObjects.Graphics, building, { name: identity, identity, variant: 0 })
+      expect(mock.calls.some(call => call.method === 'strokeCircle' && call.args[2] === 13)).toBe(true)
+      expect(mock.calls.some(call => call.method === 'fillStyle' && call.args[0] === color)).toBe(true)
+    }
+  })
+
+  it('adds bounded rooftop panels as HQ grows without changing its footprint', () => {
+    const building = URBAN_BUILDINGS.find(entry => entry.kind === 'hq')!
+    for (const tier of [1, 2, 3, 99]) {
+      const mock = mockCityScene()
+      drawCityBuilding(mock.graphics() as Phaser.GameObjects.Graphics,
+        mock.graphics() as Phaser.GameObjects.Graphics, building, { name: 'DROPi', variant: 0, growthTier: tier })
+      expect(mock.calls.filter(call => call.method === 'strokeRoundedRect' &&
+        call.args[2] === building.width - 55 && call.args[3] === 9)).toHaveLength(Math.min(3, tier))
+    }
+  })
+
+  it('shares small padded facade textures by appearance, not world position or shop name', () => {
+    const mock = mockCityScene()
+    const building = URBAN_BUILDINGS.find(entry => entry.kind === 'shop')!
+    const art = { name: 'Cedar Bakery', variant: 1 }
+    const key = ensureBuildingTexture(mock.scene, building, art)
+    expect(ensureBuildingTexture(mock.scene, { ...building, id: 'another-bakery', x: 2000, y: 2000 },
+      { ...art, name: 'Bread Shop', variant: 4 })).toBe(key)
+    expect(mock.raw.make.graphics).toHaveBeenCalledTimes(1)
+    expect(mock.calls.find(call => call.method === 'generateTexture')?.args).toEqual([
+      key, building.width + 48, building.height + 48,
+    ])
+    expect(ensureBuildingTexture(mock.scene, building, { name: 'Pharmacy', variant: 1 })).not.toBe(key)
+    expect(ensureBuildingTexture(mock.scene, {
+      ...building, entranceFacing: building.entranceFacing === 'up' ? 'down' : 'up',
+    }, art)).not.toBe(key)
+    const direct = drawCityBuilding(mock.graphics() as Phaser.GameObjects.Graphics,
+      mock.graphics() as Phaser.GameObjects.Graphics, building, art)
+    expect(cityBuildingSign(building, art)).toEqual(direct)
   })
 
   it('derives crosswalks from actual intersections, deduplicating contiguous road segments', () => {
@@ -112,7 +162,39 @@ describe('original dimensional city architecture', () => {
     }
   })
 
-  it('batches the entire city into six static Graphics while retaining real NPCs and labeled landmarks', () => {
+  it('places original canals and garden beds only in non-traversable district gaps', () => {
+    const accents = cityDistrictAccents(WORLD_ZONES, URBAN_SIDEWALKS, URBAN_BUILDINGS, WORLD_DECORATIONS)
+    expect(accents.filter(accent => accent.kind === 'canal')).toHaveLength(2)
+    expect(accents.filter(accent => accent.kind === 'garden')).toHaveLength(2)
+    expect(cityDistrictAccents(WORLD_ZONES, URBAN_SIDEWALKS, URBAN_BUILDINGS, WORLD_DECORATIONS)).toEqual(accents)
+    for (const accent of accents) {
+      for (let x = accent.x - accent.width / 2; x <= accent.x + accent.width / 2; x += 16) {
+        for (let y = accent.y - accent.height / 2; y <= accent.y + accent.height / 2; y += 8) {
+          expect(isUrbanWalkable(x, y, false, 0), `${accent.id}: ${x},${y}`).toBe(false)
+        }
+      }
+    }
+    const mock = mockCityScene()
+    drawCityDistrictAccents(mock.graphics() as Phaser.GameObjects.Graphics, accents)
+    for (const color of [CITY_COLORS.water, CITY_COLORS.waterLight, CITY_COLORS.flowerPink, CITY_COLORS.leafSun]) {
+      expect(mock.calls.some(call => ['fillStyle', 'lineStyle'].includes(call.method) && call.args.includes(color))).toBe(true)
+    }
+  })
+
+  it('omits a landscape pocket if a new path, building or tree occupies it', () => {
+    const accents = cityDistrictAccents(WORLD_ZONES, URBAN_SIDEWALKS, URBAN_BUILDINGS, WORLD_DECORATIONS)
+    const pocket = accents[0]
+    const intrusion = { id: 'new-path', x: pocket.x, y: pocket.y, width: 5, height: 5 }
+    expect(cityDistrictAccents(WORLD_ZONES, [...URBAN_SIDEWALKS, intrusion], URBAN_BUILDINGS, WORLD_DECORATIONS))
+      .not.toContainEqual(pocket)
+    expect(cityDistrictAccents(WORLD_ZONES, URBAN_SIDEWALKS, [...URBAN_BUILDINGS, intrusion], WORLD_DECORATIONS))
+      .not.toContainEqual(pocket)
+    expect(cityDistrictAccents(WORLD_ZONES, URBAN_SIDEWALKS, URBAN_BUILDINGS, [...WORLD_DECORATIONS, {
+      id: 'new-tree', x: pocket.x, y: pocket.y, radius: 14, zoneId: 'waterfront',
+    }])).not.toContainEqual(pocket)
+  })
+
+  it('uses six static ground/prop Graphics and shared facade sprites, with real NPCs and landmarks', () => {
     const mock = mockCityScene()
     expect(renderUrbanNeighborhood(mock.scene)).toBeNull()
     expect(mock.raw.add.graphics).toHaveBeenCalledTimes(6)
@@ -122,9 +204,22 @@ describe('original dimensional city architecture', () => {
     expect(labels.some(([, , text]) => text === 'MAIN DRONEPORT')).toBe(true)
     expect(labels.some(([, , text]) => text === 'FUTURE · LOCKED')).toBe(true)
     expect(labels.some(([, , text]) => text === 'PARCEL STAGING')).toBe(true)
-    expect(mock.textures.size).toBeLessThanOrEqual(16)
+    expect(mock.textures.size).toBeLessThanOrEqual(48)
     expect(mock.calls.some(call => call.method === 'generateTexture' &&
-      typeof call.args[1] === 'number' && call.args[1] > 128)).toBe(false)
+      typeof call.args[1] === 'number' && call.args[1] > 256)).toBe(false)
+    const generatedBytes = mock.calls.filter(call => call.method === 'generateTexture')
+      .reduce((sum, call) => sum + (call.args[1] as number) * (call.args[2] as number) * 4, 0)
+    expect(generatedBytes).toBeLessThan(3 * 1024 * 1024)
+    expect(mock.raw.add.image).toHaveBeenCalledTimes(URBAN_BUILDINGS.length +
+      WORLD_DECORATIONS.length + WORLD_ROUTE_POINTS.length)
+    for (const tree of WORLD_DECORATIONS) {
+      const index = mock.raw.add.image.mock.calls.findIndex(args => (args as unknown[])[0] === tree.x &&
+        (args as unknown[])[1] === tree.y)
+      const image = mock.raw.add.image.mock.results[index].value
+      expect(image.setOrigin).toHaveBeenCalledWith(0.5, 94 / 104)
+      expect(image.setScale).toHaveBeenCalledWith(tree.radius / 16)
+      expect(96 * tree.radius / 16).toBeGreaterThanOrEqual(75)
+    }
   })
 
   it('adds a parked bicycle only when owned, with honest progression and no autonomous activation', () => {
@@ -137,6 +232,19 @@ describe('original dimensional city architecture', () => {
     expect(renderUrbanNeighborhood(mock.scene, company)).not.toBeNull()
     expect(mock.raw.add.graphics).toHaveBeenCalledTimes(7)
     expect(getHQGrowth(company)).toMatchObject({ tier: 3, ownsBicycle: true })
+    expect(company).toEqual(before)
+  })
+
+  it('labels the actual company level even after its bounded HQ art reaches the final stage', () => {
+    const company = createInitialCompanyState()
+    company.level = 7
+    const before = structuredClone(company)
+    const mock = mockCityScene()
+    renderUrbanNeighborhood(mock.scene, company)
+    expect(getHQGrowth(company)).toMatchObject({ level: 7, tier: 3 })
+    const labels = mock.raw.add.text.mock.calls as unknown as [number, number, string][]
+    expect(labels.some(([, , text]) => text === 'LEVEL 7 DEPOT')).toBe(true)
+    expect(labels.some(([, , text]) => text === 'LEVEL 3 DEPOT')).toBe(false)
     expect(company).toEqual(before)
   })
 })

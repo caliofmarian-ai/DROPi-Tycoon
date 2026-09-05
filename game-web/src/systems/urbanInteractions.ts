@@ -95,9 +95,10 @@ export const getUrbanObjective = (world: WorldState): UrbanObjective => {
     }
   }
   if (order.status === 'PickedUp') {
+    const destination = findWorldRoutePoint(order.destination)
     return {
-      point: findWorldRoutePoint(order.destination) ?? URBAN_HQ,
-      title: 'Deliver to the customer',
+      point: destination ?? URBAN_HQ,
+      title: destination ? `Deliver to ${destination.displayName}` : 'Verify delivery at HQ',
       action: 'Deliver parcel',
     }
   }
@@ -155,6 +156,9 @@ export const performUrbanInteraction = (
     return result('Parcel collected! Follow the gold marker to your customer.', 'positive')
   }
   if (order.status === 'PickedUp' && inInteractionRange(world.player, objective.point)) {
+    if (!getUrbanOrderListing(world) || !isDeliveryMission(getUrbanDeliveryMission(world))) {
+      return result('HQ needs to verify this delivery route.')
+    }
     const cargo = unloadParcel(getUrbanCargo(world), parcelForOrder(order).parcelId)
     if (!cargo.ok) return result('Collect your parcel from the merchant first.')
     const delivered = attemptDelivery(order, world.player, {

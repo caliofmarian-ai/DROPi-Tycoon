@@ -3,8 +3,8 @@ import { getOrCreateGameSession, replaceGameSession } from '../state/gameSession
 import { buildCustomerReviewSummary } from '../systems/customerReviewSystem'
 import type { CompanyState, WorldState } from '../types/game'
 import { buildManagementCards, insetRect } from '../ui/managementLayout'
-import { pageItems } from '../ui/managementViewModel'
-import { drawManagementFooter, drawManagementHeader } from '../ui/managementControls'
+import { pageAfterResize, pageItems } from '../ui/managementViewModel'
+import { bindManagementPaging, drawManagementFooter, drawManagementHeader } from '../ui/managementControls'
 import { COLORS } from '../ui/theme'
 import { drawPanel, fitText } from '../ui/themeControls'
 
@@ -12,7 +12,12 @@ export class CustomerReviewsScene extends Phaser.Scene {
   private worldState!: WorldState
   private companyState!: CompanyState
   private currentPage = 0
-  private readonly handleResize = (): void => { this.render() }
+  private pageSize = 1
+  private readonly handleResize = (): void => {
+    const nextSize = buildManagementCards(this.scale.width, this.scale.height).pageSize
+    this.currentPage = pageAfterResize(this.currentPage, this.pageSize, nextSize)
+    this.render()
+  }
 
   constructor() { super('CustomerReviews') }
 
@@ -22,6 +27,8 @@ export class CustomerReviewsScene extends Phaser.Scene {
     this.companyState = session.company
     this.currentPage = 0
     this.render()
+    bindManagementPaging(this, () => buildManagementCards(this.scale.width, this.scale.height).body,
+      (delta) => this.changePage(delta))
     this.scale.on(Phaser.Scale.Events.RESIZE, this.handleResize)
     this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => {
       this.scale.off(Phaser.Scale.Events.RESIZE, this.handleResize)
@@ -31,12 +38,13 @@ export class CustomerReviewsScene extends Phaser.Scene {
   private render(): void {
     this.children.removeAll(true)
     const layout = buildManagementCards(this.scale.width, this.scale.height)
+    this.pageSize = layout.pageSize
     const reviews = [...this.companyState.reviews].reverse()
     const summary = buildCustomerReviewSummary(reviews)
     const paging = pageItems(reviews, this.currentPage, layout.pageSize)
     this.currentPage = paging.page
     drawManagementHeader(this, layout, 'Customer Reviews', this.companyState,
-      summary.count ? `${summary.averageRating.toFixed(1)} ★ · ${summary.count} reviews · ${summary.positiveCount} positive`
+      summary.count ? `${summary.averageRating.toFixed(1)} ★ · ${summary.count} reviews · Reputation ${this.companyState.reputation}`
         : 'Your reputation starts with your next delivery')
     if (!reviews.length) {
       drawPanel(this, layout.body, { tone: 'accent' })
@@ -60,10 +68,14 @@ export class CustomerReviewsScene extends Phaser.Scene {
       fitText(this, { ...box, top: box.top + box.height - 22, height: 22 }, review.orderId, 12, COLORS.textMuted)
     })
     drawManagementFooter(this, layout, { label: 'Company', action: () => this.returnToCompany() },
-      () => this.returnToMainMenu(), { ...paging, change: (delta) => {
-        this.currentPage += delta
-        this.render()
-      } })
+      () => this.returnToMainMenu(), { ...paging, change: (delta) => this.changePage(delta) })
+  }
+
+  private changePage(delta: number): void {
+    const next = pageItems(this.companyState.reviews, this.currentPage + delta, this.pageSize).page
+    if (next === this.currentPage) return
+    this.currentPage = next
+    this.render()
   }
 
   private returnToCompany(): void {

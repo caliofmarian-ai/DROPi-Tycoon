@@ -106,6 +106,7 @@ describe('urban physical delivery scene', () => {
       worldState: world,
       companyState: company,
       keys: { T: key },
+      cameras: { main: { worldView: { x: 0, y: 0, width: 740, height: 360 } } },
       hud: { movement: () => ({ x: 0, y: 0 }), isMenuOpen: () => false, notify: vi.fn(), update: vi.fn() },
       objectiveMarker: marker,
       parcel,

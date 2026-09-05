@@ -118,6 +118,11 @@ export const createThemedButton = (
     while ((label.width > rect.width - 16 || label.height > rect.height - 12) && parseInt(String(label.style.fontSize)) > 12) {
       label.setFontSize(parseInt(String(label.style.fontSize)) - 1)
     }
+    const characters = Array.from(label.text)
+    while ((label.width > rect.width - 16 || label.height > rect.height - 12) && characters.length > 0) {
+      characters.pop()
+      label.setText(`${characters.join('').trimEnd()}…`)
+    }
   }
   fitLabel()
   background.on('pointerover', () => { if (enabled) paint(palette.fillHover, 1) })
@@ -272,11 +277,12 @@ export const fitText = (
     size -= 1
     text.setFontSize(size)
   }
-  let shortened = value
-  while ((text.height > rect.height || text.width > rect.width) && shortened.length > 0) {
-    shortened = shortened.slice(0, -1)
-    text.setText(`${shortened.trimEnd()}…`)
+  const characters = Array.from(value)
+  while ((text.height > rect.height || text.width > rect.width) && characters.length > 0) {
+    characters.pop()
+    text.setText(`${characters.join('').trimEnd()}…`)
   }
+  if (text.height > rect.height || text.width > rect.width) text.setText('')
   text.setPosition(
     align === 'center' ? rect.left + rect.width / 2 : align === 'right' ? rect.left + rect.width : rect.left,
     rect.top + rect.height / 2,
@@ -324,8 +330,10 @@ export const drawHeadquarters = (scene: Phaser.Scene, rect: RectShape): void => 
     g.fillStyle(CITY_COLORS.leafLight)
     g.fillCircle(x - 4, 0, 14)
   }
-  fitText(scene, { left: rectCenterX(rect) - 62 * scale, top: rectCenterY(rect) - 44 * scale,
-    width: 124 * scale, height: 18 * scale }, 'DROPi HQ', Math.max(12, 14 * scale), '#ffffff', true, 'center')
+  if (scale >= 0.8) {
+    fitText(scene, { left: rectCenterX(rect) - 62 * scale, top: rectCenterY(rect) - 44 * scale,
+      width: 124 * scale, height: 18 * scale }, 'DROPi HQ', Math.max(12, 14 * scale), '#ffffff', true, 'center')
+  }
 }
 
 export const drawEmployeePortrait = (scene: Phaser.Scene, rect: RectShape): void => {

@@ -8,16 +8,17 @@ import {
   WORLD_DECORATIONS, WORLD_HEIGHT, WORLD_ROUTE_POINTS, WORLD_WIDTH, WORLD_ZONES,
 } from './worldLayout'
 import {
-  cityLabel, drawBench, drawCityBuilding, drawFlowerBox, drawLamp,
-  ensureNeighborTexture, ensureTreeTexture, storefrontIdentity,
+  cityBuildingSign, cityLabel, drawBench, drawFlowerBox, drawLamp,
+  ensureBuildingTexture, ensureNeighborTexture, ensureTreeTexture, NEIGHBOR_ANCHOR, NEIGHBOR_CELL, storefrontIdentity,
 } from './cityArt'
-import { drawCityPavement } from './cityGround'
+import { cityDistrictAccents, drawCityDistrictAccents, drawCityPavement } from './cityGround'
 import { drawParcel } from './courierArt'
 import { getCourierPose } from './courierPose'
 
 export const HQ_EXPANSION_POINT = URBAN_HQ
 
 export const getHQGrowth = (company?: CompanyState) => ({
+  level: company?.level ?? 1,
   tier: Math.min(3, Math.max(1, Math.floor(company?.level ?? 1))),
   staffCount: company?.employees.length ?? 0,
   ownsBicycle: company ? resolveActiveTransport(company, 'bicycle') === 'bicycle' : false,
@@ -27,7 +28,7 @@ export const drawNeighborhoodNPC = (
   scene: Phaser.Scene, x: number, y: number, merchant: boolean, index = 0,
 ): Phaser.GameObjects.Container => {
   const person = scene.add.image(0, 0, ensureNeighborTexture(scene, merchant, index))
-    .setOrigin(0.5, 54 / 62)
+    .setOrigin(NEIGHBOR_ANCHOR.x / NEIGHBOR_CELL, NEIGHBOR_ANCHOR.y / NEIGHBOR_CELL)
   return scene.add.container(x, y, [person]).setDepth(12)
 }
 
@@ -41,7 +42,7 @@ export const renderUrbanNeighborhood = (
   terrain.fillStyle(C.grass).fillRect(0, 0, WORLD_WIDTH, WORLD_HEIGHT)
   for (const zone of WORLD_ZONES) {
     terrain.fillStyle(C.lawn).fillRoundedRect(zone.x - 8, zone.y - 8, zone.width + 16, zone.height + 16, 36)
-    terrain.fillStyle(C.grass, 0.3).fillRoundedRect(zone.x + 10, zone.y + 15, zone.width - 20, zone.height - 30, 26)
+    terrain.fillStyle(zone.fillColor, 0.35).fillRoundedRect(zone.x + 10, zone.y + 15, zone.width - 20, zone.height - 30, 26)
     // Very sparse, deterministic blades: texture, not a noisy repeating tile.
     terrain.lineStyle(2, C.grassShade, 0.23)
     for (let x = zone.x + 34; x < zone.x + zone.width - 20; x += 73) {
@@ -52,6 +53,8 @@ export const renderUrbanNeighborhood = (
       }
     }
   }
+  drawCityDistrictAccents(terrain,
+    cityDistrictAccents(WORLD_ZONES, URBAN_SIDEWALKS, URBAN_BUILDINGS, WORLD_DECORATIONS))
   const pavement = scene.add.graphics().setDepth(1).setName('city-pavement')
   drawCityPavement(pavement, URBAN_ROADS, URBAN_SIDEWALKS)
   const shadow = scene.add.graphics().setDepth(3).setName('city-cast-shadows')
@@ -65,9 +68,11 @@ export const renderUrbanNeighborhood = (
     const name = hq ? 'DROPi' : location?.kind === 'pickup' ? location.displayName
       : building.kind === 'depot' ? ['DISPATCH', 'PARCEL WORKS', 'CITY LOGISTICS'][index % 3]
         : fallbackShopNames[index % fallbackShopNames.length]
-    const sign = drawCityBuilding(masonry, shadow, building, {
+    const art = {
       name, identity: storefrontIdentity(name), variant: index, growthTier: hq ? growth.tier : undefined,
-    })
+    }
+    scene.add.image(building.x, building.y, ensureBuildingTexture(scene, building, art)).setDepth(5)
+    const sign = cityBuildingSign(building, art)
     if (hq || building.kind === 'shop' || building.kind === 'depot') {
       const text = cityLabel(scene, sign.signX, sign.signY, name, hq ? 23 : 10).setDepth(7)
       if (text.width > sign.signWidth) text.setScale(sign.signWidth / text.width)
@@ -85,10 +90,11 @@ export const renderUrbanNeighborhood = (
   })
 
   WORLD_DECORATIONS.forEach((tree, index) => {
-    shadow.fillStyle(C.shadow, 0.13).fillEllipse(tree.x + tree.radius * 0.28,
-      tree.y + tree.radius * 0.6, tree.radius * 2.3, tree.radius * 1.1)
+    shadow.fillStyle(C.shadow, 0.13).fillEllipse(tree.x + tree.radius * 0.4,
+      tree.y + 3, tree.radius * 4.6, tree.radius * 1.5)
+    // The collision disk covers the trunk; the substantial canopy hangs above it.
     scene.add.image(tree.x, tree.y, ensureTreeTexture(scene, index % 4))
-      .setOrigin(0.5, 0.48).setScale(tree.radius / 36).setDepth(8)
+      .setOrigin(0.5, 94 / 104).setScale(tree.radius / 16).setDepth(8)
     if (index % 4 === 0) drawFlowerBox(props, tree.x + tree.radius + 12, tree.y + tree.radius * 0.65, 24)
   })
   // Furniture remains on non-traversable verge, never in the street/collision corridor.
@@ -128,7 +134,7 @@ export const renderUrbanNeighborhood = (
   if (growth.tier > 1) {
     props.fillStyle(C.metal).fillRect(stageX - 28, stageY - growth.tier * 13 + 4, 3, growth.tier * 13 + 13)
       .fillRect(stageX + 25, stageY - growth.tier * 13 + 4, 3, growth.tier * 13 + 13)
-    cityLabel(scene, hq.x, hq.y - 12, `LEVEL ${growth.tier} DEPOT`, 8).setDepth(7)
+    cityLabel(scene, hq.x, hq.y - 12, `LEVEL ${growth.level} DEPOT`, 8).setDepth(7)
   }
   const parkedBicycle = growth.ownsBicycle
     ? scene.add.graphics().setPosition(URBAN_HQ.x + 70, URBAN_HQ.y + 7).setDepth(10)

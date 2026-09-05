@@ -7,7 +7,7 @@ export class UrbanZoomGesture {
 
   press(id: number, point: TouchPoint): void {
     if (this.pointers.size >= 2 || !Number.isFinite(point.x) || !Number.isFinite(point.y)) return
-    this.pointers.set(id, { ...point })
+    this.pointers.set(id, { x: point.x, y: point.y })
     this.rebase()
   }
 

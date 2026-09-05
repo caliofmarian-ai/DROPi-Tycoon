@@ -3,7 +3,7 @@ import { describe, expect, it } from 'vitest'
 import { createInitialCompanyState } from '../src/state/gameState'
 import { completeEmployeeOnboarding, EMPLOYEE_CANDIDATES, hireEmployee } from '../src/systems/employeeSystem'
 import { purchaseVehicle, VEHICLE_CATALOG } from '../src/systems/vehicleSystem'
-import { buildEmployeeCards, buildFleetCards, buildManagementOverview, pageItems } from '../src/ui/managementViewModel'
+import { buildEmployeeCards, buildFleetCards, buildManagementOverview, pageAfterResize, pageItems } from '../src/ui/managementViewModel'
 import {
   buildCompanyDashboardLayout, buildFinanceDashboardLayout, buildManagementCards,
   buildManagementLayout, buildStaffCardLayout, buildVehicleCardLayout,
@@ -92,12 +92,33 @@ describe('Management data comes only from the active company and authoritative c
     expect(pageItems(items, 3, 2)).toMatchObject({ page: 1, hasNext: false, hasPrevious: true })
     expect(pageItems([], 99, 2)).toMatchObject({ page: 0, items: [], hasNext: false, hasPrevious: false })
   })
+
+  it('keeps the previously visible fleet entry in view when the page size changes', () => {
+    expect(pageItems(VEHICLE_CATALOG, pageAfterResize(1, 2, 1), 1).items[0].typeId).toBe('Motorcycle')
+    expect(pageItems(VEHICLE_CATALOG, pageAfterResize(3, 1, 2), 2).items.map(item => item.typeId))
+      .toContain('DeliveryVan')
+  })
+
+  it.each([NaN, Infinity, -Infinity, 100.5, Number.MAX_SAFE_INTEGER + 1])(
+    'does not advertise purchases or hires that the domain rejects for cash %s', (money) => {
+      const company = { ...createInitialCompanyState(), money }
+      expect(buildFleetCards(company).every(card => !card.canPurchase)).toBe(true)
+      expect(buildEmployeeCards(company).every(card => !card.canAct)).toBe(true)
+    },
+  )
+
+  it('normalizes non-finite and fractional pagination without skipping catalog entries', () => {
+    expect(pageItems(VEHICLE_CATALOG, NaN, Infinity).items[0].typeId).toBe('Bicycle')
+    expect(pageItems(VEHICLE_CATALOG, 1.9, 2).items[0].typeId).toBe('Motorcycle')
+  })
 })
 
 describe('Responsive management surfaces have distinct content and 48px action bounds', () => {
-  const viewports = [...SUPPORTED_ANDROID_VIEWPORTS, { width: 360, height: 740 }, { width: 740, height: 360 }]
+  const viewports = [...SUPPORTED_ANDROID_VIEWPORTS, { width: 320, height: 568 },
+    { width: 360, height: 740 }, { width: 740, height: 360 }]
   it.each(viewports)('prevents card, art, identity, bar, price, and action collisions at $width × $height', ({ width, height }) => {
     const catalog = buildManagementCards(width, height)
+    expect(catalog.pageLabel.width).toBeGreaterThanOrEqual(32)
     disjoint([catalog.header, ...catalog.cards, ...catalog.navigation, catalog.pageLabel])
     for (const card of catalog.cards) {
       const boxes = buildVehicleCardLayout(card)

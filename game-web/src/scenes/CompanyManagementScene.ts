@@ -74,8 +74,9 @@ export class CompanyManagementScene extends Phaser.Scene {
       `Recent Reviews${data.reviews.count ? ` · ${data.reviews.averageRating.toFixed(1)} ★` : ''}`,
       18, COLORS.textPrimary, true)
     const message = data.latestReview?.message ?? 'Your first delivery is the start of your reputation.'
-    if (!compact) {
-      fitText(this, { ...review, top: review.top + 28, height: Math.max(26, bottom.top - review.top - 34) },
+    const messageHeight = bottom.top - review.top - 34
+    if (!compact && messageHeight >= 26) {
+      fitText(this, { ...review, top: review.top + 28, height: messageHeight },
         data.latestReview ? `“${message}”` : message, 15, COLORS.textSecondary)
     }
     const half = (bottom.width - 8) / 2
@@ -101,6 +102,8 @@ export class CompanyManagementScene extends Phaser.Scene {
       if (storage) {
         const autosave = autosaveIfApproved(storage, session, 'upgrade-purchased')
         if (!autosave.saved && autosave.reason === 'write-failed') this.feedback = 'Purchased · Local autosave failed'
+      } else {
+        this.feedback = 'Purchased · Local autosave unavailable'
       }
     }
     this.render()

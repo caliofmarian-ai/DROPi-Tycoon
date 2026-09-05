@@ -7,8 +7,8 @@ import { getAudioController } from '../systems/audioSystem'
 import { purchaseVehicle, reconcileLegacyBicycleOwnership } from '../systems/vehicleSystem'
 import type { CompanyState, VehicleTypeId, WorldState } from '../types/game'
 import { buildManagementCards, buildVehicleCardLayout } from '../ui/managementLayout'
-import { buildFleetCards, buildManagementOverview, pageItems } from '../ui/managementViewModel'
-import { drawManagementFooter, drawManagementHeader } from '../ui/managementControls'
+import { buildFleetCards, buildManagementOverview, pageAfterResize, pageItems } from '../ui/managementViewModel'
+import { bindManagementPaging, drawManagementFooter, drawManagementHeader } from '../ui/managementControls'
 import { capabilityLevelFromLabel, COLORS, formatMoney, rectCenterX, rectCenterY } from '../ui/theme'
 import { createThemedButton, drawCapabilityBar, drawPanel, drawVehicleGlyph, fitText } from '../ui/themeControls'
 
@@ -16,8 +16,13 @@ export class VehicleFleetScene extends Phaser.Scene {
   private worldState!: WorldState
   private companyState!: CompanyState
   private currentPage = 0
+  private pageSize = 1
   private feedback = ''
-  private readonly handleResize = (): void => { this.render() }
+  private readonly handleResize = (): void => {
+    const nextSize = buildManagementCards(this.scale.width, this.scale.height).pageSize
+    this.currentPage = pageAfterResize(this.currentPage, this.pageSize, nextSize)
+    this.render()
+  }
 
   constructor() { super('VehicleFleet') }
 
@@ -29,6 +34,8 @@ export class VehicleFleetScene extends Phaser.Scene {
     this.currentPage = 0
     this.feedback = ''
     this.render()
+    bindManagementPaging(this, () => buildManagementCards(this.scale.width, this.scale.height).body,
+      (delta) => this.changePage(delta))
     this.scale.on(Phaser.Scale.Events.RESIZE, this.handleResize)
     this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => {
       this.scale.off(Phaser.Scale.Events.RESIZE, this.handleResize)
@@ -38,6 +45,7 @@ export class VehicleFleetScene extends Phaser.Scene {
   private render(): void {
     this.children.removeAll(true)
     const layout = buildManagementCards(this.scale.width, this.scale.height)
+    this.pageSize = layout.pageSize
     const overview = buildManagementOverview(this.companyState)
     const paging = pageItems(buildFleetCards(this.companyState), this.currentPage, layout.pageSize)
     this.currentPage = paging.page
@@ -74,11 +82,15 @@ export class VehicleFleetScene extends Phaser.Scene {
         'success', () => this.purchase(vehicle.typeId), { fontSize: 17 }).setEnabled(vehicle.canPurchase)
     })
     drawManagementFooter(this, layout, { label: 'Company', action: () => this.returnToCompany() },
-      () => this.returnToMainMenu(), { ...paging, change: (delta) => {
-        this.currentPage += delta
-        this.feedback = ''
-        this.render()
-      } })
+      () => this.returnToMainMenu(), { ...paging, change: (delta) => this.changePage(delta) })
+  }
+
+  private changePage(delta: number): void {
+    const next = pageItems(buildFleetCards(this.companyState), this.currentPage + delta, this.pageSize).page
+    if (next === this.currentPage) return
+    this.currentPage = next
+    this.feedback = ''
+    this.render()
   }
 
   private purchase(typeId: VehicleTypeId): void {
@@ -93,6 +105,8 @@ export class VehicleFleetScene extends Phaser.Scene {
       if (storage) {
         const autosave = autosaveIfApproved(storage, session, 'vehicle-purchased')
         if (!autosave.saved && autosave.reason === 'write-failed') this.feedback = 'Purchased · Local autosave failed'
+      } else {
+        this.feedback = 'Purchased · Local autosave unavailable'
       }
     }
     this.render()

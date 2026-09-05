@@ -90,6 +90,8 @@ export class FinancialReportScene extends Phaser.Scene {
       if (storage) {
         const autosave = autosaveIfApproved(storage, session, 'operating-day-closed')
         if (!autosave.saved && autosave.reason === 'write-failed') this.feedback = 'Day closed · Local autosave failed'
+      } else {
+        this.feedback = 'Day closed · Local autosave unavailable'
       }
     }
     this.render()

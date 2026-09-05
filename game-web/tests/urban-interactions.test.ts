@@ -1,13 +1,15 @@
 import { describe, expect, it } from 'vitest'
 import { createInitialCompanyState, createInitialWorldState } from '../src/state/gameState'
-import { createOrderForSequence } from '../src/systems/orderGeneration'
+import { BICYCLE_ORDER_ROUTE_TEMPLATES, createOrderForSequence, ORDER_ROUTE_TEMPLATES } from '../src/systems/orderGeneration'
 import {
-  getUrbanCargo, getUrbanDeliveryMission, getUrbanOrderListing,
+  getUrbanCargo, getUrbanDeliveryMission, getUrbanObjective, getUrbanOrderListing,
   getUrbanRouteDistance, isUrbanRouteWithinTransportRange, performUrbanInteraction, URBAN_MERCHANT_PROFILES,
 } from '../src/systems/urbanInteractions'
 import { isCargoLoad, isDeliveryMission } from '../src/systems/urbanLogistics'
 import { LOCAL_LISTING, LOCAL_MERCHANT, prepareMarketplaceOrder } from '../src/systems/urbanMarketplace'
 import { findWorldRoutePoint } from '../src/world/worldLayout'
+import { CITY_MERCHANTS, CITY_ROAD_NETWORK, findCityRoute, getCityRouteDistance } from '../src/world/city'
+import { findRoadRoute } from '../src/world/cityNavigation'
 import { inInteractionRange, isUrbanWalkable, moveUrbanPlayer, URBAN_HQ, URBAN_MERCHANT } from '../src/world/urbanWorld'
 import { getHQGrowth, HQ_EXPANSION_POINT } from '../src/world/urbanPresentation'
 import type { WorldState } from '../src/types/game'
@@ -163,5 +165,71 @@ describe('pure urban merchant listings and physical logistics', () => {
     const missing = performUrbanInteraction(world, company)
     expect(missing.settled).toBe(false)
     expect(missing.company.money).toBe(company.money)
+  })
+
+  it.each(CITY_MERCHANTS)('walks to $name and its customer through the paid marketplace loop', merchant => {
+    const sequence = ORDER_ROUTE_TEMPLATES.findIndex(route => route.pickupLocation === merchant.pickupLocation) + 1
+    expect(sequence).toBeGreaterThan(0)
+    const company = createInitialCompanyState()
+    let world = createInitialWorldState()
+    world.urban = { merchantOnboarded: true, activeTransport: 'walking' }
+    world.activeOrder = createOrderForSequence(sequence)
+    const order = { ...world.activeOrder }
+    world = performUrbanInteraction(world, company).world
+    expect(world.activeOrder.status).toBe('Accepted')
+    const approach = findRoadRoute(CITY_ROAD_NETWORK, URBAN_HQ, merchant.position)!
+    world = walkTo(world, ...approach.points)
+    const picked = performUrbanInteraction(world, company)
+    expect(picked.world.activeOrder.status).toBe('PickedUp')
+    expect(getUrbanOrderListing(picked.world)?.merchantProfileId).toBe(merchant.merchantId)
+    const customer = findWorldRoutePoint(order.destination)!
+    expect(getUrbanObjective(picked.world).title).toContain(customer.displayName)
+    const route = findCityRoute(order.pickupLocation, order.destination)!
+    world = walkTo(picked.world, ...route.points)
+    const delivered = performUrbanInteraction(world, company)
+    expect(delivered.settled).toBe(true)
+    expect(delivered.company.money).toBe(company.money + order.reward)
+    expect(delivered.company.reviews).toHaveLength(1)
+    expect(delivered.world.player.carryingPackage).toBe(false)
+    expect(delivered.world.activeOrder.pickupLocation).not.toBe(order.pickupLocation)
+    expect(delivered.world.activeOrder.destination).not.toBe(order.destination)
+    const duplicate = performUrbanInteraction(delivered.world, delivered.company)
+    expect(duplicate.settled).toBe(false)
+    expect(duplicate.company.money).toBe(delivered.company.money)
+  })
+
+  it('does not settle cargo from an unknown physical merchant', () => {
+    const world = createInitialWorldState()
+    const company = createInitialCompanyState()
+    world.activeOrder.status = 'PickedUp'
+    world.activeOrder.pickupLocation = 'missing-shop'
+    world.player.currentOrder = world.activeOrder.orderId
+    world.player.carryingPackage = true
+    Object.assign(world.player, findWorldRoutePoint(world.activeOrder.destination))
+    const before = structuredClone(world)
+    const result = performUrbanInteraction(world, company)
+    expect(result.settled).toBe(false)
+    expect(result.world.activeOrder.status).toBe('PickedUp')
+    expect(result.world.player.carryingPackage).toBe(true)
+    expect(result.company).toEqual(company)
+    expect(world).toEqual(before)
+  })
+
+  it('lets restored legitimate cargo finish before onboarding even after parking a bicycle', () => {
+    const sequence = BICYCLE_ORDER_ROUTE_TEMPLATES.findIndex(route =>
+      getCityRouteDistance(route.pickupLocation, route.destination) > 1800) + 1
+    expect(sequence).toBeGreaterThan(0)
+    const world = createInitialWorldState()
+    const company = createInitialCompanyState()
+    world.activeOrder = { ...createOrderForSequence(sequence, 'bicycle'), status: 'PickedUp' }
+    world.player.currentOrder = world.activeOrder.orderId
+    world.player.carryingPackage = true
+    Object.assign(world.player, findWorldRoutePoint(world.activeOrder.destination))
+    expect(isUrbanRouteWithinTransportRange(world)).toBe(false)
+    const result = performUrbanInteraction(world, company)
+    expect(result.settled).toBe(true)
+    expect(result.company.money).toBe(company.money + world.activeOrder.reward)
+    expect(result.world.urban?.merchantOnboarded).toBe(false)
+    expect(result.world.activeOrder.status).toBe('Available')
   })
 })

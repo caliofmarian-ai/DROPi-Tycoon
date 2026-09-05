@@ -178,7 +178,7 @@ export class GameWorldScene extends Phaser.Scene {
     this.playerVisual.setState(this.worldState.urban!.activeTransport === 'bicycle' ? 'Bicycle' : 'Walking')
     this.parkedBicycle?.setVisible(this.worldState.urban!.activeTransport === 'walking')
     this.playerVisual.setCarrying(this.worldState.player.carryingPackage)
-    this.hud.update(this.worldState, this.companyState, objective)
+    this.hud.update(this.worldState, this.companyState, objective, this.cameras.main.worldView)
   }
 
   private persist(event: 'delivery-completed' | 'progression-changed' | 'settings-changed'): boolean {

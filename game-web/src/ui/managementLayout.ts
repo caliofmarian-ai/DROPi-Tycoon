@@ -25,16 +25,19 @@ export const buildManagementLayout = (width: number, height: number, paged = fal
   const footer = { left, top: viewport.height - 60, width: contentWidth, height: 48 }
   const body = { left, top: header.top + header.height + 12, width: contentWidth,
     height: footer.top - header.top - header.height - 24 }
+  const backWidth = contentWidth < 320 ? 76 : 84
+  const menuWidth = contentWidth < 320 ? 60 : 84
   const navigation = paged
     ? [
-      { ...footer, width: 84 },
-      { ...footer, left: left + 92, width: 48 },
-      { ...footer, left: left + contentWidth - 140, width: 48 },
-      { ...footer, left: left + contentWidth - 84, width: 84 },
+      { ...footer, width: backWidth },
+      { ...footer, left: left + backWidth + 8, width: 48 },
+      { ...footer, left: left + contentWidth - menuWidth - 56, width: 48 },
+      { ...footer, left: left + contentWidth - menuWidth, width: menuWidth },
     ]
     : splitColumns(footer, 2)
   return { compactLandscape, header, body, footer, navigation,
-    pageLabel: { left: left + 142, top: footer.top, width: contentWidth - 284, height: 48 } }
+    pageLabel: { left: left + backWidth + 64, top: footer.top,
+      width: contentWidth - backWidth - menuWidth - 128, height: 48 } }
 }
 
 export const buildManagementCards = (width: number, height: number) => {

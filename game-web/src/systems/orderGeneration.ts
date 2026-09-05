@@ -61,9 +61,14 @@ const buildRoutePool = (range: number): readonly OrderRouteTemplate[] => {
 /** Walking work is always feasible; bicycle ownership opens longer connected trips. */
 export const ORDER_ROUTE_TEMPLATES = buildRoutePool(TRANSPORT_PROFILES.walking.range)
 export const BICYCLE_ORDER_ROUTE_TEMPLATES = buildRoutePool(TRANSPORT_PROFILES.bicycle.range)
+const transportRoutes = new Map<GroundTransport, readonly OrderRouteTemplate[]>([
+  ['walking', ORDER_ROUTE_TEMPLATES], ['bicycle', BICYCLE_ORDER_ROUTE_TEMPLATES],
+])
 
-export const orderRoutesForTransport = (transport: GroundTransport = 'walking'): readonly OrderRouteTemplate[] =>
-  transport === 'walking' ? ORDER_ROUTE_TEMPLATES : BICYCLE_ORDER_ROUTE_TEMPLATES
+export const orderRoutesForTransport = (transport: GroundTransport = 'walking'): readonly OrderRouteTemplate[] => {
+  if (!transportRoutes.has(transport)) transportRoutes.set(transport, buildRoutePool(TRANSPORT_PROFILES[transport].range))
+  return transportRoutes.get(transport)!
+}
 
 const sanitizeSequence = (sequence: number): number =>
   Number.isSafeInteger(sequence) && sequence > 0 ? sequence : 1
@@ -78,15 +83,26 @@ export const parseOrderSequence = (orderId: string): number => {
   return Number.isSafeInteger(sequence) && sequence > 0 ? sequence : 0
 }
 
-export const routeForSequence = (sequence: number, transport: GroundTransport = 'walking'): OrderRouteTemplate => {
-  const safeSequence = sanitizeSequence(sequence)
-  const routes = orderRoutesForTransport(transport)
-  return routes[(safeSequence - 1) % routes.length]
+const seedOffset = (seed: number, length: number): number => {
+  if (!Number.isSafeInteger(seed) || seed === 0) return 0
+  const mixed = Math.imul(seed ^ (seed >>> 16), 0x45d9f3b)
+  return (mixed >>> 0) % length
 }
 
-export const createOrderForSequence = (sequence: number, transport: GroundTransport = 'walking'): OrderState => {
+/** A seed rotates the tested schedule without losing coverage or introducing adjacent repeats. */
+export const routeForSequence = (
+  sequence: number, transport: GroundTransport = 'walking', seed = 0,
+): OrderRouteTemplate => {
   const safeSequence = sanitizeSequence(sequence)
-  const route = routeForSequence(safeSequence, transport)
+  const routes = orderRoutesForTransport(transport)
+  return routes[((safeSequence - 1) % routes.length + seedOffset(seed, routes.length)) % routes.length]
+}
+
+export const createOrderForSequence = (
+  sequence: number, transport: GroundTransport = 'walking', seed = 0,
+): OrderState => {
+  const safeSequence = sanitizeSequence(sequence)
+  const route = routeForSequence(safeSequence, transport, seed)
   return {
     orderId: formatOrderId(safeSequence),
     pickupLocation: route.pickupLocation,
@@ -98,15 +114,17 @@ export const createOrderForSequence = (sequence: number, transport: GroundTransp
   }
 }
 
-export const createNextOrder = (previousOrder: OrderState, transport: GroundTransport = 'walking'): OrderState => {
+export const createNextOrder = (
+  previousOrder: OrderState, transport: GroundTransport = 'walking', seed = 0,
+): OrderState => {
   const parsed = parseOrderSequence(previousOrder.orderId)
   const nextSequence = parsed > 0 ? parsed + 1 : 1
-  const next = createOrderForSequence(nextSequence, transport)
+  const next = createOrderForSequence(nextSequence, transport, seed)
   if (next.pickupLocation !== previousOrder.pickupLocation && next.destination !== previousOrder.destination) return next
   const routes = orderRoutesForTransport(transport)
-  const start = sanitizeSequence(nextSequence) - 1
+  const start = (sanitizeSequence(nextSequence) - 1) % routes.length
   for (let offset = 1; offset < routes.length; offset++) {
-    const route = routes[(start + offset) % routes.length]
+    const route = routeForSequence(start + offset + 1, transport, seed)
     if (route.pickupLocation !== previousOrder.pickupLocation && route.destination !== previousOrder.destination) {
       return { ...next, pickupLocation: route.pickupLocation, destination: route.destination }
     }

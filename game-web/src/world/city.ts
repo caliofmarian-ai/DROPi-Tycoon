@@ -73,7 +73,7 @@ export const isCityLocationReachable = (
 ): boolean => {
   const building = WORLD_BUILDINGS.find(entry => entry.id === location.buildingId)
   const road = WORLD_ROADS.find(entry => entry.id === location.roadId)
-  if (!building || !road || building.zoneId !== location.districtId ||
+  if (!building || !road || building.zoneId !== location.districtId || location.zoneId !== location.districtId ||
       location.door.x !== building.door.x || location.door.y !== building.door.y ||
       Math.abs(location.x - location.door.x) > 0 || Math.abs(location.y - location.door.y) > 48 ||
       Math.abs(location.x - road.x) > road.width / 2 || Math.abs(location.y - road.y) > road.height / 2 ||
@@ -81,11 +81,19 @@ export const isCityLocationReachable = (
   return findRoadRoute(network, PLAYER_START, location) !== null
 }
 
+// The physical catalog is static; HUD queries must not rerun three graph searches each frame.
+const cityRoutes = new Map<string, RoadRoute | null>()
+
 export const findCityRoute = (fromLabel: string, toLabel: string): RoadRoute | null => {
   const from = findCityLocation(fromLabel)
   const to = findCityLocation(toLabel)
-  if (!from || !to || !isCityLocationReachable(from) || !isCityLocationReachable(to)) return null
-  return findRoadRoute(CITY_ROAD_NETWORK, from, to)
+  if (!from || !to) return null
+  const routeKey = `${fromLabel}:${toLabel}`
+  if (!cityRoutes.has(routeKey)) {
+    cityRoutes.set(routeKey, isCityLocationReachable(from) && isCityLocationReachable(to)
+      ? findRoadRoute(CITY_ROAD_NETWORK, from, to) : null)
+  }
+  return cityRoutes.get(routeKey)!
 }
 
 export const getCityRouteDistance = (fromLabel: string, toLabel: string): number =>

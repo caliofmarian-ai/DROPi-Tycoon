@@ -104,11 +104,12 @@ const building = (
 
 const block = (
   zoneId: WorldZoneId, xs: readonly number[], ys: readonly number[],
-  kind: WorldBuildingLayout['kind'],
-): WorldBuildingLayout[] => ys.flatMap((y, row) => xs.map((x, column) =>
-  building(`${zoneId}-block-${row + 1}-${column + 1}`, x, y, zoneId,
-    row % 2 === 0 ? kind : 'home'),
-))
+  kind: WorldBuildingLayout['kind'], homes: readonly string[] = [],
+): WorldBuildingLayout[] => ys.flatMap((y, row) => xs.map((x, column) => {
+  const address = `${row + 1}-${column + 1}`
+  return building(`${zoneId}-block-${address}`, x, y, zoneId,
+    row % 2 === 0 && !homes.includes(address) ? kind : 'home')
+}))
 
 export const WORLD_BUILDINGS: readonly WorldBuildingLayout[] = [
   building('residential-1', 160, 194, 'residential'),
@@ -135,9 +136,9 @@ export const WORLD_BUILDINGS: readonly WorldBuildingLayout[] = [
   building('company-3', 1360, 814, 'company', 'depot'),
   building('company-4', 1160, 1040, 'company', 'depot'),
   ...block('storage', [180, 360, 540], [1394, 1620, 1994, 2190], 'depot'),
-  ...block('company', [980, 1160, 1340], [1394, 1620, 1994, 2190], 'shop'),
-  ...block('waterfront', [1820, 2020, 2220, 2580, 2800, 3020], [194, 410, 814, 1040], 'shop'),
-  ...block('garden', [1820, 2020, 2220, 2580, 2800, 3020], [1394, 1620, 1994, 2190], 'shop'),
+  ...block('company', [980, 1160, 1340], [1394, 1620, 1994, 2190], 'shop', ['3-1']),
+  ...block('waterfront', [1820, 2020, 2220, 2580, 2800, 3020], [194, 410, 814, 1040], 'shop', ['1-3', '3-3', '3-6']),
+  ...block('garden', [1820, 2020, 2220, 2580, 2800, 3020], [1394, 1620, 1994, 2190], 'shop', ['1-1', '1-5', '3-3', '3-6']),
 ]
 
 export const WORLD_DECORATIONS: readonly WorldDecorationLayout[] = WORLD_ZONES.flatMap(zone => {

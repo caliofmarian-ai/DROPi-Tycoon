@@ -7,11 +7,12 @@ import { FinancialReportScene } from '../scenes/FinancialReportScene'
 import { GameWorldScene } from '../scenes/GameWorldScene'
 import { MainMenuScene } from '../scenes/MainMenuScene'
 import { VehicleFleetScene } from '../scenes/VehicleFleetScene'
+import { COLORS } from '../ui/theme'
 
 export const createGameConfig = (parent: string): Phaser.Types.Core.GameConfig => ({
   type: Phaser.AUTO,
   parent,
-  backgroundColor: '#10151d',
+  backgroundColor: COLORS.backgroundBottom,
   width: appConfig.width,
   height: appConfig.height,
   scale: {

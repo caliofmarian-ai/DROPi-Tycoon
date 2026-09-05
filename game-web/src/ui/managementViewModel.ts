@@ -23,7 +23,7 @@ export const buildManagementOverview = (company: CompanyState) => {
 export const buildFleetCards = (company: CompanyState) =>
   VEHICLE_CATALOG.map((definition) => {
     const owned = ownsVehicleType(company, definition.typeId)
-    const affordable = Number.isFinite(company.money) && company.money >= definition.purchaseCost
+    const affordable = Number.isSafeInteger(company.money) && company.money >= definition.purchaseCost
     return { ...definition, owned, affordable, canPurchase: !owned && affordable }
   })
 
@@ -35,14 +35,17 @@ export const buildEmployeeCards = (company: CompanyState) => [
     !company.employees.some((employee) => employee.employeeId === candidate.employeeId),
   ).map((candidate) => ({
     ...candidate, status: 'Candidate' as const,
-    canAct: Number.isFinite(company.money) && company.money >= candidate.hireCost, hired: false,
+    canAct: Number.isSafeInteger(company.money) && company.money >= candidate.hireCost, hired: false,
   })),
 ]
 
 export const pageItems = <T>(items: readonly T[], requestedPage: number, pageSize: number) => {
-  const size = Math.max(1, Math.floor(pageSize))
+  const size = Number.isFinite(pageSize) ? Math.max(1, Math.floor(pageSize)) : 1
   const pageCount = Math.max(1, Math.ceil(items.length / size))
-  const page = Math.min(pageCount - 1, Math.max(0, requestedPage))
+  const page = Math.min(pageCount - 1, Math.max(0, Number.isFinite(requestedPage) ? Math.floor(requestedPage) : 0))
   return { page, pageCount, items: items.slice(page * size, (page + 1) * size),
     hasPrevious: page > 0, hasNext: page < pageCount - 1 }
 }
+
+export const pageAfterResize = (page: number, previousSize: number, nextSize: number): number =>
+  Math.floor(page * previousSize / Math.max(1, nextSize))

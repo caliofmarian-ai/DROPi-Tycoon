@@ -20,14 +20,14 @@ export const drawParcel = (g: Phaser.GameObjects.Graphics, x: number, y: number,
 }
 
 const drawBackpack = (g: Phaser.GameObjects.Graphics, p: CourierPose): void => {
-  const { x, y } = p.cargo
+  const { x, y } = p.backpack
   const side = p.projection === 'profile'
   g.fillStyle(ink).fillRoundedRect(x - (side ? 7 : 9), y - 11, side ? 11 : 18, 22, 4)
   g.fillStyle(COLORS.accentStrong).fillRoundedRect(x - (side ? 7 : 8), y - 10, side ? 9 : 16, 18, 3)
   g.fillStyle(COLORS.accent).fillRoundedRect(x - (side ? 6 : 7), y - 9, side ? 7 : 14, 5, 2)
   g.fillStyle(C.cream).fillRect(x - (side ? 5 : 6), y + 1, side ? 6 : 12, 3)
   g.fillStyle(ink).fillRoundedRect(x - 3, y + 5, 6, 3, 1)
-  if (p.carrying) drawParcel(g, x, y - 10, 12)
+  if (p.carrying && p.state === 'Walking') drawParcel(g, x, y - 10, 12)
 }
 
 const drawRider = (g: Phaser.GameObjects.Graphics, p: CourierPose): void => {
@@ -40,12 +40,15 @@ const drawRider = (g: Phaser.GameObjects.Graphics, p: CourierPose): void => {
   if (side) drawBackpack(g, p)
   g.lineStyle(6, ink)
   p.feet.forEach((foot, i) => {
-    const hipX = side ? 0 : i ? 4 : -4
-    const fy = riding ? -3 - (i ? -1 : 1) * [0, 4, 0, -4][p.frame] : foot.y
-    const fx = riding ? (side ? sign * 8 : i ? 8 : -8) : foot.x
-    g.lineBetween(hipX, hipY, fx, fy - 2)
-    g.fillStyle(C.metal).fillRoundedRect(fx - 4, fy - 2, side ? 10 : 7, 5, 2)
-    g.fillStyle(C.cream).fillRect(fx - 3, fy + 2, side ? 9 : 6, 2)
+    const hipX = side ? -sign * 3 : i ? 4 : -4
+    const { x: fx, y: fy } = foot
+    if (riding) {
+      const kneeX = side ? sign * 12 : i ? 10 : -10
+      g.lineBetween(hipX, hipY, kneeX, fy - 9).lineBetween(kneeX, fy - 9, fx, fy - 2)
+    } else g.lineBetween(hipX, hipY, fx, fy - 2)
+    const shoeX = fx - (side && sign < 0 ? 6 : 4)
+    g.fillStyle(C.metal).fillRoundedRect(shoeX, fy - 2, side ? 10 : 7, 5, 2)
+    g.fillStyle(C.cream).fillRect(shoeX + 1, fy + 2, side ? 9 : 6, 2)
   })
   g.fillStyle(C.cream).fillRoundedRect(-p.bodyWidth / 2 - 2, torsoY - 2, p.bodyWidth + 4, 20, 7)
   g.fillStyle(COLORS.accentStrong).fillRoundedRect(-p.bodyWidth / 2, torsoY, p.bodyWidth, 19, 5)
@@ -59,16 +62,17 @@ const drawRider = (g: Phaser.GameObjects.Graphics, p: CourierPose): void => {
         .lineBetween(5, torsoY, 5, torsoY + 8)
     }
   }
-  const armSwing = riding ? 0 : [0, 3, 0, -3][p.frame]
   g.lineStyle(5, C.skinShade)
   if (side) {
-    g.lineBetween(sign * 2, torsoY + 5, sign * (riding ? 14 : 5) + armSwing, torsoY + 16)
-    g.fillStyle(C.skin).fillCircle(sign * (riding ? 16 : 5) + armSwing, torsoY + 16, 3)
+    const hand = p.hands[0]
+    g.lineBetween(sign * 2, torsoY + 5, riding ? sign * 9 : hand.x, riding ? torsoY + 14 : hand.y)
+    if (riding) g.lineBetween(sign * 9, torsoY + 14, hand.x, hand.y)
+    g.fillStyle(C.skin).fillCircle(hand.x, hand.y, 3)
   } else {
-    g.lineBetween(-11, torsoY + 5, -12, torsoY + 16 + armSwing)
-      .lineBetween(11, torsoY + 5, 12, torsoY + 16 - armSwing)
-    g.fillStyle(C.skin).fillCircle(-12, torsoY + 17 + armSwing, 3)
-      .fillCircle(12, torsoY + 17 - armSwing, 3)
+    p.hands.forEach((hand, index) => {
+      g.lineBetween(index ? 11 : -11, torsoY + 5, hand.x, hand.y)
+      g.fillStyle(C.skin).fillCircle(hand.x, hand.y, 3)
+    })
   }
   if (back) drawBackpack(g, p)
   if (p.carrying && !back && !side && !riding) drawParcel(g, -14, torsoY + 14, 13)
@@ -126,8 +130,8 @@ const drawCycle = (g: Phaser.GameObjects.Graphics, p: CourierPose): void => {
     g.lineStyle(3.5, frameColor).strokeTriangle(rear.x, -3, -2 * sign, -3, -8 * sign, -20)
       .lineBetween(-8 * sign, -20, 12 * sign, -20).lineBetween(-2 * sign, -3, 12 * sign, -20)
       .lineBetween(12 * sign, -20, front.x, -3)
-    g.lineStyle(3, C.metal).lineBetween(12 * sign, -20, 12 * sign, -28)
-      .lineBetween(12 * sign, -28, 19 * sign, -28)
+    g.lineStyle(3, C.metal).lineBetween(12 * sign, -20, 12 * sign, -26)
+      .lineBetween(12 * sign, -26, p.hands[0].x, p.hands[0].y)
       .lineBetween(-13 * sign, -22, -3 * sign, -22)
     if (motor) {
       g.fillStyle(C.roofShade).fillRoundedRect(-12, -19, 30, 15, 6)
@@ -136,14 +140,16 @@ const drawCycle = (g: Phaser.GameObjects.Graphics, p: CourierPose): void => {
       g.fillStyle(C.metal).fillRoundedRect(-16 * sign - 7, -6, 16, 4, 2)
     } else if (scooter) {
       g.fillStyle(C.metal).fillRoundedRect(-14, -3, 29, 5, 2)
-      g.lineStyle(4, COLORS.accent).lineBetween(front.x, -3, 12 * sign, -28)
+      g.lineStyle(4, COLORS.accent).lineBetween(front.x, -3, 12 * sign, -26)
     }
     g.fillStyle(ink).fillRoundedRect(-15 * sign - 6, -25, 14, 5, 2)
   } else {
     g.lineStyle(motor ? 8 : 4, frameColor).lineBetween(0, -24, 0, 15)
-    g.lineStyle(3, C.metal).lineBetween(-14, sign * 13 - 10, 14, sign * 13 - 10)
-    g.fillStyle(C.cream).fillRoundedRect(-15, sign * 13 - 12, 5, 4, 1)
-      .fillRoundedRect(10, sign * 13 - 12, 5, 4, 1)
+    const handleY = p.hands[0].y
+    g.lineStyle(3, C.metal).lineBetween(-14, handleY, 14, handleY)
+      .lineBetween(0, handleY, 0, sign > 0 ? 17 : -25)
+    g.fillStyle(C.cream).fillRoundedRect(-16, handleY - 2, 5, 4, 1)
+      .fillRoundedRect(11, handleY - 2, 5, 4, 1)
     if (motor) {
       g.fillStyle(C.roofShade).fillRoundedRect(-10, -21, 20, 35, 8)
       g.fillStyle(C.roof).fillRoundedRect(-8, -20, 16, 30, 6)
@@ -152,7 +158,15 @@ const drawCycle = (g: Phaser.GameObjects.Graphics, p: CourierPose): void => {
     if (scooter) g.fillStyle(C.metal).fillRoundedRect(-6, -19, 12, 32, 4)
     g.fillStyle(ink).fillRoundedRect(-6, -11, 12, 16, 4)
   }
-  if (p.carrying) drawParcel(g, p.cargo.x, p.cargo.y + (side ? -3 : 0), 18)
+}
+
+const drawCycleCargo = (g: Phaser.GameObjects.Graphics, p: CourierPose): void => {
+  const { x, y } = p.cargo
+  g.lineStyle(3, C.metal).lineBetween(x - 12, y + 9, x + 12, y + 9)
+  if (p.carrying) {
+    drawParcel(g, x, y, 18)
+    g.lineStyle(2, C.metal).lineBetween(x - 6, y - 9, x - 6, y + 9)
+  }
 }
 
 const drawCabinVehicle = (g: Phaser.GameObjects.Graphics, p: CourierPose): void => {
@@ -199,17 +213,22 @@ export const drawCourierFrame = (g: Phaser.GameObjects.Graphics, pose: CourierPo
   const side = pose.projection === 'profile'
   g.fillStyle(C.shadow, 0.23).fillEllipse(3, 5,
     enclosed ? side ? 87 : 48 : pose.state === 'Walking' ? 30 : side ? 65 : 29,
-    enclosed ? side ? 27 : 61 : pose.state === 'Walking' ? 12 : side ? 15 : 48)
+    enclosed ? side ? 27 : 54 : pose.state === 'Walking' ? 12 : side ? 15 : 48)
   if (enclosed) drawCabinVehicle(g, pose)
   else {
-    if (pose.state !== 'Walking') drawCycle(g, pose)
+    const riding = pose.state !== 'Walking'
+    if (riding) {
+      drawCycle(g, pose)
+      if (pose.projection !== 'back') drawCycleCargo(g, pose)
+    }
     drawRider(g, pose)
+    if (riding && pose.projection === 'back') drawCycleCargo(g, pose)
   }
 }
 
 /** One 448×896 RGBA atlas per used transport, shared by all couriers/scenes. */
 export const ensureCourierAtlas = (scene: Phaser.Scene, state: CourierState): string => {
-  const key = `dropi-original-courier-v2-${state}`
+  const key = `dropi-original-courier-v3-${state}`
   if (scene.textures.exists(key)) return key
   const graphics = scene.make.graphics({ x: 0, y: 0 })
   for (const facing of COURIER_DIRECTIONS) {

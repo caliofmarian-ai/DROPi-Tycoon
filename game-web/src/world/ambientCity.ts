@@ -1,6 +1,7 @@
 import type Phaser from 'phaser'
 import { createPlayerVisual, type PlayerVisual } from './playerVisual'
-import { drawNeighborhoodNPC } from './urbanPresentation'
+import { ensureNeighborAtlas, NEIGHBOR_ANCHOR, NEIGHBOR_CELL } from './cityArt'
+import { courierAnimationFrame, getCourierPose } from './courierPose'
 import { isUrbanWalkable, type UrbanFacing, type UrbanPoint } from './urbanWorld'
 import { WORLD_ROADS } from './worldLayout'
 
@@ -27,6 +28,19 @@ const clearRoute = (start: UrbanPoint, end: UrbanPoint, roadOnly: boolean): bool
 /** Small authored loops, validated once against the real collision surfaces. */
 export const buildAmbientRoutes = (): readonly AmbientRoute[] => {
   const routes: AmbientRoute[] = []
+  for (const [index, id] of ['central-vertical', 'garden-avenue'].entries()) {
+    const road = WORLD_ROADS.find(candidate => candidate.id === id)
+    if (!road) continue
+    for (let side = 0; side < 2; side++) {
+      const x = road.x + (side ? 1 : -1) * (road.width / 2 + 12)
+      const start = { x, y: road.y - road.height / 2 + 100 }
+      const end = { x, y: start.y + 240 }
+      if (clearRoute(start, end, false)) routes.push({
+        id: `neighbor-${id}-${side}`, kind: 'pedestrian', start, end,
+        speed: 25 + index * 3, phase: index * 5 + side * 3,
+      })
+    }
+  }
   const laneIds = [
     'residential-lane', 'business-lane', 'storage-lane', 'company-lane',
     'canal-lane', 'quay-lane', 'foundry-lane', 'garden-lane', 'orchard-lane',
@@ -35,8 +49,9 @@ export const buildAmbientRoutes = (): readonly AmbientRoute[] => {
     const road = WORLD_ROADS.find(candidate => candidate.id === id)
     if (!road) return
     for (let side = 0; side < 2; side++) {
+      if (index < 4 && side === 1) continue
       const x = road.x - road.width / 2 + 120 + side * Math.min(320, road.width / 3)
-      const y = road.y + (side ? 1 : -1) * (road.height / 2 + 12)
+      const y = road.y + (side ? 1 : -1) * (road.height / 2 + 3)
       const start = { x, y }
       const end = { x: x + 180, y }
       if (clearRoute(start, end, false)) routes.push({
@@ -64,7 +79,8 @@ export const sampleAmbientRoute = (route: AmbientRoute, seconds: number, target:
   const dy = route.end.y - route.start.y
   const duration = Math.hypot(dx, dy) / Math.max(1, route.speed)
   const leg = duration + 1.5
-  const time = (Math.max(0, Number.isFinite(seconds) ? seconds : 0) + route.phase) % (leg * 2)
+  const cycle = leg * 2
+  const time = ((Math.max(0, Number.isFinite(seconds) ? seconds : 0) + route.phase) % cycle + cycle) % cycle
   const returning = time >= leg
   const progress = Math.min(1, (time % leg) / Math.max(0.001, duration))
   const fraction = returning ? 1 - progress : progress
@@ -73,7 +89,7 @@ export const sampleAmbientRoute = (route: AmbientRoute, seconds: number, target:
   target.facing = Math.abs(dx) >= Math.abs(dy)
     ? (dx > 0 !== returning ? 'right' : 'left')
     : (dy > 0 !== returning ? 'down' : 'up')
-  target.moving = progress < 1
+  target.moving = duration > 0 && progress < 1
   return target
 }
 
@@ -82,6 +98,8 @@ interface AmbientActor {
   pose: AmbientPose
   object: Phaser.GameObjects.Container
   vehicle?: PlayerVisual
+  pedestrian?: Phaser.GameObjects.Image
+  frame: number
   visible: boolean
 }
 
@@ -95,9 +113,13 @@ export class AmbientCity {
       const pose = sampleAmbientRoute(route, 0, { x: 0, y: 0, facing: 'right', moving: false })
       const vehicle = route.kind === 'pedestrian' ? undefined : createPlayerVisual(scene, pose.x, pose.y)
       vehicle?.setState(route.kind === 'van' ? 'DeliveryVan' : 'Car')
-      const object = vehicle?.container ?? drawNeighborhoodNPC(scene, pose.x, pose.y, false, index)
+      vehicle?.setFacing(pose.facing)
+      const frame = getCourierPose('Walking', pose.facing).atlasFrame
+      const pedestrian = vehicle ? undefined : scene.add.image(0, 0, ensureNeighborAtlas(scene, index), frame)
+        .setOrigin(NEIGHBOR_ANCHOR.x / NEIGHBOR_CELL, NEIGHBOR_ANCHOR.y / NEIGHBOR_CELL)
+      const object = vehicle?.container ?? scene.add.container(pose.x, pose.y, [pedestrian!])
       object.setName(route.id).setDepth(route.kind === 'pedestrian' ? 14 : 11)
-      return { route, pose, object, vehicle, visible: true }
+      return { route, pose, object, vehicle, pedestrian, frame, visible: true }
     })
   }
 
@@ -113,7 +135,14 @@ export class AmbientCity {
       if (!visible) continue
       actor.object.setPosition(p.x, p.y)
       if (actor.vehicle) actor.vehicle.setFacing(p.facing)
-      else actor.object.setScale(p.facing === 'left' ? -1 : 1, 1)
+      else {
+        const frame = getCourierPose('Walking', p.facing,
+          courierAnimationFrame((this.elapsed + actor.route.phase) * 1000, p.moving)).atlasFrame
+        if (frame !== actor.frame) {
+          actor.pedestrian!.setFrame(frame)
+          actor.frame = frame
+        }
+      }
     }
   }
 }

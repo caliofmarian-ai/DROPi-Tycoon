@@ -3,7 +3,10 @@ import { describe, expect, it } from 'vitest'
 import { createInitialCompanyState, createInitialWorldState } from '../src/state/gameState'
 import { getUrbanObjective } from '../src/systems/urbanInteractions'
 import { createOrderForSequence } from '../src/systems/orderGeneration'
-import { isUrbanHUDPoint, urbanHUDLayout, urbanMapMarkers, urbanStatusText } from '../src/ui/UrbanHUD'
+import {
+  isUrbanHUDPoint, UrbanDPadInput, urbanDistrictCaption, urbanHUDLayout, urbanMapMarkers, urbanMapViewport, urbanStatusText,
+} from '../src/ui/UrbanHUD'
+import { WORLD_HEIGHT, WORLD_WIDTH } from '../src/world/worldLayout'
 import { CAMERA_MAX_ZOOM, CAMERA_MIN_ZOOM } from '../src/ui/cameraControls'
 import { UrbanZoomGesture, urbanZoomStep } from '../src/ui/urbanZoom'
 import { minimapPoint } from '../src/world/urbanWorld'
@@ -43,6 +46,20 @@ describe('living city screen-space navigation', () => {
     }
   })
 
+  it('clips the camera footprint inside the minimap even at world edges', () => {
+    expect(urbanMapViewport({ x: -100, y: -200, width: 900, height: 800 }, 160, 120))
+      .toEqual({ x: 0, y: 0, width: 40, height: 30 })
+    expect(urbanMapViewport({
+      x: WORLD_WIDTH - 400, y: WORLD_HEIGHT - 200, width: 900, height: 600,
+    }, 160, 120)).toEqual({ x: 140, y: 110, width: 20, height: 10 })
+  })
+
+  it('names the current district, with a city fallback on connecting streets', () => {
+    expect(urbanDistrictCaption({ x: 380, y: 270 })).toBe('OLD TOWN')
+    expect(urbanDistrictCaption({ x: 2020, y: 1490 })).toBe('GARDEN BOROUGH')
+    expect(urbanDistrictCaption({ x: 800, y: 600 })).toBe('CEDAR CITY')
+  })
+
   it('uses actual money, reputation, transport and carried cargo', () => {
     const world = createInitialWorldState()
     const company = createInitialCompanyState()
@@ -52,9 +69,42 @@ describe('living city screen-space navigation', () => {
     world.player.carryingPackage = true
     expect(urbanStatusText(world, company)).toBe('$2,345  Rep 67  Bicycle  Cargo 1/3')
   })
+
+  it('keeps a direction lit until its last finger releases and ignores stale slide exits', () => {
+    const pad = new UrbanDPadInput()
+    pad.press(1, 'up')
+    pad.press(2, 'up')
+    pad.release(1)
+    expect(pad.isHeld('up')).toBe(true)
+    pad.press(2, 'right')
+    pad.release(2, 'up')
+    expect(pad.isHeld('up')).toBe(false)
+    expect(pad.isHeld('right')).toBe(true)
+    expect(pad.value()).toEqual({ x: 1, y: 0 })
+    pad.release(2)
+    expect(pad.isHeld('right')).toBe(false)
+    expect(pad.value()).toEqual({ x: 0, y: 0 })
+  })
 })
 
 describe('bounded world-only pinch and accessible zoom buttons', () => {
+  it('snapshots prototype-based Phaser pointer coordinates before either finger moves', () => {
+    class Pointer {
+      constructor(public position: { x: number; y: number }) {}
+      get x(): number { return this.position.x }
+      get y(): number { return this.position.y }
+    }
+    const gesture = new UrbanZoomGesture()
+    const stationary = new Pointer({ x: 0, y: 0 })
+    const moving = new Pointer({ x: 100, y: 0 })
+    gesture.press(1, stationary)
+    gesture.press(2, moving)
+    moving.position.x = 150
+    expect(gesture.move(2, moving, 1)).toBe(1.5)
+    stationary.position.x = 50
+    expect(gesture.move(1, stationary, 1.5)).toBe(1)
+  })
+
   it('scales continuously without rotation, with both hard bounds', () => {
     const gesture = new UrbanZoomGesture()
     gesture.press(1, { x: 0, y: 0 })
