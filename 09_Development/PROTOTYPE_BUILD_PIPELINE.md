@@ -2,11 +2,11 @@
 
 Document: PROTOTYPE_BUILD_PIPELINE.md
 Project: DROPi Tycoon
-Version: 1.0.0
+Version: 1.1.0
 Status: AI Development Pipeline
 Author: Marian Caliof & OpenAI
 Language: English
-Last Updated: 2026-07-12
+Last Updated: 2026-09-05
 
 ---
 
@@ -14,7 +14,7 @@ Last Updated: 2026-07-12
 
 ## Purpose
 
-This document defines the complete process used to transform DROPi Tycoon design documents into a playable GDevelop prototype.
+This document defines the complete process used to transform DROPi Tycoon design documents into a playable prototype.
 
 The goal is to create a repeatable development pipeline with AI assistance.
 
@@ -99,18 +99,18 @@ Contains:
 
 ## Goal
 
-Create the initial GDevelop project structure.
+Create the implementation structure required by the currently approved runtime architecture.
 
-Generated components:
+Generated components may include:
 
 ```
 Scenes
 
 Objects
 
-Events
+Events / systems
 
-Variables
+Variables / state
 
 Assets folders
 ```
@@ -222,7 +222,8 @@ Checks:
 
 Creates:
 
-- GDevelop structures
+- Runtime structures
+- Systems
 - Events
 - Logic
 
@@ -258,17 +259,141 @@ Approval is required before:
 
 ---
 
-# Build Versions
+# Canonical Build Versioning
 
-The pipeline creates versions:
+## Purpose
+
+Every distributed Android APK or AAB must be uniquely identifiable and historically traceable.
+
+Repository merges and application releases are different events. A merge does not automatically create a new APK. A release version is assigned only when a defined build scope is prepared for device validation or public distribution.
+
+## Semantic version
+
+DROPi Tycoon uses numeric semantic versioning:
 
 ```
-v0.1 Foundation
-
-v0.2 Improved Gameplay
-
-v0.3 Expanded Systems
+MAJOR.MINOR.PATCH
 ```
+
+The controlled installed-mobile release line starts at:
+
+```
+0.0.0
+```
+
+The already-installed Android evaluation APK created on 2026-09-05 used legacy metadata `0.1.0` / Android versionCode `1`. It remains historically traceable as a pre-canonical evaluation build and does not redefine the controlled version line.
+
+### PATCH
+
+Increment PATCH for bounded corrections that preserve the current release capability, including:
+
+- bug fixes;
+- layout corrections;
+- navigation fixes;
+- compatibility corrections;
+- small polish that does not materially expand gameplay capability.
+
+Examples:
+
+```
+0.0.0 → 0.0.1 → 0.0.2
+0.1.0 → 0.1.1
+```
+
+### MINOR
+
+Increment MINOR for meaningful additions to the player experience or product capability, including:
+
+- a new gameplay system;
+- a new progression capability;
+- substantial visual or audio experience work;
+- a new management surface;
+- a material expansion of the installed application experience.
+
+When MINOR increases, PATCH resets to zero.
+
+Examples:
+
+```
+0.0.4 → 0.1.0
+0.1.7 → 0.2.0
+```
+
+### MAJOR
+
+Increment MAJOR only for a major product-maturity or compatibility transition. `1.0.0` is reserved for the first fully promoted public release line and must not be assigned merely because an internal APK exists.
+
+When MAJOR increases, MINOR and PATCH reset to zero.
+
+## Android versionCode
+
+Android `versionCode` is independent from the semantic version and must increase monotonically for every EAS Android build artifact.
+
+The EAS project owns Android build numbers remotely through:
+
+```json
+"cli": {
+  "appVersionSource": "remote"
+}
+```
+
+Every Android build profile must use:
+
+```json
+"autoIncrement": true
+```
+
+This applies to development APKs, preview APKs and production AABs. A previously used Android versionCode must never be reset or reused.
+
+## Version synchronization
+
+`game-mobile/app.json` `expo.version` and `game-mobile/package.json` `version` must always contain the same semantic version.
+
+Mobile CI must fail if:
+
+- either value is not numeric `MAJOR.MINOR.PATCH`;
+- the two values differ;
+- EAS remote version ownership is removed;
+- any Android build profile disables automatic build-number incrementing;
+- a local `android.versionCode` is introduced while remote version ownership is active.
+
+## Release ledger
+
+Every actual Android build artifact must be recorded in `game-mobile/README.md` with:
+
+- semantic version;
+- Android versionCode;
+- build date;
+- exact source commit;
+- EAS build ID or URL;
+- release scope;
+- owner/device validation result;
+- discovered defects or hold state.
+
+The ledger records build artifacts, not ordinary commits.
+
+## Lockfile release gate
+
+A deterministic dependency lockfile is mandatory before an EAS build is submitted.
+
+The normal release path must not bypass EAS lockfile validation with `EAS_BUILD_SKIP_LOCKFILE_CHECK=1`.
+
+If the lockfile is missing or stale, fix and commit it before building.
+
+## Build authorization rule
+
+Do not build merely because a PR was merged. Build when the intended release scope is coherent enough to justify physical-device owner review.
+
+Before submission:
+
+1. decide the semantic increment from the actual release scope;
+2. synchronize `app.json` and `package.json`;
+3. update the mobile release ledger planned row;
+4. ensure the lockfile is committed and current;
+5. pass mobile CI and Expo Doctor;
+6. submit the EAS build;
+7. after completion, record the actual versionCode, build ID and source commit;
+8. perform owner review on the installed artifact and record PASS/HOLD plus defects.
 
 ---
 
@@ -300,17 +425,17 @@ Into documentation
 
 ↓
 
-Into a generated project
+Into an implementation
 
 ↓
 
-Into a playable mobile game prototype
+Into a playable installed mobile game
 
 ---
 
 # Canonical Rule
 
-Every build must move the project closer to a playable experience.
+Every build must move the project closer to a playable experience, and every distributed Android artifact must be uniquely versioned and historically traceable.
 
 ---
 

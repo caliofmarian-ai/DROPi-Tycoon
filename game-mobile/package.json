@@ -1,6 +1,6 @@
 {
   "name": "dropi-tycoon-mobile",
-  "version": "0.1.0",
+  "version": "0.0.0",
   "private": true,
   "main": "node_modules/expo/AppEntry.js",
   "engines": {
@@ -10,7 +10,8 @@
     "start": "expo start --dev-client",
     "android": "expo start --dev-client --android",
     "typecheck": "tsc --noEmit",
-    "doctor": "npx -y expo-doctor"
+    "doctor": "npx -y expo-doctor",
+    "version:validate": "node scripts/validate-release-version.mjs"
   },
   "dependencies": {
     "expo": "~57.0.9",
