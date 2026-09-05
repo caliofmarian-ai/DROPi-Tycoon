@@ -100,7 +100,7 @@ describe('RBATCH-014 — save-aware MainMenu extension', () => {
       mainMenuSource.indexOf('private createButton'),
       mainMenuSource.indexOf('private createModal'),
     )
-    expect(createButtonBody).toContain("button.on('pointerdown', () => {")
+    expect(createButtonBody).toContain('createThemedButton(this,')
     expect(createButtonBody).toContain('onTap()')
     expect(createButtonBody).not.toContain('text.setInteractive')
   })

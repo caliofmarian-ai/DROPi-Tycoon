@@ -29,6 +29,8 @@ import {
   buildMainMenuLayout,
   type MainMenuLayout,
 } from '../ui/mobileViewport'
+import { COLORS } from '../ui/theme'
+import { createThemedButton, drawHeadquarters, drawPanel, paintBackdrop } from '../ui/themeControls'
 
 const MODAL_DEPTH = 90
 const BRAND_LOGO_KEY = 'dropi-tycoon-logo'
@@ -48,15 +50,15 @@ export class MainMenuScene extends Phaser.Scene {
   private pendingConfirmation: (() => void) | null = null
 
   private modalOverlay!: Phaser.GameObjects.Rectangle
-  private modalPanel!: Phaser.GameObjects.Rectangle
+  private modalPanel!: Phaser.GameObjects.Graphics
   private modalText!: Phaser.GameObjects.Text
-  private modalCloseButton!: Phaser.GameObjects.Rectangle
+  private modalCloseButton!: Phaser.GameObjects.Graphics
   private modalCloseLabel!: Phaser.GameObjects.Text
-  private modalConfirmButton!: Phaser.GameObjects.Rectangle
+  private modalConfirmButton!: Phaser.GameObjects.Graphics
   private modalConfirmLabel!: Phaser.GameObjects.Text
-  private modalCancelButton!: Phaser.GameObjects.Rectangle
+  private modalCancelButton!: Phaser.GameObjects.Graphics
   private modalCancelLabel!: Phaser.GameObjects.Text
-  private soundToggleButton!: Phaser.GameObjects.Rectangle
+  private soundToggleButton!: Phaser.GameObjects.Graphics
   private soundToggleLabel!: Phaser.GameObjects.Text
 
   private readonly handleResize = (): void => {
@@ -87,7 +89,7 @@ export class MainMenuScene extends Phaser.Scene {
         : true
     getAudioController().setEnabled(initialSoundEnabled)
 
-    const actionCount = this.saveSlot.kind === 'valid' ? 5 : 4
+    const actionCount = session || this.saveSlot.kind === 'valid' ? 5 : 4
     const hasNotice =
       this.saveSlot.kind === 'corrupted' ||
       this.saveSlot.kind === 'incompatible' ||
@@ -105,11 +107,7 @@ export class MainMenuScene extends Phaser.Scene {
     const versionY = logoCenterY + logoSize / 2 + (compactLandscape ? 2 : 6)
     const taglineY = versionY + (compactLandscape ? 15 : 24)
 
-    this.cameras.main.setBackgroundColor('#06162d')
-
-    const glowRadius = Math.max(80, Math.round(Math.min(width, height) * 0.34))
-    this.add.circle(width * 0.18, height * 0.18, glowRadius, 0x0b6cff, 0.08)
-    this.add.circle(width * 0.86, height * 0.8, glowRadius * 0.8, 0x22c55e, 0.045)
+    paintBackdrop(this, width, height)
 
     this.add
       .image(layout.title.x, logoCenterY, BRAND_LOGO_KEY)
@@ -123,6 +121,15 @@ export class MainMenuScene extends Phaser.Scene {
         fontStyle: 'bold',
       })
       .setOrigin(0.5)
+
+    if (!compactLandscape && !hasNotice && width <= height) {
+      const firstAction = layout.actionCenters[0]
+      const artTop = taglineY + 24
+      const artHeight = firstAction.y - layout.buttonHeight / 2 - artTop - 12
+      if (artHeight >= 64) drawHeadquarters(this, {
+        left: width / 2 - 130, top: artTop, width: 260, height: Math.min(126, artHeight),
+      })
+    }
 
     this.add
       .text(layout.tagline.x, taglineY, 'Play. Deliver. Trade. Grow.', {
@@ -145,7 +152,7 @@ export class MainMenuScene extends Phaser.Scene {
   }
 
   private createSaveAwareActions(layout: MainMenuLayout): void {
-    if (this.saveSlot.kind === 'valid') {
+    if (peekGameSession() || this.saveSlot.kind === 'valid') {
       const labels = ['Continue Game', 'Start New Game', 'Settings', 'Information', 'Exit Game']
       const actions = [
         () => this.continueGame(),
@@ -220,6 +227,10 @@ export class MainMenuScene extends Phaser.Scene {
   }
 
   private continueGame(): void {
+    if (peekGameSession()) {
+      this.scene.start('GameWorld')
+      return
+    }
     if (!this.saveStorage) {
       this.showMessage('Local save storage is unavailable, so the saved game cannot be loaded.')
       return
@@ -244,14 +255,17 @@ export class MainMenuScene extends Phaser.Scene {
 
   private requestStartNewGame(): void {
     if (
+      peekGameSession() ||
       this.saveSlot.kind === 'valid' ||
       this.saveSlot.kind === 'corrupted' ||
       this.saveSlot.kind === 'incompatible'
     ) {
       const message =
-        this.saveSlot.kind === 'valid'
-          ? 'A saved game already exists. Start a new game and replace that progress?'
-          : 'The existing save cannot be restored. Start a new game and replace it? A backup of unreadable data will be preserved when possible.'
+        peekGameSession()
+          ? 'A game is already in progress. Start a new game and replace that progress?'
+          : this.saveSlot.kind === 'valid'
+            ? 'A saved game already exists. Start a new game and replace that progress?'
+            : 'The existing save cannot be restored. Start a new game and replace it? A backup of unreadable data will be preserved when possible.'
       this.showConfirmation(message, () => this.confirmNewGameReplacement())
       return
     }
@@ -328,25 +342,16 @@ export class MainMenuScene extends Phaser.Scene {
     onTap: () => void,
     layout: MainMenuLayout,
   ): void {
-    const button = this.add
-      .rectangle(x, y, layout.buttonWidth, layout.buttonHeight, 0x0b6cff, 1)
-      .setStrokeStyle(3, 0x67e8f9)
-      .setInteractive({ useHandCursor: true })
-
-    this.add
-      .text(x, y, label, {
-        fontFamily: 'Arial',
-        fontSize: `${layout.buttonFontSize}px`,
-        color: '#f8fbff',
-        fontStyle: 'bold',
-      })
-      .setOrigin(0.5)
-
-    button.on('pointerdown', () => {
+    const tone = label === 'Start Game' || label === 'Continue Game' ? 'success'
+      : label === 'Exit Game' ? 'danger' : 'primary'
+    createThemedButton(this, {
+      left: x - layout.buttonWidth / 2, top: y - layout.buttonHeight / 2,
+      width: layout.buttonWidth, height: layout.buttonHeight,
+    }, label, tone, () => {
       getAudioController().unlock()
       getAudioController().play('ui-tap')
       onTap()
-    })
+    }, { fontSize: Math.min(22, layout.buttonFontSize), radius: 16 })
   }
 
   private createModal(layout: MainMenuLayout): void {
@@ -362,16 +367,7 @@ export class MainMenuScene extends Phaser.Scene {
       .setVisible(false)
       .on('pointerdown', () => this.hidePanel())
 
-    this.modalPanel = this.add
-      .rectangle(
-        modal.panel.left + modal.panel.width / 2,
-        modal.panel.top + modal.panel.height / 2,
-        modal.panel.width,
-        modal.panel.height,
-        0x071a33,
-        0.98,
-      )
-      .setStrokeStyle(3, 0x38bdf8, 0.9)
+    this.modalPanel = drawPanel(this, modal.panel, { tone: 'accent', radius: 20 })
       .setDepth(MODAL_DEPTH + 1)
       .setVisible(false)
 
@@ -446,12 +442,10 @@ export class MainMenuScene extends Phaser.Scene {
     y: number,
     width: number,
     height: number,
-  ): Phaser.GameObjects.Rectangle {
-    return this.add
-      .rectangle(x, y, width, height, 0x0b6cff, 1)
-      .setStrokeStyle(2, 0x67e8f9)
+  ): Phaser.GameObjects.Graphics {
+    return drawPanel(this, { left: x - width / 2, top: y - height / 2, width, height }, { tone: 'accent', radius: 12 })
       .setDepth(MODAL_DEPTH + 3)
-      .setInteractive({ useHandCursor: true })
+      .setInteractive(new Phaser.Geom.Rectangle(x - width / 2, y - height / 2, width, height), Phaser.Geom.Rectangle.Contains)
       .setVisible(false)
   }
 
@@ -522,6 +516,16 @@ export class MainMenuScene extends Phaser.Scene {
   }
 
   private setModalVisible(visible: boolean, confirmation: boolean): void {
+    if (visible) {
+      const layout = buildMainMenuLayout(this.scale.width, this.scale.height, 4, false)
+      const maxHeight = layout.modal.secondaryActionY - layout.modal.actionHeight / 2 - 12
+        - layout.modal.panel.top - 12
+      let fontSize = layout.modal.textFontSize
+      this.modalText.setFontSize(fontSize).setColor(COLORS.textPrimary)
+      while (this.modalText.height > maxHeight && fontSize > 12) {
+        this.modalText.setFontSize(--fontSize)
+      }
+    }
     this.modalOverlay.setVisible(visible)
     this.modalPanel.setVisible(visible)
     this.modalText.setVisible(visible)

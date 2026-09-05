@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import { buildCustomerReviewSummary } from '../src/systems/customerReviewSystem'
 import type { CustomerReview } from '../src/types/game'
-import { buildCustomerReviewsLayout } from '../src/ui/customerReviewsLayout'
+import { buildManagementCards } from '../src/ui/managementLayout'
 import {
   MIN_TOUCH_TARGET_PX,
   SUPPORTED_ANDROID_VIEWPORTS,
@@ -59,39 +59,35 @@ describe('RBATCH-021 — customer review display summary', () => {
 describe('RBATCH-021 / Product Experience — customer reviews Android layout', () => {
   for (const viewport of SUPPORTED_ANDROID_VIEWPORTS) {
     it(`keeps review rows, summary and controls usable at ${viewport.width}x${viewport.height}`, () => {
-      const layout = buildCustomerReviewsLayout(viewport.width, viewport.height)
+      const layout = buildManagementCards(viewport.width, viewport.height)
 
-      expect(rectInsideViewport(layout.panel, viewport.width, viewport.height)).toBe(true)
-      expect(rectInsideViewport(layout.previousButton, viewport.width, viewport.height)).toBe(true)
-      expect(rectInsideViewport(layout.nextButton, viewport.width, viewport.height)).toBe(true)
-      expect(rectInsideViewport(layout.returnButton, viewport.width, viewport.height)).toBe(true)
-      expect(rectInsideViewport(layout.menuButton, viewport.width, viewport.height)).toBe(true)
-      expect(layout.rowRects).toHaveLength(layout.rowsPerPage)
-      expect(layout.summary.wrapWidth).toBeLessThanOrEqual(viewport.width)
+      expect(rectInsideViewport(layout.body, viewport.width, viewport.height)).toBe(true)
+      expect(layout.cards).toHaveLength(layout.pageSize)
+      expect(layout.header.width).toBeLessThanOrEqual(viewport.width)
 
-      for (const row of layout.rowRects) {
+      for (const row of layout.cards) {
         expect(rectInsideViewport(row, viewport.width, viewport.height)).toBe(true)
         expect(row.height).toBeGreaterThanOrEqual(MIN_TOUCH_TARGET_PX)
-        expect(row.left).toBeGreaterThanOrEqual(layout.panel.left)
-        expect(row.left + row.width).toBeLessThanOrEqual(layout.panel.left + layout.panel.width)
+        expect(row.left).toBeGreaterThanOrEqual(layout.body.left)
+        expect(row.left + row.width).toBeLessThanOrEqual(layout.body.left + layout.body.width)
+        expect(row.height).toBeGreaterThanOrEqual(200)
       }
 
-      expect(layout.previousButton.height).toBeGreaterThanOrEqual(MIN_TOUCH_TARGET_PX)
-      expect(layout.nextButton.height).toBeGreaterThanOrEqual(MIN_TOUCH_TARGET_PX)
-      expect(layout.returnButton.height).toBeGreaterThanOrEqual(MIN_TOUCH_TARGET_PX)
-      expect(layout.menuButton.height).toBeGreaterThanOrEqual(MIN_TOUCH_TARGET_PX)
-      expect(layout.rowTextWrapWidth).toBeGreaterThanOrEqual(180)
+      for (const nav of layout.navigation) {
+        expect(rectInsideViewport(nav, viewport.width, viewport.height)).toBe(true)
+        expect(nav.height).toBeGreaterThanOrEqual(MIN_TOUCH_TARGET_PX)
+      }
     })
   }
 
-  it('uses compact landscape paging and richer four-card portrait paging', () => {
-    const landscape = buildCustomerReviewsLayout(800, 360)
-    const portrait = buildCustomerReviewsLayout(360, 800)
+  it('uses readable two-card paging in portrait and landscape', () => {
+    const landscape = buildManagementCards(800, 360)
+    const portrait = buildManagementCards(360, 800)
 
     expect(landscape.compactLandscape).toBe(true)
-    expect(landscape.rowsPerPage).toBe(3)
+    expect(landscape.pageSize).toBe(2)
     expect(portrait.compactLandscape).toBe(false)
-    expect(portrait.rowsPerPage).toBe(4)
-    expect(portrait.summary.wrapWidth).toBeLessThan(360)
+    expect(portrait.pageSize).toBe(2)
+    expect(portrait.header.width).toBeLessThan(360)
   })
 })

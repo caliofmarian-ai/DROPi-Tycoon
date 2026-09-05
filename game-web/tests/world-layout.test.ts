@@ -23,21 +23,23 @@ const sceneSource = readFileSync(
 )
 
 describe('release blocker #273 — explorable first-map structure', () => {
-  it('materially exceeds the old 800x600 scaffold', () => {
-    expect(WORLD_WIDTH).toBeGreaterThan(800)
-    expect(WORLD_HEIGHT).toBeGreaterThan(600)
-    expect(WORLD_WIDTH * WORLD_HEIGHT).toBeGreaterThan(800 * 600 * 2)
+  it('quadruples the former 1600x1200 neighborhood footprint', () => {
+    expect(WORLD_WIDTH).toBe(3200)
+    expect(WORLD_HEIGHT).toBe(2400)
+    expect(WORLD_WIDTH * WORLD_HEIGHT).toBe(1600 * 1200 * 4)
   })
 
-  it('defines exactly the four canonical prototype gameplay zones inside world bounds', () => {
+  it('retains the four legacy zone IDs and adds two distinct districts inside world bounds', () => {
     expect(WORLD_ZONES.map(({ id }) => id).sort()).toEqual([
       'business',
       'company',
+      'garden',
       'residential',
       'storage',
+      'waterfront',
     ])
     expect(WORLD_ZONES.every(isZoneInsideWorld)).toBe(true)
-    expect(new Set(WORLD_ZONES.map(({ label }) => label)).size).toBe(4)
+    expect(new Set(WORLD_ZONES.map(({ label }) => label)).size).toBe(6)
   })
 
   it('contains a meaningful road and sidewalk network', () => {
@@ -47,17 +49,17 @@ describe('release blocker #273 — explorable first-map structure', () => {
     expect(WORLD_SIDEWALKS.every(({ x, y }) => isPointInsideWorld(x, y))).toBe(true)
   })
 
-  it('populates at least twenty lightweight structures across all four zones', () => {
-    expect(WORLD_BUILDINGS.length).toBeGreaterThanOrEqual(20)
+  it('populates at least eighty lightweight structures across all six districts', () => {
+    expect(WORLD_BUILDINGS.length).toBeGreaterThanOrEqual(80)
     const representedZones = new Set(WORLD_BUILDINGS.map(({ zoneId }) => zoneId))
-    expect(representedZones).toEqual(new Set(['residential', 'business', 'storage', 'company']))
+    expect(representedZones).toEqual(new Set(WORLD_ZONES.map(zone => zone.id)))
     expect(WORLD_BUILDINGS.every(({ x, y }) => isPointInsideWorld(x, y))).toBe(true)
   })
 
-  it('includes lightweight decorative elements across all four zones', () => {
+  it('includes lightweight decorative elements across all six districts', () => {
     expect(WORLD_DECORATIONS.length).toBeGreaterThanOrEqual(12)
     expect(new Set(WORLD_DECORATIONS.map(({ zoneId }) => zoneId))).toEqual(
-      new Set(['residential', 'business', 'storage', 'company']),
+      new Set(WORLD_ZONES.map(zone => zone.id)),
     )
     expect(WORLD_DECORATIONS.every(({ x, y }) => isPointInsideWorld(x, y))).toBe(true)
   })
@@ -84,6 +86,7 @@ describe('release blocker #273 — explorable first-map structure', () => {
 describe('release blocker #273 — scene integration contract', () => {
   it('renders from centralized world-layout collections', () => {
     const presentationSource = readFileSync(new URL('../src/world/urbanPresentation.ts', import.meta.url), 'utf8')
+    const pavementSource = readFileSync(new URL('../src/world/cityGround.ts', import.meta.url), 'utf8')
     expect(sceneSource).toContain('renderUrbanNeighborhood(this, this.companyState)')
     for (const token of [
       'URBAN_ROADS',
@@ -94,8 +97,11 @@ describe('release blocker #273 — scene integration contract', () => {
     ]) {
       expect(presentationSource).toContain(token)
     }
-    expect(presentationSource.indexOf('URBAN_SIDEWALKS.forEach'))
-      .toBeLessThan(presentationSource.indexOf('URBAN_ROADS.forEach'))
+    expect(presentationSource).toContain('drawCityPavement(pavement, URBAN_ROADS, URBAN_SIDEWALKS)')
+    const sidewalks = pavementSource.indexOf('for (const sidewalk of sidewalks)')
+    const roads = pavementSource.indexOf('for (const road of roads)')
+    expect(sidewalks).toBeGreaterThanOrEqual(0)
+    expect(roads).toBeGreaterThan(sidewalks)
   })
 
   it('removes the old scene-local scaffold arrays', () => {
@@ -112,12 +118,15 @@ describe('Workstream E — world uplift removes developer-style debug labels', (
     expect(sceneSource).not.toContain("kind === 'pickup' ? 'Pickup' : 'Delivery'")
   })
 
-  it('draws readable neighborhood signs and landmark identities without image assets', () => {
+  it('draws catalog-backed signs and landmarks without downloading image assets', () => {
     const presentationSource = readFileSync(new URL('../src/world/urbanPresentation.ts', import.meta.url), 'utf8')
-    for (const sign of ['DROPi · HQ', 'MARA’S MARKET', 'Future Main DronePort', 'CEDAR AVENUE']) {
+    for (const sign of ["'DROPi'", 'HEADQUARTERS', 'MAIN DRONEPORT', 'FUTURE · LOCKED']) {
       expect(presentationSource).toContain(sign)
     }
-    expect(presentationSource).not.toContain('.add.image(')
+    expect(presentationSource).toContain('location.displayName')
+    expect(presentationSource).toContain('zone.label.toUpperCase()')
+    expect(findWorldRoutePoint('PickupZone')?.displayName).toBe("Mara's Market")
+    expect(presentationSource).not.toContain('.load.image(')
     expect(sceneSource).not.toContain('.load.image(')
   })
 })

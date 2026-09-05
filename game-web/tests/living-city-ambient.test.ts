@@ -1,0 +1,130 @@
+import type Phaser from 'phaser'
+import { describe, expect, it, vi } from 'vitest'
+import { AMBIENT_ACTOR_LIMIT, AmbientCity, buildAmbientRoutes, sampleAmbientRoute, type AmbientPose } from '../src/world/ambientCity'
+import { ensureNeighborAtlas } from '../src/world/cityArt'
+import { isUrbanWalkable } from '../src/world/urbanWorld'
+import { createInitialCompanyState, createInitialGameSettingsState, createInitialWorldState } from '../src/state/gameState'
+import { serializeGameSession } from '../src/persistence/saveSystem'
+
+const ambientScene = () => {
+  const textures = new Map<string, { add: ReturnType<typeof vi.fn> }>()
+  let drawCalls = 0
+  const makeGraphics = vi.fn(() => {
+    const graphics = new Proxy({}, {
+      get: (_target, method: string) => (...args: unknown[]) => {
+        drawCalls++
+        if (method === 'generateTexture') textures.set(args[0] as string, { add: vi.fn() })
+        return graphics
+      },
+    })
+    return graphics
+  })
+  const object = () => ({
+    setOrigin: vi.fn().mockReturnThis(), setDepth: vi.fn().mockReturnThis(),
+    setName: vi.fn().mockReturnThis(), setVisible: vi.fn().mockReturnThis(),
+    setPosition: vi.fn().mockReturnThis(), setFrame: vi.fn().mockReturnThis(),
+    setTexture: vi.fn().mockReturnThis(), setScale: vi.fn().mockReturnThis(),
+    add: vi.fn().mockReturnThis(),
+  })
+  const images: ReturnType<typeof object>[] = []
+  const containers: ReturnType<typeof object>[] = []
+  const raw = {
+    textures: { exists: (key: string) => textures.has(key), get: (key: string) => textures.get(key) },
+    make: { graphics: makeGraphics },
+    add: {
+      image: vi.fn(() => { const image = object(); images.push(image); return image }),
+      container: vi.fn(() => { const container = object(); containers.push(container); return container }),
+    },
+  }
+  return { scene: raw as unknown as Phaser.Scene, textures, raw, images, containers, drawCalls: () => drawCalls }
+}
+
+describe('bounded deterministic city life', () => {
+  it('populates connected promenades and roads with a fixed actor budget', () => {
+    const routes = buildAmbientRoutes()
+    expect(routes.length).toBeGreaterThanOrEqual(14)
+    expect(routes.length).toBeLessThanOrEqual(AMBIENT_ACTOR_LIMIT)
+    expect(routes.filter(route => route.kind !== 'pedestrian')).toHaveLength(4)
+    expect(routes.filter(route => route.kind === 'pedestrian' && route.start.x === route.end.x)).toHaveLength(4)
+    expect(buildAmbientRoutes()).toEqual(routes)
+    expect(new Set(routes.map(route => route.id)).size).toBe(routes.length)
+    for (const route of routes) {
+      const pose: AmbientPose = { x: 0, y: 0, facing: 'right', moving: false }
+      for (let time = 0; time < 100; time += 0.5) {
+        expect(sampleAmbientRoute(route, time, pose)).toBe(pose)
+        expect(isUrbanWalkable(pose.x, pose.y, route.kind !== 'pedestrian', 6), route.id).toBe(true)
+        expect(pose.x).toBeGreaterThanOrEqual(Math.min(route.start.x, route.end.x))
+        expect(pose.x).toBeLessThanOrEqual(Math.max(route.start.x, route.end.x))
+        expect(pose.y).toBeGreaterThanOrEqual(Math.min(route.start.y, route.end.y))
+        expect(pose.y).toBeLessThanOrEqual(Math.max(route.start.y, route.end.y))
+      }
+    }
+  })
+
+  it('changes direction at route ends and pauses without random drift', () => {
+    const route = { id: 'test', kind: 'pedestrian' as const, start: { x: 0, y: 0 }, end: { x: 100, y: 0 }, speed: 10, phase: 0 }
+    const pose: AmbientPose = { x: 0, y: 0, facing: 'right', moving: false }
+    expect(sampleAmbientRoute(route, 5, pose)).toMatchObject({ x: 50, y: 0, facing: 'right', moving: true })
+    expect(sampleAmbientRoute(route, 10.5, pose)).toMatchObject({ x: 100, facing: 'right', moving: false })
+    expect(sampleAmbientRoute(route, 16.5, pose)).toMatchObject({ x: 50, facing: 'left', moving: true })
+    expect(sampleAmbientRoute(route, NaN, pose)).toMatchObject({ x: 0, y: 0 })
+    expect(sampleAmbientRoute({ ...route, phase: -1 }, 0, pose)).toMatchObject({ x: 0, moving: false })
+    expect(sampleAmbientRoute({ ...route, end: route.start }, 10, pose)).toMatchObject({ x: 0, y: 0, moving: false })
+  })
+
+  it('reuses six small four-direction pedestrian atlases, including after scene recreation', () => {
+    const mock = ambientScene()
+    for (let index = 0; index < 24; index++) ensureNeighborAtlas(mock.scene, index)
+    expect(mock.raw.make.graphics).toHaveBeenCalledTimes(6)
+    for (const texture of mock.textures.values()) expect(texture.add).toHaveBeenCalledTimes(16)
+    const initial = mock.drawCalls()
+    for (let index = -6; index < 12; index++) ensureNeighborAtlas(mock.scene, index)
+    expect(mock.drawCalls()).toBe(initial)
+  })
+
+  it('animates visible pedestrians using bounded texture frames, never Graphics redraws or mirroring', () => {
+    const mock = ambientScene()
+    const city = new AmbientCity(mock.scene)
+    const count = buildAmbientRoutes().length
+    const initial = mock.drawCalls()
+    const view = { x: 0, y: 0, right: 3200, bottom: 2400 } as Phaser.Geom.Rectangle
+    for (let tick = 0; tick < 2000; tick++) city.update(16, view)
+    expect(mock.containers).toHaveLength(count)
+    expect(mock.images).toHaveLength(count)
+    expect(mock.drawCalls()).toBe(initial)
+    expect(mock.containers.every(container => container.setScale.mock.calls.length === 0)).toBe(true)
+    expect(mock.images.slice(0, count - 4).every(image => image.setFrame.mock.calls.length > 20)).toBe(true)
+    expect(mock.images.slice(0, count - 4).flatMap(image => image.setFrame.mock.calls)
+      .every(([frame]) => Number.isInteger(frame) && frame >= 0 && frame < 16)).toBe(true)
+    new AmbientCity(mock.scene)
+    expect(mock.drawCalls()).toBe(initial)
+  })
+
+  it('culls offscreen pose writes and animation, then restores deterministic positions on return', () => {
+    const mock = ambientScene()
+    const city = new AmbientCity(mock.scene)
+    const offscreen = { x: -500, y: -500, right: -400, bottom: -400 } as Phaser.Geom.Rectangle
+    city.update(0, offscreen)
+    const initialFrames = mock.images.map(image => image.setFrame.mock.calls.length)
+    for (let tick = 0; tick < 100; tick++) city.update(100, offscreen)
+    expect(mock.containers.every(container => container.setPosition.mock.calls.length === 0)).toBe(true)
+    expect(mock.images.map(image => image.setFrame.mock.calls.length)).toEqual(initialFrames)
+    expect(mock.containers.every(container => container.setVisible.mock.calls.length === 1)).toBe(true)
+    city.update(NaN, { x: 0, y: 0, right: 3200, bottom: 2400 } as Phaser.Geom.Rectangle)
+    for (const [index, route] of buildAmbientRoutes().entries()) {
+      const pose = sampleAmbientRoute(route, 10, { x: 0, y: 0, facing: 'down', moving: false })
+      const [x, y] = mock.containers[index].setPosition.mock.calls.at(-1)!
+      expect(x).toBeCloseTo(pose.x, 8)
+      expect(y).toBeCloseTo(pose.y, 8)
+      expect(mock.containers[index].setVisible).toHaveBeenLastCalledWith(true)
+    }
+  })
+
+  it('keeps ambient population, art and camera preferences out of Save v2', () => {
+    const raw = serializeGameSession({
+      world: createInitialWorldState(), company: createInitialCompanyState(), settings: createInitialGameSettingsState(),
+    })
+    expect(JSON.parse(raw).formatVersion).toBe(2)
+    expect(raw).not.toMatch(/ambient|pedestrian|camera|zoom|texture|decoration/)
+  })
+})

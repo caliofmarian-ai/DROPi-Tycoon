@@ -1,19 +1,13 @@
 import type { OrderState, WorldState } from '../types/game'
-import { URBAN_MERCHANT, URBAN_ROADS } from '../world/urbanWorld'
 import { findWorldRoutePoint } from '../world/worldLayout'
+import { CITY_MERCHANTS, getCityRouteDistance } from '../world/city'
+import { isOrderAcceptanceEligible } from './orderSystem'
 import {
-  isDeliveryMission, TRANSPORT_PROFILES,
+  isDeliveryMission, loadParcel, TRANSPORT_PROFILES,
   type CargoLoad, type DeliveryMission, type GroundTransport, type Parcel,
 } from './urbanLogistics'
 
-export const LOCAL_MERCHANT = {
-  merchantId: 'mara-market',
-  npcId: 'mara',
-  buildingId: 'storage-3',
-  name: "Mara's Market",
-  position: URBAN_MERCHANT,
-  pickupLocation: 'PickupZone',
-} as const
+export const LOCAL_MERCHANT = CITY_MERCHANTS.find(merchant => merchant.merchantId === 'mara-market')!
 
 export const LOCAL_LISTING = {
   listingId: 'mara-neighborhood-essentials',
@@ -28,6 +22,20 @@ export const marketplaceMerchant = (world: WorldState) => ({
   active: world.urban?.merchantOnboarded === true,
   listings: world.urban?.merchantOnboarded === true ? [LOCAL_LISTING] : [],
 })
+
+export const MARKETPLACE_LISTINGS = CITY_MERCHANTS.map(merchant => merchant.merchantId === LOCAL_MERCHANT.merchantId
+  ? LOCAL_LISTING
+  : {
+    listingId: `${merchant.merchantId}-local-goods`, merchantId: merchant.merchantId,
+    productName: `${merchant.name} goods`, cargoUnits: 1,
+  })
+
+export const marketplaceMerchants = (world: WorldState) => CITY_MERCHANTS.map(merchant => ({
+  ...merchant,
+  active: world.urban?.merchantOnboarded === true,
+  listings: world.urban?.merchantOnboarded === true
+    ? MARKETPLACE_LISTINGS.filter(listing => listing.merchantId === merchant.merchantId) : [],
+}))
 
 export const parcelForOrder = (order: OrderState): Parcel => ({
   parcelId: `${order.orderId}:parcel-1`,
@@ -62,16 +70,14 @@ export const cargoForPlayer = (world: WorldState, transport: GroundTransport): C
 export const prepareMarketplaceOrder = (
   world: WorldState, transport: GroundTransport = 'walking',
 ): OrderState | null => {
-  const merchant = marketplaceMerchant(world)
-  if (!merchant.active || merchant.listings.length === 0 || world.activeOrder.status !== 'Available') return null
-  const destination = findWorldRoutePoint(world.activeOrder.destination)
-  const pickup = findWorldRoutePoint(merchant.pickupLocation)
-  const spine = URBAN_ROADS.find(road => road.id === 'central-vertical')
-  if (!destination || destination.kind !== 'delivery' || !pickup || !spine) return null
-  // Current endpoints sit on horizontal lanes connected by the central avenue.
-  const distance = pickup.y === destination.y ? Math.abs(pickup.x - destination.x) :
-    Math.abs(pickup.x - spine.x) + Math.abs(pickup.y - destination.y) + Math.abs(destination.x - spine.x)
-  if (distance > TRANSPORT_PROFILES[transport].range) return null
-  const order = { ...world.activeOrder, pickupLocation: merchant.pickupLocation }
-  return isDeliveryMission(missionForOrder(order, transport)) ? order : null
+  const order = world.activeOrder
+  if (!world.urban?.merchantOnboarded || !isOrderAcceptanceEligible(order, world.player, order.orderId)) return null
+  const merchant = CITY_MERCHANTS.find(candidate => candidate.pickupLocation === order.pickupLocation)
+  const pickup = findWorldRoutePoint(order.pickupLocation)
+  const destination = findWorldRoutePoint(order.destination)
+  if (!merchant || pickup?.kind !== 'pickup' || destination?.kind !== 'delivery') return null
+  const distance = getCityRouteDistance(pickup.label, destination.label)
+  if (!Number.isFinite(distance) || distance <= 0 || distance > TRANSPORT_PROFILES[transport].range) return null
+  if (!loadParcel(cargoForPlayer(world, transport), parcelForOrder(order)).ok) return null
+  return isDeliveryMission(missionForOrder(order, transport)) ? { ...order } : null
 }
