@@ -1,5 +1,6 @@
 import Phaser from 'phaser'
 import { appConfig } from '../config/env'
+import { requestNativeAppExit } from '../platform/nativeAppBridge'
 import { getBrowserSaveStorage } from '../persistence/browserSaveStorage'
 import {
   inspectSaveSlot,
@@ -10,6 +11,7 @@ import {
   type SaveStorage,
 } from '../persistence/saveSystem'
 import {
+  peekGameSession,
   replaceEntireGameSession,
   startNewGameSession,
 } from '../state/gameSession'
@@ -30,6 +32,8 @@ import {
 const MODAL_DEPTH = 90
 const BRAND_LOGO_KEY = 'dropi-tycoon-logo'
 const BRAND_LOGO_URL = '/assets/branding/dropi-tycoon-logo.png'
+
+type MainMenuButtonTone = 'primary' | 'exit'
 
 export class MainMenuScene extends Phaser.Scene {
   private menuState: MainMenuState = createMainMenuState()
@@ -67,7 +71,7 @@ export class MainMenuScene extends Phaser.Scene {
       ? inspectSaveSlot(this.saveStorage)
       : { kind: 'unavailable', reason: 'Local storage is unavailable.' }
 
-    const actionCount = this.saveSlot.kind === 'valid' ? 4 : 3
+    const actionCount = this.saveSlot.kind === 'valid' ? 5 : 4
     const hasNotice =
       this.saveSlot.kind === 'corrupted' ||
       this.saveSlot.kind === 'incompatible' ||
@@ -124,15 +128,23 @@ export class MainMenuScene extends Phaser.Scene {
 
   private createSaveAwareActions(layout: MainMenuLayout): void {
     if (this.saveSlot.kind === 'valid') {
-      const labels = ['Continue Game', 'Start New Game', 'Settings', 'Information']
+      const labels = ['Continue Game', 'Start New Game', 'Settings', 'Information', 'Exit Game']
       const actions = [
         () => this.continueGame(),
         () => this.requestStartNewGame(),
         () => this.showPanel('settings'),
         () => this.showPanel('information'),
+        () => this.requestExitGame(),
       ]
       layout.actionCenters.forEach((center, index) => {
-        this.createButton(center.x, center.y, labels[index], actions[index], layout)
+        this.createButton(
+          center.x,
+          center.y,
+          labels[index],
+          actions[index],
+          layout,
+          labels[index] === 'Exit Game' ? 'exit' : 'primary',
+        )
       })
       return
     }
@@ -153,14 +165,22 @@ export class MainMenuScene extends Phaser.Scene {
         )
         .setOrigin(0.5)
 
-      const labels = ['Start New Game', 'Settings', 'Information']
+      const labels = ['Start New Game', 'Settings', 'Information', 'Exit Game']
       const actions = [
         () => this.requestStartNewGame(),
         () => this.showPanel('settings'),
         () => this.showPanel('information'),
+        () => this.requestExitGame(),
       ]
       layout.actionCenters.forEach((center, index) => {
-        this.createButton(center.x, center.y, labels[index], actions[index], layout)
+        this.createButton(
+          center.x,
+          center.y,
+          labels[index],
+          actions[index],
+          layout,
+          labels[index] === 'Exit Game' ? 'exit' : 'primary',
+        )
       })
       return
     }
@@ -177,14 +197,22 @@ export class MainMenuScene extends Phaser.Scene {
         .setOrigin(0.5)
     }
 
-    const labels = ['Start Game', 'Settings', 'Information']
+    const labels = ['Start Game', 'Settings', 'Information', 'Exit Game']
     const actions = [
       () => this.startGame(),
       () => this.showPanel('settings'),
       () => this.showPanel('information'),
+      () => this.requestExitGame(),
     ]
     layout.actionCenters.forEach((center, index) => {
-      this.createButton(center.x, center.y, labels[index], actions[index], layout)
+      this.createButton(
+        center.x,
+        center.y,
+        labels[index],
+        actions[index],
+        layout,
+        labels[index] === 'Exit Game' ? 'exit' : 'primary',
+      )
     })
   }
 
@@ -249,6 +277,40 @@ export class MainMenuScene extends Phaser.Scene {
     this.scene.start('GameWorld')
   }
 
+  private requestExitGame(): void {
+    this.showConfirmation(
+      'Save current progress and exit DROPi Tycoon?',
+      () => this.saveAndExitGame(),
+    )
+  }
+
+  private saveAndExitGame(): void {
+    const session = peekGameSession()
+
+    if (session) {
+      if (!this.saveStorage) {
+        this.showMessage('The game cannot exit safely because local save storage is unavailable.')
+        return
+      }
+
+      const write = writeSaveSlot(this.saveStorage, session)
+      if (!write.ok) {
+        this.showMessage(`The game was not closed because progress could not be saved: ${write.reason}`)
+        return
+      }
+
+      this.saveSlot = inspectSaveSlot(this.saveStorage)
+    }
+
+    if (!requestNativeAppExit()) {
+      this.showMessage(
+        session
+          ? 'Progress saved. You can close DROPi Tycoon safely.'
+          : 'You can close DROPi Tycoon safely.',
+      )
+    }
+  }
+
   private describeUnreadableSave(inspection: SaveSlotInspection): string {
     if (inspection.kind === 'corrupted') {
       return `Saved progress is corrupted and cannot be restored. ${inspection.reason}`
@@ -271,10 +333,14 @@ export class MainMenuScene extends Phaser.Scene {
     label: string,
     onTap: () => void,
     layout: MainMenuLayout,
+    tone: MainMenuButtonTone = 'primary',
   ): void {
+    const fill = tone === 'exit' ? 0x7f1d1d : 0x0b6cff
+    const stroke = tone === 'exit' ? 0xfca5a5 : 0x67e8f9
+
     const button = this.add
-      .rectangle(x, y, layout.buttonWidth, layout.buttonHeight, 0x0b6cff, 1)
-      .setStrokeStyle(3, 0x67e8f9)
+      .rectangle(x, y, layout.buttonWidth, layout.buttonHeight, fill, 1)
+      .setStrokeStyle(3, stroke)
       .setInteractive({ useHandCursor: true })
 
     this.add
