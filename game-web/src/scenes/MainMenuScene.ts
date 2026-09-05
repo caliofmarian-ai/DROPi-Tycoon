@@ -10,6 +10,7 @@ import {
   type SaveStorage,
 } from '../persistence/saveSystem'
 import {
+  peekGameSession,
   replaceEntireGameSession,
   startNewGameSession,
 } from '../state/gameSession'
@@ -30,6 +31,13 @@ import {
 const MODAL_DEPTH = 90
 const BRAND_LOGO_KEY = 'dropi-tycoon-logo'
 const BRAND_LOGO_URL = '/assets/branding/dropi-tycoon-logo.png'
+const EXIT_GAME_MESSAGE = 'dropi:exit-game'
+
+type NativeBridgeWindow = Window & {
+  ReactNativeWebView?: {
+    postMessage: (message: string) => void
+  }
+}
 
 export class MainMenuScene extends Phaser.Scene {
   private menuState: MainMenuState = createMainMenuState()
@@ -67,7 +75,7 @@ export class MainMenuScene extends Phaser.Scene {
       ? inspectSaveSlot(this.saveStorage)
       : { kind: 'unavailable', reason: 'Local storage is unavailable.' }
 
-    const actionCount = this.saveSlot.kind === 'valid' ? 4 : 3
+    const actionCount = this.saveSlot.kind === 'valid' ? 5 : 4
     const hasNotice =
       this.saveSlot.kind === 'corrupted' ||
       this.saveSlot.kind === 'incompatible' ||
@@ -75,13 +83,15 @@ export class MainMenuScene extends Phaser.Scene {
     const layout = buildMainMenuLayout(width, height, actionCount, hasNotice)
     const compactLandscape = width > height && height <= 440
     const logoSize = compactLandscape
-      ? 60
+      ? actionCount >= 5
+        ? 48
+        : 60
       : Math.min(140, Math.max(104, Math.round(Math.min(width, height) * 0.22)))
     const logoCenterY = compactLandscape
-      ? layout.title.y + 10
+      ? layout.title.y + 6
       : logoSize / 2 + Math.max(8, Math.round(height * 0.015))
-    const versionY = logoCenterY + logoSize / 2 + (compactLandscape ? 4 : 6)
-    const taglineY = versionY + (compactLandscape ? 17 : 24)
+    const versionY = logoCenterY + logoSize / 2 + (compactLandscape ? 2 : 6)
+    const taglineY = versionY + (compactLandscape ? 15 : 24)
 
     this.cameras.main.setBackgroundColor('#06162d')
 
@@ -124,12 +134,13 @@ export class MainMenuScene extends Phaser.Scene {
 
   private createSaveAwareActions(layout: MainMenuLayout): void {
     if (this.saveSlot.kind === 'valid') {
-      const labels = ['Continue Game', 'Start New Game', 'Settings', 'Information']
+      const labels = ['Continue Game', 'Start New Game', 'Settings', 'Information', 'Exit Game']
       const actions = [
         () => this.continueGame(),
         () => this.requestStartNewGame(),
         () => this.showPanel('settings'),
         () => this.showPanel('information'),
+        () => this.exitGame(),
       ]
       layout.actionCenters.forEach((center, index) => {
         this.createButton(center.x, center.y, labels[index], actions[index], layout)
@@ -153,11 +164,12 @@ export class MainMenuScene extends Phaser.Scene {
         )
         .setOrigin(0.5)
 
-      const labels = ['Start New Game', 'Settings', 'Information']
+      const labels = ['Start New Game', 'Settings', 'Information', 'Exit Game']
       const actions = [
         () => this.requestStartNewGame(),
         () => this.showPanel('settings'),
         () => this.showPanel('information'),
+        () => this.exitGame(),
       ]
       layout.actionCenters.forEach((center, index) => {
         this.createButton(center.x, center.y, labels[index], actions[index], layout)
@@ -177,11 +189,12 @@ export class MainMenuScene extends Phaser.Scene {
         .setOrigin(0.5)
     }
 
-    const labels = ['Start Game', 'Settings', 'Information']
+    const labels = ['Start Game', 'Settings', 'Information', 'Exit Game']
     const actions = [
       () => this.startGame(),
       () => this.showPanel('settings'),
       () => this.showPanel('information'),
+      () => this.exitGame(),
     ]
     layout.actionCenters.forEach((center, index) => {
       this.createButton(center.x, center.y, labels[index], actions[index], layout)
@@ -247,6 +260,35 @@ export class MainMenuScene extends Phaser.Scene {
     }
 
     this.scene.start('GameWorld')
+  }
+
+  private exitGame(): void {
+    const activeSession = peekGameSession()
+
+    if (activeSession) {
+      if (!this.saveStorage) {
+        this.showMessage('The game cannot exit safely because local save storage is unavailable.')
+        return
+      }
+
+      const write = writeSaveSlot(this.saveStorage, activeSession)
+      if (!write.ok) {
+        this.showMessage(`The game was not closed because progress could not be saved: ${write.reason}`)
+        return
+      }
+    }
+
+    const nativeBridge = (window as NativeBridgeWindow).ReactNativeWebView
+    if (nativeBridge) {
+      nativeBridge.postMessage(EXIT_GAME_MESSAGE)
+      return
+    }
+
+    this.showMessage(
+      activeSession
+        ? 'Game saved. You can close this page safely.'
+        : 'You can close this page safely.',
+    )
   }
 
   private describeUnreadableSave(inspection: SaveSlotInspection): string {
