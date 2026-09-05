@@ -33,18 +33,20 @@ const walkTo = (source: WorldState, ...waypoints: { x: number; y: number }[]): W
 describe('pure urban merchant listings and physical logistics', () => {
   it('grows HQ equipment and staffing from company state without granting assets', () => {
     const company = createInitialCompanyState()
-    expect(getHQGrowth(company)).toEqual({ tier: 1, staffCount: 0, ownsBicycle: false })
+    expect(getHQGrowth(company)).toEqual({ level: 1, tier: 1, staffCount: 0, ownsBicycle: false })
     company.level = 3
     company.employees.push({
       employeeId: 'hq-courier', name: 'Rae', role: 'Courier', status: 'Active', salaryPerCycle: 10,
     })
     company.vehicles.push({ vehicleId: 'hq-bicycle', typeId: 'Bicycle' })
     const before = structuredClone(company)
-    expect(getHQGrowth(company)).toEqual({ tier: 3, staffCount: 1, ownsBicycle: true })
+    expect(getHQGrowth(company)).toEqual({ level: 3, tier: 3, staffCount: 1, ownsBicycle: true })
     expect(company).toEqual(before)
     company.vehicles = []
     company.purchasedUpgradeLevels.Bicycle = 1
     expect(getHQGrowth(company).ownsBicycle).toBe(true)
+    company.level = 7
+    expect(getHQGrowth(company)).toEqual({ level: 7, tier: 3, staffCount: 1, ownsBicycle: true })
   })
 
   it('anchors the future droneport marker at HQ without claiming another building footprint', () => {
