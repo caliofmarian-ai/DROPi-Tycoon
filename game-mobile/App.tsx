@@ -34,6 +34,11 @@ const PHASER_VIEWPORT_BOOTSTRAP = `
 })();
 `
 
+const PHASER_NATIVE_BACK_DISPATCH = `
+window.dispatchEvent(new Event('dropi:native-back'));
+true;
+`
+
 export default function App() {
   const webViewRef = useRef<WebView>(null)
   const [canGoBack, setCanGoBack] = useState(false)
@@ -53,17 +58,22 @@ export default function App() {
     const subscription = BackHandler.addEventListener(
       'hardwareBackPress',
       () => {
-        if (!canGoBack) {
+        if (canGoBack) {
+          webViewRef.current?.goBack()
+          return true
+        }
+
+        if (!loaded) {
           return false
         }
 
-        webViewRef.current?.goBack()
+        webViewRef.current?.injectJavaScript(PHASER_NATIVE_BACK_DISPATCH)
         return true
       },
     )
 
     return () => subscription.remove()
-  }, [canGoBack])
+  }, [canGoBack, loaded])
 
   if (!runtime.gameUrl) {
     return (
