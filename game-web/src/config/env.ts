@@ -1,4 +1,4 @@
-import { GAME_RELEASE_VERSION } from './releaseVersion'
+import { DROPITYCOON_VERSION } from '../version'
 
 const readNumber = (value: string | undefined, fallback: number): number => {
   const parsed = Number(value)
@@ -7,7 +7,7 @@ const readNumber = (value: string | undefined, fallback: number): number => {
 
 export const appConfig = {
   appName: import.meta.env.VITE_APP_NAME ?? 'DROPi Tycoon',
-  appVersion: GAME_RELEASE_VERSION,
+  appVersion: DROPITYCOON_VERSION,
   width: readNumber(import.meta.env.VITE_GAME_WIDTH, 1280),
   height: readNumber(import.meta.env.VITE_GAME_HEIGHT, 720),
   enableDebugPanel: (import.meta.env.VITE_ENABLE_DEBUG_PANEL ?? 'true') === 'true',
