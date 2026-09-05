@@ -46,7 +46,7 @@ export class CustomerReviewsScene extends Phaser.Scene {
     this.companyState = session.company
     this.currentPage = 0
 
-    this.cameras.main.setBackgroundColor('#111827')
+    this.cameras.main.setBackgroundColor('#08111f')
 
     this.add
       .text(this.layout.title.x, this.layout.title.y, 'Customer Reviews', {
@@ -61,8 +61,10 @@ export class CustomerReviewsScene extends Phaser.Scene {
       .text(this.layout.summary.x, this.layout.summary.y, '', {
         fontFamily: 'Arial',
         fontSize: `${this.layout.summary.fontSize}px`,
-        color: '#dbeafe',
+        color: '#c4b5fd',
         align: 'center',
+        lineSpacing: 3,
+        wordWrap: { width: this.layout.summary.wrapWidth },
       })
       .setOrigin(0.5)
 
@@ -72,10 +74,10 @@ export class CustomerReviewsScene extends Phaser.Scene {
         rectCenterY(this.layout.panel),
         this.layout.panel.width,
         this.layout.panel.height,
-        0x0f172a,
-        0.97,
+        0x101b2d,
+        0.98,
       )
-      .setStrokeStyle(3, 0x8b5cf6, 0.78)
+      .setStrokeStyle(2, 0x8b5cf6, 0.78)
 
     this.rowBackgrounds = this.layout.rowRects.map((rect) =>
       this.add
@@ -198,7 +200,9 @@ export class CustomerReviewsScene extends Phaser.Scene {
       : `${summary.totalReputationImpact}`
 
     this.summaryText.setText(
-      `Reviews: ${summary.count}   Avg: ${average}/5   Positive: ${summary.positiveCount}   Negative: ${summary.negativeCount}   Rep: ${totalImpact}`,
+      this.layout.compactLandscape
+        ? `${summary.count} reviews  •  ★ ${average}/5  •  +${summary.positiveCount} / -${summary.negativeCount}  •  Rep ${totalImpact}`
+        : `${summary.count} reviews  •  ★ ${average}/5  •  Rep ${totalImpact}\n${summary.positiveCount} positive  •  ${summary.negativeCount} negative`,
     )
 
     const pageCount = this.getPageCount()
@@ -219,12 +223,18 @@ export class CustomerReviewsScene extends Phaser.Scene {
       const impact = review.reputationImpact >= 0
         ? `+${review.reputationImpact}`
         : `${review.reputationImpact}`
-      background.setVisible(true)
+      const stars = `${'★'.repeat(Math.max(0, Math.min(5, review.rating)))}${'☆'.repeat(Math.max(0, 5 - review.rating))}`
+      const positive = review.sentiment === 'Positive'
+      background
+        .setVisible(true)
+        .setFillStyle(positive ? 0x14352e : 0x3a1f2a, 0.97)
+        .setStrokeStyle(1, positive ? 0x34d399 : 0xfb7185, 0.72)
       text
         .setVisible(true)
         .setText([
-          `${review.orderId}   ${review.rating}/5   ${review.sentiment}   Reputation ${impact}`,
+          `${review.orderId}   ${stars}`,
           review.message,
+          `${review.sentiment}  •  Reputation ${impact}`,
         ])
     })
 
