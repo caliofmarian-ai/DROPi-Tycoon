@@ -113,37 +113,74 @@ export const buildMainMenuLayout = (
   }
 
   const count = Math.max(1, Math.floor(actionCount))
+  const landscapeGrid = viewport.width > viewport.height && count >= 4
+  const columns = landscapeGrid ? 2 : 1
+  const rows = Math.ceil(count / columns)
   const topReserve = compact
     ? hasNotice
       ? 132
       : 108
     : hasNotice
       ? Math.min(270, Math.round(viewport.height * 0.36))
-      : Math.min(245, Math.round(viewport.height * 0.31))
+      : landscapeGrid
+        ? Math.min(200, Math.round(viewport.height * 0.25))
+        : Math.min(245, Math.round(viewport.height * 0.31))
   const availableHeight = Math.max(MIN_TOUCH_TARGET_PX, viewport.height - topReserve - edge)
   const minimumGap = 8
+  const rowGap = landscapeGrid
+    ? clamp(Math.round(viewport.height * 0.025), minimumGap, 16)
+    : 0
   const maximumButtonHeight = Math.floor(
-    (availableHeight - minimumGap * Math.max(0, count - 1)) / count,
+    (availableHeight - (landscapeGrid ? rowGap : minimumGap) * Math.max(0, rows - 1)) / rows,
   )
-  const preferredButtonHeight = compact ? 52 : 64
+  const preferredButtonHeight = compact ? 52 : landscapeGrid ? 58 : 64
   const buttonHeight = clamp(
     Math.min(preferredButtonHeight, maximumButtonHeight),
     MIN_TOUCH_TARGET_PX,
     preferredButtonHeight,
   )
-  const remaining = Math.max(0, availableHeight - buttonHeight * count)
-  const gap = count > 1 ? clamp(Math.floor(remaining / (count - 1)), minimumGap, 24) : 0
-  const totalActionsHeight = buttonHeight * count + gap * Math.max(0, count - 1)
-  const startY = topReserve + Math.max(0, Math.floor((availableHeight - totalActionsHeight) / 2))
-  const actionCenters = Array.from({ length: count }, (_, index) => ({
-    x: centerX,
-    y: startY + buttonHeight / 2 + index * (buttonHeight + gap),
-  }))
+  const remaining = Math.max(0, availableHeight - buttonHeight * rows)
+  const gap = rows > 1
+    ? landscapeGrid
+      ? rowGap
+      : clamp(Math.floor(remaining / (rows - 1)), minimumGap, 24)
+    : 0
+  const totalActionsHeight = buttonHeight * rows + gap * Math.max(0, rows - 1)
+  const startY = landscapeGrid
+    ? topReserve + Math.min(12, Math.max(0, Math.floor((availableHeight - totalActionsHeight) / 2)))
+    : topReserve + Math.max(0, Math.floor((availableHeight - totalActionsHeight) / 2))
 
+  const columnGap = landscapeGrid
+    ? clamp(Math.round(viewport.width * 0.025), 12, 24)
+    : 0
   const buttonWidth = Math.max(
     MIN_TOUCH_TARGET_PX,
-    Math.min(compact ? 300 : 360, viewport.width - edge * 2),
+    Math.min(
+      landscapeGrid ? 300 : compact ? 300 : 360,
+      landscapeGrid
+        ? Math.floor((viewport.width - edge * 2 - columnGap) / 2)
+        : viewport.width - edge * 2,
+    ),
   )
+  const leftColumnX = centerX - (buttonWidth + columnGap) / 2
+  const rightColumnX = centerX + (buttonWidth + columnGap) / 2
+
+  const actionCenters = Array.from({ length: count }, (_, index) => {
+    const row = Math.floor(index / columns)
+    const isUnpairedLastAction = landscapeGrid && count % 2 === 1 && index === count - 1
+    const x = isUnpairedLastAction
+      ? centerX
+      : landscapeGrid
+        ? index % 2 === 0
+          ? leftColumnX
+          : rightColumnX
+        : centerX
+
+    return {
+      x,
+      y: startY + buttonHeight / 2 + row * (buttonHeight + gap),
+    }
+  })
 
   const panelWidth = Math.min(640, viewport.width - edge * 2)
   const panelHeight = Math.min(compact ? viewport.height - edge * 2 : 360, viewport.height - edge * 2)
@@ -168,7 +205,7 @@ export const buildMainMenuLayout = (
     notice,
     buttonWidth,
     buttonHeight,
-    buttonFontSize: compact ? 18 : 27,
+    buttonFontSize: compact ? 18 : landscapeGrid ? 22 : 27,
     actionCenters,
     modal: {
       panel,
