@@ -4,6 +4,7 @@ export type InteriorLocationId = 'hq' | 'marketplace'
 export type InteriorInteractionId =
   | 'exit'
   | 'fleet'
+  | 'fleet-handoff'
   | 'employees'
   | 'operations'
   | 'staging'
@@ -49,10 +50,11 @@ export const HQ_INTERIOR: InteriorLocationDefinition = {
   spawn: { x: 600, y: 620 },
   interactions: [
     interaction('exit', 'Exit to Cedar City', 600, 662, 54),
-    interaction('fleet', 'Fleet Bay', 225, 390, 76),
-    interaction('employees', 'Employee Area', 235, 155, 70),
-    interaction('operations', 'Operations & Dispatch', 925, 155, 76),
-    interaction('staging', 'Parcel Staging', 945, 405, 76),
+    interaction('employees', 'Hiring & Staff Terminal', 235, 225, 58),
+    interaction('fleet', 'Fleet Purchase Terminal', 155, 390, 62),
+    interaction('fleet-handoff', 'Vehicle Handoff', 315, 540, 62),
+    interaction('operations', 'HQ Management Terminal', 945, 250, 68),
+    interaction('staging', 'Parcel Operations', 945, 485, 72),
   ],
   obstacles: [
     { x: 600, y: 34, width: 1120, height: 46 },
