@@ -13,7 +13,7 @@ import { minimapPoint } from '../src/world/urbanWorld'
 
 describe('living city screen-space navigation', () => {
   it.each([[360, 640], [390, 844], [640, 360], [740, 360], [844, 390], [1280, 720], [1672, 941]])(
-    'keeps the mission, minimap and large controls separate at %ix%i', (width, height) => {
+    'keeps the mission, minimap and compact controls separate at %ix%i', (width, height) => {
       const l = urbanHUDLayout(width, height)
       expect(l.objective.x + l.objective.width).toBeLessThan(l.minimap.x - 5)
       expect(l.objective.y).toBeGreaterThan(l.headerHeight)
@@ -22,8 +22,15 @@ describe('living city screen-space navigation', () => {
       expect(l.pad.y).toBeGreaterThan(l.objective.y + l.objective.height)
       expect(l.minimap.x + l.minimap.width).toBeLessThan(width)
       expect(l.action.y + l.action.height / 2).toBeLessThan(height)
-      expect(l.zoom.size).toBeGreaterThanOrEqual(44)
-      expect(l.pad.size - 2).toBeGreaterThanOrEqual(44)
+      expect(l.zoom.size).toBeGreaterThanOrEqual(36)
+      expect(l.zoom.size).toBeLessThanOrEqual(40)
+      expect(l.pad.size).toBeGreaterThanOrEqual(30)
+      expect(l.pad.size).toBeLessThanOrEqual(36)
+      expect(l.pad.size * 3).toBeLessThanOrEqual(108)
+      if (width >= 600) {
+        expect(l.objective.width).toBeLessThanOrEqual(360)
+        expect(l.objective.height).toBeLessThanOrEqual(52)
+      }
       expect(isUrbanHUDPoint(width, height, l.action.x, l.action.y)).toBe(true)
       expect(isUrbanHUDPoint(width, height, l.zoom.x, l.zoom.y)).toBe(true)
       expect(isUrbanHUDPoint(width, height, l.pad.x + l.pad.size, l.pad.y + l.pad.size)).toBe(true)
@@ -60,14 +67,15 @@ describe('living city screen-space navigation', () => {
     expect(urbanDistrictCaption({ x: 800, y: 600 })).toBe('CEDAR CITY')
   })
 
-  it('uses actual money, reputation, transport and carried cargo', () => {
+  it('uses actual money, reputation, selected transport and carried cargo', () => {
     const world = createInitialWorldState()
     const company = createInitialCompanyState()
     company.money = 2345
     company.reputation = 67
-    world.urban = { merchantOnboarded: true, activeTransport: 'bicycle' }
+    company.vehicles = [{ vehicleId: 'scooter-1', typeId: 'ElectricScooter' }]
+    world.urban = { merchantOnboarded: true, activeTransport: 'scooter' }
     world.player.carryingPackage = true
-    expect(urbanStatusText(world, company)).toBe('$2,345  Rep 67  Bicycle  Cargo 1/3')
+    expect(urbanStatusText(world, company)).toBe('$2,345  Rep 67  Electric Scooter  Cargo 1/4')
   })
 
   it('keeps a direction lit until its last finger releases and ignores stale slide exits', () => {
@@ -88,6 +96,11 @@ describe('living city screen-space navigation', () => {
 })
 
 describe('bounded world-only pinch and accessible zoom buttons', () => {
+  it('uses the wider owner-reviewed zoom range', () => {
+    expect(CAMERA_MIN_ZOOM).toBe(0.5)
+    expect(CAMERA_MAX_ZOOM).toBe(2.5)
+  })
+
   it('snapshots prototype-based Phaser pointer coordinates before either finger moves', () => {
     class Pointer {
       constructor(public position: { x: number; y: number }) {}
