@@ -22,15 +22,15 @@ interface HUDCallbacks {
 }
 
 /**
- * Issue #324: preserve touch usability while materially reclaiming the landscape viewport.
- * Direct controls use a compact 46-50 px logical cell instead of the previous oversized
- * 48-72 px-per-cell layout. Individual visual controls may be smaller than their native
- * Rectangle hit targets, but every interactive target remains at least 44x44 px.
+ * Issue #324: the visible D-pad is deliberately compact (96-108 px square), while
+ * interaction remains Android/WebView-safe through one native Rectangle covering the
+ * complete pad. This avoids four oversized buttons and also avoids overlapping hidden
+ * hit rectangles between adjacent directions.
  */
 export const urbanHUDLayout = (width: number, height: number) => {
   const portrait = width < 600
   const headerHeight = portrait ? 72 : 44
-  const size = Math.max(46, Math.min(50, Math.floor(Math.min(width, height) * 0.09)))
+  const size = Math.max(32, Math.min(36, Math.floor(Math.min(width, height) * 0.09)))
   const pad = { x: 10, y: height - size * 3 - 10, size }
   const actionWidth = Math.min(150, Math.max(124, width * 0.15))
   const action = { x: width - actionWidth / 2 - 10, y: height - 34, width: actionWidth, height: 46 }
@@ -114,6 +114,19 @@ export class UrbanDPadInput {
   }
 }
 
+/** Convert a point inside the compact pad into one cardinal direction; center is neutral. */
+export const directionFromDPadPoint = (x: number, y: number, extent: number): Direction | null => {
+  if (!Number.isFinite(x) || !Number.isFinite(y) || !Number.isFinite(extent) || extent <= 0 ||
+      x < 0 || y < 0 || x > extent || y > extent) return null
+  const center = extent / 2
+  const dx = x - center
+  const dy = y - center
+  if (Math.hypot(dx, dy) <= extent * 0.14) return null
+  return Math.abs(dx) > Math.abs(dy)
+    ? dx < 0 ? 'left' : 'right'
+    : dy < 0 ? 'up' : 'down'
+}
+
 interface HUDButton {
   button: Phaser.GameObjects.Rectangle
   chrome: Phaser.GameObjects.Graphics
@@ -171,7 +184,7 @@ export class UrbanHUD {
     const textLeft = mission.x + 41
     this.objective = this.text(textLeft, mission.y + 7, '', portrait ? 12 : 14, COLORS.textPrimary)
       .setFontStyle('bold').setWordWrapWidth(mission.width - 49)
-    this.hint = this.text(textLeft, mission.y + mission.height - (portrait ? 31 : 18), '', portrait ? 10 : 10, '#a5eaff')
+    this.hint = this.text(textLeft, mission.y + mission.height - (portrait ? 31 : 18), '', 10, '#a5eaff')
       .setWordWrapWidth(mission.width - 49)
 
     this.drawMinimap()
@@ -240,9 +253,12 @@ export class UrbanHUD {
   /**
    * Android WebView touch input uses a native Rectangle hit target. Visual chrome stays on Graphics,
    * but Graphics are never responsible for hit testing. Keep this #323 recovery contract intact.
-   * A visual button may be compact, but the hit target is never smaller than 44x44 logical px.
+   * Ordinary compact buttons still expose a minimum 44x44 logical-pixel hit target.
    */
-  private button(x: number, y: number, width: number, height: number, label: string, callback?: () => void): HUDButton {
+  private button(
+    x: number, y: number, width: number, height: number, label: string,
+    callback?: () => void, interactive = true,
+  ): HUDButton {
     const chrome = this.add(this.scene.add.graphics()).setPosition(x, y)
     const paint = (active = false): void => {
       chrome.clear().fillStyle(CITY_COLORS.shadow, 0.25).fillRoundedRect(-width / 2 + 2, -height / 2 + 2, width, height, RADII.button)
@@ -251,13 +267,13 @@ export class UrbanHUD {
       chrome.lineStyle(2, active ? COLORS.gold : COLORS.accent).strokeRoundedRect(-width / 2, -height / 2, width, height, RADII.button)
     }
     paint()
-    const hitWidth = Math.max(44, width)
-    const hitHeight = Math.max(44, height)
+    const hitWidth = interactive ? Math.max(44, width) : width
+    const hitHeight = interactive ? Math.max(44, height) : height
     const button = this.add(this.scene.add.rectangle(x, y, hitWidth, hitHeight, 0xffffff, 0.001))
-      .setInteractive({ useHandCursor: true })
+    if (interactive) button.setInteractive({ useHandCursor: true })
     const text = this.text(x, y, label, 12, COLORS.textPrimary).setOrigin(0.5).setAlign('center')
       .setFontStyle('bold').setWordWrapWidth(width - 10)
-    if (callback) button.on('pointerdown', callback)
+    if (interactive && callback) button.on('pointerdown', callback)
     const setVisible = (visible: boolean): void => {
       chrome.setVisible(visible)
       button.setVisible(visible)
@@ -271,29 +287,44 @@ export class UrbanHUD {
 
   private createDPad(): void {
     const { x, y, size } = this.layout.pad
-    const center = size * 1.5
-    this.add(this.scene.add.circle(x + center, y + center, center + 3, COLORS.surface, 0.18))
+    const extent = size * 3
+    const center = extent / 2
+    this.add(this.scene.add.circle(x + center, y + center, center + 2, COLORS.surface, 0.18))
       .setStrokeStyle(1, COLORS.accent, 0.48)
     const directions: [Direction, number, number, string][] = [
       ['up', 1, 0, '▲'], ['left', 0, 1, '◀'], ['right', 2, 1, '▶'], ['down', 1, 2, '▼'],
     ]
     directions.forEach(([direction, col, row, label]) => {
-      const b = this.button(x + col * size + size / 2, y + row * size + size / 2, size - 2, size - 2, label)
-      this.directionButtons.push({ direction, control: b })
-      b.label.setFontSize(Math.max(15, size * 0.5))
-      const press = (pointer: Phaser.Input.Pointer): void => {
-        if (!this.open) { this.pad.press(pointer.id, direction); this.paintDirections() }
-      }
-      b.button.on('pointerdown', press)
-      b.button.on('pointerover', (pointer: Phaser.Input.Pointer) => { if (pointer.isDown) press(pointer) })
-      b.button.on('pointerout', (pointer: Phaser.Input.Pointer) => {
-        this.pad.release(pointer.id, direction)
-        this.paintDirections()
-      })
-      b.button.on('pointerup', this.releasePointer)
+      const control = this.button(
+        x + col * size + size / 2,
+        y + row * size + size / 2,
+        size - 4,
+        size - 4,
+        label,
+        undefined,
+        false,
+      )
+      control.label.setFontSize(Math.max(14, size * 0.48))
+      this.directionButtons.push({ direction, control })
     })
-    this.add(this.scene.add.circle(x + center, y + center, size * 0.2, COLORS.accent, 0.18))
+    this.add(this.scene.add.circle(x + center, y + center, size * 0.18, COLORS.accent, 0.18))
       .setStrokeStyle(1, CITY_COLORS.curb)
+
+    // One compact native Rectangle owns the complete D-pad touch surface. This is both smaller
+    // on screen and safer than four adjacent >=44px invisible rectangles that would overlap.
+    const hit = this.add(this.scene.add.rectangle(x + center, y + center, extent, extent, 0xffffff, 0.001))
+      .setInteractive({ useHandCursor: true })
+    const press = (pointer: Phaser.Input.Pointer): void => {
+      if (this.open) return
+      const direction = directionFromDPadPoint(pointer.x - x, pointer.y - y, extent)
+      if (direction) this.pad.press(pointer.id, direction)
+      else this.pad.release(pointer.id)
+      this.paintDirections()
+    }
+    hit.on('pointerdown', press)
+    hit.on('pointermove', (pointer: Phaser.Input.Pointer) => { if (pointer.isDown) press(pointer) })
+    hit.on('pointerout', this.releasePointer)
+    hit.on('pointerup', this.releasePointer)
   }
 
   private drawMinimap(): void {
