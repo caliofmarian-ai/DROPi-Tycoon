@@ -17,7 +17,8 @@ import { CITY_COLORS, COLORS } from '../ui/theme'
 import { createPlayerVisual, type PlayerVisual, type PlayerVisualState } from '../world/playerVisual'
 import { renderUrbanNeighborhood } from '../world/urbanPresentation'
 import {
-  URBAN_HQ, inInteractionRange, moveUrbanPlayer, movementFacing, repairUrbanPosition, type UrbanFacing,
+  URBAN_HQ, URBAN_MARKETPLACE, inInteractionRange, moveUrbanPlayer, movementFacing, repairUrbanPosition,
+  type UrbanFacing,
 } from '../world/urbanWorld'
 import { WORLD_HEIGHT, WORLD_WIDTH } from '../world/worldLayout'
 import { AmbientCity } from '../world/ambientCity'
@@ -177,6 +178,14 @@ export class GameWorldScene extends Phaser.Scene {
 
   private onAction(): void {
     if (this.hud.isMenuOpen()) return
+    if (inInteractionRange(this.worldState.player, URBAN_HQ)) {
+      this.enterInterior('HQInterior')
+      return
+    }
+    if (inInteractionRange(this.worldState.player, URBAN_MARKETPLACE)) {
+      this.enterInterior('MarketplaceInterior')
+      return
+    }
     const result = performUrbanInteraction(this.worldState, this.companyState)
     this.worldState = result.world
     this.companyState = result.company
@@ -184,6 +193,13 @@ export class GameWorldScene extends Phaser.Scene {
     if (result.cue) getAudioController().play(result.cue)
     this.persist(result.settled ? 'delivery-completed' : 'progression-changed')
     this.refreshPresentation()
+  }
+
+  private enterInterior(scene: 'HQInterior' | 'MarketplaceInterior'): void {
+    this.clearInput()
+    this.persist('progression-changed')
+    this.scene.launch(scene)
+    this.scene.sleep()
   }
 
   private switchTransport(): void {
