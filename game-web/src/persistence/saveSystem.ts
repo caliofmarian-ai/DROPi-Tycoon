@@ -5,7 +5,7 @@ import {
 } from '../state/gameState'
 import { synchronizePlayerMovementSpeed } from '../systems/bicycleSystem'
 import { reconcileLegacyBicycleOwnership } from '../systems/vehicleSystem'
-import { resolveActiveTransport } from '../systems/urbanLogistics'
+import { resolveActiveTransport } from '../systems/activeTransportSystem'
 import {
   CUSTOMER_REVIEW_SENTIMENTS,
   EMPLOYEE_ROLES,
