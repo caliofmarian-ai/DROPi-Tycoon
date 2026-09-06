@@ -9,6 +9,10 @@ import type { CompanyState, WorldState } from '../types/game'
 import { buildCompanyDashboardLayout, insetRect } from '../ui/managementLayout'
 import { buildManagementOverview } from '../ui/managementViewModel'
 import { drawManagementFooter, drawManagementHeader } from '../ui/managementControls'
+import {
+  HQ_MANAGEMENT_RETURN_REGISTRY_KEY,
+  HQ_MANAGEMENT_RETURN_SCENE,
+} from '../ui/hqManagementNavigation'
 import { COLORS, formatMoney } from '../ui/theme'
 import { createThemedButton, drawHeadquarters, drawPanel, fitText } from '../ui/themeControls'
 
@@ -32,11 +36,16 @@ export class CompanyManagementScene extends Phaser.Scene {
     })
   }
 
+  private isOpenedFromHQ(): boolean {
+    return this.registry.get(HQ_MANAGEMENT_RETURN_REGISTRY_KEY) === HQ_MANAGEMENT_RETURN_SCENE
+  }
+
   private render(): void {
     this.children.removeAll(true)
     const layout = buildCompanyDashboardLayout(this.scale.width, this.scale.height)
     const data = buildManagementOverview(this.companyState)
-    drawManagementHeader(this, layout, 'Your Company', this.companyState,
+    const fromHQ = this.isOpenedFromHQ()
+    drawManagementHeader(this, layout, fromHQ ? 'HQ Management Terminal' : 'Your Company', this.companyState,
       this.feedback || `${data.name} · Reputation ${data.reputation}`)
     drawPanel(this, layout.hq, { tone: 'accent' })
     const hq = insetRect(layout.hq, 12)
@@ -84,8 +93,10 @@ export class CompanyManagementScene extends Phaser.Scene {
       compact ? `${data.reviews.count} Reviews ›` : 'All reviews ›', 'primary', () => this.openCustomerReviews(), { fontSize: 14 })
     createThemedButton(this, { ...bottom, left: bottom.left + half + 8, width: half },
       'Finances ›', 'primary', () => this.openFinancialReport(), { fontSize: 14 })
-    drawManagementFooter(this, layout, { label: '‹ Back to city', action: () => this.returnToGameWorld() },
-      () => this.returnToMainMenu())
+    drawManagementFooter(this, layout, {
+      label: fromHQ ? '‹ Back to HQ interior' : '‹ Back to city',
+      action: () => this.returnToGameWorld(),
+    }, () => this.returnToMainMenu())
   }
 
   private purchaseSelectedUpgrade(): void {
@@ -125,19 +136,30 @@ export class CompanyManagementScene extends Phaser.Scene {
     replaceGameSession(this.worldState, this.companyState)
     this.scene.start('VehicleFleet')
   }
+
   private returnToGameWorld(): void {
     replaceGameSession(this.worldState, this.companyState)
+    if (this.isOpenedFromHQ()) {
+      this.registry.set(HQ_MANAGEMENT_RETURN_REGISTRY_KEY, '')
+      if (typeof this.scene.isSleeping === 'function' && this.scene.isSleeping(HQ_MANAGEMENT_RETURN_SCENE)) {
+        this.scene.wake(HQ_MANAGEMENT_RETURN_SCENE)
+        this.scene.stop()
+        return
+      }
+      this.scene.start(HQ_MANAGEMENT_RETURN_SCENE)
+      return
+    }
     if (typeof this.scene.isSleeping === 'function' && this.scene.isSleeping('GameWorld')) {
-      // GameWorld owns the expensive city presentation. Wake the resident scene when possible
-      // instead of rebuilding every building, tree, label and ambient actor on every visit.
       this.scene.wake('GameWorld')
       this.scene.stop()
       return
     }
     this.scene.start('GameWorld')
   }
+
   private returnToMainMenu(): void {
     replaceGameSession(this.worldState, this.companyState)
+    this.registry.set(HQ_MANAGEMENT_RETURN_REGISTRY_KEY, '')
     this.scene.start('MainMenu')
   }
 }
