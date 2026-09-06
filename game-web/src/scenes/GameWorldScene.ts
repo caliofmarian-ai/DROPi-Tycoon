@@ -19,6 +19,10 @@ import {
 import { WORLD_HEIGHT, WORLD_WIDTH } from '../world/worldLayout'
 import { AmbientCity } from '../world/ambientCity'
 
+const HUD_REFRESH_MS = 150
+const AMBIENT_UPDATE_MS = 33
+const RESIZE_SETTLE_MS = 280
+
 export class GameWorldScene extends Phaser.Scene {
   private worldState!: WorldState
   private companyState!: CompanyState
@@ -31,9 +35,15 @@ export class GameWorldScene extends Phaser.Scene {
   private fixedUiCamera!: Phaser.Cameras.Scene2D.Camera
   private keys: Record<string, Phaser.Input.Keyboard.Key> = {}
   private lastHudUpdate = 0
+  private ambientUpdateAccumulator = 0
   private facing: UrbanFacing = 'down'
   private readonly zoomGesture = new UrbanZoomGesture()
   private ambient?: AmbientCity
+  private resizeRestartTimer?: Phaser.Time.TimerEvent
+  private lastViewportWidth = 0
+  private lastViewportHeight = 0
+  private pendingLayoutRebuild = false
+  private worldVisualSignature = ''
 
   constructor() {
     super('GameWorld')
@@ -58,6 +68,7 @@ export class GameWorldScene extends Phaser.Scene {
     this.syncRuntimeSession()
     getAudioController().setEnabled(session.settings.soundEnabled)
     this.cameras.main.setBackgroundColor(CITY_COLORS.grass).setBounds(0, 0, WORLD_WIDTH, WORLD_HEIGHT)
+    this.worldVisualSignature = this.getWorldVisualSignature(this.companyState)
     this.parkedBicycle = renderUrbanNeighborhood(this, this.companyState)
 
     const ring = this.add.circle(0, 0, 30, COLORS.gold, 0.16).setStrokeStyle(3, COLORS.gold)
@@ -101,8 +112,15 @@ export class GameWorldScene extends Phaser.Scene {
     this.input.keyboard?.on('keydown', this.unlockAudio)
     this.scale.on(Phaser.Scale.Events.RESIZE, this.handleResize)
     this.game.events.on(Phaser.Core.Events.BLUR, this.clearInput)
+    this.events.on(Phaser.Scenes.Events.SLEEP, this.handleSleep, this)
+    this.events.on(Phaser.Scenes.Events.WAKE, this.handleWake, this)
     this.events.once(Phaser.Scenes.Events.SHUTDOWN, this.shutdown, this)
+    this.lastViewportWidth = Math.round(this.scale.width)
+    this.lastViewportHeight = Math.round(this.scale.height)
+    this.pendingLayoutRebuild = false
+    this.resizeRestartTimer = undefined
     this.lastHudUpdate = 0
+    this.ambientUpdateAccumulator = 0
     this.facing = 'down'
     this.refreshPresentation()
     this.hud.notify('D-pad / WASD to move · E to interact · Gold = objective')
@@ -132,11 +150,15 @@ export class GameWorldScene extends Phaser.Scene {
     }
     this.playerVisual.setMoving(moving)
     this.playerVisual.update(delta)
-    this.ambient?.update(delta, this.cameras.main.worldView)
+    this.ambientUpdateAccumulator += Math.max(0, Math.min(Number.isFinite(delta) ? delta : 0, 100))
+    if (this.ambientUpdateAccumulator >= AMBIENT_UPDATE_MS) {
+      this.ambient?.update(this.ambientUpdateAccumulator, this.cameras.main.worldView)
+      this.ambientUpdateAccumulator = 0
+    }
     if (this.keys.ESC && Phaser.Input.Keyboard.JustDown(this.keys.ESC)) this.hud.toggleMenu()
     if (this.keys.E && Phaser.Input.Keyboard.JustDown(this.keys.E) && !this.hud.isMenuOpen()) this.onAction()
     if (this.keys.T && Phaser.Input.Keyboard.JustDown(this.keys.T) && !this.hud.isMenuOpen()) this.switchTransport()
-    if (time - this.lastHudUpdate > 90) {
+    if (time - this.lastHudUpdate > HUD_REFRESH_MS) {
       this.refreshPresentation()
       this.lastHudUpdate = time
     }
@@ -202,11 +224,23 @@ export class GameWorldScene extends Phaser.Scene {
   private navigate(scene: string): void {
     this.clearInput()
     this.persist('progression-changed')
+    if (scene === 'CompanyManagement') {
+      // Keep the expensive city scene resident while management is open. Returning without
+      // structural company changes can now wake it instead of rebuilding the full city.
+      this.scene.launch(scene)
+      this.scene.sleep()
+      return
+    }
     this.scene.start(scene)
   }
 
   private syncRuntimeSession(): void {
     replaceGameSession(this.worldState, this.companyState)
+  }
+
+  private getWorldVisualSignature(company: CompanyState): string {
+    const ownsBicycle = resolveActiveTransport(company, 'bicycle') === 'bicycle' ? 1 : 0
+    return `${company.level}:${company.employees.length}:${ownsBicycle}`
   }
 
   private readonly unlockAudio = (): void => { getAudioController().unlock() }
@@ -232,15 +266,70 @@ export class GameWorldScene extends Phaser.Scene {
     if (pointer.isDown) this.setWorldZoom(this.zoomGesture.move(pointer.id, pointer, this.cameras.main.zoom))
   }
   private readonly endZoom = (pointer: Phaser.Input.Pointer): void => { this.zoomGesture.release(pointer.id) }
-  private readonly handleResize = (): void => {
-    this.syncRuntimeSession()
-    this.scene.restart()
+
+  private scheduleResizeRestart(): void {
+    this.resizeRestartTimer?.remove()
+    this.resizeRestartTimer = this.time.delayedCall(RESIZE_SETTLE_MS, () => {
+      this.resizeRestartTimer = undefined
+      if (!this.scene.isActive()) {
+        this.pendingLayoutRebuild = true
+        return
+      }
+      this.syncRuntimeSession()
+      this.scene.restart()
+    })
   }
+
+  private readonly handleResize = (): void => {
+    const width = Math.round(this.scale.width)
+    const height = Math.round(this.scale.height)
+    if (width === this.lastViewportWidth && height === this.lastViewportHeight) return
+    this.lastViewportWidth = width
+    this.lastViewportHeight = height
+    this.fixedUiCamera?.setSize(width, height)
+    this.clearInput()
+    if (!this.scene.isActive()) {
+      this.pendingLayoutRebuild = true
+      return
+    }
+    this.scheduleResizeRestart()
+  }
+
+  private readonly handleSleep = (): void => {
+    this.clearInput()
+    this.resizeRestartTimer?.remove()
+    this.resizeRestartTimer = undefined
+  }
+
+  private readonly handleWake = (): void => {
+    const session = getOrCreateGameSession()
+    const needsWorldRebuild = this.pendingLayoutRebuild ||
+      this.getWorldVisualSignature(session.company) !== this.worldVisualSignature
+    this.pendingLayoutRebuild = false
+    if (needsWorldRebuild) {
+      this.scene.restart()
+      return
+    }
+    this.worldState = session.world
+    this.companyState = session.company
+    this.worldState.urban ??= { merchantOnboarded: false, activeTransport: 'walking' }
+    this.worldState.urban.activeTransport = resolveActiveTransport(this.companyState, this.worldState.urban.activeTransport)
+    this.worldState.isMoving = false
+    this.ambientUpdateAccumulator = 0
+    getAudioController().setEnabled(session.settings.soundEnabled)
+    this.clearInput()
+    this.refreshPresentation()
+  }
+
   private shutdown(): void {
     this.clearInput()
+    this.resizeRestartTimer?.remove()
+    this.resizeRestartTimer = undefined
     this.hud.destroy()
     this.scale.off(Phaser.Scale.Events.RESIZE, this.handleResize)
     this.game.events.off(Phaser.Core.Events.BLUR, this.clearInput)
+    this.events.off(Phaser.Scenes.Events.SLEEP, this.handleSleep, this)
+    this.events.off(Phaser.Scenes.Events.WAKE, this.handleWake, this)
     this.input.off('pointerdown', this.unlockAudio)
     this.input.off('pointerdown', this.beginZoom)
     this.input.off('pointermove', this.moveZoom)
