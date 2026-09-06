@@ -6,7 +6,7 @@ import { createOrderForSequence } from '../src/systems/orderGeneration'
 import * as marketplace from '../src/systems/urbanMarketplace'
 import { findWorldRoutePoint } from '../src/world/worldLayout'
 import { URBAN_HQ, URBAN_MERCHANT } from '../src/world/urbanWorld'
-import { UrbanDPadInput, urbanHUDLayout, urbanStatusText } from '../src/ui/UrbanHUD'
+import { directionFromDPadPoint, UrbanDPadInput, urbanHUDLayout, urbanStatusText } from '../src/ui/UrbanHUD'
 import type { WorldState } from '../src/types/game'
 
 vi.mock('phaser', () => ({
@@ -303,6 +303,16 @@ describe('urban touch controls and compact HUD', () => {
     expect(pad.value()).toEqual({ x: 0, y: 0 })
   })
 
+  it('maps the compact unified touch surface to cardinal directions with a neutral center', () => {
+    const extent = 108
+    expect(directionFromDPadPoint(54, 8, extent)).toBe('up')
+    expect(directionFromDPadPoint(54, 100, extent)).toBe('down')
+    expect(directionFromDPadPoint(8, 54, extent)).toBe('left')
+    expect(directionFromDPadPoint(100, 54, extent)).toBe('right')
+    expect(directionFromDPadPoint(54, 54, extent)).toBeNull()
+    expect(directionFromDPadPoint(-1, 54, extent)).toBeNull()
+  })
+
   it.each([[740, 360], [360, 740], [390, 844], [844, 390]])(
     'keeps controls and menu separated at %ix%i',
     (width, height) => {
@@ -316,7 +326,9 @@ describe('urban touch controls and compact HUD', () => {
         .toBeLessThan(layout.transport.y - layout.transport.height / 2)
       expect(layout.minimap.x + layout.minimap.width).toBeLessThan(width)
       expect(layout.action.y + layout.action.height / 2).toBeLessThan(height)
-      expect(layout.pad.size - 2).toBeGreaterThanOrEqual(44)
+      expect(layout.pad.size).toBeGreaterThanOrEqual(30)
+      expect(layout.pad.size).toBeLessThanOrEqual(36)
+      expect(layout.pad.size * 3).toBeLessThanOrEqual(108)
       expect(layout.transport.height).toBeGreaterThanOrEqual(44)
       expect(layout.menu.rowHeight).toBeGreaterThanOrEqual(44)
       expect(layout.toast.y).toBeGreaterThan(height / 2 + 40)
