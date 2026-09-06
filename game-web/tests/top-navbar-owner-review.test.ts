@@ -55,7 +55,11 @@ describe('M-008 owner review — compact non-overlapping top dock', () => {
     expect(hudSource).toContain("'☰  Menu', () => this.toggleMenu()")
     expect(hudSource).toContain("['Main menu', callbacks.menu]")
     expect(hudSource).toContain("['Company', callbacks.company]")
-    expect(hudSource).toContain('entry.button.setVisible(false).disableInteractive()')
+    // The Android recovery control abstraction hides both visual chrome and the native
+    // Rectangle hit target, then disables input through the same control wrapper.
+    expect(hudSource).toContain('entry.setVisible(false)')
+    expect(hudSource).toContain('entry.setEnabled(false)')
+    expect(hudSource).toContain('this.scene.add.rectangle(x, y, width, height, 0xffffff, 0.001)')
   })
 
   it('does not let tapping the fixed dock create movement or a delivery target', () => {
