@@ -5,7 +5,9 @@ import { CustomerReviewsScene } from '../scenes/CustomerReviewsScene'
 import { EmployeeManagementScene } from '../scenes/EmployeeManagementScene'
 import { FinancialReportScene } from '../scenes/FinancialReportScene'
 import { GameWorldScene } from '../scenes/GameWorldScene'
+import { HQInteriorScene } from '../scenes/HQInteriorScene'
 import { MainMenuScene } from '../scenes/MainMenuScene'
+import { MarketplaceInteriorScene } from '../scenes/MarketplaceInteriorScene'
 import { VehicleFleetScene } from '../scenes/VehicleFleetScene'
 import { COLORS } from '../ui/theme'
 
@@ -27,6 +29,8 @@ export const createGameConfig = (parent: string): Phaser.Types.Core.GameConfig =
   scene: [
     MainMenuScene,
     GameWorldScene,
+    HQInteriorScene,
+    MarketplaceInteriorScene,
     CompanyManagementScene,
     EmployeeManagementScene,
     FinancialReportScene,

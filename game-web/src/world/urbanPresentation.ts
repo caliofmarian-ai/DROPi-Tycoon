@@ -3,7 +3,9 @@ import type { CompanyState } from '../types/game'
 import { resolveActiveTransport } from '../systems/urbanLogistics'
 import { URBAN_MERCHANT_PROFILES } from '../systems/urbanInteractions'
 import { CITY_COLORS as C, COLORS } from '../ui/theme'
-import { URBAN_BUILDINGS, URBAN_HQ, URBAN_ROADS, URBAN_SIDEWALKS } from './urbanWorld'
+import {
+  URBAN_BUILDINGS, URBAN_HQ, URBAN_MARKETPLACE, URBAN_MARKETPLACE_BUILDING_ID, URBAN_ROADS, URBAN_SIDEWALKS,
+} from './urbanWorld'
 import {
   WORLD_DECORATIONS, WORLD_HEIGHT, WORLD_ROUTE_POINTS, WORLD_WIDTH, WORLD_ZONES,
 } from './worldLayout'
@@ -13,7 +15,6 @@ import {
 } from './cityArt'
 import { cityDistrictAccents, drawCityDistrictAccents, drawCityPavement } from './cityGround'
 import { drawParcel } from './courierArt'
-import { getCourierPose } from './courierPose'
 
 export const HQ_EXPANSION_POINT = URBAN_HQ
 
@@ -111,7 +112,8 @@ export const renderUrbanNeighborhood = (
   URBAN_BUILDINGS.forEach((building, index) => {
     const location = WORLD_ROUTE_POINTS.find(point => point.buildingId === building.id)
     const hq = building.kind === 'hq'
-    const name = hq ? 'DROPi' : location?.kind === 'pickup' ? location.displayName
+    const marketplace = building.id === URBAN_MARKETPLACE_BUILDING_ID
+    const name = hq ? 'DROPi' : marketplace ? 'DROPi Marketplace' : location?.kind === 'pickup' ? location.displayName
       : building.kind === 'depot' ? ['DISPATCH', 'PARCEL WORKS', 'CITY LOGISTICS'][index % 3]
         : fallbackShopNames[index % fallbackShopNames.length]
     const art = {
@@ -119,12 +121,16 @@ export const renderUrbanNeighborhood = (
     }
     scene.add.image(building.x, building.y, ensureBuildingTexture(scene, building, art)).setDepth(5)
     const sign = cityBuildingSign(building, art)
-    if (hq || building.kind === 'shop' || building.kind === 'depot') {
-      const text = cityLabel(scene, sign.signX, sign.signY, name, hq ? 23 : 10).setDepth(7)
+    if (hq || marketplace || building.kind === 'shop' || building.kind === 'depot') {
+      const text = cityLabel(scene, sign.signX, sign.signY, name, hq ? 23 : marketplace ? 12 : 10).setDepth(7)
       if (text.width > sign.signWidth) text.setScale(sign.signWidth / text.width)
     }
     if (hq) {
       cityLabel(scene, building.x, building.y + building.height / 2 + 13, 'LOCAL DELIVERY · HEADQUARTERS', 9,
+        '#175574').setDepth(7)
+    }
+    if (marketplace) {
+      cityLabel(scene, building.x, building.y + building.height / 2 + 13, 'ENTER · MARKETPLACE', 9,
         '#175574').setDepth(7)
     }
   })
@@ -171,21 +177,18 @@ export const renderUrbanNeighborhood = (
       .fillRect(stageX + 25, stageY - growth.tier * 13 + 4, 3, growth.tier * 13 + 13)
     cityLabel(scene, hq.x, hq.y - 12, `LEVEL ${growth.level} DEPOT`, 8).setDepth(7)
   }
-  const parkedBicycle = growth.ownsBicycle
-    ? scene.add.graphics().setPosition(URBAN_HQ.x + 70, URBAN_HQ.y + 7).setDepth(10)
-    : null
-  if (parkedBicycle) {
-    // Use the same physical projection as the rider, with the person omitted below.
-    const pose = getCourierPose('Bicycle', 'right')
-    const [rear, front] = pose.wheels
-    parkedBicycle.lineStyle(3, C.metal).strokeCircle(rear.x, rear.y, 11).strokeCircle(front.x, front.y, 11)
-    parkedBicycle.lineStyle(3, COLORS.gold).strokeTriangle(rear.x, rear.y, -2, -3, -8, -20)
-      .lineBetween(-8, -20, 12, -20).lineBetween(-2, -3, 12, -20).lineBetween(12, -20, front.x, front.y)
-    parkedBicycle.lineStyle(3, C.metal).lineBetween(-13, -22, -3, -22)
-      .lineBetween(12, -20, 12, -28).lineBetween(12, -28, 19, -28)
-  }
-  props.lineStyle(1, C.curb, 0.8).strokeRoundedRect(URBAN_HQ.x + 43, URBAN_HQ.y - 15, 52, 28, 4)
-  cityLabel(scene, URBAN_HQ.x + 68, URBAN_HQ.y + 25, 'BICYCLE BAY', 8, '#fff4ce', '#175574').setDepth(7)
+
+  // Issue #325: purchased vehicles live inside the physical HQ Fleet Bay. The street no longer
+  // receives a parked bicycle as a side effect of ownership.
+  cityLabel(scene, URBAN_HQ.x + 68, URBAN_HQ.y + 25, 'FLEET · INSIDE HQ', 8, '#fff4ce', '#175574').setDepth(7)
+  props.fillStyle(COLORS.accentStrong, 0.16).fillCircle(URBAN_HQ.x, URBAN_HQ.y, 25)
+  props.lineStyle(2, COLORS.accentStrong, 0.8).strokeCircle(URBAN_HQ.x, URBAN_HQ.y, 25)
+  cityLabel(scene, URBAN_HQ.x, URBAN_HQ.y + 33, 'ENTER HQ', 8, '#fff4ce', '#175574').setDepth(7)
+
+  props.fillStyle(COLORS.accent, 0.14).fillCircle(URBAN_MARKETPLACE.x, URBAN_MARKETPLACE.y, 24)
+  props.lineStyle(2, COLORS.accent, 0.82).strokeCircle(URBAN_MARKETPLACE.x, URBAN_MARKETPLACE.y, 24)
+  cityLabel(scene, URBAN_MARKETPLACE.x, URBAN_MARKETPLACE.y + 31, 'ENTER MARKETPLACE', 8, '#fff4ce', '#175574').setDepth(7)
+
   if (growth.staffCount > 0) {
     const worker = drawNeighborhoodNPC(scene, URBAN_HQ.x + 108, URBAN_HQ.y, false, 2)
       .setName('hq-dispatch-staff')
@@ -205,5 +208,5 @@ export const renderUrbanNeighborhood = (
       name, 9, '#fff4ce', '#175574').setDepth(13)
     if (text.width > 115) text.setScale(115 / text.width)
   })
-  return parkedBicycle
+  return null
 }

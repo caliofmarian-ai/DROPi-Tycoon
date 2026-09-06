@@ -232,15 +232,18 @@ describe('original dimensional city architecture', () => {
     }
   })
 
-  it('adds a parked bicycle only when owned, with honest progression and no autonomous activation', () => {
+  it('keeps bicycle ownership authoritative while storing the owned fleet inside HQ', () => {
     const company = createInitialCompanyState()
     expect(getHQGrowth(company).ownsBicycle).toBe(false)
     company.vehicles.push({ vehicleId: 'owned-bike', typeId: 'Bicycle' })
     company.level = 3
     const before = structuredClone(company)
     const mock = mockCityScene()
-    expect(renderUrbanNeighborhood(mock.scene, company)).not.toBeNull()
-    expect(mock.raw.add.graphics).toHaveBeenCalledTimes(2)
+    expect(renderUrbanNeighborhood(mock.scene, company)).toBeNull()
+    expect(mock.raw.add.graphics).toHaveBeenCalledTimes(1)
+    const labels = mock.raw.add.text.mock.calls as unknown as [number, number, string][]
+    expect(labels.some(([, , text]) => text === 'FLEET · INSIDE HQ')).toBe(true)
+    expect(labels.some(([, , text]) => text === 'BICYCLE BAY')).toBe(false)
     expect(getHQGrowth(company)).toMatchObject({ tier: 3, ownsBicycle: true })
     expect(company).toEqual(before)
   })
