@@ -37,7 +37,7 @@ export class CompanyManagementScene extends Phaser.Scene {
   }
 
   private isOpenedFromHQ(): boolean {
-    return this.registry.get(HQ_MANAGEMENT_RETURN_REGISTRY_KEY) === HQ_MANAGEMENT_RETURN_SCENE
+    return this.registry?.get?.(HQ_MANAGEMENT_RETURN_REGISTRY_KEY) === HQ_MANAGEMENT_RETURN_SCENE
   }
 
   private render(): void {

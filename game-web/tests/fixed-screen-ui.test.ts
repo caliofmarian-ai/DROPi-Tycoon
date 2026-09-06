@@ -46,7 +46,9 @@ describe('M-008 owner review — fixed screen-space UI architecture', () => {
   it('keeps both cameras unrotated and applies bounded zoom only to the world', () => {
     expect(sceneSource).toContain('this.cameras.main.setRotation(0).setZoom(1)')
     expect(sceneSource).toContain('this.cameras.main.setZoom(clampCameraZoom(zoom))')
-    expect(sceneSource).toContain("this.input.off('pointermove', this.moveZoom)")
+    expect(sceneSource).toContain("this.input.off('pointermove', this.moveWorldGesture)")
+    expect(sceneSource).toContain("this.input.off('pointerdown', this.beginWorldGesture)")
+    expect(sceneSource).toContain("this.input.off('pointerup', this.endWorldGesture)")
     expect(sceneSource).not.toContain('applyCameraControl(')
     expect(sceneSource).not.toContain('this.fixedUiCamera.setZoom(zoom)')
     expect(sceneSource).not.toContain('this.fixedUiCamera.setRotation(rotation)')
