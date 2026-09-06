@@ -102,9 +102,12 @@ export class UrbanDPadInput {
 }
 
 interface HUDButton {
-  button: Phaser.GameObjects.Graphics
+  button: Phaser.GameObjects.Rectangle
+  chrome: Phaser.GameObjects.Graphics
   label: Phaser.GameObjects.Text
   paint: (active?: boolean) => void
+  setVisible: (visible: boolean) => void
+  setEnabled: (enabled: boolean) => void
 }
 
 export class UrbanHUD {
@@ -172,6 +175,8 @@ export class UrbanHUD {
     this.actionControl.label.setFontSize(18)
     const t = this.layout.transport
     this.transportControl = this.button(t.x, t.y, t.width, t.height, 'Take bicycle', callbacks.transport)
+    this.transportControl.setVisible(false)
+    this.transportControl.setEnabled(false)
     const toast = this.layout.toast
     this.toast = this.text(toast.x, toast.y, '', 12, COLORS.textPrimary)
       .setOrigin(0.5, 0).setAlign('center')
@@ -187,8 +192,8 @@ export class UrbanHUD {
         this.toggleMenu()
         onTap()
       })
-      entry.button.setVisible(false).disableInteractive()
-      entry.label.setVisible(false)
+      entry.setVisible(false)
+      entry.setEnabled(false)
       this.menuButtons.push(entry)
     })
     scene.input.on('pointerup', this.releasePointer)
@@ -213,28 +218,35 @@ export class UrbanHUD {
     g.lineStyle(1, COLORS.accent, 0.2).lineBetween(x + 16, y + 4, x + width - 16, y + 4)
   }
 
-  private button(x: number, y: number, width: number, height: number, label: string, callback: () => void): HUDButton {
-    const button = this.add(this.scene.add.graphics()).setPosition(x, y)
+  /**
+   * Android WebView touch input uses a native Rectangle hit target. Visual chrome stays on Graphics,
+   * but Graphics are no longer responsible for hit testing. This restores the proven pre-redesign
+   * interaction path for D-pad, Action, Menu, zoom and transport controls.
+   */
+  private button(x: number, y: number, width: number, height: number, label: string, callback?: () => void): HUDButton {
+    const chrome = this.add(this.scene.add.graphics()).setPosition(x, y)
     const paint = (active = false): void => {
-      button.clear().fillStyle(CITY_COLORS.shadow, 0.3).fillRoundedRect(-width / 2 + 2, -height / 2 + 3, width, height, RADII.button)
-      button.fillStyle(active ? COLORS.accentStrong : COLORS.surfaceRaised, 0.98)
+      chrome.clear().fillStyle(CITY_COLORS.shadow, 0.3).fillRoundedRect(-width / 2 + 2, -height / 2 + 3, width, height, RADII.button)
+      chrome.fillStyle(active ? COLORS.accentStrong : COLORS.surfaceRaised, 0.98)
         .fillRoundedRect(-width / 2, -height / 2, width, height, RADII.button)
-      button.lineStyle(2, active ? COLORS.gold : COLORS.accent).strokeRoundedRect(-width / 2, -height / 2, width, height, RADII.button)
-      button.lineStyle(1, COLORS.accent, 0.3).lineBetween(-width / 2 + 12, -height / 2 + 4, width / 2 - 12, -height / 2 + 4)
+      chrome.lineStyle(2, active ? COLORS.gold : COLORS.accent).strokeRoundedRect(-width / 2, -height / 2, width, height, RADII.button)
+      chrome.lineStyle(1, COLORS.accent, 0.3).lineBetween(-width / 2 + 12, -height / 2 + 4, width / 2 - 12, -height / 2 + 4)
     }
     paint()
-    button.setInteractive(
-      { x: -width / 2, y: -height / 2, width, height },
-      (area: { x: number; y: number; width: number; height: number }, px: number, py: number) =>
-        px >= area.x && px <= area.x + area.width && py >= area.y && py <= area.y + area.height,
-    )
+    const button = this.add(this.scene.add.rectangle(x, y, width, height, 0xffffff, 0.001))
+      .setInteractive({ useHandCursor: true })
     const text = this.text(x, y, label, 14, COLORS.textPrimary).setOrigin(0.5).setAlign('center')
       .setFontStyle('bold').setWordWrapWidth(width - 12)
-    button.on('pointerdown', (_pointer: Phaser.Input.Pointer, _x: number, _y: number, event: Phaser.Types.Input.EventData) => {
-      event.stopPropagation()
-      callback()
-    })
-    return { button, label: text, paint }
+    if (callback) button.on('pointerdown', callback)
+    const setVisible = (visible: boolean): void => {
+      chrome.setVisible(visible)
+      button.setVisible(visible)
+      text.setVisible(visible)
+    }
+    const setEnabled = (enabled: boolean): void => {
+      if (button.input) button.input.enabled = enabled
+    }
+    return { button, chrome, label: text, paint, setVisible, setEnabled }
   }
 
   private createDPad(): void {
@@ -246,7 +258,7 @@ export class UrbanHUD {
       ['up', 1, 0, '▲'], ['left', 0, 1, '◀'], ['right', 2, 1, '▶'], ['down', 1, 2, '▼'],
     ]
     directions.forEach(([direction, col, row, label]) => {
-      const b = this.button(x + col * size + size / 2, y + row * size + size / 2, size - 2, size - 2, label, () => {})
+      const b = this.button(x + col * size + size / 2, y + row * size + size / 2, size - 2, size - 2, label)
       this.directionButtons.push({ direction, control: b })
       b.label.setFontSize(23)
       const press = (pointer: Phaser.Input.Pointer): void => {
@@ -315,9 +327,8 @@ export class UrbanHUD {
     this.transportControl.label.setText(world.urban?.activeTransport === 'bicycle' ? 'Park bicycle' : 'Take bicycle')
     if (atHQ !== this.transportAvailable) {
       this.transportAvailable = atHQ
-      this.transportControl.button.setVisible(atHQ)
-      this.transportControl.label.setVisible(atHQ)
-      if (this.transportControl.button.input) this.transportControl.button.input.enabled = atHQ
+      this.transportControl.setVisible(atHQ)
+      this.transportControl.setEnabled(atHQ)
     }
     const map = this.layout.minimap
     const markers = urbanMapMarkers(world, objective, map.width, map.height)
@@ -343,10 +354,9 @@ export class UrbanHUD {
   toggleMenu(): void {
     this.open = !this.open
     this.clearMovement()
-    this.menuButtons.forEach(({ button, label }) => {
-      button.setVisible(this.open)
-      label.setVisible(this.open)
-      if (button.input) button.input.enabled = this.open
+    this.menuButtons.forEach(control => {
+      control.setVisible(this.open)
+      control.setEnabled(this.open)
     })
   }
 
