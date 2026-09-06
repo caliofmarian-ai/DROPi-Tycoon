@@ -97,7 +97,8 @@ describe('release blocker #273 — scene integration contract', () => {
     ]) {
       expect(presentationSource).toContain(token)
     }
-    expect(presentationSource).toContain('drawCityPavement(pavement, URBAN_ROADS, URBAN_SIDEWALKS)')
+    expect(presentationSource).toContain('ensureCityGroundTexture')
+    expect(presentationSource).toContain('drawCityPavement(g, URBAN_ROADS, URBAN_SIDEWALKS)')
     const sidewalks = pavementSource.indexOf('for (const sidewalk of sidewalks)')
     const roads = pavementSource.indexOf('for (const road of roads)')
     expect(sidewalks).toBeGreaterThanOrEqual(0)

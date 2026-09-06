@@ -17,6 +17,15 @@ import { getCourierPose } from './courierPose'
 
 export const HQ_EXPANSION_POINT = URBAN_HQ
 
+/**
+ * Ground art is intentionally rasterized below world resolution. Buildings, characters and trees
+ * remain crisp independent sprites. The old implementation kept thousands of world-wide Graphics
+ * commands alive, so Phaser had to submit the complete city road/grass geometry every frame even
+ * when the camera only showed one neighborhood.
+ */
+export const CITY_GROUND_TEXTURE_SCALE = 0.5
+const CITY_GROUND_TEXTURE_KEY = 'dropi-city-static-ground-v1'
+
 export const getHQGrowth = (company?: CompanyState) => ({
   level: company?.level ?? 1,
   tier: Math.min(3, Math.max(1, Math.floor(company?.level ?? 1))),
@@ -34,33 +43,70 @@ export const drawNeighborhoodNPC = (
 
 const fallbackShopNames = ['SUNBEAM CAFÉ', 'CITY PHARMACY', 'CORNER GOODS', 'BLOOM & STEM', 'BAKERY', 'PANTRY']
 
+/**
+ * Produce one reusable static ground texture. This work occurs once for the Phaser texture manager;
+ * scene restarts reuse the cached texture instead of retaining/replaying the full vector command list.
+ */
+export const ensureCityGroundTexture = (scene: Phaser.Scene): string => {
+  if (scene.textures.exists(CITY_GROUND_TEXTURE_KEY)) return CITY_GROUND_TEXTURE_KEY
+  const g = scene.make.graphics({ x: 0, y: 0 })
+  g.save().scaleCanvas(CITY_GROUND_TEXTURE_SCALE, CITY_GROUND_TEXTURE_SCALE)
+  g.fillStyle(C.grass).fillRect(0, 0, WORLD_WIDTH, WORLD_HEIGHT)
+  for (const zone of WORLD_ZONES) {
+    g.fillStyle(C.lawn).fillRoundedRect(zone.x - 8, zone.y - 8, zone.width + 16, zone.height + 16, 36)
+    g.fillStyle(zone.fillColor, 0.35).fillRoundedRect(zone.x + 10, zone.y + 15, zone.width - 20, zone.height - 30, 26)
+  }
+  drawCityDistrictAccents(g,
+    cityDistrictAccents(WORLD_ZONES, URBAN_SIDEWALKS, URBAN_BUILDINGS, WORLD_DECORATIONS))
+  drawCityPavement(g, URBAN_ROADS, URBAN_SIDEWALKS)
+
+  // Shadows and low street furniture are static ground decoration and are therefore baked too.
+  WORLD_DECORATIONS.forEach((tree, index) => {
+    g.fillStyle(C.shadow, 0.13).fillEllipse(tree.x + tree.radius * 0.4,
+      tree.y + 3, tree.radius * 4.6, tree.radius * 1.5)
+    if (index % 4 === 0) drawFlowerBox(g, tree.x + tree.radius + 12, tree.y + tree.radius * 0.65, 24)
+  })
+  for (const zone of WORLD_ZONES) {
+    const x = zone.x + zone.width / 2
+    const y = zone.y + 34
+    drawBench(g, x, y)
+    drawLamp(g, x + 38, y + 2)
+  }
+
+  // Door markers are static. The active objective remains a separate dynamic marker in GameWorld.
+  WORLD_ROUTE_POINTS.forEach(point => {
+    const merchant = point.kind === 'pickup'
+    g.fillStyle(merchant ? COLORS.gold : COLORS.accent, 0.16).fillEllipse(point.x, point.y + 2, 40, 25)
+    g.lineStyle(2, merchant ? COLORS.gold : COLORS.accent, 0.85).strokeEllipse(point.x, point.y + 2, 40, 25)
+    if (merchant) {
+      g.fillStyle(C.parcel).fillRoundedRect(point.x - 5, point.y - 3, 10, 9, 1)
+      g.fillStyle(C.cream).fillRect(point.x - 1, point.y - 3, 2, 9)
+    } else {
+      g.fillStyle(C.curb, 0.85).fillCircle(point.x, point.y + 2, 3)
+    }
+  })
+  g.restore()
+  g.generateTexture(
+    CITY_GROUND_TEXTURE_KEY,
+    Math.ceil(WORLD_WIDTH * CITY_GROUND_TEXTURE_SCALE),
+    Math.ceil(WORLD_HEIGHT * CITY_GROUND_TEXTURE_SCALE),
+  )
+  g.destroy()
+  return CITY_GROUND_TEXTURE_KEY
+}
+
 export const renderUrbanNeighborhood = (
   scene: Phaser.Scene, company?: CompanyState,
 ): Phaser.GameObjects.Graphics | null => {
   const growth = getHQGrowth(company)
-  const terrain = scene.add.graphics().setDepth(0).setName('city-terrain')
-  terrain.fillStyle(C.grass).fillRect(0, 0, WORLD_WIDTH, WORLD_HEIGHT)
-  for (const zone of WORLD_ZONES) {
-    terrain.fillStyle(C.lawn).fillRoundedRect(zone.x - 8, zone.y - 8, zone.width + 16, zone.height + 16, 36)
-    terrain.fillStyle(zone.fillColor, 0.35).fillRoundedRect(zone.x + 10, zone.y + 15, zone.width - 20, zone.height - 30, 26)
-    // Very sparse, deterministic blades: texture, not a noisy repeating tile.
-    terrain.lineStyle(2, C.grassShade, 0.23)
-    for (let x = zone.x + 34; x < zone.x + zone.width - 20; x += 73) {
-      for (let y = zone.y + 29; y < zone.y + zone.height - 20; y += 91) {
-        const shift = Math.floor(x / 73) % 2 * 23
-        terrain.lineBetween(x, y + shift, x + 2, y + shift - 4)
-          .lineBetween(x + 5, y + shift, x + 7, y + shift - 3)
-      }
-    }
-  }
-  drawCityDistrictAccents(terrain,
-    cityDistrictAccents(WORLD_ZONES, URBAN_SIDEWALKS, URBAN_BUILDINGS, WORLD_DECORATIONS))
-  const pavement = scene.add.graphics().setDepth(1).setName('city-pavement')
-  drawCityPavement(pavement, URBAN_ROADS, URBAN_SIDEWALKS)
-  const shadow = scene.add.graphics().setDepth(3).setName('city-cast-shadows')
-  const masonry = scene.add.graphics().setDepth(5).setName('city-architecture')
-  const props = scene.add.graphics().setDepth(6).setName('city-street-furniture')
-  const markers = scene.add.graphics().setDepth(2).setName('city-front-doors')
+  scene.add.image(0, 0, ensureCityGroundTexture(scene))
+    .setOrigin(0, 0)
+    .setScale(1 / CITY_GROUND_TEXTURE_SCALE)
+    .setDepth(0)
+    .setName('city-ground-cache')
+
+  // Only company-dependent HQ decoration remains Graphics at runtime; its bounds stay local to HQ.
+  const props = scene.add.graphics().setDepth(6).setName('city-hq-dynamic-details')
 
   URBAN_BUILDINGS.forEach((building, index) => {
     const location = WORLD_ROUTE_POINTS.find(point => point.buildingId === building.id)
@@ -81,34 +127,23 @@ export const renderUrbanNeighborhood = (
       cityLabel(scene, building.x, building.y + building.height / 2 + 13, 'LOCAL DELIVERY · HEADQUARTERS', 9,
         '#175574').setDepth(7)
     }
-    if (building.kind === 'home') {
-      const left = building.x - building.width / 2
-      const bottom = building.y + building.height / 2
-      masonry.fillStyle(C.cream).fillRoundedRect(left + 5, bottom - 34, 11, 10, 2)
-      cityLabel(scene, left + 10, bottom - 29, `${12 + index}`, 6, '#175574').setDepth(7)
-    }
   })
 
   WORLD_DECORATIONS.forEach((tree, index) => {
-    shadow.fillStyle(C.shadow, 0.13).fillEllipse(tree.x + tree.radius * 0.4,
-      tree.y + 3, tree.radius * 4.6, tree.radius * 1.5)
     // The collision disk covers the trunk; the substantial canopy hangs above it.
     scene.add.image(tree.x, tree.y, ensureTreeTexture(scene, index % 4))
       .setOrigin(0.5, 94 / 104).setScale(tree.radius / 16).setDepth(8)
-    if (index % 4 === 0) drawFlowerBox(props, tree.x + tree.radius + 12, tree.y + tree.radius * 0.65, 24)
   })
-  // Furniture remains on non-traversable verge, never in the street/collision corridor.
   for (const zone of WORLD_ZONES) {
     const x = zone.x + zone.width / 2
     const y = zone.y + 34
-    drawBench(props, x, y)
-    drawLamp(props, x + 38, y + 2)
     cityLabel(scene, x, y - 48, zone.label.toUpperCase(), 13, '#247c48').setDepth(2).setAlpha(0.8)
   }
+
   const hq = URBAN_BUILDINGS.find(building => building.kind === 'hq')!
   const padX = hq.x - hq.width / 2 - 47
   const padY = hq.y + 5
-  shadow.fillStyle(C.shadow, 0.18).fillRoundedRect(padX - 39 + 5, padY - 31 + 7, 78, 62, 12)
+  props.fillStyle(C.shadow, 0.18).fillRoundedRect(padX - 39 + 5, padY - 31 + 7, 78, 62, 12)
   props.fillStyle(C.pavingLine).fillRoundedRect(padX - 39, padY - 31, 78, 62, 12)
   props.fillStyle(C.sidewalk).fillRoundedRect(padX - 35, padY - 27, 70, 54, 10)
   props.lineStyle(2, C.cream).strokeEllipse(padX, padY, 51, 40)
@@ -123,8 +158,8 @@ export const renderUrbanNeighborhood = (
   cityLabel(scene, padX, padY + 21, 'FUTURE · LOCKED', 7, '#175574').setDepth(7)
   const stageX = hq.x - 65
   const stageY = hq.y + hq.height / 2 + 15
-  pavement.fillStyle(C.cream, 0.7).fillRoundedRect(stageX - 29, stageY - 9, 57, 30, 4)
-  pavement.lineStyle(1, C.pavingLine).strokeRoundedRect(stageX - 29, stageY - 9, 57, 30, 4)
+  props.fillStyle(C.cream, 0.7).fillRoundedRect(stageX - 29, stageY - 9, 57, 30, 4)
+  props.lineStyle(1, C.pavingLine).strokeRoundedRect(stageX - 29, stageY - 9, 57, 30, 4)
   for (let row = 0; row < growth.tier; row++) {
     for (let box = 0; box < 3; box++) {
       drawParcel(props, stageX - 17 + box * 17, stageY + 7 - row * 13, 14)
@@ -149,7 +184,7 @@ export const renderUrbanNeighborhood = (
     parkedBicycle.lineStyle(3, C.metal).lineBetween(-13, -22, -3, -22)
       .lineBetween(12, -20, 12, -28).lineBetween(12, -28, 19, -28)
   }
-  pavement.lineStyle(1, C.curb, 0.8).strokeRoundedRect(URBAN_HQ.x + 43, URBAN_HQ.y - 15, 52, 28, 4)
+  props.lineStyle(1, C.curb, 0.8).strokeRoundedRect(URBAN_HQ.x + 43, URBAN_HQ.y - 15, 52, 28, 4)
   cityLabel(scene, URBAN_HQ.x + 68, URBAN_HQ.y + 25, 'BICYCLE BAY', 8, '#fff4ce', '#175574').setDepth(7)
   if (growth.staffCount > 0) {
     const worker = drawNeighborhoodNPC(scene, URBAN_HQ.x + 108, URBAN_HQ.y, false, 2)
@@ -165,14 +200,6 @@ export const renderUrbanNeighborhood = (
     const npcY = point.y + (north ? 8 : -9)
     drawNeighborhoodNPC(scene, npcX, npcY, merchant, index)
       .setName(profile?.worldActorId ?? `customer:${point.label}`)
-    markers.fillStyle(merchant ? COLORS.gold : COLORS.accent, 0.16).fillEllipse(point.x, point.y + 2, 40, 25)
-    markers.lineStyle(2, merchant ? COLORS.gold : COLORS.accent, 0.85).strokeEllipse(point.x, point.y + 2, 40, 25)
-    if (merchant) {
-      markers.fillStyle(C.parcel).fillRoundedRect(point.x - 5, point.y - 3, 10, 9, 1)
-      markers.fillStyle(C.cream).fillRect(point.x - 1, point.y - 3, 2, 9)
-    } else {
-      markers.fillStyle(C.curb, 0.85).fillCircle(point.x, point.y + 2, 3)
-    }
     const name = point.displayName.split(' · ')[0]
     const text = cityLabel(scene, point.x, point.y + (north ? 27 : 24),
       name, 9, '#fff4ce', '#175574').setDepth(13)
