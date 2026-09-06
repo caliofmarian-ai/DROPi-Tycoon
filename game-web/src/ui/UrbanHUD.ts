@@ -23,13 +23,14 @@ interface HUDCallbacks {
 
 /**
  * Issue #324: preserve touch usability while materially reclaiming the landscape viewport.
- * Phaser's logical canvas is scaled by the Android shell, so compact logical controls still
- * produce practical physical touch targets without covering a quarter of the city view.
+ * Direct controls use a compact 46-50 px logical cell instead of the previous oversized
+ * 48-72 px-per-cell layout. Individual visual controls may be smaller than their native
+ * Rectangle hit targets, but every interactive target remains at least 44x44 px.
  */
 export const urbanHUDLayout = (width: number, height: number) => {
   const portrait = width < 600
   const headerHeight = portrait ? 72 : 44
-  const size = Math.max(30, Math.min(36, Math.floor(Math.min(width, height) * 0.09)))
+  const size = Math.max(46, Math.min(50, Math.floor(Math.min(width, height) * 0.09)))
   const pad = { x: 10, y: height - size * 3 - 10, size }
   const actionWidth = Math.min(150, Math.max(124, width * 0.15))
   const action = { x: width - actionWidth / 2 - 10, y: height - 34, width: actionWidth, height: 46 }
@@ -44,11 +45,11 @@ export const urbanHUDLayout = (width: number, height: number) => {
   const useBottomGap = gapRight - gapLeft >= 170
   return {
     headerHeight, portrait, pad, action,
-    transport: { x: action.x, y: height - 82, width: action.width, height: 38 },
+    transport: { x: action.x, y: height - 82, width: action.width, height: 44 },
     minimap,
     zoom: { x: minimap.x + minimap.width / 2, y: minimap.y + minimap.height + 34, size: 36 },
     objective: { x: 10, y: headerHeight + 6, width: objectiveWidth, height: objectiveHeight },
-    menu: { x: width - 94, y: headerHeight + 22, width: 160, rowHeight: 40 },
+    menu: { x: width - 94, y: headerHeight + 22, width: 160, rowHeight: 44 },
     toast: {
       x: useBottomGap ? (gapLeft + gapRight) / 2 : width / 2,
       y: useBottomGap ? height - 76 : pad.y - 72,
@@ -72,8 +73,8 @@ export const isUrbanHUDPoint = (width: number, height: number, x: number, y: num
     inside(l.objective.x, l.objective.y, l.objective.width, l.objective.height) ||
     inside(l.minimap.x - 5, l.minimap.y - 5, l.minimap.width + 10, l.minimap.height + 62) ||
     inside(l.pad.x - 5, l.pad.y - 5, l.pad.size * 3 + 10, l.pad.size * 3 + 10) ||
-    inside(l.action.x - l.action.width / 2, l.transport.y - 20, l.action.width, 92) ||
-    (menuOpen && inside(l.menu.x - l.menu.width / 2, l.menu.y - 20, l.menu.width, l.menu.rowHeight * 4))
+    inside(l.action.x - l.action.width / 2, l.transport.y - 22, l.action.width, 94) ||
+    (menuOpen && inside(l.menu.x - l.menu.width / 2, l.menu.y - 22, l.menu.width, l.menu.rowHeight * 4))
 }
 
 export const urbanMapMarkers = (world: WorldState, objective: UrbanObjective, width: number, height: number) => ({
@@ -158,7 +159,7 @@ export class UrbanHUD {
       .setFontStyle('bold')
     const statsLeft = tycoon.x + tycoon.width + 20
     this.stats = this.text(portrait ? 14 : statsLeft, portrait ? 44 : 15, '', portrait ? 11 : 12, COLORS.textPrimary)
-    this.button(width - 47, headerHeight / 2, 78, 36, '☰ Menu', () => this.toggleMenu())
+    this.button(width - 47, headerHeight / 2, 78, 36, '☰  Menu', () => this.toggleMenu())
 
     const mission = this.layout.objective
     this.panel(mission.x, mission.y, mission.width, mission.height)
@@ -239,6 +240,7 @@ export class UrbanHUD {
   /**
    * Android WebView touch input uses a native Rectangle hit target. Visual chrome stays on Graphics,
    * but Graphics are never responsible for hit testing. Keep this #323 recovery contract intact.
+   * A visual button may be compact, but the hit target is never smaller than 44x44 logical px.
    */
   private button(x: number, y: number, width: number, height: number, label: string, callback?: () => void): HUDButton {
     const chrome = this.add(this.scene.add.graphics()).setPosition(x, y)
@@ -249,7 +251,9 @@ export class UrbanHUD {
       chrome.lineStyle(2, active ? COLORS.gold : COLORS.accent).strokeRoundedRect(-width / 2, -height / 2, width, height, RADII.button)
     }
     paint()
-    const button = this.add(this.scene.add.rectangle(x, y, width, height, 0xffffff, 0.001))
+    const hitWidth = Math.max(44, width)
+    const hitHeight = Math.max(44, height)
+    const button = this.add(this.scene.add.rectangle(x, y, hitWidth, hitHeight, 0xffffff, 0.001))
       .setInteractive({ useHandCursor: true })
     const text = this.text(x, y, label, 12, COLORS.textPrimary).setOrigin(0.5).setAlign('center')
       .setFontStyle('bold').setWordWrapWidth(width - 10)
