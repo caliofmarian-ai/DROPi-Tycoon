@@ -1,5 +1,8 @@
 import type Phaser from 'phaser'
 import type { CompanyState, WorldState } from '../types/game'
+import {
+  ACTIVE_TRANSPORT_LABELS, availableActiveTransports, nextActiveTransport,
+} from '../systems/activeTransportSystem'
 import { getUrbanCargo, type UrbanObjective } from '../systems/urbanInteractions'
 import {
   URBAN_BUILDINGS, URBAN_ROADS, URBAN_HQ, minimapPoint, inInteractionRange,
@@ -18,36 +21,45 @@ interface HUDCallbacks {
   zoom: (direction: 'in' | 'out') => void
 }
 
+/**
+ * Issue #324: preserve touch usability while materially reclaiming the landscape viewport.
+ * Phaser's logical canvas is scaled by the Android shell, so compact logical controls still
+ * produce practical physical touch targets without covering a quarter of the city view.
+ */
 export const urbanHUDLayout = (width: number, height: number) => {
   const portrait = width < 600
-  const headerHeight = portrait ? 80 : 52
-  const size = Math.max(48, Math.min(72, Math.floor(Math.min(width, height) * 0.11)))
-  const pad = { x: 14, y: height - size * 3 - 14, size }
-  const actionWidth = Math.min(190, Math.max(156, width * 0.16))
-  const action = { x: width - actionWidth / 2 - 12, y: height - 42, width: actionWidth, height: 56 }
-  const mapWidth = Math.max(100, Math.min(210, Math.round(width * 0.16)))
-  const minimap = { x: width - mapWidth - 16, y: headerHeight + 16, width: mapWidth, height: mapWidth * 0.75 }
-  const gapLeft = pad.x + 3 * pad.size + 12
-  const gapRight = action.x - action.width / 2 - 12
-  const useBottomGap = gapRight - gapLeft >= 180
+  const headerHeight = portrait ? 72 : 44
+  const size = Math.max(30, Math.min(36, Math.floor(Math.min(width, height) * 0.09)))
+  const pad = { x: 10, y: height - size * 3 - 10, size }
+  const actionWidth = Math.min(150, Math.max(124, width * 0.15))
+  const action = { x: width - actionWidth / 2 - 10, y: height - 34, width: actionWidth, height: 46 }
+  const mapWidth = Math.max(88, Math.min(150, Math.round(width * 0.13)))
+  const minimap = { x: width - mapWidth - 12, y: headerHeight + 10, width: mapWidth, height: mapWidth * 0.75 }
+  const objectiveWidth = portrait
+    ? Math.max(150, minimap.x - 30)
+    : Math.min(360, Math.max(220, minimap.x - 32))
+  const objectiveHeight = portrait ? 82 : 52
+  const gapLeft = pad.x + 3 * pad.size + 10
+  const gapRight = action.x - action.width / 2 - 10
+  const useBottomGap = gapRight - gapLeft >= 170
   return {
     headerHeight, portrait, pad, action,
-    transport: { x: action.x, y: height - 104, width: action.width, height: 48 },
+    transport: { x: action.x, y: height - 82, width: action.width, height: 38 },
     minimap,
-    zoom: { x: minimap.x + minimap.width / 2, y: minimap.y + minimap.height + 46, size: 44 },
-    objective: { x: 12, y: headerHeight + 12, width: Math.min(560, minimap.x - 30), height: portrait ? 124 : 84 },
-    menu: { x: width - 106, y: headerHeight + 24, width: 184, rowHeight: 44 },
+    zoom: { x: minimap.x + minimap.width / 2, y: minimap.y + minimap.height + 34, size: 36 },
+    objective: { x: 10, y: headerHeight + 6, width: objectiveWidth, height: objectiveHeight },
+    menu: { x: width - 94, y: headerHeight + 22, width: 160, rowHeight: 40 },
     toast: {
       x: useBottomGap ? (gapLeft + gapRight) / 2 : width / 2,
-      y: useBottomGap ? height - 94 : pad.y - 88,
-      width: useBottomGap ? Math.min(430, gapRight - gapLeft) : width - 32,
-      height: 72,
+      y: useBottomGap ? height - 76 : pad.y - 72,
+      width: useBottomGap ? Math.min(400, gapRight - gapLeft) : width - 28,
+      height: 60,
     },
   }
 }
 
 export const urbanStatusText = (world: WorldState, company: CompanyState): string => {
-  const transport = world.urban?.activeTransport === 'bicycle' ? 'Bicycle' : 'Walking'
+  const transport = ACTIVE_TRANSPORT_LABELS[world.urban?.activeTransport ?? 'walking']
   const cargo = getUrbanCargo(world)
   return `${formatMoney(company.money)}  Rep ${company.reputation}  ${transport}  Cargo ${cargo.parcels.length}/${cargo.capacity}`
 }
@@ -58,10 +70,10 @@ export const isUrbanHUDPoint = (width: number, height: number, x: number, y: num
     x >= left && x <= left + w && y >= top && y <= top + h
   return y <= l.headerHeight ||
     inside(l.objective.x, l.objective.y, l.objective.width, l.objective.height) ||
-    inside(l.minimap.x - 6, l.minimap.y - 6, l.minimap.width + 12, l.minimap.height + 78) ||
-    inside(l.pad.x - 6, l.pad.y - 6, l.pad.size * 3 + 12, l.pad.size * 3 + 12) ||
-    inside(l.action.x - l.action.width / 2, l.transport.y - 24, l.action.width, 114) ||
-    (menuOpen && inside(l.menu.x - l.menu.width / 2, l.menu.y - 22, l.menu.width, l.menu.rowHeight * 4))
+    inside(l.minimap.x - 5, l.minimap.y - 5, l.minimap.width + 10, l.minimap.height + 62) ||
+    inside(l.pad.x - 5, l.pad.y - 5, l.pad.size * 3 + 10, l.pad.size * 3 + 10) ||
+    inside(l.action.x - l.action.width / 2, l.transport.y - 20, l.action.width, 92) ||
+    (menuOpen && inside(l.menu.x - l.menu.width / 2, l.menu.y - 20, l.menu.width, l.menu.rowHeight * 4))
 }
 
 export const urbanMapMarkers = (world: WorldState, objective: UrbanObjective, width: number, height: number) => ({
@@ -140,23 +152,27 @@ export class UrbanHUD {
     this.layout = urbanHUDLayout(width, height)
     const { headerHeight, portrait } = this.layout
     this.panel(0, -14, width, headerHeight + 14)
-    this.text(14, 5, 'DROPi', 26, COLORS.textPrimary).setFontStyle('bold')
+    const dropi = this.text(14, 4, 'DROPi', portrait ? 23 : 24, COLORS.textPrimary).setFontStyle('bold')
       .setStroke('#07518a', 3)
-    this.text(94, 13, 'Tycoon', 18, COLORS.textGold).setFontStyle('bold')
-    this.stats = this.text(portrait ? 14 : 177, portrait ? 51 : 19, '', portrait ? 12 : 14, COLORS.textPrimary)
-    this.button(width - 53, 25, 90, 44, '☰  Menu', () => this.toggleMenu())
+    const tycoon = this.text(dropi.x + dropi.width + 7, portrait ? 10 : 9, 'Tycoon', portrait ? 15 : 16, COLORS.textGold)
+      .setFontStyle('bold')
+    const statsLeft = tycoon.x + tycoon.width + 20
+    this.stats = this.text(portrait ? 14 : statsLeft, portrait ? 44 : 15, '', portrait ? 11 : 12, COLORS.textPrimary)
+    this.button(width - 47, headerHeight / 2, 78, 36, '☰ Menu', () => this.toggleMenu())
+
     const mission = this.layout.objective
     this.panel(mission.x, mission.y, mission.width, mission.height)
-    const parcel = this.add(scene.add.graphics()).setPosition(mission.x + 27, mission.y + 29)
-    parcel.fillStyle(CITY_COLORS.parcel).fillRoundedRect(-16, -12, 32, 28, 4)
-    parcel.fillStyle(CITY_COLORS.tape).fillRect(-3, -12, 7, 28)
-    parcel.fillStyle(CITY_COLORS.cream).fillTriangle(-16, -12, 0, -20, 16, -12)
-    parcel.lineStyle(2, COLORS.gold).strokeRoundedRect(-16, -12, 32, 28, 4)
-    const textLeft = mission.x + 53
-    this.objective = this.text(textLeft, mission.y + 12, '', portrait ? 14 : 17, COLORS.textPrimary)
-      .setFontStyle('bold').setWordWrapWidth(mission.width - 62)
-    this.hint = this.text(textLeft, mission.y + mission.height - (portrait ? 42 : 31), '', portrait ? 11 : 13, '#a5eaff')
-      .setWordWrapWidth(mission.width - 62)
+    const parcel = this.add(scene.add.graphics()).setPosition(mission.x + 21, mission.y + mission.height / 2)
+    parcel.fillStyle(CITY_COLORS.parcel).fillRoundedRect(-11, -9, 22, 19, 3)
+    parcel.fillStyle(CITY_COLORS.tape).fillRect(-2, -9, 4, 19)
+    parcel.fillStyle(CITY_COLORS.cream).fillTriangle(-11, -9, 0, -14, 11, -9)
+    parcel.lineStyle(1, COLORS.gold).strokeRoundedRect(-11, -9, 22, 19, 3)
+    const textLeft = mission.x + 41
+    this.objective = this.text(textLeft, mission.y + 7, '', portrait ? 12 : 14, COLORS.textPrimary)
+      .setFontStyle('bold').setWordWrapWidth(mission.width - 49)
+    this.hint = this.text(textLeft, mission.y + mission.height - (portrait ? 31 : 18), '', portrait ? 10 : 10, '#a5eaff')
+      .setWordWrapWidth(mission.width - 49)
+
     this.drawMinimap()
     const map = this.layout.minimap
     this.mapViewport = this.add(scene.add.graphics())
@@ -164,24 +180,27 @@ export class UrbanHUD {
     this.mapTarget = this.add(scene.add.circle(0, 0, 5, COLORS.gold).setStrokeStyle(2, COLORS.surface))
     this.mapPlayer = this.add(scene.add.circle(0, 0, 4, CITY_COLORS.curb))
       .setStrokeStyle(2, COLORS.accentStrong)
-    this.mapCaption = this.text(map.x + map.width / 2, map.y + map.height + 7, 'CEDAR CITY', 10, COLORS.textPrimary)
+    this.mapCaption = this.text(map.x + map.width / 2, map.y + map.height + 5, 'CEDAR CITY', 9, COLORS.textPrimary)
       .setOrigin(0.5, 0).setFontStyle('bold')
     const zoom = this.layout.zoom
-    this.button(zoom.x - 26, zoom.y, zoom.size, zoom.size, '−', () => callbacks.zoom('out'))
-    this.button(zoom.x + 26, zoom.y, zoom.size, zoom.size, '+', () => callbacks.zoom('in'))
+    this.button(zoom.x - 22, zoom.y, zoom.size, zoom.size, '−', () => callbacks.zoom('out'))
+    this.button(zoom.x + 22, zoom.y, zoom.size, zoom.size, '+', () => callbacks.zoom('in'))
+
     this.createDPad()
     const a = this.layout.action
-    this.actionControl = this.button(a.x, a.y, a.width, a.height, '◉  Action', callbacks.action)
-    this.actionControl.label.setFontSize(18)
+    this.actionControl = this.button(a.x, a.y, a.width, a.height, '• Action', callbacks.action)
+    this.actionControl.label.setFontSize(15)
     const t = this.layout.transport
-    this.transportControl = this.button(t.x, t.y, t.width, t.height, 'Take bicycle', callbacks.transport)
+    this.transportControl = this.button(t.x, t.y, t.width, t.height, 'Switch vehicle', callbacks.transport)
+    this.transportControl.label.setFontSize(11)
     this.transportControl.setVisible(false)
     this.transportControl.setEnabled(false)
+
     const toast = this.layout.toast
-    this.toast = this.text(toast.x, toast.y, '', 12, COLORS.textPrimary)
+    this.toast = this.text(toast.x, toast.y, '', 11, COLORS.textPrimary)
       .setOrigin(0.5, 0).setAlign('center')
-      .setWordWrapWidth(toast.width - 20).setFixedSize(toast.width, toast.height)
-      .setBackgroundColor('#073354').setPadding(10, 7).setVisible(false)
+      .setWordWrapWidth(toast.width - 18).setFixedSize(toast.width, toast.height)
+      .setBackgroundColor('#073354').setPadding(9, 6).setVisible(false)
     const rows: [string, () => void][] = [
       ['Company', callbacks.company], ['Save progress', callbacks.save],
       ['Toggle sound', callbacks.audio], ['Main menu', callbacks.menu],
@@ -212,31 +231,28 @@ export class UrbanHUD {
 
   private panel(x: number, y: number, width: number, height: number): void {
     const g = this.add(this.scene.add.graphics())
-    g.fillStyle(CITY_COLORS.shadow, 0.3).fillRoundedRect(x + 2, y + 4, width, height, RADII.panel)
-    g.fillStyle(COLORS.surface, 0.97).fillRoundedRect(x, y, width, height, RADII.panel)
-    g.lineStyle(2, COLORS.accent, 0.9).strokeRoundedRect(x, y, width, height, RADII.panel)
-    g.lineStyle(1, COLORS.accent, 0.2).lineBetween(x + 16, y + 4, x + width - 16, y + 4)
+    g.fillStyle(CITY_COLORS.shadow, 0.26).fillRoundedRect(x + 2, y + 3, width, height, RADII.panel)
+    g.fillStyle(COLORS.surface, 0.93).fillRoundedRect(x, y, width, height, RADII.panel)
+    g.lineStyle(2, COLORS.accent, 0.88).strokeRoundedRect(x, y, width, height, RADII.panel)
   }
 
   /**
    * Android WebView touch input uses a native Rectangle hit target. Visual chrome stays on Graphics,
-   * but Graphics are no longer responsible for hit testing. This restores the proven pre-redesign
-   * interaction path for D-pad, Action, Menu, zoom and transport controls.
+   * but Graphics are never responsible for hit testing. Keep this #323 recovery contract intact.
    */
   private button(x: number, y: number, width: number, height: number, label: string, callback?: () => void): HUDButton {
     const chrome = this.add(this.scene.add.graphics()).setPosition(x, y)
     const paint = (active = false): void => {
-      chrome.clear().fillStyle(CITY_COLORS.shadow, 0.3).fillRoundedRect(-width / 2 + 2, -height / 2 + 3, width, height, RADII.button)
-      chrome.fillStyle(active ? COLORS.accentStrong : COLORS.surfaceRaised, 0.98)
+      chrome.clear().fillStyle(CITY_COLORS.shadow, 0.25).fillRoundedRect(-width / 2 + 2, -height / 2 + 2, width, height, RADII.button)
+      chrome.fillStyle(active ? COLORS.accentStrong : COLORS.surfaceRaised, 0.95)
         .fillRoundedRect(-width / 2, -height / 2, width, height, RADII.button)
       chrome.lineStyle(2, active ? COLORS.gold : COLORS.accent).strokeRoundedRect(-width / 2, -height / 2, width, height, RADII.button)
-      chrome.lineStyle(1, COLORS.accent, 0.3).lineBetween(-width / 2 + 12, -height / 2 + 4, width / 2 - 12, -height / 2 + 4)
     }
     paint()
     const button = this.add(this.scene.add.rectangle(x, y, width, height, 0xffffff, 0.001))
       .setInteractive({ useHandCursor: true })
-    const text = this.text(x, y, label, 14, COLORS.textPrimary).setOrigin(0.5).setAlign('center')
-      .setFontStyle('bold').setWordWrapWidth(width - 12)
+    const text = this.text(x, y, label, 12, COLORS.textPrimary).setOrigin(0.5).setAlign('center')
+      .setFontStyle('bold').setWordWrapWidth(width - 10)
     if (callback) button.on('pointerdown', callback)
     const setVisible = (visible: boolean): void => {
       chrome.setVisible(visible)
@@ -252,15 +268,15 @@ export class UrbanHUD {
   private createDPad(): void {
     const { x, y, size } = this.layout.pad
     const center = size * 1.5
-    this.add(this.scene.add.circle(x + center, y + center, center + 5, COLORS.surface, 0.35))
-      .setStrokeStyle(2, COLORS.accent, 0.6)
+    this.add(this.scene.add.circle(x + center, y + center, center + 3, COLORS.surface, 0.18))
+      .setStrokeStyle(1, COLORS.accent, 0.48)
     const directions: [Direction, number, number, string][] = [
       ['up', 1, 0, '▲'], ['left', 0, 1, '◀'], ['right', 2, 1, '▶'], ['down', 1, 2, '▼'],
     ]
     directions.forEach(([direction, col, row, label]) => {
       const b = this.button(x + col * size + size / 2, y + row * size + size / 2, size - 2, size - 2, label)
       this.directionButtons.push({ direction, control: b })
-      b.label.setFontSize(23)
+      b.label.setFontSize(Math.max(15, size * 0.5))
       const press = (pointer: Phaser.Input.Pointer): void => {
         if (!this.open) { this.pad.press(pointer.id, direction); this.paintDirections() }
       }
@@ -272,13 +288,13 @@ export class UrbanHUD {
       })
       b.button.on('pointerup', this.releasePointer)
     })
-    this.add(this.scene.add.circle(x + center, y + center, size * 0.26, COLORS.accent, 0.24))
-      .setStrokeStyle(2, CITY_COLORS.curb)
+    this.add(this.scene.add.circle(x + center, y + center, size * 0.2, COLORS.accent, 0.18))
+      .setStrokeStyle(1, CITY_COLORS.curb)
   }
 
   private drawMinimap(): void {
     const { x, y, width, height } = this.layout.minimap
-    this.panel(x - 5, y - 5, width + 10, height + 30)
+    this.panel(x - 4, y - 4, width + 8, height + 24)
     const g = this.add(this.scene.add.graphics())
     g.fillStyle(CITY_COLORS.grass).fillRect(x, y, width, height)
     for (const district of WORLD_ZONES) {
@@ -301,8 +317,8 @@ export class UrbanHUD {
         .fillRect(x + p.x - w / 2, y + p.y - h / 2, w, h)
     }
     const hq = minimapPoint(URBAN_HQ, width, height)
-    this.text(x + hq.x - 6, y + hq.y - 14, 'H', 11, COLORS.textPrimary).setFontStyle('bold').setStroke('#073354', 3)
-    this.text(x + width - 8, y + 3, 'N', 11, COLORS.textPrimary).setOrigin(0.5, 0).setStroke('#073354', 3)
+    this.text(x + hq.x - 5, y + hq.y - 12, 'H', 9, COLORS.textPrimary).setFontStyle('bold').setStroke('#073354', 2)
+    this.text(x + width - 7, y + 2, 'N', 9, COLORS.textPrimary).setOrigin(0.5, 0).setStroke('#073354', 2)
   }
 
   update(
@@ -310,25 +326,27 @@ export class UrbanHUD {
     cameraView?: { x: number; y: number; width: number; height: number },
   ): void {
     this.stats.setText(urbanStatusText(world, company))
-    const available = this.layout.portrait ? this.scene.scale.width - 28 : this.scene.scale.width - 285
-    this.stats.setScale(Math.min(1, available / Math.max(1, this.stats.width)))
+    const availableStatsWidth = this.layout.portrait ? this.scene.scale.width - 28 : this.scene.scale.width - this.stats.x - 105
+    this.stats.setScale(Math.min(1, availableStatsWidth / Math.max(1, this.stats.width)))
     this.objective.setText(objective.title.toUpperCase())
     const dx = objective.point.x - world.player.x
     const dy = objective.point.y - world.player.y
     const nearby = inInteractionRange(world.player, objective.point)
     const bearing = `${dy < -35 ? 'N' : dy > 35 ? 'S' : ''}${dx < -35 ? 'W' : dx > 35 ? 'E' : ''}`
-    this.hint.setText(nearby ? 'You are here • Action' : `${bearing} • ${Math.round(Math.hypot(dx, dy))} units\nFollow streets`)
-    this.actionControl.label.setText('◉  Action')
+    this.hint.setText(nearby ? 'Here • Action' : `${bearing || '•'} · ${Math.round(Math.hypot(dx, dy))}u · Follow streets`)
+    this.actionControl.label.setText('• Action')
     if (nearby !== this.nearby) {
       this.nearby = nearby
       this.actionControl.paint(nearby)
     }
-    const atHQ = inInteractionRange(world.player, URBAN_HQ)
-    this.transportControl.label.setText(world.urban?.activeTransport === 'bicycle' ? 'Park bicycle' : 'Take bicycle')
-    if (atHQ !== this.transportAvailable) {
-      this.transportAvailable = atHQ
-      this.transportControl.setVisible(atHQ)
-      this.transportControl.setEnabled(atHQ)
+    const owned = availableActiveTransports(company)
+    const canSwitch = inInteractionRange(world.player, URBAN_HQ) && owned.length > 1
+    const next = nextActiveTransport(company, world.urban?.activeTransport)
+    this.transportControl.label.setText(`Next: ${ACTIVE_TRANSPORT_LABELS[next]}`)
+    if (canSwitch !== this.transportAvailable) {
+      this.transportAvailable = canSwitch
+      this.transportControl.setVisible(canSwitch)
+      this.transportControl.setEnabled(canSwitch)
     }
     const map = this.layout.minimap
     const markers = urbanMapMarkers(world, objective, map.width, map.height)
@@ -348,7 +366,7 @@ export class UrbanHUD {
   notify(message: string): void {
     this.toastTimer?.remove()
     this.toast.setText(message).setVisible(true)
-    this.toastTimer = this.scene.time.delayedCall(4800, () => this.toast.setVisible(false))
+    this.toastTimer = this.scene.time.delayedCall(4200, () => this.toast.setVisible(false))
   }
 
   toggleMenu(): void {
