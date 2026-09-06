@@ -127,7 +127,7 @@ export class CompanyManagementScene extends Phaser.Scene {
   }
   private returnToGameWorld(): void {
     replaceGameSession(this.worldState, this.companyState)
-    if (this.scene.isSleeping('GameWorld')) {
+    if (typeof this.scene.isSleeping === 'function' && this.scene.isSleeping('GameWorld')) {
       // GameWorld owns the expensive city presentation. Wake the resident scene when possible
       // instead of rebuilding every building, tree, label and ambient actor on every visit.
       this.scene.wake('GameWorld')
