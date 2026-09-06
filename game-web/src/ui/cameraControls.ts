@@ -5,10 +5,11 @@ import {
   GAMEWORLD_TOP_BAR_TOUCH_TARGET_PX,
 } from './gameWorldTopBar'
 
-export const CAMERA_MIN_ZOOM = 0.65
-export const CAMERA_MAX_ZOOM = 2
+/** Owner-reviewed #324 range: wider city overview and closer inspection without changing world logic. */
+export const CAMERA_MIN_ZOOM = 0.5
+export const CAMERA_MAX_ZOOM = 2.5
 export const CAMERA_DEFAULT_ZOOM = 1
-export const CAMERA_ZOOM_STEP = 0.15
+export const CAMERA_ZOOM_STEP = 0.2
 export const CAMERA_ROTATION_STEP_RADIANS = Math.PI / 12
 export const CAMERA_PAN_THRESHOLD_PX = 10
 
