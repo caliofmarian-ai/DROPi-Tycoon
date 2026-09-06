@@ -123,7 +123,13 @@ export interface PlayerState {
   movementSpeed: number
 }
 
-export type ActiveTransport = 'walking' | 'bicycle'
+/**
+ * Player-selectable terrestrial transports currently embodied by the fleet runtime.
+ * `car` remains a future logistics transport profile, but is not selectable until a
+ * stable Company vehicle type exists for it.
+ */
+export const ACTIVE_TRANSPORTS = ['walking', 'bicycle', 'scooter', 'motorcycle', 'van'] as const
+export type ActiveTransport = (typeof ACTIVE_TRANSPORTS)[number]
 
 export interface UrbanProgressState {
   merchantOnboarded: boolean
