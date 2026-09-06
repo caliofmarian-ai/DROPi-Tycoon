@@ -7,7 +7,9 @@ const hudSource = readFileSync(new URL('../src/ui/UrbanHUD.ts', import.meta.url)
 describe('Android touch controls recovery', () => {
   it('uses native Rectangle hit targets instead of custom Graphics hit testing for HUD controls', () => {
     expect(hudSource).toContain('button: Phaser.GameObjects.Rectangle')
-    expect(hudSource).toContain('this.scene.add.rectangle(x, y, width, height, 0xffffff, 0.001)')
+    expect(hudSource).toContain('const hitWidth = Math.max(44, width)')
+    expect(hudSource).toContain('const hitHeight = Math.max(44, height)')
+    expect(hudSource).toContain('this.scene.add.rectangle(x, y, hitWidth, hitHeight, 0xffffff, 0.001)')
     expect(hudSource).toContain('.setInteractive({ useHandCursor: true })')
     expect(hudSource).toContain('chrome.clear().fillStyle')
     expect(hudSource).not.toContain('button.setInteractive(\n      { x: -width / 2, y: -height / 2, width, height }')
@@ -34,6 +36,6 @@ describe('Android touch controls recovery', () => {
     expect(hudSource).toContain('button.setVisible(visible)')
     expect(hudSource).toContain('text.setVisible(visible)')
     expect(hudSource).toContain('control.setEnabled(this.open)')
-    expect(hudSource).toContain('this.transportControl.setEnabled(atHQ)')
+    expect(hudSource).toContain('this.transportControl.setEnabled(canSwitch)')
   })
 })
