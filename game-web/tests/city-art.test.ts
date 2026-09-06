@@ -6,9 +6,13 @@ import {
   NEIGHBOR_ANCHOR, NEIGHBOR_CELL,
 } from '../src/world/cityArt'
 import { cityDistrictAccents, drawCityDistrictAccents, drawCityPavement, roadCrossings } from '../src/world/cityGround'
-import { drawNeighborhoodNPC, getHQGrowth, renderUrbanNeighborhood } from '../src/world/urbanPresentation'
+import {
+  CITY_GROUND_TEXTURE_SCALE, drawNeighborhoodNPC, getHQGrowth, renderUrbanNeighborhood,
+} from '../src/world/urbanPresentation'
 import { isUrbanWalkable, URBAN_BUILDINGS, URBAN_ROADS, URBAN_SIDEWALKS } from '../src/world/urbanWorld'
-import { WORLD_DECORATIONS, WORLD_ROUTE_POINTS, WORLD_ZONES } from '../src/world/worldLayout'
+import {
+  WORLD_DECORATIONS, WORLD_HEIGHT, WORLD_ROUTE_POINTS, WORLD_WIDTH, WORLD_ZONES,
+} from '../src/world/worldLayout'
 import { createInitialCompanyState } from '../src/state/gameState'
 
 const mockCityScene = () => {
@@ -194,24 +198,30 @@ describe('original dimensional city architecture', () => {
     }])).not.toContainEqual(pocket)
   })
 
-  it('uses six static ground/prop Graphics and shared facade sprites, with real NPCs and landmarks', () => {
+  it('caches static ground and keeps only local HQ Graphics with shared facade sprites', () => {
     const mock = mockCityScene()
     expect(renderUrbanNeighborhood(mock.scene)).toBeNull()
-    expect(mock.raw.add.graphics).toHaveBeenCalledTimes(6)
+    expect(mock.raw.add.graphics).toHaveBeenCalledTimes(1)
     expect(mock.raw.add.container).toHaveBeenCalledTimes(WORLD_ROUTE_POINTS.length)
     const labels = mock.raw.add.text.mock.calls as unknown as [number, number, string][]
     expect(labels.some(([, , text]) => text === 'DROPi')).toBe(true)
     expect(labels.some(([, , text]) => text === 'MAIN DRONEPORT')).toBe(true)
     expect(labels.some(([, , text]) => text === 'FUTURE · LOCKED')).toBe(true)
     expect(labels.some(([, , text]) => text === 'PARCEL STAGING')).toBe(true)
-    expect(mock.textures.size).toBeLessThanOrEqual(48)
-    expect(mock.calls.some(call => call.method === 'generateTexture' &&
-      typeof call.args[1] === 'number' && call.args[1] > 256)).toBe(false)
+    expect(mock.textures.size).toBeLessThanOrEqual(49)
+    const groundTexture = mock.calls.find(call => call.method === 'generateTexture' &&
+      call.args[0] === 'dropi-city-static-ground-v1')
+    expect(groundTexture?.args).toEqual([
+      'dropi-city-static-ground-v1',
+      Math.ceil(WORLD_WIDTH * CITY_GROUND_TEXTURE_SCALE),
+      Math.ceil(WORLD_HEIGHT * CITY_GROUND_TEXTURE_SCALE),
+    ])
     const generatedBytes = mock.calls.filter(call => call.method === 'generateTexture')
       .reduce((sum, call) => sum + (call.args[1] as number) * (call.args[2] as number) * 4, 0)
-    expect(generatedBytes).toBeLessThan(3 * 1024 * 1024)
-    expect(mock.raw.add.image).toHaveBeenCalledTimes(URBAN_BUILDINGS.length +
+    expect(generatedBytes).toBeLessThan(12 * 1024 * 1024)
+    expect(mock.raw.add.image).toHaveBeenCalledTimes(1 + URBAN_BUILDINGS.length +
       WORLD_DECORATIONS.length + WORLD_ROUTE_POINTS.length)
+    expect(mock.raw.add.image).toHaveBeenCalledWith(0, 0, 'dropi-city-static-ground-v1')
     for (const tree of WORLD_DECORATIONS) {
       const index = mock.raw.add.image.mock.calls.findIndex(args => (args as unknown[])[0] === tree.x &&
         (args as unknown[])[1] === tree.y)
@@ -230,7 +240,7 @@ describe('original dimensional city architecture', () => {
     const before = structuredClone(company)
     const mock = mockCityScene()
     expect(renderUrbanNeighborhood(mock.scene, company)).not.toBeNull()
-    expect(mock.raw.add.graphics).toHaveBeenCalledTimes(7)
+    expect(mock.raw.add.graphics).toHaveBeenCalledTimes(2)
     expect(getHQGrowth(company)).toMatchObject({ tier: 3, ownsBicycle: true })
     expect(company).toEqual(before)
   })
