@@ -4,14 +4,17 @@ import { autosaveIfApproved } from '../persistence/saveSystem'
 import { getOrCreateGameSession, replaceGameSession } from '../state/gameSession'
 import { createNextOrder, pickupPointForOrder } from '../systems/orderGeneration'
 import { getAudioController } from '../systems/audioSystem'
-import { resolveActiveTransport, TRANSPORT_PROFILES } from '../systems/urbanLogistics'
+import {
+  ACTIVE_TRANSPORT_LABELS, availableActiveTransports, nextActiveTransport, resolveActiveTransport,
+} from '../systems/activeTransportSystem'
+import { TRANSPORT_PROFILES } from '../systems/urbanLogistics'
 import { getUrbanObjective, performUrbanInteraction } from '../systems/urbanInteractions'
-import type { CompanyState, WorldState } from '../types/game'
+import type { ActiveTransport, CompanyState, WorldState } from '../types/game'
 import { UrbanHUD, isUrbanHUDPoint } from '../ui/UrbanHUD'
 import { UrbanZoomGesture, urbanZoomStep } from '../ui/urbanZoom'
 import { clampCameraZoom } from '../ui/cameraControls'
 import { CITY_COLORS, COLORS } from '../ui/theme'
-import { createPlayerVisual, type PlayerVisual } from '../world/playerVisual'
+import { createPlayerVisual, type PlayerVisual, type PlayerVisualState } from '../world/playerVisual'
 import { renderUrbanNeighborhood } from '../world/urbanPresentation'
 import {
   URBAN_HQ, inInteractionRange, moveUrbanPlayer, movementFacing, repairUrbanPosition, type UrbanFacing,
@@ -22,6 +25,14 @@ import { AmbientCity } from '../world/ambientCity'
 const HUD_REFRESH_MS = 150
 const AMBIENT_UPDATE_MS = 33
 const RESIZE_SETTLE_MS = 280
+
+const PLAYER_VISUAL_BY_TRANSPORT: Readonly<Record<ActiveTransport, PlayerVisualState>> = {
+  walking: 'Walking',
+  bicycle: 'Bicycle',
+  scooter: 'ElectricScooter',
+  motorcycle: 'Motorcycle',
+  van: 'DeliveryVan',
+}
 
 export class GameWorldScene extends Phaser.Scene {
   private worldState!: WorldState
@@ -178,16 +189,19 @@ export class GameWorldScene extends Phaser.Scene {
   private switchTransport(): void {
     if (this.hud.isMenuOpen()) return
     if (!inInteractionRange(this.worldState.player, URBAN_HQ)) {
-      this.hud.notify('Change transport at the HQ parking stand.')
+      this.hud.notify('Change transport at the HQ fleet bay.')
       return
     }
     const urban = this.worldState.urban!
-    if (urban.activeTransport === 'walking' && resolveActiveTransport(this.companyState, 'bicycle') !== 'bicycle') {
-      this.hud.notify('Buy Bicycle in Company (Purchase or Vehicles), then collect it at HQ.')
+    const available = availableActiveTransports(this.companyState)
+    if (available.length <= 1) {
+      this.hud.notify('Buy a vehicle in Company → Vehicles, then collect it at HQ.')
       return
     }
-    urban.activeTransport = urban.activeTransport === 'walking' ? 'bicycle' : 'walking'
-    this.hud.notify(urban.activeTransport === 'bicycle' ? 'Bicycle ready! Faster travel; carry your parcel with you.' : 'Parked the bicycle. Exploring on foot.')
+    urban.activeTransport = nextActiveTransport(this.companyState, urban.activeTransport)
+    const profile = TRANSPORT_PROFILES[urban.activeTransport]
+    this.worldState.player.movementSpeed = profile.speed
+    this.hud.notify(`${ACTIVE_TRANSPORT_LABELS[urban.activeTransport]} selected from your owned fleet.`)
     this.persist('progression-changed')
     this.refreshPresentation()
   }
@@ -197,8 +211,9 @@ export class GameWorldScene extends Phaser.Scene {
     this.objectiveMarker.setPosition(objective.point.x, objective.point.y)
     const pickup = pickupPointForOrder(this.worldState.activeOrder)
     this.parcel.setPosition(pickup.x, pickup.y).setVisible(this.worldState.activeOrder.status === 'Accepted')
-    this.playerVisual.setState(this.worldState.urban!.activeTransport === 'bicycle' ? 'Bicycle' : 'Walking')
-    this.parkedBicycle?.setVisible(this.worldState.urban!.activeTransport === 'walking')
+    const transport = this.worldState.urban!.activeTransport
+    this.playerVisual.setState(PLAYER_VISUAL_BY_TRANSPORT[transport])
+    this.parkedBicycle?.setVisible(transport !== 'bicycle')
     this.playerVisual.setCarrying(this.worldState.player.carryingPackage)
     this.hud.update(this.worldState, this.companyState, objective, this.cameras.main.worldView)
   }

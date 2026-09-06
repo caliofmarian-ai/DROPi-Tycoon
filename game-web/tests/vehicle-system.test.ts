@@ -138,11 +138,14 @@ describe('Workstream D — GameWorldScene binds the drawn player visual, not a p
     expect(gameWorldSource).not.toContain('player_character_move')
   })
 
-  it('creates the code-drawn player visual and binds the explicitly selected owned transport', () => {
+  it('creates the code-drawn player visual and binds every selectable owned transport', () => {
     expect(gameWorldSource).toContain('createPlayerVisual(')
     expect(gameWorldSource).toContain('resolveActiveTransport(this.companyState')
-    expect(gameWorldSource).toContain("activeTransport === 'bicycle' ? 'Bicycle' : 'Walking'")
-    expect(gameWorldSource).toContain('this.playerVisual.setState(')
+    expect(gameWorldSource).toContain('PLAYER_VISUAL_BY_TRANSPORT')
+    expect(gameWorldSource).toContain("scooter: 'ElectricScooter'")
+    expect(gameWorldSource).toContain("motorcycle: 'Motorcycle'")
+    expect(gameWorldSource).toContain("van: 'DeliveryVan'")
+    expect(gameWorldSource).toContain('this.playerVisual.setState(PLAYER_VISUAL_BY_TRANSPORT[transport])')
   })
 
   it('drives facing/moving feedback from the drawn visual instead of texture swaps', () => {
