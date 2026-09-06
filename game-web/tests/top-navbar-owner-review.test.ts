@@ -50,17 +50,20 @@ describe('M-008 owner review — compact non-overlapping top dock', () => {
     expect(sceneSource).toContain('this.cameras.main.ignore(this.fixedUiLayer)')
   })
 
-  it('keeps Main Menu and Company behind the single navbar toggle', () => {
+  it('keeps Main Menu behind the navbar while Company management is entered physically through HQ', () => {
     const hudSource = readFileSync(new URL('../src/ui/UrbanHUD.ts', import.meta.url), 'utf8')
     expect(hudSource).toContain("'☰  Menu', () => this.toggleMenu()")
     expect(hudSource).toContain("['Main menu', callbacks.menu]")
-    expect(hudSource).toContain("['Company', callbacks.company]")
+    expect(hudSource).not.toContain("['Company', callbacks.company]")
     // The Android recovery control abstraction hides both visual chrome and the native
     // Rectangle hit target, then disables input through the same control wrapper.
     expect(hudSource).toContain('entry.setVisible(false)')
     expect(hudSource).toContain('entry.setEnabled(false)')
     expect(hudSource).toContain('this.scene.add.rectangle(x, y, hitWidth, hitHeight, 0xffffff, 0.001)')
-    expect(hudSource).toContain('this.scene.add.rectangle(x + center, y + center, extent, extent, 0xffffff, 0.001)')
+    // #323/#339 remains intact for the analog joystick: the hit target is still a native
+    // Phaser Rectangle, now sized by the larger Android-safe shared hit diameter.
+    expect(hudSource).toContain('ANALOG_JOYSTICK_HIT_DIAMETER, ANALOG_JOYSTICK_HIT_DIAMETER, 0xffffff, 0.001')
+    expect(hudSource).toContain("hit.on('pointerdown', this.pressJoystickPointer)")
   })
 
   it('does not let tapping the fixed dock create movement or a delivery target', () => {

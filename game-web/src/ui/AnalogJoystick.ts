@@ -5,18 +5,24 @@ export interface AnalogJoystickSample {
   knob: AnalogPoint
 }
 
+export const ANALOG_JOYSTICK_VISUAL_DIAMETER = 118
+export const ANALOG_JOYSTICK_HIT_DIAMETER = 154
+export const ANALOG_JOYSTICK_KNOB_RADIUS = 24
+export const ANALOG_JOYSTICK_TRAVEL_RADIUS = 42
+export const ANALOG_JOYSTICK_DEADZONE_RATIO = 0.08
+
 const ZERO: Readonly<AnalogPoint> = Object.freeze({ x: 0, y: 0 })
 
 /**
  * Convert a drag offset around a circular joystick into a continuous movement vector.
- * The returned knob offset is clamped to the visual radius; movement magnitude is
- * re-scaled after the deadzone so a partial thumb drag produces partial movement.
+ * The returned knob offset is clamped to the visual travel radius; movement magnitude
+ * is re-scaled after a deliberately small deadzone so slow thumb movement remains stable.
  */
 export const sampleAnalogJoystick = (
   offsetX: number,
   offsetY: number,
   radius: number,
-  deadzoneRatio = 0.16,
+  deadzoneRatio = ANALOG_JOYSTICK_DEADZONE_RATIO,
 ): AnalogJoystickSample => {
   if (![offsetX, offsetY, radius, deadzoneRatio].every(Number.isFinite) || radius <= 0) {
     return { vector: { ...ZERO }, knob: { ...ZERO } }

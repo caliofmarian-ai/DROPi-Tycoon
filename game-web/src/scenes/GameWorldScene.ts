@@ -11,6 +11,7 @@ import { TRANSPORT_PROFILES } from '../systems/urbanLogistics'
 import { getUrbanObjective, performUrbanInteraction } from '../systems/urbanInteractions'
 import type { ActiveTransport, CompanyState, WorldState } from '../types/game'
 import { UrbanHUD, isUrbanHUDPoint } from '../ui/UrbanHUD'
+import { UrbanCameraPan, cameraScrollFromDrag } from '../ui/UrbanCameraPan'
 import { UrbanZoomGesture, urbanZoomStep } from '../ui/urbanZoom'
 import { clampCameraZoom } from '../ui/cameraControls'
 import { CITY_COLORS, COLORS } from '../ui/theme'
@@ -50,6 +51,8 @@ export class GameWorldScene extends Phaser.Scene {
   private ambientUpdateAccumulator = 0
   private facing: UrbanFacing = 'down'
   private readonly zoomGesture = new UrbanZoomGesture()
+  private readonly cameraPan = new UrbanCameraPan()
+  private cameraFreeLook = false
   private ambient?: AmbientCity
   private resizeRestartTimer?: Phaser.Time.TimerEvent
   private lastViewportWidth = 0
@@ -92,7 +95,7 @@ export class GameWorldScene extends Phaser.Scene {
     this.playerVisual = createPlayerVisual(this, this.worldState.player.x, this.worldState.player.y)
     this.playerVisual.container.setDepth(20)
     this.cameras.main.setRotation(0).setZoom(1)
-    this.cameras.main.startFollow(this.playerVisual.container, false, 1, 1)
+    this.recenterCamera(false)
     this.ambient = new AmbientCity(this)
 
     const worldRenderObjects = [...this.children.list]
@@ -107,19 +110,19 @@ export class GameWorldScene extends Phaser.Scene {
     this.hud = new UrbanHUD(this, this.fixedUiLayer, {
       action: () => this.onAction(),
       transport: () => this.switchTransport(),
-      company: () => this.navigate('CompanyManagement'),
       menu: () => this.navigate('MainMenu'),
       save: () => this.saveProgress(),
       audio: () => this.toggleAudio(),
       zoom: direction => this.setWorldZoom(urbanZoomStep(this.cameras.main.zoom, direction)),
+      recenter: () => this.recenterCamera(),
     })
     this.input.addPointer(Math.max(0, 4 - this.input.manager.pointers.length))
     this.keys = (this.input.keyboard?.addKeys('W,A,S,D,UP,DOWN,LEFT,RIGHT,E,T,ESC') ?? {}) as typeof this.keys
     this.input.on('pointerdown', this.unlockAudio)
-    this.input.on('pointerdown', this.beginZoom)
-    this.input.on('pointermove', this.moveZoom)
-    this.input.on('pointerup', this.endZoom)
-    this.input.on('pointerupoutside', this.endZoom)
+    this.input.on('pointerdown', this.beginWorldGesture)
+    this.input.on('pointermove', this.moveWorldGesture)
+    this.input.on('pointerup', this.endWorldGesture)
+    this.input.on('pointerupoutside', this.endWorldGesture)
     this.input.on('gameout', this.clearInput)
     this.input.keyboard?.on('keydown', this.unlockAudio)
     this.scale.on(Phaser.Scale.Events.RESIZE, this.handleResize)
@@ -135,7 +138,7 @@ export class GameWorldScene extends Phaser.Scene {
     this.ambientUpdateAccumulator = 0
     this.facing = 'down'
     this.refreshPresentation()
-    this.hud.notify('D-pad / WASD to move · E to interact · Gold = objective')
+    this.hud.notify('Joystick / WASD to move · Drag the city to explore · ⌖ returns to courier')
   }
 
   update(time: number, delta: number): void {
@@ -205,13 +208,13 @@ export class GameWorldScene extends Phaser.Scene {
   private switchTransport(): void {
     if (this.hud.isMenuOpen()) return
     if (!inInteractionRange(this.worldState.player, URBAN_HQ)) {
-      this.hud.notify('Change transport at the HQ fleet bay.')
+      this.hud.notify('Change transport at the HQ Fleet Bay.')
       return
     }
     const urban = this.worldState.urban!
     const available = availableActiveTransports(this.companyState)
     if (available.length <= 1) {
-      this.hud.notify('Buy a vehicle in Company → Vehicles, then collect it at HQ.')
+      this.hud.notify('Enter HQ and purchase a vehicle at the Fleet Bay terminal.')
       return
     }
     urban.activeTransport = nextActiveTransport(this.companyState, urban.activeTransport)
@@ -255,13 +258,6 @@ export class GameWorldScene extends Phaser.Scene {
   private navigate(scene: string): void {
     this.clearInput()
     this.persist('progression-changed')
-    if (scene === 'CompanyManagement') {
-      // Keep the expensive city scene resident while management is open. Returning without
-      // structural company changes can now wake it instead of rebuilding the full city.
-      this.scene.launch(scene)
-      this.scene.sleep()
-      return
-    }
     this.scene.start(scene)
   }
 
@@ -275,28 +271,68 @@ export class GameWorldScene extends Phaser.Scene {
   }
 
   private readonly unlockAudio = (): void => { getAudioController().unlock() }
+
   private readonly clearInput = (): void => {
     this.hud?.clearMovement()
     this.input.keyboard?.resetKeys()
     this.zoomGesture.clear()
+    this.cameraPan.clear()
   }
+
   private setWorldZoom(zoom: number): void {
     if (this.hud.isMenuOpen()) return
     this.cameras.main.setZoom(clampCameraZoom(zoom))
   }
-  private readonly beginZoom = (pointer: Phaser.Input.Pointer): void => {
-    if (!this.hud.isMenuOpen() && !isUrbanHUDPoint(this.scale.width, this.scale.height, pointer.x, pointer.y)) {
-      this.zoomGesture.press(pointer.id, pointer)
-    }
-  }
-  private readonly moveZoom = (pointer: Phaser.Input.Pointer): void => {
-    if (this.hud.isMenuOpen() || isUrbanHUDPoint(this.scale.width, this.scale.height, pointer.x, pointer.y)) {
-      this.zoomGesture.release(pointer.id)
+
+  private readonly beginWorldGesture = (pointer: Phaser.Input.Pointer): void => {
+    if (this.hud.isMenuOpen() || isUrbanHUDPoint(this.scale.width, this.scale.height, pointer.x, pointer.y)) return
+    this.zoomGesture.press(pointer.id, pointer)
+    if (this.zoomGesture.isPinching()) {
+      this.cameraPan.clear()
       return
     }
-    if (pointer.isDown) this.setWorldZoom(this.zoomGesture.move(pointer.id, pointer, this.cameras.main.zoom))
+    this.cameraPan.begin(pointer.id, pointer)
   }
-  private readonly endZoom = (pointer: Phaser.Input.Pointer): void => { this.zoomGesture.release(pointer.id) }
+
+  private readonly moveWorldGesture = (pointer: Phaser.Input.Pointer): void => {
+    if (!pointer.isDown || !this.zoomGesture.owns(pointer.id)) return
+    const zoom = this.zoomGesture.move(pointer.id, pointer, this.cameras.main.zoom)
+    if (this.zoomGesture.isPinching()) {
+      this.cameraPan.clear()
+      this.setWorldZoom(zoom)
+      return
+    }
+    if (!this.cameraPan.owns(pointer.id)) return
+    const drag = this.cameraPan.move(pointer.id, pointer)
+    if (!drag) return
+    if (!this.cameraFreeLook) {
+      this.cameras.main.stopFollow()
+      this.cameraFreeLook = true
+      this.hud.notify('Free-look camera · drag to inspect the city · tap ⌖ to follow the courier again')
+    }
+    const next = cameraScrollFromDrag(
+      { x: this.cameras.main.scrollX, y: this.cameras.main.scrollY },
+      drag,
+      this.cameras.main.zoom,
+      { width: this.cameras.main.width, height: this.cameras.main.height },
+      { width: WORLD_WIDTH, height: WORLD_HEIGHT },
+    )
+    this.cameras.main.setScroll(next.x, next.y)
+  }
+
+  private readonly endWorldGesture = (pointer: Phaser.Input.Pointer): void => {
+    this.zoomGesture.release(pointer.id)
+    this.cameraPan.release(pointer.id)
+  }
+
+  private recenterCamera(notify = true): void {
+    if (!this.playerVisual) return
+    this.zoomGesture.clear()
+    this.cameraPan.clear()
+    this.cameraFreeLook = false
+    this.cameras.main.startFollow(this.playerVisual.container, false, 0.18, 0.18)
+    if (notify && this.hud) this.hud.notify('Camera centered on courier · drag the city to enter free-look again')
+  }
 
   private scheduleResizeRestart(): void {
     this.resizeRestartTimer?.remove()
@@ -349,6 +385,7 @@ export class GameWorldScene extends Phaser.Scene {
     this.ambientUpdateAccumulator = 0
     getAudioController().setEnabled(session.settings.soundEnabled)
     this.clearInput()
+    this.recenterCamera(false)
     this.refreshPresentation()
   }
 
@@ -362,10 +399,10 @@ export class GameWorldScene extends Phaser.Scene {
     this.events.off(Phaser.Scenes.Events.SLEEP, this.handleSleep, this)
     this.events.off(Phaser.Scenes.Events.WAKE, this.handleWake, this)
     this.input.off('pointerdown', this.unlockAudio)
-    this.input.off('pointerdown', this.beginZoom)
-    this.input.off('pointermove', this.moveZoom)
-    this.input.off('pointerup', this.endZoom)
-    this.input.off('pointerupoutside', this.endZoom)
+    this.input.off('pointerdown', this.beginWorldGesture)
+    this.input.off('pointermove', this.moveWorldGesture)
+    this.input.off('pointerup', this.endWorldGesture)
+    this.input.off('pointerupoutside', this.endWorldGesture)
     this.input.off('gameout', this.clearInput)
     this.input.keyboard?.off('keydown', this.unlockAudio)
     this.ambient = undefined

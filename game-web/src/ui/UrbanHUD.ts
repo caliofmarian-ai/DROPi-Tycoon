@@ -8,29 +8,38 @@ import {
   URBAN_BUILDINGS, URBAN_ROADS, URBAN_HQ, minimapPoint, inInteractionRange,
 } from '../world/urbanWorld'
 import { findWorldRoutePoint, WORLD_HEIGHT, WORLD_WIDTH, WORLD_ZONES } from '../world/worldLayout'
-import { AnalogJoystickInput } from './AnalogJoystick'
+import {
+  ANALOG_JOYSTICK_HIT_DIAMETER,
+  ANALOG_JOYSTICK_KNOB_RADIUS,
+  ANALOG_JOYSTICK_TRAVEL_RADIUS,
+  ANALOG_JOYSTICK_VISUAL_DIAMETER,
+  AnalogJoystickInput,
+} from './AnalogJoystick'
 import { CITY_COLORS, COLORS, formatMoney, RADII, TYPOGRAPHY } from './theme'
 
 type Direction = 'up' | 'down' | 'left' | 'right'
+const MENU_ROW_COUNT = 3
+
 interface HUDCallbacks {
   action: () => void
   transport: () => void
-  company: () => void
   menu: () => void
   save: () => void
   audio: () => void
   zoom: (direction: 'in' | 'out') => void
+  recenter: () => void
 }
 
 /**
- * Issue #338: the compact 96-108 px footprint now contains a true analog thumb joystick.
- * One Android-safe Rectangle owns touch input while the circular chrome/knob remain visual only.
+ * Owner-reviewed analog control. The visible control is intentionally modest, but the
+ * invisible Android-safe hit surface is larger so a thumb can travel beyond the blue knob
+ * without firing pointer-out and stopping the courier.
  */
 export const urbanHUDLayout = (width: number, height: number) => {
   const portrait = width < 600
   const headerHeight = portrait ? 72 : 44
-  const size = Math.max(32, Math.min(36, Math.floor(Math.min(width, height) * 0.09)))
-  const pad = { x: 10, y: height - size * 3 - 10, size }
+  const size = ANALOG_JOYSTICK_VISUAL_DIAMETER / 3
+  const pad = { x: 12, y: height - ANALOG_JOYSTICK_VISUAL_DIAMETER - 12, size }
   const actionWidth = Math.min(150, Math.max(124, width * 0.15))
   const action = { x: width - actionWidth / 2 - 10, y: height - 34, width: actionWidth, height: 46 }
   const mapWidth = Math.max(88, Math.min(150, Math.round(width * 0.13)))
@@ -39,7 +48,7 @@ export const urbanHUDLayout = (width: number, height: number) => {
     ? Math.max(150, minimap.x - 30)
     : Math.min(360, Math.max(220, minimap.x - 32))
   const objectiveHeight = portrait ? 82 : 52
-  const gapLeft = pad.x + 3 * pad.size + 10
+  const gapLeft = pad.x + ANALOG_JOYSTICK_VISUAL_DIAMETER + 10
   const gapRight = action.x - action.width / 2 - 10
   const useBottomGap = gapRight - gapLeft >= 170
   return {
@@ -68,12 +77,13 @@ export const isUrbanHUDPoint = (width: number, height: number, x: number, y: num
   const l = urbanHUDLayout(width, height)
   const inside = (left: number, top: number, w: number, h: number) =>
     x >= left && x <= left + w && y >= top && y <= top + h
+  const padExtra = (ANALOG_JOYSTICK_HIT_DIAMETER - ANALOG_JOYSTICK_VISUAL_DIAMETER) / 2
   return y <= l.headerHeight ||
     inside(l.objective.x, l.objective.y, l.objective.width, l.objective.height) ||
-    inside(l.minimap.x - 5, l.minimap.y - 5, l.minimap.width + 10, l.minimap.height + 62) ||
-    inside(l.pad.x - 5, l.pad.y - 5, l.pad.size * 3 + 10, l.pad.size * 3 + 10) ||
+    inside(l.minimap.x - 5, l.minimap.y - 5, l.minimap.width + 10, l.minimap.height + 66) ||
+    inside(l.pad.x - padExtra, l.pad.y - padExtra, ANALOG_JOYSTICK_HIT_DIAMETER, ANALOG_JOYSTICK_HIT_DIAMETER) ||
     inside(l.action.x - l.action.width / 2, l.transport.y - 22, l.action.width, 94) ||
-    (menuOpen && inside(l.menu.x - l.menu.width / 2, l.menu.y - 22, l.menu.width, l.menu.rowHeight * 4))
+    (menuOpen && inside(l.menu.x - l.menu.width / 2, l.menu.y - 22, l.menu.width, l.menu.rowHeight * MENU_ROW_COUNT))
 }
 
 export const urbanMapMarkers = (world: WorldState, objective: UrbanObjective, width: number, height: number) => ({
@@ -141,6 +151,8 @@ export class UrbanHUD {
   private readonly layout
   private readonly pad = new AnalogJoystickInput()
   private joystickKnob!: Phaser.GameObjects.Arc
+  private joystickCenterX = 0
+  private joystickCenterY = 0
   private readonly stats: Phaser.GameObjects.Text
   private readonly objective: Phaser.GameObjects.Text
   private readonly hint: Phaser.GameObjects.Text
@@ -196,8 +208,9 @@ export class UrbanHUD {
     this.mapCaption = this.text(map.x + map.width / 2, map.y + map.height + 5, 'CEDAR CITY', 9, COLORS.textPrimary)
       .setOrigin(0.5, 0).setFontStyle('bold')
     const zoom = this.layout.zoom
-    this.button(zoom.x - 22, zoom.y, zoom.size, zoom.size, '−', () => callbacks.zoom('out'))
-    this.button(zoom.x + 22, zoom.y, zoom.size, zoom.size, '+', () => callbacks.zoom('in'))
+    this.button(zoom.x - 38, zoom.y, zoom.size, zoom.size, '−', () => callbacks.zoom('out'))
+    this.button(zoom.x, zoom.y, zoom.size, zoom.size, '⌖', callbacks.recenter)
+    this.button(zoom.x + 38, zoom.y, zoom.size, zoom.size, '+', () => callbacks.zoom('in'))
 
     this.createDPad()
     const a = this.layout.action
@@ -215,8 +228,9 @@ export class UrbanHUD {
       .setWordWrapWidth(toast.width - 18).setFixedSize(toast.width, toast.height)
       .setBackgroundColor('#073354').setPadding(9, 6).setVisible(false)
     const rows: [string, () => void][] = [
-      ['Company', callbacks.company], ['Save progress', callbacks.save],
-      ['Toggle sound', callbacks.audio], ['Main menu', callbacks.menu],
+      ['Save progress', callbacks.save],
+      ['Toggle sound', callbacks.audio],
+      ['Main menu', callbacks.menu],
     ]
     rows.forEach(([label, onTap], index) => {
       const m = this.layout.menu
@@ -228,6 +242,7 @@ export class UrbanHUD {
       entry.setEnabled(false)
       this.menuButtons.push(entry)
     })
+    scene.input.on('pointermove', this.moveJoystickPointer)
     scene.input.on('pointerup', this.releasePointer)
     scene.input.on('pointerupoutside', this.releasePointer)
     scene.input.on('gameout', this.clearMovement)
@@ -249,11 +264,7 @@ export class UrbanHUD {
     g.lineStyle(2, COLORS.accent, 0.88).strokeRoundedRect(x, y, width, height, RADII.panel)
   }
 
-  /**
-   * Android WebView touch input uses a native Rectangle hit target. Visual chrome stays on Graphics,
-   * but Graphics are never responsible for hit testing. Keep this #323 recovery contract intact.
-   * Ordinary compact buttons still expose a minimum 44x44 logical-pixel hit target.
-   */
+  /** Android WebView-safe Rectangle hit targets remain the permanent #323/#339 invariant. */
   private button(
     x: number, y: number, width: number, height: number, label: string,
     callback?: () => void, interactive = true,
@@ -284,47 +295,55 @@ export class UrbanHUD {
     return { button, chrome, label: text, paint, setVisible, setEnabled }
   }
 
-  /** Runtime name retained to minimize churn; visually/behaviorally this is the #338 analog joystick. */
+  /** Runtime name retained to minimize churn; this is the shared #338 analog joystick. */
   private createDPad(): void {
-    const { x, y, size } = this.layout.pad
-    const extent = size * 3
+    const { x, y } = this.layout.pad
+    const extent = ANALOG_JOYSTICK_VISUAL_DIAMETER
     const center = extent / 2
-    const centerX = x + center
-    const centerY = y + center
-    const radius = center - 5
-    this.add(this.scene.add.circle(centerX, centerY, radius + 3, COLORS.surface, 0.42))
-      .setStrokeStyle(2, COLORS.accent, 0.72)
-    this.add(this.scene.add.circle(centerX, centerY, radius * 0.63, COLORS.surfaceRaised, 0.32))
-      .setStrokeStyle(1, CITY_COLORS.curb, 0.7)
-    this.joystickKnob = this.add(this.scene.add.circle(centerX, centerY, Math.max(13, size * 0.43), COLORS.accentStrong, 0.96))
-      .setStrokeStyle(2, COLORS.gold, 0.92)
+    this.joystickCenterX = x + center
+    this.joystickCenterY = y + center
 
-    // #323/#339 invariant: a native Rectangle owns joystick touch input; Graphics never hit-test.
-    const hit = this.add(this.scene.add.rectangle(x + center, y + center, extent, extent, 0xffffff, 0.001))
-      .setInteractive({ useHandCursor: true })
-    const press = (pointer: Phaser.Input.Pointer): void => {
-      if (this.open) return
-      this.pad.begin(pointer.id, pointer.x - centerX, pointer.y - centerY, radius)
-      this.paintJoystick(centerX, centerY)
-    }
-    hit.on('pointerdown', press)
-    hit.on('pointermove', (pointer: Phaser.Input.Pointer) => {
-      if (!pointer.isDown || !this.pad.owns(pointer.id)) return
-      this.pad.move(pointer.id, pointer.x - centerX, pointer.y - centerY, radius)
-      this.paintJoystick(centerX, centerY)
-    })
-    hit.on('pointerout', this.releasePointer)
-    hit.on('pointerup', this.releasePointer)
+    // The owner wants the blue thumb to dominate visually. The outer guide is deliberately faint.
+    this.add(this.scene.add.circle(this.joystickCenterX, this.joystickCenterY, center - 4, COLORS.surface, 0.06))
+      .setStrokeStyle(2, COLORS.accent, 0.18)
+    this.joystickKnob = this.add(this.scene.add.circle(
+      this.joystickCenterX, this.joystickCenterY, ANALOG_JOYSTICK_KNOB_RADIUS, COLORS.accentStrong, 0.98,
+    )).setStrokeStyle(2, COLORS.accent, 0.62)
+
+    // The larger invisible Rectangle keeps ownership while the thumb travels beyond the visible ring.
+    const hit = this.add(this.scene.add.rectangle(
+      this.joystickCenterX, this.joystickCenterY,
+      ANALOG_JOYSTICK_HIT_DIAMETER, ANALOG_JOYSTICK_HIT_DIAMETER, 0xffffff, 0.001,
+    )).setInteractive({ useHandCursor: true })
+    hit.on('pointerdown', this.pressJoystickPointer)
   }
 
-  private paintJoystick(centerX?: number, centerY?: number): void {
+  private readonly pressJoystickPointer = (pointer: Phaser.Input.Pointer): void => {
+    if (this.open) return
+    this.pad.begin(
+      pointer.id,
+      pointer.x - this.joystickCenterX,
+      pointer.y - this.joystickCenterY,
+      ANALOG_JOYSTICK_TRAVEL_RADIUS,
+    )
+    this.paintJoystick()
+  }
+
+  private readonly moveJoystickPointer = (pointer: Phaser.Input.Pointer): void => {
+    if (!pointer.isDown || !this.pad.owns(pointer.id)) return
+    this.pad.move(
+      pointer.id,
+      pointer.x - this.joystickCenterX,
+      pointer.y - this.joystickCenterY,
+      ANALOG_JOYSTICK_TRAVEL_RADIUS,
+    )
+    this.paintJoystick()
+  }
+
+  private paintJoystick(): void {
     if (!this.joystickKnob) return
-    const { x, y, size } = this.layout.pad
-    const center = size * 1.5
-    const baseX = centerX ?? x + center
-    const baseY = centerY ?? y + center
     const knob = this.pad.knobOffset()
-    this.joystickKnob.setPosition(baseX + knob.x, baseY + knob.y)
+    this.joystickKnob.setPosition(this.joystickCenterX + knob.x, this.joystickCenterY + knob.y)
   }
 
   private drawMinimap(): void {
@@ -389,7 +408,10 @@ export class UrbanHUD {
     this.mapTarget.setPosition(map.x + markers.target.x, map.y + markers.target.y)
     this.mapPickup.setPosition(map.x + markers.pickup.x, map.y + markers.pickup.y)
       .setVisible(world.activeOrder.status === 'Accepted')
-    this.mapCaption.setText(urbanDistrictCaption(world.player))
+    const captionPoint = cameraView
+      ? { x: cameraView.x + cameraView.width / 2, y: cameraView.y + cameraView.height / 2 }
+      : world.player
+    this.mapCaption.setText(urbanDistrictCaption(captionPoint))
     this.mapCaption.setScale(Math.min(1, map.width / Math.max(1, this.mapCaption.width)))
     if (cameraView) {
       const view = urbanMapViewport(cameraView, map.width, map.height)
@@ -427,6 +449,7 @@ export class UrbanHUD {
   destroy(): void {
     this.clearMovement()
     this.toastTimer?.remove()
+    this.scene.input.off('pointermove', this.moveJoystickPointer)
     this.scene.input.off('pointerup', this.releasePointer)
     this.scene.input.off('pointerupoutside', this.releasePointer)
     this.scene.input.off('gameout', this.clearMovement)

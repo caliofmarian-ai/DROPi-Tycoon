@@ -114,10 +114,11 @@ describe('release blocker #269 — GameWorld integration contract', () => {
     expect(sceneSource).not.toContain('cameraControlBounds:')
   })
 
-  it('keeps following the player without manual pan or rotation', () => {
-    expect(sceneSource).not.toContain('stopFollow()')
+  it('supports bounded free-look while preserving unrotated recenter follow', () => {
+    expect(sceneSource).toContain('this.cameras.main.stopFollow()')
     expect(sceneSource).not.toContain('panCameraByScreenDelta')
-    expect(sceneSource).toContain('startFollow(this.player')
+    expect(sceneSource).toContain('this.cameras.main.startFollow(this.playerVisual.container')
+    expect(sceneSource).toContain('this.cameraFreeLook = false')
     expect(sceneSource).toContain('setRotation(0)')
   })
 })

@@ -10,7 +10,18 @@ import {
 import { performUrbanInteraction } from '../systems/urbanInteractions'
 import { MARKETPLACE_LISTINGS } from '../systems/urbanMarketplace'
 import type { CompanyState, EmployeeState, VehicleTypeId, WorldState } from '../types/game'
-import { AnalogJoystickInput } from '../ui/AnalogJoystick'
+import {
+  ANALOG_JOYSTICK_HIT_DIAMETER,
+  ANALOG_JOYSTICK_KNOB_RADIUS,
+  ANALOG_JOYSTICK_TRAVEL_RADIUS,
+  ANALOG_JOYSTICK_VISUAL_DIAMETER,
+  AnalogJoystickInput,
+} from '../ui/AnalogJoystick'
+import {
+  HQ_MANAGEMENT_RETURN_REGISTRY_KEY,
+  HQ_MANAGEMENT_RETURN_SCENE,
+  type HQManagementScene,
+} from '../ui/hqManagementNavigation'
 import { CITY_COLORS, COLORS } from '../ui/theme'
 import {
   INTERIOR_LOCATIONS,
@@ -25,7 +36,6 @@ import {
 import { movementFacing, type UrbanFacing } from '../world/urbanWorld'
 import { createPlayerVisual, type PlayerVisual } from '../world/playerVisual'
 
-const JOYSTICK_EXTENT = 96
 const WALK_SPEED = 185
 
 const vehicleLabel = (typeId: VehicleTypeId): string => {
@@ -85,13 +95,19 @@ export abstract class BaseInteriorScene extends Phaser.Scene {
     this.createControls()
     this.keys = (this.input.keyboard?.addKeys('W,A,S,D,UP,DOWN,LEFT,RIGHT,E,ESC') ?? {}) as typeof this.keys
     this.input.keyboard?.on('keydown-ESC', this.exitInterior)
+    this.input.on('pointermove', this.movePad)
+    this.input.on('pointerup', this.releasePad)
+    this.input.on('pointerupoutside', this.releasePad)
+    this.input.on('gameout', this.clearInput)
     this.scale.on(Phaser.Scale.Events.RESIZE, this.layoutControls)
     this.game.events.on(Phaser.Core.Events.BLUR, this.clearInput)
+    this.events.on(Phaser.Scenes.Events.SLEEP, this.clearInput)
+    this.events.on(Phaser.Scenes.Events.WAKE, this.handleWake, this)
     this.events.once(Phaser.Scenes.Events.SHUTDOWN, this.shutdown, this)
     this.refreshStateLabels()
     this.refreshPrompt()
     this.notify(this.locationId === 'hq'
-      ? 'Use the joystick to walk · Action at a department · Exit through the south door.'
+      ? 'HQ is physical management: Hiring, Fleet, Management and Parcel terminals are inside this building.'
       : 'Use the joystick to walk · Action at a counter · Exit through the south door.')
   }
 
@@ -135,53 +151,54 @@ export abstract class BaseInteriorScene extends Phaser.Scene {
   }
 
   private drawHQInterior(): void {
-    // Non-overlapping operational floor plan: employee onboarding, fleet, operations and staging are distinct rooms.
-    this.zonePanel(65, 105, 335, 145, 'EMPLOYEE AREA', 'Onboarding · staff coordination', COLORS.accentStrong)
-    this.zonePanel(65, 285, 335, 330, 'FLEET BAY', 'Owned vehicles · active handoff', COLORS.accent)
-    this.zonePanel(765, 105, 365, 175, 'OPERATIONS & DISPATCH', 'Courier work · route operations', COLORS.gold)
-    this.zonePanel(765, 330, 365, 180, 'PARCEL STAGING', 'Sorting · handoff · cargo status', COLORS.accentStrong)
+    this.zonePanel(65, 105, 335, 180, 'EMPLOYEE AREA', 'Hiring · onboarding · field-team status', COLORS.accentStrong)
+    this.zonePanel(65, 310, 335, 305, 'FLEET BAY', 'Buy vehicles · owned fleet · active handoff', COLORS.accent)
+    this.zonePanel(765, 105, 365, 195, 'OPERATIONS & DISPATCH', 'Company management · route control', COLORS.gold)
+    this.zonePanel(765, 335, 365, 190, 'PARCEL STAGING', 'Accept work · sorting · parcel handoff', COLORS.accentStrong)
     this.zonePanel(445, 105, 270, 120, 'HQ EXPANSION', 'Future operational wings', 0x6d7d91)
     this.zonePanel(445, 270, 270, 145, 'MAINTENANCE WING', 'Construction required · issue #343', 0x7c8793)
-    this.add.text(478, 174, 'FUTURE · NOT YET OPERATIONAL', {
-      fontFamily: 'Arial, sans-serif', fontSize: '11px', fontStyle: 'bold', color: '#6a7685',
+    this.add.text(478, 178, 'FUTURE · NOT YET OPERATIONAL', {
+      fontFamily: 'Arial, sans-serif', fontSize: '10px', fontStyle: 'bold', color: '#6a7685',
     }).setDepth(4)
     this.drawConstructionZone(580, 355)
 
-    this.drawEmployeeDepartmentEquipment()
+    this.drawDepartmentEquipment()
     this.drawOwnedFleet()
     this.drawEmployees()
 
-    this.fleetText = this.add.text(88, 567, '', {
-      fontFamily: 'Arial, sans-serif', fontSize: '12px', fontStyle: 'bold', color: '#123f5d',
+    this.fleetText = this.add.text(88, 575, '', {
+      fontFamily: 'Arial, sans-serif', fontSize: '11px', fontStyle: 'bold', color: '#123f5d',
       wordWrap: { width: 285 },
     }).setDepth(8)
   }
 
-  private drawEmployeeDepartmentEquipment(): void {
-    // Employee/onboarding desks.
-    for (const x of [130, 235, 340]) {
-      this.add.rectangle(x, 205, 76, 22, 0x8b6846, 0.94).setStrokeStyle(2, CITY_COLORS.trunk).setDepth(4)
-      this.add.rectangle(x, 191, 30, 20, 0x1b4460, 0.95).setStrokeStyle(2, COLORS.accent).setDepth(5)
-      this.add.rectangle(x, 190, 22, 12, CITY_COLORS.glass, 0.9).setDepth(6)
-    }
+  /** Department equipment begins below the reserved title/subtitle header strip. */
+  private drawDepartmentEquipment(): void {
+    // Hiring terminal: current employees are Couriers, so this is a recruitment/onboarding station,
+    // not a fake office desk where field couriers are shown working.
+    this.add.rectangle(145, 225, 92, 24, 0x8b6846, 0.94).setStrokeStyle(2, CITY_COLORS.trunk).setDepth(4)
+    this.add.rectangle(145, 207, 38, 27, 0x1b4460, 0.95).setStrokeStyle(2, COLORS.accent).setDepth(5)
+    this.add.rectangle(145, 206, 29, 17, CITY_COLORS.glass, 0.9).setDepth(6)
+    this.add.text(145, 247, 'HIRING TERMINAL', {
+      fontFamily: 'Arial, sans-serif', fontSize: '8px', fontStyle: 'bold', color: '#47687b',
+    }).setOrigin(0.5).setDepth(6)
 
-    // Operations control desk and route monitors.
-    this.add.rectangle(950, 225, 270, 28, 0x77553c, 0.96).setStrokeStyle(2, CITY_COLORS.trunk).setDepth(4)
+    // Operations control equipment exists as infrastructure. No Courier is seated here.
+    this.add.rectangle(950, 249, 270, 28, 0x77553c, 0.96).setStrokeStyle(2, CITY_COLORS.trunk).setDepth(4)
     ;[870, 950, 1030].forEach((x, index) => {
-      this.add.rectangle(x, 185, 64, 42, 0x153d59, 0.98).setStrokeStyle(2, COLORS.accent).setDepth(5)
-      this.add.rectangle(x, 185, 54, 32, index === 1 ? CITY_COLORS.glass : 0x78d8e8, 0.82).setDepth(6)
-      this.add.text(x, 185, index === 1 ? 'ROUTES' : index === 0 ? 'ORDERS' : 'FLEET', {
+      this.add.rectangle(x, 207, 64, 42, 0x153d59, 0.98).setStrokeStyle(2, COLORS.accent).setDepth(5)
+      this.add.rectangle(x, 207, 54, 32, index === 1 ? CITY_COLORS.glass : 0x78d8e8, 0.82).setDepth(6)
+      this.add.text(x, 207, index === 1 ? 'ROUTES' : index === 0 ? 'ORDERS' : 'FLEET', {
         fontFamily: 'Arial, sans-serif', fontSize: '8px', fontStyle: 'bold', color: '#073354',
       }).setOrigin(0.5).setDepth(7)
     })
 
-    // Parcel shelves/conveyor: visible department-specific equipment, not text-only.
-    this.add.rectangle(950, 462, 270, 22, 0x6c7d89, 0.9).setStrokeStyle(2, 0x42525e).setDepth(4)
+    this.add.rectangle(950, 474, 270, 22, 0x6c7d89, 0.9).setStrokeStyle(2, 0x42525e).setDepth(4)
     for (let index = 0; index < 6; index += 1) {
       const x = 835 + index * 46
-      this.add.rectangle(x, 430 - (index % 2) * 4, 32, 26, CITY_COLORS.parcel, 0.95)
+      this.add.rectangle(x, 443 - (index % 2) * 4, 32, 26, CITY_COLORS.parcel, 0.95)
         .setStrokeStyle(1, CITY_COLORS.trunk).setDepth(5)
-      this.add.rectangle(x, 430 - (index % 2) * 4, 5, 26, CITY_COLORS.tape).setDepth(6)
+      this.add.rectangle(x, 443 - (index % 2) * 4, 5, 26, CITY_COLORS.tape).setDepth(6)
     }
   }
 
@@ -200,8 +217,9 @@ export abstract class BaseInteriorScene extends Phaser.Scene {
     if (vehicles.length === 0) {
       const legacy = availableActiveTransports(this.companyState).filter(transport => transport !== 'walking')
       if (legacy.length === 0) {
-        this.add.text(235, 420, 'No owned vehicles yet', {
-          fontFamily: 'Arial, sans-serif', fontSize: '15px', fontStyle: 'bold', color: '#47687b',
+        this.add.text(235, 455, 'No owned vehicles yet · use Fleet Purchase Terminal', {
+          fontFamily: 'Arial, sans-serif', fontSize: '12px', fontStyle: 'bold', color: '#47687b',
+          wordWrap: { width: 250 }, align: 'center',
         }).setOrigin(0.5).setDepth(5)
         return
       }
@@ -209,14 +227,14 @@ export abstract class BaseInteriorScene extends Phaser.Scene {
         const typeId: VehicleTypeId = transport === 'bicycle' ? 'Bicycle'
           : transport === 'scooter' ? 'ElectricScooter'
             : transport === 'motorcycle' ? 'Motorcycle' : 'DeliveryVan'
-        this.drawFleetVehicle(130 + (index % 2) * 180, 370 + Math.floor(index / 2) * 105, typeId, transportBayLabel(transport))
+        this.drawFleetVehicle(130 + (index % 2) * 180, 410 + Math.floor(index / 2) * 105, typeId, transportBayLabel(transport))
       })
       return
     }
     vehicles.forEach((vehicle, index) => {
       this.drawFleetVehicle(
         130 + (index % 2) * 180,
-        370 + Math.floor(index / 2) * 105,
+        410 + Math.floor(index / 2) * 105,
         vehicle.typeId,
         vehicleLabel(vehicle.typeId),
       )
@@ -259,37 +277,37 @@ export abstract class BaseInteriorScene extends Phaser.Scene {
   }
 
   private drawEmployees(): void {
-    const employees = this.companyState.employees.slice(0, 6)
-    employees.forEach((employee, index) => this.drawWorkingEmployee(employee, index))
-    if (employees.length === 0) {
-      this.add.text(235, 223, 'No employees hired yet', {
-        fontFamily: 'Arial, sans-serif', fontSize: '12px', color: '#47687b',
-      }).setOrigin(0.5).setDepth(7)
-    }
+    const employees = this.companyState.employees.slice(0, 8)
+    const onboarding = employees.filter(employee => employee.status === 'Onboarding').slice(0, 2)
+    const fieldCouriers = employees.filter(employee => employee.status === 'Active' && employee.role === 'Courier')
+
+    onboarding.forEach((employee, index) => this.drawOnboardingCourier(employee, index))
+
+    const board = this.add.rectangle(290, 218, 180, 82, 0xe9f7fb, 0.94)
+      .setStrokeStyle(2, COLORS.accent).setDepth(5)
+    const fieldNames = fieldCouriers.slice(0, 2).map(employee => employee.name).join(' · ')
+    this.add.text(290, 218,
+      fieldCouriers.length
+        ? `FIELD COURIERS: ${fieldCouriers.length}\n${fieldNames}\nOUTSIDE HQ · delivery role`
+        : employees.length ? 'No active field courier yet' : 'No employees hired yet', {
+        fontFamily: 'Arial, sans-serif', fontSize: '9px', fontStyle: 'bold', color: '#123f5d',
+        align: 'center', wordWrap: { width: 164 },
+      }).setOrigin(0.5).setDepth(6)
+    board.setAlpha(0.94)
   }
 
-  private drawWorkingEmployee(employee: EmployeeState, index: number): void {
-    const onboarding = employee.status === 'Onboarding'
-    // Today Courier is the only authoritative role. Active couriers work at dispatch/staging;
-    // future roles will map to their own constructed department under #343 rather than being fabricated here.
-    const operations = !onboarding && index % 2 === 0
-    const baseX = onboarding ? 130 + (index % 3) * 105 : operations ? 845 + (index % 3) * 85 : 845 + (index % 3) * 85
-    const baseY = onboarding ? 175 : operations ? 245 : 405
+  private drawOnboardingCourier(employee: EmployeeState, index: number): void {
+    const baseX = 105 + index * 55
+    const baseY = 255
     const actor = this.add.graphics().setPosition(baseX, baseY).setDepth(9)
-    actor.fillStyle(CITY_COLORS.shadow, 0.18).fillEllipse(0, 18, 26, 8)
-    actor.fillStyle(COLORS.accentStrong).fillRoundedRect(-7, -2, 14, 24, 5)
+    actor.fillStyle(CITY_COLORS.shadow, 0.18).fillEllipse(0, 16, 24, 7)
+    actor.fillStyle(COLORS.accentStrong).fillRoundedRect(-7, -1, 14, 22, 5)
+    actor.fillStyle(COLORS.accent).fillRoundedRect(-9, 2, 18, 7, 2) // courier vest band
     actor.fillStyle(CITY_COLORS.skin).fillCircle(0, -12, 7)
     actor.fillStyle(CITY_COLORS.hair).fillEllipse(0, -16, 13, 7)
-    if (operations) {
-      actor.lineStyle(3, CITY_COLORS.skinShade).lineBetween(-5, 3, -12, 10).lineBetween(5, 3, 12, 10)
-    } else if (!onboarding) {
-      actor.fillStyle(CITY_COLORS.parcel).fillRoundedRect(8, 2, 14, 12, 2)
-      actor.fillStyle(CITY_COLORS.tape).fillRect(13, 2, 3, 12)
-    }
-    this.tweens.add({ targets: actor, y: baseY - 2, duration: 720 + index * 70, yoyo: true, repeat: -1 })
-    const station = onboarding ? 'Onboarding' : operations ? 'Dispatch terminal' : 'Parcel staging'
-    this.add.text(baseX, baseY + 26, `${employee.name}\n${employee.role} · ${station}`, {
-      fontFamily: 'Arial, sans-serif', fontSize: '8px', fontStyle: 'bold', color: '#123f5d', align: 'center',
+    actor.fillStyle(COLORS.accent).fillRoundedRect(-8, -20, 16, 5, 2) // courier cap
+    this.add.text(baseX, baseY + 23, `${employee.name}\nCourier · onboarding`, {
+      fontFamily: 'Arial, sans-serif', fontSize: '7px', fontStyle: 'bold', color: '#123f5d', align: 'center',
     }).setOrigin(0.5, 0).setDepth(9)
   }
 
@@ -315,32 +333,35 @@ export abstract class BaseInteriorScene extends Phaser.Scene {
   private zonePanel(x: number, y: number, width: number, height: number, title: string, subtitle: string, accent: number): void {
     this.add.rectangle(x + width / 2, y + height / 2, width, height, 0xffffff, 0.58)
       .setStrokeStyle(3, accent, 0.9).setDepth(2)
-    this.add.text(x + 18, y + 15, title, {
-      fontFamily: 'Arial, sans-serif', fontSize: '18px', fontStyle: 'bold', color: '#123f5d',
-    }).setDepth(3)
-    this.add.text(x + 18, y + 42, subtitle, {
-      fontFamily: 'Arial, sans-serif', fontSize: '11px', color: '#47687b',
-    }).setDepth(3)
+    // Reserved header band prevents department names/subtitles from colliding with equipment.
+    this.add.rectangle(x + width / 2, y + 30, width - 6, 58, accent, 0.09).setDepth(3)
+    this.add.text(x + 16, y + 9, title, {
+      fontFamily: 'Arial, sans-serif', fontSize: '17px', fontStyle: 'bold', color: '#123f5d',
+    }).setDepth(4)
+    this.add.text(x + 16, y + 36, subtitle, {
+      fontFamily: 'Arial, sans-serif', fontSize: '10px', color: '#47687b',
+      wordWrap: { width: width - 32 },
+    }).setDepth(4)
+    this.add.rectangle(x + width / 2, y + 61, width - 18, 1, accent, 0.34).setDepth(4)
   }
 
   private drawInteractionMarker(interaction: InteriorInteraction): void {
     const color = interaction.id === 'exit' ? 0x3e9e65 : interaction.id === 'operations' ? COLORS.gold : COLORS.accent
-    this.add.circle(interaction.x, interaction.y, 24, color, 0.17).setStrokeStyle(2, color, 0.92).setDepth(5)
-    this.add.text(interaction.x, interaction.y + 28, interaction.label, {
-      fontFamily: 'Arial, sans-serif', fontSize: '11px', fontStyle: 'bold', color: '#123f5d',
-    }).setOrigin(0.5, 0).setDepth(5)
+    const radius = interaction.id === 'exit' ? 21 : 18
+    this.add.circle(interaction.x, interaction.y, radius, color, 0.18).setStrokeStyle(2, color, 0.88).setDepth(10)
+    this.add.text(interaction.x, interaction.y, interaction.id === 'exit' ? 'EXIT' : 'A', {
+      fontFamily: 'Arial, sans-serif', fontSize: interaction.id === 'exit' ? '8px' : '12px',
+      fontStyle: 'bold', color: '#123f5d',
+    }).setOrigin(0.5).setDepth(11)
   }
 
   private createControls(): void {
     this.padChrome = this.add.graphics().setScrollFactor(0).setDepth(100)
-    this.padHit = this.add.rectangle(0, 0, JOYSTICK_EXTENT, JOYSTICK_EXTENT, 0xffffff, 0.001)
+    this.padHit = this.add.rectangle(0, 0, ANALOG_JOYSTICK_HIT_DIAMETER, ANALOG_JOYSTICK_HIT_DIAMETER, 0xffffff, 0.001)
       .setScrollFactor(0).setDepth(101).setInteractive({ useHandCursor: true })
     this.padHit.on('pointerdown', this.pressPad)
-    this.padHit.on('pointermove', this.movePad)
-    this.padHit.on('pointerup', this.releasePad)
-    this.padHit.on('pointerout', this.releasePad)
-    this.padKnob = this.add.circle(0, 0, 15, COLORS.accentStrong, 0.96)
-      .setStrokeStyle(2, COLORS.gold, 0.92).setScrollFactor(0).setDepth(102)
+    this.padKnob = this.add.circle(0, 0, ANALOG_JOYSTICK_KNOB_RADIUS, COLORS.accentStrong, 0.98)
+      .setStrokeStyle(2, COLORS.accent, 0.62).setScrollFactor(0).setDepth(102)
 
     this.actionChrome = this.add.graphics().setScrollFactor(0).setDepth(100)
     this.actionHit = this.add.rectangle(0, 0, 128, 48, 0xffffff, 0.001)
@@ -368,14 +389,12 @@ export abstract class BaseInteriorScene extends Phaser.Scene {
   private readonly layoutControls = (): void => {
     const width = this.scale.width
     const height = this.scale.height
-    const padX = 16 + JOYSTICK_EXTENT / 2
-    const padY = height - 16 - JOYSTICK_EXTENT / 2
+    const padX = 14 + ANALOG_JOYSTICK_VISUAL_DIAMETER / 2
+    const padY = height - 14 - ANALOG_JOYSTICK_VISUAL_DIAMETER / 2
     this.padHit?.setPosition(padX, padY)
     this.padChrome?.clear()
-      .fillStyle(COLORS.surface, 0.48).fillCircle(padX, padY, JOYSTICK_EXTENT / 2)
-      .lineStyle(2, COLORS.accent, 0.86).strokeCircle(padX, padY, JOYSTICK_EXTENT / 2)
-      .fillStyle(COLORS.surfaceRaised, 0.32).fillCircle(padX, padY, JOYSTICK_EXTENT * 0.31)
-      .lineStyle(1, CITY_COLORS.curb, 0.65).strokeCircle(padX, padY, JOYSTICK_EXTENT * 0.31)
+      .fillStyle(COLORS.surface, 0.06).fillCircle(padX, padY, ANALOG_JOYSTICK_VISUAL_DIAMETER / 2 - 4)
+      .lineStyle(2, COLORS.accent, 0.18).strokeCircle(padX, padY, ANALOG_JOYSTICK_VISUAL_DIAMETER / 2 - 4)
     const knob = this.joystick.knobOffset()
     this.padKnob?.setPosition(padX + knob.x, padY + knob.y)
 
@@ -392,15 +411,13 @@ export abstract class BaseInteriorScene extends Phaser.Scene {
   }
 
   private readonly pressPad = (pointer: Phaser.Input.Pointer): void => {
-    const radius = JOYSTICK_EXTENT / 2 - 5
-    this.joystick.begin(pointer.id, pointer.x - this.padHit.x, pointer.y - this.padHit.y, radius)
+    this.joystick.begin(pointer.id, pointer.x - this.padHit.x, pointer.y - this.padHit.y, ANALOG_JOYSTICK_TRAVEL_RADIUS)
     this.layoutControls()
   }
 
   private readonly movePad = (pointer: Phaser.Input.Pointer): void => {
     if (!pointer.isDown || !this.joystick.owns(pointer.id)) return
-    const radius = JOYSTICK_EXTENT / 2 - 5
-    this.joystick.move(pointer.id, pointer.x - this.padHit.x, pointer.y - this.padHit.y, radius)
+    this.joystick.move(pointer.id, pointer.x - this.padHit.x, pointer.y - this.padHit.y, ANALOG_JOYSTICK_TRAVEL_RADIUS)
     this.layoutControls()
   }
 
@@ -417,7 +434,7 @@ export abstract class BaseInteriorScene extends Phaser.Scene {
 
   private refreshPrompt(): void {
     const nearby = nearestInteriorInteraction(this.location, this.position)
-    this.prompt.setText(nearby ? `Action · ${nearby.label}` : 'Walk to a highlighted zone')
+    this.prompt.setText(nearby ? `Action · ${nearby.label}` : 'Walk to a highlighted terminal/zone')
     this.actionChrome.clear()
       .fillStyle(nearby ? COLORS.accentStrong : COLORS.surfaceRaised, 0.95)
       .fillRoundedRect(this.actionHit.x - 64, this.actionHit.y - 24, 128, 48, 12)
@@ -428,7 +445,7 @@ export abstract class BaseInteriorScene extends Phaser.Scene {
   private onAction(): void {
     const interaction = nearestInteriorInteraction(this.location, this.position)
     if (!interaction) {
-      this.notify('Move closer to a highlighted interior zone.')
+      this.notify('Move closer to a highlighted interior terminal or zone.')
       return
     }
     switch (interaction.id) {
@@ -436,18 +453,19 @@ export abstract class BaseInteriorScene extends Phaser.Scene {
         this.exitInterior()
         return
       case 'fleet':
+        this.openHQManagement('VehicleFleet')
+        return
+      case 'fleet-handoff':
         this.cycleOwnedFleet()
         return
       case 'employees':
-        this.notify(`${this.companyState.employees.length} employee${this.companyState.employees.length === 1 ? '' : 's'} assigned. Visible staff use only authoritative current roles; future specialist departments unlock through #343.`)
+        this.openHQManagement('EmployeeManagement')
         return
       case 'operations':
-        this.useOperationsDesk()
+        this.openHQManagement('CompanyManagement')
         return
       case 'staging':
-        this.notify(this.worldState.player.carryingPackage
-          ? 'Parcel staging: courier currently carries an active parcel.'
-          : 'Parcel staging ready. No parcel is currently carried by the courier.')
+        this.useOperationsDesk()
         return
       case 'market-stalls':
         this.notify(`Local Marketplace: ${MARKETPLACE_LISTINGS.length} merchant listing templates are available to the Tycoon simulation.`)
@@ -458,17 +476,26 @@ export abstract class BaseInteriorScene extends Phaser.Scene {
     }
   }
 
+  private openHQManagement(scene: HQManagementScene): void {
+    if (this.locationId !== 'hq') return
+    this.clearInput()
+    this.persist('progression-changed')
+    this.registry.set(HQ_MANAGEMENT_RETURN_REGISTRY_KEY, HQ_MANAGEMENT_RETURN_SCENE)
+    this.scene.launch(scene)
+    this.scene.sleep()
+  }
+
   private cycleOwnedFleet(): void {
     const available = availableActiveTransports(this.companyState)
     if (available.length <= 1) {
-      this.notify('Fleet Bay: no owned vehicle yet. Purchase one through Company → Vehicles.')
+      this.notify('Fleet Bay: no owned vehicle yet. Use the Fleet Purchase Terminal inside HQ.')
       return
     }
     const urban = this.worldState.urban ??= { merchantOnboarded: false, activeTransport: 'walking' }
     urban.activeTransport = nextActiveTransport(this.companyState, urban.activeTransport)
     this.persist('progression-changed')
     this.refreshStateLabels()
-    this.notify(`${ACTIVE_TRANSPORT_LABELS[urban.activeTransport]} is now the active vehicle. It will be handed off when you exit HQ.`)
+    this.notify(`${ACTIVE_TRANSPORT_LABELS[urban.activeTransport]} is now the active vehicle. The remaining fleet stays available for future employee assignment.`)
   }
 
   private useOperationsDesk(): void {
@@ -485,7 +512,7 @@ export abstract class BaseInteriorScene extends Phaser.Scene {
     this.activeText.setText(`${this.location.title}\nActive: ${ACTIVE_TRANSPORT_LABELS[active]}`)
     if (this.fleetText) {
       const owned = availableActiveTransports(this.companyState).filter(transport => transport !== 'walking')
-      this.fleetText.setText(`ACTIVE VEHICLE: ${ACTIVE_TRANSPORT_LABELS[active]}\nOWNED: ${owned.length ? owned.map(transportBayLabel).join(' · ') : 'None'}`)
+      this.fleetText.setText(`ACTIVE: ${ACTIVE_TRANSPORT_LABELS[active]}\nOWNED: ${owned.length ? owned.map(transportBayLabel).join(' · ') : 'None'}`)
     }
   }
 
@@ -501,9 +528,16 @@ export abstract class BaseInteriorScene extends Phaser.Scene {
     this.toastTimer = this.time.delayedCall(4400, () => this.toast.setVisible(false))
   }
 
+  private readonly handleWake = (): void => {
+    this.clearInput()
+    // Management may have changed fleet/employees; bounded interior restart redraws the authoritative state.
+    this.scene.restart()
+  }
+
   private readonly exitInterior = (): void => {
     this.clearInput()
     this.persist('progression-changed')
+    if (this.locationId === 'hq') this.registry.set(HQ_MANAGEMENT_RETURN_REGISTRY_KEY, '')
     if (this.scene.isSleeping('GameWorld')) this.scene.wake('GameWorld')
     else this.scene.start('GameWorld')
     this.scene.stop()
@@ -514,6 +548,12 @@ export abstract class BaseInteriorScene extends Phaser.Scene {
     this.toastTimer?.remove()
     this.scale.off(Phaser.Scale.Events.RESIZE, this.layoutControls)
     this.game.events.off(Phaser.Core.Events.BLUR, this.clearInput)
+    this.events.off(Phaser.Scenes.Events.SLEEP, this.clearInput)
+    this.events.off(Phaser.Scenes.Events.WAKE, this.handleWake, this)
+    this.input.off('pointermove', this.movePad)
+    this.input.off('pointerup', this.releasePad)
+    this.input.off('pointerupoutside', this.releasePad)
+    this.input.off('gameout', this.clearInput)
     this.input.keyboard?.off('keydown-ESC', this.exitInterior)
     this.playerVisual?.destroy()
   }

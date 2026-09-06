@@ -10,16 +10,18 @@ describe('Android touch controls recovery', () => {
     expect(hudSource).toContain('const hitWidth = interactive ? Math.max(44, width) : width')
     expect(hudSource).toContain('const hitHeight = interactive ? Math.max(44, height) : height')
     expect(hudSource).toContain('this.scene.add.rectangle(x, y, hitWidth, hitHeight, 0xffffff, 0.001)')
-    expect(hudSource).toContain('this.scene.add.rectangle(x + center, y + center, extent, extent, 0xffffff, 0.001)')
+    expect(hudSource).toContain('ANALOG_JOYSTICK_HIT_DIAMETER')
+    expect(hudSource).toContain('0xffffff, 0.001')
     expect(hudSource).toContain('if (interactive) button.setInteractive({ useHandCursor: true })')
-    expect(hudSource).toContain("hit.on('pointermove'")
-    expect(hudSource).toContain("hit.on('pointerout', this.releasePointer)")
-    expect(hudSource).toContain("hit.on('pointerup', this.releasePointer)")
+    expect(hudSource).toContain("scene.input.on('pointermove', this.moveJoystickPointer)")
+    expect(hudSource).toContain("scene.input.on('pointerup', this.releasePointer)")
+    expect(hudSource).toContain("scene.input.on('pointerupoutside', this.releasePointer)")
+    expect(hudSource).not.toContain("hit.on('pointerout', this.releasePointer)")
     expect(hudSource).toContain('chrome.clear().fillStyle')
     expect(hudSource).not.toContain('button.setInteractive(\n      { x: -width / 2, y: -height / 2, width, height }')
   })
 
-  it('keeps D-pad pointer ownership and releases only the matching finger/direction', () => {
+  it('keeps legacy D-pad pointer ownership safe for backward compatibility', () => {
     const pad = new UrbanDPadInput()
     pad.press(1, 'right')
     pad.press(2, 'up')

@@ -28,6 +28,14 @@ const mainMenuSource = readFileSync(
   new URL('../src/scenes/MainMenuScene.ts', import.meta.url),
   'utf8',
 )
+const hudSource = readFileSync(
+  new URL('../src/ui/UrbanHUD.ts', import.meta.url),
+  'utf8',
+)
+const interiorSource = readFileSync(
+  new URL('../src/scenes/BaseInteriorScene.ts', import.meta.url),
+  'utf8',
+)
 
 afterEach(() => {
   clearGameSession()
@@ -235,19 +243,22 @@ describe('RBATCH-012 — scene integration boundaries', () => {
     expect(gameWorldSource).not.toContain('createInitialWorldState()')
   })
 
-  it('GameWorld synchronizes runtime state before opening CompanyManagement', () => {
-    const body = gameWorldSource.slice(
+  it('removes global Company navigation and makes HQ the physical management gateway', () => {
+    expect(gameWorldSource).not.toContain("company: () => this.navigate('CompanyManagement')")
+    expect(hudSource).not.toContain("['Company',")
+    expect(interiorSource).toContain("this.openHQManagement('CompanyManagement')")
+    expect(interiorSource).toContain("this.openHQManagement('EmployeeManagement')")
+    expect(interiorSource).toContain("this.openHQManagement('VehicleFleet')")
+    const navigateBody = gameWorldSource.slice(
       gameWorldSource.indexOf('private navigate('),
       gameWorldSource.indexOf('private syncRuntimeSession'),
     )
-    expect(gameWorldSource).toContain("company: () => this.navigate('CompanyManagement')")
-    expect(body).toContain("this.persist('progression-changed')")
-    expect(body).toContain('this.scene.start(scene)')
-    expect(body.indexOf('this.persist(')).toBeLessThan(body.indexOf('this.scene.start('))
+    expect(navigateBody).toContain("this.persist('progression-changed')")
+    expect(navigateBody).toContain('this.scene.start(scene)')
+    expect(navigateBody.indexOf('this.persist(')).toBeLessThan(navigateBody.indexOf('this.scene.start('))
   })
 
   it('GameWorld navigation labels are non-interactive with one input owner per button', () => {
-    const hudSource = readFileSync(new URL('../src/ui/UrbanHUD.ts', import.meta.url), 'utf8')
     const body = hudSource.slice(
       hudSource.indexOf('private button('),
       hudSource.indexOf('private createDPad'),
@@ -257,10 +268,12 @@ describe('RBATCH-012 — scene integration boundaries', () => {
     expect(body).not.toContain('text.setInteractive')
   })
 
-  it('CompanyManagement owns purchase and return-to-world actions without label input duplication', () => {
+  it('CompanyManagement owns purchase and returns to physical HQ when opened there', () => {
     expect(companyManagementSource).toContain('purchaseUpgrade(')
     expect(companyManagementSource).toContain('replaceGameSession(')
     expect(companyManagementSource).toContain("this.scene.start('GameWorld')")
+    expect(companyManagementSource).toContain("this.scene.wake(HQ_MANAGEMENT_RETURN_SCENE)")
+    expect(companyManagementSource).toContain("'‹ Back to HQ interior'")
     expect(companyManagementSource).toContain('drawManagementFooter(')
     expect(companyManagementSource).toContain('createThemedButton(')
     const controls = readFileSync(new URL('../src/ui/themeControls.ts', import.meta.url), 'utf8')

@@ -24,9 +24,10 @@ describe('living city screen-space navigation', () => {
       expect(l.action.y + l.action.height / 2).toBeLessThan(height)
       expect(l.zoom.size).toBeGreaterThanOrEqual(36)
       expect(l.zoom.size).toBeLessThanOrEqual(40)
-      expect(l.pad.size).toBeGreaterThanOrEqual(30)
-      expect(l.pad.size).toBeLessThanOrEqual(36)
-      expect(l.pad.size * 3).toBeLessThanOrEqual(108)
+      expect(l.pad.size).toBeGreaterThanOrEqual(38)
+      expect(l.pad.size).toBeLessThanOrEqual(40)
+      expect(l.pad.size * 3).toBeGreaterThanOrEqual(114)
+      expect(l.pad.size * 3).toBeLessThanOrEqual(120)
       if (width >= 600) {
         expect(l.objective.width).toBeLessThanOrEqual(360)
         expect(l.objective.height).toBeLessThanOrEqual(52)
