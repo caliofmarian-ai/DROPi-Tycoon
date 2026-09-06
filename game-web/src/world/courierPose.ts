@@ -31,15 +31,51 @@ export interface CourierPose {
 }
 
 const point = (x: number, y: number): PosePoint => Object.freeze({ x, y })
+
+const riderFeet = (
+  state: CourierState,
+  profile: boolean,
+  sign: number,
+  stride: number,
+): readonly [PosePoint, PosePoint] => {
+  if (state === 'Walking') {
+    return Object.freeze([
+      point(profile ? -stride * 7 : -5, -2 + (profile ? 0 : stride * 3)),
+      point(profile ? stride * 7 : 5, -2 - (profile ? 0 : stride * 3)),
+    ]) as readonly [PosePoint, PosePoint]
+  }
+  if (state === 'Bicycle') {
+    return Object.freeze([
+      point(profile ? sign * 5 + stride * 5 : -8, -3 - stride * 5),
+      point(profile ? sign * 5 - stride * 5 : 8, -3 + stride * 5),
+    ]) as readonly [PosePoint, PosePoint]
+  }
+  if (state === 'ElectricScooter') {
+    // Both feet stay planted on the scooter deck. The wheels may animate, the rider never pedals.
+    return Object.freeze(profile
+      ? [point(-7 * sign, -3), point(5 * sign, -3)]
+      : [point(-5, -3), point(5, -3)]) as readonly [PosePoint, PosePoint]
+  }
+  if (state === 'Motorcycle') {
+    // Seated rider uses fixed foot/peg positions; frame animation is vehicle-only.
+    return Object.freeze(profile
+      ? [point(-5 * sign, -1), point(8 * sign, -1)]
+      : [point(-8, -1), point(8, -1)]) as readonly [PosePoint, PosePoint]
+  }
+  return Object.freeze([point(-8, -3), point(8, -3)]) as readonly [PosePoint, PosePoint]
+}
+
 const makePose = (
   state: CourierState, facing: UrbanFacing, frame: CourierFrame, carrying: boolean,
 ): CourierPose => {
   const profile = facing === 'left' || facing === 'right'
   const sign = facing === 'left' || facing === 'up' ? -1 : 1
   const walking = state === 'Walking'
+  const bicycle = state === 'Bicycle'
   const enclosed = state === 'Car' || state === 'DeliveryVan'
-  const stride = [0, 1, 0, -1][frame]
-  const bob = !enclosed && frame % 2 ? walking ? -1.5 : -0.5 : 0
+  // Only walking and bicycle states animate the legs. Motorized transports keep the rider planted/seated.
+  const stride = walking || bicycle ? [0, 1, 0, -1][frame] : 0
+  const bob = enclosed ? 0 : frame % 2 ? walking ? -1.5 : bicycle ? -0.5 : 0 : 0
   const wheelbase = state === 'ElectricScooter' ? 16 : state === 'Motorcycle' ? 23 : 21
   const wheels = walking ? [] : enclosed
     ? (profile
@@ -55,12 +91,7 @@ const makePose = (
     wheelAxis: walking ? null : profile ? 'x' : 'y',
     wheels: Object.freeze(wheels),
     head: point(profile ? sign * (walking ? 2 : 7) : 0, (walking ? -39 : -45) + bob),
-    feet: Object.freeze([
-      point(profile ? walking ? -stride * 7 : sign * 5 + stride * 5 : walking ? -5 : -8,
-        walking ? -2 + (profile ? 0 : stride * 3) : -3 - stride * 5),
-      point(profile ? walking ? stride * 7 : sign * 5 - stride * 5 : walking ? 5 : 8,
-        walking ? -2 - (profile ? 0 : stride * 3) : -3 + stride * 5),
-    ]) as readonly [PosePoint, PosePoint],
+    feet: riderFeet(state, profile, sign, stride),
     hands: Object.freeze([
       point(profile ? sign * (walking ? 5 : 18) + (walking ? stride * 3 : 0) : -14,
         walking ? -9 + bob + stride * 3 : profile ? -26 : facing === 'up' ? -29 : -7),
