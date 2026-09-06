@@ -8,6 +8,7 @@ import {
   URBAN_BUILDINGS, URBAN_ROADS, URBAN_HQ, minimapPoint, inInteractionRange,
 } from '../world/urbanWorld'
 import { findWorldRoutePoint, WORLD_HEIGHT, WORLD_WIDTH, WORLD_ZONES } from '../world/worldLayout'
+import { AnalogJoystickInput } from './AnalogJoystick'
 import { CITY_COLORS, COLORS, formatMoney, RADII, TYPOGRAPHY } from './theme'
 
 type Direction = 'up' | 'down' | 'left' | 'right'
@@ -22,10 +23,8 @@ interface HUDCallbacks {
 }
 
 /**
- * Issue #324: the visible D-pad is deliberately compact (96-108 px square), while
- * interaction remains Android/WebView-safe through one native Rectangle covering the
- * complete pad. This avoids four oversized buttons and also avoids overlapping hidden
- * hit rectangles between adjacent directions.
+ * Issue #338: the compact 96-108 px footprint now contains a true analog thumb joystick.
+ * One Android-safe Rectangle owns touch input while the circular chrome/knob remain visual only.
  */
 export const urbanHUDLayout = (width: number, height: number) => {
   const portrait = width < 600
@@ -96,7 +95,7 @@ export const urbanDistrictCaption = (point: { x: number; y: number }): string =>
   (WORLD_ZONES.find(zone => point.x >= zone.x && point.x <= zone.x + zone.width &&
     point.y >= zone.y && point.y <= zone.y + zone.height)?.label ?? 'Cedar City').toUpperCase()
 
-/** Pointer ownership keeps releasing one finger from cancelling a second finger. */
+/** Legacy exported cardinal model retained only for backward compatibility/tests; Android runtime uses analog input. */
 export class UrbanDPadInput {
   private readonly held = new Map<number, Direction>()
   press(pointer: number, direction: Direction): void { this.held.set(pointer, direction) }
@@ -114,7 +113,7 @@ export class UrbanDPadInput {
   }
 }
 
-/** Convert a point inside the compact pad into one cardinal direction; center is neutral. */
+/** Legacy cardinal helper retained for Save/test compatibility; runtime joystick no longer calls it. */
 export const directionFromDPadPoint = (x: number, y: number, extent: number): Direction | null => {
   if (!Number.isFinite(x) || !Number.isFinite(y) || !Number.isFinite(extent) || extent <= 0 ||
       x < 0 || y < 0 || x > extent || y > extent) return null
@@ -140,7 +139,8 @@ export class UrbanHUD {
   private readonly scene: Phaser.Scene
   private readonly layer: Phaser.GameObjects.Layer
   private readonly layout
-  private readonly pad = new UrbanDPadInput()
+  private readonly pad = new AnalogJoystickInput()
+  private joystickKnob!: Phaser.GameObjects.Arc
   private readonly stats: Phaser.GameObjects.Text
   private readonly objective: Phaser.GameObjects.Text
   private readonly hint: Phaser.GameObjects.Text
@@ -153,7 +153,6 @@ export class UrbanHUD {
   private readonly mapCaption: Phaser.GameObjects.Text
   private readonly mapViewport: Phaser.GameObjects.Graphics
   private readonly menuButtons: HUDButton[] = []
-  private readonly directionButtons: { direction: Direction; control: HUDButton }[] = []
   private transportAvailable?: boolean
   private nearby?: boolean
   private open = false
@@ -285,46 +284,47 @@ export class UrbanHUD {
     return { button, chrome, label: text, paint, setVisible, setEnabled }
   }
 
+  /** Runtime name retained to minimize churn; visually/behaviorally this is the #338 analog joystick. */
   private createDPad(): void {
     const { x, y, size } = this.layout.pad
     const extent = size * 3
     const center = extent / 2
-    this.add(this.scene.add.circle(x + center, y + center, center + 2, COLORS.surface, 0.18))
-      .setStrokeStyle(1, COLORS.accent, 0.48)
-    const directions: [Direction, number, number, string][] = [
-      ['up', 1, 0, '▲'], ['left', 0, 1, '◀'], ['right', 2, 1, '▶'], ['down', 1, 2, '▼'],
-    ]
-    directions.forEach(([direction, col, row, label]) => {
-      const control = this.button(
-        x + col * size + size / 2,
-        y + row * size + size / 2,
-        size - 4,
-        size - 4,
-        label,
-        undefined,
-        false,
-      )
-      control.label.setFontSize(Math.max(14, size * 0.48))
-      this.directionButtons.push({ direction, control })
-    })
-    this.add(this.scene.add.circle(x + center, y + center, size * 0.18, COLORS.accent, 0.18))
-      .setStrokeStyle(1, CITY_COLORS.curb)
+    const centerX = x + center
+    const centerY = y + center
+    const radius = center - 5
+    this.add(this.scene.add.circle(centerX, centerY, radius + 3, COLORS.surface, 0.42))
+      .setStrokeStyle(2, COLORS.accent, 0.72)
+    this.add(this.scene.add.circle(centerX, centerY, radius * 0.63, COLORS.surfaceRaised, 0.32))
+      .setStrokeStyle(1, CITY_COLORS.curb, 0.7)
+    this.joystickKnob = this.add(this.scene.add.circle(centerX, centerY, Math.max(13, size * 0.43), COLORS.accentStrong, 0.96))
+      .setStrokeStyle(2, COLORS.gold, 0.92)
 
-    // One compact native Rectangle owns the complete D-pad touch surface. This is both smaller
-    // on screen and safer than four adjacent >=44px invisible rectangles that would overlap.
+    // #323/#339 invariant: a native Rectangle owns joystick touch input; Graphics never hit-test.
     const hit = this.add(this.scene.add.rectangle(x + center, y + center, extent, extent, 0xffffff, 0.001))
       .setInteractive({ useHandCursor: true })
     const press = (pointer: Phaser.Input.Pointer): void => {
       if (this.open) return
-      const direction = directionFromDPadPoint(pointer.x - x, pointer.y - y, extent)
-      if (direction) this.pad.press(pointer.id, direction)
-      else this.pad.release(pointer.id)
-      this.paintDirections()
+      this.pad.begin(pointer.id, pointer.x - centerX, pointer.y - centerY, radius)
+      this.paintJoystick(centerX, centerY)
     }
     hit.on('pointerdown', press)
-    hit.on('pointermove', (pointer: Phaser.Input.Pointer) => { if (pointer.isDown) press(pointer) })
+    hit.on('pointermove', (pointer: Phaser.Input.Pointer) => {
+      if (!pointer.isDown || !this.pad.owns(pointer.id)) return
+      this.pad.move(pointer.id, pointer.x - centerX, pointer.y - centerY, radius)
+      this.paintJoystick(centerX, centerY)
+    })
     hit.on('pointerout', this.releasePointer)
     hit.on('pointerup', this.releasePointer)
+  }
+
+  private paintJoystick(centerX?: number, centerY?: number): void {
+    if (!this.joystickKnob) return
+    const { x, y, size } = this.layout.pad
+    const center = size * 1.5
+    const baseX = centerX ?? x + center
+    const baseY = centerY ?? y + center
+    const knob = this.pad.knobOffset()
+    this.joystickKnob.setPosition(baseX + knob.x, baseY + knob.y)
   }
 
   private drawMinimap(): void {
@@ -417,14 +417,11 @@ export class UrbanHUD {
   movement(): { x: number; y: number } { return this.pad.value() }
   readonly clearMovement = (): void => {
     this.pad.clear()
-    this.paintDirections()
-  }
-  private paintDirections(): void {
-    this.directionButtons.forEach(({ direction, control }) => control.paint(this.pad.isHeld(direction)))
+    this.paintJoystick()
   }
   private readonly releasePointer = (pointer: Phaser.Input.Pointer): void => {
     this.pad.release(pointer.id)
-    this.paintDirections()
+    this.paintJoystick()
   }
 
   destroy(): void {
