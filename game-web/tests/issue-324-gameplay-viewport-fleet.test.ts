@@ -80,11 +80,12 @@ describe('#324 authoritative active fleet selection', () => {
 })
 
 describe('#324 Android landscape viewport reclamation', () => {
-  it('keeps mission and directional controls materially smaller at the owner screenshot aspect', () => {
+  it('keeps mission chrome compact while giving the owner a usable analog thumb control', () => {
     const layout = urbanHUDLayout(740, 360)
     expect(layout.objective.width).toBeLessThanOrEqual(360)
     expect(layout.objective.height).toBeLessThanOrEqual(52)
-    expect(layout.pad.size * 3).toBeLessThanOrEqual(108)
+    expect(layout.pad.size * 3).toBeGreaterThanOrEqual(114)
+    expect(layout.pad.size * 3).toBeLessThanOrEqual(120)
     expect(layout.minimap.width).toBeLessThanOrEqual(100)
     expect(layout.action.width).toBeLessThanOrEqual(150)
   })
