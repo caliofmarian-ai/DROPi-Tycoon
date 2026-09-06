@@ -4,8 +4,9 @@ import { attemptDelivery, attemptPickup } from './orderSystem'
 import { applyOrderAcceptanceRequest } from './orderAcceptance'
 import { settleDeliveryOutcome } from './economySettlement'
 import { createNextOrder, pickupPointForOrder } from './orderGeneration'
+import { resolveActiveTransport } from './activeTransportSystem'
 import {
-  isDeliveryMission, loadParcel, resolveActiveTransport, TRANSPORT_PROFILES, unloadParcel,
+  isDeliveryMission, loadParcel, TRANSPORT_PROFILES, unloadParcel,
   type CargoLoad, type DeliveryMission,
 } from './urbanLogistics'
 import {
