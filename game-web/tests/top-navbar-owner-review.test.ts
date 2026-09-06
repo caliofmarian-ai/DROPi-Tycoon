@@ -59,7 +59,8 @@ describe('M-008 owner review — compact non-overlapping top dock', () => {
     // Rectangle hit target, then disables input through the same control wrapper.
     expect(hudSource).toContain('entry.setVisible(false)')
     expect(hudSource).toContain('entry.setEnabled(false)')
-    expect(hudSource).toContain('this.scene.add.rectangle(x, y, width, height, 0xffffff, 0.001)')
+    expect(hudSource).toContain('this.scene.add.rectangle(x, y, hitWidth, hitHeight, 0xffffff, 0.001)')
+    expect(hudSource).toContain('this.scene.add.rectangle(x + center, y + center, extent, extent, 0xffffff, 0.001)')
   })
 
   it('does not let tapping the fixed dock create movement or a delivery target', () => {
