@@ -26,6 +26,8 @@ export class UrbanZoomGesture {
   release(id: number): void { this.pointers.delete(id); this.rebase() }
   clear(): void { this.pointers.clear(); this.distance = 0 }
   isPinching(): boolean { return this.pointers.size === 2 }
+  owns(id: number): boolean { return this.pointers.has(id) }
+  pointerCount(): number { return this.pointers.size }
 
   private rebase(): void {
     if (this.pointers.size !== 2) { this.distance = 0; return }
