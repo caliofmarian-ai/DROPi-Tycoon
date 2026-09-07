@@ -1,8 +1,8 @@
 # Company Governance — Canonical Domain Specialization
 
-Status: Active design and non-visible domain foundation  
-Parent canon: `00_Project/BUSINESS_DESIGN.md`  
-Parent implementation issue: #362  
+Status: Active design and non-visible domain foundation
+Parent canon: `00_Project/BUSINESS_DESIGN.md`
+Parent implementation issue: #362
 Governance foundation issue: #388
 
 ---
@@ -11,92 +11,54 @@ Governance foundation issue: #388
 
 Company governance determines how current executive control can change without rewriting company history, duplicating ownership, or allowing a company to become permanently unusable.
 
-This specialization is deliberately separate from:
-
-- historical Founder identity;
-- employment and operational job titles;
-- treasury-share purchase settlement;
-- dividend settlement;
-- future real-player multiplayer authority;
-- visible UI.
-
-The domain is designed first as deterministic local simulation so later server authority can preserve the same economic and governance semantics.
+This specialization is separate from historical Founder identity, employment, treasury-share settlement, dividends, multiplayer authority, persistence, and visible UI.
 
 ---
 
-## 2. Founder Is Historical Identity
+## 2. Founder and Executive Identity
 
-`founderActorId` is permanent company history.
+`founderActorId` is permanent company history and governance must never rewrite it.
 
-Governance must never rewrite it.
+`executiveActorId` is current operational leadership and may change through legitimate governance or bounded continuity recovery.
 
-The Founder may:
+The Founder may lose executive control without losing Founder identity. Founder identity does not grant a permanent veto or permanent executive immunity.
 
-- remain executive;
-- be replaced as executive through legitimate governance;
-- later regain executive control if eligible and legitimately appointed;
-- temporarily act as bounded continuity caretaker only when no active member is available.
+Prototype executive candidates must be active company members.
 
-Founder identity does not imply permanent executive permission.
+Changing executive control must not alter company ID, Founder identity, equity supply, pool supply, treasury units, or shareholder holdings.
 
 ---
 
-## 3. Executive Control Is Mutable
+## 3. Voting Equity
 
-`executiveActorId` represents current operational leadership.
-
-An elected executive candidate must satisfy the current governed eligibility policy.
-
-Prototype baseline:
-
-- executive candidate must be an active company member;
-- changing executive control does not transfer shares;
-- changing executive control does not alter Founder identity;
-- changing executive control does not alter company equity supply.
-
----
-
-## 4. Voting Equity Baseline
-
-Prototype governance policy version: `prototype-governance-v1`.
+Prototype policy version: `prototype-governance-v1`.
 
 Both structural equity pools may carry governance weight when units are actually held by Economic Actors:
 
 - `InternalMember`;
 - `ExternalMarket`.
 
-This preserves the structural 51% / 49% ownership ceiling while allowing outside investors to participate in governance without making the external pool independently capable of exceeding the protected internal structural share.
+Treasury-held units carry zero voting weight because treasury availability is company-held supply, not an actor ballot.
 
-Treasury-held units carry zero voting weight.
-
-Treasury is company-held availability, not an actor ballot.
+This preserves the structural 51% Internal / 49% External ceiling while allowing outside investors to participate in governance.
 
 ---
 
-## 5. Voting Snapshot
+## 4. Proposal Voting Snapshot
 
 Voting power is frozen when a proposal opens.
 
-The snapshot records, per Economic Actor:
+The proposal stores each eligible actor's aggregate voting units across policy-enabled pools. Later share transfers do not change that open proposal's voting weight.
 
-- actor identity;
-- aggregate voting units across policy-enabled pools.
+This prevents retroactive vote manipulation and double use of transferred shares inside one proposal.
 
-Later share transfers do not change an already-open proposal's voting weights.
-
-This prevents:
-
-- retroactive vote manipulation;
-- double use of transferred shares within one proposal;
-- ambiguity when ownership changes during a governance cycle.
-
-A later proposal takes a new snapshot from then-current valid equity state.
+A later proposal uses a new snapshot from the then-current valid equity state.
 
 ---
 
-## 6. Proposal Lifecycle
+## 5. Proposal Lifecycle
 
-Prototype proposal statuses are:
+Prototype statuses are:
 
 1. `Open`;
 2. `Approved`;
@@ -106,198 +68,120 @@ Prototype proposal statuses are:
 
 The first implemented governed side effect is executive appointment.
 
-Future governance actions may reuse the proposal/vote/resolution framework for separately designed decisions such as:
-
-- strategic investment;
-- infrastructure projects;
-- dividend-policy changes;
-- expansion;
-- high-value asset sales;
-- mergers/acquisitions;
-- Founder Artifact decisions.
-
-Those future side effects are not activated by #388.
+Future decisions may reuse this framework for strategic investment, infrastructure, dividend-policy changes, expansion, high-value asset sales, mergers/acquisitions, and Founder Artifact decisions, but those side effects are not activated by #388.
 
 ---
 
-## 7. Proposal Creation Eligibility
+## 6. Proposal Creation
 
-Prototype baseline requires:
+Opening an executive-appointment proposal requires:
 
 - valid company equity state;
 - valid governance state;
 - matching company identity;
-- valid versioned governance policy;
-- stable non-empty proposal, action and command IDs;
+- valid versioned policy;
+- stable non-empty command, proposal, and action IDs;
 - an eligible active-member executive candidate;
-- at least one actually held voting unit in the company;
-- proposal creator must have positive voting weight in the proposal snapshot.
+- positive actually-held voting equity in the company;
+- a proposal creator with positive voting weight in the snapshot.
 
 Treasury availability alone cannot create governance power.
 
 ---
 
-## 8. Ballots
+## 7. Ballots
 
 Each snapshotted voter may cast at most one ballot per proposal.
 
-Choices are:
+Choices are `For`, `Against`, and `Abstain`.
 
-- `For`;
-- `Against`;
-- `Abstain`.
+Ballot weight always comes from the frozen voting snapshot. A caller cannot provide a replacement weight.
 
-Ballot weight is copied from the immutable proposal snapshot.
-
-A client or caller cannot provide a different voting weight.
-
-Forged or inconsistent governance state fails integrity validation.
+Forged or inconsistent ballot weights invalidate governance state.
 
 ---
 
-## 9. Quorum and Approval
+## 8. Quorum and Approval
 
-Prototype policy baseline:
+Prototype baseline:
 
 - quorum: 50% of snapshotted eligible voting units;
 - approval: strictly more than 50% of participating voting units.
 
-Abstention participates in turnout and therefore quorum, but it is not a `For` vote.
+Abstentions count toward participation/quorum but are not `For` votes.
 
 An exact tie does not approve.
 
 A proposal explicitly resolved without quorum is rejected.
 
-Thresholds are policy configuration, not historical company state, and may be versioned later without rewriting company history.
+Thresholds belong to versioned governance policy, not historical company state.
 
 ---
 
-## 10. Execution
+## 9. Execution Safety
 
-An approved executive-appointment proposal may execute once.
+An approved executive appointment may execute once.
 
-Execution must re-check current candidate eligibility.
+Execution re-checks current candidate eligibility. A candidate who leaves the company after voting but before execution cannot silently become executive.
 
-Therefore a candidate who was eligible when voting began but left the company before execution cannot silently become executive.
+Successful execution changes only current executive identity.
 
-Successful execution changes only current executive identity within the equity/company-ownership domain.
-
-It must preserve:
-
-- Founder identity;
-- company ID;
-- total equity supply;
-- pool supplies;
-- actor holdings;
-- treasury balances.
+Exact replay of an already accepted governance command is a `DuplicateCommand` and causes no second mutation. Reusing the same command ID with different terms is a `CommandIdConflict`.
 
 ---
 
-## 11. Exactly-Once Governance Commands
+## 10. Anti-Soft-Lock Continuity
 
-Accepted governance commands use stable IDs and receipts.
+A company must not become permanently unusable because its current executive is no longer eligible.
 
-The domain distinguishes:
+If the current executive remains an active member, no recovery occurs.
 
-- exact replay of the same command and terms: `DuplicateCommand`, no second mutation;
-- reuse of the same command ID with different terms: `CommandIdConflict`;
-- reuse of proposal/action identity for another proposal: rejected.
-
-This local deterministic behavior is intentionally compatible with later authoritative command processing.
-
----
-
-## 12. Anti-Soft-Lock Executive Continuity
-
-A company must not become permanently unusable because its current executive is no longer an eligible active member.
-
-Continuity recovery is deterministic.
-
-If the current executive remains an active member:
-
-- no recovery occurs.
-
-If the current executive is ineligible and active members exist:
+If the executive is ineligible and active members exist:
 
 1. rank active members by current `InternalMember` stake descending;
 2. break equal-stake ties deterministically by actor ID;
 3. assign the highest-ranked active member as temporary caretaker executive.
 
-If no active member exists:
+If no active member exists, historical Founder identity becomes bounded caretaker executive.
 
-- historical Founder identity becomes bounded caretaker executive.
-
-The Founder caretaker fallback:
+Founder caretaker fallback:
 
 - does not reactivate membership;
-- does not create shares;
-- does not restore forfeited Internal shares;
-- does not grant permanent executive immunity;
-- is replaceable once eligible membership/governance exists.
+- does not create or restore shares;
+- does not undo member-exit forfeiture;
+- does not grant permanent control;
+- remains replaceable once eligible membership/governance exists.
 
 This is a continuity mechanism, not a Founder veto.
 
 ---
 
-## 13. Integrity and Failure Safety
+## 11. Integrity and Failure Safety
 
-Governance must fail safe on:
+Governance fails safe on corrupted equity, malformed governance state, duplicate proposal/action IDs, duplicate voters, forged ballot weights, unknown vote choices/statuses, unsafe arithmetic, mismatched company identity, invalid policy, invalid executive candidates, and duplicate execution.
 
-- corrupted equity;
-- malformed governance state;
-- duplicate proposal/action IDs;
-- duplicate voters;
-- forged ballot weights;
-- unknown vote choices/statuses;
-- unsafe integer arithmetic;
-- mismatched company identity;
-- invalid policy;
-- invalid executive candidate;
-- duplicate execution.
-
-Rejected operations do not partially change governance or equity state.
+Rejected operations must not partially mutate governance or equity state.
 
 ---
 
-## 14. Multiplayer Migration Boundary
+## 12. Multiplayer Migration Boundary
 
 Real-player governance remains future server-authoritative state.
 
-The current domain establishes semantics only.
-
-Before multiplayer activation, authority must enforce:
-
-- stable actor/company identity;
-- optimistic concurrency;
-- exactly-once commands;
-- durable proposal/receipt persistence;
-- anti-cheat and permission enforcement;
-- recovery from interrupted operations.
+Before multiplayer activation, authority must enforce stable identity, optimistic concurrency, exactly-once commands, durable proposal/receipt persistence, anti-cheat, permission enforcement, and recovery from interrupted operations.
 
 A client must never self-assign executive authority.
 
 ---
 
-## 15. Deliberate Non-Goals of This Slice
+## 13. Non-Goals of #388
 
-#388 does not activate:
-
-- visible governance UI;
-- Save v2 persistence;
-- multiplayer networking;
-- real-player authoritative voting;
-- strategic-investment side effects;
-- infrastructure decision side effects;
-- M&A;
-- real securities or real-money investment;
-- blockchain, NFT, wallet, or DROPi token behavior.
-
-Company Money and Personal Money remain fictional game-economic ledgers governed by their existing canonical specializations.
+This slice does not activate visible governance UI, Save v2 persistence, multiplayer networking, real-player voting, strategic/infrastructure/M&A side effects, real securities, real money, blockchain, NFT, wallet, or DROPi token behavior.
 
 ---
 
-## 16. Next Integration Stage
+## 14. Next Integration Stage
 
-After this governance foundation is merged, #362 still requires a separate persistence/runtime activation slice before visible rollout.
+After #388, parent #362 still requires a separate persistence/runtime activation slice.
 
-That later slice must integrate equity, Personal Money, treasury settlement, dividends and governance into compatible persisted runtime state with migration tests before Android owner review is requested.
+That later slice must integrate equity, Personal Money, treasury settlement, dividends, and governance into compatible persisted runtime state with migration tests before Android owner review is requested.
