@@ -80,6 +80,56 @@ export interface HQProgressionState {
   constructedDepartments: HQDepartmentId[]
 }
 
+/**
+ * Stable personal knowledge/capability identifiers. They describe fictional Tycoon
+ * progression and must not be presented as real-world legal licences or certificates.
+ */
+export const PERSONAL_CAPABILITY_IDS = [
+  'DeliveryAppLiteracy',
+  'WalkingCourierFundamentals',
+  'BicycleOperation',
+  'BicycleMaintenance',
+  'ElectricScooterOperation',
+  'MotorcycleOperation',
+  'CarOperation',
+  'DeliveryVanOperation',
+  'DispatchOperations',
+  'WarehouseOperations',
+  'Entrepreneurship',
+  'VehicleMaintenance',
+  'DroneTheory',
+  'DroneOperation',
+  'AirCargoOperations',
+  'MaritimeCargoOperations',
+  'RailCargoOperations',
+] as const
+export type PersonalCapabilityId = (typeof PERSONAL_CAPABILITY_IDS)[number]
+
+export const PERSONAL_CAPABILITY_FAMILIES = [
+  'Foundation',
+  'Bicycle',
+  'PoweredTwoWheel',
+  'RoadVehicle',
+  'Operations',
+  'Technical',
+  'Business',
+  'Drone',
+  'Air',
+  'Maritime',
+  'Rail',
+] as const
+export type PersonalCapabilityFamily = (typeof PERSONAL_CAPABILITY_FAMILIES)[number]
+
+/**
+ * Personal progression is deliberately separate from CompanyState. Existing internal
+ * fixtures may omit it, while runtime creation/restoration always materializes it.
+ */
+export interface PersonalProgressionState {
+  experiencePoints: number
+  progressionPoints: number
+  learnedCapabilityIds: PersonalCapabilityId[]
+}
+
 export const CUSTOMER_REVIEW_SENTIMENTS = ['Positive', 'Negative'] as const
 export type CustomerReviewSentiment = (typeof CUSTOMER_REVIEW_SENTIMENTS)[number]
 
@@ -174,6 +224,8 @@ export interface GameSessionState {
   world: WorldState
   company: CompanyState
   settings: GameSettingsState
+  /** Additive personal progression domain; runtime materializes a default when omitted. */
+  personalProgression?: PersonalProgressionState
 }
 
 export interface PickupContext {
