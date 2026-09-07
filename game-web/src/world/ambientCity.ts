@@ -40,7 +40,7 @@ const clearRoute = (start: UrbanPoint, end: UrbanPoint, roadOnly: boolean): bool
 
 /** Small authored loops, validated once against the real collision surfaces. */
 export const buildAmbientRoutes = (): readonly AmbientRoute[] => {
-  const pedestrianRoutes: AmbientRoute[] = []
+  const sidewalkRoutes: AmbientRoute[] = []
   for (const [index, id] of ['central-vertical', 'garden-avenue'].entries()) {
     const road = WORLD_ROADS.find(candidate => candidate.id === id)
     if (!road) continue
@@ -48,7 +48,7 @@ export const buildAmbientRoutes = (): readonly AmbientRoute[] => {
       const x = road.x + (side ? 1 : -1) * (road.width / 2 + 12)
       const start = { x, y: road.y - road.height / 2 + 100 }
       const end = { x, y: start.y + 240 }
-      if (clearRoute(start, end, false)) pedestrianRoutes.push({
+      if (clearRoute(start, end, false)) sidewalkRoutes.push({
         id: `neighbor-${id}-${side}`, kind: 'pedestrian', start, end,
         speed: 25 + index * 3, phase: index * 5 + side * 3,
       })
@@ -67,7 +67,7 @@ export const buildAmbientRoutes = (): readonly AmbientRoute[] => {
       const y = road.y + (side ? 1 : -1) * (road.height / 2 + 3)
       const start = { x, y }
       const end = { x: x + 180, y }
-      if (clearRoute(start, end, false)) pedestrianRoutes.push({
+      if (clearRoute(start, end, false)) sidewalkRoutes.push({
         id: `neighbor-${id}-${side}`, kind: 'pedestrian', start, end,
         speed: 24 + index % 4 * 3, phase: index * 2.3 + side * 4.7,
       })
@@ -75,9 +75,10 @@ export const buildAmbientRoutes = (): readonly AmbientRoute[] => {
   })
 
   // One authored legal road crossing demonstrates real pedestrian/traffic priority without
-  // turning every ambient actor into a pathfinding agent. It stays within the existing actor budget.
+  // turning every ambient actor into a pathfinding agent. Its slot is reserved so decorative
+  // sidewalk density can never push the actual crossing behavior out of the mobile actor budget.
   const crossing = CENTRAL_CONTROLLED_CROSSING
-  pedestrianRoutes.push({
+  const crossingRoute: AmbientRoute = {
     id: `neighbor-${crossing.id}`,
     kind: 'pedestrian',
     start: { x: crossing.x, y: crossing.y - crossing.halfLength },
@@ -85,7 +86,7 @@ export const buildAmbientRoutes = (): readonly AmbientRoute[] => {
     speed: (crossing.halfLength * 2) / 3,
     phase: 0,
     controlledCrossingId: crossing.id,
-  })
+  }
 
   // Preserve every authored traffic route. New pedestrian life may use the remaining mobile budget,
   // but it must never silently remove traffic variety from the city.
@@ -102,7 +103,11 @@ export const buildAmbientRoutes = (): readonly AmbientRoute[] => {
     })
   }
   const pedestrianBudget = Math.max(0, AMBIENT_ACTOR_LIMIT - trafficRoutes.length)
-  return [...pedestrianRoutes.slice(0, pedestrianBudget), ...trafficRoutes]
+  const sidewalkBudget = Math.max(0, pedestrianBudget - 1)
+  const boundedPedestrians = pedestrianBudget > 0
+    ? [...sidewalkRoutes.slice(0, sidewalkBudget), crossingRoute]
+    : []
+  return [...boundedPedestrians, ...trafficRoutes]
 }
 
 /** Writes into a reused pose, with bounded waits at route ends and controlled crossings. */
