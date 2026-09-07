@@ -247,6 +247,7 @@ export const createSessionAuthorityRegistry = () => {
     getProfile,
     getReceipt,
     execute,
+    close: async () => {},
     stats: () => ({ profiles: profiles.size, commands: commands.size, authoritativeSequence }),
   }
 }
