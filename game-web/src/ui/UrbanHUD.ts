@@ -15,6 +15,7 @@ import {
   ANALOG_JOYSTICK_VISUAL_DIAMETER,
   AnalogJoystickInput,
 } from './AnalogJoystick'
+import { PlayerSmartphoneOverlay } from './PlayerSmartphone'
 import { CITY_COLORS, COLORS, formatMoney, RADII, TYPOGRAPHY } from './theme'
 
 type Direction = 'up' | 'down' | 'left' | 'right'
@@ -57,6 +58,7 @@ export const urbanHUDLayout = (width: number, height: number) => {
     minimap,
     zoom: { x: minimap.x + minimap.width / 2, y: minimap.y + minimap.height + 34, size: 36 },
     objective: { x: 10, y: headerHeight + 6, width: objectiveWidth, height: objectiveHeight },
+    phone: { x: width - 142, y: headerHeight / 2, width: 96, height: 36 },
     menu: { x: width - 94, y: headerHeight + 22, width: 160, rowHeight: 44 },
     toast: {
       x: useBottomGap ? (gapLeft + gapRight) / 2 : width / 2,
@@ -150,6 +152,7 @@ export class UrbanHUD {
   private readonly layer: Phaser.GameObjects.Layer
   private readonly layout
   private readonly pad = new AnalogJoystickInput()
+  private readonly smartphone: PlayerSmartphoneOverlay
   private joystickKnob!: Phaser.GameObjects.Arc
   private joystickCenterX = 0
   private joystickCenterY = 0
@@ -183,6 +186,8 @@ export class UrbanHUD {
       .setFontStyle('bold')
     const statsLeft = tycoon.x + tycoon.width + 20
     this.stats = this.text(portrait ? 14 : statsLeft, portrait ? 44 : 15, '', portrait ? 11 : 12, COLORS.textPrimary)
+    const phone = this.layout.phone
+    this.button(phone.x, phone.y, phone.width, phone.height, 'Phone', () => this.togglePhone())
     this.button(width - 47, headerHeight / 2, 78, 36, '☰  Menu', () => this.toggleMenu())
 
     const mission = this.layout.objective
@@ -242,6 +247,10 @@ export class UrbanHUD {
       entry.setEnabled(false)
       this.menuButtons.push(entry)
     })
+
+    // Created last so the in-world phone always renders above ordinary HUD chrome.
+    this.smartphone = new PlayerSmartphoneOverlay(scene, layer)
+
     scene.input.on('pointermove', this.moveJoystickPointer)
     scene.input.on('pointerup', this.releasePointer)
     scene.input.on('pointerupoutside', this.releasePointer)
@@ -319,7 +328,7 @@ export class UrbanHUD {
   }
 
   private readonly pressJoystickPointer = (pointer: Phaser.Input.Pointer): void => {
-    if (this.open) return
+    if (this.isMenuOpen()) return
     this.pad.begin(
       pointer.id,
       pointer.x - this.joystickCenterX,
@@ -380,7 +389,7 @@ export class UrbanHUD {
     cameraView?: { x: number; y: number; width: number; height: number },
   ): void {
     this.stats.setText(urbanStatusText(world, company))
-    const availableStatsWidth = this.layout.portrait ? this.scene.scale.width - 28 : this.scene.scale.width - this.stats.x - 105
+    const availableStatsWidth = this.layout.portrait ? this.scene.scale.width - 28 : this.scene.scale.width - this.stats.x - 210
     this.stats.setScale(Math.min(1, availableStatsWidth / Math.max(1, this.stats.width)))
     this.objective.setText(objective.title.toUpperCase())
     const dx = objective.point.x - world.player.x
@@ -418,6 +427,7 @@ export class UrbanHUD {
       this.mapViewport.clear().lineStyle(1, CITY_COLORS.curb, 0.9)
         .strokeRect(map.x + view.x, map.y + view.y, view.width, view.height)
     }
+    this.smartphone.update(world, company, objective)
   }
 
   notify(message: string): void {
@@ -426,8 +436,8 @@ export class UrbanHUD {
     this.toastTimer = this.scene.time.delayedCall(4200, () => this.toast.setVisible(false))
   }
 
-  toggleMenu(): void {
-    this.open = !this.open
+  private setMenuOpen(open: boolean): void {
+    this.open = open
     this.clearMovement()
     this.menuButtons.forEach(control => {
       control.setVisible(this.open)
@@ -435,7 +445,23 @@ export class UrbanHUD {
     })
   }
 
-  isMenuOpen(): boolean { return this.open }
+  toggleMenu(): void {
+    if (this.smartphone.isOpen()) {
+      this.smartphone.close()
+      this.clearMovement()
+      return
+    }
+    this.setMenuOpen(!this.open)
+  }
+
+  togglePhone(): void {
+    if (this.open) this.setMenuOpen(false)
+    this.smartphone.toggle()
+    this.clearMovement()
+  }
+
+  /** Name retained for GameWorld compatibility; true means any modal HUD overlay blocks world input. */
+  isMenuOpen(): boolean { return this.open || this.smartphone.isOpen() }
   movement(): { x: number; y: number } { return this.pad.value() }
   readonly clearMovement = (): void => {
     this.pad.clear()
@@ -449,6 +475,7 @@ export class UrbanHUD {
   destroy(): void {
     this.clearMovement()
     this.toastTimer?.remove()
+    this.smartphone.destroy()
     this.scene.input.off('pointermove', this.moveJoystickPointer)
     this.scene.input.off('pointerup', this.releasePointer)
     this.scene.input.off('pointerupoutside', this.releasePointer)
