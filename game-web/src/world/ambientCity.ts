@@ -4,6 +4,12 @@ import { ensureNeighborAtlas, NEIGHBOR_ANCHOR, NEIGHBOR_CELL } from './cityArt'
 import { courierAnimationFrame, getCourierPose } from './courierPose'
 import { isUrbanWalkable, type UrbanFacing, type UrbanPoint } from './urbanWorld'
 import { WORLD_ROADS } from './worldLayout'
+import {
+  CENTRAL_CONTROLLED_CROSSING,
+  CONTROLLED_CROSSINGS,
+  sampleControlledCrossingPedestrian,
+  yieldHorizontalTrafficAtCrossing,
+} from './cityTrafficRules'
 
 export interface AmbientRoute {
   id: string
@@ -12,9 +18,14 @@ export interface AmbientRoute {
   end: UrbanPoint
   speed: number
   phase: number
+  controlledCrossingId?: string
 }
 export interface AmbientPose extends UrbanPoint { facing: UrbanFacing; moving: boolean }
 export const AMBIENT_ACTOR_LIMIT = 22
+export const AMBIENT_PEDESTRIAN_SCALE = 0.72
+
+const crossingById = (id: string | undefined) =>
+  id ? CONTROLLED_CROSSINGS.find(crossing => crossing.id === id) : undefined
 
 const clearRoute = (start: UrbanPoint, end: UrbanPoint, roadOnly: boolean): boolean => {
   const steps = Math.ceil(Math.hypot(end.x - start.x, end.y - start.y) / 12)
@@ -60,6 +71,20 @@ export const buildAmbientRoutes = (): readonly AmbientRoute[] => {
       })
     }
   })
+
+  // One authored legal road crossing demonstrates real pedestrian/traffic priority without
+  // turning every ambient actor into a pathfinding agent. It stays within the existing actor budget.
+  const crossing = CENTRAL_CONTROLLED_CROSSING
+  routes.push({
+    id: `neighbor-${crossing.id}`,
+    kind: 'pedestrian',
+    start: { x: crossing.x, y: crossing.y - crossing.halfLength },
+    end: { x: crossing.x, y: crossing.y + crossing.halfLength },
+    speed: (crossing.halfLength * 2) / 3,
+    phase: 0,
+    controlledCrossingId: crossing.id,
+  })
+
   for (const [index, id] of ['central-horizontal', 'business-lane', 'market-boulevard', 'garden-boulevard'].entries()) {
     const road = WORLD_ROADS.find(candidate => candidate.id === id)
     if (!road) continue
@@ -68,19 +93,26 @@ export const buildAmbientRoutes = (): readonly AmbientRoute[] => {
     if (clearRoute(start, end, true)) routes.push({
       id: `traffic-${id}`, kind: index % 2 ? 'van' : 'car', start, end,
       speed: 74 + index * 7, phase: index * 13,
+      controlledCrossingId: id === 'central-horizontal' ? crossing.id : undefined,
     })
   }
   return routes.slice(0, AMBIENT_ACTOR_LIMIT)
 }
 
-/** Writes into a reused pose, with a short stop at each end of the promenade. */
+/** Writes into a reused pose, with bounded waits at route ends and controlled crossings. */
 export const sampleAmbientRoute = (route: AmbientRoute, seconds: number, target: AmbientPose): AmbientPose => {
+  const crossing = crossingById(route.controlledCrossingId)
+  if (route.kind === 'pedestrian' && crossing) {
+    return sampleControlledCrossingPedestrian(crossing, seconds + route.phase, target)
+  }
+
   const dx = route.end.x - route.start.x
   const dy = route.end.y - route.start.y
   const duration = Math.hypot(dx, dy) / Math.max(1, route.speed)
   const leg = duration + 1.5
   const cycle = leg * 2
-  const time = ((Math.max(0, Number.isFinite(seconds) ? seconds : 0) + route.phase) % cycle + cycle) % cycle
+  const safeSeconds = Math.max(0, Number.isFinite(seconds) ? seconds : 0)
+  const time = ((safeSeconds + route.phase) % cycle + cycle) % cycle
   const returning = time >= leg
   const progress = Math.min(1, (time % leg) / Math.max(0.001, duration))
   const fraction = returning ? 1 - progress : progress
@@ -90,6 +122,10 @@ export const sampleAmbientRoute = (route: AmbientRoute, seconds: number, target:
     ? (dx > 0 !== returning ? 'right' : 'left')
     : (dy > 0 !== returning ? 'down' : 'up')
   target.moving = duration > 0 && progress < 1
+
+  if (route.kind !== 'pedestrian' && crossing) {
+    yieldHorizontalTrafficAtCrossing(crossing, safeSeconds, target)
+  }
   return target
 }
 
@@ -103,7 +139,7 @@ interface AmbientActor {
   visible: boolean
 }
 
-/** Ambient actors never own gameplay, collisions, jobs, or serialized state. */
+/** Ambient actors never own gameplay jobs or serialized state; city-rule behavior stays deterministic. */
 export class AmbientCity {
   private elapsed = 0
   private readonly actors: AmbientActor[]
@@ -117,6 +153,7 @@ export class AmbientCity {
       const frame = getCourierPose('Walking', pose.facing).atlasFrame
       const pedestrian = vehicle ? undefined : scene.add.image(0, 0, ensureNeighborAtlas(scene, index), frame)
         .setOrigin(NEIGHBOR_ANCHOR.x / NEIGHBOR_CELL, NEIGHBOR_ANCHOR.y / NEIGHBOR_CELL)
+        .setScale(AMBIENT_PEDESTRIAN_SCALE)
       const object = vehicle?.container ?? scene.add.container(pose.x, pose.y, [pedestrian!])
       object.setName(route.id).setDepth(route.kind === 'pedestrian' ? 14 : 11)
       return { route, pose, object, vehicle, pedestrian, frame, visible: true }
