@@ -12,7 +12,7 @@ permissions:
 
 jobs:
   reconcile:
-    if: github.actor != 'github-actions[bot]'
+    if: ${{ github.actor != 'github-actions[bot]' }}
     runs-on: ubuntu-latest
     steps:
       - name: Checkout branch
@@ -23,74 +23,23 @@ jobs:
 
       - name: Reconcile DOCUMENT_INDEX
         shell: bash
+        env:
+          REP08_B64: IyAwOF9Bc3NldHMKCiMjIFB1cnBvc2UKCkFzc2V0IHN0YW5kYXJkcywgYXBwcm92ZWQgcmVmZXJlbmNlcywgd29ybGQtYXJ0IGNhbm9uLCBwcm9kdWN0aW9uIHBsYW5uaW5nIGFuZCByZXNvdXJjZSBnb3Zlcm5hbmNlLgoKRG9jdW1lbnRzOgoKLSBgMDhfQXNzZXRzL0FTU0VUUy5tZGAg4oCUIHRvcC1sZXZlbCBjYW5vbmljYWwgYXNzZXQgbWFuYWdlbWVudCwgYXBwcm92YWwtc3RhdGUsIGlkZW50aXR5IGFuZCBzdG9yYWdlIHJ1bGVzLgotIGAwOF9Bc3NldHMvV09STERfQVNTRVRfQklCTEUubWRgIOKAlCBleHBsaWNpdGx5IG93bmVyLWF1dGhvcml6ZWQgY2Fub25pY2FsIHdvcmxkLWFydC9hc3NldCBzcGVjaWFsaXphdGlvbiBjb3ZlcmluZyB0aGUgc3R5bGl6ZWQgM0QgcHJlLXJlbmRlcmVkIHZpc3VhbCBsYW5ndWFnZSwgZGl2ZXJzaXR5LCBwcm9kdWN0cywgY29tcGFuaWVzLCBjaXRpZXMsIGluZnJhc3RydWN0dXJlLCBkaW1lbnNpb25zIGFuZCBwcm9kdWN0aW9uIGdhdGVzLgotIGAwOF9Bc3NldHMvTUFTVEVSX0FTU0VUX1BMQU5fVjIubWRgIOKAlCBnb3Zlcm5lZCBzdGFnZWQgcHJvZHVjdGlvbiBwbGFuIGZvciBzY2FsaW5nIHRoZSBsaWJyYXJ5IGludG8gdGhvdXNhbmRzIG9mIG1lYW5pbmdmdWwgYXNzZXRzLgotIGAwOF9Bc3NldHMvQkFUQ0hfMDAzX1BMQUNFSE9MREVSX1BST1ZFTkFOQ0UubWRgIOKAlCBoaXN0b3JpY2FsIHBsYWNlaG9sZGVyIHByb3ZlbmFuY2UuCi0gYDA4X0Fzc2V0cy9BcHByb3ZlZF9SZWZlcmVuY2VzL2Ag4oCUIG93bmVyLWFwcHJvdmVkIHZpc3VhbCByZWZlcmVuY2UgYm9hcmRzLgotIGAwOF9Bc3NldHMvUHJvZHVjdGlvbi9NYW5pZmVzdHMvYCDigJQgZXhlY3V0YWJsZSBhc3NldC1wcm9kdWN0aW9uIG1hbmlmZXN0cyBjb25zdHJhaW5lZCBieSB0aGUgV29ybGQgQXNzZXQgQmlibGUuCgpBdXRob3JpdHkgbm90ZToKCmBXT1JMRF9BU1NFVF9CSUJMRS5tZGAgaXMgYSBsb3dlci1sZXZlbCBzcGVjaWFsaXphdGlvbiBvZiBVbml2ZXJzZSwgQnVzaW5lc3MsIExvZ2lzdGljcywgR2FtZSwgV29ybGQgYW5kIFVJIGNhbm9uLiBJdCBkZWZpbmVzIGhvdyB0aG9zZSB0cnV0aHMgYmVjb21lIHZpc3VhbGx5IGNvaGVyZW50IGFzc2V0czsgaXQgZG9lcyBub3QgcmVkZWZpbmUgdGhlaXIgZ2FtZXBsYXkvZWNvbm9taWMgYmVoYXZpb3IuCgotLS0KCg==
+          REPBIBLE_B64: IyBCSUJMRS1MZXZlbCBEb2N1bWVudGF0aW9uCgojIyBBdXRob3JpemVkIEJJQkxFCgpUaGUgUHJvamVjdCBPd25lciBleHBsaWNpdGx5IGF1dGhvcml6ZWQgYDA4X0Fzc2V0cy9XT1JMRF9BU1NFVF9CSUJMRS5tZGAgb24gMjAyNi0wOS0wNyBhZnRlciB0aGUgcmVxdWlyZWQgZG9tYWluIGF1ZGl0L3JlY29uY2lsaWF0aW9uIGFuZCBPd25lciBEaXJlY3RpdmUgMDAzLgoKVGhpcyBhdXRob3JpemF0aW9uIGlzIHNwZWNpZmljIHRvIHRoZSB3b3JsZC1hcnQvYXNzZXQgZG9tYWluLgoKYFdPUkxEX0FTU0VUX0JJQkxFLm1kYCBtdXN0OgoKLSByZW1haW4gc3Vib3JkaW5hdGUgdG8gYFZJU0lPTmAsIGBVTklWRVJTRV9ERVNJR05gLCBgQlVTSU5FU1NfREVTSUdOYCwgYExPR0lTVElDU19ERVNJR05gLCBHYW1lL1dvcmxkL1VJIGFuZCBUZWNobmljYWwgYXV0aG9yaXR5OwotIGF2b2lkIGR1cGxpY2F0aW5nIGdhbWVwbGF5L2Vjb25vbXkvbG9naXN0aWNzIG93bmVyc2hpcDsKLSBnb3Zlcm4gdmlzdWFsIHN0eWxlLCBkaXZlcnNpdHksIGFzc2V0IGZhbWlsaWVzLCBwcm9kdWN0IHJlcHJlc2VudGF0aW9uLCBwcm9kdWN0aW9uIHN0YXRlcywgZGltZW5zaW9ucyBhbmQgYXNzZXQtcXVhbGl0eSBnYXRlczsKLSBiZSBjaGFuZ2VkIG1hdGVyaWFsbHkgb25seSB0aHJvdWdoIGRlbGliZXJhdGUgY2Fub25pY2FsIHJlY29uY2lsaWF0aW9uIGFuZCBvd25lciBhcHByb3ZhbCB3aGVyZSB0aGUgdmlzdWFsIGRpcmVjdGlvbiBjaGFuZ2VzLgoKIyMgT3RoZXIgRnV0dXJlIEJJQkxFIERvY3VtZW50cwoKTm8gb3RoZXIgQklCTEUgZG9jdW1lbnQgaXMgYXV0b21hdGljYWxseSBhdXRob3JpemVkIGJ5IHRoaXMgZGVjaXNpb24uCgpBbnkgYWRkaXRpb25hbCBCSUJMRSBzdGlsbCByZXF1aXJlczoKCjEuIGNvbXBsZXRlIGRvbWFpbiBhdWRpdDsKMi4gb3duZXJzaGlwIG1hcHBpbmc7CjMuIG92ZXJsYXAgZGV0ZWN0aW9uOwo0LiBjb250cmFkaWN0aW9uIGFuYWx5c2lzOwo1LiBtaWdyYXRpb24gcHJvcG9zYWw7CjYuIGV4cGxpY2l0IFByb2plY3QgT3duZXIgYXBwcm92YWwuCgotLS0KCg==
         run: |
           python - <<'PY'
+          import base64, os
           from pathlib import Path
-
           p = Path('00_Project/DOCUMENT_INDEX.md')
           text = p.read_text(encoding='utf-8')
-
+          rep08 = base64.b64decode(os.environ['REP08_B64']).decode('utf-8')
+          repbible = base64.b64decode(os.environ['REPBIBLE_B64']).decode('utf-8')
           start = text.index('# 08_Assets')
           end = text.index('# 09_Development')
-          replacement = '''# 08_Assets
-
-## Purpose
-
-Asset standards, approved references, world-art canon, production planning and resource governance.
-
-Documents:
-
-- `08_Assets/ASSETS.md` — top-level canonical asset management, approval-state, identity and storage rules.
-- `08_Assets/WORLD_ASSET_BIBLE.md` — explicitly owner-authorized canonical world-art/asset specialization covering the stylized 3D pre-rendered visual language, diversity, products, companies, cities, infrastructure, dimensions and production gates.
-- `08_Assets/MASTER_ASSET_PLAN_V2.md` — governed staged production plan for scaling the library into thousands of meaningful assets.
-- `08_Assets/BATCH_003_PLACEHOLDER_PROVENANCE.md` — historical placeholder provenance.
-- `08_Assets/Approved_References/` — owner-approved visual reference boards.
-- `08_Assets/Production/Manifests/` — executable asset-production manifests constrained by the World Asset Bible.
-
-Authority note:
-
-`WORLD_ASSET_BIBLE.md` is a lower-level specialization of Universe, Business, Logistics, Game, World and UI canon. It defines how those truths become visually coherent assets; it does not redefine their gameplay/economic behavior.
-
----
-
-'''
-          text = text[:start] + replacement + text[end:]
-
+          text = text[:start] + rep08 + text[end:]
           start = text.index('# Future BIBLE-Level Documentation')
           end = text.index('# External DROPi Canonical Reference Package')
-          replacement = '''# BIBLE-Level Documentation
-
-## Authorized BIBLE
-
-The Project Owner explicitly authorized `08_Assets/WORLD_ASSET_BIBLE.md` on 2026-09-07 after the required domain audit/reconciliation and Owner Directive 003.
-
-This authorization is specific to the world-art/asset domain.
-
-`WORLD_ASSET_BIBLE.md` must:
-
-- remain subordinate to `VISION`, `UNIVERSE_DESIGN`, `BUSINESS_DESIGN`, `LOGISTICS_DESIGN`, Game/World/UI and Technical authority;
-- avoid duplicating gameplay/economy/logistics ownership;
-- govern visual style, diversity, asset families, product representation, production states, dimensions and asset-quality gates;
-- be changed materially only through deliberate canonical reconciliation and owner approval where the visual direction changes.
-
-## Other Future BIBLE Documents
-
-No other BIBLE document is automatically authorized by this decision.
-
-Any additional BIBLE still requires:
-
-1. complete domain audit;
-2. ownership mapping;
-3. overlap detection;
-4. contradiction analysis;
-5. migration proposal;
-6. explicit Project Owner approval.
-
----
-
-'''
-          text = text[:start] + replacement + text[end:]
-
+          text = text[:start] + repbible + text[end:]
           text = text.replace('Version: 2.0.0', 'Version: 2.1.0', 1)
           p.write_text(text, encoding='utf-8')
           PY
