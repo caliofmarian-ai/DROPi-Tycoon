@@ -97,20 +97,78 @@ export const buildSmartphoneSnapshot = (
   }
 }
 
+/**
+ * Responsive fixed-screen phone geometry for the canonical Android viewport matrix.
+ * Portrait uses a stacked flow (live apps -> locked apps -> content); landscape keeps
+ * the compact two-pane presentation. No orientation is blocked or treated as secondary.
+ */
 export const smartphoneLayout = (width: number, height: number) => {
+  const portrait = width < height
+  const edge = 8
+  const headerHeight = 48
+  const liveButtonHeight = TOUCH_TARGET_MIN_PX
+  const futureTileHeight = TOUCH_TARGET_MIN_PX
+  const tileGap = 6
+
+  if (portrait) {
+    const shellWidth = Math.max(1, width - edge * 2)
+    const shellHeight = Math.max(1, Math.min(700, height - edge * 2))
+    const left = (width - shellWidth) / 2
+    const top = (height - shellHeight) / 2
+    const innerGap = 10
+    const paneWidth = shellWidth - innerGap * 2
+    const liveTop = top + headerHeight + innerGap
+    const futureTop = liveTop + liveButtonHeight + 28
+    const futureRows = Math.ceil(SMARTPHONE_FUTURE_APPS.length / 2)
+    const futureHeight = futureRows * futureTileHeight + (futureRows - 1) * tileGap
+    const contentTop = futureTop + futureHeight + 12
+    const shellBottom = top + shellHeight
+
+    return {
+      portrait,
+      shell: { left, top, width: shellWidth, height: shellHeight },
+      headerHeight,
+      close: {
+        x: left + shellWidth - 38,
+        y: top + headerHeight / 2,
+        width: 60,
+        height: TOUCH_TARGET_MIN_PX,
+      },
+      live: {
+        left: left + innerGap,
+        top: liveTop,
+        width: paneWidth,
+        buttonHeight: liveButtonHeight,
+        gap: tileGap,
+      },
+      future: {
+        left: left + innerGap,
+        top: futureTop,
+        width: paneWidth,
+        tileHeight: futureTileHeight,
+        gap: tileGap,
+        columns: 2,
+      },
+      content: {
+        left: left + innerGap,
+        top: contentTop,
+        width: paneWidth,
+        height: Math.max(120, shellBottom - innerGap - contentTop),
+      },
+    }
+  }
+
   const shellWidth = Math.min(620, Math.max(500, width * 0.74))
   const shellHeight = Math.min(350, Math.max(304, height - 24))
   const left = (width - shellWidth) / 2
   const top = (height - shellHeight) / 2
-  const headerHeight = 48
   const innerGap = 12
   const appPaneWidth = Math.min(270, shellWidth * 0.44)
   const contentLeft = left + appPaneWidth + innerGap * 2
   const contentWidth = shellWidth - appPaneWidth - innerGap * 3
-  const liveButtonHeight = TOUCH_TARGET_MIN_PX
-  const futureTileHeight = TOUCH_TARGET_MIN_PX
 
   return {
+    portrait,
     shell: { left, top, width: shellWidth, height: shellHeight },
     headerHeight,
     close: {
@@ -124,14 +182,14 @@ export const smartphoneLayout = (width: number, height: number) => {
       top: top + headerHeight + innerGap,
       width: appPaneWidth,
       buttonHeight: liveButtonHeight,
-      gap: 6,
+      gap: tileGap,
     },
     future: {
       left: left + innerGap,
       top: top + headerHeight + innerGap + liveButtonHeight + 34,
       width: appPaneWidth,
       tileHeight: futureTileHeight,
-      gap: 6,
+      gap: tileGap,
       columns: 2,
     },
     content: {
