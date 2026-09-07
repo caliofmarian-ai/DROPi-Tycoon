@@ -14,14 +14,19 @@ COPY . .
 RUN npm run build
 
 # ---- Production stage ----
-# server/server.mjs uses only Node built-ins, so no node_modules are needed at runtime.
+# The Node server can have runtime package imports (for example `postgres`).
+# Install only production dependencies so the image cannot pass build while
+# crashing at startup because a server dependency exists only in the builder.
 FROM node:22.12.0-alpine3.21 AS production
 
 WORKDIR /app
 
+COPY --from=builder /app/package.json ./package.json
+COPY --from=builder /app/package-lock.json ./package-lock.json
+RUN npm ci --omit=dev --ignore-scripts
+
 COPY --from=builder /app/dist ./dist
 COPY --from=builder /app/server ./server
-COPY --from=builder /app/package.json ./package.json
 
 ENV NODE_ENV=production
 
