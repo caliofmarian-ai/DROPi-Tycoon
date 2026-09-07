@@ -40,7 +40,7 @@ const clearRoute = (start: UrbanPoint, end: UrbanPoint, roadOnly: boolean): bool
 
 /** Small authored loops, validated once against the real collision surfaces. */
 export const buildAmbientRoutes = (): readonly AmbientRoute[] => {
-  const routes: AmbientRoute[] = []
+  const pedestrianRoutes: AmbientRoute[] = []
   for (const [index, id] of ['central-vertical', 'garden-avenue'].entries()) {
     const road = WORLD_ROADS.find(candidate => candidate.id === id)
     if (!road) continue
@@ -48,7 +48,7 @@ export const buildAmbientRoutes = (): readonly AmbientRoute[] => {
       const x = road.x + (side ? 1 : -1) * (road.width / 2 + 12)
       const start = { x, y: road.y - road.height / 2 + 100 }
       const end = { x, y: start.y + 240 }
-      if (clearRoute(start, end, false)) routes.push({
+      if (clearRoute(start, end, false)) pedestrianRoutes.push({
         id: `neighbor-${id}-${side}`, kind: 'pedestrian', start, end,
         speed: 25 + index * 3, phase: index * 5 + side * 3,
       })
@@ -67,7 +67,7 @@ export const buildAmbientRoutes = (): readonly AmbientRoute[] => {
       const y = road.y + (side ? 1 : -1) * (road.height / 2 + 3)
       const start = { x, y }
       const end = { x: x + 180, y }
-      if (clearRoute(start, end, false)) routes.push({
+      if (clearRoute(start, end, false)) pedestrianRoutes.push({
         id: `neighbor-${id}-${side}`, kind: 'pedestrian', start, end,
         speed: 24 + index % 4 * 3, phase: index * 2.3 + side * 4.7,
       })
@@ -77,7 +77,7 @@ export const buildAmbientRoutes = (): readonly AmbientRoute[] => {
   // One authored legal road crossing demonstrates real pedestrian/traffic priority without
   // turning every ambient actor into a pathfinding agent. It stays within the existing actor budget.
   const crossing = CENTRAL_CONTROLLED_CROSSING
-  routes.push({
+  pedestrianRoutes.push({
     id: `neighbor-${crossing.id}`,
     kind: 'pedestrian',
     start: { x: crossing.x, y: crossing.y - crossing.halfLength },
@@ -87,18 +87,22 @@ export const buildAmbientRoutes = (): readonly AmbientRoute[] => {
     controlledCrossingId: crossing.id,
   })
 
+  // Preserve every authored traffic route. New pedestrian life may use the remaining mobile budget,
+  // but it must never silently remove traffic variety from the city.
+  const trafficRoutes: AmbientRoute[] = []
   for (const [index, id] of ['central-horizontal', 'business-lane', 'market-boulevard', 'garden-boulevard'].entries()) {
     const road = WORLD_ROADS.find(candidate => candidate.id === id)
     if (!road) continue
     const start = { x: road.x - road.width / 2 + 90, y: road.y + road.height * 0.22 }
     const end = { x: road.x + road.width / 2 - 90, y: start.y }
-    if (clearRoute(start, end, true)) routes.push({
+    if (clearRoute(start, end, true)) trafficRoutes.push({
       id: `traffic-${id}`, kind: index % 2 ? 'van' : 'car', start, end,
       speed: 74 + index * 7, phase: index * 13,
       controlledCrossingId: id === 'central-horizontal' ? crossing.id : undefined,
     })
   }
-  return routes.slice(0, AMBIENT_ACTOR_LIMIT)
+  const pedestrianBudget = Math.max(0, AMBIENT_ACTOR_LIMIT - trafficRoutes.length)
+  return [...pedestrianRoutes.slice(0, pedestrianBudget), ...trafficRoutes]
 }
 
 /** Writes into a reused pose, with bounded waits at route ends and controlled crossings. */
