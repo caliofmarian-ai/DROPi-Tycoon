@@ -2,7 +2,7 @@
 
 Document: VALUATION.md
 Project: DROPi Tycoon
-Version: 1.0.0
+Version: 1.1.0
 Status: Canonical — Company Valuation Specialization
 Author: Marian Caliof & OpenAI
 Language: English
@@ -166,7 +166,9 @@ It is not automatically:
 - an exchange quote;
 - a real-money value.
 
-Future treasury-share purchases may use this reference as one governed input to explicit Company Money settlement.
+Future treasury-share purchases may use this reference as one governed input to an explicit settlement funded by the buyer's **Personal Money**. The issuing company receives the purchase proceeds as Company Money only through that future atomic settlement.
+
+See `02_Economy/PERSONAL_FINANCE.md`.
 
 ---
 
@@ -178,7 +180,8 @@ The owner-approved rule remains binding:
 - those units return to the Internal treasury pool;
 - the units are not deleted;
 - the units are not redistributed for free;
-- other eligible active company members may later purchase those treasury units through an explicit paid Company Money transaction;
+- other eligible active company members may later purchase those treasury units through an explicit paid transaction funded from the buyer's Personal Money;
+- purchase proceeds belong to the issuing company and become Company Money only through authoritative settlement;
 - external portfolio holdings are independent and are not confiscated because operational membership changes.
 
 Valuation does not itself execute that purchase. It only provides a future reference basis.
@@ -217,7 +220,7 @@ This system does not implement or authorize:
 - NFT ownership;
 - wallets;
 - tokenized shares;
-- conversion of Company Money into real financial claims.
+- conversion of Company Money or Personal Money into real financial claims.
 
 ---
 
