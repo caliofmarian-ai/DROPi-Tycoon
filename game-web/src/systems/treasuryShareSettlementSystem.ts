@@ -7,6 +7,7 @@ import type {
   InternalTreasuryPurchaseRequest,
   InternalTreasuryQuoteResult,
   TreasurySharePurchaseReceipt,
+  TreasuryShareSettlementBlockReason,
   TreasuryShareSettlementJournal,
   TreasuryShareSettlementResult,
 } from '../types/treasuryShareSettlement'
@@ -120,7 +121,7 @@ const receiptMatchesRequest = (
   receipt.units === request.units
 
 const blocked = (
-  reason: TreasuryShareSettlementResult extends { settled: false; reason: infer R } ? R : never,
+  reason: TreasuryShareSettlementBlockReason,
   equityState: CompanyEquityState,
   buyerFunds: PersonalFundsAccountState,
   issuingCompanyMoney: number,
