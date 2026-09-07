@@ -1,0 +1,1 @@
+After this foundation PR merges, continue without owner interruption to the Global Map implementation issue unless a material product decision is required.
