@@ -2,6 +2,7 @@ import Phaser from 'phaser'
 import { getBrowserSaveStorage } from '../persistence/browserSaveStorage'
 import { autosaveIfApproved } from '../persistence/saveSystem'
 import { getOrCreateGameSession, replaceGameSession } from '../state/gameSession'
+import { calculateDailyEmployeeDeliveryRevenue } from '../systems/employeeFleetSystem'
 import { buildFinancialReport, calculateDailyOperatingExpense, processDailyOperatingExpense } from '../systems/financialSystem'
 import { calculateDailyVehicleMaintenanceExpense } from '../systems/vehicleSystem'
 import type { CompanyState, WorldState } from '../types/game'
@@ -36,6 +37,7 @@ export class FinancialReportScene extends Phaser.Scene {
     const report = buildFinancialReport(this.companyState)
     const nextExpense = calculateDailyOperatingExpense(this.companyState)
     const nextMaintenance = calculateDailyVehicleMaintenanceExpense(this.companyState)
+    const nextEmployeeRevenue = calculateDailyEmployeeDeliveryRevenue(this.companyState)
     drawManagementHeader(this, layout, 'Financial Report', this.companyState,
       this.feedback || `${this.companyState.companyName} · All-time performance`)
     const metrics = [
@@ -56,25 +58,27 @@ export class FinancialReportScene extends Phaser.Scene {
     drawPanel(this, layout.operations)
     const operations = insetRect(layout.operations, 12)
     fitText(this, { ...operations, height: 23 }, 'Operations', 18, COLORS.textPrimary, true)
-    const lineHeight = Math.min(26, (operations.height - 27) / 3)
+    const lineHeight = Math.min(24, (operations.height - 27) / 4)
     const rows = [
       `Operating days closed   ${report.lastProcessedDay}`,
-      `Salary cycles paid   ${report.lastSalaryCycle}`,
+      `Employee delivery income   ${formatMoney(report.employeeDeliveryIncome)}`,
+      `Salary paid   ${formatMoney(report.salaryExpenses)}`,
       `Maintenance paid   ${formatMoney(report.maintenanceExpenses)}`,
     ]
     rows.forEach((text, index) => {
       fitText(this, { ...operations, top: operations.top + 27 + index * lineHeight, height: lineHeight },
-        text, 14, COLORS.textSecondary)
+        text, 13, COLORS.textSecondary)
     })
     if (layout.compactLandscape) {
       fitText(this, { ...layout.action, top: layout.operations.top, height: 26 },
         'Next operating day', 15, COLORS.textSecondary)
       fitText(this, { ...layout.action, top: layout.operations.top + 28, height: 26 },
-        formatMoney(nextExpense + nextMaintenance), 23, COLORS.textGold, true)
+        `+${formatMoney(nextEmployeeRevenue)} · -${formatMoney(nextExpense + nextMaintenance)}`,
+        20, nextEmployeeRevenue >= nextExpense + nextMaintenance ? COLORS.textSuccess : COLORS.textGold, true)
     }
     createThemedButton(this, layout.action,
-      `Close day ${report.lastProcessedDay + 1} · ${formatMoney(nextExpense + nextMaintenance)}`,
-      'gold', () => this.closeNextOperatingDay(), { fontSize: 16 })
+      `Close day ${report.lastProcessedDay + 1} · +${formatMoney(nextEmployeeRevenue)} / -${formatMoney(nextExpense + nextMaintenance)}`,
+      'gold', () => this.closeNextOperatingDay(), { fontSize: 14 })
     drawManagementFooter(this, layout, { label: 'Company', action: () => this.returnToCompany() },
       () => this.returnToMainMenu())
   }
