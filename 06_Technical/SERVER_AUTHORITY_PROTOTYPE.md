@@ -4,6 +4,8 @@ Status: Canonical technical specialization for the first network authority slice
 
 Authority owner: `06_Technical/SHARED_AUTHORITY_CONTRACT.md` remains the higher-level contract.
 
+Next-stage authority: `06_Technical/DURABLE_AUTHORITY_AND_AUTHENTICATION.md` owns the persistence/authentication requirements that must be satisfied before any real shared economic state migrates server-side.
+
 ## Purpose
 
 The current DROPi Tycoon production service already serves the Phaser/Vite runtime through one Node HTTP process on Railway. The first network-authority slice extends that same process with a bounded `/api/authority/*` prototype so the project can prove real client -> server command, revision, receipt, replay and reconnect semantics before selecting production authentication or durable persistence.
@@ -34,7 +36,7 @@ The registry is memory-resident and resets whenever the Node process restarts, t
 
 Therefore this prototype MUST NOT be treated as durable account, ownership, balance, membership, marketplace, permission or world state.
 
-A later governed child of #363 must select durable persistence and authentication before any real shared economic state is migrated.
+Durable persistence and authentication requirements are defined by `DURABLE_AUTHORITY_AND_AUTHENTICATION.md`. A later governed implementation child must select/provision providers before any real shared economic state is migrated.
 
 ## HTTP surface
 
@@ -98,14 +100,15 @@ These limits reduce abuse risk while the endpoint remains unauthenticated and no
 
 ## Migration sequence after this slice
 
-The governed order remains:
+The governed order is now specialized by `DURABLE_AUTHORITY_AND_AUTHENTICATION.md`:
 
 1. shared-authority contract — completed by #376/#377;
-2. real HTTP command/revision/replay boundary — #394;
-3. durable persistence choice and repository implementation;
-4. authentication/account identity binding;
-5. migrate one shared state family at a time;
-6. only after those gates, real-player membership/economy/market/world synchronization.
+2. real HTTP command/revision/replay boundary — completed by #394/#397;
+3. canonical durable persistence/authentication boundary — #398;
+4. governed provider selection/provisioning;
+5. authenticated durable account identity;
+6. migrate one shared state family at a time;
+7. only after those gates, real-player membership/economy/market/world synchronization.
 
 Company Money, ownership shares and multiplayer employment MUST NOT be moved to this session-only registry.
 
