@@ -50,9 +50,26 @@ describe('M-008 owner review — compact non-overlapping top dock', () => {
     expect(sceneSource).toContain('this.cameras.main.ignore(this.fixedUiLayer)')
   })
 
+  it.each(SUPPORTED_ANDROID_VIEWPORTS.filter(viewport => viewport.width < viewport.height))(
+    'keeps portrait Phone/Menu hit row above status text at $width x $height',
+    ({ width, height }) => {
+      const layout = urbanHUDLayout(width, height)
+      const hitBottom = layout.topControlY + GAMEWORLD_TOP_BAR_TOUCH_TARGET_PX / 2
+      const phoneRight = layout.phone.x + layout.phone.width / 2
+      const menuLeft = width - 47 - 78 / 2
+
+      expect(layout.portrait).toBe(true)
+      expect(hitBottom).toBeLessThanOrEqual(layout.statusY)
+      expect(layout.phone.y).toBe(layout.topControlY)
+      expect(phoneRight).toBeLessThan(menuLeft)
+      expect(layout.statusY).toBeLessThan(layout.headerHeight)
+    },
+  )
+
   it('keeps Main Menu behind the navbar while Company management is entered physically through HQ', () => {
     const hudSource = readFileSync(new URL('../src/ui/UrbanHUD.ts', import.meta.url), 'utf8')
     expect(hudSource).toContain("'☰  Menu', () => this.toggleMenu()")
+    expect(hudSource).toContain('this.button(width - 47, this.layout.topControlY, 78, 36')
     expect(hudSource).toContain("['Main menu', callbacks.menu]")
     expect(hudSource).not.toContain("['Company', callbacks.company]")
     // The Android recovery control abstraction hides both visual chrome and the native
