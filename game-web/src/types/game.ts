@@ -30,6 +30,8 @@ export type VehicleTypeId = (typeof VEHICLE_TYPE_IDS)[number]
 export interface OwnedVehicleState {
   vehicleId: string
   typeId: VehicleTypeId
+  /** Stable employee assignment. Ownership always remains with the company. */
+  assignedEmployeeId?: string
 }
 
 export const EMPLOYEE_ROLES = ['Courier'] as const
@@ -56,6 +58,8 @@ export interface FinancialState {
   lastProcessedDay: number
   /** Cumulative delivery revenue settled by the authoritative economy system. */
   totalRevenue: number
+  /** Cumulative delivery revenue generated specifically by productive employees. */
+  totalEmployeeDeliveryRevenue?: number
   /** Cumulative non-salary operating expenses processed by RBATCH-019. */
   totalOperatingExpenses: number
   /** Cumulative salary expense produced by the RBATCH-018 payroll system. */
