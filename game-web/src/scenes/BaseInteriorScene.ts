@@ -25,6 +25,7 @@ import {
 import { CITY_COLORS, COLORS } from '../ui/theme'
 import {
   INTERIOR_LOCATIONS,
+  isInteriorWalkable,
   moveInteriorPlayer,
   nearestInteriorInteraction,
   transportBayLabel,
@@ -37,6 +38,11 @@ import { movementFacing, type UrbanFacing } from '../world/urbanWorld'
 import { createPlayerVisual, type PlayerVisual } from '../world/playerVisual'
 
 const WALK_SPEED = 185
+
+interface InteriorResumeState {
+  returnPosition?: InteriorPoint
+  returnFacing?: UrbanFacing
+}
 
 const vehicleLabel = (typeId: VehicleTypeId): string => {
   switch (typeId) {
@@ -53,6 +59,7 @@ export abstract class BaseInteriorScene extends Phaser.Scene {
   private worldState!: WorldState
   private companyState!: CompanyState
   private position!: InteriorPoint
+  private resumePosition?: InteriorPoint
   private playerVisual!: PlayerVisual
   private keys: Record<string, Phaser.Input.Keyboard.Key> = {}
   private facing: UrbanFacing = 'up'
@@ -74,12 +81,26 @@ export abstract class BaseInteriorScene extends Phaser.Scene {
     this.locationId = locationId
   }
 
+  init(data?: InteriorResumeState): void {
+    const returnPosition = data?.returnPosition
+    this.resumePosition = returnPosition && Number.isFinite(returnPosition.x) && Number.isFinite(returnPosition.y)
+      ? { ...returnPosition }
+      : undefined
+    this.facing = data?.returnFacing && ['up', 'down', 'left', 'right'].includes(data.returnFacing)
+      ? data.returnFacing
+      : 'up'
+  }
+
   create(): void {
     const session = getOrCreateGameSession()
     this.worldState = session.world
     this.companyState = session.company
     this.location = INTERIOR_LOCATIONS[this.locationId]
-    this.position = { ...this.location.spawn }
+    const resumePosition = this.resumePosition
+    this.position = resumePosition && isInteriorWalkable(this.location, resumePosition)
+      ? { ...resumePosition }
+      : { ...this.location.spawn }
+    this.resumePosition = undefined
     this.cameras.main
       .setBackgroundColor(COLORS.backgroundBottom)
       .setBounds(0, 0, this.location.width, this.location.height)
@@ -107,7 +128,7 @@ export abstract class BaseInteriorScene extends Phaser.Scene {
     this.refreshStateLabels()
     this.refreshPrompt()
     this.notify(this.locationId === 'hq'
-      ? 'HQ is physical management: Hiring, Fleet, Management and Parcel terminals are inside this building.'
+      ? 'HQ is physical management: Hiring, Fleet, Operations and Parcel terminals are inside this building.'
       : 'Use the joystick to walk · Action at a counter · Exit through the south door.')
   }
 
@@ -153,7 +174,7 @@ export abstract class BaseInteriorScene extends Phaser.Scene {
   private drawHQInterior(): void {
     this.zonePanel(65, 105, 335, 180, 'EMPLOYEE AREA', 'Hiring · onboarding · field-team status', COLORS.accentStrong)
     this.zonePanel(65, 310, 335, 305, 'FLEET BAY', 'Buy vehicles · owned fleet · active handoff', COLORS.accent)
-    this.zonePanel(765, 105, 365, 195, 'OPERATIONS & DISPATCH', 'Company management · route control', COLORS.gold)
+    this.zonePanel(765, 105, 365, 195, 'OPERATIONS & DISPATCH', 'Operations console · routes · company status', COLORS.gold)
     this.zonePanel(765, 335, 365, 190, 'PARCEL STAGING', 'Accept work · sorting · parcel handoff', COLORS.accentStrong)
     this.zonePanel(445, 105, 270, 120, 'HQ EXPANSION', 'Future operational wings', 0x6d7d91)
     this.zonePanel(445, 270, 270, 145, 'MAINTENANCE WING', 'Construction required · issue #343', 0x7c8793)
@@ -530,8 +551,10 @@ export abstract class BaseInteriorScene extends Phaser.Scene {
 
   private readonly handleWake = (): void => {
     this.clearInput()
-    // Management may have changed fleet/employees; bounded interior restart redraws the authoritative state.
-    this.scene.restart()
+    // Management may change fleet/employees, so redraw authoritative state without losing the in-HQ return point.
+    const returnPosition = { ...this.position }
+    const returnFacing = this.facing
+    this.scene.restart({ returnPosition, returnFacing } satisfies InteriorResumeState)
   }
 
   private readonly exitInterior = (): void => {
