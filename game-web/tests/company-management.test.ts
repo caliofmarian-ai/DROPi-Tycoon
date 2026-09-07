@@ -36,6 +36,10 @@ const interiorSource = readFileSync(
   new URL('../src/scenes/BaseInteriorScene.ts', import.meta.url),
   'utf8',
 )
+const interiorLocationsSource = readFileSync(
+  new URL('../src/world/interiorLocations.ts', import.meta.url),
+  'utf8',
+)
 
 afterEach(() => {
   clearGameSession()
@@ -268,17 +272,35 @@ describe('RBATCH-012 — scene integration boundaries', () => {
     expect(body).not.toContain('text.setInteractive')
   })
 
+  it('presents company state through the physical Operations & Dispatch console', () => {
+    expect(interiorLocationsSource).toContain("interaction('operations', 'Operations & Dispatch Console'")
+    expect(companyManagementSource).toContain("fromHQ ? 'Operations & Dispatch Console' : 'Company Overview'")
+    expect(companyManagementSource).not.toContain("'HQ Management Terminal'")
+    expect(companyManagementSource).not.toContain("'Your Company'")
+  })
+
   it('CompanyManagement owns purchase and returns to physical HQ when opened there', () => {
     expect(companyManagementSource).toContain('purchaseUpgrade(')
     expect(companyManagementSource).toContain('replaceGameSession(')
     expect(companyManagementSource).toContain("this.scene.start('GameWorld')")
     expect(companyManagementSource).toContain("this.scene.wake(HQ_MANAGEMENT_RETURN_SCENE)")
-    expect(companyManagementSource).toContain("'‹ Back to HQ interior'")
+    expect(companyManagementSource).toContain("'‹ Back to HQ · Operations'")
     expect(companyManagementSource).toContain('drawManagementFooter(')
     expect(companyManagementSource).toContain('createThemedButton(')
     const controls = readFileSync(new URL('../src/ui/themeControls.ts', import.meta.url), 'utf8')
     expect(controls).toContain('background.setInteractive(')
     expect(controls).not.toContain('label.setInteractive')
+  })
+
+  it('redraws HQ after management while restoring the exact interior position and facing', () => {
+    expect(interiorSource).toContain('interface InteriorResumeState')
+    expect(interiorSource).toContain('returnPosition?: InteriorPoint')
+    expect(interiorSource).toContain('returnFacing?: UrbanFacing')
+    expect(interiorSource).toContain('isInteriorWalkable(this.location, resumePosition)')
+    expect(interiorSource).toContain('const returnPosition = { ...this.position }')
+    expect(interiorSource).toContain('const returnFacing = this.facing')
+    expect(interiorSource).toContain('this.scene.restart({ returnPosition, returnFacing }')
+    expect(interiorSource).not.toContain('this.scene.restart()')
   })
 
   it('does not implement persistent Save/Load storage in RBATCH-012 scenes or session state', () => {
