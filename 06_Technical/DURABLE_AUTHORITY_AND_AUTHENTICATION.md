@@ -2,11 +2,11 @@
 
 ## Document Information
 
-Project: DROPi Tycoon  
-Status: Canonical Technical Specialization  
-Authority level: Level 7 — Technical Design  
-Parent authorities: `00_Project/VISION.md`, `00_Project/BUSINESS_DESIGN.md`, `01_GameDesign/COMPANY_SOCIETY_AND_MULTIPLAYER.md`, `02_Economy/ECONOMY.md`, `06_Technical/ARCHITECTURE.md`, `06_Technical/SHARED_AUTHORITY_CONTRACT.md`  
-Coordinates: Issue #363, child #398  
+Project: DROPi Tycoon
+Status: Canonical Technical Specialization
+Authority level: Level 7 — Technical Design
+Parent authorities: `00_Project/VISION.md`, `00_Project/BUSINESS_DESIGN.md`, `01_GameDesign/COMPANY_SOCIETY_AND_MULTIPLAYER.md`, `02_Economy/ECONOMY.md`, `06_Technical/ARCHITECTURE.md`, `06_Technical/SHARED_AUTHORITY_CONTRACT.md`
+Coordinates: Issue #363, child #398
 Date: 2026-09-07
 
 ---
