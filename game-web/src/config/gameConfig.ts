@@ -6,7 +6,7 @@ import { EmployeeManagementScene } from '../scenes/EmployeeManagementScene'
 import { FinancialReportScene } from '../scenes/FinancialReportScene'
 import { GameWorldScene } from '../scenes/GameWorldScene'
 import { HQInteriorScene } from '../scenes/HQInteriorScene'
-import { MainMenuScene } from '../scenes/MainMenuScene'
+import { ApprovedAssetMainMenuScene } from '../scenes/ApprovedAssetMainMenuScene'
 import { MarketplaceInteriorScene } from '../scenes/MarketplaceInteriorScene'
 import { VehicleFleetScene } from '../scenes/VehicleFleetScene'
 import { COLORS } from '../ui/theme'
@@ -27,7 +27,7 @@ export const createGameConfig = (parent: string): Phaser.Types.Core.GameConfig =
     activePointers: 3,
   },
   scene: [
-    MainMenuScene,
+    ApprovedAssetMainMenuScene,
     GameWorldScene,
     HQInteriorScene,
     MarketplaceInteriorScene,
