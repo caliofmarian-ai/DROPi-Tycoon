@@ -128,6 +128,7 @@ const sanitizeHQProgression = (value: unknown): { hq: HQProgressionState; repair
   const seen = new Set<HQDepartmentId>(constructedDepartments)
   let repaired = false
 
+  if (value === undefined) return { hq: { constructedDepartments }, repaired: false }
   if (!isRecord(value) || !Array.isArray(value.constructedDepartments)) {
     return { hq: { constructedDepartments }, repaired: true }
   }
