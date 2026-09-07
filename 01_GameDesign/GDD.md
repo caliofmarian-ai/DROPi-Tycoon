@@ -2,11 +2,11 @@
 
 Document: GDD.md
 Project: DROPi Tycoon
-Version: 1.0.0
+Version: 1.1.0
 Status: Canonical
 Author: Marian Caliof & OpenAI
 Language: English
-Last Updated: 2026-07-12
+Last Updated: 2026-09-07
 
 ---
 
@@ -14,147 +14,280 @@ Last Updated: 2026-07-12
 
 ## Purpose
 
-This document defines the overall game design of DROPi Tycoon.
+This document defines the highest-level gameplay design of DROPi Tycoon.
 
-It establishes the vision, gameplay direction, player experience, and design rules that every future gameplay system must follow.
+It explains how the player interacts with the world defined by `00_Project/UNIVERSE_DESIGN.md`, the organizations defined by `00_Project/BUSINESS_DESIGN.md`, and the logistics model defined by `00_Project/LOGISTICS_DESIGN.md`.
 
-This document is considered the highest-level gameplay specification for the project.
+This document is subordinate to those higher strategic owners and specializes them into playable experience.
 
 ---
 
 # Game Identity
 
-DROPi Tycoon is an **Urban RPG + Business Tycoon + Local Marketplace + Multimodal Logistics + Future Drone Network Simulation**.
+DROPi Tycoon is an **Urban RPG + Business Tycoon + Local Marketplace + Multimodal Logistics + Infrastructure Builder + future Drone Network Simulation**.
 
-The game combines strategic planning, economic management, technological progression, and operational optimization into a single living ecosystem.
+The game combines personal progression, operational work, strategic planning, economic management, technological progression, company life, infrastructure, competition, and future multiplayer society into one living ecosystem.
 
-The player is a person physically inhabiting the city, initially walking deliveries from a small headquarters and later managing an evolving organization. Game first; ecosystem second. The game must be enjoyable without knowledge of the real DROPi company.
+**Game first. Ecosystem second.**
 
-The former abstract marker and unrestricted straight-line map traversal are deprecated prototype behavior. Human movement follows accessible streets, sidewalks and entrances; buildings and blocked terrain cannot be crossed. Terrestrial vehicles use compatible paths, with cars and vans restricted to roads. The human operator never becomes an aerial drone.
+The player is a visible person physically inhabiting the world, not a cursor floating above a management dashboard.
 
-The company headquarters begins before drone unlock and evolves into the integrated Main Multimodal Operations Hub / Main DronePort. Fixed and mobile DronePorts, fallback storage and future Smart Parcel Lockers expand that network; drones complement rather than replace terrestrial delivery. See `GAMEPLAY.md` for source authority, deliberate simulation abstractions and current scope.
+The player begins with limited personal capability and direct local work, then gradually gains skills, vehicles, company roles, assets, employees, facilities, infrastructure, market influence, and larger-scale logistics access.
+
+The current single-player path may place the player in control of a starter company/operation early. Long-term gameplay also supports roles such as employee, specialist, founder, executive, and investor as those systems are canonically implemented.
 
 ---
 
 # Core Experience
 
-The player should constantly feel that every decision contributes to the growth of something larger.
+The player should constantly feel that individual actions contribute to something larger.
 
-Small investments become major infrastructure.
+One delivery teaches the city.
 
-Simple deliveries become global logistics.
+One qualification opens a profession.
 
-One courier becomes thousands.
+One vehicle changes how work can be performed.
 
-One neighborhood becomes the entire world.
+One employee becomes productive capacity.
 
-Progress should always feel meaningful.
+One HQ room becomes a real department.
+
+One local company becomes part of a competitive city economy.
+
+One city becomes part of a regional and international network.
+
+Progress should feel earned, visible, and connected.
+
+---
+
+# World-Embodied Gameplay
+
+Major gameplay systems should exist in the world whenever their physical existence matters.
+
+Examples:
+
+- the player walks or rides through actual accessible streets;
+- vehicles are visible owned assets and active transport modes;
+- important buildings have entrances/interiors where appropriate;
+- HQ departments must exist before their specialist equipment/actions exist;
+- employees should increasingly appear in role-appropriate activity;
+- parcels/cargo move through custody and logistics locations;
+- warehouses, DronePorts, airports, ports, rail, and other infrastructure are world assets;
+- civic or training actions may require relevant institutions;
+- customers and businesses exist as world/economic participants.
+
+The game may use abstraction for scale and performance, but abstractions must preserve equivalent gameplay consequences.
+
+The old unrestricted marker/cube traversal and developer-style omniscient menu model are temporary/historical prototype behaviors, not final design direction.
+
+---
+
+# Player Interface Philosophy
+
+The interface supports the world; it does not replace it.
+
+## Smartphone
+
+The player's in-world smartphone is the canonical portable interface.
+
+It may progressively support:
+
+- delivery work;
+- mission tracking;
+- GPS/map;
+- messages;
+- study/training theory;
+- marketplace browsing;
+- money/assets information;
+- weather/news generated from the game world;
+- future investment information;
+- future multiplayer communication;
+- authorized monitoring/control of advanced systems.
+
+See `07_UI/PLAYER_SMARTPHONE.md`.
+
+## Physical Company Interfaces
+
+Actions that require a place, person, vehicle, parcel, specialist, or infrastructure remain physically grounded unless later progression explicitly authorizes remote operation.
+
+Examples include hiring, fleet handoff, maintenance, practical training, construction, parcel handling, civic registration, and major infrastructure operation.
+
+---
+
+# Movement and Transport
+
+Human movement follows valid streets, sidewalks, entrances, and accessible interior geometry.
+
+Buildings and blocked terrain cannot be crossed.
+
+Terrestrial vehicles use compatible paths; cars/vans and equivalent motor vehicles remain road-bound where the world rules require it.
+
+Transport progression may include:
+
+- Walking;
+- Bicycle;
+- Electric Scooter;
+- Motorcycle;
+- Car;
+- Delivery Van;
+- specialized terrestrial vehicles;
+- drones as separate logistics actors;
+- rail/air/maritime systems at later scale.
+
+The human operator never becomes an aerial drone.
+
+Drone operations keep the human operator and drone as separate entities under `00_Project/LOGISTICS_DESIGN.md` and `03_Logistics/DRONES.md`.
 
 ---
 
 # Design Objectives
 
-The game is designed around five primary objectives.
+## Personal Growth
+
+The player should gain knowledge, qualifications, professions, and responsibilities rather than only money and company level.
+
+---
 
 ## Business Growth
 
-Transform a small startup into a worldwide logistics corporation.
+A small operation can become a productive organization with people, assets, customers, facilities, infrastructure, ownership, and history.
 
 ---
 
 ## Strategic Decision Making
 
-Every investment should involve opportunity cost.
+Investments create opportunity cost.
 
-Choosing one path should delay another.
+Choosing one growth path should delay or change another.
 
-No decision should feel meaningless.
+There should not be one universally optimal build.
 
 ---
 
 ## Operational Management
 
-Running a logistics company involves balancing multiple interconnected systems.
+Running logistics requires balancing interconnected systems such as:
 
-Examples include:
+- finances;
+- demand;
+- fleet;
+- employees;
+- qualifications;
+- infrastructure;
+- cargo/custody;
+- routes;
+- maintenance;
+- customer satisfaction;
+- technology;
+- reputation;
+- capacity and reliability.
 
-- finances
-- fleet
-- infrastructure
-- employees
-- customer satisfaction
-- technology
-- reputation
+---
+
+## Visible Consequence
+
+Purchases, failures, upgrades, construction, hiring, transport choice, and company growth should produce understandable visual or systemic consequences.
+
+---
+
+## Living Competition
+
+Multiple companies should eventually compete for customers through actual simulated performance, differentiation, capacity, value, and strategy.
+
+Competition must include recovery/counterplay and must not permit permanent griefing.
 
 ---
 
 ## Technology Evolution
 
-Technology should continuously expand gameplay.
+Technology expands gameplay rather than deleting earlier systems.
 
-New technologies introduce new possibilities instead of replacing previous mechanics.
+Drones do not make terrestrial delivery meaningless. Automation does not erase capacity, infrastructure, cost, or people requirements. Advanced logistics does not invalidate local work.
 
 ---
 
 ## Endless Progression
 
-The game has no traditional ending.
+The game has no traditional hard ending.
 
-Growth continues through optimization, expansion, innovation, and experimentation.
+Growth continues through specialization, optimization, expansion, innovation, competition, investment, infrastructure, new worlds, and legacy.
 
 ---
 
 # Gameplay Principles
 
-Every gameplay mechanic should satisfy the following principles.
+## Simple Input, Deep Systems
 
-## Simple Input
+Moment-to-moment actions should remain understandable on mobile.
 
-Players should perform simple actions.
-
-Complexity emerges from interactions between systems.
+Depth comes from interacting systems, not control complexity.
 
 ---
 
 ## Visible Consequences
 
-Every action should produce understandable consequences.
+The player should understand what changed and why.
 
-Players should learn naturally without requiring excessive tutorials.
+---
+
+## Earned Capability
+
+Money alone cannot unlock every advanced capability.
+
+Depending on the system, progression may require:
+
+- personal qualification;
+- company specialist capability;
+- infrastructure;
+- equipment;
+- research;
+- reputation;
+- authorization;
+- previous mastery.
 
 ---
 
 ## Reward Long-Term Thinking
 
-Planning should consistently outperform improvisation.
+Planning should consistently matter.
+
+Short-term optimization should be balanced against growth, resilience, reputation, cash flow, specialization, and infrastructure.
 
 ---
 
 ## Multiple Valid Strategies
 
-Players should never be forced into a single optimal solution.
-
-Different business models should all be capable of success.
+Players should not be forced into one company type, one profession, one transport mode, or one investment strategy.
 
 ---
 
-## Meaningful Choices
+## Recovery and Fairness
 
-Every upgrade, investment, expansion, and technology unlock should feel valuable.
+Meaningful failure is allowed.
+
+Permanent soft-lock, irreversible griefing, or arbitrary loss of core identity/progression is not.
+
+Serious negative effects require recovery, alternative paths, defense, expiration, or rebuilding mechanisms.
 
 ---
 
-## Mechanic Evaluation
+# Mechanic Evaluation
 
-Every mechanic should answer at least one of the following questions:
+Every proposed mechanic should answer positively to at least one of these questions:
 
 - Does it create meaningful decisions?
 - Does it increase strategic depth?
 - Does it improve immersion?
-- Does it support long-term progression?
-- Does it interact with existing systems?
+- Does it support personal, company, or world progression?
+- Does it interact coherently with existing systems?
+- Does it make the living economic/logistics society more believable or playable?
+- Does it create a visible consequence worth understanding?
 
-If the answer is "no", the mechanic should be redesigned or removed.
+A particularly important project-level test is:
+
+**Does this mechanic help the player evolve from an individual into a meaningful participant in a living economic and logistics society?**
+
+If a proposed feature is only an abstract button/dashboard disconnected from the world and does not require abstraction for usability, it should be redesigned or removed.
 
 ---
 
@@ -162,99 +295,165 @@ If the answer is "no", the mechanic should be redesigned or removed.
 
 Players are motivated by:
 
-- building
-- optimizing
-- expanding
-- discovering
-- improving
-- competing with themselves
+- learning;
+- working;
+- earning;
+- building;
+- specializing;
+- optimizing;
+- collecting;
+- investing;
+- creating organizations;
+- helping organizations grow;
+- competing;
+- cooperating;
+- discovering;
+- expanding;
+- leaving legacy.
 
-The game should continuously provide meaningful goals.
+The game should continuously provide meaningful next goals without forcing one path.
 
 ---
 
 # Emotional Journey
 
-The intended emotional progression is:
+The intended long-term emotional progression is:
 
 Curiosity
 
-↓
+-> Discovery
 
-Discovery
+-> Competence
 
-↓
+-> Independence
 
-Growth
+-> Responsibility
 
-↓
+-> Specialization
 
-Responsibility
+-> Organization
 
-↓
+-> Competition / Cooperation
 
-Optimization
+-> Mastery
 
-↓
+-> Innovation
 
-Mastery
+-> Influence
 
-↓
+-> Legacy
 
-Innovation
+---
 
-↓
+# Company and Society Gameplay
 
-Legacy
+Detailed player/company society rules are specialized in `01_GameDesign/COMPANY_SOCIETY_AND_MULTIPLAYER.md`.
+
+They include:
+
+- real-player and NPC workforce compatibility;
+- company formation/authorization;
+- education/specialization;
+- competition/customer acquisition;
+- equity/governance;
+- founder legacy;
+- future multiplayer authority boundaries;
+- Company Heart / Founder Artifact;
+- world-scale economic expansion.
+
+Those systems are long-term canon, not current-runtime claims.
+
+---
+
+# HQ Progression
+
+The HQ is a physical progression asset rather than a permanently complete menu shell.
+
+Only constructed/unlocked departments are operational.
+
+Departments may require money, progression, specialists, infrastructure, research, or other authoritative prerequisites.
+
+See `01_GameDesign/HQ_PROGRESSION.md`.
 
 ---
 
 # Replayability
 
-Every new game should generate unique circumstances.
+Replayability should come from dynamic systems and different choices rather than only scripted content.
 
-Replayability is achieved through dynamic systems rather than scripted content.
+Sources may include:
 
-Examples include:
+- profession/specialization choices;
+- company strategies;
+- customer demand;
+- regional differences;
+- competitor behavior;
+- market cycles;
+- infrastructure paths;
+- technology choices;
+- weather/events;
+- governance/investment choices;
+- future human-player activity.
 
-- changing customer demand
-- weather
-- market prices
-- competitors
-- city expansion
-- random events
+---
+
+# Multiplayer Principle
+
+Multiplayer enriches the existing game rather than replacing it.
+
+Low-population or offline play must remain viable through NPC/simulated participants.
+
+Before real shared economic state is enabled, Technical Design must provide stable identity, server authority, persistence, migration, concurrency, anti-cheat/anti-duplication, transactions, and moderation where communication exists.
+
+The current game must not display simulated local systems as if real players were already online.
 
 ---
 
 # AI-Friendly Design
 
-All gameplay systems must be:
+Gameplay systems must be:
 
-- modular
-- deterministic where appropriate
-- data-driven
-- configurable
-- independently testable
-
-This allows AI agents to implement, balance, extend, and maintain systems with minimal ambiguity.
+- modular;
+- deterministic where appropriate;
+- data-driven;
+- configurable;
+- independently testable;
+- explicit about authority and state ownership;
+- capable of later server authority without duplicating economic truth.
 
 ---
 
 # Vision Traceability
 
-The Core Values defined in `00_Project/VISION.md` — Freedom, Progression, Realism, Accessibility, and Innovation — directly constrain and guide the gameplay design in this document.
+The Core Values in `00_Project/VISION.md` constrain all gameplay design:
 
-- **Freedom** is enforced by the *Multiple Valid Strategies* principle: no single optimal path should exist.
-- **Progression** is enforced by the *Reward Long-Term Thinking* principle and the *Endless Progression* design objective.
-- **Realism** is enforced by the *Operational Management* objective: systems must simulate believable logistics without unnecessary complexity.
-- **Accessibility** is enforced by the *Simple Input* principle: players perform simple actions while complexity emerges from system interactions.
-- **Innovation** is enforced by the *Technology Evolution* objective: new technologies expand gameplay rather than replace existing mechanics.
+- **Freedom** -> multiple valid roles and strategies;
+- **Progression** -> earned personal/company/world capability;
+- **Realism** -> believable relationships with deliberate abstractions;
+- **Accessibility** -> simple mobile interaction and gradual complexity;
+- **Innovation** -> technologies expand rather than replace gameplay.
+
+Higher strategic owners additionally constrain this GDD:
+
+- `UNIVERSE_DESIGN.md` defines the society/world;
+- `BUSINESS_DESIGN.md` defines organization/business truth;
+- `LOGISTICS_DESIGN.md` defines strategic logistics truth.
+
+---
+
+# Real DROPi Boundary
+
+DROPi Tycoon is an independent fictional simulation.
+
+Game inventions must not be represented as real DROPi features.
+
+No gameplay success, simulated market, share system, token concept, or logistics result guarantees real-world financial or business results.
 
 ---
 
 # Canonical Rule
 
-If any gameplay document conflicts with this document, this Game Design Document takes priority unless explicitly superseded by a future canonical revision.
+**Game Design turns the canonical DROPi Tycoon universe, businesses, and logistics model into an embodied mobile game. The player should be able to work, learn, move, build, manage, compete, cooperate, invest, expand, and see the consequences of those choices in one coherent living world.**
 
 ---
 
