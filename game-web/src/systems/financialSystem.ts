@@ -1,10 +1,12 @@
 import { BALANCING } from '../config/balancing'
-import { canAfford } from './economySettlement'
+import { calculateDailyEmployeeDeliveryRevenue } from './employeeFleetSystem'
 import { calculateDailyVehicleMaintenanceExpense } from './vehicleSystem'
 import type { CompanyState, FinancialState } from '../types/game'
 
 export interface FinancialReport {
   income: number
+  playerDeliveryIncome: number
+  employeeDeliveryIncome: number
   operatingExpenses: number
   salaryExpenses: number
   maintenanceExpenses: number
@@ -22,6 +24,7 @@ export type DailyExpenseResult =
       dayId: number
       amount: number
       maintenanceAmount: number
+      employeeDeliveryRevenue: number
       activeEmployeeCount: number
       message: string
     }
@@ -31,6 +34,7 @@ export type DailyExpenseResult =
       dayId: number
       amount: number
       maintenanceAmount: number
+      employeeDeliveryRevenue: number
       activeEmployeeCount: number
       reason: 'invalid-day' | 'already-processed' | 'out-of-sequence' | 'not-enough-money' | 'invalid-state'
       message: string
@@ -65,42 +69,75 @@ export const processDailyOperatingExpense = (
   const activeEmployeeCount = company.employees.filter((employee) => employee.status === 'Active').length
   const amount = calculateDailyOperatingExpense(company)
   const maintenanceAmount = calculateDailyVehicleMaintenanceExpense(company)
+  const employeeDeliveryRevenue = calculateDailyEmployeeDeliveryRevenue(company)
   const totalCost = amount + maintenanceAmount
   const financials = financialsFor(company)
+  const employeeRevenueLedger = financials.totalEmployeeDeliveryRevenue ?? 0
 
   if (!Number.isSafeInteger(dayId) || dayId <= 0) {
-    return { processed: false, company, dayId, amount, maintenanceAmount, activeEmployeeCount, reason: 'invalid-day', message: 'Operating day identifier must be a positive integer.' }
+    return { processed: false, company, dayId, amount, maintenanceAmount, employeeDeliveryRevenue, activeEmployeeCount, reason: 'invalid-day', message: 'Operating day identifier must be a positive integer.' }
   }
 
   if (
     !validNonNegativeInteger(company.money) ||
     !validNonNegativeInteger(financials.lastProcessedDay) ||
     !validNonNegativeInteger(financials.totalRevenue) ||
+    !validNonNegativeInteger(employeeRevenueLedger) ||
     !validNonNegativeInteger(financials.totalOperatingExpenses) ||
     !validNonNegativeInteger(financials.totalSalaryExpenses) ||
     !validNonNegativeInteger(financials.totalMaintenanceExpenses) ||
     !validNonNegativeInteger(amount) ||
-    !validNonNegativeInteger(maintenanceAmount)
+    !validNonNegativeInteger(maintenanceAmount) ||
+    !validNonNegativeInteger(employeeDeliveryRevenue)
   ) {
-    return { processed: false, company, dayId, amount, maintenanceAmount, activeEmployeeCount, reason: 'invalid-state', message: 'Company financial state is invalid.' }
+    return { processed: false, company, dayId, amount, maintenanceAmount, employeeDeliveryRevenue, activeEmployeeCount, reason: 'invalid-state', message: 'Company financial state is invalid.' }
   }
 
   if (dayId <= financials.lastProcessedDay) {
-    return { processed: false, company, dayId, amount, maintenanceAmount, activeEmployeeCount, reason: 'already-processed', message: `Operating day ${dayId} was already processed.` }
+    return { processed: false, company, dayId, amount, maintenanceAmount, employeeDeliveryRevenue, activeEmployeeCount, reason: 'already-processed', message: `Operating day ${dayId} was already processed.` }
   }
 
   if (dayId !== financials.lastProcessedDay + 1) {
-    return { processed: false, company, dayId, amount, maintenanceAmount, activeEmployeeCount, reason: 'out-of-sequence', message: `Operating day ${financials.lastProcessedDay + 1} must be processed next.` }
+    return { processed: false, company, dayId, amount, maintenanceAmount, employeeDeliveryRevenue, activeEmployeeCount, reason: 'out-of-sequence', message: `Operating day ${financials.lastProcessedDay + 1} must be processed next.` }
   }
 
-  if (!canAfford(company.money, totalCost)) {
-    return { processed: false, company, dayId, amount, maintenanceAmount, activeEmployeeCount, reason: 'not-enough-money', message: `Company needs ${totalCost} to close operating day ${dayId}.` }
+  const cashAfterEmployeeWork = company.money + employeeDeliveryRevenue
+  if (!validNonNegativeInteger(cashAfterEmployeeWork) || cashAfterEmployeeWork < totalCost) {
+    return {
+      processed: false,
+      company,
+      dayId,
+      amount,
+      maintenanceAmount,
+      employeeDeliveryRevenue,
+      activeEmployeeCount,
+      reason: 'not-enough-money',
+      message: `Company needs ${Math.max(0, totalCost - employeeDeliveryRevenue)} available cash before employee delivery income to close operating day ${dayId}.`,
+    }
   }
 
+  const totalRevenue = financials.totalRevenue + employeeDeliveryRevenue
+  const totalEmployeeDeliveryRevenue = employeeRevenueLedger + employeeDeliveryRevenue
   const totalOperatingExpenses = financials.totalOperatingExpenses + amount
   const totalMaintenanceExpenses = financials.totalMaintenanceExpenses + maintenanceAmount
-  if (!validNonNegativeInteger(totalOperatingExpenses) || !validNonNegativeInteger(totalMaintenanceExpenses)) {
-    return { processed: false, company, dayId, amount, maintenanceAmount, activeEmployeeCount, reason: 'invalid-state', message: 'Operating expense result is invalid.' }
+  if (
+    !validNonNegativeInteger(totalRevenue) ||
+    !validNonNegativeInteger(totalEmployeeDeliveryRevenue) ||
+    !validNonNegativeInteger(totalOperatingExpenses) ||
+    !validNonNegativeInteger(totalMaintenanceExpenses)
+  ) {
+    return { processed: false, company, dayId, amount, maintenanceAmount, employeeDeliveryRevenue, activeEmployeeCount, reason: 'invalid-state', message: 'Operating-day financial result is invalid.' }
+  }
+
+  const nextFinancials: FinancialState = {
+    ...financials,
+    lastProcessedDay: dayId,
+    totalRevenue,
+    totalOperatingExpenses,
+    totalMaintenanceExpenses,
+    ...(employeeDeliveryRevenue > 0 || financials.totalEmployeeDeliveryRevenue !== undefined
+      ? { totalEmployeeDeliveryRevenue }
+      : {}),
   }
 
   return {
@@ -108,19 +145,16 @@ export const processDailyOperatingExpense = (
     dayId,
     amount,
     maintenanceAmount,
+    employeeDeliveryRevenue,
     activeEmployeeCount,
     company: {
       ...company,
-      money: company.money - totalCost,
-      financials: {
-        ...financials,
-        lastProcessedDay: dayId,
-        totalOperatingExpenses,
-        totalMaintenanceExpenses,
-      },
+      money: cashAfterEmployeeWork - totalCost,
+      financials: nextFinancials,
     },
-    message:
-      maintenanceAmount > 0
+    message: employeeDeliveryRevenue > 0
+      ? `Operating day ${dayId} closed. Employee deliveries earned ${employeeDeliveryRevenue}; operating expenses ${amount}; maintenance ${maintenanceAmount}.`
+      : maintenanceAmount > 0
         ? `Operating day ${dayId} closed. Expenses: ${amount}. Vehicle maintenance: ${maintenanceAmount}.`
         : `Operating day ${dayId} closed. Expenses: ${amount}.`,
   }
@@ -128,10 +162,14 @@ export const processDailyOperatingExpense = (
 
 export const buildFinancialReport = (company: CompanyState): FinancialReport => {
   const financials = financialsFor(company)
+  const employeeDeliveryIncome = financials.totalEmployeeDeliveryRevenue ?? 0
+  const playerDeliveryIncome = Math.max(0, financials.totalRevenue - employeeDeliveryIncome)
   const totalExpenses =
     financials.totalOperatingExpenses + financials.totalSalaryExpenses + financials.totalMaintenanceExpenses
   return {
     income: financials.totalRevenue,
+    playerDeliveryIncome,
+    employeeDeliveryIncome,
     operatingExpenses: financials.totalOperatingExpenses,
     salaryExpenses: financials.totalSalaryExpenses,
     maintenanceExpenses: financials.totalMaintenanceExpenses,
