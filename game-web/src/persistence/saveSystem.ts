@@ -134,7 +134,12 @@ const sanitizeHQProgression = (value: unknown): { hq: HQProgressionState; repair
   }
 
   value.constructedDepartments.forEach((departmentId) => {
-    if (!isHQDepartmentId(departmentId) || seen.has(departmentId)) {
+    if (!isHQDepartmentId(departmentId)) {
+      repaired = true
+      return
+    }
+    if (departmentId === 'Core') return
+    if (seen.has(departmentId)) {
       repaired = true
       return
     }
