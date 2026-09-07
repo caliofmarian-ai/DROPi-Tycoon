@@ -20,6 +20,8 @@ import { CITY_COLORS, COLORS, formatMoney, RADII, TYPOGRAPHY } from './theme'
 
 type Direction = 'up' | 'down' | 'left' | 'right'
 const MENU_ROW_COUNT = 3
+const URBAN_TOP_CONTROL_HIT_HEIGHT = 44
+const PORTRAIT_STATUS_Y = 44
 
 interface HUDCallbacks {
   action: () => void
@@ -39,6 +41,7 @@ interface HUDCallbacks {
 export const urbanHUDLayout = (width: number, height: number) => {
   const portrait = width < 600
   const headerHeight = portrait ? 72 : 44
+  const topControlY = portrait ? URBAN_TOP_CONTROL_HIT_HEIGHT / 2 : headerHeight / 2
   const size = ANALOG_JOYSTICK_VISUAL_DIAMETER / 3
   const pad = { x: 12, y: height - ANALOG_JOYSTICK_VISUAL_DIAMETER - 12, size }
   const actionWidth = Math.min(150, Math.max(124, width * 0.15))
@@ -53,12 +56,13 @@ export const urbanHUDLayout = (width: number, height: number) => {
   const gapRight = action.x - action.width / 2 - 10
   const useBottomGap = gapRight - gapLeft >= 170
   return {
-    headerHeight, portrait, pad, action,
+    headerHeight, portrait, topControlY, pad, action,
+    statusY: portrait ? PORTRAIT_STATUS_Y : 15,
     transport: { x: action.x, y: height - 82, width: action.width, height: 44 },
     minimap,
     zoom: { x: minimap.x + minimap.width / 2, y: minimap.y + minimap.height + 34, size: 36 },
     objective: { x: 10, y: headerHeight + 6, width: objectiveWidth, height: objectiveHeight },
-    phone: { x: width - 142, y: headerHeight / 2, width: 96, height: 36 },
+    phone: { x: width - 142, y: topControlY, width: 96, height: 36 },
     menu: { x: width - 94, y: headerHeight + 22, width: 160, rowHeight: 44 },
     toast: {
       x: useBottomGap ? (gapLeft + gapRight) / 2 : width / 2,
@@ -125,7 +129,7 @@ export class UrbanDPadInput {
   }
 }
 
-/** Legacy cardinal helper retained for Save/test compatibility; runtime joystick no longer calls it. */
+/** Legacy cardinal helper retained only for backward compatibility/tests; runtime joystick no longer calls it. */
 export const directionFromDPadPoint = (x: number, y: number, extent: number): Direction | null => {
   if (!Number.isFinite(x) || !Number.isFinite(y) || !Number.isFinite(extent) || extent <= 0 ||
       x < 0 || y < 0 || x > extent || y > extent) return null
@@ -185,10 +189,10 @@ export class UrbanHUD {
     const tycoon = this.text(dropi.x + dropi.width + 7, portrait ? 10 : 9, 'Tycoon', portrait ? 15 : 16, COLORS.textGold)
       .setFontStyle('bold')
     const statsLeft = tycoon.x + tycoon.width + 20
-    this.stats = this.text(portrait ? 14 : statsLeft, portrait ? 44 : 15, '', portrait ? 11 : 12, COLORS.textPrimary)
+    this.stats = this.text(portrait ? 14 : statsLeft, this.layout.statusY, '', portrait ? 11 : 12, COLORS.textPrimary)
     const phone = this.layout.phone
     this.button(phone.x, phone.y, phone.width, phone.height, 'Phone', () => this.togglePhone())
-    this.button(width - 47, headerHeight / 2, 78, 36, '☰  Menu', () => this.toggleMenu())
+    this.button(width - 47, this.layout.topControlY, 78, 36, '☰  Menu', () => this.toggleMenu())
 
     const mission = this.layout.objective
     this.panel(mission.x, mission.y, mission.width, mission.height)
