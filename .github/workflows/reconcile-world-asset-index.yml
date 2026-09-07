@@ -1,0 +1,106 @@
+name: Reconcile world asset documentation index
+
+on:
+  push:
+    branches:
+      - openai/world-asset-bible-v2
+    paths:
+      - '.github/workflows/reconcile-world-asset-index.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  reconcile:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout branch
+        uses: actions/checkout@v4
+        with:
+          ref: openai/world-asset-bible-v2
+          fetch-depth: 0
+
+      - name: Reconcile DOCUMENT_INDEX
+        shell: bash
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+
+          p = Path('00_Project/DOCUMENT_INDEX.md')
+          text = p.read_text(encoding='utf-8')
+
+          start = text.index('# 08_Assets')
+          end = text.index('# 09_Development')
+          replacement = '''# 08_Assets
+
+## Purpose
+
+Asset standards, approved references, world-art canon, production planning and resource governance.
+
+Documents:
+
+- `08_Assets/ASSETS.md` — top-level canonical asset management, approval-state, identity and storage rules.
+- `08_Assets/WORLD_ASSET_BIBLE.md` — explicitly owner-authorized canonical world-art/asset specialization covering the stylized 3D pre-rendered visual language, diversity, products, companies, cities, infrastructure, dimensions and production gates.
+- `08_Assets/MASTER_ASSET_PLAN_V2.md` — governed staged production plan for scaling the library into thousands of meaningful assets.
+- `08_Assets/BATCH_003_PLACEHOLDER_PROVENANCE.md` — historical placeholder provenance.
+- `08_Assets/Approved_References/` — owner-approved visual reference boards.
+- `08_Assets/Production/Manifests/` — executable asset-production manifests constrained by the World Asset Bible.
+
+Authority note:
+
+`WORLD_ASSET_BIBLE.md` is a lower-level specialization of Universe, Business, Logistics, Game, World and UI canon. It defines how those truths become visually coherent assets; it does not redefine their gameplay/economic behavior.
+
+---
+
+'''
+          text = text[:start] + replacement + text[end:]
+
+          start = text.index('# Future BIBLE-Level Documentation')
+          end = text.index('# External DROPi Canonical Reference Package')
+          replacement = '''# BIBLE-Level Documentation
+
+## Authorized BIBLE
+
+The Project Owner explicitly authorized `08_Assets/WORLD_ASSET_BIBLE.md` on 2026-09-07 after the required domain audit/reconciliation and Owner Directive 003.
+
+This authorization is specific to the world-art/asset domain.
+
+`WORLD_ASSET_BIBLE.md` must:
+
+- remain subordinate to `VISION`, `UNIVERSE_DESIGN`, `BUSINESS_DESIGN`, `LOGISTICS_DESIGN`, Game/World/UI and Technical authority;
+- avoid duplicating gameplay/economy/logistics ownership;
+- govern visual style, diversity, asset families, product representation, production states, dimensions and asset-quality gates;
+- be changed materially only through deliberate canonical reconciliation and owner approval where the visual direction changes.
+
+## Other Future BIBLE Documents
+
+No other BIBLE document is automatically authorized by this decision.
+
+Any additional BIBLE still requires:
+
+1. complete domain audit;
+2. ownership mapping;
+3. overlap detection;
+4. contradiction analysis;
+5. migration proposal;
+6. explicit Project Owner approval.
+
+---
+
+'''
+          text = text[:start] + replacement + text[end:]
+
+          text = text.replace('Version: 2.0.0', 'Version: 2.1.0', 1)
+          p.write_text(text, encoding='utf-8')
+          PY
+
+      - name: Commit reconciliation
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add 00_Project/DOCUMENT_INDEX.md
+          git commit -m 'docs: authorize and index world asset bible'
+          git push origin HEAD:openai/world-asset-bible-v2
