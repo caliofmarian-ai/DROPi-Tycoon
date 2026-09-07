@@ -1,4 +1,5 @@
 import { BALANCING } from '../config/balancing'
+import { isVehicleTypeAvailableToPlayer } from './employeeFleetSystem'
 import type {
   CompanyState,
   OwnedVehicleState,
@@ -236,16 +237,9 @@ export const calculateDailyVehicleMaintenanceExpense = (company: CompanyState): 
   }, 0)
 
 /**
- * Owner quality-gate presentation rule (Workstream D). There is no canonical
- * "active vehicle" selection mechanic yet, so the visible player/operator
- * representation deterministically uses the highest currently-owned
- * compatible personal delivery vehicle in this fixed progression order:
- *
- *   Delivery Van > Motorcycle > Electric Scooter > Bicycle > walking
- *
- * This selection is presentation-only. It does not change movement speed,
- * economy, or any other gameplay semantics, which remain governed solely by
- * existing systems (see bicycleSystem.ts).
+ * Owner quality-gate presentation rule. The player representation can use only
+ * company vehicles that are not assigned to an employee. Company ownership and
+ * player availability are deliberately separate concepts.
  */
 export const PLAYER_VISUAL_VEHICLE_PRIORITY: readonly VehicleTypeId[] = [
   'DeliveryVan',
@@ -255,4 +249,4 @@ export const PLAYER_VISUAL_VEHICLE_PRIORITY: readonly VehicleTypeId[] = [
 ]
 
 export const selectActiveVehiclePresentation = (company: CompanyState): VehicleTypeId | null =>
-  PLAYER_VISUAL_VEHICLE_PRIORITY.find((typeId) => ownsVehicleType(company, typeId)) ?? null
+  PLAYER_VISUAL_VEHICLE_PRIORITY.find((typeId) => isVehicleTypeAvailableToPlayer(company, typeId)) ?? null
