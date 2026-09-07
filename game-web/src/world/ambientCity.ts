@@ -7,8 +7,10 @@ import { WORLD_ROADS } from './worldLayout'
 import {
   CENTRAL_CONTROLLED_CROSSING,
   CONTROLLED_CROSSINGS,
+  pedestrianHasCrossingPriority,
   sampleControlledCrossingPedestrian,
   yieldHorizontalTrafficAtCrossing,
+  type ControlledCrossing,
 } from './cityTrafficRules'
 
 export interface AmbientRoute {
@@ -139,12 +141,49 @@ interface AmbientActor {
   visible: boolean
 }
 
+interface AmbientCrossingSignal {
+  crossing: ControlledCrossing
+  stopLamp: Phaser.GameObjects.Arc
+  goLamp: Phaser.GameObjects.Arc
+}
+
+const renderControlledCrossing = (scene: Phaser.Scene, crossing: ControlledCrossing): AmbientCrossingSignal => {
+  // Zebra markings and stop lines are intentionally tiny bounded Rectangle objects rather than
+  // world-sized Graphics, preserving the Android culling/performance baseline.
+  for (let stripe = -5; stripe <= 5; stripe += 1) {
+    scene.add.rectangle(crossing.x, crossing.y + stripe * 14, crossing.halfWidth * 2, 6, 0xf5f3e8, 0.86)
+      .setDepth(2).setName(`${crossing.id}-zebra-${stripe + 5}`)
+  }
+  for (const direction of [-1, 1]) {
+    scene.add.rectangle(
+      crossing.x + direction * crossing.approachStopOffset,
+      crossing.y,
+      5,
+      92,
+      0xf5f3e8,
+      0.78,
+    ).setDepth(2).setName(`${crossing.id}-stop-line-${direction < 0 ? 'west' : 'east'}`)
+  }
+
+  const signalX = crossing.x - crossing.approachStopOffset - 22
+  const signalY = crossing.y - 72
+  scene.add.rectangle(signalX, signalY + 10, 4, 26, 0x324552, 1)
+    .setDepth(4).setName(`${crossing.id}-signal-pole`)
+  const stopLamp = scene.add.circle(signalX, signalY - 5, 6, 0xd74d4d, 1)
+    .setDepth(4).setName(`${crossing.id}-signal-stop`)
+  const goLamp = scene.add.circle(signalX, signalY + 8, 6, 0x46b96a, 1)
+    .setDepth(4).setName(`${crossing.id}-signal-go`)
+  return { crossing, stopLamp, goLamp }
+}
+
 /** Ambient actors never own gameplay jobs or serialized state; city-rule behavior stays deterministic. */
 export class AmbientCity {
   private elapsed = 0
   private readonly actors: AmbientActor[]
+  private readonly crossingSignals: AmbientCrossingSignal[]
 
   constructor(scene: Phaser.Scene) {
+    this.crossingSignals = CONTROLLED_CROSSINGS.map(crossing => renderControlledCrossing(scene, crossing))
     this.actors = buildAmbientRoutes().map((route, index) => {
       const pose = sampleAmbientRoute(route, 0, { x: 0, y: 0, facing: 'right', moving: false })
       const vehicle = route.kind === 'pedestrian' ? undefined : createPlayerVisual(scene, pose.x, pose.y)
@@ -162,6 +201,11 @@ export class AmbientCity {
 
   update(delta: number, view: Phaser.Geom.Rectangle): void {
     this.elapsed += Math.max(0, Math.min(Number.isFinite(delta) ? delta : 0, 100)) / 1000
+    for (const signal of this.crossingSignals) {
+      const stop = pedestrianHasCrossingPriority(signal.crossing, this.elapsed)
+      signal.stopLamp.setAlpha(stop ? 1 : 0.2)
+      signal.goLamp.setAlpha(stop ? 0.2 : 1)
+    }
     for (const actor of this.actors) {
       const p = sampleAmbientRoute(actor.route, this.elapsed, actor.pose)
       const visible = p.x >= view.x - 100 && p.x <= view.right + 100 && p.y >= view.y - 100 && p.y <= view.bottom + 100
