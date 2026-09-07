@@ -2,19 +2,21 @@
 
 Document: ENVIRONMENT_VARIABLES.md
 Project: DROPi Tycoon
-Version: 0.1.0
+Version: 0.2.0
 Status: Active Web Runtime Contract
 Author: Marian Caliof & OpenAI
 Language: English
-Last Updated: 2026-07-15
+Last Updated: 2026-09-07
 
 ---
 
 # Environment Variables
 
-This document defines the active environment-variable contract for the first deployable web runtime in `game-web/`.
+This document defines the active environment-variable contract for the current deployable web runtime in `game-web/`.
 
 Only variables actually consumed by the application are listed here.
+
+Economy, identity and server-authority terminology is owned by current canonical design/technical documents. This file does not create currencies, wallets, accounts, authentication providers, databases or payment systems.
 
 ---
 
@@ -48,44 +50,48 @@ The production server:
 - falls back locally to `3000`;
 - binds to `0.0.0.0`.
 
+As of 2026-09-07, the canonical production service has no approved database/authentication variable contract. The session authority prototype under `/api/authority/*` is deliberately non-durable and unauthenticated.
+
 ---
 
-# What Must Not Be Stored In Environment Variables
+# What Must Not Be Stored In Frontend/Public Environment Variables
 
-The following must not be stored in `.env`, `VITE_*`, or any frontend-exposed variable:
+The following must not be stored in `.env` files committed to Git, public `VITE_*` variables, or any frontend-exposed configuration:
 
 - gameplay state;
 - player position;
 - player save data;
-- Money balances;
-- DROPiCoins balances;
+- Company Money balances;
+- Personal Money balances;
+- company equity/share holdings;
 - marketplace state;
 - inventory ownership;
 - transaction history;
 - item ownership;
 - payment state;
-- Google Play purchase receipts;
-- secret tokens;
-- Android signing material.
+- purchase receipts;
+- secret/session tokens;
+- authentication-provider secrets;
+- database credentials;
+- Android signing material;
+- future ecosystem-token private keys or custody secrets.
 
-Money is the canonical standard in-game currency.
-
-DROPiCoins is the approved premium currency.
-
-Neither currency is active in this milestone.
+Company Money, Personal Money and company equity are defined by current Business/Economy canon. Historical references in older migration material to generic `Money` wallets or `DROPiCoins` do not create current authority and do not activate a premium currency.
 
 ---
 
 # Railway and GitHub Secret Guidance
 
-Future secrets must be stored only in:
+Future server secrets, if and when their owning systems are approved, must be stored only in an approved encrypted secret surface such as:
 
 - Railway encrypted service variables; or
-- GitHub encrypted secrets, where appropriate.
+- GitHub encrypted secrets, where appropriate to build/deployment automation.
 
-No secret token is required for this milestone.
+The exact secret contract must be introduced by the issue that selects and provisions the corresponding authentication/persistence provider.
 
-No database URL is required for this milestone.
+No database URL, authentication secret, payment secret, wallet secret or token secret is part of the currently approved production contract.
+
+See `06_Technical/DURABLE_AUTHORITY_AND_AUTHENTICATION.md` for the canonical future persistence/authentication boundary.
 
 ---
 
