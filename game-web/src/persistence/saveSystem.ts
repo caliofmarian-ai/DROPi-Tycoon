@@ -46,6 +46,7 @@ export const CANONICAL_AUTOSAVE_EVENTS = [
   'employee-onboarding-completed',
   'salary-cycle-processed',
   'vehicle-purchased',
+  'employee-vehicle-assignment-changed',
   'settings-changed',
   'operating-day-closed',
 ] as const
@@ -157,6 +158,14 @@ const sanitizeFinancials = (value: unknown): { financials: FinancialState; repai
     if (typeof raw === 'number' && Number.isSafeInteger(raw) && raw >= 0) financials[field] = raw
     else repaired = true
   })
+  if (value.totalEmployeeDeliveryRevenue !== undefined) {
+    const raw = value.totalEmployeeDeliveryRevenue
+    if (typeof raw === 'number' && Number.isSafeInteger(raw) && raw >= 0) financials.totalEmployeeDeliveryRevenue = raw
+    else {
+      financials.totalEmployeeDeliveryRevenue = 0
+      repaired = true
+    }
+  }
   return { financials, repaired }
 }
 
@@ -189,11 +198,13 @@ const sanitizeReviews = (value: unknown): { reviews: CustomerReview[]; repaired:
 const sanitizeVehicles = (
   value: unknown,
   purchasedUpgradeLevels: PurchasedUpgradeLevels,
+  employees: readonly EmployeeState[],
 ): { vehicles: OwnedVehicleState[]; repaired: boolean } => {
   let repaired = false
   const vehicles: OwnedVehicleState[] = []
   const seenVehicleIds = new Set<string>()
   const seenTypes = new Set<VehicleTypeId>()
+  const seenAssignedEmployees = new Set<string>()
 
   if (!Array.isArray(value)) {
     repaired = true
@@ -215,15 +226,32 @@ const sanitizeVehicles = (
         return
       }
 
+      let assignedEmployeeId: string | undefined
+      if (entry.assignedEmployeeId !== undefined) {
+        const candidateId = typeof entry.assignedEmployeeId === 'string' && entry.assignedEmployeeId.trim().length > 0
+          ? entry.assignedEmployeeId.trim()
+          : null
+        const employee = candidateId
+          ? employees.find((item) => item.employeeId === candidateId)
+          : null
+        if (!candidateId || !employee || employee.status !== 'Active' || employee.role !== 'Courier' || seenAssignedEmployees.has(candidateId)) {
+          repaired = true
+        } else {
+          assignedEmployeeId = candidateId
+          seenAssignedEmployees.add(candidateId)
+        }
+      }
+
       seenVehicleIds.add(vehicleId)
       seenTypes.add(typeId)
-      vehicles.push({ vehicleId, typeId })
+      vehicles.push({ vehicleId, typeId, ...(assignedEmployeeId ? { assignedEmployeeId } : {}) })
     })
   }
 
   const reconciled = reconcileLegacyBicycleOwnership({
     ...createInitialCompanyState(),
     purchasedUpgradeLevels: { ...purchasedUpgradeLevels },
+    employees: employees.map((employee) => ({ ...employee })),
     vehicles,
   })
 
@@ -263,7 +291,7 @@ const sanitizeCompany = (
     const payrollResult = sanitizePayroll(value.payroll)
     const financialResult = sanitizeFinancials(value.financials)
     const reviewResult = sanitizeReviews(value.reviews)
-    const vehicleResult = sanitizeVehicles(value.vehicles, purchasedUpgradeLevels)
+    const vehicleResult = sanitizeVehicles(value.vehicles, purchasedUpgradeLevels, employeeResult.employees)
     employees = employeeResult.employees
     payroll = payrollResult.payroll
     financials = financialResult.financials
@@ -304,6 +332,7 @@ const sanitizeSettings = (value: unknown): { settings: GameSettingsState; repair
 const hasFinancialActivity = (financials: FinancialState): boolean =>
   financials.lastProcessedDay !== 0 ||
   financials.totalRevenue !== 0 ||
+  (financials.totalEmployeeDeliveryRevenue ?? 0) !== 0 ||
   financials.totalOperatingExpenses !== 0 ||
   financials.totalSalaryExpenses !== 0 ||
   financials.totalMaintenanceExpenses !== 0
