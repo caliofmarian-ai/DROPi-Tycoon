@@ -1,0 +1,1 @@
+STOP: do not add more foundation documents unless implementation exposes a missing rule. Proceed to issues, PR, CI and runtime.
