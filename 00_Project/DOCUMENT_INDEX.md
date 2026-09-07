@@ -2,11 +2,11 @@
 
 Document: DOCUMENT_INDEX.md
 Project: DROPi Tycoon
-Version: 1.5.0
+Version: 1.6.0
 Status: Documentation Control
 Author: Marian Caliof & OpenAI
 Language: English
-Last Updated: 2026-09-05
+Last Updated: 2026-09-07
 
 ---
 
@@ -96,8 +96,9 @@ Documents:
 - `01_GameDesign/GAMEPLAY.md`
 - `01_GameDesign/MISSIONS.md`
 - `01_GameDesign/PROGRESSION.md`
+- `01_GameDesign/COMPANY_SOCIETY_AND_MULTIPLAYER.md` — canonical specialization for player/company society, education, competition, equity/governance, multiplayer staging, founder legacy, and world-scale economic expansion.
 
-Note: `00_Project/VISION.md` owns canonical project/game vision. `01_GameDesign/` owns gameplay design specification.
+Note: `00_Project/VISION.md` owns canonical project/game vision. `01_GameDesign/GDD.md` owns global gameplay design authority. Other `01_GameDesign/` documents specialize that authority without overriding it.
 
 ---
 
@@ -112,6 +113,7 @@ Documents:
 - `02_Economy/ECONOMY.md`
 - `02_Economy/MARKET.md`
 - `02_Economy/PRICING.md`
+- `02_Economy/EMPLOYEES.md` — canonical Phase-2 employee/workforce detail.
 
 ---
 
@@ -191,6 +193,8 @@ Documents:
 
 - `07_UI/UI.md`
 - `07_UI/UX.md`
+- `07_UI/VISUAL_DESIGN_SYSTEM.md` — canonical visual and interaction direction.
+- `07_UI/PLAYER_SMARTPHONE.md` — canonical portable in-world smartphone surface and physical-location boundary.
 
 ---
 
