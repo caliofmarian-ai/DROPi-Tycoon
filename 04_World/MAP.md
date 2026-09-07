@@ -2,243 +2,241 @@
 
 Document: MAP.md
 Project: DROPi Tycoon
-Version: 1.0.0
+Version: 2.0.0
 Status: Canonical
 Author: Marian Caliof & OpenAI
 Language: English
-Last Updated: 2026-07-12
+Last Updated: 2026-09-08
 
 ---
 
-# Map System
+# Global Map System
 
 ## Purpose
 
-This document defines the map system of DROPi Tycoon.
+The map is the spatial backbone of DROPi Tycoon. It represents one coherent global logistics/economic world at several levels of detail rather than one giant continuously rendered scene.
 
-The map represents the physical space where the company operates.
+Canonical zoom hierarchy:
 
-It determines:
+**Global -> Country -> First-order Administrative Region -> Representative Locality / External Economic Node -> Detailed Local Scene.**
 
-- Delivery distances
-- Customer distribution
-- Business opportunities
-- Expansion decisions
-- Logistics challenges
-
-The map is the foundation for all movement and operational planning.
+The strategic map and the player smartphone/GPS must use this same hierarchy.
 
 ---
 
-# Map Philosophy
+# 1. Global Layer
 
-The map should create strategic decisions.
+The maximum zoom-out level represents the whole planet and all supported sovereign countries using recognizable real-world geography and approximate real placement.
 
-A location should not only be a visual element.
+At this level the game may show:
 
-Every area should have:
+- countries and borders appropriate to the versioned map dataset;
+- major international freight corridors;
+- international sea, air, rail and road flows;
+- country-level demand, supply, population, infrastructure and trade summaries;
+- major events or disruptions.
 
-- Economic value
-- Logistics characteristics
-- Growth potential
-- Operational challenges
-
-The player must decide where to expand and why.
-
----
-
-# Map Structure
-
-The world map is organized into multiple layers.
+Individual streets, buildings, citizens and local vehicles are not rendered at global scale.
 
 ---
 
-## City
+# 2. Country Layer
 
-The complete playable environment.
+A country is represented sparsely rather than by every real settlement.
 
-A city contains:
+A normal country may expose up to nine representative locality nodes:
 
-- Multiple zones
-- Transportation networks
-- Businesses
-- Customers
-- Infrastructure
+1. its real capital at its approximate real position;
+2. up to one representative urban city in the North;
+3. up to one representative urban city in the East;
+4. up to one representative urban city in the South;
+5. up to one representative urban city in the West;
+6. up to one rural/small locality in the North-East;
+7. up to one rural/small locality in the South-East;
+8. up to one rural/small locality in the South-West;
+9. up to one rural/small locality in the North-West.
 
----
+These are coverage roles, not a requirement to force nine nodes into every country. Microstates, island states, elongated countries and unusual geographies may legitimately use fewer nodes. Never invent a settlement merely to complete the compass.
 
-## Zones
+A city is a point at this scale. Streets and individual buildings appear only after entering its detailed local scene.
 
-Zones divide the city into operational areas.
-
-Each zone has unique characteristics.
-
-Examples:
-
-- Residential district
-- Commercial district
-- Industrial area
-- Downtown
-- Suburban area
+Representative node selection should consider real geography, regional coverage, economic specialization, logistics relevance, population/importance and gameplay variety.
 
 ---
 
-## Locations
+# 3. Administrative Region Layer
 
-Locations are specific points inside zones.
+The world model must not hardcode the term `county` globally.
 
-Examples:
+Use a country-neutral first-order administrative region that can specialize to the real local concept, such as:
 
-- Customer homes
-- Restaurants
-- Stores
-- Offices
-- Warehouses
-- Company facilities
+- state;
+- province;
+- county;
+- județ;
+- region;
+- governorate;
+- canton;
+- another appropriate first-order division.
 
----
+Romania specializes this layer as județe.
 
-# Zone Characteristics
-
-Each zone contains important attributes.
-
----
-
-## Population Density
-
-Determines potential customer demand.
-
-High population:
-
-- More delivery opportunities
-
-Low population:
-
-- Fewer opportunities
+This layer summarizes regional population, production, infrastructure, demand and transport without requiring every real settlement to exist in the simulation.
 
 ---
 
-## Business Density
+# 4. Representative Localities
 
-Determines commercial activity.
+Locality roles are:
 
-High business density creates:
+- Capital;
+- Urban North / East / South / West;
+- Rural or Small North-East / South-East / South-West / North-West.
 
-- More contracts
-- Higher delivery volume
+Urban detailed areas may host at most **5 active delivery competitors**.
 
----
+Rural/small-locality detailed areas normally host at most **2 active delivery competitors**.
 
-## Traffic Level
+Each locality may have its own:
 
-Influences delivery efficiency.
-
-Examples:
-
-Low traffic:
-
-- Faster movement
-
-High traffic:
-
-- Longer routes
-
----
-
-## Expansion Value
-
-Represents future potential.
-
-Some areas may become more valuable as the company grows.
+- architecture family;
+- population and workforce;
+- specialist availability;
+- local marketplace;
+- demand/supply profile;
+- transport capacity;
+- public and private infrastructure;
+- industrial/commercial specialization;
+- tourism and migration pressure.
 
 ---
 
-# Transportation Network
+# 5. External Economic Nodes
 
-The map contains movement connections.
+Important productive infrastructure may exist outside any locality and must be represented as independent map nodes.
 
-Examples:
+Examples include:
 
-- Roads
-- Paths
-- Delivery routes
-- Future drone corridors
+- steelworks/metallurgical complexes;
+- paper/pulp mills;
+- chemical and fertilizer plants;
+- refineries;
+- mines and quarries;
+- power plants;
+- large farms, livestock and forestry operations;
+- food-processing plants;
+- construction-material and machinery plants;
+- warehouses/distribution centers;
+- industrial ports;
+- rail freight terminals;
+- airport cargo terminals.
 
-The quality of connections affects logistics efficiency.
+These nodes do not consume representative-locality slots.
 
----
-
-# Map Expansion
-
-The player begins with limited access.
-
-Expansion happens through:
-
-- Company growth
-- Financial investment
-- Reputation
-- Infrastructure development
-
-New areas create new opportunities.
+A site receives a high-detail scene only when gameplay value requires one; a remote steelworks or farm does not require an invented surrounding city.
 
 ---
 
-# Strategic Map Decisions
+# 6. Detailed Local Scene
 
-Players must decide:
+The detailed scene is the high-fidelity playable layer containing streets, districts, individual buildings, citizens, employees, merchants, local traffic, parcels, company facilities and last-mile logistics.
 
-- Where to establish operations
-- Which zones to prioritize
-- Where to build infrastructure
-- Which customers to target
+Only the active detailed area carries local-frame rendering and actor simulation cost.
 
----
-
-# MVP Map Scope
-
-The first playable version includes:
-
-- One small city
-- Limited zones
-- Basic roads
-- Delivery locations
-- Simple expansion system
-
-The map does not require a realistic city simulation initially.
+The current playable city becomes one locality destination inside the global hierarchy rather than the entire world.
 
 ---
 
-# Future Expansion
+# 7. Geography Fidelity
 
-Possible future systems:
+DROPi Tycoon is inspired by real geography, not a GIS clone.
 
-- Multiple cities
-- Regional maps
-- International operations
-- Dynamic city growth
-- Player-owned territories
-- Smart city development
+Requirements:
+
+- country shapes and relative placement should be recognizable;
+- capitals and representative settlements should use approximate real positions;
+- coastlines, major rivers, mountain barriers and transport-relevant geography may affect routes where useful;
+- geography may be simplified for Android readability/performance;
+- geography datasets are versioned so existing World Instances remain reproducible.
+
+Real geography seeds the world. Simulation owns its future.
 
 ---
 
-# Balance Principles
+# 8. Transport by Scale
 
-The map must:
+## Global / International
+- sea shipping;
+- international air cargo;
+- cross-border rail;
+- cross-border road freight;
+- major multimodal gateways.
 
-- Encourage exploration
-- Reward strategic planning
-- Support logistics gameplay
-- Remain understandable
+## National
+- highway freight;
+- national rail;
+- domestic air where useful;
+- river/sea transport where geographically valid;
+- national distribution hubs.
 
-More space does not automatically mean better gameplay.
+## Regional
+- regional road/rail;
+- feeder hubs;
+- warehouses and terminals.
+
+## Local
+- walking;
+- bicycle;
+- scooter/motorcycle;
+- car/van/company fleet;
+- drone where unlocked;
+- final-mile delivery.
+
+Traffic is simulated at the frequency appropriate to its layer. The game must never update every global vehicle at local-scene frequency.
+
+---
+
+# 9. Strategic Map Information
+
+Map layers may expose summarized:
+
+- product demand and supply;
+- inventory and price pressure;
+- productive capacity;
+- agricultural output;
+- workforce/specialist availability;
+- population trend;
+- infrastructure capacity;
+- trade corridors;
+- congestion;
+- contracts/opportunities;
+- current events/disruptions.
+
+The map exists to create economic and logistics decisions, not merely navigation.
+
+---
+
+# 10. Evolution
+
+Map entities persist and may change over world time.
+
+Localities may grow or shrink; industries may open, expand, close or change ownership; infrastructure may be built; eligible undeveloped territory may later support new settlements; population and specialist distribution may shift; national and international trade routes may change.
+
+These changes belong to the same world economy and must become visible at the appropriate zoom level.
+
+---
+
+# 11. Performance Rule
+
+Global scale is achieved through hierarchical state and simulation, not brute-force rendering.
+
+The game must not simultaneously render or high-frequency simulate every city, citizen, building or vehicle on Earth. Inactive areas use summarized lower-frequency state until the player enters or materially affects them.
 
 ---
 
 # Canonical Rule
 
-The map exists to create meaningful operational decisions.
-
-Every location must have a gameplay purpose.
+**DROPi Tycoon represents the whole planet through sparse layered geography. Every country can participate in one coherent global economy, while strategically selected localities and external productive nodes receive progressively deeper simulation as the player zooms in.**
 
 ---
 

@@ -2,234 +2,259 @@
 
 Document: WORLD.md
 Project: DROPi Tycoon
-Version: 1.0.0
+Version: 2.0.0
 Status: Canonical
 Author: Marian Caliof & OpenAI
 Language: English
-Last Updated: 2026-07-12
+Last Updated: 2026-09-08
 
 ---
 
-# World System
+# Living Global World System
 
 ## Purpose
 
-This document defines the world simulation system of DROPi Tycoon.
+DROPi Tycoon is a persistent global economic/logistics society. Geography, people, companies, productive assets, trade, infrastructure, time, migration, tourism, specialists and events evolve inside one coherent world model.
 
-The world represents the environment where the company operates.
-
-It connects:
-
-- Locations
-- Customers
-- Businesses
-- Infrastructure
-- Weather
-- Economic activity
-- Logistics opportunities
-
-The world exists to create a living environment where company decisions have visible consequences.
+The current detailed city is one local scene inside this hierarchy; it is not the whole world.
 
 ---
 
-# World Philosophy
+# 1. World Hierarchy
 
-The world of DROPi Tycoon should feel active and responsive.
+**Global -> Country -> First-order Administrative Region -> Representative Locality / External Economic Node -> Detailed Local Scene.**
 
-The player is not managing deliveries inside an empty simulation.
-
-The player is building a logistics company inside a changing environment.
-
-The world should provide:
-
-- Opportunities
-- Challenges
-- Growth possibilities
-- Strategic decisions
+Only the active detailed area and current operational context run at high frequency. Countries, inactive regions, inactive localities, external producers and global trade persist as lower-frequency strategic state.
 
 ---
 
-# World Structure
+# 2. World Time
 
-The game world is organized into multiple layers.
+The world has authoritative game time with several responsibilities:
 
----
+- **local clock** — day/night and time-of-day behavior;
+- **operating day** — routine deliveries, business operation, inventories and production;
+- **week/market cycle** — recurring contracts and short economic trends;
+- **season** — agriculture, tourism, weather and broader demand shifts;
+- **year/slow cycle** — demographics, construction, industrial and national development.
 
-## City Layer
+The real-time-to-game-time ratio is a balancing/configuration decision and is not fixed here.
 
-The city is the main operational environment.
-
-It contains:
-
-- Residential areas
-- Commercial areas
-- Industrial areas
-- Special locations
-- Transportation infrastructure
+Day/night is not only a filter. It may influence traffic, customer demand, opening patterns, industrial shifts, employee availability and visible ambience.
 
 ---
 
-## Zone Layer
+# 3. Population, Workforce and Specialists
 
-The city is divided into smaller operational zones.
+Localities, regions and countries may track summarized:
 
-Each zone has unique characteristics.
+- residents;
+- workforce;
+- available jobs;
+- qualified specialists;
+- tourists/temporary visitors;
+- migration pressure;
+- housing/service capacity.
 
-Examples:
+Specialists are productive strategic resources. Advanced industry, transport, research and infrastructure may require appropriate trained people in addition to money and equipment.
 
-- Population density
-- Business activity
-- Demand level
-- Traffic conditions
-- Expansion potential
-
----
-
-## Location Layer
-
-Individual points of interest exist inside zones.
-
-Examples:
-
-- Homes
-- Restaurants
-- Shops
-- Offices
-- Warehouses
-- Logistics facilities
+Visual/social diversity must not become a discriminatory economic mechanic based on protected personal traits.
 
 ---
 
-# World Evolution
+# 4. Migration and Tourism
 
-The world changes as the company grows.
+People may move between localities, regions and countries in response to fictional world conditions such as:
 
-Company actions can influence:
+- employment and wages;
+- housing and services;
+- economic opportunity or decline;
+- specialist demand;
+- infrastructure and connectivity;
+- environmental conditions;
+- tourism attractiveness;
+- major events.
 
-- Business opportunities
-- Infrastructure development
-- Customer demand
-- Available services
+Migration changes demand, workforce supply, housing pressure, architecture and business opportunity.
 
----
-
-# Player Relationship With The World
-
-The player interacts with the world through:
-
-- Deliveries
-- Investments
-- Partnerships
-- Expansion
-- Infrastructure development
-
-The company becomes part of the city's ecosystem.
+Large migration waves can exist as advanced game events but are not predictions about real populations.
 
 ---
 
-# World Simulation Principles
+# 5. Urban and Rural Development
 
-The world should follow these principles:
+A locality grows only when multiple supporting systems can sustain growth, for example:
 
-## Consistency
+- food;
+- energy;
+- construction materials;
+- jobs;
+- housing;
+- transport/logistics access;
+- public/service capacity;
+- industry;
+- specialists;
+- trade connectivity;
+- investment.
 
-The world must follow understandable rules.
+Visible consequences may include new housing, denser or more diverse architecture, commercial growth, industry, roads, utilities, services and increased population activity.
 
----
-
-## Growth
-
-The world should provide new opportunities as the company develops.
-
----
-
-## Feedback
-
-Player actions should create visible consequences.
-
----
-
-## Scalability
-
-The system must allow future expansion.
+Rural localities develop through agriculture, livestock, forestry, extraction, processing, tourism, specialist industry and connectivity while preserving a distinct rural identity rather than becoming small copies of cities.
 
 ---
 
-# World Time System
+# 6. New Settlements
 
-Time affects world behavior.
+Advanced world simulation may create new settlements in eligible undeveloped territory.
 
-Examples:
+A new town/city requires a plausible foundation such as resources or productive activity, employment, transport access, infrastructure/housing investment and population inflow.
 
-Morning:
-
-- Business activity increases
-
-Afternoon:
-
-- Commercial activity changes
-
-Evening:
-
-- Residential demand increases
-
-Future versions may include:
-
-- Seasons
-- Holidays
-- Long-term city evolution
+New settlements emerge from world rules, not arbitrary random placement.
 
 ---
 
-# World Events
+# 7. Productive Geography
 
-Future versions may introduce dynamic events.
+Economic activity is not limited to towns.
 
-Examples:
+Large farms, mines, steelworks, paper mills, chemical/fertilizer plants, refineries, energy sites, processing facilities, warehouses and freight terminals may exist as independent external economic nodes.
 
-- Local festivals
-- New businesses opening
-- Infrastructure projects
-- Economic changes
-- Weather events
-
-Events should create new strategic situations.
+They consume inputs, create outputs/inventory and generate physical logistics demand.
 
 ---
 
-# MVP World Scope
+# 8. Country Development
 
-The first playable version includes:
+Countries are dynamic entities whose long-term condition may respond to a basket of:
 
-- One city
-- Basic zones
-- Simple locations
-- Static world layout
-- Basic customer activity
+- productive output and productivity;
+- trade;
+- transport/infrastructure;
+- food and energy availability;
+- workforce and specialists;
+- innovation;
+- population trend;
+- tourism/services;
+- logistics capacity;
+- major events and disruptions.
 
-Advanced simulation is introduced later.
+Countries may become more prosperous, connected and urbanized or may decline through sustained demographic, economic, infrastructure or environmental pressure.
+
+No single score should determine national success.
 
 ---
 
-# Future Expansion
+# 9. National Currency — Future Advanced System
 
-Possible future systems:
+A future advanced economy may model national game currencies and exchange-rate pressure.
 
-- Multiple cities
-- Countries
-- International logistics
-- Smart city simulation
-- Population growth
-- Urban development
-- Global logistics networks
+Currency strength may respond to fictionalized fundamentals such as productivity, trade, stability, inflation/liquidity abstractions and confidence. The mechanic does not need to reproduce live real-world exchange rates.
+
+Company Money remains sufficient for normal gameplay until multi-currency settlement is separately implemented and approved.
+
+---
+
+# 10. World Events
+
+Events may operate at local, regional, national or global scale.
+
+Possible categories include:
+
+- festivals and tourism surges;
+- harvest variation;
+- severe weather/environmental disruption;
+- industrial openings/closures;
+- infrastructure projects/failures;
+- commodity shortages/surpluses;
+- workforce shortages;
+- economic/financial cycles;
+- route or border disruption;
+- migration waves;
+- advanced geopolitical conflict/war as macro simulation.
+
+Events must alter the same logistics/economic state used by normal gameplay and provide understandable consequences and recovery paths.
+
+They may be inspired by recognizable real-world event categories but must not be presented as forecasts or exact reenactments of current real conflicts.
+
+---
+
+# 11. War and State Change
+
+DROPi Tycoon is not a tactical combat game.
+
+Advanced geopolitical conflict may instead cause macro consequences such as:
+
+- route closures;
+- reduced or damaged infrastructure capacity;
+- displaced population;
+- emergency logistics demand;
+- commodity shortages;
+- changing trade access;
+- changes in political control/state status.
+
+Inside a fictional World Instance, a political state may become inactive, merge, split or later re-emerge. Land geography and stable historical identifiers remain preserved so company, cargo and world history are not orphaned.
+
+These are fictional simulation outcomes, not predictions about real countries.
+
+---
+
+# 12. Decline and Recovery
+
+Regions/localities/countries may decline through combinations of unemployment, supply loss, industrial collapse, weak connectivity, population outflow, environmental degradation and prolonged disruption.
+
+Visible consequences may include abandoned facilities/housing, reduced services, lower production and shrinking demand.
+
+Normal decline must preserve meaningful recovery through trade, investment, migration, new industry, specialists, infrastructure and logistics access.
+
+---
+
+# 13. Persistent World Instances
+
+DROPi Tycoon may operate multiple independent global economies at the same time.
+
+A new **World Instance** starts from a versioned baseline seed and evolves independently. Opening a new world does not reset or delete older worlds. Mature worlds may remain as persistent legacy economies with their own history.
+
+Launch cadence may eventually be monthly, seasonal, multi-month or annual according to live-operations balance; no cadence is fixed yet.
+
+A logical World Instance is not one physical server and may span many services/shards at scale.
+
+---
+
+# 14. Visible Consequences
+
+Important changes should become visible at the appropriate map layer:
+
+- factory/farm growth or closure;
+- new/expanded infrastructure;
+- changing trade corridors;
+- city density and architecture growth;
+- rural prosperity or decline;
+- migration and workforce activity;
+- new settlements;
+- national development/decline;
+- global freight shifts.
+
+---
+
+# 15. Performance Rule
+
+World scale comes from hierarchical simulation frequency.
+
+Typical responsibility bands are:
+
+- active local scene — frame/high frequency;
+- active route/hub — operational frequency;
+- production/inventory/local markets — economic ticks;
+- country/global trade — strategic ticks;
+- demographics/urbanization/structural state — slow world cycles.
+
+Inactive areas use deterministic summarized/catch-up simulation rather than replaying every missed local frame.
 
 ---
 
 # Canonical Rule
 
-The world is the foundation where all gameplay systems exist.
-
-Every future feature must integrate naturally into the world instead of existing as an isolated mechanic.
+**DROPi Tycoon is a persistent evolving global economy. Time, population, specialists, production, trade, infrastructure and events change the geography of opportunity, while detailed simulation remains bounded to the player's active context.**
 
 ---
 
