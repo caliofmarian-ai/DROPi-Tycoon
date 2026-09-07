@@ -131,7 +131,7 @@ describe('issue #349 / #367 / #392 player smartphone foundation', () => {
     expect(snapshot.assets.lines).toContain('Treasury shares: 4975 internal · 4860 external')
     expect(snapshot.assets.lines).toContain('Dividends received: $280')
     expect(snapshot.assets.lines).toContain('Founder: You · Executive: You')
-    expect(snapshot.assets.lines).toContain('Rep 0 · Team 1/1 active')
+    expect(snapshot.assets.lines).toContain(`Rep ${company.reputation} · Team 1/1 active`)
     expect(snapshot.assets.lines).toContain('Fleet 1 owned/1 assigned · HQ 2 depts')
     expect(snapshot.map.lines).toContain('Transport: Walking')
     expect(snapshot.map.lines).toContain('Distance: 50u')
