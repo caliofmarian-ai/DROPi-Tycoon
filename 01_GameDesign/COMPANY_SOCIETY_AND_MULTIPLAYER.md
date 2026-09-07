@@ -2,7 +2,7 @@
 
 Document: COMPANY_SOCIETY_AND_MULTIPLAYER.md
 Project: DROPi Tycoon
-Version: 1.0.0
+Version: 1.0.1
 Status: Canonical Gameplay Specialization
 Author: Marian Caliof & OpenAI
 Language: English
@@ -309,15 +309,22 @@ A stronger company therefore becomes more valuable and harder to displace natura
 
 Internal/member shares represent participation tied to active membership and company governance.
 
-A member who wants to leave should normally be able to sell, transfer, or redeem eligible internal holdings through defined company-market rules before departure.
+The owner-approved exit rule is strict: **a player who definitively leaves a company forfeits all Internal/Member shares still held in that company at the moment of exit**.
 
-If a player leaves a company while still holding member-restricted shares that cannot legally remain with a non-member under the game rules, those shares return to the company treasury/internal pool and become available for eligible internal acquisition. The departing player does not carry those member-restricted governance rights into the new company.
+Those forfeited shares:
 
-This consequence must be clearly disclosed before departure and must not silently confiscate external investments.
+- return to the company treasury/internal pool;
+- are not destroyed;
+- are not automatically redistributed for free;
+- become available for later purchase by other eligible active company members through an explicit paid transaction once valuation/pricing and settlement rules exist.
 
-External market shares held in other companies are separate portfolio assets and are not automatically lost merely because the player changes operational company membership.
+The departing player does not carry those member-restricted governance rights into another company and receives no automatic right to retain Internal/Member shares after final exit.
 
-Assigned company equipment, employment permissions, and internal operational rights are also separate from external investment ownership.
+This consequence must be clearly disclosed before departure.
+
+External market shares held as portfolio investments are separate assets and are not automatically lost merely because the player changes operational company membership.
+
+Assigned company equipment, employment permissions, internal membership shares, and external investment ownership are distinct concepts.
 
 ---
 
