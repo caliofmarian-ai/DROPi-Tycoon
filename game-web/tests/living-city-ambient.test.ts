@@ -1,7 +1,15 @@
 import type Phaser from 'phaser'
 import { describe, expect, it, vi } from 'vitest'
-import { AMBIENT_ACTOR_LIMIT, AmbientCity, buildAmbientRoutes, sampleAmbientRoute, type AmbientPose } from '../src/world/ambientCity'
+import {
+  AMBIENT_ACTOR_LIMIT,
+  AMBIENT_PEDESTRIAN_SCALE,
+  AmbientCity,
+  buildAmbientRoutes,
+  sampleAmbientRoute,
+  type AmbientPose,
+} from '../src/world/ambientCity'
 import { ensureNeighborAtlas } from '../src/world/cityArt'
+import { CONTROLLED_CROSSINGS } from '../src/world/cityTrafficRules'
 import { isUrbanWalkable } from '../src/world/urbanWorld'
 import { createInitialCompanyState, createInitialGameSettingsState, createInitialWorldState } from '../src/state/gameState'
 import { serializeGameSession } from '../src/persistence/saveSystem'
@@ -24,28 +32,34 @@ const ambientScene = () => {
     setName: vi.fn().mockReturnThis(), setVisible: vi.fn().mockReturnThis(),
     setPosition: vi.fn().mockReturnThis(), setFrame: vi.fn().mockReturnThis(),
     setTexture: vi.fn().mockReturnThis(), setScale: vi.fn().mockReturnThis(),
-    add: vi.fn().mockReturnThis(),
+    setAlpha: vi.fn().mockReturnThis(), add: vi.fn().mockReturnThis(),
   })
   const images: ReturnType<typeof object>[] = []
   const containers: ReturnType<typeof object>[] = []
+  const rectangles: ReturnType<typeof object>[] = []
+  const circles: ReturnType<typeof object>[] = []
   const raw = {
     textures: { exists: (key: string) => textures.has(key), get: (key: string) => textures.get(key) },
     make: { graphics: makeGraphics },
     add: {
       image: vi.fn(() => { const image = object(); images.push(image); return image }),
       container: vi.fn(() => { const container = object(); containers.push(container); return container }),
+      rectangle: vi.fn(() => { const rectangle = object(); rectangles.push(rectangle); return rectangle }),
+      circle: vi.fn(() => { const circle = object(); circles.push(circle); return circle }),
     },
   }
-  return { scene: raw as unknown as Phaser.Scene, textures, raw, images, containers, drawCalls: () => drawCalls }
+  return { scene: raw as unknown as Phaser.Scene, textures, raw, images, containers, rectangles, circles, drawCalls: () => drawCalls }
 }
 
 describe('bounded deterministic city life', () => {
-  it('populates connected promenades and roads with a fixed actor budget', () => {
+  it('populates sidewalks, a legal crossing and roads within a fixed actor budget', () => {
     const routes = buildAmbientRoutes()
-    expect(routes.length).toBeGreaterThanOrEqual(14)
+    expect(routes.length).toBeGreaterThanOrEqual(15)
     expect(routes.length).toBeLessThanOrEqual(AMBIENT_ACTOR_LIMIT)
     expect(routes.filter(route => route.kind !== 'pedestrian')).toHaveLength(4)
-    expect(routes.filter(route => route.kind === 'pedestrian' && route.start.x === route.end.x)).toHaveLength(4)
+    expect(routes.filter(route => route.kind === 'pedestrian' && route.start.x === route.end.x).length)
+      .toBeGreaterThanOrEqual(5)
+    expect(routes.filter(route => route.controlledCrossingId)).toHaveLength(2)
     expect(buildAmbientRoutes()).toEqual(routes)
     expect(new Set(routes.map(route => route.id)).size).toBe(routes.length)
     for (const route of routes) {
@@ -82,10 +96,21 @@ describe('bounded deterministic city life', () => {
     expect(mock.drawCalls()).toBe(initial)
   })
 
+  it('renders one bounded zebra/signal surface and scales pedestrians below courier size', () => {
+    const mock = ambientScene()
+    new AmbientCity(mock.scene)
+    const pedestrianCount = buildAmbientRoutes().filter(route => route.kind === 'pedestrian').length
+    expect(mock.rectangles.length).toBe(CONTROLLED_CROSSINGS.length * 14)
+    expect(mock.circles.length).toBe(CONTROLLED_CROSSINGS.length * 2)
+    expect(mock.images.slice(0, pedestrianCount)
+      .every(image => image.setScale.mock.calls.some(([scale]) => scale === AMBIENT_PEDESTRIAN_SCALE))).toBe(true)
+  })
+
   it('animates visible pedestrians using bounded texture frames, never Graphics redraws or mirroring', () => {
     const mock = ambientScene()
     const city = new AmbientCity(mock.scene)
     const count = buildAmbientRoutes().length
+    const pedestrianCount = buildAmbientRoutes().filter(route => route.kind === 'pedestrian').length
     const initial = mock.drawCalls()
     const view = { x: 0, y: 0, right: 3200, bottom: 2400 } as Phaser.Geom.Rectangle
     for (let tick = 0; tick < 2000; tick++) city.update(16, view)
@@ -93,9 +118,10 @@ describe('bounded deterministic city life', () => {
     expect(mock.images).toHaveLength(count)
     expect(mock.drawCalls()).toBe(initial)
     expect(mock.containers.every(container => container.setScale.mock.calls.length === 0)).toBe(true)
-    expect(mock.images.slice(0, count - 4).every(image => image.setFrame.mock.calls.length > 20)).toBe(true)
-    expect(mock.images.slice(0, count - 4).flatMap(image => image.setFrame.mock.calls)
+    expect(mock.images.slice(0, pedestrianCount).every(image => image.setFrame.mock.calls.length > 20)).toBe(true)
+    expect(mock.images.slice(0, pedestrianCount).flatMap(image => image.setFrame.mock.calls)
       .every(([frame]) => Number.isInteger(frame) && frame >= 0 && frame < 16)).toBe(true)
+    expect(mock.circles.every(circle => circle.setAlpha.mock.calls.length > 20)).toBe(true)
     new AmbientCity(mock.scene)
     expect(mock.drawCalls()).toBe(initial)
   })
@@ -120,11 +146,11 @@ describe('bounded deterministic city life', () => {
     }
   })
 
-  it('keeps ambient population, art and camera preferences out of Save v2', () => {
+  it('keeps ambient population, crossing phases and camera preferences out of Save v2', () => {
     const raw = serializeGameSession({
       world: createInitialWorldState(), company: createInitialCompanyState(), settings: createInitialGameSettingsState(),
     })
     expect(JSON.parse(raw).formatVersion).toBe(2)
-    expect(raw).not.toMatch(/ambient|pedestrian|camera|zoom|texture|decoration/)
+    expect(raw).not.toMatch(/ambient|pedestrian|crossing|camera|zoom|texture|decoration/)
   })
 })
