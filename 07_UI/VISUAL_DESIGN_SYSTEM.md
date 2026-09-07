@@ -2,11 +2,11 @@
 
 Document: VISUAL_DESIGN_SYSTEM.md
 Project: DROPi Tycoon
-Version: 1.0.0
+Version: 1.1.0
 Status: Canonical
 Author: Marian Caliof & OpenAI
 Language: English
-Last Updated: 2026-09-04
+Last Updated: 2026-09-07
 
 ---
 
@@ -14,13 +14,15 @@ Last Updated: 2026-09-04
 
 ## Purpose
 
-This document defines the visual and interaction direction of DROPi Tycoon. It converts the project's long-term visual-quality goal into concrete UI rules that can evolve without changing core simulation logic.
+This document defines the visual and interaction direction of DROPi Tycoon UI/UX. It converts the project's long-term visual-quality goal into concrete interface rules that can evolve without changing core simulation logic.
+
+World-art identity, asset-family diversity and production rules are owned by `08_Assets/WORLD_ASSET_BIBLE.md`.
 
 ---
 
 # Experience Target
 
-DROPi Tycoon should feel like a living logistics company, not a collection of debug panels.
+DROPi Tycoon should feel like a living logistics company and society, not a collection of debug panels.
 
 The interface must be:
 
@@ -30,9 +32,26 @@ The interface must be:
 - compact enough for mobile;
 - comfortable for touch;
 - rich enough to support immersion;
-- scalable as company complexity grows.
+- scalable as company/world complexity grows;
+- visually compatible with the canonical world art.
 
 Prototype simplicity is temporary implementation scope, not a permanent visual target.
+
+---
+
+# Canonical Art Relationship — 2026-09-07
+
+The Project Owner has explicitly approved the current candidate-asset direction and its improvement toward a richer three-dimensional presentation.
+
+The canonical world style is:
+
+**Stylized 3D Pre-Rendered Mobile World — premium mobile tycoon presentation, soft-isometric / elevated 3/4 perspective, readable forms, controlled color, clear materials and consistent lighting.**
+
+UI does not need to mimic a three-dimensional world object literally, but its icons, cards, illustrations, depth, materials and color language must feel like part of the same product.
+
+UI may remain technically vector/text/Phaser/HTML-driven where that improves readability and responsiveness.
+
+The art direction may be materially changed only by a later explicit Project Owner decision and canonical reconciliation.
 
 ---
 
@@ -52,7 +71,9 @@ Candidate and employee surfaces should support:
 
 A candidate must not be reduced to a name and a purchase button when the game already models that person as an employee.
 
-Visual identity should persist after hiring so the player can recognize and develop relationships with recurring characters.
+Visual identity should persist after hiring so the player can recognize recurring characters.
+
+Human portraits/avatars must use the diversity and identity-continuity rules in `WORLD_ASSET_BIBLE.md`; the interface must not present the same generic face for unrelated people merely for convenience.
 
 ---
 
@@ -90,7 +111,7 @@ Automated responsive tests do not replace real-device owner review.
 
 # Reusable Visual Language
 
-Similar concepts should use consistent patterns across Employees, Vehicles, Reviews, Finance, Warehouses, Drones, and future systems.
+Similar concepts should use consistent patterns across Employees, Vehicles, Reviews, Finance, Warehouses, Products, Drones, Rail, Aviation, Ports and future systems.
 
 The reusable language should include:
 
@@ -98,13 +119,15 @@ The reusable language should include:
 - status chips;
 - person cards;
 - vehicle cards;
+- product/cargo cards;
+- company/industry cards;
 - summary metrics;
 - primary and secondary actions;
 - empty states;
 - warnings;
 - success feedback;
 - pagination or progressive lists;
-- modal or detail surfaces when complexity requires them.
+- modal/detail surfaces when complexity requires them.
 
 ---
 
@@ -126,6 +149,21 @@ Do not invent unsupported attributes merely to decorate a card.
 
 ---
 
+# Product and Cargo Presentation
+
+When products/cargo are visible in UI, presentation should help the player identify:
+
+- product/category;
+- packaging/cargo form;
+- quantity/capacity where authoritative;
+- handling status where modeled;
+- pickup/source;
+- destination/customer or transfer point where relevant.
+
+UI must use real modeled product/cargo truth and must not fabricate unsupported stock or demand merely to fill cards.
+
+---
+
 # Visual Feedback
 
 Important changes should feel consequential.
@@ -138,25 +176,32 @@ Examples include:
 - promotion;
 - major customer review;
 - financial milestone;
-- expansion unlocked.
+- expansion unlocked;
+- construction completed;
+- product/cargo transferred;
+- new transport gateway unlocked.
 
-Feedback can use restrained animation, character reaction, sound, iconography, or short narrative copy. Effects must support comprehension rather than distract from gameplay.
+Feedback can use restrained animation, character reaction, sound, iconography or short narrative copy. Effects must support comprehension rather than distract from gameplay.
 
 ---
 
-# Art Direction Boundary
+# Art Direction and Rendering Technology Boundary
 
-This document establishes interaction and presentation principles but does not permanently lock the game to one rendering technology or final art style.
+The art style is now canonically constrained by `WORLD_ASSET_BIBLE.md`.
 
-High-fidelity portraits, characters, vehicles, buildings, animation, lighting, and interface art may evolve as production quality increases.
+The rendering technology is not permanently locked.
 
-Temporary assets must be replaceable without changing simulation state or gameplay rules.
+High-fidelity portraits, characters, vehicles, buildings, animation, lighting and interface art may improve over time **inside the approved visual language**.
+
+Temporary/runtime-procedural assets must remain replaceable without changing simulation state or gameplay rules.
+
+A future real-time 3D rendering migration, if ever considered, is a Technical/Product decision and may not be inferred merely from the three-dimensional appearance of pre-rendered art.
 
 ---
 
 # Owner Visual Gate
 
-Any merged change that materially affects player-visible UI should be checked on the deployed game.
+Any merged change that materially affects player-visible UI should be checked on the deployed/installed game.
 
 Owner verification should state:
 
@@ -172,9 +217,7 @@ A system may be functionally correct while remaining on visual hold.
 
 # Canonical Rule
 
-DROPi Tycoon UI must make complex company systems understandable while making the company and its people feel alive.
-
-Clarity and usability are mandatory; visual richness and immersion should increase over time rather than remain at prototype-panel quality.
+**DROPi Tycoon UI must make complex company/world systems understandable while making the company, products and people feel alive. It must remain mobile-first and functionally clear while visually belonging to the same canonical stylized 3D pre-rendered DROPi Tycoon world.**
 
 ---
 
