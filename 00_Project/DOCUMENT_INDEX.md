@@ -2,7 +2,7 @@
 
 Document: DOCUMENT_INDEX.md
 Project: DROPi Tycoon
-Version: 2.0.0
+Version: 2.1.0
 Status: Documentation Control
 Author: Marian Caliof & OpenAI
 Language: English
@@ -240,11 +240,20 @@ UX/UI must support world-embodied gameplay rather than replace physical game sys
 
 ## Purpose
 
-Asset standards, approved references, and resource governance.
+Asset standards, approved references, world-art canon, production planning and resource governance.
 
 Documents:
 
-- `08_Assets/ASSETS.md`
+- `08_Assets/ASSETS.md` — top-level canonical asset management, approval-state, identity and storage rules.
+- `08_Assets/WORLD_ASSET_BIBLE.md` — explicitly owner-authorized canonical world-art/asset specialization covering the stylized 3D pre-rendered visual language, diversity, products, companies, cities, infrastructure, dimensions and production gates.
+- `08_Assets/MASTER_ASSET_PLAN_V2.md` — governed staged production plan for scaling the library into thousands of meaningful assets.
+- `08_Assets/BATCH_003_PLACEHOLDER_PROVENANCE.md` — historical placeholder provenance.
+- `08_Assets/Approved_References/` — owner-approved visual reference boards.
+- `08_Assets/Production/Manifests/` — executable asset-production manifests constrained by the World Asset Bible.
+
+Authority note:
+
+`WORLD_ASSET_BIBLE.md` is a lower-level specialization of Universe, Business, Logistics, Game, World and UI canon. It defines how those truths become visually coherent assets; it does not redefine their gameplay/economic behavior.
 
 ---
 
@@ -377,13 +386,26 @@ Governance source: `09_Development/Owner_Directives/README.md`.
 
 ---
 
-# Future BIBLE-Level Documentation
+# BIBLE-Level Documentation
 
-**Status:** Approved future architecture concept — no BIBLE files currently authorized or created.
+## Authorized BIBLE
 
-Potential domain BIBLE documents remain a future option only.
+The Project Owner explicitly authorized `08_Assets/WORLD_ASSET_BIBLE.md` on 2026-09-07 after the required domain audit/reconciliation and Owner Directive 003.
 
-Creating a BIBLE still requires:
+This authorization is specific to the world-art/asset domain.
+
+`WORLD_ASSET_BIBLE.md` must:
+
+- remain subordinate to `VISION`, `UNIVERSE_DESIGN`, `BUSINESS_DESIGN`, `LOGISTICS_DESIGN`, Game/World/UI and Technical authority;
+- avoid duplicating gameplay/economy/logistics ownership;
+- govern visual style, diversity, asset families, product representation, production states, dimensions and asset-quality gates;
+- be changed materially only through deliberate canonical reconciliation and owner approval where the visual direction changes.
+
+## Other Future BIBLE Documents
+
+No other BIBLE document is automatically authorized by this decision.
+
+Any additional BIBLE still requires:
 
 1. complete domain audit;
 2. ownership mapping;
@@ -391,10 +413,6 @@ Creating a BIBLE still requires:
 4. contradiction analysis;
 5. migration proposal;
 6. explicit Project Owner approval.
-
-The 2026-09-07 Universe/Business/Logistics audit authorized the three strategic bridge documents created in `00_Project/`; it **does not** automatically authorize BIBLE documents.
-
-A future BIBLE must not duplicate an existing canonical owner.
 
 ---
 
