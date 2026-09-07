@@ -55,6 +55,7 @@ export const LEGACY_SAVE_FORMAT_VERSION = 1 as const
 export const LEGACY_SAVE_STORAGE_KEY = 'dropi.tycoon.save.v1'
 export const LEGACY_SAVE_STAGING_KEY = 'dropi.tycoon.save.staging.v1'
 
+/** Stable legacy trigger inventory retained for existing tests and callers. */
 export const CANONICAL_AUTOSAVE_EVENTS = [
   'delivery-completed',
   'upgrade-purchased',
@@ -67,10 +68,16 @@ export const CANONICAL_AUTOSAVE_EVENTS = [
   'employee-vehicle-assignment-changed',
   'settings-changed',
   'operating-day-closed',
+] as const
+
+/** Additive #390 ownership/economy trigger family. */
+export const OWNERSHIP_ECONOMY_AUTOSAVE_EVENTS = [
   'ownership-economy-changed',
 ] as const
 
-export type CanonicalAutosaveEvent = (typeof CANONICAL_AUTOSAVE_EVENTS)[number]
+export type CanonicalAutosaveEvent =
+  | (typeof CANONICAL_AUTOSAVE_EVENTS)[number]
+  | (typeof OWNERSHIP_ECONOMY_AUTOSAVE_EVENTS)[number]
 
 export interface SaveStorage {
   getItem(key: string): string | null
@@ -610,7 +617,8 @@ export const preserveInvalidSaveBeforeReplacement = (storage: SaveStorage, inspe
 }
 
 export const isCanonicalAutosaveEvent = (event: string): event is CanonicalAutosaveEvent =>
-  CANONICAL_AUTOSAVE_EVENTS.some((approvedEvent) => approvedEvent === event)
+  CANONICAL_AUTOSAVE_EVENTS.some((approvedEvent) => approvedEvent === event) ||
+  OWNERSHIP_ECONOMY_AUTOSAVE_EVENTS.some((approvedEvent) => approvedEvent === event)
 
 export const autosaveIfApproved = (storage: SaveStorage, session: GameSessionState, event: string): AutosaveResult => {
   if (!isCanonicalAutosaveEvent(event)) return { saved: false, reason: 'not-approved' }
