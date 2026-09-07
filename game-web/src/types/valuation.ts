@@ -47,6 +47,10 @@ export interface CompanyValuationPolicy {
     technology: number
     specialistCapability: number
   }
+  riskWeights: {
+    operationalRisk: number
+    reliabilityDeficit: number
+  }
 }
 
 export interface CompanyValuationBreakdown {
@@ -65,4 +69,9 @@ export interface CompanyValuationBreakdown {
   totalReferenceValuation: number
   /** Reference only. This is not a live exchange quote or guaranteed transaction price. */
   referenceEquityUnitValue: number
+}
+
+export interface CompanyValuationValidationResult {
+  valid: boolean
+  errors: string[]
 }
