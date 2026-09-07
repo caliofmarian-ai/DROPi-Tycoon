@@ -1,5 +1,5 @@
 import type { BusinessCompanyId, EconomicActorId } from './business'
-import type { EquityPoolId } from './equity'
+import type { CompanyEquityState, EquityPoolId } from './equity'
 
 export const GOVERNANCE_PROPOSAL_STATUSES = ['Open', 'Approved', 'Rejected', 'Expired', 'Executed'] as const
 export type GovernanceProposalStatus = (typeof GOVERNANCE_PROPOSAL_STATUSES)[number]
@@ -76,6 +76,7 @@ export type GovernanceBlockReason =
   | 'InvalidPolicy'
   | 'CompanyMismatch'
   | 'InvalidIdentifier'
+  | 'DuplicateCommand'
   | 'CommandIdConflict'
   | 'ProposalIdConflict'
   | 'ProposalNotFound'
@@ -115,5 +116,5 @@ export interface ExecutiveContinuityResult {
   changed: boolean
   mode: ExecutiveContinuityMode
   caretaker: boolean
-  state: import('./equity').CompanyEquityState
+  state: CompanyEquityState
 }
