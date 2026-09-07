@@ -1,12 +1,10 @@
 # R1 — Owner Decision Register
 
-Status: **RESEARCH ONLY — AWAITING OWNER DECISION**  
+Status: **RESEARCH ONLY — PARTIALLY DECIDED BY OWNER**  
 Parent: #423  
 Track: #424
 
-These decisions are intentionally not canonical yet.
-
-The recommended package is designed to keep fresh World Instances fair, make one human identity flexible enough for a multiplayer society, prevent offline softlocks and preserve the existing person/company separation.
+These decisions are intentionally not canonical yet. Owner statements recorded here guide the research model and will be reconciled into canon only after the full Game Logic Research exit gate.
 
 ---
 
@@ -19,13 +17,6 @@ Allow multiple independent economic heroes/alts per account in the same World In
 Allow **one primary economic hero per account per World Instance**.
 
 The hero can change professions, employers and companies instead of creating alternate identities.
-
-### Why B
-- clearer identity and reputation;
-- harder to self-deal/fake labor;
-- easier anti-collusion and market integrity;
-- company membership has real meaning;
-- still allows the account to have separate heroes in separate World Instances.
 
 Decision: **PENDING OWNER**
 
@@ -44,16 +35,7 @@ Only non-economic account history transfers by default:
 - historical achievements/profile;
 - tutorial familiarity / optional tutorial skip.
 
-The new world's hero re-establishes:
-- Personal Money;
-- qualifications/mastery;
-- property/assets;
-- shares;
-- employment/membership;
-- reputation with economic effect.
-
-### Why B
-A new World Instance remains a genuine fresh economy instead of being immediately dominated by mature-world progression.
+The new world's hero re-establishes Personal Money, qualifications/mastery with economic effect, property/assets, shares, employment/membership and economic reputation.
 
 Decision: **PENDING OWNER**
 
@@ -67,41 +49,52 @@ A hero may be an internal member of many companies simultaneously.
 ### Option B — RECOMMENDED
 A hero has **one active primary Internal/Member company at a time**.
 
-They may still:
-- own external shares in many companies;
-- buy/sell goods with competitors;
-- accept governed outside contracts where employment permits;
-- retain historical Founder identity in old companies.
-
-### Why B
-- coherent with the current Internal/Member share exit rule;
-- stronger company identity;
-- reduced collusion/self-dealing;
-- simpler governance.
+They may still own external shares in many companies, trade with competitors, perform governed outside contracts where permitted and retain historical Founder identity in old companies.
 
 Decision: **PENDING OWNER**
 
 ---
 
-## D-R1-004 — Personal housing and survival needs
+## D-R1-004 — Personal metabolism, consumption and work energy
 
-### Option A
-Hard survival simulation: hunger, sleep and housing are mandatory moment-to-moment player needs.
+### Previous recommendation — REJECTED BY OWNER
+Treat food, water, housing and personal consumption mainly as soft lifestyle/economy sinks without a meaningful recurring survival/energy constraint.
 
-### Option B — RECOMMENDED
-Housing, personal consumption and living standard exist primarily as:
-- property/progression;
-- storage/location;
-- comfort/prestige;
-- personal-money sinks;
-- demand inputs for the wider economy.
+### Owner direction — ACCEPTED FOR RESEARCH
+The human hero is both a **producer and a consumer** in the simulated economy.
 
-Do **not** make hunger/sleep meters the core player loop.
+Authoritative world time creates recurring personal consumption and operating requirements. The research model must include at minimum:
 
-### Why B
-Keeps the game focused on economy, work, logistics and society rather than repetitive survival maintenance.
+- food consumption;
+- water/basic household consumption;
+- Personal Money living costs;
+- housing/accommodation costs where applicable;
+- a finite personal **Energy / Work Capacity** resource;
+- rest/recovery requirements;
+- equipment-dependent efficiency;
+- fuel/electric charge/energy consumption for personally operated vehicles and equipment;
+- maintenance and other recurring ownership costs where applicable.
 
-Decision: **PENDING OWNER**
+The hero cannot perform unlimited work continuously. Walking, carrying cargo, operating equipment and completing shifts consume finite personal capacity. Rest, food, water and suitable conditions restore or support capacity according to later balancing rules.
+
+This is an **economic-metabolic loop**, not an arcade punishment loop. Exact hunger/thirst timers, quantities and UI representation remain research/balancing questions.
+
+### Offline / inactive consequence
+
+World time does not freeze merely because a player is offline.
+
+Governed recurring obligations and consumption may continue while the hero is inactive. Depending on their assets, contracts and reserves, an inactive hero may:
+
+- exhaust liquid Personal Money;
+- lose optional services or rented privileges;
+- become unable to fund fuel/maintenance/travel;
+- default on future designed obligations;
+- liquidate or lose eligible assets under later insolvency rules;
+- become personally insolvent / bankrupt.
+
+Bankruptcy does **not** delete player identity. It returns the person to a recoverable economic state with access to legitimate low-entry work.
+
+Decision: **OWNER DIRECTION RECORDED — research details still open**
 
 ---
 
@@ -111,12 +104,7 @@ Decision: **PENDING OWNER**
 Player hero ages out/dies permanently as World Instance years pass.
 
 ### Option B — RECOMMENDED
-No permanent aging-out/death of the human player's economic identity.
-
-Population births/deaths may be simulated abstractly for society, while the player's hero persists. Retirement/inactivity/legacy are voluntary or governed social states, not deletion.
-
-### Why B
-World Instances may run for years and players may return after long absences. Permanent age death would punish long-term identity attachment and complicate ownership/history.
+No permanent aging-out/death of the human player's economic identity. Population births/deaths may be simulated abstractly for society, while the player persists. Retirement/inactivity/legacy are social/economic states rather than deletion.
 
 Decision: **PENDING OWNER**
 
@@ -128,19 +116,9 @@ Decision: **PENDING OWNER**
 Selecting a country/city on the strategic map instantly teleports the hero there.
 
 ### Option B — RECOMMENDED
-The strategic map selects/plans destinations; physical presence changes through transport infrastructure.
+The strategic map selects/plans destinations; physical presence changes through unlocked transport infrastructure.
 
-Long-distance travel may use:
-- tickets/fees;
-- schedules;
-- modeled travel time;
-- time compression/transition screens;
-- company transport when authorized.
-
-A recovery path prevents permanent stranding.
-
-### Why B
-Makes airports, ports, rail, roads and global transport economically meaningful instead of decorative.
+Travel may consume tickets/fees, fuel/energy, schedules and modeled time. Long travel may be time-compressed for usability, but route/infrastructure capability remains economically real.
 
 Decision: **PENDING OWNER**
 
@@ -148,24 +126,23 @@ Decision: **PENDING OWNER**
 
 ## D-R1-007 — Newcomer/recovery floor in mature worlds
 
-### Option A
-A mature world provides no special entry protection; new players must survive entirely through existing player markets.
+### Owner clarification
+The recovery floor must **not** make a poor player economically comfortable for free. It guarantees a way back into productive society, not immunity from poverty.
 
-### Option B — RECOMMENDED
-Every World Instance guarantees a minimum non-softlocking entry/recovery floor:
-- basic phone/access;
-- walking/basic parcel capacity;
-- orientation/training access;
-- at least one legitimate path to basic income;
-- public/entry transport or relocation fallback;
-- NPC/simulated economic fallback when humans do not provide essential starter opportunities.
+### Revised recommendation
+Every World Instance guarantees a non-softlocking **lowest economic rung**:
 
-The system should create as little free currency as practical and will be reconciled with R4 faucets/sinks.
+- basic embodied access and basic phone/application access;
+- walking as the lowest transport mode;
+- access to water/basic subsistence through a governed mechanism;
+- access to the lowest-tier legitimate employment or public/NPC fallback when the human market supplies none;
+- access to introductory training;
+- a path to earn Personal Money again;
+- no free high-value vehicle, company, industrial asset or specialist qualification.
 
-### Why B
-A player joining two years late must still be able to enter the economy without waiting for another human to rescue them.
+A bankrupt hero may therefore be very poor and constrained, but must still have a path to recover through work.
 
-Decision: **PENDING OWNER**
+Decision: **OWNER DIRECTION RECORDED — details continue in R1/R3/R4**
 
 ---
 
@@ -175,22 +152,76 @@ Decision: **PENDING OWNER**
 Import current local Company Money/assets/company ownership directly into a future fresh shared World Instance.
 
 ### Option B — RECOMMENDED
-Preserve current saves through an explicit legacy/offline/migration path, but **do not inject existing local economic power into a fresh competitive World Instance**.
-
-Possible later migration solutions include:
-- dedicated legacy/single-player world;
-- historical conversion that preserves achievements without economic power;
-- owner/test migration tooling.
-
-### Why B
-Local prototype state was never created under multiplayer authority, anti-cheat or shared-world scarcity and therefore cannot safely become contested economic truth.
+Preserve current saves through an explicit legacy/offline/migration path, but do **not** inject existing local economic power into a fresh competitive World Instance.
 
 Decision: **PENDING OWNER**
 
 ---
 
-# Package recommendation
+## D-R1-009 — Starting socio-economic position
 
-Approve **Option B for D-R1-001 through D-R1-008** as one coherent R1 architecture package.
+### Previous broad model
+New hero begins as a generic newcomer with several possible introductory work paths.
 
-If the owner rejects any item, the rejected item must be reopened before R1 canon reconciliation because these decisions affect identity, progression, economy, transport and multiplayer authority together.
+### Owner direction — ACCEPTED FOR RESEARCH
+The intended first-life fantasy is deliberately poor and constrained:
+
+1. the hero begins as a **pedestrian courier / entry employee** rather than a company owner;
+2. the hero works for a large incumbent delivery/logistics employer;
+3. the earliest work consists of low-value, low-capacity jobs such as flyers, letters/envelopes and other small/light items;
+4. the hero is paid primarily **per work day / shift**, not automatically per parcel;
+5. the employer owns/controls the commercial operation and the hero initially owns almost no productive capital;
+6. the hero must fund personal consumption from wages;
+7. early equipment and transport progression comes through saving, buying, studying, qualifying and obtaining the relevant authorizations/access;
+8. the hero cannot move directly from pedestrian courier to owning a railway, steelworks, airport or international industrial network merely because enough game time elapsed;
+9. advanced ownership requires cumulative capital, knowledge, qualifications, organizational capability, infrastructure access and other prerequisites defined by later tracks.
+
+The owner used **Amazon** as the concrete starting-employer reference. Research must separately decide whether production uses a licensed real brand, an explicit parody/reference, or a fictionalized large incumbent logistics company. Until that legal/brand decision is closed, the economic role is authoritative for research but the final employer name is not.
+
+Decision: **OWNER DIRECTION RECORDED**
+
+---
+
+## D-R1-010 — Capability-gated delivery and equipment progression
+
+### Owner direction — ACCEPTED FOR RESEARCH
+No hero can deliver every cargo, operate every vehicle or access every geography from the beginning.
+
+A delivery/service opportunity may require a compatible combination of:
+
+- personal Energy / Work Capacity;
+- physical cargo capacity;
+- equipment/tool capability;
+- vehicle capacity/range;
+- fuel/charge/energy availability;
+- qualification/training;
+- license/authorization/permit abstraction where modeled;
+- employer/company permission;
+- infrastructure access;
+- geographic/world access;
+- cargo-handling specialization;
+- money for operating/travel costs;
+- reputation/experience where justified;
+- company capability for advanced commercial work.
+
+Progression therefore emerges from **earning + buying + studying + qualifying + being authorized + gaining organizational/territorial access**, not from one arbitrary player level.
+
+Decision: **OWNER DIRECTION RECORDED**
+
+---
+
+# Revised R1 architecture package
+
+The owner has materially revised the earlier package. The current research direction is now:
+
+- one persistent person can hold multiple orthogonal social/economic roles;
+- the person has real recurring consumption and finite work energy;
+- vehicles/equipment have operating resources and recurring costs;
+- offline time can create economic deterioration and personal insolvency;
+- insolvency is severe but recoverable and never deletes identity;
+- the first hero state is deliberately poor, employed and pedestrian;
+- first income is wage/shift based rather than arbitrary per-parcel money creation;
+- cargo, transport, geography and ownership are capability-gated;
+- industrial/global power must be built through capital, learning, authorization, people and infrastructure.
+
+R1 remains open until the remaining pending identity/world-transfer/aging/travel/save decisions and the detailed metabolic/offline model are reconciled with R3, R4 and R8.
