@@ -4,6 +4,11 @@ import {
   createInitialWorldState,
 } from '../state/gameState'
 import { synchronizePlayerMovementSpeed } from '../systems/bicycleSystem'
+import {
+  createInitialPersonalProgressionState,
+  hasPersonalProgressionActivity,
+  sanitizePersonalProgression,
+} from '../systems/personalCapabilitySystem'
 import { reconcileLegacyBicycleOwnership } from '../systems/vehicleSystem'
 import { resolveActiveTransport } from '../systems/activeTransportSystem'
 import {
@@ -26,6 +31,7 @@ import {
   type HQProgressionState,
   type OwnedVehicleState,
   type PayrollState,
+  type PersonalProgressionState,
   type PurchasedUpgradeLevels,
   type VehicleTypeId,
   type UrbanProgressState,
@@ -74,6 +80,8 @@ export interface SaveGameV2 {
   company: SaveCompanyV2
   settings: GameSettingsState
   urban?: UrbanProgressState
+  /** Additive #370 field. Older Save v2 payloads intentionally omit it. */
+  personalProgression?: PersonalProgressionState
 }
 
 export type SaveDecodeResult =
@@ -392,32 +400,44 @@ const sanitizeUrban = (
   }
 }
 
-export const createSaveGame = (session: GameSessionState): SaveGameV2 => ({
-  formatVersion: SAVE_FORMAT_VERSION,
-  company: {
-    companyName: session.company.companyName,
-    money: session.company.money,
-    level: session.company.level,
-    reputation: session.company.reputation,
-    purchasedUpgradeLevels: { ...session.company.purchasedUpgradeLevels },
-    employees: session.company.employees.map((employee) => ({ ...employee })),
-    payroll: { ...session.company.payroll },
-    ...(hasFinancialActivity(session.company.financials)
-      ? { financials: { ...session.company.financials } }
-      : {}),
-    ...(session.company.reviews.length > 0
-      ? { reviews: session.company.reviews.map((review) => ({ ...review })) }
-      : {}),
-    ...(session.company.vehicles.length > 0
-      ? { vehicles: session.company.vehicles.map((vehicle) => ({ ...vehicle })) }
-      : {}),
-    ...(hasExpandedHQ(session.company.hq)
-      ? { hq: { constructedDepartments: [...session.company.hq.constructedDepartments] } }
-      : {}),
-  },
-  settings: { tutorialCompleted: session.settings.tutorialCompleted, soundEnabled: session.settings.soundEnabled },
-  ...(session.world.urban ? { urban: sanitizeUrban(session.world.urban, session.company).urban } : {}),
+const clonePersonalProgression = (state: PersonalProgressionState): PersonalProgressionState => ({
+  experiencePoints: state.experiencePoints,
+  progressionPoints: state.progressionPoints,
+  learnedCapabilityIds: [...state.learnedCapabilityIds],
 })
+
+export const createSaveGame = (session: GameSessionState): SaveGameV2 => {
+  const personalProgression = sanitizePersonalProgression(session.personalProgression).personalProgression
+  return {
+    formatVersion: SAVE_FORMAT_VERSION,
+    company: {
+      companyName: session.company.companyName,
+      money: session.company.money,
+      level: session.company.level,
+      reputation: session.company.reputation,
+      purchasedUpgradeLevels: { ...session.company.purchasedUpgradeLevels },
+      employees: session.company.employees.map((employee) => ({ ...employee })),
+      payroll: { ...session.company.payroll },
+      ...(hasFinancialActivity(session.company.financials)
+        ? { financials: { ...session.company.financials } }
+        : {}),
+      ...(session.company.reviews.length > 0
+        ? { reviews: session.company.reviews.map((review) => ({ ...review })) }
+        : {}),
+      ...(session.company.vehicles.length > 0
+        ? { vehicles: session.company.vehicles.map((vehicle) => ({ ...vehicle })) }
+        : {}),
+      ...(hasExpandedHQ(session.company.hq)
+        ? { hq: { constructedDepartments: [...session.company.hq.constructedDepartments] } }
+        : {}),
+    },
+    settings: { tutorialCompleted: session.settings.tutorialCompleted, soundEnabled: session.settings.soundEnabled },
+    ...(session.world.urban ? { urban: sanitizeUrban(session.world.urban, session.company).urban } : {}),
+    ...(hasPersonalProgressionActivity(personalProgression)
+      ? { personalProgression: clonePersonalProgression(personalProgression) }
+      : {}),
+  }
+}
 
 export const serializeGameSession = (session: GameSessionState): string => JSON.stringify(createSaveGame(session))
 
@@ -436,6 +456,9 @@ export const decodeSave = (raw: string): SaveDecodeResult => {
   const settingsResult = sanitizeSettings(parsed.settings)
   const company = companyResult.company
   const urbanResult = sanitizeUrban(parsed.urban, company)
+  const personalProgressionResult = sanitizePersonalProgression(parsed.personalProgression)
+  const includePersonalProgression = parsed.personalProgression !== undefined ||
+    hasPersonalProgressionActivity(personalProgressionResult.personalProgression)
 
   return {
     kind: 'valid',
@@ -456,8 +479,11 @@ export const decodeSave = (raw: string): SaveDecodeResult => {
       },
       settings: settingsResult.settings,
       urban: urbanResult.urban,
+      ...(includePersonalProgression
+        ? { personalProgression: clonePersonalProgression(personalProgressionResult.personalProgression) }
+        : {}),
     },
-    repaired: migratingV1 || companyResult.repaired || settingsResult.repaired || urbanResult.repaired,
+    repaired: migratingV1 || companyResult.repaired || settingsResult.repaired || urbanResult.repaired || personalProgressionResult.repaired,
     ...(migratingV1 ? { migratedFrom: 1 as const } : {}),
   }
 }
@@ -481,7 +507,15 @@ export const restoreGameSessionFromSave = (save: SaveGameV2): GameSessionState =
   company = reconcileLegacyBicycleOwnership(company)
   const world = synchronizePlayerMovementSpeed(createInitialWorldState(), company)
   world.urban = sanitizeUrban(save.urban, company).urban
-  return { world, company, settings: { ...save.settings } }
+  const personalProgression = save.personalProgression
+    ? sanitizePersonalProgression(save.personalProgression).personalProgression
+    : createInitialPersonalProgressionState()
+  return {
+    world,
+    company,
+    settings: { ...save.settings },
+    personalProgression: clonePersonalProgression(personalProgression),
+  }
 }
 
 const inspectRaw = (raw: string, source: 'primary' | 'staging' | 'legacy-primary' | 'legacy-staging'): SaveSlotInspection => {
