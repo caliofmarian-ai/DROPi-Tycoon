@@ -2,7 +2,7 @@
 
 Document: BUSINESS_DESIGN.md
 Project: DROPi Tycoon
-Version: 1.0.0
+Version: 1.0.1
 Status: Canonical — Business Design Authority
 Author: Marian Caliof & OpenAI
 Language: English
@@ -325,15 +325,20 @@ Detailed issuance, pricing, dilution, voting classes, anti-collusion, market-mak
 
 # 15. Member Shares and Exit
 
-Internal/member-restricted shares are tied to membership/governance eligibility.
+Internal/member-restricted shares represent active participation in the company and require current membership eligibility.
 
-Before leaving, an eligible member should normally have a governed path to sell, transfer, or redeem those holdings.
+The owner-approved exit rule is explicit:
 
-If a departing player still holds shares that cannot remain with a non-member under game rules, those shares return to the company treasury/internal pool under disclosed rules.
+- when a player definitively leaves the company, all remaining **Internal/Member** shares held in that company are forfeited;
+- the forfeited Internal/Member units return to the company's internal treasury pool;
+- they are not destroyed and are not redistributed for free;
+- other eligible active company members may later purchase those treasury shares through an explicit paid transaction once valuation/pricing and settlement rules are implemented;
+- the departing player receives no automatic right to keep Internal/Member shares after final exit;
+- unrelated **External** portfolio holdings remain the player's investment assets and are not confiscated merely because operational membership changes.
 
-External portfolio investments in other companies are separate assets and are not automatically lost when a player changes operational company membership.
+The purchase price and settlement mechanism for returned treasury shares must be governed by the later valuation/market system. Treasury availability by itself does not grant free ownership.
 
-Company equipment, employment rights, and portfolio ownership are distinct concepts.
+Company equipment, employment rights, internal membership shares, and external portfolio ownership are distinct concepts.
 
 ---
 
