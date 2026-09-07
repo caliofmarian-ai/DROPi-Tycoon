@@ -1,0 +1,74 @@
+name: Production Docker Runtime Smoke
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+jobs:
+  production-image-smoke:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Build production Docker image
+        shell: bash
+        run: |
+          set -euo pipefail
+          docker build \
+            --target production \
+            --tag dropi-tycoon-production-smoke:${GITHUB_SHA} \
+            game-web
+
+      - name: Start production image and verify runtime dependencies
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          IMAGE="dropi-tycoon-production-smoke:${GITHUB_SHA}"
+          CONTAINER="dropi-tycoon-production-smoke"
+
+          docker run \
+            --detach \
+            --name "$CONTAINER" \
+            --publish 127.0.0.1:3001:3000 \
+            "$IMAGE"
+
+          cleanup() {
+            docker logs "$CONTAINER" > /tmp/dropi-tycoon-production-container.log 2>&1 || true
+            docker rm --force "$CONTAINER" >/dev/null 2>&1 || true
+          }
+          trap cleanup EXIT
+
+          for i in {1..30}; do
+            if curl --fail --silent --show-error http://127.0.0.1:3001/ > /tmp/dropi-tycoon-production-index.html \
+              && curl --fail --silent --show-error http://127.0.0.1:3001/api/authority/status > /tmp/dropi-tycoon-authority-status.json; then
+              test -s /tmp/dropi-tycoon-production-index.html
+              grep -q '"durability":"session-only"' /tmp/dropi-tycoon-authority-status.json
+              grep -q '"persistent":false' /tmp/dropi-tycoon-authority-status.json
+              docker logs "$CONTAINER" | grep -q 'Session authority prototype enabled at /api/authority/'
+              echo 'Production Docker image runtime smoke: PASS'
+              exit 0
+            fi
+
+            if ! docker inspect --format '{{.State.Running}}' "$CONTAINER" 2>/dev/null | grep -q '^true$'; then
+              echo 'Production container exited before becoming healthy.'
+              docker logs "$CONTAINER" || true
+              exit 1
+            fi
+
+            sleep 1
+          done
+
+          echo 'Production container did not become healthy in time.'
+          docker logs "$CONTAINER" || true
+          exit 1
