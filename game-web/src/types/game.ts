@@ -1,3 +1,5 @@
+import type { OwnershipEconomyState } from './ownershipEconomy'
+
 export const ORDER_STATUSES = [
   'Created',
   'Available',
@@ -226,6 +228,8 @@ export interface GameSessionState {
   settings: GameSettingsState
   /** Additive personal progression domain; runtime materializes a default when omitted. */
   personalProgression?: PersonalProgressionState
+  /** Additive #390 ownership/economy aggregate; runtime materializes a default when omitted. */
+  ownershipEconomy?: OwnershipEconomyState
 }
 
 export interface PickupContext {
