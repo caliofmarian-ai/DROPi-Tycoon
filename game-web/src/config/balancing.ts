@@ -53,6 +53,11 @@ export const BALANCING = {
   HQ_MAINTENANCE_WING_MIN_LEVEL: 1,
   HQ_MAINTENANCE_WING_CONSTRUCTION_COST: 250,
 
+  // Issue #360 / #372 domain-only company-formation tuning. This is an in-game
+  // resource threshold for the Local Courier service model, not a real legal
+  // incorporation fee and not permanent canon.
+  LOCAL_COURIER_COMPANY_FORMATION_MIN_RESOURCES: 500,
+
   // RBATCH-022 fleet purchasing values. VEHICLES.md defines the progression
   // families; these concrete prices are replaceable implementation tuning.
   ELECTRIC_SCOOTER_COST: 300,
