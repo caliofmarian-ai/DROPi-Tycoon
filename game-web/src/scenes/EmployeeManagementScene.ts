@@ -3,7 +3,9 @@ import { getBrowserSaveStorage } from '../persistence/browserSaveStorage'
 import { autosaveIfApproved } from '../persistence/saveSystem'
 import { getOrCreateGameSession, replaceGameSession } from '../state/gameSession'
 import { getAudioController } from '../systems/audioSystem'
+import { getAssignedVehicleForEmployee } from '../systems/employeeFleetSystem'
 import { completeEmployeeOnboarding, hireEmployee } from '../systems/employeeSystem'
+import { getVehicleDefinition } from '../systems/vehicleSystem'
 import type { CompanyState, WorldState } from '../types/game'
 import { buildManagementLayout, buildStaffCardLayout } from '../ui/managementLayout'
 import { buildEmployeeCards, buildManagementOverview, pageItems } from '../ui/managementViewModel'
@@ -45,6 +47,12 @@ export class EmployeeManagementScene extends Phaser.Scene {
       this.feedback || `${data.employees} hired · ${data.activeEmployees} active`)
     const employee = paging.items[0]
     if (employee) {
+      const assignedVehicle = employee.hired
+        ? getAssignedVehicleForEmployee(this.companyState, employee.employeeId)
+        : null
+      const assignedVehicleName = assignedVehicle
+        ? getVehicleDefinition(assignedVehicle.typeId)?.name ?? assignedVehicle.typeId
+        : null
       const boxes = buildStaffCardLayout(layout.body)
       drawPanel(this, boxes.panel, { tone: employee.status === 'Active' ? 'success' : 'accent' })
       drawEmployeePortrait(this, boxes.avatar)
@@ -56,7 +64,10 @@ export class EmployeeManagementScene extends Phaser.Scene {
       fitText(this, boxes.salary, `Salary · ${formatMoney(employee.salaryPerCycle)} per cycle`, 16, COLORS.textGold, true)
       if (boxes.note.height >= 28) {
         fitText(this, boxes.note,
-          employee.status === 'Active' ? `Ready for work.\n${this.companyState.payroll.lastProcessedCycle} salary cycles processed.`
+          employee.status === 'Active'
+            ? assignedVehicleName
+              ? `Field delivery active · ${assignedVehicleName}\nRevenue settles with each operating day.`
+              : `No field vehicle assigned.\nUse the HQ Fleet Purchase Terminal to assign available fleet.`
             : employee.hired ? 'Welcome aboard! Complete onboarding to activate this courier.'
               : `Grow your team.\nHiring costs ${formatMoney(employee.hireCost)}. Onboarding starts after hiring.`,
           16, COLORS.textSecondary)
