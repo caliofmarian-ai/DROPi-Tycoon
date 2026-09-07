@@ -52,6 +52,8 @@ export interface CompanyValuationPolicy {
 export interface CompanyValuationBreakdown {
   companyId: BusinessCompanyId
   policyVersion: string
+  grossTangibleValue: number
+  liabilityDeduction: number
   netTangibleValue: number
   sustainableEarningsValue: number
   marketStrengthIndex: number
