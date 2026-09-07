@@ -1,7 +1,10 @@
 import type Phaser from 'phaser'
-import type { CompanyState, WorldState } from '../types/game'
+import { getOrCreateGameSession } from '../state/gameSession'
 import { ACTIVE_TRANSPORT_LABELS } from '../systems/activeTransportSystem'
+import { sanitizeOwnershipEconomyState } from '../systems/ownershipEconomySystem'
 import type { UrbanObjective } from '../systems/urbanInteractions'
+import type { CompanyState, WorldState } from '../types/game'
+import type { OwnershipEconomyState } from '../types/ownershipEconomy'
 import { WORLD_ZONES } from '../world/worldLayout'
 import { COLORS, formatMoney, RADII, TOUCH_TARGET_MIN_PX, TYPOGRAPHY } from './theme'
 
@@ -48,6 +51,21 @@ const parcelStatus = (world: WorldState): string => {
   return 'No parcel collected'
 }
 
+const heldUnits = (ownership: OwnershipEconomyState, poolId: 'InternalMember' | 'ExternalMarket'): number =>
+  ownership.equity.holdings
+    .filter(holding => holding.actorId === ownership.playerActorId && holding.poolId === poolId)
+    .reduce((sum, holding) => sum + holding.units, 0)
+
+const treasuryUnits = (ownership: OwnershipEconomyState, poolId: 'InternalMember' | 'ExternalMarket'): number =>
+  ownership.equity.pools.find(pool => pool.poolId === poolId)?.treasuryUnits ?? 0
+
+const dividendIncome = (ownership: OwnershipEconomyState): number => {
+  const account = ownership.personalAccounts.find(candidate => candidate.actorId === ownership.playerActorId)
+  return account?.entries
+    .filter(entry => entry.reason === 'DividendIncome' && entry.companyId === ownership.companyId && entry.delta > 0)
+    .reduce((sum, entry) => sum + entry.delta, 0) ?? 0
+}
+
 /**
  * Pure player-facing projection of already-authoritative runtime state.
  * The phone owns no economy, mission, fleet or progression truth of its own.
@@ -55,12 +73,21 @@ const parcelStatus = (world: WorldState): string => {
 export const buildSmartphoneSnapshot = (
   world: WorldState,
   company: CompanyState,
+  ownership: OwnershipEconomyState,
   objective: UrbanObjective,
 ): SmartphoneSnapshot => {
   const transport = ACTIVE_TRANSPORT_LABELS[world.urban?.activeTransport ?? 'walking']
   const distance = Math.round(Math.hypot(objective.point.x - world.player.x, objective.point.y - world.player.y))
   const activeEmployees = company.employees.filter(employee => employee.status === 'Active').length
   const assignedVehicles = company.vehicles.filter(vehicle => vehicle.assignedEmployeeId).length
+  const personalAccount = ownership.personalAccounts.find(account => account.actorId === ownership.playerActorId)
+  const internalHeld = heldUnits(ownership, 'InternalMember')
+  const externalHeld = heldUnits(ownership, 'ExternalMarket')
+  const internalTreasury = treasuryUnits(ownership, 'InternalMember')
+  const externalTreasury = treasuryUnits(ownership, 'ExternalMarket')
+  const founder = ownership.equity.founderActorId === ownership.playerActorId ? 'You' : 'Historical founder'
+  const executive = ownership.equity.executiveActorId === ownership.playerActorId ? 'You' : 'Company member'
+  const departmentCount = company.hq.constructedDepartments.length
 
   return {
     delivery: {
@@ -84,14 +111,17 @@ export const buildSmartphoneSnapshot = (
       ],
     },
     assets: {
-      heading: 'COMPANY OVERVIEW',
+      heading: 'MONEY & OWNERSHIP',
       lines: [
         `${company.companyName}`,
         `Company Money: ${formatMoney(company.money)}`,
-        `Reputation: ${company.reputation}`,
-        `Employees: ${activeEmployees} active / ${company.employees.length} total`,
-        `Fleet: ${company.vehicles.length} owned / ${assignedVehicles} assigned`,
-        `HQ: ${company.hq.constructedDepartments.length} department${company.hq.constructedDepartments.length === 1 ? '' : 's'} built`,
+        `Personal Money: ${formatMoney(personalAccount?.balance ?? 0)}`,
+        `Your shares: ${internalHeld} internal · ${externalHeld} external`,
+        `Treasury shares: ${internalTreasury} internal · ${externalTreasury} external`,
+        `Dividends received: ${formatMoney(dividendIncome(ownership))}`,
+        `Founder: ${founder} · Executive: ${executive}`,
+        `Rep ${company.reputation} · Team ${activeEmployees}/${company.employees.length} active`,
+        `Fleet ${company.vehicles.length} owned/${assignedVehicles} assigned · HQ ${departmentCount} dept${departmentCount === 1 ? '' : 's'}`,
       ],
     },
   }
@@ -375,7 +405,8 @@ export class PlayerSmartphoneOverlay {
   }
 
   update(world: WorldState, company: CompanyState, objective: UrbanObjective): void {
-    this.snapshot = buildSmartphoneSnapshot(world, company, objective)
+    const ownership = sanitizeOwnershipEconomyState(getOrCreateGameSession().ownershipEconomy).state
+    this.snapshot = buildSmartphoneSnapshot(world, company, ownership, objective)
     if (this.isOpen()) this.renderSnapshot()
   }
 

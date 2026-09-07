@@ -1,6 +1,7 @@
 import { readFileSync } from 'node:fs'
 import { describe, expect, it } from 'vitest'
 import { createInitialCompanyState, createInitialWorldState } from '../src/state/gameState'
+import { createInitialOwnershipEconomyState } from '../src/systems/ownershipEconomySystem'
 import {
   SMARTPHONE_FUTURE_APPS,
   SMARTPHONE_LIVE_APPS,
@@ -12,7 +13,13 @@ import { TOUCH_TARGET_MIN_PX } from '../src/ui/theme'
 
 const source = (path: string): string => readFileSync(new URL(path, import.meta.url), 'utf8')
 
-describe('issue #349 / #367 player smartphone foundation', () => {
+const objectiveFor = (world: ReturnType<typeof createInitialWorldState>) => ({
+  point: { x: world.player.x + 30, y: world.player.y + 40 },
+  title: 'Collect at Corner Shop',
+  action: 'Pick up parcel',
+})
+
+describe('issue #349 / #367 / #392 player smartphone foundation', () => {
   it.each(SUPPORTED_ANDROID_VIEWPORTS)(
     'keeps the complete phone inside the supported Android viewport $width x $height',
     ({ width, height }) => {
@@ -59,9 +66,27 @@ describe('issue #349 / #367 player smartphone foundation', () => {
     expect(landscape.live.left + landscape.live.width).toBeLessThan(landscape.content.left)
   })
 
-  it('projects only existing authoritative mission, map and company state into the phone', () => {
+  it('shows safe legacy-materialized ownership defaults without changing Company Money', () => {
     const world = createInitialWorldState()
     const company = createInitialCompanyState()
+    const ownership = createInitialOwnershipEconomyState()
+    company.money = 1234
+
+    const snapshot = buildSmartphoneSnapshot(world, company, ownership, objectiveFor(world))
+
+    expect(snapshot.assets.heading).toBe('MONEY & OWNERSHIP')
+    expect(snapshot.assets.lines).toContain('Company Money: $1,234')
+    expect(snapshot.assets.lines).toContain('Personal Money: $0')
+    expect(snapshot.assets.lines).toContain('Your shares: 0 internal · 0 external')
+    expect(snapshot.assets.lines).toContain('Treasury shares: 5100 internal · 4900 external')
+    expect(snapshot.assets.lines).toContain('Dividends received: $0')
+    expect(snapshot.assets.lines).toContain('Founder: You · Executive: You')
+  })
+
+  it('projects populated Personal Money, holdings and dividend income from authoritative ownership state', () => {
+    const world = createInitialWorldState()
+    const company = createInitialCompanyState()
+    const ownership = createInitialOwnershipEconomyState()
     world.urban = { merchantOnboarded: true, activeTransport: 'walking' }
     world.activeOrder.status = 'Accepted'
     world.player.carryingPackage = true
@@ -74,25 +99,49 @@ describe('issue #349 / #367 player smartphone foundation', () => {
     })
     company.hq.constructedDepartments = ['Core', 'Maintenance']
 
-    const snapshot = buildSmartphoneSnapshot(world, company, {
-      point: { x: world.player.x + 30, y: world.player.y + 40 },
-      title: 'Collect at Corner Shop',
-      action: 'Pick up parcel',
-    })
+    ownership.personalAccounts[0] = {
+      actorId: ownership.playerActorId,
+      balance: 280,
+      entries: [{
+        transactionId: 'dividend-private-id',
+        sequence: 1,
+        actorId: ownership.playerActorId,
+        delta: 280,
+        reason: 'DividendIncome',
+        companyId: ownership.companyId,
+      }],
+    }
+    ownership.equity.holdings = [
+      { actorId: ownership.playerActorId, poolId: 'InternalMember', units: 125 },
+      { actorId: ownership.playerActorId, poolId: 'ExternalMarket', units: 40 },
+    ]
+    ownership.equity.pools = ownership.equity.pools.map(pool => ({
+      ...pool,
+      treasuryUnits: pool.poolId === 'InternalMember' ? 4975 : 4860,
+    }))
+
+    const snapshot = buildSmartphoneSnapshot(world, company, ownership, objectiveFor(world))
 
     expect(snapshot.delivery.lines).toContain('Status: Accepted')
     expect(snapshot.delivery.lines).toContain('Objective: Collect at Corner Shop')
     expect(snapshot.delivery.lines).toContain('Cargo: Parcel in hand')
     expect(snapshot.assets.lines).toContain('Company Money: $1,234')
-    expect(snapshot.assets.lines).toContain('Employees: 1 active / 1 total')
-    expect(snapshot.assets.lines).toContain('Fleet: 1 owned / 1 assigned')
-    expect(snapshot.assets.lines).toContain('HQ: 2 departments built')
+    expect(snapshot.assets.lines).toContain('Personal Money: $280')
+    expect(snapshot.assets.lines).toContain('Your shares: 125 internal · 40 external')
+    expect(snapshot.assets.lines).toContain('Treasury shares: 4975 internal · 4860 external')
+    expect(snapshot.assets.lines).toContain('Dividends received: $280')
+    expect(snapshot.assets.lines).toContain('Founder: You · Executive: You')
+    expect(snapshot.assets.lines).toContain(`Rep ${company.reputation} · Team 1/1 active`)
+    expect(snapshot.assets.lines).toContain('Fleet 1 owned/1 assigned · HQ 2 depts')
     expect(snapshot.map.lines).toContain('Transport: Walking')
     expect(snapshot.map.lines).toContain('Distance: 50u')
 
     const playerFacingProjection = JSON.stringify(snapshot)
     expect(playerFacingProjection).not.toContain('employee-private-id')
     expect(playerFacingProjection).not.toContain('vehicle-private-id')
+    expect(playerFacingProjection).not.toContain(ownership.playerActorId)
+    expect(playerFacingProjection).not.toContain(ownership.companyId)
+    expect(playerFacingProjection).not.toContain('dividend-private-id')
   })
 
   it('keeps unavailable systems visibly future instead of pretending they are online', () => {
@@ -119,12 +168,14 @@ describe('issue #349 / #367 player smartphone foundation', () => {
     expect(worldSource).not.toContain("'PlayerSmartphone'")
   })
 
-  it('keeps physical company actions out of the smartphone interaction surface', () => {
+  it('keeps the phone ownership surface read-only and physical company actions at HQ', () => {
     const phoneSource = source('../src/ui/PlayerSmartphone.ts')
 
     expect(phoneSource).not.toContain("scene.start('CompanyManagement')")
     expect(phoneSource).not.toContain("scene.start('EmployeeManagement')")
     expect(phoneSource).not.toContain("scene.start('VehicleFleet')")
+    expect(phoneSource).not.toContain('settleSessionInternalTreasuryPurchase(')
+    expect(phoneSource).not.toContain('executeSessionExecutiveAppointment(')
     expect(phoneSource).not.toContain('constructDepartment(')
   })
 })
