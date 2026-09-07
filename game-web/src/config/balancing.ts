@@ -47,6 +47,12 @@ export const BALANCING = {
   EMPLOYEE_COURIER_LEVEL_BONUS_PER_DAY: 2,
   EMPLOYEE_COURIER_LEVEL_BONUS_CAP: 20,
 
+  // Issue #343 / #352 first physical HQ construction slice. These are
+  // prototype balancing values and remain replaceable; the progression model,
+  // not these exact numbers, is the authoritative requirement.
+  HQ_MAINTENANCE_WING_MIN_LEVEL: 1,
+  HQ_MAINTENANCE_WING_CONSTRUCTION_COST: 250,
+
   // RBATCH-022 fleet purchasing values. VEHICLES.md defines the progression
   // families; these concrete prices are replaceable implementation tuning.
   ELECTRIC_SCOOTER_COST: 300,

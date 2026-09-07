@@ -68,6 +68,18 @@ export interface FinancialState {
   totalMaintenanceExpenses: number
 }
 
+export const HQ_DEPARTMENT_IDS = ['Core', 'Maintenance'] as const
+export type HQDepartmentId = (typeof HQ_DEPARTMENT_IDS)[number]
+
+/**
+ * Explicit company-owned HQ construction state. `Core` is the minimum viable
+ * headquarters footprint and is always present; later departments are added
+ * only through governed progression systems.
+ */
+export interface HQProgressionState {
+  constructedDepartments: HQDepartmentId[]
+}
+
 export const CUSTOMER_REVIEW_SENTIMENTS = ['Positive', 'Negative'] as const
 export type CustomerReviewSentiment = (typeof CUSTOMER_REVIEW_SENTIMENTS)[number]
 
@@ -102,6 +114,8 @@ export interface CompanyState {
   reviews: CustomerReview[]
   /** Explicit Phase-2 fleet ownership. Maintenance remains RBATCH-023 scope. */
   vehicles: OwnedVehicleState[]
+  /** Persistent physical HQ construction/unlock state. */
+  hq: HQProgressionState
 }
 
 export interface GameSettingsState {

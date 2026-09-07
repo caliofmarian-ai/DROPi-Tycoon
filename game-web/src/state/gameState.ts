@@ -27,6 +27,9 @@ export const createInitialCompanyState = (): CompanyState => ({
   },
   reviews: [],
   vehicles: [],
+  hq: {
+    constructedDepartments: ['Core'],
+  },
 })
 
 export const createInitialGameSettingsState = (): GameSettingsState => ({
