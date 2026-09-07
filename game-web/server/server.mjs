@@ -3,11 +3,16 @@ import { stat } from 'node:fs/promises'
 import { createServer } from 'node:http'
 import { extname, join, normalize } from 'node:path'
 import { fileURLToPath } from 'node:url'
+import {
+  createSessionAuthorityRegistry,
+  handleSessionAuthorityRequest,
+} from './session-authority.mjs'
 
 const __dirname = fileURLToPath(new URL('.', import.meta.url))
 const distDir = normalize(join(__dirname, '..', 'dist'))
 const port = Number.parseInt(process.env.PORT ?? '3000', 10) || 3000
 const host = '0.0.0.0'
+const sessionAuthority = createSessionAuthorityRegistry()
 
 const mimeTypes = {
   '.css': 'text/css; charset=utf-8',
@@ -47,6 +52,8 @@ const sendFile = async (filePath, response) => {
 }
 
 const server = createServer(async (request, response) => {
+  if (await handleSessionAuthorityRequest(request, response, sessionAuthority)) return
+
   const requestUrl = request.url ?? '/'
   const safePath = normalize(requestUrl.split('?')[0]).replace(/^(\.\.[/\\])+/, '')
   const candidatePath = normalize(join(distDir, safePath))
@@ -74,4 +81,5 @@ const server = createServer(async (request, response) => {
 
 server.listen(port, host, () => {
   console.log(`DROPi Tycoon web runtime listening on http://${host}:${port}`)
+  console.log('Session authority prototype enabled at /api/authority/* (non-durable, unauthenticated public-profile scope only).')
 })
