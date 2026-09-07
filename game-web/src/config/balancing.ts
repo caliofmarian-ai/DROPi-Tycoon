@@ -58,6 +58,17 @@ export const BALANCING = {
   // incorporation fee and not permanent canon.
   LOCAL_COURIER_COMPANY_FORMATION_MIN_RESOURCES: 500,
 
+  // Issue #361 / #374 local competition prototype weights. Each market factor
+  // is normalized to 0..100 and the weights sum to 100. These values are
+  // replaceable balancing, while the multi-factor/capacity model is the rule.
+  LOCAL_COMPETITION_PRICE_VALUE_WEIGHT: 18,
+  LOCAL_COMPETITION_DELIVERY_SPEED_WEIGHT: 18,
+  LOCAL_COMPETITION_RELIABILITY_WEIGHT: 20,
+  LOCAL_COMPETITION_SERVICE_QUALITY_WEIGHT: 16,
+  LOCAL_COMPETITION_REPUTATION_WEIGHT: 12,
+  LOCAL_COMPETITION_COVERAGE_WEIGHT: 10,
+  LOCAL_COMPETITION_CAPABILITY_WEIGHT: 6,
+
   // RBATCH-022 fleet purchasing values. VEHICLES.md defines the progression
   // families; these concrete prices are replaceable implementation tuning.
   ELECTRIC_SCOOTER_COST: 300,
