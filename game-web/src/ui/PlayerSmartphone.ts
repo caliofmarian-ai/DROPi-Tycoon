@@ -1,6 +1,7 @@
 import type Phaser from 'phaser'
 import { getOrCreateGameSession } from '../state/gameSession'
 import { ACTIVE_TRANSPORT_LABELS } from '../systems/activeTransportSystem'
+import { sanitizeOwnershipEconomyState } from '../systems/ownershipEconomySystem'
 import type { UrbanObjective } from '../systems/urbanInteractions'
 import type { CompanyState, WorldState } from '../types/game'
 import type { OwnershipEconomyState } from '../types/ownershipEconomy'
@@ -404,7 +405,7 @@ export class PlayerSmartphoneOverlay {
   }
 
   update(world: WorldState, company: CompanyState, objective: UrbanObjective): void {
-    const ownership = getOrCreateGameSession().ownershipEconomy
+    const ownership = sanitizeOwnershipEconomyState(getOrCreateGameSession().ownershipEconomy).state
     this.snapshot = buildSmartphoneSnapshot(world, company, ownership, objective)
     if (this.isOpen()) this.renderSnapshot()
   }
