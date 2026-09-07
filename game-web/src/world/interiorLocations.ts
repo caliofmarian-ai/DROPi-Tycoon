@@ -53,7 +53,7 @@ export const HQ_INTERIOR: InteriorLocationDefinition = {
     interaction('employees', 'Hiring & Staff Terminal', 235, 225, 58),
     interaction('fleet', 'Fleet Purchase Terminal', 155, 390, 62),
     interaction('fleet-handoff', 'Vehicle Handoff', 315, 540, 62),
-    interaction('operations', 'HQ Management Terminal', 945, 250, 68),
+    interaction('operations', 'Operations & Dispatch Console', 945, 250, 68),
     interaction('staging', 'Parcel Operations', 945, 485, 72),
   ],
   obstacles: [
