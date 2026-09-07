@@ -24,4 +24,8 @@ export const COMPANY_VALUATION_POLICY_V1: CompanyValuationPolicy = {
     technology: 0.3,
     specialistCapability: 0.3,
   },
+  riskWeights: {
+    operationalRisk: 0.6,
+    reliabilityDeficit: 0.4,
+  },
 }
