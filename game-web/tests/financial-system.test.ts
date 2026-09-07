@@ -123,6 +123,8 @@ describe('ISSUE-027 — authoritative financial report', () => {
 
     expect(buildFinancialReport(company)).toEqual({
       income: 300,
+      playerDeliveryIncome: 300,
+      employeeDeliveryIncome: 0,
       operatingExpenses: 30,
       salaryExpenses: 50,
       maintenanceExpenses: 0,
