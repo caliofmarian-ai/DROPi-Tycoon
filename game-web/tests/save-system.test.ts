@@ -407,6 +407,7 @@ describe('ISSUE-016 + RBATCH-018 — canonical autosave policy', () => {
       'employee-onboarding-completed',
       'salary-cycle-processed',
       'vehicle-purchased',
+      'employee-vehicle-assignment-changed',
       'settings-changed',
       'operating-day-closed',
     ])
@@ -491,4 +492,3 @@ describe('MainMenu regression — toggling sound before Continue Game never lose
     expect(finalInspection.save.settings.soundEnabled).toBe(false)
   })
 })
-

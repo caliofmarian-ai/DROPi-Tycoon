@@ -37,6 +37,16 @@ export const BALANCING = {
   DAILY_BASE_OPERATING_EXPENSE: 10,
   DAILY_ACTIVE_EMPLOYEE_OPERATING_EXPENSE: 5,
 
+  // Issue #346 productive employee-fleet balancing. These are centralized
+  // prototype values, never per-screen constants. A compatible assigned
+  // vehicle enables deterministic courier field revenue for an Active Courier.
+  EMPLOYEE_COURIER_BICYCLE_REVENUE_PER_DAY: 35,
+  EMPLOYEE_COURIER_ELECTRIC_SCOOTER_REVENUE_PER_DAY: 48,
+  EMPLOYEE_COURIER_MOTORCYCLE_REVENUE_PER_DAY: 60,
+  EMPLOYEE_COURIER_DELIVERY_VAN_REVENUE_PER_DAY: 78,
+  EMPLOYEE_COURIER_LEVEL_BONUS_PER_DAY: 2,
+  EMPLOYEE_COURIER_LEVEL_BONUS_CAP: 20,
+
   // RBATCH-022 fleet purchasing values. VEHICLES.md defines the progression
   // families; these concrete prices are replaceable implementation tuning.
   ELECTRIC_SCOOTER_COST: 300,
