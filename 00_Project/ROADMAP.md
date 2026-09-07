@@ -2,291 +2,496 @@
 
 Document: ROADMAP.md
 Project: DROPi Tycoon
-Version: 2.3.0
+Version: 3.0.0
 Status: Canonical
 Author: Marian Caliof & OpenAI
 Language: English
-Last Updated: 2026-09-01
+Last Updated: 2026-09-07
 
 ---
 
 # Development Roadmap
 
-DROPi Tycoon remains a web-first project. The active deployable runtime is the standard code-based web runtime in `game-web/`, deployed through Railway; archived GDevelop work in `Game/` remains historical/reference-only. Specific libraries, frameworks, and engines are replaceable implementation details rather than canonical technology.
-
 ## Purpose
 
-This document defines the long-term development strategy for DROPi Tycoon.
+This document defines the canonical strategic development order for DROPi Tycoon.
 
-The objective is to build the game incrementally while maintaining a stable, scalable, and AI-friendly architecture.
+DROPi Tycoon is now a **mobile-first installed game**, beginning with Android.
 
-Every new feature should build upon previously completed systems.
+The authoritative gameplay runtime remains Phaser in `game-web/`. The mobile application shell hosts that runtime for the installed product. Railway remains a secondary deployment, preview, diagnostics, and smoke-test surface.
+
+The roadmap expands existing systems rather than replacing the current game.
+
+---
+
+# Strategic Authority
+
+Roadmap decisions must follow:
+
+`VISION -> UNIVERSE_DESIGN -> BUSINESS_DESIGN -> LOGISTICS_DESIGN -> GDD -> PROGRESSION -> domain canon -> ROADMAP execution planning.`
+
+The historical milestone/epic/RBATCH package in `09_Development/Planning/` remains valuable traceability evidence, but its original Phase 0–9 ordering predates the 2026-09-07 canonical reconciliation.
+
+Until issue #357 completes backlog reconciliation, old Phase numbers and dependency chains must **not** be executed blindly when they conflict with this Roadmap.
+
+Historical IDs are preserved; they will be mapped, updated, absorbed, or closed deliberately rather than deleted.
 
 ---
 
 # Development Philosophy
 
-DROPi Tycoon follows an iterative development model.
+DROPi Tycoon follows these rules:
 
-Each milestone delivers a playable version of the game while expanding existing systems rather than replacing them.
-
-No feature should require rewriting the core architecture.
-
-## Long-Term Visual Quality Direction
-
-### Active owner pivot — Urban RPG / multimodal foundation
-
-The current product combines Urban RPG, Business Tycoon, Local Marketplace,
-Multimodal Logistics and a future Drone Network Simulation. This direction
-supersedes abstract unrestricted map traversal, not already-merged company,
-fleet, employee, audio or financial systems. See `01_GameDesign/GAMEPLAY.md`.
-
-The playable foundation prioritizes one walkable district, an embodied courier,
-direct Android-landscape controls, bounded follow camera, minimap, proximity NPC
-interaction, physical deliveries, an owned bicycle and a modest HQ. The HQ later
-becomes the Main DronePort. Fixed/mobile DronePorts, cargo/legs, fallback, lockers
-and separate operator/drone actors receive domain foundations before full automation.
-
-Existing issue #317 remains the cross-cutting owner quality gate; the M-010 fleet
-milestone and infrastructure/network placeholders remain relevant rather than
-being replaced with dozens of micro-issues. PR #318 is the merged baseline, not
-work to repeat. One implementation PR requires owner Android review and must not
-be automatically merged.
-
-The minimal visual presentation of Prototype v0.1 is a temporary development stage, not the intended final quality bar for DROPi Tycoon.
-
-The long-term product is expected to evolve toward a substantially richer, polished, and visually impressive game experience. Later phases may improve or replace prototype presentation through higher-fidelity art, environments, buildings, vehicles, characters, animation, lighting, visual effects, UI presentation, audio-visual feedback, and other production-quality assets.
-
-The word **minimal** in Phase 1 describes implementation scope only. It must never be interpreted as a permanent limit on visual quality, depth, ambition, or production value.
-
-Core systems — including economy, logistics, progression, Save/Load, simulation state, and game rules — must remain sufficiently separated from rendering and temporary assets so visual technology and art direction can evolve without rewriting the underlying game logic.
+1. Keep the game playable after every major checkpoint.
+2. Preserve completed work whenever it remains compatible with canon.
+3. Build systems in dependency order, not issue-number order.
+4. Establish deterministic single-player/local rules before contested multiplayer authority where practical.
+5. Prepare server authority early enough that mature online ownership/markets are not bolted on after the entire economy is built.
+6. Make visible systems feel like a polished mobile game, not developer panels.
+7. Require installed Android owner review for visible gameplay changes.
+8. Preserve Save compatibility or provide explicit migrations.
+9. Keep Company Money sufficient for normal progression.
+10. Do not activate blockchain/token/real-money systems without separate approval and review.
 
 ---
 
-# Phase 0 — Foundation
+# Current Foundation — Already Built / Preserved
 
-Objective:
+The current project is not reset by this roadmap.
 
-Create a solid technical and design foundation.
+Existing foundation includes, at minimum:
 
-Deliverables:
+- authoritative Phaser gameplay runtime;
+- installed Android application shell;
+- walkable city/world geometry;
+- player movement and camera controls;
+- delivery lifecycle;
+- money/economy settlement;
+- reputation and customer reviews;
+- employee management;
+- productive employee + assigned-vehicle delivery income;
+- vehicle ownership/selection;
+- financial reporting;
+- Save/Continue;
+- physical HQ interior;
+- physical Marketplace interior;
+- HQ management surfaces tied to physical locations;
+- progressive HQ construction foundation;
+- visual/product-quality direction;
+- player-smartphone canon;
+- company-society/multiplayer canon;
+- Universe, Business, and Logistics strategic design owners.
 
-- Canonical documentation
-- Project architecture
-- Core gameplay definition
-- UI wireframes
-- Technical architecture
-- Repository structure
-- Asset pipeline
-
-Status:
-
-Completed — canonical documentation foundation established.
-
----
-
-# Phase 1 — First Playable Prototype
-
-Objective:
-
-Deliver a minimal but fully playable logistics game. The minimal scope validates gameplay foundations; it does not define the final visual quality of the product.
-
-Features:
-
-- Small city map
-- One courier
-- Walking deliveries
-- Bicycle deliveries
-- Basic customer system
-- Package generation
-- Simple economy
-- Save & Load (local device persistence; see `06_Technical/SAVE_SYSTEM.md`)
-- Basic UI
-
-Success Criteria:
-
-The player can start a company, deliver packages, earn money, and continue growing.
+All compatible completed work remains part of the path forward.
 
 ---
 
-# Phase 2 — Company Management
+# Strategic Wave 0 — Canonical Reconciliation and Backlog Alignment
 
-Features:
+## Objective
 
-- Employees
-- Salaries
-- Daily expenses
-- Company reputation
-- Financial reports
-- Vehicle purchasing
-- Maintenance costs
-- Customer reviews
+Make the documentation and GitHub backlog describe the same game before more feature implementation proceeds.
 
----
+## Scope
 
-# Phase 3 — Logistics Expansion
+- materialize Universe Design;
+- materialize Business Design;
+- materialize Logistics Design;
+- reconcile Vision/GDD/Progression/Roadmap;
+- reconcile strategic/domain ownership;
+- audit current open issues;
+- classify issues as KEEP / UPDATE / MERGE-ABSORB / CLOSE-HISTORICAL / NEW-CHILD-NEEDED;
+- remap old milestone/epic/batch dependencies to current strategic waves;
+- add missing executable issues.
 
-Features:
+## Status
 
-- Warehouses
-- Multiple city districts
-- Delivery zones
-- Fleet management
-- Route optimization
-- Vehicle upgrades
+**IN PROGRESS — issue #357.**
+
+No new gameplay feature should leapfrog this reconciliation.
 
 ---
 
-# Phase 4 — Drone Technology
+# Strategic Wave 1 — Embodied Local Game Quality
 
-Features:
+## Objective
 
-- Drone research
-- Drone manufacturing partners
-- DronePorts
-- Battery swapping
-- Autonomous deliveries
-- Flight restrictions
-- Weather effects
+Make the existing local courier game stable, readable, touch-safe, visually coherent, and physically believable on Android.
 
----
+## Core areas
 
-# Phase 5 — Advanced Economy
+- mobile landscape controls;
+- analog joystick/input safety;
+- camera/free-look/zoom;
+- readable HUD;
+- visible courier and vehicles;
+- improved city/world art;
+- pedestrians/traffic/crossings;
+- building/interior reliability;
+- audio foundation;
+- Save/Exit and platform polish;
+- product-quality gate #317.
 
-Features:
+## Principle
 
-- Dynamic market
-- Inflation
-- Fuel prices
-- Electricity costs
-- Business loans
-- Investors
-- Competitors
+This wave improves the experience of already-existing systems and must not be treated as temporary throwaway work.
 
----
-
-# Phase 6 — Artificial Intelligence
-
-Features:
-
-- Smart routing
-- Predictive demand
-- Dynamic pricing
-- Autonomous fleet management
-- AI dispatch center
+Much of this wave is already implemented or underway through the modern owner-feedback issues.
 
 ---
 
-# Phase 7 — International Expansion
+# Strategic Wave 2 — Physical Local Company
 
-Features:
+## Objective
 
-- Multiple cities
-- Multiple countries
-- Different regulations
-- Customs
-- Airports
-- Ports
-- International logistics
+Turn the starter company from a collection of management values into a visibly productive organization.
 
----
+## Core areas
 
-# Phase 8 — Global Corporation
+- productive employee/fleet economy;
+- progressive HQ departments;
+- employee role visibility;
+- Fleet Bay and valid vehicle storage/selection;
+- Maintenance/Workshop capability;
+- Operations & Dispatch;
+- parcel staging/sorting foundation;
+- vehicle maintenance costs tied to legitimate maintenance capability;
+- company capacity/reliability consequences;
+- player smartphone foundation replacing remaining portable abstract Company-menu behavior.
 
-Features:
+## Current anchors
 
-- Public company
-- Stock market
-- Franchises
-- Corporate headquarters
-- Worldwide DronePort network
-
----
-
-# Phase 9 — Endless Evolution
-
-Future systems may include:
-
-- Multiplayer
-- Cooperative companies
-- Competitive economy
-- Robotics
-- Autonomous warehouses
-- Smart cities
-- Space logistics
-- Community-created content
+- productive employee-fleet foundation: implemented through #346 stream;
+- HQ progression: #343 / #352 and future department slices;
+- smartphone foundation: #349;
+- vehicle maintenance backlog must be reconciled with constructed Maintenance capability rather than implemented as an unrelated report-only number.
 
 ---
 
-# Guiding Principles
+# Strategic Wave 3 — Personal Education, Professions and Legitimate Company Formation
 
-Every phase must:
+## Objective
 
-- Be playable.
-- Improve existing systems.
-- Avoid unnecessary complexity that does not improve the player experience.
-- Remain compatible with future expansions.
-- Preserve save-game compatibility whenever possible.
-- Allow visual fidelity and presentation quality to improve without forcing core-system rewrites.
+Separate personal capability from company capability so the player earns professions and organizational authority.
+
+## Core areas
+
+- personal XP/progression foundation;
+- education/training model;
+- smartphone theory-study surfaces;
+- practical qualification/certification locations;
+- bicycle/repair specialization;
+- scooter/motorcycle/car/van qualifications;
+- dispatch, warehouse, maintenance, business specializations;
+- entrepreneurship qualification;
+- company formation flow;
+- civic/commercial-registry gameplay abstraction;
+- local company authorization/capacity rules;
+- explicit migration from the current starter-company model when required.
+
+## Dependency rule
+
+Advanced company systems must increasingly require the right combination of qualified people and infrastructure, not money alone.
+
+---
+
+# Strategic Wave 4 — Living City Economy and Competition
+
+## Objective
+
+Make the city an economy containing multiple companies, customers, merchants, goods, and meaningful competition.
+
+## Core areas
+
+- NPC competitor companies first where practical;
+- customer acquisition and retention;
+- service-quality competition;
+- pricing/value strategies;
+- reliability/capacity/reputation effects;
+- marketing/loyalty gameplay;
+- local business authorization scarcity with recoverable entry paths;
+- dynamic demand/market foundations;
+- local Marketplace depth;
+- inventory/listing/product foundations;
+- company products/production where separately implemented;
+- warehouses and district growth where dependencies are satisfied.
+
+## Principle
+
+The city should remain playable without real human competitors.
+
+Multiplayer later replaces or supplements control sources, not the business rules themselves.
+
+---
+
+# Strategic Wave 5 — Company Value, Investment and Governance Simulation
+
+## Objective
+
+Model mature company ownership and investment safely in deterministic simulation before contested online financial transactions.
+
+## Core areas
+
+- company valuation model;
+- business loans/investors;
+- 51% internal/member pool + 49% external market pool design baseline;
+- share issuance/ownership rules;
+- internal member-share exit/redeem rules;
+- external portfolio ownership;
+- distributable profit/dividends;
+- end-of-season dividend default;
+- voting/governance;
+- founder historical status vs executive control;
+- anti-deadlock/anti-collusion rules;
+- Company Heart / Founder Artifact design implementation planning;
+- Economic Museum integration planning.
+
+## Principle
+
+Company value must respond to real business fundamentals and risk, not a simplistic single-number exploit.
+
+---
+
+# Strategic Wave 6 — Server-Authoritative Online Society Foundation
+
+## Objective
+
+Prepare real multiplayer before activating shared ownership, shared markets, or contested world assets.
+
+## Technical foundation
+
+- stable player/account identity;
+- public profile vs private account boundary;
+- authentication/session model;
+- server-authoritative player/company/economy state;
+- migration from local Save state;
+- transaction integrity;
+- anti-duplication;
+- concurrency/conflict resolution;
+- reconnect/recovery;
+- shard/world membership;
+- moderation/report/block/rate-limit infrastructure;
+- privacy/media ownership for avatars and communication.
+
+## Player/social activation
+
+After authority is ready:
+
+- real-player company membership;
+- real-player employment/specialist roles;
+- presence;
+- company/local/world communication;
+- friends/contacts;
+- authoritative player marketplace transactions;
+- authoritative investment/share transactions where enabled;
+- cooperative and competitive company interaction.
+
+## Offline / Low-Population Rule
+
+NPC companies, workers, merchants, and customers remain valid.
+
+Normal gameplay must not collapse when no other human players are available.
+
+---
+
+# Strategic Wave 7 — Regional and Multi-City Multimodal Logistics
+
+## Objective
+
+Expand beyond one city without creating one giant always-running map.
+
+## Core areas
+
+- multiple cities/active-city transition architecture;
+- regional warehouses/distribution centers;
+- highway gateways;
+- regional contracts;
+- explicit inter-city cargo/custody legs;
+- rail corridors/terminals;
+- DronePort networks;
+- airport cargo terminals;
+- river/sea ports;
+- multi-leg transfer chains;
+- regional products/demand dependencies;
+- infrastructure ownership/concessions under fair-access safeguards.
+
+## Current anchor
+
+Issue #344 contains useful multimodal hub/custody foundations and should be reconciled with older multi-city/international planning rather than duplicated.
+
+---
+
+# Strategic Wave 8 — International / Global Corporation and Automation
+
+## Objective
+
+Connect country/logical worlds into large-scale multimodal business and logistics networks.
+
+## Core areas
+
+- country/world entry;
+- cross-border gameplay abstractions;
+- customs handling;
+- international air/sea/rail networks;
+- global products/trade;
+- franchise/network structures;
+- worldwide infrastructure coordination;
+- advanced AI routing/dispatch;
+- predictive demand;
+- automation;
+- robotics/autonomous warehouses;
+- mature corporate governance at global scale;
+- resilient global logistics optimization.
+
+## Principle
+
+Automation remains subject to capacity, infrastructure, cost, maintenance, qualification, and authority. It does not become infinite passive income.
+
+---
+
+# Strategic Wave 9 — Frontier / Planetary Expansion and Optional Ecosystem Review
+
+## Objective
+
+Extend the same society/business/logistics principles into very-late-game frontier environments only after Earth-scale systems are mature.
+
+## Possible areas
+
+- space logistics gateways;
+- orbital infrastructure;
+- planetary settlements/worlds;
+- off-world products/resources;
+- interplanetary cargo/custody;
+- frontier company/infrastructure governance;
+- new professions and technologies.
+
+## Optional DROPi Ecosystem Asset Review
+
+Only at a separately approved stage may the project evaluate an optional shared DROPi ecosystem asset/token.
+
+This requires, before implementation:
+
+- separate repository/cross-project canon;
+- economic design;
+- game-balance review;
+- security architecture;
+- legal/regulatory review where applicable;
+- monetization/UX review;
+- explicit owner approval.
+
+This Roadmap does not authorize blockchain, wallet, smart contracts, tokenomics, exchange, KYC, or real-money rewards.
+
+Company Money remains sufficient for normal gameplay.
+
+---
+
+# Cross-Wave Systems
+
+Some systems evolve across several waves rather than belonging to one monolithic phase.
+
+## Drone Progression
+
+Drone gameplay may evolve through:
+
+- personal theory/qualification;
+- research;
+- workshop/maintenance capability;
+- DronePort construction;
+- operator/infrastructure requirements;
+- local delivery;
+- regional networks;
+- autonomous operations;
+- international/global use.
+
+Therefore old “Drone Phase 4” backlog items remain useful but must be remapped by dependency, not executed as one block.
+
+## Warehouses
+
+Warehouse capability may begin in local company/city growth and later expand into regional/global networks.
+
+## AI / Automation
+
+AI may assist locally before global scale, but progressively stronger automation requires the underlying business/logistics systems to exist first.
+
+## Multiplayer
+
+Identity/server authority arrives before mature shared transactions; large shared worlds expand afterward.
+
+Multiplayer is therefore no longer canonically treated as only a final Phase 9 feature.
+
+---
+
+# Quality and Verification Rules
+
+Every implementation wave must preserve:
+
+- green automated tests;
+- TypeScript/build health where applicable;
+- Save compatibility/migrations;
+- Android input safety;
+- mobile performance;
+- owner-visible quality;
+- physical-world coherence;
+- exactly-once economic settlement;
+- authority boundaries;
+- real DROPi separation.
+
+Visible gameplay changes require installed Android owner review before their acceptance issue is closed.
+
+Documentation/planning-only PRs require CI and canonical consistency review but do not require a new APK or visual Android acceptance unless they change runtime behavior.
+
+---
+
+# Planning Architecture Reconciliation Rule
+
+The existing planning package currently contains:
+
+- 21 milestones;
+- 46 epics;
+- 54 RBATCH items;
+- executable issues and planning placeholders;
+- a dependency graph based on the older Phase 0–9 strategy.
+
+Those identifiers are preserved for historical traceability.
+
+Under issue #357, every open item must be classified and mapped to this Roadmap.
+
+Allowed reconciliation outcomes are:
+
+- **KEEP** — scope/order still correct;
+- **UPDATE** — useful item, but title/scope/dependency/wave requires change;
+- **MERGE-ABSORB** — useful content belongs inside a newer authoritative issue;
+- **CLOSE-HISTORICAL** — completed/superseded tracking item with sufficient evidence;
+- **NEW-CHILD-NEEDED** — this Roadmap requires an executable issue that does not yet exist.
+
+No historical ID should be deleted from repository history.
+
+---
+
+# Immediate Execution Order After Reconciliation
+
+The near-term sequence is:
+
+1. complete canonical/backlog reconciliation under #357;
+2. complete/close any pending owner acceptance for already-merged visible work, including #352 where applicable;
+3. continue progressive HQ/specialist capability only according to reconciled dependencies;
+4. implement the player smartphone foundation #349;
+5. establish personal education/specialization foundation;
+6. establish legitimate company formation/authorization;
+7. build living local competition/economy;
+8. progress toward ownership/governance simulation;
+9. establish server-authoritative online foundations before real shared economic state;
+10. expand regionally/internationally in staged multimodal slices.
 
 ---
 
 # Success Metric
 
-Development is considered successful when every milestone results in a complete, enjoyable, and stable gameplay experience while preserving the path toward the long-term product-quality target.
+Development is successful when every strategic wave deepens the same coherent experience:
 
-## Planning Architecture Reference
+**person -> profession -> productive organization -> competitive city economy -> ownership/governance -> shared society -> regional/global logistics -> frontier legacy.**
 
-- `09_Development/Planning/MILESTONE_ARCHITECTURE.md` — 21 milestones
-- `09_Development/Planning/EPIC_CATALOG.md` — 46 epics
-- `09_Development/Planning/BATCH_ARCHITECTURE.md` — 54 roadmap batches
-- `09_Development/Planning/ISSUE_CATALOG.md` — 34 executable issues and 32 planning placeholders
-- `09_Development/Planning/DEPENDENCY_GRAPH.md` — milestone, epic, and batch graphs validated acyclic
-- `09_Development/Planning/LABEL_TAXONOMY.md` — 122 labels
-- `09_Development/Planning/GITHUB_CREATION_PLAN.md` — non-destructive GitHub creation procedure and Owner Directive coverage matrix
-- `09_Development/Planning/github_creation_plan.yaml` — machine-readable planning package
-
-## Derived Planning Summary
-
-| Item | Count |
-|---|---|
-| Milestones | 21 |
-| Epics | 46 |
-| Roadmap Batches | 54 (`RBATCH-001..RBATCH-054`) |
-| Legacy Crosswalk Entries | 17 |
-| Executable Issues | 34 |
-| Planning Placeholders | 32 |
-| Labels | 122 |
-
-## Milestone Summary
-
-| ID | Phase | Title | Status |
-|---|---|---|---|
-| M-001 | 0 | Foundation & Documentation Complete | COMPLETED |
-| M-002 | 1 | Prototype Scaffold & Runtime Foundation | COMPLETED |
-| M-003 | 1 | World Navigation | COMPLETED |
-| M-004 | 1 | Order Lifecycle Core | COMPLETED |
-| M-005 | 1 | Economy, HUD & Game Flow | In Progress |
-| M-006 | 1 | Company Management & Bicycle | In Progress |
-| M-007 | 1 | Save & Load System | In Progress |
-| M-008 | 1 | Prototype v0.1 Verification & Release | In Progress |
-| M-009 | 2 | Employee & Financial Systems | Planned — Future |
-| M-010 | 2 | Vehicle Fleet Management | Planned — Future |
-| M-011 | 3 | Warehouse & District System | Planned — Future |
-| M-012 | 3 | Advanced Fleet & Route Optimization | Planned — Future |
-| M-013 | 4 | Drone Research & Manufacturing | Planned — Future |
-| M-014 | 4 | DronePort Infrastructure | Planned — Future |
-| M-015 | 4 | Autonomous Drone Operations | Planned — Future |
-| M-016 | 5 | Dynamic Market System | Planned — Future |
-| M-017 | 5 | Financial Instruments & Competition | Planned — Future |
-| M-018 | 6 | Autonomous Intelligence Systems | Planned — Future |
-| M-019 | 7 | International Multi-City Logistics | Planned — Future |
-| M-020 | 8 | Global Empire & Corporate Systems | Planned — Future |
-| M-021 | 9 | Multiplayer & Community Systems | Planned — Future |
-
-## Legacy Numbering Authority Rule
-
-Legacy `BATCH-001..BATCH-016` plus `BATCH-010b` remain historical lineage only. `M-001` / `E-001` / `E-002` are completed canonical-documentation owners and are not evidenced by historical `BATCH-001`. Historical `BATCH-001` maps to `RBATCH-001` under `M-002` / `E-003`. Execute only the mapped `RBATCH-*` identifiers from `09_Development/Planning/BATCH_ARCHITECTURE.md`; use `09_Development/Implementation_Preparation/IMPLEMENTATION_BATCH_PLAN.md` as lineage evidence, not authoritative current planning.
+The player should never feel that a later phase discarded the game they learned earlier.
 
 ---
 
