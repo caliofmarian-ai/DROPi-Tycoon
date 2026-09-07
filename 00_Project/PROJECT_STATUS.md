@@ -2,212 +2,284 @@
 
 Document: PROJECT_STATUS.md
 Project: DROPi Tycoon
-Version: 1.3.0
-Status: Active Development
+Version: 2.0.0
+Status: Active Development — Canonical Reconciliation Checkpoint
 Author: Marian Caliof & OpenAI
 Language: English
-Last Updated: 2026-09-05
+Last Updated: 2026-09-07
 
 ---
 
 # Project Status
 
-## Current Phase
+## Current Checkpoint
 
-DROPi Tycoon has a working Phaser-based prototype with delivery gameplay, economy, company management, employees, financial reporting, customer reviews/reputation, save/load support, and mobile-oriented UI work already implemented.
+DROPi Tycoon has moved beyond the original browser/prototype and mobile-foundation checkpoints.
 
-The project is now entering a **mobile application foundation checkpoint** before further feature expansion.
+The authoritative Phaser runtime is playable through the installed Android application shell, and the project has already implemented substantial local-game/company foundations.
+
+The Project Owner has now ordered a temporary feature-implementation pause so the expanded long-term product vision can be written into canonical authority and the historical GitHub backlog can be reconciled before more systems are built.
+
+**Current active checkpoint: Strategic Wave 0 — Canonical Reconciliation and Backlog Alignment.**
+
+Primary tracking issue: **#357**.
 
 ---
 
 # Current Objective
 
-Implement GitHub Issue #295:
+Complete the following sequence:
 
-**Android application foundation with Expo Dev Client + Phaser runtime**
-
-The immediate objective is to move Project Owner gameplay evaluation from Chrome/Railway to an installed Android development build while preserving the existing authoritative game runtime and gameplay rules.
-
-This checkpoint also owns the companion camera/viewport corrections required for a real mobile-game experience.
+1. materialize the approved Universe Design authority;
+2. materialize Business Design authority;
+3. materialize strategic Logistics Design authority;
+4. reconcile Vision, GDD, Progression, Roadmap, and Document Index;
+5. audit all current open GitHub issues/milestones/epics/RBATCH items against that canon;
+6. classify each current issue as KEEP / UPDATE / MERGE-ABSORB / CLOSE-HISTORICAL / NEW-CHILD-NEEDED;
+7. create missing executable issues and repair dependency order;
+8. resume gameplay implementation only from the reconciled backlog.
 
 ---
 
-# Canonical Platform Direction
+# Current Product Direction
 
-DROPi Tycoon is a global mobile game and must stand on its own independently of the real DROPi application.
+DROPi Tycoon is a:
 
-Primary product/review surface:
+**Urban RPG + Business Tycoon + Local Marketplace + Multimodal Logistics + Infrastructure Builder + future Drone Network Simulation.**
+
+The long-term experience is a living economic and logistics society.
+
+The player begins as one visible person and may grow through work, education, professions, company membership/formation, leadership, investment, infrastructure, regional/global logistics, and very-late-game frontier/off-world expansion.
+
+Existing completed gameplay remains the foundation of this direction.
+
+---
+
+# Current Canonical Hierarchy
 
 ```text
-Installed Android application
+Project Vision
+-> Universe Design
+-> Business Design
+-> Logistics Design
+-> Game Design
+-> UX Design
+-> Technical Design
+-> Implementation
+-> Verification
+-> Historical Reporting
 ```
 
-Secondary development/preview surface:
-
-```text
-Railway browser deployment
-```
-
-Current platform authority:
+Current strategic owners:
 
 - `00_Project/VISION.md`
-- `06_Technical/ARCHITECTURE.md`
-- `06_Technical/MOBILE_APPLICATION_PLATFORM.md`
+- `00_Project/UNIVERSE_DESIGN.md`
+- `00_Project/BUSINESS_DESIGN.md`
+- `00_Project/LOGISTICS_DESIGN.md`
+- `01_GameDesign/GDD.md`
+- `01_GameDesign/PROGRESSION.md`
+- `00_Project/ROADMAP.md`
 
-AI agents must not revive historical Web-First assumptions when they conflict with these live canonical documents.
+The 2026-09-07 ownership audit is recorded in `09_Development/AI_Reports/2026-09-07_103_CANONICAL_OWNERSHIP_AND_ROADMAP_AUDIT.md`.
 
 ---
 
-# Current Runtime and Technology
+# Current Runtime and Platform
 
-## Authoritative Game Runtime
+## Authoritative Gameplay Runtime
 
 `game-web/`
 
-Current implementation:
+- Phaser;
+- TypeScript;
+- Vite;
+- deterministic domain/game systems;
+- automated tests;
+- Railway-compatible production server.
 
-- Phaser 3
-- TypeScript
-- Vite
-- deterministic game/domain systems and tests
+## Installed Mobile Shell
 
-The Phaser runtime remains the authoritative game implementation during the mobile migration.
+`game-mobile/`
 
-## Current Web Deployment
+- Expo / React Native shell;
+- hosts the authoritative Phaser runtime rather than duplicating gameplay;
+- Android landscape presentation;
+- native lifecycle/Back/system UI bridge;
+- EAS build integration.
 
-Railway hosts the active browser build for preview, smoke testing, rapid remote checks, and development support.
+## Primary Owner / Player Review Surface
 
-The Railway/Chrome experience is no longer the final Project Owner quality bar for mobile gameplay presentation.
+**Installed Android application.**
 
-## Approved Mobile Application Baseline
+## Secondary Surface
 
-Issue #295 is authorized to introduce:
+**Original Railway deployment / browser preview.**
 
-- `game-mobile/` as the mobile application shell;
-- Expo / React Native shell architecture;
-- `expo-dev-client` development builds;
-- EAS Build for Android development/release artifacts;
-- `react-native-webview` as the first-stage bridge to the Phaser runtime;
-- temporary Railway-hosted game loading during early mobile-shell iteration;
-- later bundling of the Phaser game into the installed application for normal production startup.
-
-Gameplay/domain logic must not be duplicated in React Native.
+Railway remains important for deployment, smoke tests, and remote runtime delivery in the current staged architecture, but it is not the final visual-quality bar.
 
 ---
 
-# Owner Experience Decision
+# Current Implemented Foundation
 
-Project Owner physical-device review established that the browser experience is not an acceptable final mobile-game surface because browser chrome and browser viewport behavior materially degrade composition, map framing, zoom, and the overall feeling of playing a real game.
+The current project includes, among other completed or substantially implemented foundations:
 
-Therefore future visual acceptance should move to installed Android development builds as soon as the mobile foundation exists.
+- walkable city/world geometry;
+- visible player/courier movement;
+- direct Android controls;
+- camera/zoom/free-look foundations;
+- order generation and delivery lifecycle;
+- Company Money and economy settlement;
+- company management;
+- employee hiring/onboarding;
+- salaries and financial reporting;
+- customer reviews and reputation;
+- vehicle purchasing/ownership/selection;
+- productive employee + assigned-vehicle income;
+- Save/Continue;
+- physical HQ interior;
+- physical Marketplace interior;
+- HQ employee/fleet/operations interactions;
+- progressive HQ construction foundation;
+- Maintenance Wing construction implementation;
+- audio/product-experience foundations;
+- mobile-first installed application architecture.
 
-Railway remains valuable but secondary.
-
----
-
-# Camera / Viewport Checkpoint
-
-The Android foundation must include or unblock a robust game-world camera contract:
-
-- player Follow mode;
-- bounded Free Camera pan;
-- pinch zoom within tested bounds;
-- Fit / Overview behavior computed from actual viewport and world dimensions;
-- no world/map spill outside the intended game surface;
-- fixed HUD isolation from world-camera transforms;
-- gesture isolation so camera gestures do not trigger gameplay actions underneath them.
-
-A fixed zoom value is not sufficient as the only fit strategy across Android devices.
-
----
-
-# Recently Completed / Verified Work
-
-The current prototype includes the following recently completed owner-visible systems:
-
-- Employee Hiring & Onboarding;
-- Financial Report and operating-day cost flow;
-- Customer Review generation and reputation integration;
-- Customer Reviews display;
-- mobile visual remediation for Employees, Financial Report, and Reviews merged in PR #294;
-- canonical Product Experience direction establishing richer, more human, reality-inspired game presentation.
-
-The owner confirmed that these systems function, while also establishing that future visual evaluation must happen in the installed mobile game rather than treating Chrome as the final product surface.
+These systems are retained and reconciled into the new strategic model rather than rewritten from zero.
 
 ---
 
-# Active Holds
+# Pending Owner Acceptance
 
-## Vehicle Fleet — PR #288
+Visible merged work may remain open until explicit Android owner validation.
 
-PR #288 remains on HOLD / Draft.
+Current relevant example:
 
-Do not resume or merge Vehicle Fleet merely because its code is available.
+- **#352 Maintenance Wing** — implementation merged through PR #356 and deployed successfully to the original Railway service; owner Android acceptance remains the closure criterion if not already explicitly recorded.
 
-Resume it only after the Android application/camera foundation has reached Project Owner acceptance or the Project Owner explicitly changes this hold.
-
----
-
-# Relationship with Real DROPi
-
-DROPi Tycoon is global; the real DROPi application may initially exist only in selected cities/regions.
-
-The game must be excellent even for users who never access real DROPi.
-
-At the same time, the game should use believable real-world logistics, employee, customer, fleet, economy, environmental, and company-management concepts so that it can naturally introduce people to the DROPi ecosystem and may later support dedicated training/onboarding scenarios.
-
-The game is not a guarantee of real-world profit or financial success.
-
-See `00_Project/VISION.md` for canonical product intent.
+The parent HQ progression program **#343** remains open for future department slices after backlog reconciliation.
 
 ---
 
-# Immediate Next Steps
+# Current Canonical Product Expansion
 
-1. Merge the canonical mobile-platform documentation alignment for Issue #295 after CI passes.
-2. Create the `game-mobile/` Expo application shell.
-3. Configure Expo Dev Client and EAS development-build profiles.
-4. Host the existing Phaser runtime in the shell without rewriting gameplay logic.
-5. Establish landscape-first installed-game presentation, safe-area/system UI behavior, and Android Back handling.
-6. Implement/validate Follow, Free Camera, pinch zoom, and computed Fit/Overview behavior.
-7. Produce the first installable Android development build.
-8. Project Owner installs and tests DROPi Tycoon on a physical Android phone.
-9. Record Functional PASS/HOLD and Visual/Experience PASS/HOLD.
-10. Only then decide whether Vehicle Fleet PR #288 resumes.
+The current long-term canon now includes staged directions for:
+
+- player smartphone as portable interface;
+- personal education and specialization;
+- physical/progressive company departments;
+- multiple competing companies;
+- local civic/company-formation capacity;
+- products and production;
+- warehouses and multimodal infrastructure;
+- company valuation;
+- 51% internal/member + 49% external equity design baseline;
+- dividends/governance;
+- Founder historical identity and Company Heart/Founder Artifact;
+- Economic Museum;
+- real-player + NPC company society;
+- server-authoritative multiplayer migration;
+- regional/international logistics;
+- very-late-game planetary/off-world logistics.
+
+A listed future direction is not a claim that the runtime already implements it.
 
 ---
 
-# Development Rule
+# Immediate Development Hold
 
-Gameplay before unnecessary complexity, but **player experience is part of gameplay**.
+During issue #357:
 
-Passing automated tests is necessary but does not by itself constitute Project Owner visual acceptance.
+- do not start the next gameplay feature merely because an old issue is open;
+- do not execute historical milestone order blindly;
+- do not create parallel economy/company truth;
+- do not add blockchain/token functionality;
+- do not rewrite Phaser gameplay in React Native;
+- do not create/reconfigure a second Railway project/service/environment.
 
-Major owner-visible merges should be followed by explicit instructions describing where the Project Owner can see and test the change.
+Documentation, audit, issue reconciliation, CI, and planning changes may proceed.
+
+---
+
+# Strategic Next Sequence
+
+After #357 completes, execution should follow the reconciled Roadmap rather than old issue numbering.
+
+Near-term direction is expected to include:
+
+1. close any pending owner acceptance for already-merged work;
+2. continue progressive physical HQ only under reconciled specialist/dependency rules;
+3. implement the player smartphone foundation #349;
+4. implement personal education/specialization foundation;
+5. implement company formation/civic authorization;
+6. build local competitor/customer-market simulation;
+7. build valuation/equity/governance simulation;
+8. establish server-authoritative identity/economy/company migration before real shared transactions;
+9. expand through multi-city/regional/international multimodal logistics.
+
+The final issue mapping is produced by #357 and may refine this sequence without contradicting `ROADMAP.md`.
+
+---
+
+# Real DROPi Boundary
+
+DROPi Tycoon is an independent global game.
+
+The real `caliofmarian-ai/dropi-mobile` repository remains authoritative for the real DROPi product.
+
+Tycoon inventions — including fictional permits, company shares, founder artifacts, planets, simulated institutions, or future optional ecosystem assets — must not be presented as real DROPi functionality unless separately confirmed by real DROPi canon.
+
+---
+
+# Optional Ecosystem Asset Status
+
+**NOT IMPLEMENTED / NOT AUTHORIZED FOR IMPLEMENTATION.**
+
+Current canon does not activate:
+
+- blockchain;
+- smart contracts;
+- wallets;
+- tokenomics;
+- ticker/supply;
+- exchange;
+- KYC;
+- real-money rewards.
+
+Company Money remains sufficient for normal gameplay.
 
 ---
 
 # Project Health
 
-Architecture: **ACTIVE / MOBILE PLATFORM REALIGNMENT APPROVED**
+Architecture: **ACTIVE / MOBILE-FIRST / PHASER AUTHORITATIVE**
 
-Documentation: **ACTIVE / CANONICAL PLATFORM ALIGNMENT IN PROGRESS**
+Canonical documentation: **ACTIVE / STRATEGIC RECONCILIATION IN PROGRESS (#357)**
 
-Gameplay prototype: **WORKING**
+Gameplay runtime: **WORKING**
 
-Browser preview: **WORKING / SECONDARY SURFACE**
+Installed Android shell: **WORKING / PRIMARY OWNER REVIEW SURFACE**
 
-Android installed application: **NEXT ACTIVE FOUNDATION**
+Railway deployment: **WORKING / SECONDARY DEPLOYMENT & PREVIEW SURFACE**
 
-Vehicle Fleet expansion: **HOLD**
+Progressive HQ: **FOUNDATION IMPLEMENTED / PROGRAM OPEN**
+
+Player smartphone: **CANONICAL / IMPLEMENTATION PENDING (#349)**
+
+Education/specialization: **CANONICAL DIRECTION / EXECUTABLE ISSUE TO BE RECONCILED/CREATED**
+
+Multiplayer society: **CANONICAL DIRECTION / SERVER-AUTHORITATIVE FOUNDATION REQUIRED BEFORE SHARED ECONOMIC STATE**
+
+DROPi ecosystem token: **FUTURE OPTIONAL REVIEW ONLY / NO IMPLEMENTATION AUTHORIZED**
 
 ---
 
 # Canonical Continuity Rule
 
-For current project direction, future AI sessions must prefer live canonical documents and current GitHub state over historical AI reports, old Web-First migration notes, stale task descriptions, or chat assumptions.
+Future sessions must inspect current canonical authority and current GitHub state before acting.
 
-When current status and an older implementation report disagree, inspect authority and current GitHub state before acting.
+Historical AI reports, old Web-First assumptions, stale milestones, and superseded issue dependencies are evidence only when they conflict with current live canon.
+
+**Current strategy flows downward from canon into planning and implementation — never upward from historical issue numbering into product truth.**
 
 ---
 
