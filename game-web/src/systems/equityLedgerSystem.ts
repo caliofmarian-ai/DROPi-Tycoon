@@ -35,6 +35,8 @@ export const createInitialCompanyEquityState = (
 })
 
 const isPositiveSafeInteger = (value: number): boolean => Number.isSafeInteger(value) && value > 0
+const isEquityPoolId = (value: unknown): value is EquityPoolId =>
+  typeof value === 'string' && EQUITY_POOL_IDS.some(poolId => poolId === value)
 const holdingKey = (actorId: EconomicActorId, poolId: EquityPoolId): string => `${actorId}\u0000${poolId}`
 
 export const validateCompanyEquityIntegrity = (state: CompanyEquityState): EquityIntegrityResult => {
@@ -44,7 +46,9 @@ export const validateCompanyEquityIntegrity = (state: CompanyEquityState): Equit
   if (!state.executiveActorId.trim()) errors.push('executiveActorId must be non-empty.')
   if (state.totalUnits !== COMPANY_EQUITY_TOTAL_UNITS) errors.push('totalUnits must equal canonical company supply.')
 
-  const poolById = new Map(state.pools.map(pool => [pool.poolId, pool]))
+  const validPools = state.pools.filter(pool => isEquityPoolId(pool.poolId))
+  if (validPools.length !== state.pools.length) errors.push('Unknown equity pool detected.')
+  const poolById = new Map(validPools.map(pool => [pool.poolId, pool]))
   if (state.pools.length !== EQUITY_POOL_IDS.length || poolById.size !== EQUITY_POOL_IDS.length) {
     errors.push('Equity pools must contain exactly one entry per canonical pool.')
   }
@@ -72,6 +76,10 @@ export const validateCompanyEquityIntegrity = (state: CompanyEquityState): Equit
   const heldByPool: Record<EquityPoolId, number> = { InternalMember: 0, ExternalMarket: 0 }
   for (const holding of state.holdings) {
     if (!holding.actorId.trim()) errors.push('Holding actorId must be non-empty.')
+    if (!isEquityPoolId(holding.poolId)) {
+      errors.push('Unknown holding pool detected.')
+      continue
+    }
     const key = holdingKey(holding.actorId, holding.poolId)
     if (seenHoldings.has(key)) errors.push('Duplicate actor/pool holding detected.')
     seenHoldings.add(key)
@@ -90,7 +98,7 @@ export const validateCompanyEquityIntegrity = (state: CompanyEquityState): Equit
     }
   }
 
-  const poolTotal = state.pools.reduce((sum, pool) => sum + pool.totalUnits, 0)
+  const poolTotal = validPools.reduce((sum, pool) => sum + pool.totalUnits, 0)
   if (poolTotal !== state.totalUnits) errors.push('Pool supplies must sum to total company supply.')
 
   return { valid: errors.length === 0, errors }
@@ -113,13 +121,36 @@ const updateHolding = (
   return next
 }
 
+/**
+ * Internal/member-restricted holdings return to company treasury on exit in this
+ * baseline path. External holdings are deliberately preserved as portfolio assets.
+ */
+export const reconcileEquityMemberExit = (
+  state: CompanyEquityState,
+  actorId: EconomicActorId,
+): CompanyEquityState => {
+  const next = cloneEquityState(state)
+  const internalHolding = next.holdings.find(
+    holding => holding.actorId === actorId && holding.poolId === 'InternalMember',
+  )
+  if (internalHolding) {
+    const pool = next.pools.find(item => item.poolId === 'InternalMember')!
+    pool.treasuryUnits += internalHolding.units
+    next.holdings = next.holdings.filter(
+      holding => !(holding.actorId === actorId && holding.poolId === 'InternalMember'),
+    )
+  }
+  next.activeMemberActorIds = next.activeMemberActorIds.filter(id => id !== actorId)
+  return next
+}
+
 export const setEquityMemberActive = (
   state: CompanyEquityState, actorId: EconomicActorId, active: boolean,
 ): CompanyEquityState => {
+  if (!active) return reconcileEquityMemberExit(state, actorId)
   const next = cloneEquityState(state)
   const members = new Set(next.activeMemberActorIds)
-  if (active) members.add(actorId)
-  else members.delete(actorId)
+  members.add(actorId)
   next.activeMemberActorIds = [...members]
   return next
 }
@@ -169,29 +200,6 @@ export const setCurrentExecutive = (
   state: CompanyEquityState,
   executiveActorId: EconomicActorId,
 ): CompanyEquityState => ({ ...cloneEquityState(state), executiveActorId })
-
-/**
- * Internal/member-restricted holdings return to company treasury on exit in this
- * baseline path. External holdings are deliberately preserved as portfolio assets.
- */
-export const reconcileEquityMemberExit = (
-  state: CompanyEquityState,
-  actorId: EconomicActorId,
-): CompanyEquityState => {
-  const next = cloneEquityState(state)
-  const internalHolding = next.holdings.find(
-    holding => holding.actorId === actorId && holding.poolId === 'InternalMember',
-  )
-  if (internalHolding) {
-    const pool = next.pools.find(item => item.poolId === 'InternalMember')!
-    pool.treasuryUnits += internalHolding.units
-    next.holdings = next.holdings.filter(
-      holding => !(holding.actorId === actorId && holding.poolId === 'InternalMember'),
-    )
-  }
-  next.activeMemberActorIds = next.activeMemberActorIds.filter(id => id !== actorId)
-  return next
-}
 
 export const getActorEquityUnits = (
   state: CompanyEquityState, actorId: EconomicActorId, poolId: EquityPoolId,
