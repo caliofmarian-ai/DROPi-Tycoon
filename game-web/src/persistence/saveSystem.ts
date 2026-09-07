@@ -5,6 +5,14 @@ import {
 } from '../state/gameState'
 import { synchronizePlayerMovementSpeed } from '../systems/bicycleSystem'
 import {
+  cloneOwnershipEconomyForSave,
+  hasOwnershipEconomyActivity,
+} from '../systems/ownershipEconomyPersistence'
+import {
+  createInitialOwnershipEconomyState,
+  sanitizeOwnershipEconomyState,
+} from '../systems/ownershipEconomySystem'
+import {
   createInitialPersonalProgressionState,
   hasPersonalProgressionActivity,
   sanitizePersonalProgression,
@@ -36,6 +44,7 @@ import {
   type VehicleTypeId,
   type UrbanProgressState,
 } from '../types/game'
+import type { OwnershipEconomyState } from '../types/ownershipEconomy'
 
 export const SAVE_FORMAT_VERSION = 2 as const
 export const SAVE_STORAGE_KEY = 'dropi.tycoon.save.v2'
@@ -58,6 +67,7 @@ export const CANONICAL_AUTOSAVE_EVENTS = [
   'employee-vehicle-assignment-changed',
   'settings-changed',
   'operating-day-closed',
+  'ownership-economy-changed',
 ] as const
 
 export type CanonicalAutosaveEvent = (typeof CANONICAL_AUTOSAVE_EVENTS)[number]
@@ -82,6 +92,8 @@ export interface SaveGameV2 {
   urban?: UrbanProgressState
   /** Additive #370 field. Older Save v2 payloads intentionally omit it. */
   personalProgression?: PersonalProgressionState
+  /** Additive #390 field. Older Save v2 payloads intentionally omit it. */
+  ownershipEconomy?: OwnershipEconomyState
 }
 
 export type SaveDecodeResult =
@@ -408,6 +420,7 @@ const clonePersonalProgression = (state: PersonalProgressionState): PersonalProg
 
 export const createSaveGame = (session: GameSessionState): SaveGameV2 => {
   const personalProgression = sanitizePersonalProgression(session.personalProgression).personalProgression
+  const ownershipEconomy = cloneOwnershipEconomyForSave(session.ownershipEconomy)
   return {
     formatVersion: SAVE_FORMAT_VERSION,
     company: {
@@ -436,6 +449,9 @@ export const createSaveGame = (session: GameSessionState): SaveGameV2 => {
     ...(hasPersonalProgressionActivity(personalProgression)
       ? { personalProgression: clonePersonalProgression(personalProgression) }
       : {}),
+    ...(hasOwnershipEconomyActivity(ownershipEconomy)
+      ? { ownershipEconomy }
+      : {}),
   }
 }
 
@@ -457,8 +473,11 @@ export const decodeSave = (raw: string): SaveDecodeResult => {
   const company = companyResult.company
   const urbanResult = sanitizeUrban(parsed.urban, company)
   const personalProgressionResult = sanitizePersonalProgression(parsed.personalProgression)
+  const ownershipEconomyResult = sanitizeOwnershipEconomyState(parsed.ownershipEconomy)
   const includePersonalProgression = parsed.personalProgression !== undefined ||
     hasPersonalProgressionActivity(personalProgressionResult.personalProgression)
+  const includeOwnershipEconomy = parsed.ownershipEconomy !== undefined ||
+    hasOwnershipEconomyActivity(ownershipEconomyResult.state)
 
   return {
     kind: 'valid',
@@ -482,8 +501,12 @@ export const decodeSave = (raw: string): SaveDecodeResult => {
       ...(includePersonalProgression
         ? { personalProgression: clonePersonalProgression(personalProgressionResult.personalProgression) }
         : {}),
+      ...(includeOwnershipEconomy
+        ? { ownershipEconomy: cloneOwnershipEconomyForSave(ownershipEconomyResult.state) }
+        : {}),
     },
-    repaired: migratingV1 || companyResult.repaired || settingsResult.repaired || urbanResult.repaired || personalProgressionResult.repaired,
+    repaired: migratingV1 || companyResult.repaired || settingsResult.repaired || urbanResult.repaired ||
+      personalProgressionResult.repaired || ownershipEconomyResult.repaired,
     ...(migratingV1 ? { migratedFrom: 1 as const } : {}),
   }
 }
@@ -510,11 +533,15 @@ export const restoreGameSessionFromSave = (save: SaveGameV2): GameSessionState =
   const personalProgression = save.personalProgression
     ? sanitizePersonalProgression(save.personalProgression).personalProgression
     : createInitialPersonalProgressionState()
+  const ownershipEconomy = save.ownershipEconomy
+    ? sanitizeOwnershipEconomyState(save.ownershipEconomy).state
+    : createInitialOwnershipEconomyState()
   return {
     world,
     company,
     settings: { ...save.settings },
     personalProgression: clonePersonalProgression(personalProgression),
+    ownershipEconomy: cloneOwnershipEconomyForSave(ownershipEconomy),
   }
 }
 
