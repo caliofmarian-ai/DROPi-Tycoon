@@ -45,7 +45,8 @@ export class CompanyManagementScene extends Phaser.Scene {
     const layout = buildCompanyDashboardLayout(this.scale.width, this.scale.height)
     const data = buildManagementOverview(this.companyState)
     const fromHQ = this.isOpenedFromHQ()
-    drawManagementHeader(this, layout, fromHQ ? 'HQ Management Terminal' : 'Your Company', this.companyState,
+    // Internal scene key remains CompanyManagement for save/navigation compatibility; player-facing copy is the physical console.
+    drawManagementHeader(this, layout, fromHQ ? 'Operations & Dispatch Console' : 'Company Overview', this.companyState,
       this.feedback || `${data.name} · Reputation ${data.reputation}`)
     drawPanel(this, layout.hq, { tone: 'accent' })
     const hq = insetRect(layout.hq, 12)
@@ -94,7 +95,7 @@ export class CompanyManagementScene extends Phaser.Scene {
     createThemedButton(this, { ...bottom, left: bottom.left + half + 8, width: half },
       'Finances ›', 'primary', () => this.openFinancialReport(), { fontSize: 14 })
     drawManagementFooter(this, layout, {
-      label: fromHQ ? '‹ Back to HQ interior' : '‹ Back to city',
+      label: fromHQ ? '‹ Back to HQ · Operations' : '‹ Back to city',
       action: () => this.returnToGameWorld(),
     }, () => this.returnToMainMenu())
   }
