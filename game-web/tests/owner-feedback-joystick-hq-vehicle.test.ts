@@ -100,7 +100,8 @@ describe('HQ interior physical management and field staff semantics', () => {
   it('routes hiring, vehicle purchase and company management through physical HQ terminals', () => {
     expect(interiorLocationsSource).toContain("'Hiring & Staff Terminal'")
     expect(interiorLocationsSource).toContain("'Fleet Purchase Terminal'")
-    expect(interiorLocationsSource).toContain("'HQ Management Terminal'")
+    expect(interiorLocationsSource).toContain("'Operations & Dispatch Console'")
+    expect(interiorLocationsSource).not.toContain("'HQ Management Terminal'")
     expect(interiorLocationsSource).toContain("'Vehicle Handoff'")
     expect(interiorSource).toContain("this.openHQManagement('EmployeeManagement')")
     expect(interiorSource).toContain("this.openHQManagement('VehicleFleet')")
