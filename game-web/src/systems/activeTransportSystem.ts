@@ -4,7 +4,7 @@ import {
   type CompanyState,
   type VehicleTypeId,
 } from '../types/game'
-import { ownsVehicleType } from './vehicleSystem'
+import { isVehicleTypeAvailableToPlayer } from './employeeFleetSystem'
 
 export const ACTIVE_TRANSPORT_LABELS: Readonly<Record<ActiveTransport, string>> = {
   walking: 'Walking',
@@ -27,12 +27,13 @@ export const isActiveTransportOwned = (
 ): boolean => {
   if (transport === 'walking') return true
   const typeId = ACTIVE_TRANSPORT_VEHICLE_TYPES[transport]
-  return typeId !== undefined && ownsVehicleType(company, typeId)
+  return typeId !== undefined && isVehicleTypeAvailableToPlayer(company, typeId)
 }
 
 /**
  * Save/runtime guard for the currently selected terrestrial transport.
- * Invalid, unsupported or no-longer-owned values always fail safely to Walking.
+ * Invalid, unsupported, no-longer-owned or employee-assigned values always
+ * fail safely to Walking.
  */
 export const resolveActiveTransport = (
   company: CompanyState,
