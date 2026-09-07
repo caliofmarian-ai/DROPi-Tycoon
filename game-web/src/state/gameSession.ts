@@ -3,6 +3,7 @@ import {
   createInitialGameSettingsState,
   createInitialWorldState,
 } from './gameState'
+import { createInitialPersonalProgressionState } from '../systems/personalCapabilitySystem'
 import type {
   CompanyState,
   GameSessionState,
@@ -17,6 +18,7 @@ export const startNewGameSession = (): GameSessionState => {
     world: createInitialWorldState(),
     company: createInitialCompanyState(),
     settings: createInitialGameSettingsState(),
+    personalProgression: createInitialPersonalProgressionState(),
   }
   return activeSession
 }
@@ -29,12 +31,20 @@ export const replaceGameSession = (
   company: CompanyState,
   settings: GameSettingsState = activeSession?.settings ?? createInitialGameSettingsState(),
 ): GameSessionState => {
-  activeSession = { world, company, settings }
+  activeSession = {
+    world,
+    company,
+    settings,
+    personalProgression: activeSession?.personalProgression ?? createInitialPersonalProgressionState(),
+  }
   return activeSession
 }
 
 export const replaceEntireGameSession = (session: GameSessionState): GameSessionState => {
-  activeSession = session
+  activeSession = {
+    ...session,
+    personalProgression: session.personalProgression ?? createInitialPersonalProgressionState(),
+  }
   return activeSession
 }
 
