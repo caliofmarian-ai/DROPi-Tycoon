@@ -123,7 +123,7 @@ export class VehicleFleetScene extends Phaser.Scene {
         const label = usage === 'PlayerActive'
           ? 'Player active · switch at Handoff'
           : 'Need an active unassigned Courier'
-        createThemedButton(this, box.purchase, label, 'accent', () => undefined, { fontSize: 14 }).setEnabled(false)
+        createThemedButton(this, box.purchase, label, 'primary', () => undefined, { fontSize: 14 }).setEnabled(false)
       }
     })
     drawManagementFooter(this, layout, { label: 'Company', action: () => this.returnToCompany() },
