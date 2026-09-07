@@ -1,5 +1,3 @@
-import type { LocalBusinessRegistryState } from './business'
-
 export const ORDER_STATUSES = [
   'Created',
   'Available',
@@ -228,8 +226,6 @@ export interface GameSessionState {
   settings: GameSettingsState
   /** Additive personal progression domain; runtime materializes a default when omitted. */
   personalProgression?: PersonalProgressionState
-  /** Additive #372 business-world registry; current starter-company runtime remains separate until governed migration. */
-  businessRegistry?: LocalBusinessRegistryState
 }
 
 export interface PickupContext {
