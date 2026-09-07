@@ -101,7 +101,7 @@ export const createPostgresAuthorityRegistry = async ({ databaseUrl, migrate = t
   }
 
   const sql = postgres(databaseUrl, {
-    max: 5,
+    max: 1,
     prepare: false,
     connect_timeout: 10,
     idle_timeout: 20,
