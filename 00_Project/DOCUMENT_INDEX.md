@@ -2,7 +2,7 @@
 
 Document: DOCUMENT_INDEX.md
 Project: DROPi Tycoon
-Version: 1.7.0
+Version: 2.0.0
 Status: Documentation Control
 Author: Marian Caliof & OpenAI
 Language: English
@@ -14,29 +14,32 @@ Last Updated: 2026-09-07
 
 ## Purpose
 
-This document is the canonical documentation map for DROPi-Tycoon.
+This document is the canonical documentation map for DROPi Tycoon.
 
 It defines:
 
-- every stable live Markdown document that must be individually discoverable;
-- every managed root-level directory that must be represented;
+- stable live Markdown documents that must be discoverable;
+- managed root-level directories;
+- documentation ownership and authority;
 - directory-policy treatment for dynamic, historical, or generated areas.
 
 ---
 
-## Indexing Policy
+# Indexing Policy
 
 1. Stable live Markdown documents are listed individually.
-2. Managed root-level directories are always represented, even when placeholder-only.
-3. Dynamic/high-churn historical streams are represented at directory-policy level when appropriate.
-4. Generated internals and build artifacts are not individually enumerated here.
-5. Document discoverability in this index does not change canonical ownership of content.
+2. Managed root-level directories are represented explicitly.
+3. Dynamic/high-churn historical streams may be represented at directory-policy level.
+4. Generated internals and build artifacts are not individually enumerated.
+5. Discoverability does not change content ownership.
+6. Higher-level strategic owners constrain lower-level specializations.
+7. Historical reports and old planning evidence never override live canon.
 
 ---
 
-# Project Structure
+# Repository Structure
 
-```
+```text
 DROPi-Tycoon/
 
 README.md
@@ -52,10 +55,13 @@ README.md
 09_Development/
 Game/
 Builds/
+game-mobile/
 game-web/
 ```
 
-The canonical mobile platform architecture defines a future managed `game-mobile/` application-shell root. It must be added to this filesystem map when the directory is materially created by the Android application foundation implementation.
+`game-mobile/` is materially present and owns the installed mobile application shell implementation.
+
+`game-web/` contains the authoritative Phaser gameplay runtime and secondary Railway/browser deployment surface.
 
 ---
 
@@ -69,18 +75,28 @@ The canonical mobile platform architecture defines a future managed `game-mobile
 
 ## Purpose
 
-Project identity, governance, intake, status, and documentation control.
+Strategic design authority, project identity, governance, intake, roadmap, status, and documentation control.
 
-Documents:
+## Canonical Strategic Owners
+
+- `00_Project/VISION.md` — Level 1 Project Vision Authority.
+- `00_Project/UNIVERSE_DESIGN.md` — Level 2 Universe Design Authority: persistent society/world, citizens, organizations, institutions, infrastructure, scale, world-access/fairness principles.
+- `00_Project/BUSINESS_DESIGN.md` — Level 3 Business Design Authority: organizations, formation, workforce, competition, ownership/governance, founder legacy, products, business/infrastructure relationships.
+- `00_Project/LOGISTICS_DESIGN.md` — Level 4 Logistics Design Authority: strategic custody, transport, multimodal flows, hubs, qualifications, infrastructure, local-to-global logistics.
+- `00_Project/ROADMAP.md` — canonical strategic development order; currently uses reconciled Strategic Waves rather than the historical Phase 0–9 execution order.
+
+## Other Stable Project Documents
 
 - `00_Project/README.md`
-- `00_Project/VISION.md` — canonical project/game vision owner.
 - `00_Project/PROJECT_STATUS.md`
-- `00_Project/ROADMAP.md`
 - `00_Project/PROJECT_INTAKE_PROTOCOL.md`
 - `00_Project/DOCUMENT_INDEX.md`
-- `00_Project/PROJECT_CONSISTENCY_REPORT_TEMPLATE.md` — template document.
-- `00_Project/INITIAL_REPOSITORY_AUDIT.md` — stable historical audit document.
+- `00_Project/PRODUCT_EXPERIENCE_PRINCIPLES.md` — owner-approved product-experience principles.
+- `00_Project/PRODUCT_EXPERIENCE_CANONICAL_ADDENDUM.md` — canonical product-experience addendum.
+- `00_Project/PROJECT_CONSISTENCY_REPORT_TEMPLATE.md` — consistency-report template.
+- `00_Project/INITIAL_REPOSITORY_AUDIT.md` — stable historical audit.
+
+The Universe/Business/Logistics strategic owners were materialized only after the mandatory architecture/ownership audit recorded in `09_Development/AI_Reports/2026-09-07_103_CANONICAL_OWNERSHIP_AND_ROADMAP_AUDIT.md`.
 
 ---
 
@@ -88,18 +104,21 @@ Documents:
 
 ## Purpose
 
-High-level game design, gameplay structure, progression, and mission definitions.
+Playable design: player experience, gameplay structure, progression, missions, physical HQ progression, and company-society specialization.
 
 Documents:
 
-- `01_GameDesign/GDD.md`
+- `01_GameDesign/GDD.md` — Level 5 global Game Design Authority. It defines player interaction with the Universe/Business/Logistics strategic models.
 - `01_GameDesign/GAMEPLAY.md`
 - `01_GameDesign/MISSIONS.md`
-- `01_GameDesign/PROGRESSION.md`
-- `01_GameDesign/HQ_PROGRESSION.md` — canonical specialization for physical headquarters growth, department construction/unlock state, prerequisites, visibility gating, and Save/Continue persistence.
-- `01_GameDesign/COMPANY_SOCIETY_AND_MULTIPLAYER.md` — canonical specialization for player/company society, education, competition, equity/governance, multiplayer staging, founder legacy, and world-scale economic expansion.
+- `01_GameDesign/PROGRESSION.md` — canonical three-axis progression model: Personal Capability + Company Capability + World Access.
+- `01_GameDesign/HQ_PROGRESSION.md` — physical HQ growth, department construction/unlock state, prerequisites, visibility gating, and persistence.
+- `01_GameDesign/COMPANY_SOCIETY_AND_MULTIPLAYER.md` — gameplay specialization for player/company society, education, competition, equity/governance, founder legacy, multiplayer staging, and world-scale economic expansion.
 
-Note: `00_Project/VISION.md` owns canonical project/game vision. `01_GameDesign/GDD.md` owns global gameplay design authority. Other `01_GameDesign/` documents specialize that authority without overriding it.
+Authority note:
+
+- `GDD.md` cannot contradict `VISION`, `UNIVERSE_DESIGN`, `BUSINESS_DESIGN`, or `LOGISTICS_DESIGN`.
+- Other Game Design documents specialize `GDD.md` and their relevant higher strategic owners.
 
 ---
 
@@ -107,14 +126,18 @@ Note: `00_Project/VISION.md` owns canonical project/game vision. `01_GameDesign/
 
 ## Purpose
 
-In-game economy systems.
+Detailed in-game financial/economic systems.
 
 Documents:
 
-- `02_Economy/ECONOMY.md`
+- `02_Economy/ECONOMY.md` — financial economy and Company Money rules.
 - `02_Economy/MARKET.md`
 - `02_Economy/PRICING.md`
-- `02_Economy/EMPLOYEES.md` — canonical Phase-2 employee/workforce detail.
+- `02_Economy/EMPLOYEES.md` — detailed workforce/economic rules.
+
+Authority note:
+
+`02_Economy/*` specializes `00_Project/BUSINESS_DESIGN.md` and Game Design. It owns detailed economic calculations but does not redefine strategic company identity, universe rules, or gameplay authority.
 
 ---
 
@@ -122,16 +145,20 @@ Documents:
 
 ## Purpose
 
-Delivery and logistics gameplay systems.
+Detailed logistics gameplay systems.
 
 Documents:
 
-- `03_Logistics/LOGISTICS.md`
+- `03_Logistics/LOGISTICS.md` — detailed core logistics gameplay system.
 - `03_Logistics/ORDERS.md`
 - `03_Logistics/ROUTING.md`
 - `03_Logistics/VEHICLES.md`
 - `03_Logistics/DRONES.md`
 - `03_Logistics/DRONEPORTS.md`
+
+Authority note:
+
+`03_Logistics/*` specializes `00_Project/LOGISTICS_DESIGN.md` into detailed order, routing, vehicle, drone, DronePort, and delivery behavior.
 
 ---
 
@@ -139,7 +166,7 @@ Documents:
 
 ## Purpose
 
-World simulation, map, and environment definitions.
+Detailed world simulation, map, buildings, NPCs, environment, and weather.
 
 Documents:
 
@@ -148,6 +175,10 @@ Documents:
 - `04_World/BUILDINGS.md`
 - `04_World/NPC.md`
 - `04_World/WEATHER.md`
+
+Authority note:
+
+`04_World/*` specializes `00_Project/UNIVERSE_DESIGN.md` into concrete world/simulation rules. World documents do not override universe-level society, scale, fair-access, or low-population continuity principles.
 
 ---
 
@@ -162,7 +193,9 @@ Documents:
 - `05_AI/AI_SYSTEM.md`
 - `05_AI/AI_AGENTS.md`
 
-Important: this folder defines in-game AI, not AI-assisted development workflow.
+Important: this folder defines **in-game AI**, not AI-assisted development workflow.
+
+AI/automation must remain constrained by Game, Business, Logistics, Economy, and Technical authority; it cannot create unexplained economic or logistics truth.
 
 ---
 
@@ -170,17 +203,19 @@ Important: this folder defines in-game AI, not AI-assisted development workflow.
 
 ## Purpose
 
-Technical architecture and implementation governance.
+Level 7 Technical Design and implementation-governance specifications.
 
 Documents:
 
-- `06_Technical/ARCHITECTURE.md` — canonical global technical architecture.
-- `06_Technical/MOBILE_APPLICATION_PLATFORM.md` — canonical installed-mobile runtime, Android application-shell, Railway role, camera/viewport, owner-review, and AI continuity specification.
-- `06_Technical/SAVE_SYSTEM.md` — canonical in-game Save & Load specification.
+- `06_Technical/ARCHITECTURE.md` — global technical architecture.
+- `06_Technical/MOBILE_APPLICATION_PLATFORM.md` — installed-mobile runtime, Android application shell, Railway role, camera/viewport, owner-review, and AI continuity specification.
+- `06_Technical/SAVE_SYSTEM.md` — in-game Save & Load specification.
 - `06_Technical/SAFE_SYSTEM.md` — development/project safety and stability governance.
 - `06_Technical/TDD.md`
 
-Note: `MOBILE_APPLICATION_PLATFORM.md` owns the mobile application/platform boundary; `SAVE_SYSTEM.md` owns save semantics; `SAFE_SYSTEM.md` owns development/project safety. These responsibilities remain separate.
+Technical Design implements the approved product/game model; it does not redefine strategic gameplay merely because an implementation is easier.
+
+`MOBILE_APPLICATION_PLATFORM.md`, `SAVE_SYSTEM.md`, and `SAFE_SYSTEM.md` retain separate ownership boundaries.
 
 ---
 
@@ -188,7 +223,7 @@ Note: `MOBILE_APPLICATION_PLATFORM.md` owns the mobile application/platform boun
 
 ## Purpose
 
-Player interface and user experience definitions.
+Level 6 UX/UI Design and player-interface specialization.
 
 Documents:
 
@@ -197,13 +232,15 @@ Documents:
 - `07_UI/VISUAL_DESIGN_SYSTEM.md` — canonical visual and interaction direction.
 - `07_UI/PLAYER_SMARTPHONE.md` — canonical portable in-world smartphone surface and physical-location boundary.
 
+UX/UI must support world-embodied gameplay rather than replace physical game systems with omniscient menus.
+
 ---
 
 # 08_Assets
 
 ## Purpose
 
-Asset standards and resource governance.
+Asset standards, approved references, and resource governance.
 
 Documents:
 
@@ -215,9 +252,9 @@ Documents:
 
 ## Purpose
 
-Development process, workflow, planning, implementation support, and reporting governance.
+Implementation process, workflow, planning support, verification, reporting, and historical evidence.
 
-Stable top-level documents:
+## Stable Top-Level Documents
 
 - `09_Development/AI_AGENT_EXECUTION_PROTOCOL.md`
 - `09_Development/AI_DEVELOPMENT_WORKFLOW.md`
@@ -245,59 +282,70 @@ Stable top-level documents:
 - `09_Development/PROTOTYPE_V0.1.md`
 - `09_Development/TASKS.md`
 
-### Managed historical report directory
+---
 
-- `09_Development/AI_Reports/` — historical AI task report stream.
+## Managed Historical Report Directory
+
+- `09_Development/AI_Reports/` — historical AI task/audit/report stream.
 - Governance source: `09_Development/AI_REPORTING_PROTOCOL.md`.
-- Individual AI reports are not enumerated in this index.
-- Latest report sequence values are not stored in this index.
+- Individual reports are not enumerated in this index.
+- Reports are evidence, not live canonical authority.
 
 ---
 
-### Managed implementation-preparation documentation directory
+## Managed Implementation-Preparation Directory
 
-- `09_Development/Implementation_Preparation/` — non-authoritative implementation preparation package for Prototype v0.1.
+- `09_Development/Implementation_Preparation/` — non-authoritative implementation-preparation package.
 
-**Purpose:** Transforms approved canonical documentation into a dependency-ordered, agent-executable implementation plan. Allows future implementation agents to begin without inventing architecture, gameplay behavior, variable names, or scope.
+Purpose:
 
-**Ownership:** Created and maintained by AI agents under Project Owner governance. The Project Owner decides when updates are required.
+Transforms approved canon into executable implementation guidance.
 
-**Discoverability policy:** The package is discoverable as a managed directory. Individual preparation files within it are not individually enumerated in this index.
+Rules:
 
-**Relationship to canonical docs:** This package is **non-authoritative**. It does not override, replace, or supplement any canonical document. If any conflict exists between a preparation file and a canonical document, the canonical document governs. Preparation content is expected to be canonically traceable and must be revalidated whenever corrected or materially updated.
-
-**Maintenance expectations:** Point-in-time preparation artifact. If canonical documents are updated materially during implementation, affected sections of this package should be reviewed and updated. The Project Owner decides when such updates are required.
-
-**Non-authoritative rule:** No content in this directory constitutes a canonical gameplay, architecture, scope, or design decision unless explicitly confirmed by the Project Owner and recorded in the appropriate canonical document.
-
----
-
-### Managed planning documentation directory
-
-- `09_Development/Planning/` — canonical planning package for milestone, epic, batch, and issue architecture.
-
-**Purpose:** Defines the complete project roadmap planning architecture including milestones, epics, roadmap batches, GitHub issues, dependency graphs, label taxonomy, and GitHub creation plan.
-
-**Ownership:** Created and maintained by AI agents under Project Owner governance. This directory is the authoritative source for planning structure, complete through Phases 0–9.
-
-**Contents (stable enumerated documents):**
-
-- `09_Development/Planning/MILESTONE_ARCHITECTURE.md` — 21 milestones (M-001 through M-021)
-- `09_Development/Planning/EPIC_CATALOG.md` — 46 epics (E-001 through E-046)
-- `09_Development/Planning/BATCH_ARCHITECTURE.md` — 54 roadmap batches (RBATCH-001 through RBATCH-054)
-- `09_Development/Planning/ISSUE_CATALOG.md` — 34 executable issues and 32 planning placeholders
-- `09_Development/Planning/DEPENDENCY_GRAPH.md` — acyclic dependency graphs for milestones, epics, and batches
-- `09_Development/Planning/LABEL_TAXONOMY.md` — GitHub label taxonomy (122 labels)
-- `09_Development/Planning/GITHUB_CREATION_PLAN.md` — GitHub creation instructions
-- `09_Development/Planning/github_creation_plan.yaml` — machine-readable GitHub creation plan
-
-**Authority note:** The planning documents in this directory are planning-canonical. They do not override the gameplay canonical documents (`00_Project/ROADMAP.md`, `01_GameDesign/`, `02_Economy/`, etc.). Conflicts between planning scope and gameplay canonical documents must be escalated to the Project Owner.
+- does not override canonical design;
+- must be revalidated after material canonical changes;
+- outdated preparation is historical guidance, not authority;
+- Project Owner governance remains binding.
 
 ---
 
-### Managed engine-migration documentation directory
+## Managed Planning Directory
 
-- `09_Development/Engine_Migration/` — migration and deployment documentation for the code-based web runtime.
+- `09_Development/Planning/` — planning-canonical milestone/epic/batch/issue architecture.
+
+Stable planning documents:
+
+- `09_Development/Planning/MILESTONE_ARCHITECTURE.md`
+- `09_Development/Planning/EPIC_CATALOG.md`
+- `09_Development/Planning/BATCH_ARCHITECTURE.md`
+- `09_Development/Planning/ISSUE_CATALOG.md`
+- `09_Development/Planning/DEPENDENCY_GRAPH.md`
+- `09_Development/Planning/LABEL_TAXONOMY.md`
+- `09_Development/Planning/GITHUB_CREATION_PLAN.md`
+- `09_Development/Planning/github_creation_plan.yaml`
+
+### Reconciliation State — 2026-09-07
+
+The planning package was created under the older Phase 0–9 strategic roadmap and therefore remains authoritative for **historical planning identity/traceability**, but its old execution order is under active reconciliation in issue #357.
+
+The current strategic execution order is owned by `00_Project/ROADMAP.md` v3.x.
+
+Until reconciliation completes:
+
+- preserve all M/E/RBATCH IDs;
+- do not delete historical identifiers;
+- do not execute an old dependency merely because it has a lower ID;
+- where old planning conflicts with current strategic canon, current higher-level canon governs;
+- classify items as KEEP / UPDATE / MERGE-ABSORB / CLOSE-HISTORICAL / NEW-CHILD-NEEDED.
+
+After #357, the planning files must be updated or explicitly crosswalked so this temporary reconciliation state is removed.
+
+---
+
+## Managed Engine-Migration Directory
+
+- `09_Development/Engine_Migration/`
 
 Stable documents:
 
@@ -305,121 +353,66 @@ Stable documents:
 - `09_Development/Engine_Migration/FUTURE_SERVER_AUTHORITATIVE_ARCHITECTURE_PREPARATION.md`
 - `09_Development/Engine_Migration/WEB_RUNTIME_MIGRATION_MILESTONE_001.md`
 
-Authority note:
+Authority notes:
 
-- `WEB_RUNTIME_MIGRATION_MILESTONE_001.md` documents the historical/deployable web-runtime migration milestone and does not override the current mobile-first platform canon.
-- `ENVIRONMENT_VARIABLES.md` documents the active web-runtime configuration contract where that runtime remains deployed.
-- `FUTURE_SERVER_AUTHORITATIVE_ARCHITECTURE_PREPARATION.md` is explicitly non-canonical preparation content and does not activate backend scope.
-- Current primary-runtime authority is `00_Project/VISION.md`, `06_Technical/ARCHITECTURE.md`, and `06_Technical/MOBILE_APPLICATION_PLATFORM.md`.
-
----
-
-### Managed Owner Directives directory
-
-- `09_Development/Owner_Directives/` — permanent authoritative location for high-level strategic directives issued directly by the Project Owner.
-
-**Nature of Owner Directives:**
-
-- Owner Directives are authoritative strategic inputs issued by the Project Owner.
-- They are **not** automatically canonical documentation. A directive does not become canonical simply by existing in this directory.
-- They require dedicated canonical integration tasks before their contents enter the canonical documentation set.
-- AI agents **must** inspect this directory before proposing major architectural changes, universe design modifications, business model decisions, or documentation restructuring. See `09_Development/AI_AGENT_EXECUTION_PROTOCOL.md` for the mandatory inspection rule.
-
-**Governance source:** `09_Development/Owner_Directives/README.md`.
-
-Individual Owner Directives are not individually enumerated in this index. The `README.md` within the directory maintains the index of directives.
+- `WEB_RUNTIME_MIGRATION_MILESTONE_001.md` is historical/deployable-web migration evidence and does not override mobile-first canon.
+- `ENVIRONMENT_VARIABLES.md` documents the active web-runtime configuration contract where relevant.
+- `FUTURE_SERVER_AUTHORITATIVE_ARCHITECTURE_PREPARATION.md` is preparation only; it does not activate a backend by itself.
+- Primary platform authority remains `VISION.md`, `ARCHITECTURE.md`, and `MOBILE_APPLICATION_PLATFORM.md`.
 
 ---
 
-# Planned Future Documentation Architecture
+## Managed Owner Directives Directory
 
-This section registers architecture concepts that are approved in principle but have not yet been fully implemented, reorganized, or created. Registering a concept here does not create any document or directory, and does not transfer or create canonical ownership.
+- `09_Development/Owner_Directives/` — authoritative owner strategic inputs requiring deliberate canonical integration.
 
----
+Rules:
 
-## Universe Design Domain
+- directives are binding owner input;
+- directives do not automatically become canonical system documents;
+- affected canon must be deliberately reconciled/updated;
+- agents must inspect directives before major architectural, universe, business, documentation, or product-direction changes.
 
-**Status:** Approved emerging domain — awaiting dedicated architecture and ownership audit.
-
-Universe Design is an approved documentation domain of DROPi Tycoon. It is positioned immediately below Project Vision in the design hierarchy:
-
-```
-Project Vision
-→ Universe Design
-→ Business Design
-→ Logistics Design
-→ Game Design
-→ UX Design
-→ Technical Design
-→ Implementation
-→ Verification
-→ Historical Reporting
-```
-
-Universe Design defines the persistent world and ecosystem. Game Design defines player interaction with that world.
-
-A dedicated architecture and ownership audit is required before Universe Design documents are created or canonical documents are reorganized to reflect this domain.
-
-See `00_Project/VISION.md` for the canonical description of the Universe Design domain.
+Governance source: `09_Development/Owner_Directives/README.md`.
 
 ---
 
-## BIBLE-Level Canonical Documentation
+# Future BIBLE-Level Documentation
 
-**Status:** Approved future architecture — no BIBLE files exist yet.
+**Status:** Approved future architecture concept — no BIBLE files currently authorized or created.
 
-The project approves the future use of domain-specific canonical BIBLE documents. BIBLE documents would serve as definitive authoritative references for major design domains (e.g., `WORLD_SIMULATION_BIBLE.md`, `LOGISTICS_BIBLE.md`, `ECONOMY_BIBLE.md`).
+Potential domain BIBLE documents remain a future option only.
 
-No BIBLE files have been created. No BIBLE files should be created without completing the mandatory preparation process.
+Creating a BIBLE still requires:
 
-**BIBLE creation requires all of the following in order:**
+1. complete domain audit;
+2. ownership mapping;
+3. overlap detection;
+4. contradiction analysis;
+5. migration proposal;
+6. explicit Project Owner approval.
 
-1. Complete canonical audit of the target domain;
-2. Ownership mapping — identifying all existing documents that touch the domain;
-3. Overlap detection — identifying content that would need to move;
-4. Contradiction analysis — surfacing any conflicts between existing documents;
-5. Migration proposal — describing the full document change;
-6. Explicit Project Owner approval.
+The 2026-09-07 Universe/Business/Logistics audit authorized the three strategic bridge documents created in `00_Project/`; it **does not** automatically authorize BIBLE documents.
 
-A BIBLE must not duplicate an existing canonical owner. An approved BIBLE becomes the authoritative single source of truth for its domain; all other documents referencing that domain must defer to it.
+A future BIBLE must not duplicate an existing canonical owner.
 
 ---
 
-## External DROPi Canonical Reference Package
+# External DROPi Canonical Reference Package
 
-**Status:** Planned — package not yet uploaded.
+**Status:** Planned — package not uploaded.
 
-An external reference package named `DROPi_Canonical_Reference.zip` is expected to be provided in the future. The package has not been uploaded. It does not exist in the repository.
+A future `DROPi_Canonical_Reference.zip` may provide a read-only snapshot of real DROPi canon.
 
-**Policy — do not invent or create a placeholder for this package.**
+Until the real package exists:
 
-When the real package is uploaded, the following policies govern its treatment:
+- do not invent it;
+- do not create a placeholder;
+- do not claim Tycoon gameplay inventions are real DROPi features.
 
-- The real DROPi repository remains canonical for the real-world DROPi platform.
-- DROPi Tycoon remains canonical for its simulation and gameplay adaptation.
-- The package is treated as a read-only reference snapshot only.
-- Package contents do not automatically become Tycoon canon.
-- Package contents must not blindly overwrite Tycoon documentation.
-- A dedicated cross-project alignment audit is required before any content is integrated.
+When uploaded, integration requires a dedicated cross-project alignment audit covering manifest/source verification, terminology, architecture, overlap, contradictions, gameplay adaptation, and explicit Owner approval.
 
-**Cross-project alignment audit process (mandatory after upload):**
-
-1. Manifest inspection;
-2. Source commit verification;
-3. Complete document inventory;
-4. Terminology mapping;
-5. Architecture mapping;
-6. Overlap analysis;
-7. Contradiction analysis;
-8. Gameplay adaptation analysis;
-9. Project Owner approval;
-10. Integration into the correct Tycoon canonical owners only.
-
-**Recommended future repository location for external reference snapshots:**
-
-`09_Development/External_References/`
-
-This directory does not exist yet and must not be created until the actual package is ready for upload.
+The real DROPi repository remains authoritative for the real product.
 
 ---
 
@@ -427,12 +420,14 @@ This directory does not exist yet and must not be created until the actual packa
 
 ## Purpose
 
-Managed root directory for live editable game project/source files.
+Historical/managed game project area.
 
-Current state:
+Current role:
 
-- Placeholder-only (`Game/.gitkeep`).
-- Internal/generated game project internals are not individually indexed here.
+- archived GDevelop lineage/reference;
+- not the authoritative current gameplay runtime.
+
+Generated/internal files are not individually indexed here.
 
 ---
 
@@ -440,12 +435,27 @@ Current state:
 
 ## Purpose
 
-Managed root directory for generated/exported game build outputs.
+Managed generated/exported build-output area.
+
+Generated build artifacts are not individually indexed.
+
+---
+
+# game-mobile/
+
+## Purpose
+
+Installed mobile application shell implementation.
 
 Current state:
 
-- Placeholder-only (`Builds/.gitkeep`).
-- Generated build artifacts are not individually indexed here.
+- materially present;
+- Expo / React Native application shell;
+- hosts the authoritative Phaser runtime rather than reimplementing gameplay;
+- owns native lifecycle, orientation, system UI, Android Back/native bridge behavior, packaging, and EAS build integration;
+- supports installed Android owner review.
+
+Canonical authority: `06_Technical/MOBILE_APPLICATION_PLATFORM.md` and `06_Technical/ARCHITECTURE.md`.
 
 ---
 
@@ -453,89 +463,132 @@ Current state:
 
 ## Purpose
 
-Managed root directory containing the active Vite + TypeScript + Phaser game runtime and the secondary Railway/browser deployment surface.
+Authoritative Phaser/Vite/TypeScript gameplay runtime plus secondary web deployment surface.
 
 Current state:
 
-- Active authoritative Phaser game/runtime implementation for the current prototype
-- Contains the production web server, frontend source, test files, and runtime assets required for Railway/browser preview and smoke validation
-- Intended to be hosted/consumed by the mobile application shell rather than duplicated in a second gameplay implementation
-- Browser/Railway presentation is secondary to the installed mobile experience under the current platform canon
-- Historical GDevelop source remains separately preserved in `Game/`
+- owns gameplay rendering/simulation/runtime behavior;
+- contains production web server, frontend source, tests, and runtime assets;
+- consumed by the mobile application shell during the current staged architecture;
+- deployed through the original Railway service for preview/smoke/runtime delivery where currently configured;
+- browser/Railway presentation remains secondary to installed Android owner/player quality evaluation.
 
-See `06_Technical/MOBILE_APPLICATION_PLATFORM.md` for the mobile application ownership boundary and intended future `game-mobile/` root.
-
----
-
-# Information Ownership Rules
-
-- Strategic project/game vision is owned by `00_Project/VISION.md`.
-- Gameplay design authority is owned by `01_GameDesign/`.
-- Economy, logistics, world, in-game AI, technical, UI, and asset domains are owned by their respective numbered folders.
-- Mobile application/runtime platform ownership is defined by `06_Technical/MOBILE_APPLICATION_PLATFORM.md` within the Technical domain.
-- Development process/governance is owned by `09_Development/`.
-- Historical AI reports in `09_Development/AI_Reports/` are non-canonical records unless a canonical document is explicitly updated.
+The project must not create a second independent React Native gameplay implementation.
 
 ---
 
-# Document Authority Hierarchy
+# Global Document Authority Hierarchy
 
-This section records the global document authority hierarchy approved by the Project Owner to resolve audit finding F-27. It governs how conflicts between documents are resolved across the entire repository.
+The previous five-level hierarchy is superseded by the strategic hierarchy approved in `VISION.md` and materialized after the 2026-09-07 ownership audit.
 
-## Approved Five-Level Hierarchy
+## Level 1 — Project Vision
 
-**Level 1 — Project Vision Authority**
-`00_Project/VISION.md` — project identity and non-negotiable vision constraints.
+`00_Project/VISION.md`
 
-**Level 2 — Global Gameplay Design Authority**
-`01_GameDesign/GDD.md` — global gameplay design rules.
+Owns non-negotiable project identity and strategic purpose.
 
-**Level 3 — Canonical System / Domain Authority**
-Canonical system/domain documents in:
-- `02_Economy/`
-- `03_Logistics/`
-- `04_World/`
-- `05_AI/`
-- `06_Technical/`
-- `07_UI/`
+## Level 2 — Universe Design
 
-These documents own domain-specific rules within their respective domains.
+`00_Project/UNIVERSE_DESIGN.md`
 
-**Level 4 — Prototype Scope Authority**
-`09_Development/PROTOTYPE_V0.1.md` — Prototype v0.1 scope constraints.
+Owns persistent society/world truths.
 
-**Level 5 — Implementation Specification Authority**
-`09_Development/` implementation specifications — documents describing how the approved canonical design and prototype scope are implemented.
+## Level 3 — Business Design
 
-## Conflict-Resolution Rules
+`00_Project/BUSINESS_DESIGN.md`
 
-The following rules apply when documents at different authority levels appear to conflict:
+Owns organization/business truths.
 
-1. **Detail, specialization, and narrowing:** Lower-priority documents may detail, specialize, or narrow higher-priority rules within their legitimate scope. This is permitted and does not constitute a contradiction.
-2. **No contradiction of higher-priority documents:** Lower-priority documents must not contradict higher-priority documents. If a contradiction exists, the higher-priority document governs.
-3. **Specificity does not override authority:** A more specific document does not automatically override a higher-priority document. Authority level takes precedence over specificity.
-4. **Domain ownership remains binding:** Domain ownership still applies. A document outside a domain must not redefine that domain's canonical rules.
-5. **Same-level conflict escalation:** If two canonical documents at the same authority level conflict and ownership/scope rules do not resolve the conflict, the AI agent must stop the affected change and escalate the conflict to the Project Owner.
-6. **Historical AI reports never override live canonical documents:** Reports in `09_Development/AI_Reports/` are evidence and traceability records only. They never override current live canonical documents.
-7. **Recency does not override authority:** A newer modification date, version number, commit order, or report sequence number alone does not override a higher-priority canonical document.
-8. **Project Owner decisions are binding:** Explicit Project Owner decisions override AI interpretation. Owner decisions must be persisted into the appropriate canonical document before dependent implementation proceeds.
+## Level 4 — Logistics Design
+
+`00_Project/LOGISTICS_DESIGN.md`
+
+Owns strategic logistics/custody/network truths.
+
+## Level 5 — Game Design
+
+`01_GameDesign/GDD.md` and its legitimate specializations.
+
+Owns how the player interacts with the higher-level model.
+
+## Level 6 — UX Design
+
+`07_UI/` canonical UI/UX documents and project-experience specializations.
+
+Own player-interface presentation/interaction without overriding gameplay truth.
+
+## Level 7 — Technical Design
+
+`06_Technical/` canonical documents.
+
+Own implementation architecture, runtime/platform, persistence, safety, and later server-authority mechanics.
+
+## Level 8 — Implementation / Prototype Scope
+
+Implementation specs, code, balancing/configuration, and prototype-scope documents.
+
+These realize higher authority and may not redefine it silently.
+
+## Level 9 — Verification
+
+Tests, CI, owner acceptance, deployment evidence, consistency checks, and audit results.
+
+Verification proves behavior; it does not create new product truth by itself.
+
+## Level 10 — Historical Reporting
+
+AI reports, migration reports, old planning evidence, and historical implementation records.
+
+Historical evidence never overrides current live canon.
+
+---
+
+# Domain Ownership Rules
+
+Strategic hierarchy and domain ownership work together.
+
+Examples:
+
+- Universe Design owns the societal/world-level rule; `04_World/` owns detailed world simulation under it.
+- Business Design owns company identity/governance principles; `02_Economy/` owns detailed economic calculations under it.
+- Logistics Design owns multimodal/custody principles; `03_Logistics/` owns detailed logistics mechanics under it.
+- GDD owns playable interaction; specialized Game Design docs narrow it.
+- UX cannot invent game authority merely because a screen displays something.
+- Technical code cannot silently create new game canon.
+
+---
+
+# Conflict-Resolution Rules
+
+1. **Owner decisions are binding.** Explicit Project Owner decisions override AI interpretation and must be persisted into the correct canonical owner before dependent implementation.
+2. **Higher authority wins.** Lower-level documents cannot contradict higher-level documents.
+3. **Specialization is allowed.** Lower levels may detail or narrow higher-level rules within legitimate scope.
+4. **Specificity alone does not override authority.** A more detailed implementation document does not outrank a strategic owner.
+5. **Domain ownership remains binding.** A document outside its legitimate domain cannot redefine that domain.
+6. **Same-level conflict requires reconciliation.** Do not silently choose between conflicting same-authority owners.
+7. **Recency alone does not create authority.** Newer timestamp/version/commit does not outrank hierarchy.
+8. **Reports are evidence only.** AI reports never override live canonical docs.
+9. **Implementation is not canon by accident.** Existing code is preserved where compatible, but incompatible implementation must be reconciled rather than treated as higher truth.
+10. **Real DROPi remains separate.** Tycoon canon cannot redefine the real DROPi product.
 
 ---
 
 # Maintenance Rule
 
-When files are added, removed, or moved:
+When files are added, removed, moved, or materially change authority:
 
-1. Keep this index aligned with the real repository filesystem.
-2. Individually register new stable live Markdown documents in their owning section.
-3. Keep dynamic/generated/historical streams represented via directory-policy rules where applicable.
-4. Do not introduce obsolete paths or folder names.
+1. keep this index aligned with the real repository filesystem;
+2. individually register stable live Markdown documents;
+3. keep generated/historical streams represented through directory policy where appropriate;
+4. update authority descriptions when ownership changes;
+5. remove obsolete “future/planned” statements after materialization;
+6. never introduce paths that do not exist as if they were live implementation.
 
 ---
 
 # Canonical Rule
 
-Every project decision must have one clear canonical home, and this index must remain accurate, searchable, and internally consistent.
+**Every important project truth must have one clear owner, every specialization must know which higher authority it serves, and planning/implementation must always reconcile downward from the current strategic canon rather than upward from historical issue numbering.**
 
 ---
 
