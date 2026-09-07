@@ -240,10 +240,14 @@ export const createSessionAuthorityRegistry = () => {
   }
 
   return {
+    authority: 'server-process',
     durability: 'session-only',
+    persistent: false,
+    authentication: 'not-configured',
     getProfile,
     getReceipt,
     execute,
+    close: async () => {},
     stats: () => ({ profiles: profiles.size, commands: commands.size, authoritativeSequence }),
   }
 }
@@ -271,11 +275,11 @@ export const handleSessionAuthorityRequest = async (request, response, registry)
   try {
     if (request.method === 'GET' && segments.length === 3 && segments[2] === 'status') {
       sendJson(response, 200, {
-        authority: 'server-process',
+        authority: registry.authority ?? 'server-process',
         durability: registry.durability,
         scope: 'public-profile-prototype',
-        persistent: false,
-        authentication: 'not-configured',
+        persistent: registry.persistent ?? false,
+        authentication: registry.authentication ?? 'not-configured',
       })
       return true
     }
@@ -286,7 +290,7 @@ export const handleSessionAuthorityRequest = async (request, response, registry)
         sendJson(response, 400, { error: 'INVALID_AGGREGATE_ID' })
         return true
       }
-      const profile = registry.getProfile(aggregateId)
+      const profile = await registry.getProfile(aggregateId)
       if (!profile) {
         sendJson(response, 404, { error: 'PROFILE_NOT_FOUND' })
         return true
@@ -301,7 +305,7 @@ export const handleSessionAuthorityRequest = async (request, response, registry)
         sendJson(response, 400, { error: 'INVALID_COMMAND_ID' })
         return true
       }
-      const receipt = registry.getReceipt(commandId)
+      const receipt = await registry.getReceipt(commandId)
       if (!receipt) {
         sendJson(response, 404, { error: 'RECEIPT_NOT_FOUND' })
         return true
@@ -316,7 +320,7 @@ export const handleSessionAuthorityRequest = async (request, response, registry)
         sendJson(response, 400, { error: 'INVALID_COMMAND_ENVELOPE' })
         return true
       }
-      const result = registry.execute(body)
+      const result = await registry.execute(body)
       if (result.kind === 'conflict') {
         sendJson(response, 409, { error: result.code })
         return true
