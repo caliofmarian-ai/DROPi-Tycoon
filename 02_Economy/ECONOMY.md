@@ -2,11 +2,11 @@
 
 Document: ECONOMY.md
 Project: DROPi Tycoon
-Version: 1.1.0
+Version: 1.0.0
 Status: Canonical
 Author: Marian Caliof & OpenAI
 Language: English
-Last Updated: 2026-09-07
+Last Updated: 2026-07-12
 
 ---
 
@@ -16,11 +16,11 @@ Last Updated: 2026-09-07
 
 This document defines the fundamental economic simulation of DROPi Tycoon.
 
-The economy represents the financial life of companies and, as player-life systems mature, the financial life of individual economic actors.
+The economy represents the financial life of the company and connects all business activities.
 
 Every decision made by the player has an economic consequence.
 
-The goal of the economy system is to create meaningful business and personal economic decisions while remaining accessible and understandable.
+The goal of the economy system is to create meaningful business decisions while remaining accessible and understandable.
 
 ---
 
@@ -38,8 +38,7 @@ Money is a tool used to:
 - purchase resources;
 - expand the company;
 - research technology;
-- create new opportunities;
-- support future personal education, spending, and investment.
+- create new opportunities.
 
 ---
 
@@ -89,38 +88,26 @@ More Demand
 
 # Financial Resources
 
-## Company Money
+The main financial resource is:
 
-Company Money is owned by the company and is the currently active main financial resource.
+## Company Money
 
 Used for:
 
 - Purchasing vehicles
-- Paying company salaries and operating obligations
+- Paying salaries
 - Maintaining equipment
 - Building infrastructure
 - Research
 - Expansion
 
-Company Money must not masquerade as money personally owned by a player/member.
-
-## Personal Money
-
-Personal Money is a separate future/player-life financial resource owned by an individual Economic Actor/person.
-
-It may receive governed personal income such as future player wages and dividends and may fund personal expenses or investments such as future share purchases.
-
-A company member cannot buy that company's treasury shares using the same company's Company Money as if those funds belonged personally to the member.
-
-Transfers between Company Money and Personal Money require explicit balanced settlement.
-
-See `02_Economy/PERSONAL_FINANCE.md`.
+Future versions may introduce additional financial resources.
 
 ---
 
 # Revenue System
 
-Company revenue is generated through company activities.
+Revenue is generated through company activities.
 
 Main revenue sources:
 
@@ -138,17 +125,17 @@ Revenue depends on:
 - Company reputation
 - Operational capacity
 
-Company revenue belongs to the company until an explicit governed transfer such as wages or dividends credits Personal Money.
-
 ---
 
 # Expense System
 
 Every company activity creates costs.
 
-Main expenses include:
+Main expenses:
 
 ## Employee Costs
+
+Includes:
 
 - Salaries
 - Training
@@ -157,6 +144,8 @@ Main expenses include:
 ---
 
 ## Vehicle Costs
+
+Includes:
 
 - Purchase price
 - Maintenance
@@ -167,6 +156,8 @@ Main expenses include:
 
 ## Infrastructure Costs
 
+Includes:
+
 - Offices
 - Warehouses
 - Future DronePorts
@@ -174,6 +165,8 @@ Main expenses include:
 ---
 
 ## Operational Costs
+
+Includes:
 
 - Software
 - Communication
@@ -187,13 +180,11 @@ Profit represents the financial result after all expenses are deducted.
 
 Formula:
 
-`Profit = Revenue - Expenses`
+Profit = Revenue - Expenses
 
 A profitable company can reinvest and expand.
 
 An unprofitable company must adapt its strategy.
-
-Company profit is not automatically Personal Money. Personal distribution requires an explicit governed wage/dividend/other transfer.
 
 ---
 
@@ -209,35 +200,41 @@ Players must balance:
 - Current expenses
 - Emergency reserves
 
-As personal finance activates, player-owned Personal Money has its own ledger and cannot be silently merged with company cash flow.
-
 ---
 
 # Investment System
 
-Company Money may be used for governed company investments that improve the organization.
+Players use available money to improve the company.
 
-Investment categories include:
+Investment categories:
 
 ## Operations
+
+Examples:
 
 - More vehicles
 - Better equipment
 - Employee growth
 
+---
+
 ## Infrastructure
+
+Examples:
 
 - Offices
 - Warehouses
 - Distribution centers
 
+---
+
 ## Technology
+
+Examples:
 
 - Software improvements
 - Automation
 - Future drone systems
-
-Personal investment in company equity is a separate flow funded from Personal Money under `PERSONAL_FINANCE.md` and future equity-settlement rules.
 
 ---
 
@@ -267,7 +264,7 @@ Examples:
 - Buying too many vehicles
 - Hiring too many employees
 - Expanding before demand exists
-- Taking excessive loans when loans are eventually implemented
+- Taking excessive loans
 
 Smart companies grow at a sustainable pace.
 
@@ -295,15 +292,14 @@ The first playable version includes:
 - Simple profit calculation
 - Company balance
 
-Personal Money, equity settlement, dividends and other advanced financial systems activate only through explicit later slices.
+Advanced financial systems will be introduced later.
 
 ---
 
 # Future Expansion
 
-Possible future systems include:
+Possible future systems:
 
-- Personal Money/player-life finance
 - Loans
 - Investors
 - Stock market
@@ -313,8 +309,6 @@ Possible future systems include:
 - Insurance
 - Financial reports
 - Company valuation
-
-Every future system remains subject to explicit canonical and technical boundaries.
 
 ---
 
@@ -327,7 +321,6 @@ The economy must:
 - Avoid excessive complexity
 - Provide clear feedback
 - Encourage long-term planning
-- Keep company-owned and person-owned funds economically distinct
 
 ---
 
@@ -336,8 +329,6 @@ The economy must:
 Every system that creates, consumes, or modifies resources must follow this economic framework.
 
 No independent economic systems may exist outside this model.
-
-**Company Money belongs to a company. Personal Money belongs to a person. Transfers between them must be explicit and balanced.**
 
 ---
 
