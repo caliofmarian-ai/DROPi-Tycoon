@@ -18,6 +18,11 @@ import {
 const RUNTIME_DELIVERY_ACTIVITY_PREFIX = 'runtime-delivery:'
 const MAX_RUNTIME_ORDER_ID_LENGTH = 120
 
+type BasicDeliveryWorkFailureReason = Extract<
+  BasicDeliveryWorkResult,
+  { performed: false }
+>['reason']
+
 export interface PlayerEconomyWorkPort {
   worldInstanceId: string
   heroActorId: string
@@ -48,7 +53,7 @@ export type RuntimeProductiveWorkResult =
         | 'runtime-not-settled'
         | 'invalid-runtime-transition'
         | 'duplicate-delivery'
-        | Exclude<BasicDeliveryWorkResult extends { performed: false; reason: infer R } ? R : never, 'duplicate-activity'>
+        | Exclude<BasicDeliveryWorkFailureReason, 'duplicate-activity'>
     }
 
 const validRuntimeOrderId = (orderId: unknown): orderId is string =>
