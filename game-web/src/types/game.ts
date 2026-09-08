@@ -1,4 +1,5 @@
 import type { OwnershipEconomyState } from './ownershipEconomy'
+import type { WorldIdentityState } from './worldIdentity'
 
 export const ORDER_STATUSES = [
   'Created',
@@ -230,6 +231,8 @@ export interface GameSessionState {
   personalProgression?: PersonalProgressionState
   /** Additive #390 ownership/economy aggregate; runtime materializes a default when omitted. */
   ownershipEconomy?: OwnershipEconomyState
+  /** B1 #515 local World Instance/account/hero identity; not persisted until the governed B2 slice. */
+  worldIdentity?: WorldIdentityState
 }
 
 export interface PickupContext {
