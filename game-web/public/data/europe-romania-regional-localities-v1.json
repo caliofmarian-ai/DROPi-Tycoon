@@ -1,0 +1,1103 @@
+{
+  "version": "1.0.0",
+  "issue": 509,
+  "continent": "Europe",
+  "country": {
+    "geometryId": "642",
+    "sourceCountryCode": "RO",
+    "renderedName": "Romania"
+  },
+  "administrativeModel": {
+    "level": "first-order",
+    "nativeTerm": "județ",
+    "normalCountyCount": 41,
+    "countyEquivalentCount": 1,
+    "unitCount": 42,
+    "countyEquivalent": "Municipality of Bucharest",
+    "officialStructureReference": "https://schengen.mai.gov.ro/English/index10.htm"
+  },
+  "source": {
+    "provider": "GeoNames",
+    "license": "Creative Commons Attribution 4.0",
+    "releaseTag": "source-geonames-cities500-2026-09-08-f3cda4f9",
+    "cities500Sha256": "f3cda4f9d256d90045121fb8eebad3ed91695c32370ed93b50fbe0cb616e2bbd",
+    "admin1Sha256": "590651498043f674accda2b7f46d21286cda0e290b02f8561c5005eee9a5448c",
+    "retainedRomaniaCandidateCount": 7149,
+    "publishedGameplayRepresentativeCount": 42
+  },
+  "developmentModel": {
+    "authority": "shared-regional-national-multiplayer-economy",
+    "personalPlayerProgressionUnlock": false,
+    "numericThresholdsDefined": false,
+    "signalsPlanned": [
+      "company-activity",
+      "employment-demand",
+      "production",
+      "logistics-throughput",
+      "construction-investment",
+      "transport-connectivity",
+      "trade-volume",
+      "population-economic-simulation",
+      "regional-national-policy"
+    ],
+    "rule": "Representative locality prominence and development are shared-world economic outcomes, not personal progression rewards."
+  },
+  "selectionModel": {
+    "primary": "Choose the retained GeoNames PPLC/PPLA locality inside each Romanian admin1 unit.",
+    "fallback": "If no PPLC/PPLA exists, choose the highest-population retained PPLA2 locality and label it representative rather than claiming a first-order-seat role.",
+    "hardcodedCoordinates": false,
+    "highDensityGameplayImport": false
+  },
+  "units": [
+    {
+      "admin1Code": "01",
+      "regionSourceName": "Alba County",
+      "regionAsciiName": "Alba County",
+      "regionSourceRef": "geonames:686581",
+      "unitType": "county",
+      "representativeLocality": {
+        "localityId": "dropi:locality:geonames:686578",
+        "sourceRef": "geonames:686578",
+        "name": "Alba Iulia",
+        "asciiName": "Alba Iulia",
+        "latitude": 46.06667,
+        "longitude": 23.58333,
+        "featureCode": "PPLA",
+        "populationSourceValue": 64227,
+        "selectionBasis": "source-first-order-seat-role",
+        "presentationRole": "regional-representative-locality"
+      },
+      "economicEmergence": {
+        "authority": "shared-regional-national-multiplayer-economy",
+        "personalPlayerProgressionUnlock": false,
+        "numericThresholdsDefined": false,
+        "presentationState": "economy-system-governed"
+      }
+    },
+    {
+      "admin1Code": "02",
+      "regionSourceName": "Arad County",
+      "regionAsciiName": "Arad County",
+      "regionSourceRef": "geonames:686253",
+      "unitType": "county",
+      "representativeLocality": {
+        "localityId": "dropi:locality:geonames:686254",
+        "sourceRef": "geonames:686254",
+        "name": "Arad",
+        "asciiName": "Arad",
+        "latitude": 46.18333,
+        "longitude": 21.31667,
+        "featureCode": "PPLA",
+        "populationSourceValue": 169065,
+        "selectionBasis": "source-first-order-seat-role",
+        "presentationRole": "regional-representative-locality"
+      },
+      "economicEmergence": {
+        "authority": "shared-regional-national-multiplayer-economy",
+        "personalPlayerProgressionUnlock": false,
+        "numericThresholdsDefined": false,
+        "presentationState": "economy-system-governed"
+      }
+    },
+    {
+      "admin1Code": "03",
+      "regionSourceName": "Arges",
+      "regionAsciiName": "Arges",
+      "regionSourceRef": "geonames:686192",
+      "unitType": "county",
+      "representativeLocality": {
+        "localityId": "dropi:locality:geonames:670609",
+        "sourceRef": "geonames:670609",
+        "name": "Piteşti",
+        "asciiName": "Pitesti",
+        "latitude": 44.85,
+        "longitude": 24.86667,
+        "featureCode": "PPLA",
+        "populationSourceValue": 141275,
+        "selectionBasis": "source-first-order-seat-role",
+        "presentationRole": "regional-representative-locality"
+      },
+      "economicEmergence": {
+        "authority": "shared-regional-national-multiplayer-economy",
+        "personalPlayerProgressionUnlock": false,
+        "numericThresholdsDefined": false,
+        "presentationState": "economy-system-governed"
+      }
+    },
+    {
+      "admin1Code": "04",
+      "regionSourceName": "Bacău County",
+      "regionAsciiName": "Bacau County",
+      "regionSourceRef": "geonames:685947",
+      "unitType": "county",
+      "representativeLocality": {
+        "localityId": "dropi:locality:geonames:685948",
+        "sourceRef": "geonames:685948",
+        "name": "Bacău",
+        "asciiName": "Bacau",
+        "latitude": 46.56718,
+        "longitude": 26.91384,
+        "featureCode": "PPLA",
+        "populationSourceValue": 136087,
+        "selectionBasis": "source-first-order-seat-role",
+        "presentationRole": "regional-representative-locality"
+      },
+      "economicEmergence": {
+        "authority": "shared-regional-national-multiplayer-economy",
+        "personalPlayerProgressionUnlock": false,
+        "numericThresholdsDefined": false,
+        "presentationState": "economy-system-governed"
+      }
+    },
+    {
+      "admin1Code": "05",
+      "regionSourceName": "Bihor County",
+      "regionAsciiName": "Bihor County",
+      "regionSourceRef": "geonames:684878",
+      "unitType": "county",
+      "representativeLocality": {
+        "localityId": "dropi:locality:geonames:671768",
+        "sourceRef": "geonames:671768",
+        "name": "Oradea",
+        "asciiName": "Oradea",
+        "latitude": 47.0458,
+        "longitude": 21.91833,
+        "featureCode": "PPLA",
+        "populationSourceValue": 183105,
+        "selectionBasis": "source-first-order-seat-role",
+        "presentationRole": "regional-representative-locality"
+      },
+      "economicEmergence": {
+        "authority": "shared-regional-national-multiplayer-economy",
+        "personalPlayerProgressionUnlock": false,
+        "numericThresholdsDefined": false,
+        "presentationState": "economy-system-governed"
+      }
+    },
+    {
+      "admin1Code": "06",
+      "regionSourceName": "Bistrița-Năsăud County",
+      "regionAsciiName": "Bistrita-Nasaud County",
+      "regionSourceRef": "geonames:684647",
+      "unitType": "county",
+      "representativeLocality": {
+        "localityId": "dropi:locality:geonames:684657",
+        "sourceRef": "geonames:684657",
+        "name": "Bistriţa",
+        "asciiName": "Bistrita",
+        "latitude": 47.13316,
+        "longitude": 24.50011,
+        "featureCode": "PPLA",
+        "populationSourceValue": 78877,
+        "selectionBasis": "source-first-order-seat-role",
+        "presentationRole": "regional-representative-locality"
+      },
+      "economicEmergence": {
+        "authority": "shared-regional-national-multiplayer-economy",
+        "personalPlayerProgressionUnlock": false,
+        "numericThresholdsDefined": false,
+        "presentationState": "economy-system-governed"
+      }
+    },
+    {
+      "admin1Code": "07",
+      "regionSourceName": "Botoșani County",
+      "regionAsciiName": "Botosani County",
+      "regionSourceRef": "geonames:684038",
+      "unitType": "county",
+      "representativeLocality": {
+        "localityId": "dropi:locality:geonames:684039",
+        "sourceRef": "geonames:684039",
+        "name": "Botoşani",
+        "asciiName": "Botosani",
+        "latitude": 47.75,
+        "longitude": 26.66667,
+        "featureCode": "PPLA",
+        "populationSourceValue": 90010,
+        "selectionBasis": "source-first-order-seat-role",
+        "presentationRole": "regional-representative-locality"
+      },
+      "economicEmergence": {
+        "authority": "shared-regional-national-multiplayer-economy",
+        "personalPlayerProgressionUnlock": false,
+        "numericThresholdsDefined": false,
+        "presentationState": "economy-system-governed"
+      }
+    },
+    {
+      "admin1Code": "08",
+      "regionSourceName": "Brăila County",
+      "regionAsciiName": "Braila County",
+      "regionSourceRef": "geonames:683901",
+      "unitType": "county",
+      "representativeLocality": {
+        "localityId": "dropi:locality:geonames:683902",
+        "sourceRef": "geonames:683902",
+        "name": "Brăila",
+        "asciiName": "Braila",
+        "latitude": 45.27152,
+        "longitude": 27.97429,
+        "featureCode": "PPLA",
+        "populationSourceValue": 154686,
+        "selectionBasis": "source-first-order-seat-role",
+        "presentationRole": "regional-representative-locality"
+      },
+      "economicEmergence": {
+        "authority": "shared-regional-national-multiplayer-economy",
+        "personalPlayerProgressionUnlock": false,
+        "numericThresholdsDefined": false,
+        "presentationState": "economy-system-governed"
+      }
+    },
+    {
+      "admin1Code": "09",
+      "regionSourceName": "Brașov County",
+      "regionAsciiName": "Brasov County",
+      "regionSourceRef": "geonames:683843",
+      "unitType": "county",
+      "representativeLocality": {
+        "localityId": "dropi:locality:geonames:683844",
+        "sourceRef": "geonames:683844",
+        "name": "Braşov",
+        "asciiName": "Brasov",
+        "latitude": 45.64861,
+        "longitude": 25.60613,
+        "featureCode": "PPLA",
+        "populationSourceValue": 253200,
+        "selectionBasis": "source-first-order-seat-role",
+        "presentationRole": "regional-representative-locality"
+      },
+      "economicEmergence": {
+        "authority": "shared-regional-national-multiplayer-economy",
+        "personalPlayerProgressionUnlock": false,
+        "numericThresholdsDefined": false,
+        "presentationState": "economy-system-governed"
+      }
+    },
+    {
+      "admin1Code": "10",
+      "regionSourceName": "Bucharest",
+      "regionAsciiName": "Bucharest",
+      "regionSourceRef": "geonames:683504",
+      "unitType": "capital-municipality-county-equivalent",
+      "representativeLocality": {
+        "localityId": "dropi:locality:geonames:683506",
+        "sourceRef": "geonames:683506",
+        "name": "Bucharest",
+        "asciiName": "Bucharest",
+        "latitude": 44.43225,
+        "longitude": 26.10626,
+        "featureCode": "PPLC",
+        "populationSourceValue": 1877155,
+        "selectionBasis": "source-first-order-seat-role",
+        "presentationRole": "national-capital-and-regional-node"
+      },
+      "economicEmergence": {
+        "authority": "shared-regional-national-multiplayer-economy",
+        "personalPlayerProgressionUnlock": false,
+        "numericThresholdsDefined": false,
+        "presentationState": "economy-system-governed"
+      }
+    },
+    {
+      "admin1Code": "11",
+      "regionSourceName": "Buzău County",
+      "regionAsciiName": "Buzau County",
+      "regionSourceRef": "geonames:683121",
+      "unitType": "county",
+      "representativeLocality": {
+        "localityId": "dropi:locality:geonames:683123",
+        "sourceRef": "geonames:683123",
+        "name": "Buzău",
+        "asciiName": "Buzau",
+        "latitude": 45.15,
+        "longitude": 26.83333,
+        "featureCode": "PPLA",
+        "populationSourceValue": 103481,
+        "selectionBasis": "source-first-order-seat-role",
+        "presentationRole": "regional-representative-locality"
+      },
+      "economicEmergence": {
+        "authority": "shared-regional-national-multiplayer-economy",
+        "personalPlayerProgressionUnlock": false,
+        "numericThresholdsDefined": false,
+        "presentationState": "economy-system-governed"
+      }
+    },
+    {
+      "admin1Code": "12",
+      "regionSourceName": "Caraș-Severin County",
+      "regionAsciiName": "Caras-Severin County",
+      "regionSourceRef": "geonames:682714",
+      "unitType": "county",
+      "representativeLocality": {
+        "localityId": "dropi:locality:geonames:668954",
+        "sourceRef": "geonames:668954",
+        "name": "Reşiţa",
+        "asciiName": "Resita",
+        "latitude": 45.30083,
+        "longitude": 21.88917,
+        "featureCode": "PPLA",
+        "populationSourceValue": 81228,
+        "selectionBasis": "source-first-order-seat-role",
+        "presentationRole": "regional-representative-locality"
+      },
+      "economicEmergence": {
+        "authority": "shared-regional-national-multiplayer-economy",
+        "personalPlayerProgressionUnlock": false,
+        "numericThresholdsDefined": false,
+        "presentationState": "economy-system-governed"
+      }
+    },
+    {
+      "admin1Code": "13",
+      "regionSourceName": "Cluj County",
+      "regionAsciiName": "Cluj County",
+      "regionSourceRef": "geonames:681291",
+      "unitType": "county",
+      "representativeLocality": {
+        "localityId": "dropi:locality:geonames:681290",
+        "sourceRef": "geonames:681290",
+        "name": "Cluj-Napoca",
+        "asciiName": "Cluj-Napoca",
+        "latitude": 46.76667,
+        "longitude": 23.6,
+        "featureCode": "PPLA",
+        "populationSourceValue": 286598,
+        "selectionBasis": "source-first-order-seat-role",
+        "presentationRole": "regional-representative-locality"
+      },
+      "economicEmergence": {
+        "authority": "shared-regional-national-multiplayer-economy",
+        "personalPlayerProgressionUnlock": false,
+        "numericThresholdsDefined": false,
+        "presentationState": "economy-system-governed"
+      }
+    },
+    {
+      "admin1Code": "14",
+      "regionSourceName": "Constanța County",
+      "regionAsciiName": "Constanta County",
+      "regionSourceRef": "geonames:680962",
+      "unitType": "county",
+      "representativeLocality": {
+        "localityId": "dropi:locality:geonames:680963",
+        "sourceRef": "geonames:680963",
+        "name": "Constanţa",
+        "asciiName": "Constanta",
+        "latitude": 44.18073,
+        "longitude": 28.63432,
+        "featureCode": "PPLA",
+        "populationSourceValue": 317832,
+        "selectionBasis": "source-first-order-seat-role",
+        "presentationRole": "regional-representative-locality"
+      },
+      "economicEmergence": {
+        "authority": "shared-regional-national-multiplayer-economy",
+        "personalPlayerProgressionUnlock": false,
+        "numericThresholdsDefined": false,
+        "presentationState": "economy-system-governed"
+      }
+    },
+    {
+      "admin1Code": "15",
+      "regionSourceName": "Covasna County",
+      "regionAsciiName": "Covasna County",
+      "regionSourceRef": "geonames:680428",
+      "unitType": "county",
+      "representativeLocality": {
+        "localityId": "dropi:locality:geonames:667303",
+        "sourceRef": "geonames:667303",
+        "name": "Sfântu Gheorghe",
+        "asciiName": "Sfantu Gheorghe",
+        "latitude": 45.86667,
+        "longitude": 25.78333,
+        "featureCode": "PPLA",
+        "populationSourceValue": 50080,
+        "selectionBasis": "source-first-order-seat-role",
+        "presentationRole": "regional-representative-locality"
+      },
+      "economicEmergence": {
+        "authority": "shared-regional-national-multiplayer-economy",
+        "personalPlayerProgressionUnlock": false,
+        "numericThresholdsDefined": false,
+        "presentationState": "economy-system-governed"
+      }
+    },
+    {
+      "admin1Code": "16",
+      "regionSourceName": "Dâmbovița County",
+      "regionAsciiName": "Dambovita County",
+      "regionSourceRef": "geonames:679385",
+      "unitType": "county",
+      "representativeLocality": {
+        "localityId": "dropi:locality:geonames:665024",
+        "sourceRef": "geonames:665024",
+        "name": "Târgovişte",
+        "asciiName": "Targoviste",
+        "latitude": 44.92543,
+        "longitude": 25.4567,
+        "featureCode": "PPLA",
+        "populationSourceValue": 66965,
+        "selectionBasis": "source-first-order-seat-role",
+        "presentationRole": "regional-representative-locality"
+      },
+      "economicEmergence": {
+        "authority": "shared-regional-national-multiplayer-economy",
+        "personalPlayerProgressionUnlock": false,
+        "numericThresholdsDefined": false,
+        "presentationState": "economy-system-governed"
+      }
+    },
+    {
+      "admin1Code": "17",
+      "regionSourceName": "Dolj",
+      "regionAsciiName": "Dolj",
+      "regionSourceRef": "geonames:679134",
+      "unitType": "county",
+      "representativeLocality": {
+        "localityId": "dropi:locality:geonames:680332",
+        "sourceRef": "geonames:680332",
+        "name": "Craiova",
+        "asciiName": "Craiova",
+        "latitude": 44.31667,
+        "longitude": 23.8,
+        "featureCode": "PPLA",
+        "populationSourceValue": 234140,
+        "selectionBasis": "source-first-order-seat-role",
+        "presentationRole": "regional-representative-locality"
+      },
+      "economicEmergence": {
+        "authority": "shared-regional-national-multiplayer-economy",
+        "personalPlayerProgressionUnlock": false,
+        "numericThresholdsDefined": false,
+        "presentationState": "economy-system-governed"
+      }
+    },
+    {
+      "admin1Code": "18",
+      "regionSourceName": "Galați County",
+      "regionAsciiName": "Galati County",
+      "regionSourceRef": "geonames:677692",
+      "unitType": "county",
+      "representativeLocality": {
+        "localityId": "dropi:locality:geonames:677697",
+        "sourceRef": "geonames:677697",
+        "name": "Galaţi",
+        "asciiName": "Galati",
+        "latitude": 45.43687,
+        "longitude": 28.05028,
+        "featureCode": "PPLA",
+        "populationSourceValue": 217851,
+        "selectionBasis": "source-first-order-seat-role",
+        "presentationRole": "regional-representative-locality"
+      },
+      "economicEmergence": {
+        "authority": "shared-regional-national-multiplayer-economy",
+        "personalPlayerProgressionUnlock": false,
+        "numericThresholdsDefined": false,
+        "presentationState": "economy-system-governed"
+      }
+    },
+    {
+      "admin1Code": "19",
+      "regionSourceName": "Gorj County",
+      "regionAsciiName": "Gorj County",
+      "regionSourceRef": "geonames:676898",
+      "unitType": "county",
+      "representativeLocality": {
+        "localityId": "dropi:locality:geonames:665010",
+        "sourceRef": "geonames:665010",
+        "name": "Târgu Jiu",
+        "asciiName": "Targu Jiu",
+        "latitude": 45.05,
+        "longitude": 23.28333,
+        "featureCode": "PPLA",
+        "populationSourceValue": 73545,
+        "selectionBasis": "source-first-order-seat-role",
+        "presentationRole": "regional-representative-locality"
+      },
+      "economicEmergence": {
+        "authority": "shared-regional-national-multiplayer-economy",
+        "personalPlayerProgressionUnlock": false,
+        "numericThresholdsDefined": false,
+        "presentationState": "economy-system-governed"
+      }
+    },
+    {
+      "admin1Code": "20",
+      "regionSourceName": "Harghita County",
+      "regionAsciiName": "Harghita County",
+      "regionSourceRef": "geonames:676309",
+      "unitType": "county",
+      "representativeLocality": {
+        "localityId": "dropi:locality:geonames:673441",
+        "sourceRef": "geonames:673441",
+        "name": "Miercurea-Ciuc",
+        "asciiName": "Miercurea-Ciuc",
+        "latitude": 46.35,
+        "longitude": 25.8,
+        "featureCode": "PPLA",
+        "populationSourceValue": 34484,
+        "selectionBasis": "source-first-order-seat-role",
+        "presentationRole": "regional-representative-locality"
+      },
+      "economicEmergence": {
+        "authority": "shared-regional-national-multiplayer-economy",
+        "personalPlayerProgressionUnlock": false,
+        "numericThresholdsDefined": false,
+        "presentationState": "economy-system-governed"
+      }
+    },
+    {
+      "admin1Code": "21",
+      "regionSourceName": "Hunedoara County",
+      "regionAsciiName": "Hunedoara County",
+      "regionSourceRef": "geonames:675917",
+      "unitType": "county",
+      "representativeLocality": {
+        "localityId": "dropi:locality:geonames:679452",
+        "sourceRef": "geonames:679452",
+        "name": "Deva",
+        "asciiName": "Deva",
+        "latitude": 45.88333,
+        "longitude": 22.9,
+        "featureCode": "PPLA2",
+        "populationSourceValue": 67802,
+        "selectionBasis": "fallback-largest-secondary-admin-place",
+        "presentationRole": "regional-representative-locality"
+      },
+      "economicEmergence": {
+        "authority": "shared-regional-national-multiplayer-economy",
+        "personalPlayerProgressionUnlock": false,
+        "numericThresholdsDefined": false,
+        "presentationState": "economy-system-governed"
+      }
+    },
+    {
+      "admin1Code": "22",
+      "regionSourceName": "Ialomița County",
+      "regionAsciiName": "Ialomita County",
+      "regionSourceRef": "geonames:675848",
+      "unitType": "county",
+      "representativeLocality": {
+        "localityId": "dropi:locality:geonames:8581467",
+        "sourceRef": "geonames:8581467",
+        "name": "Slobozia",
+        "asciiName": "Slobozia",
+        "latitude": 44.5647,
+        "longitude": 27.3633,
+        "featureCode": "PPLA",
+        "populationSourceValue": 41550,
+        "selectionBasis": "source-first-order-seat-role",
+        "presentationRole": "regional-representative-locality"
+      },
+      "economicEmergence": {
+        "authority": "shared-regional-national-multiplayer-economy",
+        "personalPlayerProgressionUnlock": false,
+        "numericThresholdsDefined": false,
+        "presentationState": "economy-system-governed"
+      }
+    },
+    {
+      "admin1Code": "23",
+      "regionSourceName": "Iași County",
+      "regionAsciiName": "Iasi County",
+      "regionSourceRef": "geonames:675809",
+      "unitType": "county",
+      "representativeLocality": {
+        "localityId": "dropi:locality:geonames:675810",
+        "sourceRef": "geonames:675810",
+        "name": "Iaşi",
+        "asciiName": "Iasi",
+        "latitude": 47.16667,
+        "longitude": 27.6,
+        "featureCode": "PPLA",
+        "populationSourceValue": 378954,
+        "selectionBasis": "source-first-order-seat-role",
+        "presentationRole": "regional-representative-locality"
+      },
+      "economicEmergence": {
+        "authority": "shared-regional-national-multiplayer-economy",
+        "personalPlayerProgressionUnlock": false,
+        "numericThresholdsDefined": false,
+        "presentationState": "economy-system-governed"
+      }
+    },
+    {
+      "admin1Code": "25",
+      "regionSourceName": "Maramureş",
+      "regionAsciiName": "Maramures",
+      "regionSourceRef": "geonames:673887",
+      "unitType": "county",
+      "representativeLocality": {
+        "localityId": "dropi:locality:geonames:685826",
+        "sourceRef": "geonames:685826",
+        "name": "Baia Mare",
+        "asciiName": "Baia Mare",
+        "latitude": 47.65729,
+        "longitude": 23.56808,
+        "featureCode": "PPLA",
+        "populationSourceValue": 108759,
+        "selectionBasis": "source-first-order-seat-role",
+        "presentationRole": "regional-representative-locality"
+      },
+      "economicEmergence": {
+        "authority": "shared-regional-national-multiplayer-economy",
+        "personalPlayerProgressionUnlock": false,
+        "numericThresholdsDefined": false,
+        "presentationState": "economy-system-governed"
+      }
+    },
+    {
+      "admin1Code": "26",
+      "regionSourceName": "Mehedinți County",
+      "regionAsciiName": "Mehedinti County",
+      "regionSourceRef": "geonames:673612",
+      "unitType": "county",
+      "representativeLocality": {
+        "localityId": "dropi:locality:geonames:678817",
+        "sourceRef": "geonames:678817",
+        "name": "Drobeta-Turnu Severin",
+        "asciiName": "Drobeta-Turnu Severin",
+        "latitude": 44.62693,
+        "longitude": 22.65288,
+        "featureCode": "PPLA",
+        "populationSourceValue": 79865,
+        "selectionBasis": "source-first-order-seat-role",
+        "presentationRole": "regional-representative-locality"
+      },
+      "economicEmergence": {
+        "authority": "shared-regional-national-multiplayer-economy",
+        "personalPlayerProgressionUnlock": false,
+        "numericThresholdsDefined": false,
+        "presentationState": "economy-system-governed"
+      }
+    },
+    {
+      "admin1Code": "27",
+      "regionSourceName": "Mureș County",
+      "regionAsciiName": "Mures County",
+      "regionSourceRef": "geonames:672628",
+      "unitType": "county",
+      "representativeLocality": {
+        "localityId": "dropi:locality:geonames:665004",
+        "sourceRef": "geonames:665004",
+        "name": "Târgu Mureş",
+        "asciiName": "Targu Mures",
+        "latitude": 46.54245,
+        "longitude": 24.55747,
+        "featureCode": "PPLA",
+        "populationSourceValue": 212752,
+        "selectionBasis": "source-first-order-seat-role",
+        "presentationRole": "regional-representative-locality"
+      },
+      "economicEmergence": {
+        "authority": "shared-regional-national-multiplayer-economy",
+        "personalPlayerProgressionUnlock": false,
+        "numericThresholdsDefined": false,
+        "presentationState": "economy-system-governed"
+      }
+    },
+    {
+      "admin1Code": "28",
+      "regionSourceName": "Neamț County",
+      "regionAsciiName": "Neamt County",
+      "regionSourceRef": "geonames:672460",
+      "unitType": "county",
+      "representativeLocality": {
+        "localityId": "dropi:locality:geonames:670889",
+        "sourceRef": "geonames:670889",
+        "name": "Piatra Neamţ",
+        "asciiName": "Piatra Neamt",
+        "latitude": 46.91667,
+        "longitude": 26.33333,
+        "featureCode": "PPLA",
+        "populationSourceValue": 102688,
+        "selectionBasis": "source-first-order-seat-role",
+        "presentationRole": "regional-representative-locality"
+      },
+      "economicEmergence": {
+        "authority": "shared-regional-national-multiplayer-economy",
+        "personalPlayerProgressionUnlock": false,
+        "numericThresholdsDefined": false,
+        "presentationState": "economy-system-governed"
+      }
+    },
+    {
+      "admin1Code": "29",
+      "regionSourceName": "Olt",
+      "regionAsciiName": "Olt",
+      "regionSourceRef": "geonames:671857",
+      "unitType": "county",
+      "representativeLocality": {
+        "localityId": "dropi:locality:geonames:666767",
+        "sourceRef": "geonames:666767",
+        "name": "Slatina",
+        "asciiName": "Slatina",
+        "latitude": 44.43333,
+        "longitude": 24.36667,
+        "featureCode": "PPLA",
+        "populationSourceValue": 63487,
+        "selectionBasis": "source-first-order-seat-role",
+        "presentationRole": "regional-representative-locality"
+      },
+      "economicEmergence": {
+        "authority": "shared-regional-national-multiplayer-economy",
+        "personalPlayerProgressionUnlock": false,
+        "numericThresholdsDefined": false,
+        "presentationState": "economy-system-governed"
+      }
+    },
+    {
+      "admin1Code": "30",
+      "regionSourceName": "Prahova",
+      "regionAsciiName": "Prahova",
+      "regionSourceRef": "geonames:669737",
+      "unitType": "county",
+      "representativeLocality": {
+        "localityId": "dropi:locality:geonames:670474",
+        "sourceRef": "geonames:670474",
+        "name": "Ploieşti",
+        "asciiName": "Ploiesti",
+        "latitude": 44.95,
+        "longitude": 26.01667,
+        "featureCode": "PPLA",
+        "populationSourceValue": 180540,
+        "selectionBasis": "source-first-order-seat-role",
+        "presentationRole": "regional-representative-locality"
+      },
+      "economicEmergence": {
+        "authority": "shared-regional-national-multiplayer-economy",
+        "personalPlayerProgressionUnlock": false,
+        "numericThresholdsDefined": false,
+        "presentationState": "economy-system-governed"
+      }
+    },
+    {
+      "admin1Code": "31",
+      "regionSourceName": "Sălaj County",
+      "regionAsciiName": "Salaj County",
+      "regionSourceRef": "geonames:668248",
+      "unitType": "county",
+      "representativeLocality": {
+        "localityId": "dropi:locality:geonames:662334",
+        "sourceRef": "geonames:662334",
+        "name": "Zalău",
+        "asciiName": "Zalau",
+        "latitude": 47.2,
+        "longitude": 23.05,
+        "featureCode": "PPLA",
+        "populationSourceValue": 52359,
+        "selectionBasis": "source-first-order-seat-role",
+        "presentationRole": "regional-representative-locality"
+      },
+      "economicEmergence": {
+        "authority": "shared-regional-national-multiplayer-economy",
+        "personalPlayerProgressionUnlock": false,
+        "numericThresholdsDefined": false,
+        "presentationState": "economy-system-governed"
+      }
+    },
+    {
+      "admin1Code": "32",
+      "regionSourceName": "Satu Mare County",
+      "regionAsciiName": "Satu Mare County",
+      "regionSourceRef": "geonames:667869",
+      "unitType": "county",
+      "representativeLocality": {
+        "localityId": "dropi:locality:geonames:667873",
+        "sourceRef": "geonames:667873",
+        "name": "Satu Mare",
+        "asciiName": "Satu Mare",
+        "latitude": 47.79926,
+        "longitude": 22.86255,
+        "featureCode": "PPLA",
+        "populationSourceValue": 112490,
+        "selectionBasis": "source-first-order-seat-role",
+        "presentationRole": "regional-representative-locality"
+      },
+      "economicEmergence": {
+        "authority": "shared-regional-national-multiplayer-economy",
+        "personalPlayerProgressionUnlock": false,
+        "numericThresholdsDefined": false,
+        "presentationState": "economy-system-governed"
+      }
+    },
+    {
+      "admin1Code": "33",
+      "regionSourceName": "Sibiu County",
+      "regionAsciiName": "Sibiu County",
+      "regionSourceRef": "geonames:667267",
+      "unitType": "county",
+      "representativeLocality": {
+        "localityId": "dropi:locality:geonames:667268",
+        "sourceRef": "geonames:667268",
+        "name": "Sibiu",
+        "asciiName": "Sibiu",
+        "latitude": 45.8,
+        "longitude": 24.15,
+        "featureCode": "PPLA",
+        "populationSourceValue": 134309,
+        "selectionBasis": "source-first-order-seat-role",
+        "presentationRole": "regional-representative-locality"
+      },
+      "economicEmergence": {
+        "authority": "shared-regional-national-multiplayer-economy",
+        "personalPlayerProgressionUnlock": false,
+        "numericThresholdsDefined": false,
+        "presentationState": "economy-system-governed"
+      }
+    },
+    {
+      "admin1Code": "34",
+      "regionSourceName": "Suceava",
+      "regionAsciiName": "Suceava",
+      "regionSourceRef": "geonames:665849",
+      "unitType": "county",
+      "representativeLocality": {
+        "localityId": "dropi:locality:geonames:665850",
+        "sourceRef": "geonames:665850",
+        "name": "Suceava",
+        "asciiName": "Suceava",
+        "latitude": 47.63333,
+        "longitude": 26.25,
+        "featureCode": "PPLA",
+        "populationSourceValue": 84308,
+        "selectionBasis": "source-first-order-seat-role",
+        "presentationRole": "regional-representative-locality"
+      },
+      "economicEmergence": {
+        "authority": "shared-regional-national-multiplayer-economy",
+        "personalPlayerProgressionUnlock": false,
+        "numericThresholdsDefined": false,
+        "presentationState": "economy-system-governed"
+      }
+    },
+    {
+      "admin1Code": "35",
+      "regionSourceName": "Teleorman County",
+      "regionAsciiName": "Teleorman County",
+      "regionSourceRef": "geonames:665283",
+      "unitType": "county",
+      "representativeLocality": {
+        "localityId": "dropi:locality:geonames:686502",
+        "sourceRef": "geonames:686502",
+        "name": "Alexandria",
+        "asciiName": "Alexandria",
+        "latitude": 43.98333,
+        "longitude": 25.33333,
+        "featureCode": "PPLA",
+        "populationSourceValue": 40390,
+        "selectionBasis": "source-first-order-seat-role",
+        "presentationRole": "regional-representative-locality"
+      },
+      "economicEmergence": {
+        "authority": "shared-regional-national-multiplayer-economy",
+        "personalPlayerProgressionUnlock": false,
+        "numericThresholdsDefined": false,
+        "presentationState": "economy-system-governed"
+      }
+    },
+    {
+      "admin1Code": "36",
+      "regionSourceName": "Timiș County",
+      "regionAsciiName": "Timis County",
+      "regionSourceRef": "geonames:665091",
+      "unitType": "county",
+      "representativeLocality": {
+        "localityId": "dropi:locality:geonames:665087",
+        "sourceRef": "geonames:665087",
+        "name": "Timişoara",
+        "asciiName": "Timisoara",
+        "latitude": 45.75372,
+        "longitude": 21.22571,
+        "featureCode": "PPLA",
+        "populationSourceValue": 250849,
+        "selectionBasis": "source-first-order-seat-role",
+        "presentationRole": "regional-representative-locality"
+      },
+      "economicEmergence": {
+        "authority": "shared-regional-national-multiplayer-economy",
+        "personalPlayerProgressionUnlock": false,
+        "numericThresholdsDefined": false,
+        "presentationState": "economy-system-governed"
+      }
+    },
+    {
+      "admin1Code": "37",
+      "regionSourceName": "Tulcea County",
+      "regionAsciiName": "Tulcea County",
+      "regionSourceRef": "geonames:664517",
+      "unitType": "county",
+      "representativeLocality": {
+        "localityId": "dropi:locality:geonames:664518",
+        "sourceRef": "geonames:664518",
+        "name": "Tulcea",
+        "asciiName": "Tulcea",
+        "latitude": 45.1787,
+        "longitude": 28.80501,
+        "featureCode": "PPLA",
+        "populationSourceValue": 65624,
+        "selectionBasis": "source-first-order-seat-role",
+        "presentationRole": "regional-representative-locality"
+      },
+      "economicEmergence": {
+        "authority": "shared-regional-national-multiplayer-economy",
+        "personalPlayerProgressionUnlock": false,
+        "numericThresholdsDefined": false,
+        "presentationState": "economy-system-governed"
+      }
+    },
+    {
+      "admin1Code": "38",
+      "regionSourceName": "Vaslui County",
+      "regionAsciiName": "Vaslui County",
+      "regionSourceRef": "geonames:663116",
+      "unitType": "county",
+      "representativeLocality": {
+        "localityId": "dropi:locality:geonames:663118",
+        "sourceRef": "geonames:663118",
+        "name": "Vaslui",
+        "asciiName": "Vaslui",
+        "latitude": 46.63333,
+        "longitude": 27.73333,
+        "featureCode": "PPLA",
+        "populationSourceValue": 63035,
+        "selectionBasis": "source-first-order-seat-role",
+        "presentationRole": "regional-representative-locality"
+      },
+      "economicEmergence": {
+        "authority": "shared-regional-national-multiplayer-economy",
+        "personalPlayerProgressionUnlock": false,
+        "numericThresholdsDefined": false,
+        "presentationState": "economy-system-governed"
+      }
+    },
+    {
+      "admin1Code": "39",
+      "regionSourceName": "Vâlcea County",
+      "regionAsciiName": "Valcea County",
+      "regionSourceRef": "geonames:662892",
+      "unitType": "county",
+      "representativeLocality": {
+        "localityId": "dropi:locality:geonames:668872",
+        "sourceRef": "geonames:668872",
+        "name": "Râmnicu Vâlcea",
+        "asciiName": "Ramnicu Valcea",
+        "latitude": 45.1,
+        "longitude": 24.36667,
+        "featureCode": "PPLA",
+        "populationSourceValue": 93151,
+        "selectionBasis": "source-first-order-seat-role",
+        "presentationRole": "regional-representative-locality"
+      },
+      "economicEmergence": {
+        "authority": "shared-regional-national-multiplayer-economy",
+        "personalPlayerProgressionUnlock": false,
+        "numericThresholdsDefined": false,
+        "presentationState": "economy-system-governed"
+      }
+    },
+    {
+      "admin1Code": "40",
+      "regionSourceName": "Vrancea",
+      "regionAsciiName": "Vrancea",
+      "regionSourceRef": "geonames:662447",
+      "unitType": "county",
+      "representativeLocality": {
+        "localityId": "dropi:locality:geonames:678015",
+        "sourceRef": "geonames:678015",
+        "name": "Focșani",
+        "asciiName": "Focsani",
+        "latitude": 45.7,
+        "longitude": 27.18333,
+        "featureCode": "PPLA",
+        "populationSourceValue": 66648,
+        "selectionBasis": "source-first-order-seat-role",
+        "presentationRole": "regional-representative-locality"
+      },
+      "economicEmergence": {
+        "authority": "shared-regional-national-multiplayer-economy",
+        "personalPlayerProgressionUnlock": false,
+        "numericThresholdsDefined": false,
+        "presentationState": "economy-system-governed"
+      }
+    },
+    {
+      "admin1Code": "41",
+      "regionSourceName": "Călărași County",
+      "regionAsciiName": "Calarasi County",
+      "regionSourceRef": "geonames:683016",
+      "unitType": "county",
+      "representativeLocality": {
+        "localityId": "dropi:locality:geonames:673150",
+        "sourceRef": "geonames:673150",
+        "name": "Călăraşi",
+        "asciiName": "Calarasi",
+        "latitude": 44.2051,
+        "longitude": 27.31356,
+        "featureCode": "PPLA",
+        "populationSourceValue": 6687,
+        "selectionBasis": "source-first-order-seat-role",
+        "presentationRole": "regional-representative-locality"
+      },
+      "economicEmergence": {
+        "authority": "shared-regional-national-multiplayer-economy",
+        "personalPlayerProgressionUnlock": false,
+        "numericThresholdsDefined": false,
+        "presentationState": "economy-system-governed"
+      }
+    },
+    {
+      "admin1Code": "42",
+      "regionSourceName": "Giurgiu County",
+      "regionAsciiName": "Giurgiu County",
+      "regionSourceRef": "geonames:677104",
+      "unitType": "county",
+      "representativeLocality": {
+        "localityId": "dropi:locality:geonames:677106",
+        "sourceRef": "geonames:677106",
+        "name": "Giurgiu",
+        "asciiName": "Giurgiu",
+        "latitude": 43.88664,
+        "longitude": 25.9627,
+        "featureCode": "PPLA",
+        "populationSourceValue": 54551,
+        "selectionBasis": "source-first-order-seat-role",
+        "presentationRole": "regional-representative-locality"
+      },
+      "economicEmergence": {
+        "authority": "shared-regional-national-multiplayer-economy",
+        "personalPlayerProgressionUnlock": false,
+        "numericThresholdsDefined": false,
+        "presentationState": "economy-system-governed"
+      }
+    },
+    {
+      "admin1Code": "43",
+      "regionSourceName": "Ilfov",
+      "regionAsciiName": "Ilfov",
+      "regionSourceRef": "geonames:865518",
+      "unitType": "county",
+      "representativeLocality": {
+        "localityId": "dropi:locality:geonames:662476",
+        "sourceRef": "geonames:662476",
+        "name": "Voluntari",
+        "asciiName": "Voluntari",
+        "latitude": 44.49002,
+        "longitude": 26.17338,
+        "featureCode": "PPLA2",
+        "populationSourceValue": 30323,
+        "selectionBasis": "fallback-largest-secondary-admin-place",
+        "presentationRole": "regional-representative-locality"
+      },
+      "economicEmergence": {
+        "authority": "shared-regional-national-multiplayer-economy",
+        "personalPlayerProgressionUnlock": false,
+        "numericThresholdsDefined": false,
+        "presentationState": "economy-system-governed"
+      }
+    }
+  ]
+}
