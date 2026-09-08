@@ -6,6 +6,7 @@ const NATIVE_BACK_TARGETS: Readonly<Record<string, string>> = {
   CustomerReviews: 'CompanyManagement',
   VehicleFleet: 'CompanyManagement',
   CompanyManagement: 'GameWorld',
+  GlobalMap: 'GameWorld',
   GameWorld: 'MainMenu',
 }
 
