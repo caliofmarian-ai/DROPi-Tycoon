@@ -43,6 +43,8 @@ def main():
         assert unit['regionName'] == expected['canonicalName']
         assert unit['regionSourceName'] == expected['sourceName']
         locality = unit['representativeLocality']
+        expected_source_country = expected.get('localitySourceCountryCode', config['country']['sourceCountryCode'])
+        assert locality.get('sourceCountryCode', config['country']['sourceCountryCode']) == expected_source_country
         assert -90 <= locality['latitude'] <= 90
         assert -180 <= locality['longitude'] <= 180
         assert locality['localityId'].startswith('dropi:locality:geonames:')
@@ -55,9 +57,12 @@ def main():
     fallback = len(units) - primary
     assert primary == config['selectionPolicy']['expectedPrimarySelections']
     assert fallback == config['selectionPolicy']['expectedFallbackSelections']
-    capitals = [unit for unit in units if unit['representativeLocality']['featureCode'] == 'PPLC']
-    assert len(capitals) == 1
-    assert capitals[0]['representativeLocality']['presentationRole'] == 'national-capital-and-regional-node'
+    national_capitals = [
+        unit for unit in units
+        if unit['representativeLocality']['presentationRole'] == 'national-capital-and-regional-node'
+    ]
+    assert len(national_capitals) == 1
+    assert national_capitals[0]['representativeLocality']['featureCode'] == 'PPLC'
 
     print(
         f"PASS: {payload['country']['renderedName']} representative regional registry "

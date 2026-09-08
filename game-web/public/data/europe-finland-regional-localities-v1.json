@@ -1,0 +1,615 @@
+{
+  "version": "1.0.0",
+  "issue": 538,
+  "continent": "Europe",
+  "country": {
+    "geometryId": "246",
+    "sourceCountryCode": "FI",
+    "renderedName": "Finland"
+  },
+  "administrativeModel": {
+    "level": "first-order-region-with-autonomous-special-case",
+    "nativeTermSingular": "maakunta",
+    "nativeTermPlural": "maakunnat",
+    "englishTerm": "region",
+    "unitCount": 19,
+    "officialReferences": [
+      "https://stat.fi/en/luokitukset/maakunta/maakunta_1_20260101",
+      "https://www.aland.ax/en/facts-about-aland"
+    ],
+    "specialCases": [
+      {
+        "type": "aland-autonomous-region",
+        "canonicalRegionCode": "21",
+        "note": "Åland is one of Statistics Finland’s 19 regions and has autonomous legislative and budgetary powers under Finland’s constitutional/legal order. DROPi preserves that autonomy semantically without creating duplicate territorial ownership."
+      },
+      {
+        "type": "cross-source-locality-ownership",
+        "canonicalRegionCode": "21",
+        "note": "GeoNames publishes Åland localities under country code AX rather than FI. The Finland regional layer therefore crosswalks official region 21 Åland to the retained AX locality corpus and selects Mariehamn without fabricating coordinates or pretending an AX internal admin1 row is the Finnish region itself."
+      }
+    ]
+  },
+  "source": {
+    "provider": "GeoNames",
+    "license": "Creative Commons Attribution 4.0",
+    "releaseTag": "source-geonames-cities500-2026-09-08-f3cda4f9",
+    "cities500Sha256": "f3cda4f9d256d90045121fb8eebad3ed91695c32370ed93b50fbe0cb616e2bbd",
+    "admin1Sha256": "590651498043f674accda2b7f46d21286cda0e290b02f8561c5005eee9a5448c",
+    "candidateCountryCodes": [
+      "FI",
+      "AX"
+    ],
+    "expectedCountryCandidateCount": 951,
+    "regionalCrosswalkProvider": "Statistics Finland",
+    "regionalCrosswalkReference": "https://stat.fi/en/luokitukset/maakunta/maakunta_1_20260101",
+    "publishedGameplayRepresentativeCount": 19
+  },
+  "selectionModel": {
+    "primaryFeatureCodes": [
+      "PPLC",
+      "PPLA"
+    ],
+    "fallbackFeatureCodes": [
+      "PPLA2",
+      "PPLA3",
+      "PPL"
+    ],
+    "expectedPrimarySelections": 19,
+    "expectedFallbackSelections": 0,
+    "highDensityGameplayImport": false,
+    "hardcodedCoordinates": false,
+    "rule": "One source-backed representative locality per governed first-order region; retained high-density source remains reference-only."
+  },
+  "developmentModel": {
+    "authority": "shared-regional-national-multiplayer-economy",
+    "personalPlayerProgressionUnlock": false,
+    "numericThresholdsDefined": false,
+    "signalsPlanned": [
+      "company-activity",
+      "employment-demand",
+      "production",
+      "logistics-throughput",
+      "construction-investment",
+      "transport-connectivity",
+      "trade-volume",
+      "population-economic-simulation",
+      "regional-national-policy"
+    ],
+    "rule": "Representative locality prominence and development are shared-world economic outcomes, not personal progression rewards."
+  },
+  "units": [
+    {
+      "admin1Code": "01",
+      "regionName": "Uusimaa",
+      "regionSourceName": "Uusimaa",
+      "regionAsciiName": "Uusimaa",
+      "regionSourceRef": "geonames:830709",
+      "representativeLocality": {
+        "localityId": "dropi:locality:geonames:658225",
+        "sourceRef": "geonames:658225",
+        "sourceCountryCode": "FI",
+        "sourceAdmin1Code": "01",
+        "sourceScope": "admin1",
+        "name": "Helsinki",
+        "asciiName": "Helsinki",
+        "latitude": 60.16952,
+        "longitude": 24.93545,
+        "featureCode": "PPLC",
+        "populationSourceValue": 658864,
+        "selectionBasis": "source-first-order-seat-role",
+        "presentationRole": "national-capital-and-regional-node"
+      },
+      "economicEmergence": {
+        "authority": "shared-regional-national-multiplayer-economy",
+        "personalPlayerProgressionUnlock": false,
+        "numericThresholdsDefined": false,
+        "presentationState": "economy-system-governed"
+      }
+    },
+    {
+      "admin1Code": "02",
+      "regionName": "Southwest Finland",
+      "regionSourceName": "Southwest Finland",
+      "regionAsciiName": "Southwest Finland",
+      "regionSourceRef": "geonames:830708",
+      "representativeLocality": {
+        "localityId": "dropi:locality:geonames:633679",
+        "sourceRef": "geonames:633679",
+        "sourceCountryCode": "FI",
+        "sourceAdmin1Code": "02",
+        "sourceScope": "admin1",
+        "name": "Turku",
+        "asciiName": "Turku",
+        "latitude": 60.45148,
+        "longitude": 22.26869,
+        "featureCode": "PPLA",
+        "populationSourceValue": 206655,
+        "selectionBasis": "source-first-order-seat-role",
+        "presentationRole": "regional-representative-locality"
+      },
+      "economicEmergence": {
+        "authority": "shared-regional-national-multiplayer-economy",
+        "personalPlayerProgressionUnlock": false,
+        "numericThresholdsDefined": false,
+        "presentationState": "economy-system-governed"
+      }
+    },
+    {
+      "admin1Code": "04",
+      "regionName": "Satakunta",
+      "regionSourceName": "Satakunta",
+      "regionAsciiName": "Satakunta",
+      "regionSourceRef": "geonames:831041",
+      "representativeLocality": {
+        "localityId": "dropi:locality:geonames:640999",
+        "sourceRef": "geonames:640999",
+        "sourceCountryCode": "FI",
+        "sourceAdmin1Code": "04",
+        "sourceScope": "admin1",
+        "name": "Pori",
+        "asciiName": "Pori",
+        "latitude": 61.48072,
+        "longitude": 21.78518,
+        "featureCode": "PPLA",
+        "populationSourceValue": 83157,
+        "selectionBasis": "source-first-order-seat-role",
+        "presentationRole": "regional-representative-locality"
+      },
+      "economicEmergence": {
+        "authority": "shared-regional-national-multiplayer-economy",
+        "personalPlayerProgressionUnlock": false,
+        "numericThresholdsDefined": false,
+        "presentationState": "economy-system-governed"
+      }
+    },
+    {
+      "admin1Code": "05",
+      "regionName": "Kanta-Häme",
+      "regionSourceName": "Kanta-Häme",
+      "regionAsciiName": "Kanta-Haeme",
+      "regionSourceRef": "geonames:830705",
+      "representativeLocality": {
+        "localityId": "dropi:locality:geonames:659180",
+        "sourceRef": "geonames:659180",
+        "sourceCountryCode": "FI",
+        "sourceAdmin1Code": "05",
+        "sourceScope": "admin1",
+        "name": "Hämeenlinna",
+        "asciiName": "Haemeenlinna",
+        "latitude": 60.99596,
+        "longitude": 24.46434,
+        "featureCode": "PPLA",
+        "populationSourceValue": 68473,
+        "selectionBasis": "source-first-order-seat-role",
+        "presentationRole": "regional-representative-locality"
+      },
+      "economicEmergence": {
+        "authority": "shared-regional-national-multiplayer-economy",
+        "personalPlayerProgressionUnlock": false,
+        "numericThresholdsDefined": false,
+        "presentationState": "economy-system-governed"
+      }
+    },
+    {
+      "admin1Code": "06",
+      "regionName": "Pirkanmaa",
+      "regionSourceName": "Pirkanmaa",
+      "regionAsciiName": "Pirkanmaa",
+      "regionSourceRef": "geonames:830704",
+      "representativeLocality": {
+        "localityId": "dropi:locality:geonames:634963",
+        "sourceRef": "geonames:634963",
+        "sourceCountryCode": "FI",
+        "sourceAdmin1Code": "06",
+        "sourceScope": "admin1",
+        "name": "Tampere",
+        "asciiName": "Tampere",
+        "latitude": 61.49911,
+        "longitude": 23.78712,
+        "featureCode": "PPLA",
+        "populationSourceValue": 260646,
+        "selectionBasis": "source-first-order-seat-role",
+        "presentationRole": "regional-representative-locality"
+      },
+      "economicEmergence": {
+        "authority": "shared-regional-national-multiplayer-economy",
+        "personalPlayerProgressionUnlock": false,
+        "numericThresholdsDefined": false,
+        "presentationState": "economy-system-governed"
+      }
+    },
+    {
+      "admin1Code": "07",
+      "regionName": "Päijät-Häme",
+      "regionSourceName": "Paijat-Hame",
+      "regionAsciiName": "Paijat-Hame",
+      "regionSourceRef": "geonames:831040",
+      "representativeLocality": {
+        "localityId": "dropi:locality:geonames:649360",
+        "sourceRef": "geonames:649360",
+        "sourceCountryCode": "FI",
+        "sourceAdmin1Code": "07",
+        "sourceScope": "admin1",
+        "name": "Lahti",
+        "asciiName": "Lahti",
+        "latitude": 60.98267,
+        "longitude": 25.66151,
+        "featureCode": "PPLA",
+        "populationSourceValue": 121622,
+        "selectionBasis": "source-first-order-seat-role",
+        "presentationRole": "regional-representative-locality"
+      },
+      "economicEmergence": {
+        "authority": "shared-regional-national-multiplayer-economy",
+        "personalPlayerProgressionUnlock": false,
+        "numericThresholdsDefined": false,
+        "presentationState": "economy-system-governed"
+      }
+    },
+    {
+      "admin1Code": "08",
+      "regionName": "Kymenlaakso",
+      "regionSourceName": "Kymenlaakso",
+      "regionAsciiName": "Kymenlaakso",
+      "regionSourceRef": "geonames:830703",
+      "representativeLocality": {
+        "localityId": "dropi:locality:geonames:650859",
+        "sourceRef": "geonames:650859",
+        "sourceCountryCode": "FI",
+        "sourceAdmin1Code": "08",
+        "sourceScope": "admin1",
+        "name": "Kouvola",
+        "asciiName": "Kouvola",
+        "latitude": 60.86667,
+        "longitude": 26.7,
+        "featureCode": "PPLA",
+        "populationSourceValue": 78094,
+        "selectionBasis": "source-first-order-seat-role",
+        "presentationRole": "regional-representative-locality"
+      },
+      "economicEmergence": {
+        "authority": "shared-regional-national-multiplayer-economy",
+        "personalPlayerProgressionUnlock": false,
+        "numericThresholdsDefined": false,
+        "presentationState": "economy-system-governed"
+      }
+    },
+    {
+      "admin1Code": "09",
+      "regionName": "South Karelia",
+      "regionSourceName": "South Karelia",
+      "regionAsciiName": "South Karelia",
+      "regionSourceRef": "geonames:830699",
+      "representativeLocality": {
+        "localityId": "dropi:locality:geonames:648900",
+        "sourceRef": "geonames:648900",
+        "sourceCountryCode": "FI",
+        "sourceAdmin1Code": "09",
+        "sourceScope": "admin1",
+        "name": "Lappeenranta",
+        "asciiName": "Lappeenranta",
+        "latitude": 61.05871,
+        "longitude": 28.18871,
+        "featureCode": "PPLA",
+        "populationSourceValue": 72909,
+        "selectionBasis": "source-first-order-seat-role",
+        "presentationRole": "regional-representative-locality"
+      },
+      "economicEmergence": {
+        "authority": "shared-regional-national-multiplayer-economy",
+        "personalPlayerProgressionUnlock": false,
+        "numericThresholdsDefined": false,
+        "presentationState": "economy-system-governed"
+      }
+    },
+    {
+      "admin1Code": "10",
+      "regionName": "South Savo",
+      "regionSourceName": "South Savo",
+      "regionAsciiName": "South Savo",
+      "regionSourceRef": "geonames:830695",
+      "representativeLocality": {
+        "localityId": "dropi:locality:geonames:646005",
+        "sourceRef": "geonames:646005",
+        "sourceCountryCode": "FI",
+        "sourceAdmin1Code": "10",
+        "sourceScope": "admin1",
+        "name": "Mikkeli",
+        "asciiName": "Mikkeli",
+        "latitude": 61.68857,
+        "longitude": 27.27227,
+        "featureCode": "PPLA",
+        "populationSourceValue": 51661,
+        "selectionBasis": "source-first-order-seat-role",
+        "presentationRole": "regional-representative-locality"
+      },
+      "economicEmergence": {
+        "authority": "shared-regional-national-multiplayer-economy",
+        "personalPlayerProgressionUnlock": false,
+        "numericThresholdsDefined": false,
+        "presentationState": "economy-system-governed"
+      }
+    },
+    {
+      "admin1Code": "11",
+      "regionName": "North Savo",
+      "regionSourceName": "North Savo",
+      "regionAsciiName": "North Savo",
+      "regionSourceRef": "geonames:830690",
+      "representativeLocality": {
+        "localityId": "dropi:locality:geonames:650224",
+        "sourceRef": "geonames:650224",
+        "sourceCountryCode": "FI",
+        "sourceAdmin1Code": "11",
+        "sourceScope": "admin1",
+        "name": "Kuopio",
+        "asciiName": "Kuopio",
+        "latitude": 62.89238,
+        "longitude": 27.67703,
+        "featureCode": "PPLA",
+        "populationSourceValue": 125462,
+        "selectionBasis": "source-first-order-seat-role",
+        "presentationRole": "regional-representative-locality"
+      },
+      "economicEmergence": {
+        "authority": "shared-regional-national-multiplayer-economy",
+        "personalPlayerProgressionUnlock": false,
+        "numericThresholdsDefined": false,
+        "presentationState": "economy-system-governed"
+      }
+    },
+    {
+      "admin1Code": "12",
+      "regionName": "North Karelia",
+      "regionSourceName": "North Karelia",
+      "regionAsciiName": "North Karelia",
+      "regionSourceRef": "geonames:830686",
+      "representativeLocality": {
+        "localityId": "dropi:locality:geonames:655808",
+        "sourceRef": "geonames:655808",
+        "sourceCountryCode": "FI",
+        "sourceAdmin1Code": "12",
+        "sourceScope": "admin1",
+        "name": "Joensuu",
+        "asciiName": "Joensuu",
+        "latitude": 62.60118,
+        "longitude": 29.76316,
+        "featureCode": "PPLA",
+        "populationSourceValue": 78398,
+        "selectionBasis": "source-first-order-seat-role",
+        "presentationRole": "regional-representative-locality"
+      },
+      "economicEmergence": {
+        "authority": "shared-regional-national-multiplayer-economy",
+        "personalPlayerProgressionUnlock": false,
+        "numericThresholdsDefined": false,
+        "presentationState": "economy-system-governed"
+      }
+    },
+    {
+      "admin1Code": "13",
+      "regionName": "Central Finland",
+      "regionSourceName": "Central Finland",
+      "regionAsciiName": "Central Finland",
+      "regionSourceRef": "geonames:830685",
+      "representativeLocality": {
+        "localityId": "dropi:locality:geonames:655194",
+        "sourceRef": "geonames:655194",
+        "sourceCountryCode": "FI",
+        "sourceAdmin1Code": "13",
+        "sourceScope": "admin1",
+        "name": "Jyväskylä",
+        "asciiName": "Jyvaeskylae",
+        "latitude": 62.24147,
+        "longitude": 25.72088,
+        "featureCode": "PPLA",
+        "populationSourceValue": 148744,
+        "selectionBasis": "source-first-order-seat-role",
+        "presentationRole": "regional-representative-locality"
+      },
+      "economicEmergence": {
+        "authority": "shared-regional-national-multiplayer-economy",
+        "personalPlayerProgressionUnlock": false,
+        "numericThresholdsDefined": false,
+        "presentationState": "economy-system-governed"
+      }
+    },
+    {
+      "admin1Code": "14",
+      "regionName": "South Ostrobothnia",
+      "regionSourceName": "South Ostrobothnia",
+      "regionAsciiName": "South Ostrobothnia",
+      "regionSourceRef": "geonames:830682",
+      "representativeLocality": {
+        "localityId": "dropi:locality:geonames:637219",
+        "sourceRef": "geonames:637219",
+        "sourceCountryCode": "FI",
+        "sourceAdmin1Code": "14",
+        "sourceScope": "admin1",
+        "name": "Seinäjoki",
+        "asciiName": "Seinaejoki",
+        "latitude": 62.79446,
+        "longitude": 22.82822,
+        "featureCode": "PPLA",
+        "populationSourceValue": 66848,
+        "selectionBasis": "source-first-order-seat-role",
+        "presentationRole": "regional-representative-locality"
+      },
+      "economicEmergence": {
+        "authority": "shared-regional-national-multiplayer-economy",
+        "personalPlayerProgressionUnlock": false,
+        "numericThresholdsDefined": false,
+        "presentationState": "economy-system-governed"
+      }
+    },
+    {
+      "admin1Code": "15",
+      "regionName": "Ostrobothnia",
+      "regionSourceName": "Ostrobothnia",
+      "regionAsciiName": "Ostrobothnia",
+      "regionSourceRef": "geonames:830676",
+      "representativeLocality": {
+        "localityId": "dropi:locality:geonames:632978",
+        "sourceRef": "geonames:632978",
+        "sourceCountryCode": "FI",
+        "sourceAdmin1Code": "15",
+        "sourceScope": "admin1",
+        "name": "Vaasa",
+        "asciiName": "Vaasa",
+        "latitude": 63.096,
+        "longitude": 21.61577,
+        "featureCode": "PPLA",
+        "populationSourceValue": 69819,
+        "selectionBasis": "source-first-order-seat-role",
+        "presentationRole": "regional-representative-locality"
+      },
+      "economicEmergence": {
+        "authority": "shared-regional-national-multiplayer-economy",
+        "personalPlayerProgressionUnlock": false,
+        "numericThresholdsDefined": false,
+        "presentationState": "economy-system-governed"
+      }
+    },
+    {
+      "admin1Code": "16",
+      "regionName": "Central Ostrobothnia",
+      "regionSourceName": "Central Ostrobothnia",
+      "regionAsciiName": "Central Ostrobothnia",
+      "regionSourceRef": "geonames:830675",
+      "representativeLocality": {
+        "localityId": "dropi:locality:geonames:651943",
+        "sourceRef": "geonames:651943",
+        "sourceCountryCode": "FI",
+        "sourceAdmin1Code": "16",
+        "sourceScope": "admin1",
+        "name": "Kokkola",
+        "asciiName": "Kokkola",
+        "latitude": 63.83847,
+        "longitude": 23.13066,
+        "featureCode": "PPLA",
+        "populationSourceValue": 48361,
+        "selectionBasis": "source-first-order-seat-role",
+        "presentationRole": "regional-representative-locality"
+      },
+      "economicEmergence": {
+        "authority": "shared-regional-national-multiplayer-economy",
+        "personalPlayerProgressionUnlock": false,
+        "numericThresholdsDefined": false,
+        "presentationState": "economy-system-governed"
+      }
+    },
+    {
+      "admin1Code": "17",
+      "regionName": "North Ostrobothnia",
+      "regionSourceName": "North Ostrobothnia",
+      "regionAsciiName": "North Ostrobothnia",
+      "regionSourceRef": "geonames:830667",
+      "representativeLocality": {
+        "localityId": "dropi:locality:geonames:643492",
+        "sourceRef": "geonames:643492",
+        "sourceCountryCode": "FI",
+        "sourceAdmin1Code": "17",
+        "sourceScope": "admin1",
+        "name": "Oulu",
+        "asciiName": "Oulu",
+        "latitude": 65.01236,
+        "longitude": 25.46816,
+        "featureCode": "PPLA",
+        "populationSourceValue": 216066,
+        "selectionBasis": "source-first-order-seat-role",
+        "presentationRole": "regional-representative-locality"
+      },
+      "economicEmergence": {
+        "authority": "shared-regional-national-multiplayer-economy",
+        "personalPlayerProgressionUnlock": false,
+        "numericThresholdsDefined": false,
+        "presentationState": "economy-system-governed"
+      }
+    },
+    {
+      "admin1Code": "18",
+      "regionName": "Kainuu",
+      "regionSourceName": "Kainuu",
+      "regionAsciiName": "Kainuu",
+      "regionSourceRef": "geonames:830664",
+      "representativeLocality": {
+        "localityId": "dropi:locality:geonames:654899",
+        "sourceRef": "geonames:654899",
+        "sourceCountryCode": "FI",
+        "sourceAdmin1Code": "18",
+        "sourceScope": "admin1",
+        "name": "Kajaani",
+        "asciiName": "Kajaani",
+        "latitude": 64.22728,
+        "longitude": 27.72846,
+        "featureCode": "PPLA",
+        "populationSourceValue": 36458,
+        "selectionBasis": "source-first-order-seat-role",
+        "presentationRole": "regional-representative-locality"
+      },
+      "economicEmergence": {
+        "authority": "shared-regional-national-multiplayer-economy",
+        "personalPlayerProgressionUnlock": false,
+        "numericThresholdsDefined": false,
+        "presentationState": "economy-system-governed"
+      }
+    },
+    {
+      "admin1Code": "19",
+      "regionName": "Lapland",
+      "regionSourceName": "Lapland",
+      "regionAsciiName": "Lapland",
+      "regionSourceRef": "geonames:830603",
+      "representativeLocality": {
+        "localityId": "dropi:locality:geonames:638936",
+        "sourceRef": "geonames:638936",
+        "sourceCountryCode": "FI",
+        "sourceAdmin1Code": "19",
+        "sourceScope": "admin1",
+        "name": "Rovaniemi",
+        "asciiName": "Rovaniemi",
+        "latitude": 66.49897,
+        "longitude": 25.68867,
+        "featureCode": "PPLA",
+        "populationSourceValue": 65670,
+        "selectionBasis": "source-first-order-seat-role",
+        "presentationRole": "regional-representative-locality"
+      },
+      "economicEmergence": {
+        "authority": "shared-regional-national-multiplayer-economy",
+        "personalPlayerProgressionUnlock": false,
+        "numericThresholdsDefined": false,
+        "presentationState": "economy-system-governed"
+      }
+    },
+    {
+      "admin1Code": "21",
+      "regionName": "Åland",
+      "regionSourceName": "Åland",
+      "regionAsciiName": "Aland",
+      "regionSourceRef": "https://stat.fi/en/luokitukset/maakunta/maakunta_1_20260101",
+      "representativeLocality": {
+        "localityId": "dropi:locality:geonames:3041732",
+        "sourceRef": "geonames:3041732",
+        "sourceCountryCode": "AX",
+        "sourceAdmin1Code": "211",
+        "sourceScope": "country",
+        "name": "Mariehamn",
+        "asciiName": "Mariehamn",
+        "latitude": 60.09726,
+        "longitude": 19.93481,
+        "featureCode": "PPLC",
+        "populationSourceValue": 10682,
+        "selectionBasis": "source-first-order-seat-role",
+        "presentationRole": "autonomous-region-capital-and-regional-node"
+      },
+      "economicEmergence": {
+        "authority": "shared-regional-national-multiplayer-economy",
+        "personalPlayerProgressionUnlock": false,
+        "numericThresholdsDefined": false,
+        "presentationState": "economy-system-governed"
+      }
+    }
+  ]
+}
