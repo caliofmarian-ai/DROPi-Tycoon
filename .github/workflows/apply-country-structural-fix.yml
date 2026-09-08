@@ -39,7 +39,7 @@ jobs:
                   name = str((geometry.get('properties') or {}).get('name') or '').strip()
                   missing.append({'index': index, 'name': name, 'sourceId': raw})
           print('MISSING_SOURCE_IDS=' + json.dumps(missing, ensure_ascii=False, sort_keys=True))
-          print('MISSING_SOURCE_ID_COUNT=' + str(len(missing)))
+          assert [item['name'] for item in missing] == ['N. Cyprus', 'Somaliland', 'Kosovo']
           PY
       - name: Patch runtime scene and regression tests
         run: |
@@ -67,7 +67,7 @@ jobs:
               raise SystemExit('runtime test locality anchor missing')
           text = text.replace(old, new, 1)
           old = "    expect(ireland.find(node => node.role === 'capital')?.name).toBe('Dublin')\n"
-          new = "    expect(ireland.find(node => node.role === 'capital')?.name).toBe('Dublin')\n    expect(unitedKingdom.find(node => node.role === 'capital')?.name).toBe('London')\n    expect(unitedKingdom.some(node => node.name === 'Hamilton')).toBe(false)\n    expect(kosovo.find(node => node.role === 'capital')?.name).toBe('Pristina')\n    expect(localityCatalog.geometryIdentity?.byRenderedName.Kosovo).toBe('XKX')\n    expect(localityCatalog.countries.None).toBeUndefined()\n"
+          new = "    expect(ireland.find(node => node.role === 'capital')?.name).toBe('Dublin')\n    expect(unitedKingdom.find(node => node.role === 'capital')?.name).toBe('London')\n    expect(unitedKingdom.some(node => node.name === 'Hamilton')).toBe(false)\n    expect(kosovo.find(node => node.role === 'capital')?.name).toBe('Pristina')\n    expect(localityCatalog.geometryIdentity?.byRenderedName['N. Cyprus']).toBe('XNC')\n    expect(localityCatalog.geometryIdentity?.byRenderedName.Somaliland).toBe('XSL')\n    expect(localityCatalog.geometryIdentity?.byRenderedName.Kosovo).toBe('XKX')\n    expect(localityCatalog.countries.None).toBeUndefined()\n"
           if old not in text:
               raise SystemExit('runtime test capital anchor missing')
           text = text.replace(old, new, 1)
@@ -77,7 +77,7 @@ jobs:
               raise SystemExit('runtime decode anchor missing')
           text = text.replace(old, new, 1)
           old = "    expect(names.has('Romania')).toBe(true)\n"
-          new = "    expect(names.has('Romania')).toBe(true)\n    expect(countries.find(country => country.name === 'Kosovo')?.id).toBe('XKX')\n    expect(countries.every(country => !country.id.startsWith('unresolved:'))).toBe(true)\n"
+          new = "    expect(names.has('Romania')).toBe(true)\n    expect(countries.find(country => country.name === 'N. Cyprus')?.id).toBe('XNC')\n    expect(countries.find(country => country.name === 'Somaliland')?.id).toBe('XSL')\n    expect(countries.find(country => country.name === 'Kosovo')?.id).toBe('XKX')\n    expect(countries.every(country => !country.id.startsWith('unresolved:'))).toBe(true)\n"
           if old not in text:
               raise SystemExit('runtime names anchor missing')
           test.write_text(text.replace(old, new, 1))
