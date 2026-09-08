@@ -1,0 +1,282 @@
+import json
+import textwrap
+from pathlib import Path
+
+
+def read_json(path):
+    return json.loads(Path(path).read_text())
+
+
+def write_json(path, value):
+    Path(path).write_text(json.dumps(value, ensure_ascii=False, indent=2) + "\n")
+
+
+def replace_one(path, old, new):
+    p = Path(path)
+    text = p.read_text()
+    count = text.count(old)
+    if count != 1:
+        raise RuntimeError(f"{path}: expected one occurrence of {old!r}, found {count}")
+    p.write_text(text.replace(old, new, 1))
+
+
+role_path = "04_World/Country_Catalog/COUNTRY_LOCALITY_ROLE_OVERRIDES.json"
+role = read_json(role_path)
+if role["version"] != "1.2.0":
+    raise RuntimeError(f"unexpected role override version {role['version']!r}")
+role["version"] = "1.3.0"
+role["entries"]["834"] = {
+    "issue": 461,
+    "country": "Tanzania",
+    "currentCapital": {"sourceNames": ["Dodoma"], "displayName": "Dodoma"},
+    "requiredRepresentatives": [
+        {"sourceNames": ["Dar es Salaam"], "displayName": "Dar es Salaam", "role": "urban"}
+    ],
+}
+write_json(role_path, role)
+
+review_path = "04_World/Country_Catalog/COUNTRY_REVIEW_REGISTRY.json"
+review = read_json(review_path)
+if review["version"] != "1.5.0":
+    raise RuntimeError(f"unexpected review registry version {review['version']!r}")
+review["version"] = "1.6.0"
+review["reviews"]["834"] = {
+    "issue": 461,
+    "reason": "Dodoma capital override implemented; Dar es Salaam retained as commercial capital / major seaport; owner Android Country Layer acceptance pending",
+}
+write_json(review_path, review)
+
+semantic_path = "game-web/public/data/country-semantic-metadata-v1.json"
+semantic = read_json(semantic_path)
+if semantic["version"] != "1.3.0":
+    raise RuntimeError(f"unexpected semantic metadata version {semantic['version']!r}")
+semantic["version"] = "1.4.0"
+semantic["sources"]["tanzania-dodoma-capital-act"] = {
+    "publisher": "Office of the Attorney General, United Republic of Tanzania",
+    "title": "The Dodoma Capital City (Declaration) Act, 2018",
+    "url": "https://oagmis.oag.go.tz/portal/acts/52",
+    "publishedOn": "2018-09-25",
+    "accessedOn": "2026-09-08",
+    "note": "Act No. 5 of 2018 declares Dodoma the Capital City of the United Republic of Tanzania and records the national decision to establish the capital at Dodoma.",
+}
+semantic["sources"]["tanzania-government-country-profile"] = {
+    "publisher": "Permanent Mission of the United Republic of Tanzania to the United Nations",
+    "title": "About Tanzania",
+    "url": "https://www.un.tzembassy.go.tz/tanzania/about-tanzania",
+    "accessedOn": "2026-09-08",
+    "note": "The official Tanzania profile identifies Dodoma as the capital city and Dar es Salaam as the commercial capital and major seaport for Tanzania Mainland.",
+}
+semantic["entries"]["834"] = {
+    "issue": 461,
+    "renderedName": "Tanzania",
+    "statusLabel": "National and commercial capital roles",
+    "statusSummary": "Dodoma is Tanzania’s national capital. Dar es Salaam remains the commercial capital and major seaport for Tanzania Mainland, so DROPi retains it as a major strategic city without presenting it as the national capital.",
+    "placeRoles": [
+        {"locality": "Dodoma", "role": "national-capital", "label": "National capital"},
+        {
+            "locality": "Dar es Salaam",
+            "role": "commercial-capital-major-seaport",
+            "label": "Commercial capital / major seaport",
+        },
+    ],
+    "sourceRefs": ["tanzania-dodoma-capital-act", "tanzania-government-country-profile"],
+}
+write_json(semantic_path, semantic)
+
+generator = "scripts/build_country_locality_catalog.py"
+replace_one(
+    generator,
+    "assert capital('710') == 'Pretoria'\n",
+    "assert capital('710') == 'Pretoria'\nassert capital('834') == 'Dodoma'\n",
+)
+replace_one(
+    generator,
+    "assert node('710', 'Johannesburg') and node('710', 'Johannesburg')['role'] != 'capital'\n",
+    "assert node('710', 'Johannesburg') and node('710', 'Johannesburg')['role'] != 'capital'\nassert node('834', 'Dar es Salaam') and node('834', 'Dar es Salaam')['role'] != 'capital'\n",
+)
+replace_one(generator, "'version': '1.5.0',", "'version': '1.6.0',")
+
+global_test = "game-web/tests/global-map-runtime.test.ts"
+replace_one(
+    global_test,
+    "expect(roleOverrideRegistry.version).toBe('1.2.0')",
+    "expect(roleOverrideRegistry.version).toBe('1.3.0')",
+)
+p = Path(global_test)
+text = p.read_text()
+old_ids = "['104', '144', '152', '226', '392', '710']"
+if text.count(old_ids) != 2:
+    raise RuntimeError(f"{global_test}: expected two override ID lists, found {text.count(old_ids)}")
+p.write_text(text.replace(old_ids, "['104', '144', '152', '226', '392', '710', '834']"))
+replace_one(
+    global_test,
+    "expect(localityCatalog.version).toBe('1.5.0')",
+    "expect(localityCatalog.version).toBe('1.6.0')",
+)
+replace_one(
+    global_test,
+    "expect(semanticCatalog.version).toBe('1.3.0')",
+    "expect(semanticCatalog.version).toBe('1.4.0')",
+)
+
+for path in [
+    "game-web/tests/country-locality-authoritative-supplements.test.ts",
+    "game-web/tests/south-africa-capital-semantics.test.ts",
+]:
+    replace_one(
+        path,
+        "expect(roleOverrideRegistry.version).toBe('1.2.0')",
+        "expect(roleOverrideRegistry.version).toBe('1.3.0')",
+    )
+    replace_one(
+        path,
+        "expect(localityCatalog.version).toBe('1.5.0')",
+        "expect(localityCatalog.version).toBe('1.6.0')",
+    )
+    replace_one(
+        path,
+        "expect(semanticCatalog.version).toBe('1.3.0')",
+        "expect(semanticCatalog.version).toBe('1.4.0')",
+    )
+
+tanzania_test = textwrap.dedent("""\
+import { readFileSync } from 'node:fs'
+import { describe, expect, it } from 'vitest'
+
+const roleOverrideRegistry = JSON.parse(readFileSync(
+  new URL('../../04_World/Country_Catalog/COUNTRY_LOCALITY_ROLE_OVERRIDES.json', import.meta.url),
+  'utf8',
+)) as {
+  version: string
+  entries: Record<string, {
+    issue: number
+    currentCapital: { sourceNames?: string[]; displayName: string }
+    requiredRepresentatives?: Array<{ sourceNames: string[]; displayName: string; role: string }>
+  }>
+}
+
+const localityCatalog = JSON.parse(readFileSync(
+  new URL('../public/data/country-representative-localities-v1.json', import.meta.url),
+  'utf8',
+)) as {
+  version: string
+  localityRoleOverrides?: { registryVersion: string; countryIds: string[] }
+  countries: Record<string, Array<{
+    name: string
+    role: string
+    longitude: number
+    latitude: number
+    sourceFeatureClass: string
+    sourceKind?: string
+  }>>
+}
+
+const semanticCatalog = JSON.parse(readFileSync(
+  new URL('../public/data/country-semantic-metadata-v1.json', import.meta.url),
+  'utf8',
+)) as {
+  version: string
+  sources: Record<string, { publisher: string; url: string; note: string }>
+  entries: Record<string, {
+    issue: number
+    statusLabel: string
+    statusSummary: string
+    placeRoles: Array<{ locality: string; role: string; label: string }>
+    sourceRefs: string[]
+  }>
+}
+
+const labelFor = (locality: string) =>
+  semanticCatalog.entries['834']?.placeRoles.find(role => role.locality === locality)?.label
+
+describe('Tanzania Dodoma capital semantics #461', () => {
+  it('governs Dodoma and retains Dar es Salaam without embedding coordinates', () => {
+    const override = roleOverrideRegistry.entries['834']
+
+    expect(roleOverrideRegistry.version).toBe('1.3.0')
+    expect(override.issue).toBe(461)
+    expect(override.currentCapital).toEqual({ sourceNames: ['Dodoma'], displayName: 'Dodoma' })
+    expect(override.requiredRepresentatives).toEqual([
+      { sourceNames: ['Dar es Salaam'], displayName: 'Dar es Salaam', role: 'urban' },
+    ])
+    expect(JSON.stringify(override)).not.toContain('longitude')
+    expect(JSON.stringify(override)).not.toContain('latitude')
+  })
+
+  it('materializes Dodoma as the single structural capital and keeps Dar es Salaam source-backed', () => {
+    const nodes = localityCatalog.countries['834'] ?? []
+    const dodoma = nodes.find(node => node.name === 'Dodoma')
+    const dar = nodes.find(node => node.name === 'Dar es Salaam')
+
+    expect(localityCatalog.version).toBe('1.6.0')
+    expect(localityCatalog.localityRoleOverrides?.registryVersion).toBe('1.3.0')
+    expect(localityCatalog.localityRoleOverrides?.countryIds).toContain('834')
+    expect(nodes.length).toBeLessThanOrEqual(9)
+    expect(nodes.filter(node => node.role === 'capital')).toHaveLength(1)
+    expect(dodoma?.role).toBe('capital')
+    expect(dar).toBeDefined()
+    expect(dar?.role).not.toBe('capital')
+    for (const node of [dodoma, dar]) {
+      expect(node).toBeDefined()
+      expect(Number.isFinite(node?.longitude)).toBe(true)
+      expect(Number.isFinite(node?.latitude)).toBe(true)
+      expect(node?.sourceFeatureClass.length).toBeGreaterThan(0)
+      expect(node?.sourceKind).toBeUndefined()
+    }
+  })
+
+  it('exposes official national and commercial-capital semantics', () => {
+    const entry = semanticCatalog.entries['834']
+    const act = semanticCatalog.sources['tanzania-dodoma-capital-act']
+    const profile = semanticCatalog.sources['tanzania-government-country-profile']
+
+    expect(semanticCatalog.version).toBe('1.4.0')
+    expect(entry.issue).toBe(461)
+    expect(entry.statusLabel).toBe('National and commercial capital roles')
+    expect(entry.statusSummary).toContain('Dodoma')
+    expect(entry.statusSummary).toContain('Dar es Salaam')
+    expect(labelFor('Dodoma')).toBe('National capital')
+    expect(labelFor('Dar es Salaam')).toBe('Commercial capital / major seaport')
+    expect(entry.sourceRefs).toEqual(['tanzania-dodoma-capital-act', 'tanzania-government-country-profile'])
+    expect(act.publisher).toContain('Attorney General')
+    expect(act.url).toBe('https://oagmis.oag.go.tz/portal/acts/52')
+    expect(profile.url).toBe('https://www.un.tzembassy.go.tz/tanzania/about-tanzania')
+    expect(profile.note).toContain('commercial capital and major seaport')
+  })
+})
+""")
+Path("game-web/tests/tanzania-capital-semantics.test.ts").write_text(tanzania_test)
+
+dataset = "04_World/COUNTRY_LAYER_LOCALITY_DATASET.md"
+sa_line = "- South Africa (`710`): Pretoria receives the structural capital slot while source-backed Cape Town, Bloemfontein and Johannesburg are all retained as required representative nodes. Semantic metadata exposes Pretoria as administrative capital, Cape Town as legislative capital, Bloemfontein as judicial capital and Johannesburg as a major city hosting the Constitutional Court (#460)."
+replace_one(
+    dataset,
+    sa_line,
+    sa_line
+    + "\n- Tanzania (`834`): Dodoma receives the structural national-capital slot while source-backed Dar es Salaam is retained as the commercial capital / major seaport. The correction changes locality roles only and does not activate or alter logistics/economy simulation (#461).",
+)
+replace_one(
+    dataset,
+    "Dataset v1.5.0 provides representative nodes",
+    "Dataset v1.6.0 provides representative nodes",
+)
+
+semantic_doc = "04_World/Country_Catalog/COUNTRY_SEMANTIC_METADATA.md"
+replace_one(
+    semantic_doc,
+    "Coordinates: #418 #459 #460 #464 #465 #466 #473 #478 #481 #482",
+    "Coordinates: #418 #459 #460 #461 #464 #465 #466 #473 #478 #481 #482",
+)
+anchor = "Johannesburg must never be described as South Africa's sole national capital simply because Natural Earth marks it with a capital-class feature. Likewise, Cape Town and Bloemfontein must not disappear from the sparse Country Layer merely because only one structural `capital` slot exists.\n\n## Role-override registry contract"
+replacement = """Johannesburg must never be described as South Africa's sole national capital simply because Natural Earth marks it with a capital-class feature. Likewise, Cape Town and Bloemfontein must not disappear from the sparse Country Layer merely because only one structural `capital` slot exists.
+
+### Tanzania (`834`) — #461
+
+The Dodoma Capital City (Declaration) Act, 2018 establishes Dodoma as the Capital City of the United Republic of Tanzania. Tanzania's official diplomatic country profile likewise identifies Dodoma as the capital city while describing Dar es Salaam as the commercial capital and major seaport for Tanzania Mainland.
+
+Both localities resolve uniquely in the pinned Natural Earth source. The governed override therefore assigns Dodoma the structural `capital` slot and forces Dar es Salaam to remain in the <=9 sparse representative-node budget without adding or moving coordinates. Player-facing semantic metadata labels Dodoma `National capital` and Dar es Salaam `Commercial capital / major seaport`.
+
+This correction is geographic/semantic only. It must not be interpreted as activating, relocating or otherwise changing DROPi logistics, port, route or economy simulation.
+
+## Role-override registry contract"""
+replace_one(semantic_doc, anchor, replacement)
