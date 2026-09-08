@@ -1,4 +1,5 @@
 import { readFileSync } from 'node:fs'
+import type { CountryLocalityCatalog } from '../src/world/countryLayerNodes'
 import { describe, expect, it } from 'vitest'
 import {
   countryAtMapPoint,
@@ -14,6 +15,10 @@ const topology = JSON.parse(readFileSync(
   new URL('../public/data/world-atlas-countries-110m.json', import.meta.url),
   'utf8',
 )) as WorldTopology
+const localityCatalog = JSON.parse(readFileSync(
+  new URL('../public/data/country-representative-localities-v1.json', import.meta.url),
+  'utf8',
+)) as CountryLocalityCatalog
 
 const configSource = readFileSync(new URL('../src/config/gameConfig.ts', import.meta.url), 'utf8')
 const worldSource = readFileSync(new URL('../src/scenes/GameWorldScene.ts', import.meta.url), 'utf8')
@@ -21,6 +26,18 @@ const hudSource = readFileSync(new URL('../src/ui/UrbanHUD.ts', import.meta.url)
 const mapSource = readFileSync(new URL('../src/scenes/GlobalMapScene.ts', import.meta.url), 'utf8')
 
 describe('Global Map runtime #418', () => {
+  it('materializes sparse real-world locality nodes for country drill-down', () => {
+    const romania = localityCatalog.countries['642'] ?? []
+    const ireland = localityCatalog.countries['372'] ?? []
+    expect(romania.find(node => node.role === 'capital')?.name).toMatch(/Bucharest|Bucuresti/)
+    expect(ireland.find(node => node.role === 'capital')?.name).toBe('Dublin')
+    expect(romania.length).toBeLessThanOrEqual(9)
+    expect(ireland.length).toBeLessThanOrEqual(9)
+    expect(Object.values(localityCatalog.countries).every(nodes => nodes.length <= 9)).toBe(true)
+    expect(localityCatalog.stats.countriesWithRepresentativeNodes).toBeGreaterThan(150)
+    expect(localityCatalog.source.upstreamCommit).toBe('ca96624a56bd078437bca8184e78163e5039ad19')
+  })
+
   it('loads the pinned local country topology as real selectable geography', () => {
     const countries = decodeWorldTopology(topology, 1440, 720)
     const names = new Set(countries.map(country => country.name))
@@ -83,5 +100,9 @@ describe('Global Map runtime #418', () => {
     expect(mapSource).toContain('No player, cargo or company state is moved by map inspection.')
     expect(mapSource).not.toContain('player.x =')
     expect(mapSource).not.toContain('player.y =')
+    expect(mapSource).toContain('repaintCountryLocalities')
+    expect(mapSource).toContain('selectedLocality')
+    expect(mapSource).not.toContain('GeometryOnly')
+    expect(mapSource).not.toContain('NotActivated')
   })
 })
