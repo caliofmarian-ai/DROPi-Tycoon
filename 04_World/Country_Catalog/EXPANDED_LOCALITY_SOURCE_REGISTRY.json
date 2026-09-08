@@ -1,0 +1,119 @@
+{
+  "version": "1.0.0",
+  "issue": 502,
+  "reviewedOn": "2026-09-08",
+  "purpose": "Govern the source and licensing contract for the expanded Country/Region locality LOD without replacing the existing Natural Earth sparse Global LOD anchors.",
+  "selectedSourceId": "geonames-cities500",
+  "sources": {
+    "geonames-cities500": {
+      "publisher": "GeoNames",
+      "dataset": "cities500.zip",
+      "url": "https://download.geonames.org/export/dump/cities500.zip",
+      "documentationUrl": "https://www.geonames.org/export/",
+      "readmeUrl": "https://download.geonames.org/export/dump/readme.txt",
+      "license": "Creative Commons Attribution 4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by/4.0/",
+      "commercialUseAllowed": true,
+      "attributionRequired": true,
+      "attributionText": "GeoNames",
+      "selectionRule": "Cities with population greater than 500 or seats of administrative divisions down to PPLA4, as defined by the GeoNames dump readme.",
+      "sourceIdentityField": "geonameid",
+      "coordinateReference": "WGS84 decimal degrees",
+      "fieldsUsed": [
+        "geonameid",
+        "name",
+        "asciiname",
+        "latitude",
+        "longitude",
+        "feature class",
+        "feature code",
+        "country code",
+        "admin1 code",
+        "admin2 code",
+        "admin3 code",
+        "admin4 code",
+        "population",
+        "timezone",
+        "modification date"
+      ]
+    },
+    "geonames-admin1-codes-ascii": {
+      "publisher": "GeoNames",
+      "dataset": "admin1CodesASCII.txt",
+      "url": "https://download.geonames.org/export/dump/admin1CodesASCII.txt",
+      "license": "Creative Commons Attribution 4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by/4.0/",
+      "attributionRequired": true,
+      "purpose": "Resolve GeoNames first-order administrative codes to display names and source geoname IDs."
+    },
+    "natural-earth-sparse-anchors": {
+      "publisher": "Natural Earth",
+      "dataset": "1:10m populated places simple (pinned project snapshot)",
+      "upstreamCommit": "ca96624a56bd078437bca8184e78163e5039ad19",
+      "license": "Public domain",
+      "termsUrl": "https://www.naturalearthdata.com/about/terms-of-use/",
+      "role": "Existing Global LOD sparse anchors remain authoritative and are not replaced by this source selection."
+    }
+  },
+  "observedSnapshot": {
+    "observedOn": "2026-09-08",
+    "cities500": {
+      "sha256": "f3cda4f9d256d90045121fb8eebad3ed91695c32370ed93b50fbe0cb616e2bbd",
+      "bytes": 13602522,
+      "httpLastModified": "2026-09-08T01:54:33+00:00",
+      "innerFile": "cities500.txt",
+      "records": 235694,
+      "uniqueGeonameIds": 235694,
+      "countriesOrTerritoriesWithRecords": 246,
+      "recordsWithAdmin1Code": 235577,
+      "recordsWithPositivePopulation": 205080,
+      "sampleCountryRecordCounts": {
+        "RU": 5323,
+        "CA": 3296,
+        "AU": 4901,
+        "BR": 5897,
+        "US": 21784,
+        "IN": 7112,
+        "DE": 11920,
+        "RO": 7149,
+        "IE": 566
+      },
+      "topFeatureCodes": {
+        "PPL": 139343,
+        "PPLA3": 30529,
+        "PPLA4": 27343,
+        "PPLA2": 23373,
+        "PPLX": 10542,
+        "PPLA": 3463,
+        "PPLL": 599,
+        "PPLC": 241,
+        "STLMT": 48,
+        "PPLF": 47,
+        "PPLS": 45,
+        "PPLQ": 41
+      }
+    },
+    "admin1CodesASCII": {
+      "sha256": "590651498043f674accda2b7f46d21286cda0e290b02f8561c5005eee9a5448c",
+      "bytes": 151536,
+      "httpLastModified": "2026-09-08T01:54:33+00:00",
+      "records": 3865
+    },
+    "readme": {
+      "sha256": "b1957379b6c1242c700c98ac9a8aa0a09f56c3c0a50ee72175527005f48ef2c5",
+      "bytes": 8843,
+      "httpLastModified": "2026-09-08T01:45:28+00:00"
+    }
+  },
+  "governance": {
+    "rawUpstreamArchiveCommittedInThisSlice": false,
+    "rawSnapshotRetentionRequiredBeforeProductionCatalogMerge": true,
+    "sourceRefreshMustBeExplicitVersionedChange": true,
+    "sourceCountryCodeIsMetadataNotSovereigntyAssertion": true,
+    "dropiGeometryOwnershipMustBeResolvedAndAuditedSeparately": true,
+    "specialStatusSemanticsRemainAuthoritative": true,
+    "currentSparseCatalogRemainsGlobalLod": true,
+    "noInventedLocalities": true,
+    "boundedAndroidRenderObjects": true
+  }
+}
