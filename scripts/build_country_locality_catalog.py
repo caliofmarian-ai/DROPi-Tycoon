@@ -1,4 +1,4 @@
-import json, math, pathlib, urllib.request, unicodedata
+import json, math, pathlib, re, urllib.request, unicodedata
 import pycountry
 
 from country_geometry_identity import load_geometry_id_registry, topology_names
@@ -16,6 +16,31 @@ W, H = 1440.0, 720.0
 def norm(v):
     v = unicodedata.normalize('NFKD', str(v or ''))
     return ''.join(ch for ch in v.lower() if not unicodedata.combining(ch) and ch.isalnum())
+
+
+def parse_dms_coordinate_text(value):
+    text = str(value or '').strip()
+    matches = re.findall(r'(\d{1,3})°(\d{1,2})[′\'](\d{1,2}(?:\.\d+)?)[″\"]([NSEW])', text)
+    if len(matches) != 2:
+        raise ValueError(f'expected latitude/longitude DMS pair, got {text!r}')
+
+    latitude = None
+    longitude = None
+    for degrees, minutes, seconds, hemisphere in matches:
+        decimal = float(degrees) + float(minutes) / 60.0 + float(seconds) / 3600.0
+        if hemisphere in {'S', 'W'}:
+            decimal *= -1
+        if hemisphere in {'N', 'S'}:
+            if latitude is not None:
+                raise ValueError(f'duplicate latitude in {text!r}')
+            latitude = decimal
+        else:
+            if longitude is not None:
+                raise ValueError(f'duplicate longitude in {text!r}')
+            longitude = decimal
+    if latitude is None or longitude is None:
+        raise ValueError(f'coordinate text must contain one latitude and one longitude: {text!r}')
+    return longitude, latitude
 
 
 with urllib.request.urlopen(SRC_URL, timeout=60) as r:
@@ -109,10 +134,17 @@ def authoritative_supplement(ref, country_id_value):
         raise RuntimeError(f'{country_id_value}: supplement {ref!r} targets countryId {entry.get("countryId")!r}')
     source_ref = str(entry.get('sourceRef') or '')
     source_meta = supplement_sources.get(source_ref)
-    if not source_meta or not str(source_meta.get('url') or '').startswith('https://'):
+    if (
+        not source_meta
+        or not str(source_meta.get('publisher') or '').strip()
+        or not str(source_meta.get('url') or '').startswith('https://')
+    ):
         raise RuntimeError(f'{country_id_value}: supplement {ref!r} has invalid institutional source {source_ref!r}')
-    if not entry.get('sourceCoordinateText') or not entry.get('issue'):
+    source_coordinate_text = str(entry.get('sourceCoordinateText') or '').strip()
+    if not source_coordinate_text or not entry.get('issue'):
         raise RuntimeError(f'{country_id_value}: supplement {ref!r} lacks coordinate/review provenance')
+    if not str(entry.get('name') or '').strip():
+        raise RuntimeError(f'{country_id_value}: supplement {ref!r} lacks a canonical locality name')
     try:
         lon = float(entry['longitude'])
         lat = float(entry['latitude'])
@@ -120,6 +152,15 @@ def authoritative_supplement(ref, country_id_value):
         raise RuntimeError(f'{country_id_value}: supplement {ref!r} has invalid coordinates') from exc
     if not (-180 <= lon <= 180 and -90 <= lat <= 90):
         raise RuntimeError(f'{country_id_value}: supplement {ref!r} coordinates are out of range')
+    try:
+        source_lon, source_lat = parse_dms_coordinate_text(source_coordinate_text)
+    except ValueError as exc:
+        raise RuntimeError(f'{country_id_value}: supplement {ref!r} has invalid source coordinate text') from exc
+    if not math.isclose(lon, source_lon, rel_tol=0.0, abs_tol=1e-12) or not math.isclose(lat, source_lat, rel_tol=0.0, abs_tol=1e-12):
+        raise RuntimeError(
+            f'{country_id_value}: supplement {ref!r} decimal coordinates do not match '
+            f'the exact DMS conversion of {source_coordinate_text!r}'
+        )
     return {
         'name': str(entry.get('name') or '').strip(),
         'lon': lon,
@@ -133,7 +174,7 @@ def authoritative_supplement(ref, country_id_value):
         'sourceKind': 'authoritative-supplement',
         'supplementRef': ref,
         'sourceRef': source_ref,
-        'sourceCoordinateText': str(entry.get('sourceCoordinateText')),
+        'sourceCoordinateText': source_coordinate_text,
         'effectiveOn': str(entry.get('effectiveOn') or ''),
     }
 
@@ -309,6 +350,7 @@ assert node('144', 'Colombo') and node('144', 'Colombo')['role'] != 'capital'
 assert node('152', 'Valparaíso') and node('152', 'Valparaíso')['role'] != 'capital'
 assert node('226', 'Malabo') and node('226', 'Malabo')['role'] != 'capital'
 assert node('226', 'Ciudad de la Paz')['sourceKind'] == 'authoritative-supplement'
+assert node('226', 'Ciudad de la Paz')['effectiveOn'] == '2026-01-02'
 assert all(n['name'] != 'Hamilton' for n in countries.get('826', []))
 assert all(len(v) <= 9 for v in countries.values())
 ireland_n = next((n for n in countries['372'] if n['role'] == 'urban' and n['sector'] == 'N'), None)
