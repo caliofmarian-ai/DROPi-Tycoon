@@ -1,0 +1,80 @@
+{
+  "version": "1.0.0",
+  "issue": 524,
+  "continent": "Europe",
+  "country": {
+    "geometryId": "100",
+    "sourceCountryCode": "BG",
+    "renderedName": "Bulgaria"
+  },
+  "administrativeModel": {
+    "level": "first-order",
+    "nativeTermSingular": "област",
+    "nativeTermPlural": "области",
+    "englishTerm": "administrative district",
+    "unitCount": 28,
+    "officialReferences": [
+      "https://www.nsi.bg/en/press-release/administrative-territorial-and-territorial-division-of-the-republic-of-bulgaria-9010",
+      "https://www.nsi.bg/en/statistical-data/46/1333"
+    ],
+    "specialCases": [
+      {
+        "admin1Code": "58",
+        "type": "administrative-centre-outside-source-ownership",
+        "label": "Sofia district administrative-centre exception",
+        "note": "The city of Sofia is the official administrative centre of both Sofia-Capital district and Sofia district. GeoNames source-owns Sofia under BG.42 Sofia-Capital, so DROPi keeps Sofia there as the unique national-capital locality and uses a separate source-backed inside-district representative for BG.58 without relabeling that representative as the district capital."
+      }
+    ]
+  },
+  "source": {
+    "provider": "GeoNames",
+    "license": "Creative Commons Attribution 4.0",
+    "releaseTag": "source-geonames-cities500-2026-09-08-f3cda4f9",
+    "cities500Sha256": "f3cda4f9d256d90045121fb8eebad3ed91695c32370ed93b50fbe0cb616e2bbd",
+    "admin1Sha256": "590651498043f674accda2b7f46d21286cda0e290b02f8561c5005eee9a5448c",
+    "expectedCountryCandidateCount": 333
+  },
+  "selectionPolicy": {
+    "primaryFeatureCodes": ["PPLC", "PPLA"],
+    "fallbackFeatureCodes": ["PPL", "PPLA2"],
+    "expectedPrimarySelections": 27,
+    "expectedFallbackSelections": 1,
+    "highDensityGameplayImport": false,
+    "hardcodedCoordinates": false
+  },
+  "economicEmergence": {
+    "authority": "shared-regional-national-multiplayer-economy",
+    "personalPlayerProgressionUnlock": false,
+    "numericThresholdsDefined": false
+  },
+  "expectedRegions": [
+    {"admin1Code": "38", "canonicalName": "Blagoevgrad", "sourceName": "Blagoevgrad"},
+    {"admin1Code": "39", "canonicalName": "Burgas", "sourceName": "Burgas"},
+    {"admin1Code": "40", "canonicalName": "Dobrich", "sourceName": "Dobrich"},
+    {"admin1Code": "41", "canonicalName": "Gabrovo", "sourceName": "Gabrovo"},
+    {"admin1Code": "42", "canonicalName": "Sofia-Capital", "sourceName": "Sofia-Capital"},
+    {"admin1Code": "43", "canonicalName": "Haskovo", "sourceName": "Haskovo"},
+    {"admin1Code": "44", "canonicalName": "Kardzhali", "sourceName": "Kardzhali"},
+    {"admin1Code": "45", "canonicalName": "Kyustendil", "sourceName": "Kyustendil"},
+    {"admin1Code": "46", "canonicalName": "Lovech", "sourceName": "Lovech"},
+    {"admin1Code": "47", "canonicalName": "Montana", "sourceName": "Montana"},
+    {"admin1Code": "48", "canonicalName": "Pazardzhik", "sourceName": "Pazardzhik"},
+    {"admin1Code": "49", "canonicalName": "Pernik", "sourceName": "Pernik"},
+    {"admin1Code": "50", "canonicalName": "Pleven", "sourceName": "Pleven"},
+    {"admin1Code": "51", "canonicalName": "Plovdiv", "sourceName": "Plovdiv"},
+    {"admin1Code": "52", "canonicalName": "Razgrad", "sourceName": "Razgrad"},
+    {"admin1Code": "53", "canonicalName": "Ruse", "sourceName": "Ruse"},
+    {"admin1Code": "54", "canonicalName": "Shumen", "sourceName": "Shumen"},
+    {"admin1Code": "55", "canonicalName": "Silistra", "sourceName": "Silistra"},
+    {"admin1Code": "56", "canonicalName": "Sliven", "sourceName": "Sliven"},
+    {"admin1Code": "57", "canonicalName": "Smolyan", "sourceName": "Smolyan"},
+    {"admin1Code": "58", "canonicalName": "Sofia", "sourceName": "Sofia"},
+    {"admin1Code": "59", "canonicalName": "Stara Zagora", "sourceName": "Stara Zagora"},
+    {"admin1Code": "60", "canonicalName": "Targovishte", "sourceName": "Targovishte"},
+    {"admin1Code": "61", "canonicalName": "Varna", "sourceName": "Varna"},
+    {"admin1Code": "62", "canonicalName": "Veliko Tarnovo", "sourceName": "Veliko Tarnovo"},
+    {"admin1Code": "63", "canonicalName": "Vidin", "sourceName": "Vidin"},
+    {"admin1Code": "64", "canonicalName": "Vratsa", "sourceName": "Vratsa"},
+    {"admin1Code": "65", "canonicalName": "Yambol", "sourceName": "Yambol"}
+  ]
+}
