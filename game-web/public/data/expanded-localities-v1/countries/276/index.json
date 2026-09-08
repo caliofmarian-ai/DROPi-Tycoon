@@ -1,0 +1,372 @@
+{
+  "version": "1.0.0",
+  "issue": 502,
+  "coverageMode": "pilot",
+  "geometryId": "276",
+  "renderedName": "Germany",
+  "countryCode": "DE",
+  "recordCount": 11920,
+  "admin1PartitionCount": 16,
+  "bounds": {
+    "west": 5.92978,
+    "south": 47.40724,
+    "east": 14.98853,
+    "north": 55.01917,
+    "wrapsAntimeridian": false
+  },
+  "partitions": [
+    {
+      "admin1Code": "01",
+      "admin1Name": "Baden-Wurttemberg",
+      "admin1SourceRef": "geonames:2953481",
+      "recordCount": 1113,
+      "bestImportanceTier": 1,
+      "maxPopulation": 612663,
+      "bounds": {
+        "west": 7.55756,
+        "south": 47.55,
+        "east": 10.40028,
+        "north": 49.759,
+        "wrapsAntimeridian": false
+      },
+      "file": "admin1/01.json"
+    },
+    {
+      "admin1Code": "02",
+      "admin1Name": "Bavaria",
+      "admin1SourceRef": "geonames:2951839",
+      "recordCount": 2031,
+      "bestImportanceTier": 1,
+      "maxPopulation": 1505005,
+      "bounds": {
+        "west": 9.00553,
+        "south": 47.40724,
+        "east": 13.79333,
+        "north": 50.52054,
+        "wrapsAntimeridian": false
+      },
+      "file": "admin1/02.json"
+    },
+    {
+      "admin1Code": "03",
+      "admin1Name": "Bremen",
+      "admin1SourceRef": "geonames:2944387",
+      "recordCount": 4,
+      "bestImportanceTier": 1,
+      "maxPopulation": 546501,
+      "bounds": {
+        "west": 8.57553,
+        "south": 53.07582,
+        "east": 8.80717,
+        "north": 53.55357,
+        "wrapsAntimeridian": false
+      },
+      "file": "admin1/03.json"
+    },
+    {
+      "admin1Code": "04",
+      "admin1Name": "Hamburg",
+      "admin1SourceRef": "geonames:2911297",
+      "recordCount": 82,
+      "bestImportanceTier": 1,
+      "maxPopulation": 1973896,
+      "bounds": {
+        "west": 9.75708,
+        "south": 53.41972,
+        "east": 10.22904,
+        "north": 53.70806,
+        "wrapsAntimeridian": false
+      },
+      "file": "admin1/04.json"
+    },
+    {
+      "admin1Code": "05",
+      "admin1Name": "Hesse",
+      "admin1SourceRef": "geonames:2905330",
+      "recordCount": 441,
+      "bestImportanceTier": 1,
+      "maxPopulation": 650000,
+      "bounds": {
+        "west": 7.86716,
+        "south": 49.40735,
+        "east": 10.17283,
+        "north": 51.64263,
+        "wrapsAntimeridian": false
+      },
+      "file": "admin1/05.json"
+    },
+    {
+      "admin1Code": "06",
+      "admin1Name": "Lower Saxony",
+      "admin1SourceRef": "geonames:2862926",
+      "recordCount": 1154,
+      "bestImportanceTier": 1,
+      "maxPopulation": 515140,
+      "bounds": {
+        "west": 6.69153,
+        "south": 51.41505,
+        "east": 11.56448,
+        "north": 53.86828,
+        "wrapsAntimeridian": false
+      },
+      "file": "admin1/06.json"
+    },
+    {
+      "admin1Code": "07",
+      "admin1Name": "North Rhine-Westphalia",
+      "admin1SourceRef": "geonames:2861876",
+      "recordCount": 579,
+      "bestImportanceTier": 1,
+      "maxPopulation": 1024621,
+      "bounds": {
+        "west": 5.92978,
+        "south": 50.38607,
+        "east": 9.38155,
+        "north": 52.43425,
+        "wrapsAntimeridian": false
+      },
+      "file": "admin1/07.json"
+    },
+    {
+      "admin1Code": "08",
+      "admin1Name": "Rheinland-Pfalz",
+      "admin1SourceRef": "geonames:2847618",
+      "recordCount": 2250,
+      "bestImportanceTier": 1,
+      "maxPopulation": 222889,
+      "bounds": {
+        "west": 6.13333,
+        "south": 48.98117,
+        "east": 8.49472,
+        "north": 50.90377,
+        "wrapsAntimeridian": false
+      },
+      "file": "admin1/08.json"
+    },
+    {
+      "admin1Code": "09",
+      "admin1Name": "Saarland",
+      "admin1SourceRef": "geonames:2842635",
+      "recordCount": 68,
+      "bestImportanceTier": 1,
+      "maxPopulation": 182971,
+      "bounds": {
+        "west": 6.38134,
+        "south": 49.15,
+        "east": 7.33867,
+        "north": 49.60762,
+        "wrapsAntimeridian": false
+      },
+      "file": "admin1/09.json"
+    },
+    {
+      "admin1Code": "10",
+      "admin1Name": "Schleswig-Holstein",
+      "admin1SourceRef": "geonames:2838632",
+      "recordCount": 1112,
+      "bestImportanceTier": 1,
+      "maxPopulation": 252668,
+      "bounds": {
+        "west": 7.8863,
+        "south": 53.37199,
+        "east": 11.2,
+        "north": 55.01917,
+        "wrapsAntimeridian": false
+      },
+      "file": "admin1/10.json"
+    },
+    {
+      "admin1Code": "11",
+      "admin1Name": "Brandenburg",
+      "admin1SourceRef": "geonames:2945356",
+      "recordCount": 316,
+      "bestImportanceTier": 1,
+      "maxPopulation": 184754,
+      "bounds": {
+        "west": 11.47453,
+        "south": 51.37505,
+        "east": 14.7055,
+        "north": 53.40626,
+        "wrapsAntimeridian": false
+      },
+      "file": "admin1/11.json"
+    },
+    {
+      "admin1Code": "12",
+      "admin1Name": "Mecklenburg-Vorpommern",
+      "admin1SourceRef": "geonames:2872567",
+      "recordCount": 538,
+      "bestImportanceTier": 1,
+      "maxPopulation": 198293,
+      "bounds": {
+        "west": 10.65408,
+        "south": 53.1408,
+        "east": 14.3351,
+        "north": 54.63624,
+        "wrapsAntimeridian": false
+      },
+      "file": "admin1/12.json"
+    },
+    {
+      "admin1Code": "13",
+      "admin1Name": "Saxony",
+      "admin1SourceRef": "geonames:2842566",
+      "recordCount": 496,
+      "bestImportanceTier": 1,
+      "maxPopulation": 564904,
+      "bounds": {
+        "west": 11.92828,
+        "south": 50.21667,
+        "east": 14.98853,
+        "north": 51.64071,
+        "wrapsAntimeridian": false
+      },
+      "file": "admin1/13.json"
+    },
+    {
+      "admin1Code": "14",
+      "admin1Name": "Saxony-Anhalt",
+      "admin1SourceRef": "geonames:2842565",
+      "recordCount": 719,
+      "bestImportanceTier": 1,
+      "maxPopulation": 244329,
+      "bounds": {
+        "west": 10.59867,
+        "south": 50.97739,
+        "east": 13.12756,
+        "north": 52.93989,
+        "wrapsAntimeridian": false
+      },
+      "file": "admin1/14.json"
+    },
+    {
+      "admin1Code": "15",
+      "admin1Name": "Thuringia",
+      "admin1SourceRef": "geonames:2822542",
+      "recordCount": 918,
+      "bestImportanceTier": 1,
+      "maxPopulation": 218793,
+      "bounds": {
+        "west": 9.94776,
+        "south": 50.25,
+        "east": 12.62883,
+        "north": 51.58656,
+        "wrapsAntimeridian": false
+      },
+      "file": "admin1/15.json"
+    },
+    {
+      "admin1Code": "16",
+      "admin1Name": "State of Berlin",
+      "admin1SourceRef": "geonames:2950157",
+      "recordCount": 99,
+      "bestImportanceTier": 0,
+      "maxPopulation": 3426354,
+      "bounds": {
+        "west": 13.14445,
+        "south": 52.37513,
+        "east": 13.68708,
+        "north": 52.6347,
+        "wrapsAntimeridian": false
+      },
+      "file": "admin1/16.json"
+    }
+  ],
+  "anchorReconciliation": {
+    "globalAnchorCount": 9,
+    "matchedCount": 9,
+    "unmatchedCount": 0,
+    "entries": [
+      {
+        "anchorName": "Berlin",
+        "anchorSector": "CAPITAL",
+        "anchorRole": "capital",
+        "status": "MATCHED",
+        "localityId": "dropi:locality:geonames:2950159",
+        "sourceRef": "geonames:2950159",
+        "distanceKm": 0.742,
+        "matchBasis": "primary-name"
+      },
+      {
+        "anchorName": "Hamburg",
+        "anchorSector": "N",
+        "anchorRole": "urban",
+        "status": "MATCHED",
+        "localityId": "dropi:locality:geonames:2911298",
+        "sourceRef": "geonames:2911298",
+        "distanceKm": 0.36,
+        "matchBasis": "primary-name"
+      },
+      {
+        "anchorName": "Dresden",
+        "anchorSector": "E",
+        "anchorRole": "urban",
+        "status": "MATCHED",
+        "localityId": "dropi:locality:geonames:2935022",
+        "sourceRef": "geonames:2935022",
+        "distanceKm": 0.823,
+        "matchBasis": "primary-name"
+      },
+      {
+        "anchorName": "Munich",
+        "anchorSector": "S",
+        "anchorRole": "urban",
+        "status": "MATCHED",
+        "localityId": "dropi:locality:geonames:2867714",
+        "sourceRef": "geonames:2867714",
+        "distanceKm": 0.642,
+        "matchBasis": "primary-name"
+      },
+      {
+        "anchorName": "Dusseldorf",
+        "anchorSector": "W",
+        "anchorRole": "urban",
+        "status": "MATCHED",
+        "localityId": "dropi:locality:geonames:2934246",
+        "sourceRef": "geonames:2934246",
+        "distanceKm": 0.317,
+        "matchBasis": "primary-name"
+      },
+      {
+        "anchorName": "Stralsund",
+        "anchorSector": "NE",
+        "anchorRole": "secondary",
+        "status": "MATCHED",
+        "localityId": "dropi:locality:geonames:2826287",
+        "sourceRef": "geonames:2826287",
+        "distanceKm": 1.527,
+        "matchBasis": "primary-name"
+      },
+      {
+        "anchorName": "Passau",
+        "anchorSector": "SE",
+        "anchorRole": "secondary",
+        "status": "MATCHED",
+        "localityId": "dropi:locality:geonames:2855328",
+        "sourceRef": "geonames:2855328",
+        "distanceKm": 1.237,
+        "matchBasis": "primary-name"
+      },
+      {
+        "anchorName": "Mainz",
+        "anchorSector": "SW",
+        "anchorRole": "secondary",
+        "status": "MATCHED",
+        "localityId": "dropi:locality:geonames:2874225",
+        "sourceRef": "geonames:2874225",
+        "distanceKm": 0.495,
+        "matchBasis": "primary-name"
+      },
+      {
+        "anchorName": "Emden",
+        "anchorSector": "NW",
+        "anchorRole": "secondary",
+        "status": "MATCHED",
+        "localityId": "dropi:locality:geonames:2930596",
+        "sourceRef": "geonames:2930596",
+        "distanceKm": 0.55,
+        "matchBasis": "primary-name"
+      }
+    ]
+  }
+}

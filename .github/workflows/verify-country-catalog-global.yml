@@ -7,7 +7,9 @@ on:
     paths:
       - '04_World/Country_Catalog/**'
       - 'game-web/public/data/world-atlas-countries-110m.json'
+      - 'game-web/public/data/expanded-localities-v1/**'
       - 'scripts/verify_country_catalog_chapters.py'
+      - 'scripts/verify_expanded_locality_catalog.py'
       - '.github/workflows/verify-country-catalog-global.yml'
   pull_request:
     branches:
@@ -15,7 +17,9 @@ on:
     paths:
       - '04_World/Country_Catalog/**'
       - 'game-web/public/data/world-atlas-countries-110m.json'
+      - 'game-web/public/data/expanded-localities-v1/**'
       - 'scripts/verify_country_catalog_chapters.py'
+      - 'scripts/verify_expanded_locality_catalog.py'
       - '.github/workflows/verify-country-catalog-global.yml'
 
 permissions:
@@ -26,8 +30,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Verify one-geometry/one-chapter Country Catalog accounting
+      - name: Verify Country Catalog and expanded locality accounting
         run: |
           set -euo pipefail
           python scripts/verify_country_catalog_chapters.py
+          python scripts/verify_expanded_locality_catalog.py
           git diff --check

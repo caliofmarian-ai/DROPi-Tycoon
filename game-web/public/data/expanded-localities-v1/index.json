@@ -1,0 +1,104 @@
+{
+  "version": "1.0.0",
+  "issue": 502,
+  "coverageMode": "pilot",
+  "purpose": "Country/Region LOD locality partitions generated deterministically from the retained GeoNames snapshot.",
+  "source": {
+    "registryVersion": "1.1.0",
+    "releaseTag": "source-geonames-cities500-2026-09-08-f3cda4f9",
+    "cities500Sha256": "f3cda4f9d256d90045121fb8eebad3ed91695c32370ed93b50fbe0cb616e2bbd",
+    "license": "Creative Commons Attribution 4.0",
+    "attributionText": "GeoNames"
+  },
+  "ownership": {
+    "model": "GeoNames ISO alpha-2 -> ISO numeric DROPi geometry for standard pilot countries",
+    "specialStatusProjectIdsIncluded": false,
+    "sourceCountryCodeIsMetadataNotSovereigntyAssertion": true
+  },
+  "globalLodAnchorCatalogVersion": "1.9.0",
+  "countryCount": 5,
+  "localityCount": 31337,
+  "matchedGlobalAnchorCount": 36,
+  "countries": [
+    {
+      "geometryId": "036",
+      "renderedName": "Australia",
+      "countryCode": "AU",
+      "recordCount": 4901,
+      "admin1PartitionCount": 8,
+      "bounds": {
+        "west": 113.53327,
+        "south": -43.31423,
+        "east": 153.61246,
+        "north": -10.58257,
+        "wrapsAntimeridian": false
+      },
+      "indexFile": "countries/036/index.json",
+      "matchedGlobalAnchors": 9
+    },
+    {
+      "geometryId": "076",
+      "renderedName": "Brazil",
+      "countryCode": "BR",
+      "recordCount": 5897,
+      "admin1PartitionCount": 27,
+      "bounds": {
+        "west": -72.89583,
+        "south": -33.69111,
+        "east": -32.4107,
+        "north": 4.59556,
+        "wrapsAntimeridian": false
+      },
+      "indexFile": "countries/076/index.json",
+      "matchedGlobalAnchors": 9
+    },
+    {
+      "geometryId": "124",
+      "renderedName": "Canada",
+      "countryCode": "CA",
+      "recordCount": 3296,
+      "admin1PartitionCount": 13,
+      "bounds": {
+        "west": -139.43328,
+        "south": 41.98339,
+        "east": -52.68134,
+        "north": 73.03752,
+        "wrapsAntimeridian": false
+      },
+      "indexFile": "countries/124/index.json",
+      "matchedGlobalAnchors": 4
+    },
+    {
+      "geometryId": "276",
+      "renderedName": "Germany",
+      "countryCode": "DE",
+      "recordCount": 11920,
+      "admin1PartitionCount": 16,
+      "bounds": {
+        "west": 5.92978,
+        "south": 47.40724,
+        "east": 14.98853,
+        "north": 55.01917,
+        "wrapsAntimeridian": false
+      },
+      "indexFile": "countries/276/index.json",
+      "matchedGlobalAnchors": 9
+    },
+    {
+      "geometryId": "643",
+      "renderedName": "Russia",
+      "countryCode": "RU",
+      "recordCount": 5323,
+      "admin1PartitionCount": 83,
+      "bounds": {
+        "west": 19.90929,
+        "south": 41.28413,
+        "east": -169.80979,
+        "north": 73.50819,
+        "wrapsAntimeridian": true
+      },
+      "indexFile": "countries/643/index.json",
+      "matchedGlobalAnchors": 5
+    }
+  ]
+}

@@ -1,0 +1,298 @@
+{
+  "version": "1.0.0",
+  "issue": 502,
+  "coverageMode": "pilot",
+  "geometryId": "124",
+  "renderedName": "Canada",
+  "countryCode": "CA",
+  "recordCount": 3296,
+  "admin1PartitionCount": 13,
+  "bounds": {
+    "west": -139.43328,
+    "south": 41.98339,
+    "east": -52.68134,
+    "north": 73.03752,
+    "wrapsAntimeridian": false
+  },
+  "partitions": [
+    {
+      "admin1Code": "01",
+      "admin1Name": "Alberta",
+      "admin1SourceRef": "geonames:5883102",
+      "recordCount": 582,
+      "bestImportanceTier": 1,
+      "maxPopulation": 1306784,
+      "bounds": {
+        "west": -119.55836,
+        "south": 49.19998,
+        "east": -110.02256,
+        "north": 58.72224,
+        "wrapsAntimeridian": false
+      },
+      "file": "admin1/01.json"
+    },
+    {
+      "admin1Code": "02",
+      "admin1Name": "British Columbia",
+      "admin1SourceRef": "geonames:5909050",
+      "recordCount": 551,
+      "bestImportanceTier": 1,
+      "maxPopulation": 662248,
+      "bounds": {
+        "west": -132.14707,
+        "south": 48.36639,
+        "east": -114.88532,
+        "north": 58.80533,
+        "wrapsAntimeridian": false
+      },
+      "file": "admin1/02.json"
+    },
+    {
+      "admin1Code": "03",
+      "admin1Name": "Manitoba",
+      "admin1SourceRef": "geonames:6065171",
+      "recordCount": 86,
+      "bestImportanceTier": 1,
+      "maxPopulation": 749607,
+      "bounds": {
+        "west": -101.87433,
+        "south": 49.10469,
+        "east": -94.09035,
+        "north": 58.76811,
+        "wrapsAntimeridian": false
+      },
+      "file": "admin1/03.json"
+    },
+    {
+      "admin1Code": "04",
+      "admin1Name": "New Brunswick",
+      "admin1SourceRef": "geonames:6087430",
+      "recordCount": 262,
+      "bestImportanceTier": 1,
+      "maxPopulation": 86106,
+      "bounds": {
+        "west": -68.64344,
+        "south": 44.6526,
+        "east": -64.07635,
+        "north": 48.06442,
+        "wrapsAntimeridian": false
+      },
+      "file": "admin1/04.json"
+    },
+    {
+      "admin1Code": "05",
+      "admin1Name": "Newfoundland and Labrador",
+      "admin1SourceRef": "geonames:6354959",
+      "recordCount": 173,
+      "bestImportanceTier": 1,
+      "maxPopulation": 110525,
+      "bounds": {
+        "west": -66.91137,
+        "south": 46.91664,
+        "east": -52.68134,
+        "north": 56.54193,
+        "wrapsAntimeridian": false
+      },
+      "file": "admin1/05.json"
+    },
+    {
+      "admin1Code": "07",
+      "admin1Name": "Nova Scotia",
+      "admin1SourceRef": "geonames:6091530",
+      "recordCount": 205,
+      "bestImportanceTier": 1,
+      "maxPopulation": 471559,
+      "bounds": {
+        "west": -66.11557,
+        "south": 43.56285,
+        "east": -59.86514,
+        "north": 46.90014,
+        "wrapsAntimeridian": false
+      },
+      "file": "admin1/07.json"
+    },
+    {
+      "admin1Code": "08",
+      "admin1Name": "Ontario",
+      "admin1SourceRef": "geonames:6093943",
+      "recordCount": 637,
+      "bestImportanceTier": 0,
+      "maxPopulation": 2794356,
+      "bounds": {
+        "west": -94.48985,
+        "south": 41.98339,
+        "east": -74.61595,
+        "north": 52.92774,
+        "wrapsAntimeridian": false
+      },
+      "file": "admin1/08.json"
+    },
+    {
+      "admin1Code": "09",
+      "admin1Name": "Prince Edward Island",
+      "admin1SourceRef": "geonames:6113358",
+      "recordCount": 31,
+      "bestImportanceTier": 1,
+      "maxPopulation": 38809,
+      "bounds": {
+        "west": -64.23204,
+        "south": 46.08341,
+        "east": -62.09861,
+        "north": 46.95014,
+        "wrapsAntimeridian": false
+      },
+      "file": "admin1/09.json"
+    },
+    {
+      "admin1Code": "10",
+      "admin1Name": "Quebec",
+      "admin1SourceRef": "geonames:6115047",
+      "recordCount": 545,
+      "bestImportanceTier": 1,
+      "maxPopulation": 1762949,
+      "bounds": {
+        "west": -79.43297,
+        "south": 45.00699,
+        "east": -58.65017,
+        "north": 62.20411,
+        "wrapsAntimeridian": false
+      },
+      "file": "admin1/10.json"
+    },
+    {
+      "admin1Code": "11",
+      "admin1Name": "Saskatchewan",
+      "admin1SourceRef": "geonames:6141242",
+      "recordCount": 184,
+      "bestImportanceTier": 1,
+      "maxPopulation": 266141,
+      "bounds": {
+        "west": -109.93484,
+        "south": 49.13337,
+        "east": -101.66666,
+        "north": 55.86086,
+        "wrapsAntimeridian": false
+      },
+      "file": "admin1/11.json"
+    },
+    {
+      "admin1Code": "12",
+      "admin1Name": "Yukon",
+      "admin1SourceRef": "geonames:6185811",
+      "recordCount": 7,
+      "bestImportanceTier": 1,
+      "maxPopulation": 28201,
+      "bounds": {
+        "west": -139.43328,
+        "south": 60.04958,
+        "east": -128.70893,
+        "north": 64.06013,
+        "wrapsAntimeridian": false
+      },
+      "file": "admin1/12.json"
+    },
+    {
+      "admin1Code": "13",
+      "admin1Name": "Northwest Territories",
+      "admin1SourceRef": "geonames:6091069",
+      "recordCount": 16,
+      "bestImportanceTier": 1,
+      "maxPopulation": 20340,
+      "bounds": {
+        "west": -135.01071,
+        "south": 60.00439,
+        "east": -111.88871,
+        "north": 69.44472,
+        "wrapsAntimeridian": false
+      },
+      "file": "admin1/13.json"
+    },
+    {
+      "admin1Code": "14",
+      "admin1Name": "Nunavut",
+      "admin1SourceRef": "geonames:6091732",
+      "recordCount": 17,
+      "bestImportanceTier": 1,
+      "maxPopulation": 7429,
+      "bounds": {
+        "west": -115.09649,
+        "south": 56.54106,
+        "east": -65.69996,
+        "north": 73.03752,
+        "wrapsAntimeridian": false
+      },
+      "file": "admin1/14.json"
+    }
+  ],
+  "anchorReconciliation": {
+    "globalAnchorCount": 8,
+    "matchedCount": 4,
+    "unmatchedCount": 4,
+    "entries": [
+      {
+        "anchorName": "Ottawa",
+        "anchorSector": "CAPITAL",
+        "anchorRole": "capital",
+        "status": "MATCHED",
+        "localityId": "dropi:locality:geonames:6094817",
+        "sourceRef": "geonames:6094817",
+        "distanceKm": 0.883,
+        "matchBasis": "primary-name"
+      },
+      {
+        "anchorName": "St. John's",
+        "anchorSector": "E",
+        "anchorRole": "urban",
+        "status": "MATCHED",
+        "localityId": "dropi:locality:geonames:6324733",
+        "sourceRef": "geonames:6324733",
+        "distanceKm": 3.079,
+        "matchBasis": "primary-name"
+      },
+      {
+        "anchorName": "Toronto",
+        "anchorSector": "S",
+        "anchorRole": "urban",
+        "status": "MATCHED",
+        "localityId": "dropi:locality:geonames:6167865",
+        "sourceRef": "geonames:6167865",
+        "distanceKm": 4.705,
+        "matchBasis": "primary-name"
+      },
+      {
+        "anchorName": "Whitehorse",
+        "anchorSector": "W",
+        "anchorRole": "urban",
+        "status": "MATCHED",
+        "localityId": "dropi:locality:geonames:6180550",
+        "sourceRef": "geonames:6180550",
+        "distanceKm": 0.216,
+        "matchBasis": "primary-name"
+      },
+      {
+        "anchorName": "Alert",
+        "anchorSector": "NE",
+        "anchorRole": "secondary",
+        "status": "UNMATCHED"
+      },
+      {
+        "anchorName": "Trepassey",
+        "anchorSector": "SE",
+        "anchorRole": "secondary",
+        "status": "UNMATCHED"
+      },
+      {
+        "anchorName": "Ennadai",
+        "anchorSector": "SW",
+        "anchorRole": "secondary",
+        "status": "UNMATCHED"
+      },
+      {
+        "anchorName": "Holman",
+        "anchorSector": "NW",
+        "anchorRole": "secondary",
+        "status": "UNMATCHED"
+      }
+    ]
+  }
+}
