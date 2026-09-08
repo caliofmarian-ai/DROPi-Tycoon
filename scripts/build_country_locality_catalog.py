@@ -2,6 +2,7 @@ import json, math, pathlib, urllib.request, unicodedata
 import pycountry
 
 from country_geometry_identity import load_geometry_id_registry, topology_names
+from country_semantics import load_country_semantics, runtime_semantics, semantic_functions, source_place_for_spec
 
 ROOT = pathlib.Path(__file__).resolve().parents[1]
 SRC_COMMIT = 'ca96624a56bd078437bca8184e78163e5039ad19'
@@ -20,6 +21,7 @@ with urllib.request.urlopen(SRC_URL, timeout=60) as r:
     source = json.load(r)
 topology = json.loads(TOPOLOGY.read_text())
 identity_registry, identity_by_name = load_geometry_id_registry()
+semantics_registry, semantics_by_id = load_country_semantics()
 rendered = topology_names(topology, identity_by_name)
 ids = set(rendered)
 name_to_id = {norm(name): cid for cid, name in rendered.items() if name}
@@ -70,6 +72,7 @@ directions = {
     'N': (0, -1), 'NE': (.7071, -.7071), 'E': (1, 0), 'SE': (.7071, .7071),
     'S': (0, 1), 'SW': (-.7071, .7071), 'W': (-1, 0), 'NW': (-.7071, -.7071),
 }
+DIRECTION_ORDER = ('N', 'E', 'S', 'W', 'NE', 'SE', 'SW', 'NW')
 
 
 def point(p):
@@ -80,9 +83,10 @@ def place_key(p):
     return (round(p['lon'], 6), round(p['lat'], 6), p['name'])
 
 
-def choose(places):
+def choose(places, semantic=None):
     if not places:
         return []
+    semantic = semantic or {}
     xs, ys = zip(*(point(p) for p in places))
     cx, cy = (min(xs) + max(xs)) / 2, (min(ys) + max(ys)) / 2
     hw, hh = max(8, (max(xs) - min(xs)) / 2), max(8, (max(ys) - min(ys)) / 2)
@@ -95,17 +99,26 @@ def choose(places):
 
     capitals = [p for p in places if p['isCapital']]
     capitals.sort(key=lambda p: (p['scalerank'], -p['population'], p['name']))
-    capital = capitals[0] if capitals else max(places, key=lambda p: (p['population'], -p['scalerank']))
+    source_capital = capitals[0] if capitals else max(places, key=lambda p: (p['population'], -p['scalerank']))
     selected = []
     used = set()
+    used_sectors = set()
+    selected_by_place = {}
 
-    def add(p, role, sector):
+    def add(p, role, sector, display_name=None, functions=None):
         k = place_key(p)
-        if k in used:
-            return
-        used.add(k)
-        selected.append({
-            'name': p['name'],
+        existing = selected_by_place.get(k)
+        if existing is not None:
+            merged = sorted(set(existing.get('functions', [])) | set(functions or []))
+            if merged:
+                existing['functions'] = merged
+            if display_name:
+                existing['name'] = display_name
+            return existing
+        if sector != 'CAPITAL' and sector in used_sectors:
+            return None
+        node = {
+            'name': display_name or p['name'],
             'role': role,
             'sector': sector,
             'longitude': round(p['lon'], 6),
@@ -113,9 +126,52 @@ def choose(places):
             'populationReference': p['population'],
             'admin1': p['admin1'],
             'sourceFeatureClass': p['featureClass'],
-        })
+        }
+        fn = sorted(set(functions or []))
+        if fn:
+            node['functions'] = fn
+        used.add(k)
+        if sector != 'CAPITAL':
+            used_sectors.add(sector)
+        selected_by_place[k] = node
+        selected.append(node)
+        return node
 
-    add(capital, 'capital', 'CAPITAL')
+    primary_spec = semantic.get('primaryCapital')
+    capital_mode = str(semantic.get('capitalMode') or 'single')
+    demote_source_capital = bool(semantic.get('demoteSourceCapital'))
+    if primary_spec:
+        resolved = source_place_for_spec(places, primary_spec)
+        add(
+            resolved,
+            'capital',
+            'CAPITAL',
+            primary_spec.get('displayName'),
+            semantic_functions(primary_spec),
+        )
+    elif not demote_source_capital and capital_mode not in {'none', 'status-sensitive'}:
+        add(source_capital, 'capital', 'CAPITAL')
+
+    def best_sector_for_required(p):
+        dx, dy, _ = vec(p)
+        candidates = []
+        for sector in DIRECTION_ORDER:
+            if sector in used_sectors:
+                continue
+            ux, uy = directions[sector]
+            candidates.append((dx * ux + dy * uy, sector))
+        candidates.sort(reverse=True)
+        return candidates[0][1] if candidates else None
+
+    for spec in semantic.get('requiredCenters', []):
+        resolved = source_place_for_spec(places, spec)
+        k = place_key(resolved)
+        if k in selected_by_place:
+            add(resolved, 'urban', selected_by_place[k]['sector'], spec.get('displayName'), semantic_functions(spec))
+            continue
+        sector = best_sector_for_required(resolved)
+        if sector:
+            add(resolved, 'urban', sector, spec.get('displayName'), semantic_functions(spec))
 
     def significant(p):
         return p['isAdmin1'] or p['population'] >= 15000
@@ -125,7 +181,7 @@ def choose(places):
         winner = None
         best_score = -1e9
         for p in places:
-            if place_key(p) in used or p is capital:
+            if place_key(p) in used:
                 continue
             dx, dy, distance = vec(p)
             alignment = dx * ux + dy * uy
@@ -147,10 +203,14 @@ def choose(places):
         return winner
 
     for sector in ('N', 'E', 'S', 'W'):
+        if sector in used_sectors or len(selected) >= 9:
+            continue
         p = best(sector, False)
         if p:
             add(p, 'urban', sector)
     for sector in ('NE', 'SE', 'SW', 'NW'):
+        if sector in used_sectors or len(selected) >= 9:
+            continue
         p = best(sector, True)
         if p:
             add(p, 'secondary', sector)
@@ -159,7 +219,7 @@ def choose(places):
 
 countries = {}
 for cid in sorted(ids):
-    nodes = choose(grouped.get(cid, []))
+    nodes = choose(grouped.get(cid, []), semantics_by_id.get(cid))
     if nodes:
         countries[cid] = nodes
 missing = [{'id': cid, 'name': rendered[cid]} for cid in sorted(ids) if cid not in countries]
@@ -173,13 +233,26 @@ assert capital('642') in {'Bucharest', 'Bucuresti'}
 assert capital('372') == 'Dublin'
 assert capital('826') == 'London'
 assert capital('XKX') == 'Pristina'
+assert capital('204') == 'Porto-Novo'
+assert capital('108') == 'Gitega'
+assert capital('384') == 'Yamoussoukro'
+assert capital('226') == 'Ciudad de la Paz'
+assert capital('710') == 'Pretoria'
+assert capital('834') == 'Dodoma'
+assert capital('392') == 'Tokyo'
+assert capital('104') == 'Nay Pyi Taw'
+assert capital('144') == 'Sri Jayewardenepura Kotte'
+assert capital('068') == 'Sucre'
+assert capital('152') == 'Santiago'
+for no_capital_id in ('376', '275', '732', '238', '010', 'XSL'):
+    assert capital(no_capital_id) is None
 assert all(n['name'] != 'Hamilton' for n in countries.get('826', []))
 assert all(len(v) <= 9 for v in countries.values())
 ireland_n = next((n for n in countries['372'] if n['role'] == 'urban' and n['sector'] == 'N'), None)
 assert ireland_n is None or ireland_n['populationReference'] >= 15000 or 'Admin-1 capital' in ireland_n['sourceFeatureClass']
 
 payload = {
-    'version': '1.2.0',
+    'version': '1.3.0',
     'source': {
         'name': 'Natural Earth 1:10m populated places simple',
         'upstreamCommit': SRC_COMMIT,
@@ -189,6 +262,8 @@ payload = {
         'registryVersion': identity_registry.get('version', 'unknown'),
         'byRenderedName': identity_by_name,
     },
+    'semanticsVersion': semantics_registry.get('version', 'unknown'),
+    'semantics': runtime_semantics(semantics_by_id),
     'stats': {
         'renderedCountries': len(ids),
         'countriesWithRepresentativeNodes': len(countries),
