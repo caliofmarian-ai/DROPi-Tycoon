@@ -2,238 +2,281 @@
 
 Document: MISSIONS.md
 Project: DROPi Tycoon
-Version: 1.0.0
-Status: Canonical
+Version: 2.0.0
+Status: Canonical — Objectives, Guidance, Contracts and Milestones
 Author: Marian Caliof & OpenAI
 Language: English
-Last Updated: 2026-07-12
+Last Updated: 2026-09-08
 
 ---
 
-# Mission System
+# Objectives, Guidance, Contracts and Milestones
 
 ## Purpose
 
-This document defines the mission, objective, milestone, contract, and achievement systems used throughout DROPi Tycoon.
+This document defines how DROPi Tycoon gives the player direction without creating a second artificial economy.
 
-The mission system exists to guide players naturally through gameplay without forcing a linear experience.
+The project may use objectives, tutorials, milestones, achievements, contracts and event guidance, but these systems have different responsibilities.
 
-Players should always have meaningful goals while remaining free to choose how they achieve them.
-
----
-
-# Design Philosophy
-
-DROPi Tycoon does not use traditional scripted missions.
-
-Instead, the game combines several objective systems that evolve alongside the player's company.
-
-These systems provide direction while preserving player freedom.
+**Guidance may surface a real opportunity. It may not invent the economic need, payer, cargo, inventory or money merely to create a mission.**
 
 ---
 
-# Mission Categories
+# 1. Design Philosophy
 
-The game contains five primary objective categories.
+DROPi Tycoon is not built around a linear scripted campaign.
+
+The player should understand what they can do next while retaining meaningful freedom over career, spending, learning, transport, company participation and world contribution.
+
+Objectives exist to:
+
+- teach;
+- clarify;
+- suggest;
+- record;
+- celebrate;
+- surface real economic/world opportunities.
+
+They do not override `02_Economy/ECONOMY.md`, `02_Economy/MARKET.md`, or `00_Project/LOGISTICS_DESIGN.md`.
 
 ---
 
-## Tutorial Objectives
+# 2. Objective Categories
 
-Purpose:
+## Tutorial / Learning Objectives
 
-Teach new mechanics naturally.
+Teach mechanics through real gameplay.
+
+Early examples:
+
+- report for the first starter shift;
+- accept/understand a light work assignment;
+- pick up and deliver a flyer/letter/small parcel;
+- observe the recipient/business/world consequence;
+- complete the first wage settlement;
+- inspect Personal Money and basic living needs;
+- make a first spending/saving decision;
+- choose an authored next goal such as Bicycle, equipment or training.
+
+Tutorials should avoid dumping the global economy into menus before the player needs it.
+
+## Personal Milestones
+
+Record meaningful history such as:
+
+- first wage;
+- first qualification;
+- first personally owned Bicycle/vehicle;
+- first recovery from financial distress;
+- cities/countries visited;
+- profession/career achievements.
+
+## Company Milestones
+
+Record organizational history such as:
+
+- company formation;
+- first employee;
+- first profitable operating period;
+- first warehouse;
+- first productive facility relationship/acquisition;
+- first inter-city/international operation;
+- major infrastructure completion.
+
+## Real Economic Contracts
+
+Contracts are binding economic relationships, not arbitrary mission-reward containers.
+
+They must originate from real modeled counterparties/requirements and specify relevant terms such as:
+
+- buyer/payer/provider;
+- goods/service/capacity;
+- quantity;
+- origin/destination;
+- time/quality requirements;
+- price/payment/settlement;
+- penalties/default/failure consequences;
+- qualification/infrastructure requirements.
+
+Examples may include medicine supply, restaurant replenishment, industrial parts, supermarket distribution, construction inputs, airport cargo or public/emergency logistics.
+
+## Event / Community Objectives
+
+World events or community projects may surface contribution goals that use real world state.
 
 Examples:
 
-• Complete your first delivery.
+- supply a shortage;
+- contribute materials to a bridge/project;
+- support recovery after weather disruption;
+- move harvest output;
+- help clear waste/recycling backlog.
 
-• Earn your first profit.
+Progress must modify the same authoritative project/inventory/economic state.
 
-• Purchase your first bicycle.
+## Achievements / Collections
 
-• Hire your first employee.
+Achievements record exceptional or interesting history.
 
-Tutorial objectives disappear once completed.
+They may support cosmetics, history, display or non-economic recognition.
 
----
-
-## Business Milestones
-
-Milestones celebrate major company achievements.
-
-Examples:
-
-• Complete 100 deliveries.
-
-• Open your first office.
-
-• Own 10 vehicles.
-
-• Build your first warehouse.
-
-• Reach positive monthly profit.
-
-Milestones permanently record company growth.
+They should not become unexplained economic faucets or mandatory progression gates unless a separate system explicitly defines and balances that effect.
 
 ---
 
-## Business Contracts
+# 3. Economic Origin Rule
 
-Contracts generate income and introduce new strategic decisions.
+An objective may point at an existing order/contract/need, but it must not create economic value independently.
 
-Examples:
+Example:
 
-• Deliver medicine to hospitals.
+```text
+shop inventory low
+-> procurement demand exists
+-> supplier/logistics opportunity exists
+-> objective may say "help restock the shop"
+-> actual contract/order owns cargo and settlement
+-> completed delivery changes inventory
+-> objective records/guides the event
+```
 
-• Partner with restaurants.
+Not canonical:
 
-• Deliver supermarket orders.
-
-• Government logistics contracts.
-
-• Airport cargo distribution.
-
-Contracts have deadlines, rewards, and penalties.
-
----
-
-## Dynamic Events
-
-Random events create variety.
-
-Examples:
-
-• Heavy rain.
-
-• Vehicle breakdown.
-
-• Fuel shortage.
-
-• Power outage.
-
-• Traffic accident.
-
-• Holiday demand.
-
-• Technology conference.
-
-Players must adapt their strategies accordingly.
+```text
+random mission appears
+-> package has no economic source
+-> waypoint touched
+-> money appears from nowhere
+```
 
 ---
 
-## Achievements
+# 4. Rewards and Recognition
 
-Achievements reward exceptional accomplishments.
+Economic payment belongs to the underlying work/contract/transaction.
 
-Examples:
+Objective-layer recognition may include:
 
-• Deliver 1,000 packages.
+- completion/history record;
+- cosmetic unlock;
+- collection entry;
+- title/badge;
+- tutorial progression;
+- access to information/next learning step when legitimately tied to mastery;
+- bounded non-economic appreciation.
 
-• Reach 99% customer satisfaction.
+Money, research capability, qualifications, blueprints or productive power must not be granted arbitrarily merely because an objective counter reached a number.
 
-• Stage 7+: Build 100 DronePorts.
-
-• Expand internationally.
-
-• Operate entirely with renewable energy.
-
-Achievements never expire.
-
----
-
-# Mission Generation
-
-Objectives should be generated dynamically whenever possible.
-
-Mission generation considers:
-
-- Company size
-- Reputation
-- Technology level
-- Economy
-- Region
-- Weather
-- Current infrastructure
-
-This ensures every company receives unique challenges.
+When an economic benefit exists, its source and causal rule must be explicit in the governing economy/progression system.
 
 ---
 
-# Difficulty Scaling
+# 5. Dynamic Objective Generation
 
-Mission difficulty increases gradually.
+Procedural systems may dynamically choose what to **surface**, prioritize or explain based on:
 
-Growth should feel natural.
+- current personal state;
+- available legitimate work;
+- economic shortage/surplus;
+- contracts;
+- world events;
+- company capability;
+- qualifications;
+- location;
+- recovery needs;
+- community projects.
 
-The game should avoid sudden difficulty spikes.
-
-As the company expands, objectives become more strategic rather than simply requiring larger numbers.
-
----
-
-# Rewards
-
-Mission rewards may include:
-
-- Money
-- Reputation
-- Research Points
-- Unlock Tokens
-- Technology Blueprints
-- Special Contracts
-- Unique Decorations
-- Company Titles
-
-Rewards should always support long-term progression.
+Procedural objectives do not fabricate infinite jobs or demand.
 
 ---
 
-# Failure
+# 6. Difficulty and Variety
 
-Most missions may be failed.
+Objective difficulty should follow capability and context rather than merely bigger counters.
 
-Failure should create new gameplay opportunities rather than ending the game.
+Variety may come from:
 
-Examples:
+- different cargo/handling requirements;
+- route choices;
+- customer/location types;
+- time/weather/traffic;
+- production/inventory consequences;
+- profession requirements;
+- competing opportunities;
+- recovery situations;
+- regional differences;
+- company/community projects.
 
-Late deliveries reduce reputation.
-
-Broken contracts reduce future trust.
-
-Poor performance decreases customer demand.
-
-Failure becomes part of the company's story.
+Delivery must not degrade into repeated identical waypoint touching.
 
 ---
 
-# Endless Objectives
+# 7. Failure and Recovery
 
-After reaching advanced stages, the game continuously generates procedural objectives.
+Objectives/contracts may fail.
 
-Examples:
+The consequence belongs to the underlying system, for example:
 
-Increase delivery efficiency by 5%.
+- lost wage opportunity;
+- contract penalty/default;
+- reputation/trust impact;
+- inventory shortage continuing;
+- project delay;
+- customer loss;
+- wasted time/fuel/Work Capacity.
 
-Reduce operating costs.
+Failure should create a comprehensible next problem and a recovery path rather than an arbitrary game-over.
 
-Expand into a neighboring city.
+---
 
-Upgrade aging vehicles.
+# 8. Long-Term Direction Without FOMO
 
-Improve employee satisfaction.
+The game may continuously surface self-authored and systemic goals, but it should not rely on:
 
-These objectives ensure players always have meaningful goals.
+- punitive daily-login streaks;
+- fake countdowns;
+- essential power available only in short real-world windows;
+- notification spam;
+- rewards designed primarily to force checking the app.
+
+World events may be time-bounded, but missing one must not permanently cripple ordinary progression.
+
+---
+
+# 9. Player-Authored Goals
+
+Not every goal should be generated by the game.
+
+Important progression should naturally create goals such as:
+
+- save for a Bicycle;
+- qualify for a better profession;
+- stabilize housing/finances;
+- join or create a company;
+- buy a vehicle;
+- win a contract;
+- expand a warehouse/fleet;
+- secure an industrial supplier;
+- enter a new locality/country;
+- help complete infrastructure.
+
+The UI should help the player remember/track these without pretending they are externally issued missions.
+
+---
+
+# 10. Prototype Boundary
+
+Current Prototype orders and rewards may still use simplified mission-like generation and direct reward fields.
+
+Those are legacy implementation truths until the order/economy migration occurs.
+
+This canonical document does not silently mutate current Save/runtime behavior.
 
 ---
 
 # Canonical Rule
 
-Mission systems should encourage exploration, experimentation, and strategic thinking.
-
-Objectives exist to support gameplay—not to restrict player freedom.
-
-Every mission should feel like a business opportunity rather than a mandatory task.
+**Objectives guide, teach, surface and record gameplay; they do not create a parallel reward economy. Economic jobs and contracts must originate from real modeled needs, counterparties, inventory/capacity and settlement, while milestones/achievements primarily preserve history, mastery, discovery and recognition.**
 
 ---
 
