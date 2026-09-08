@@ -1,11 +1,11 @@
 # Document Information
 
-Document: PLAYER_ECONOMY_RUNTIME.md  
-Project: DROPi Tycoon  
-Version: 1.0.0  
-Status: Phase-1 Implementation Contract — Issue #436 First Slice  
-Author: Marian Caliof & OpenAI  
-Language: English  
+Document: PLAYER_ECONOMY_RUNTIME.md
+Project: DROPi Tycoon
+Version: 1.0.0
+Status: Phase-1 Implementation Contract — Issue #436 First Slice
+Author: Marian Caliof & OpenAI
+Language: English
 Last Updated: 2026-09-08
 
 ---
