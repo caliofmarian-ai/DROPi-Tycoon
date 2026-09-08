@@ -15,7 +15,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Audit retained Belgium source hierarchy
+      - name: Audit retained Belgium source hierarchy and inside-region fallbacks
         run: |
           set -euo pipefail
           base='https://github.com/caliofmarian-ai/DROPi-Tycoon/releases/download/source-geonames-cities500-2026-09-08-f3cda4f9'
@@ -29,11 +29,10 @@ jobs:
 
           admin = {}
           for line in Path('/tmp/admin1CodesASCII.txt').read_text(encoding='utf-8').splitlines():
-              if not line.startswith('BE.'):
-                  continue
-              f = line.split('\t')
-              code = f[0].split('.', 1)[1]
-              admin[code] = {'name': f[1], 'asciiName': f[2], 'sourceRef': f'geonames:{f[3]}'}
+              if line.startswith('BE.'):
+                  f = line.split('\t')
+                  code = f[0].split('.', 1)[1]
+                  admin[code] = {'name': f[1], 'asciiName': f[2], 'sourceRef': f'geonames:{f[3]}'}
 
           fields = [
               'geonameid','name','asciiname','alternatenames','latitude','longitude',
@@ -51,28 +50,24 @@ jobs:
 
           print('BELGIUM_ADMIN1_COUNT', len(admin))
           print('BELGIUM_SOURCE_LOCALITIES', sum(len(rows) for rows in groups.values()))
-          print('BELGIUM_ADMIN1_WITH_LOCALITIES', sum(bool(groups.get(code)) for code in admin))
-          priority = {'PPLC': 0, 'PPLA': 1, 'PPLA2': 2}
           for code in sorted(admin):
               rows = groups.get(code, [])
-              ranked = [r for r in rows if r['feature_code'] in priority]
-              ranked.sort(key=lambda r: (priority[r['feature_code']], -int(r['population'] or 0), r['name'].casefold(), int(r['geonameid'])))
+              by_population = sorted(rows, key=lambda r: (-int(r['population'] or 0), r['name'].casefold(), int(r['geonameid'])))
+              admin_roles = [r for r in rows if r['feature_code'] in {'PPLC','PPLA','PPLA2','PPLA3','PPLA4'}]
+              admin_priority = {'PPLC': 0, 'PPLA': 1, 'PPLA2': 2, 'PPLA3': 3, 'PPLA4': 4}
+              admin_roles.sort(key=lambda r: (admin_priority[r['feature_code']], -int(r['population'] or 0), r['name'].casefold(), int(r['geonameid'])))
+              def compact(r):
+                  return {
+                      'name': r['name'], 'asciiName': r['asciiname'], 'featureCode': r['feature_code'],
+                      'population': int(r['population'] or 0), 'sourceRef': f"geonames:{r['geonameid']}",
+                      'lat': float(r['latitude']), 'lon': float(r['longitude'])
+                  }
               print(json.dumps({
                   'code': code,
                   'region': admin[code]['name'],
-                  'regionAscii': admin[code]['asciiName'],
                   'regionSourceRef': admin[code]['sourceRef'],
                   'candidateCount': len(rows),
-                  'adminCandidates': [
-                      {
-                          'name': r['name'],
-                          'asciiName': r['asciiname'],
-                          'featureCode': r['feature_code'],
-                          'population': int(r['population'] or 0),
-                          'sourceRef': f"geonames:{r['geonameid']}",
-                          'lat': float(r['latitude']),
-                          'lon': float(r['longitude'])
-                      } for r in ranked[:6]
-                  ]
+                  'adminRoleCandidates': [compact(r) for r in admin_roles[:10]],
+                  'topPopulationCandidates': [compact(r) for r in by_population[:12]],
               }, ensure_ascii=False))
           PY
