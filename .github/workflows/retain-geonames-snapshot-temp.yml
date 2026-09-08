@@ -1,0 +1,138 @@
+name: TEMP Retain GeoNames Snapshot
+
+on:
+  push:
+    branches:
+      - openai/geonames-snapshot-retention-502
+
+permissions:
+  contents: write
+
+jobs:
+  retain:
+    runs-on: ubuntu-24.04
+    env:
+      RELEASE_TAG: source-geonames-cities500-2026-09-08-f3cda4f9
+      TARGET_COMMIT: 5e7a3339ae70eb07529135bb13bb44477aaad038
+      CITIES_SHA: f3cda4f9d256d90045121fb8eebad3ed91695c32370ed93b50fbe0cb616e2bbd
+      ADMIN1_SHA: 590651498043f674accda2b7f46d21286cda0e290b02f8561c5005eee9a5448c
+      README_SHA: b1957379b6c1242c700c98ac9a8aa0a09f56c3c0a50ee72175527005f48ef2c5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: openai/geonames-snapshot-retention-502
+          fetch-depth: 0
+      - name: Download and checksum exact audited sources
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/geonames-snapshot
+          curl --fail --location --retry 3 --output /tmp/geonames-snapshot/cities500.zip https://download.geonames.org/export/dump/cities500.zip
+          curl --fail --location --retry 3 --output /tmp/geonames-snapshot/admin1CodesASCII.txt https://download.geonames.org/export/dump/admin1CodesASCII.txt
+          curl --fail --location --retry 3 --output /tmp/geonames-snapshot/geonames-readme.txt https://download.geonames.org/export/dump/readme.txt
+          echo "$CITIES_SHA  /tmp/geonames-snapshot/cities500.zip" | sha256sum -c -
+          echo "$ADMIN1_SHA  /tmp/geonames-snapshot/admin1CodesASCII.txt" | sha256sum -c -
+          echo "$README_SHA  /tmp/geonames-snapshot/geonames-readme.txt" | sha256sum -c -
+          test "$(stat -c%s /tmp/geonames-snapshot/cities500.zip)" = "13602522"
+      - name: Create immutable source release and upload assets
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          if ! gh release view "$RELEASE_TAG" >/dev/null 2>&1; then
+            gh release create "$RELEASE_TAG" \
+              --target "$TARGET_COMMIT" \
+              --title "GeoNames cities500 source snapshot — 2026-09-08" \
+              --notes $'Source-only reproducibility snapshot for DROPi Tycoon issue #502.\n\nGeoNames data is licensed under Creative Commons Attribution 4.0. Attribution: GeoNames.\n\nThis release preserves the exact audited upstream inputs used to build future expanded Country/Region locality catalogs. It is not a gameplay release.'
+          fi
+          gh release upload "$RELEASE_TAG" \
+            /tmp/geonames-snapshot/cities500.zip \
+            /tmp/geonames-snapshot/admin1CodesASCII.txt \
+            /tmp/geonames-snapshot/geonames-readme.txt \
+            --clobber
+          gh release view "$RELEASE_TAG" --json url,tagName,targetCommitish,assets
+      - name: Canonize retained snapshot metadata
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import json
+          from pathlib import Path
+
+          registry_path = Path('04_World/Country_Catalog/EXPANDED_LOCALITY_SOURCE_REGISTRY.json')
+          registry = json.loads(registry_path.read_text())
+          registry['version'] = '1.1.0'
+          tag = 'source-geonames-cities500-2026-09-08-f3cda4f9'
+          base = f'https://github.com/caliofmarian-ai/DROPi-Tycoon/releases/download/{tag}'
+          registry['retainedSnapshot'] = {
+              'status': 'RETAINED',
+              'retainedOn': '2026-09-08',
+              'releaseTag': tag,
+              'releaseUrl': f'https://github.com/caliofmarian-ai/DROPi-Tycoon/releases/tag/{tag}',
+              'targetCommit': '5e7a3339ae70eb07529135bb13bb44477aaad038',
+              'license': 'Creative Commons Attribution 4.0',
+              'attributionText': 'GeoNames',
+              'assets': {
+                  'cities500.zip': {
+                      'url': f'{base}/cities500.zip',
+                      'sha256': 'f3cda4f9d256d90045121fb8eebad3ed91695c32370ed93b50fbe0cb616e2bbd',
+                      'bytes': 13602522,
+                  },
+                  'admin1CodesASCII.txt': {
+                      'url': f'{base}/admin1CodesASCII.txt',
+                      'sha256': '590651498043f674accda2b7f46d21286cda0e290b02f8561c5005eee9a5448c',
+                      'bytes': 151536,
+                  },
+                  'geonames-readme.txt': {
+                      'url': f'{base}/geonames-readme.txt',
+                      'sha256': 'b1957379b6c1242c700c98ac9a8aa0a09f56c3c0a50ee72175527005f48ef2c5',
+                      'bytes': 8843,
+                  },
+              },
+          }
+          registry['governance']['rawSnapshotRetentionSatisfied'] = True
+          registry['governance']['productionImporterMustUseRetainedSnapshot'] = True
+          registry_path.write_text(json.dumps(registry, indent=2, ensure_ascii=False) + '\n')
+
+          audit_path = Path('04_World/Country_Catalog/EXPANDED_LOCALITY_SOURCE_AUDIT.md')
+          audit = audit_path.read_text()
+          section = '''\n## Durable snapshot retention\n\nThe exact 2026-09-08 audited inputs are retained outside the Git source tree as GitHub Release assets under tag `source-geonames-cities500-2026-09-08-f3cda4f9`.\n\nRetained assets:\n- `cities500.zip` — SHA-256 `f3cda4f9d256d90045121fb8eebad3ed91695c32370ed93b50fbe0cb616e2bbd`;\n- `admin1CodesASCII.txt` — SHA-256 `590651498043f674accda2b7f46d21286cda0e290b02f8561c5005eee9a5448c`;\n- `geonames-readme.txt` — SHA-256 `b1957379b6c1242c700c98ac9a8aa0a09f56c3c0a50ee72175527005f48ef2c5`.\n\nProduction catalog generation must consume this retained snapshot, verify checksums before parsing, and must not silently fall back to the moving upstream daily dump. A future GeoNames refresh requires a new explicit snapshot/version rather than mutation of this retained source contract.\n'''
+          if '## Durable snapshot retention' not in audit:
+              audit_path.write_text(audit.rstrip() + '\n' + section)
+          PY
+          cat > game-web/tests/expanded-locality-snapshot-retention.test.ts <<'EOF'
+          import { describe, expect, it } from 'vitest';
+          import registry from '../../04_World/Country_Catalog/EXPANDED_LOCALITY_SOURCE_REGISTRY.json';
+
+          describe('expanded locality retained source snapshot', () => {
+            it('pins the exact retained GeoNames snapshot used by production importers', () => {
+              expect(registry.version).toBe('1.1.0');
+              expect(registry.retainedSnapshot.status).toBe('RETAINED');
+              expect(registry.retainedSnapshot.releaseTag).toBe('source-geonames-cities500-2026-09-08-f3cda4f9');
+              expect(registry.retainedSnapshot.targetCommit).toBe('5e7a3339ae70eb07529135bb13bb44477aaad038');
+              expect(registry.retainedSnapshot.assets['cities500.zip']).toMatchObject({
+                sha256: 'f3cda4f9d256d90045121fb8eebad3ed91695c32370ed93b50fbe0cb616e2bbd',
+                bytes: 13602522,
+              });
+              expect(registry.retainedSnapshot.assets['admin1CodesASCII.txt'].sha256).toBe(
+                '590651498043f674accda2b7f46d21286cda0e290b02f8561c5005eee9a5448c',
+              );
+              expect(registry.retainedSnapshot.assets['geonames-readme.txt'].sha256).toBe(
+                'b1957379b6c1242c700c98ac9a8aa0a09f56c3c0a50ee72175527005f48ef2c5',
+              );
+              expect(registry.governance.rawSnapshotRetentionSatisfied).toBe(true);
+              expect(registry.governance.productionImporterMustUseRetainedSnapshot).toBe(true);
+            });
+          });
+          EOF
+          git diff --check
+      - name: Commit canonical retention metadata and remove temporary workflow
+        run: |
+          set -euo pipefail
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git rm .github/workflows/retain-geonames-snapshot-temp.yml
+          git add 04_World/Country_Catalog/EXPANDED_LOCALITY_SOURCE_REGISTRY.json \
+                  04_World/Country_Catalog/EXPANDED_LOCALITY_SOURCE_AUDIT.md \
+                  game-web/tests/expanded-locality-snapshot-retention.test.ts
+          git diff --cached --check
+          git commit -m 'data: retain exact GeoNames locality source snapshot'
+          git push origin HEAD:openai/geonames-snapshot-retention-502
