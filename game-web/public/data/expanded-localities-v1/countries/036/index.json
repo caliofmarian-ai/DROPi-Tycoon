@@ -1,0 +1,235 @@
+{
+  "version": "1.0.0",
+  "issue": 502,
+  "coverageMode": "pilot",
+  "geometryId": "036",
+  "renderedName": "Australia",
+  "countryCode": "AU",
+  "recordCount": 4901,
+  "admin1PartitionCount": 8,
+  "bounds": {
+    "west": 113.53327,
+    "south": -43.31423,
+    "east": 153.61246,
+    "north": -10.58257,
+    "wrapsAntimeridian": false
+  },
+  "partitions": [
+    {
+      "admin1Code": "01",
+      "admin1Name": "Australian Capital Territory",
+      "admin1SourceRef": "geonames:2177478",
+      "recordCount": 101,
+      "bestImportanceTier": 0,
+      "maxPopulation": 367752,
+      "bounds": {
+        "west": 149.01101,
+        "south": -35.47194,
+        "east": 150.7042,
+        "north": -35.12806,
+        "wrapsAntimeridian": false
+      },
+      "file": "admin1/01.json"
+    },
+    {
+      "admin1Code": "02",
+      "admin1Name": "New South Wales",
+      "admin1SourceRef": "geonames:2155400",
+      "recordCount": 1531,
+      "bestImportanceTier": 1,
+      "maxPopulation": 5638830,
+      "bounds": {
+        "west": 141.4512,
+        "south": -37.06675,
+        "east": 153.61246,
+        "north": -28.17671,
+        "wrapsAntimeridian": false
+      },
+      "file": "admin1/02.json"
+    },
+    {
+      "admin1Code": "03",
+      "admin1Name": "Northern Territory",
+      "admin1SourceRef": "geonames:2064513",
+      "recordCount": 111,
+      "bestImportanceTier": 1,
+      "maxPopulation": 139902,
+      "bounds": {
+        "west": 129.52177,
+        "south": -25.2406,
+        "east": 136.88995,
+        "north": -11.76082,
+        "wrapsAntimeridian": false
+      },
+      "file": "admin1/03.json"
+    },
+    {
+      "admin1Code": "04",
+      "admin1Name": "Queensland",
+      "admin1SourceRef": "geonames:2152274",
+      "recordCount": 1054,
+      "bestImportanceTier": 1,
+      "maxPopulation": 2780063,
+      "bounds": {
+        "west": 138.12013,
+        "south": -28.65425,
+        "east": 153.53664,
+        "north": -10.58257,
+        "wrapsAntimeridian": false
+      },
+      "file": "admin1/04.json"
+    },
+    {
+      "admin1Code": "05",
+      "admin1Name": "South Australia",
+      "admin1SourceRef": "geonames:2061327",
+      "recordCount": 514,
+      "bestImportanceTier": 1,
+      "maxPopulation": 1469163,
+      "bounds": {
+        "west": 132.13343,
+        "south": -38.05313,
+        "east": 140.91199,
+        "north": -26.27825,
+        "wrapsAntimeridian": false
+      },
+      "file": "admin1/05.json"
+    },
+    {
+      "admin1Code": "06",
+      "admin1Name": "Tasmania",
+      "admin1SourceRef": "geonames:2147291",
+      "recordCount": 184,
+      "bestImportanceTier": 1,
+      "maxPopulation": 254930,
+      "bounds": {
+        "west": 143.85385,
+        "south": -43.31423,
+        "east": 148.30583,
+        "north": -39.92976,
+        "wrapsAntimeridian": false
+      },
+      "file": "admin1/06.json"
+    },
+    {
+      "admin1Code": "07",
+      "admin1Name": "Victoria",
+      "admin1SourceRef": "geonames:2145234",
+      "recordCount": 848,
+      "bestImportanceTier": 1,
+      "maxPopulation": 5435590,
+      "bounds": {
+        "west": 141.24216,
+        "south": -38.7594,
+        "east": 149.75407,
+        "north": -34.16802,
+        "wrapsAntimeridian": false
+      },
+      "file": "admin1/07.json"
+    },
+    {
+      "admin1Code": "08",
+      "admin1Name": "Western Australia",
+      "admin1SourceRef": "geonames:2058645",
+      "recordCount": 558,
+      "bestImportanceTier": 1,
+      "maxPopulation": 2384371,
+      "bounds": {
+        "west": 113.53327,
+        "south": -35.06803,
+        "east": 128.74208,
+        "north": -15.4869,
+        "wrapsAntimeridian": false
+      },
+      "file": "admin1/08.json"
+    }
+  ],
+  "anchorReconciliation": {
+    "globalAnchorCount": 9,
+    "matchedCount": 9,
+    "unmatchedCount": 0,
+    "entries": [
+      {
+        "anchorName": "Canberra",
+        "anchorSector": "CAPITAL",
+        "anchorRole": "capital",
+        "status": "MATCHED",
+        "localityId": "dropi:locality:geonames:2172517",
+        "sourceRef": "geonames:2172517",
+        "distanceKm": 0.099
+      },
+      {
+        "anchorName": "Darwin",
+        "anchorSector": "N",
+        "anchorRole": "urban",
+        "status": "MATCHED",
+        "localityId": "dropi:locality:geonames:2073124",
+        "sourceRef": "geonames:2073124",
+        "distanceKm": 4.076
+      },
+      {
+        "anchorName": "Brisbane",
+        "anchorSector": "E",
+        "anchorRole": "urban",
+        "status": "MATCHED",
+        "localityId": "dropi:locality:geonames:2174003",
+        "sourceRef": "geonames:2174003",
+        "distanceKm": 1.726
+      },
+      {
+        "anchorName": "Melbourne",
+        "anchorSector": "S",
+        "anchorRole": "urban",
+        "status": "MATCHED",
+        "localityId": "dropi:locality:geonames:2158177",
+        "sourceRef": "geonames:2158177",
+        "distanceKm": 0.97
+      },
+      {
+        "anchorName": "Perth",
+        "anchorSector": "W",
+        "anchorRole": "urban",
+        "status": "MATCHED",
+        "localityId": "dropi:locality:geonames:2063523",
+        "sourceRef": "geonames:2063523",
+        "distanceKm": 2.205
+      },
+      {
+        "anchorName": "Richmond",
+        "anchorSector": "NE",
+        "anchorRole": "secondary",
+        "status": "MATCHED",
+        "localityId": "dropi:locality:geonames:2151651",
+        "sourceRef": "geonames:2151651",
+        "distanceKm": 2.088
+      },
+      {
+        "anchorName": "Bicheno",
+        "anchorSector": "SE",
+        "anchorRole": "secondary",
+        "status": "MATCHED",
+        "localityId": "dropi:locality:geonames:2175958",
+        "sourceRef": "geonames:2175958",
+        "distanceKm": 1.228
+      },
+      {
+        "anchorName": "Mount Barker",
+        "anchorSector": "SW",
+        "anchorRole": "secondary",
+        "status": "MATCHED",
+        "localityId": "dropi:locality:geonames:2065666",
+        "sourceRef": "geonames:2065666",
+        "distanceKm": 0.222
+      },
+      {
+        "anchorName": "Onslow",
+        "anchorSector": "NW",
+        "anchorRole": "secondary",
+        "status": "MATCHED",
+        "localityId": "dropi:locality:geonames:2064155",
+        "sourceRef": "geonames:2064155",
+        "distanceKm": 2.762
+      }
+    ]
+  }
+}

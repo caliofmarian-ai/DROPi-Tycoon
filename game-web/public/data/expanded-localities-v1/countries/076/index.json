@@ -1,0 +1,539 @@
+{
+  "version": "1.0.0",
+  "issue": 502,
+  "coverageMode": "pilot",
+  "geometryId": "076",
+  "renderedName": "Brazil",
+  "countryCode": "BR",
+  "recordCount": 5897,
+  "admin1PartitionCount": 27,
+  "bounds": {
+    "west": -72.89583,
+    "south": -33.69111,
+    "east": -32.4107,
+    "north": 4.59556,
+    "wrapsAntimeridian": false
+  },
+  "partitions": [
+    {
+      "admin1Code": "01",
+      "admin1Name": "Acre",
+      "admin1SourceRef": "geonames:3665474",
+      "recordCount": 24,
+      "bestImportanceTier": 1,
+      "maxPopulation": 419452,
+      "bounds": {
+        "west": -72.89583,
+        "south": -11.02889,
+        "east": -66.88333,
+        "north": -7.61417,
+        "wrapsAntimeridian": false
+      },
+      "file": "admin1/01.json"
+    },
+    {
+      "admin1Code": "02",
+      "admin1Name": "Alagoas",
+      "admin1SourceRef": "geonames:3408096",
+      "recordCount": 102,
+      "bestImportanceTier": 1,
+      "maxPopulation": 1031597,
+      "bounds": {
+        "west": -38.00472,
+        "south": -10.40556,
+        "east": -35.2225,
+        "north": -8.84167,
+        "wrapsAntimeridian": false
+      },
+      "file": "admin1/02.json"
+    },
+    {
+      "admin1Code": "03",
+      "admin1Name": "Amapá",
+      "admin1SourceRef": "geonames:3407762",
+      "recordCount": 24,
+      "bestImportanceTier": 1,
+      "maxPopulation": 512902,
+      "bounds": {
+        "west": -52.506,
+        "south": -0.92641,
+        "east": -50.78821,
+        "north": 3.84306,
+        "wrapsAntimeridian": false
+      },
+      "file": "admin1/03.json"
+    },
+    {
+      "admin1Code": "04",
+      "admin1Name": "Amazonas",
+      "admin1SourceRef": "geonames:3665361",
+      "recordCount": 70,
+      "bestImportanceTier": 1,
+      "maxPopulation": 2219580,
+      "bounds": {
+        "west": -72.58361,
+        "south": -8.75222,
+        "east": -56.71306,
+        "north": -0.1181,
+        "wrapsAntimeridian": false
+      },
+      "file": "admin1/04.json"
+    },
+    {
+      "admin1Code": "05",
+      "admin1Name": "Bahia",
+      "admin1SourceRef": "geonames:3471168",
+      "recordCount": 432,
+      "bestImportanceTier": 1,
+      "maxPopulation": 2711840,
+      "bounds": {
+        "west": -45.78501,
+        "south": -18.08639,
+        "east": -37.61056,
+        "north": -8.72028,
+        "wrapsAntimeridian": false
+      },
+      "file": "admin1/05.json"
+    },
+    {
+      "admin1Code": "06",
+      "admin1Name": "Ceará",
+      "admin1SourceRef": "geonames:3402362",
+      "recordCount": 189,
+      "bestImportanceTier": 1,
+      "maxPopulation": 2400000,
+      "bounds": {
+        "west": -41.3,
+        "south": -7.82895,
+        "east": -37.35528,
+        "north": -2.88556,
+        "wrapsAntimeridian": false
+      },
+      "file": "admin1/06.json"
+    },
+    {
+      "admin1Code": "07",
+      "admin1Name": "Federal District",
+      "admin1SourceRef": "geonames:3463504",
+      "recordCount": 33,
+      "bestImportanceTier": 0,
+      "maxPopulation": 2207718,
+      "bounds": {
+        "west": -48.19667,
+        "south": -16.03095,
+        "east": -47.64874,
+        "north": -15.59135,
+        "wrapsAntimeridian": false
+      },
+      "file": "admin1/07.json"
+    },
+    {
+      "admin1Code": "08",
+      "admin1Name": "Espírito Santo",
+      "admin1SourceRef": "geonames:3463930",
+      "recordCount": 81,
+      "bestImportanceTier": 1,
+      "maxPopulation": 520653,
+      "bounds": {
+        "west": -41.84528,
+        "south": -21.15361,
+        "east": -39.73222,
+        "north": -18.03028,
+        "wrapsAntimeridian": false
+      },
+      "file": "admin1/08.json"
+    },
+    {
+      "admin1Code": "11",
+      "admin1Name": "Mato Grosso do Sul",
+      "admin1SourceRef": "geonames:3457415",
+      "recordCount": 82,
+      "bestImportanceTier": 1,
+      "maxPopulation": 906092,
+      "bounds": {
+        "west": -57.8825,
+        "south": -23.97028,
+        "east": -51.09361,
+        "north": -17.57694,
+        "wrapsAntimeridian": false
+      },
+      "file": "admin1/11.json"
+    },
+    {
+      "admin1Code": "13",
+      "admin1Name": "Maranhão",
+      "admin1SourceRef": "geonames:3395443",
+      "recordCount": 225,
+      "bestImportanceTier": 1,
+      "maxPopulation": 917237,
+      "bounds": {
+        "west": -48.42917,
+        "south": -9.44667,
+        "east": -41.90306,
+        "north": -1.20736,
+        "wrapsAntimeridian": false
+      },
+      "file": "admin1/13.json"
+    },
+    {
+      "admin1Code": "14",
+      "admin1Name": "Mato Grosso",
+      "admin1SourceRef": "geonames:3457419",
+      "recordCount": 158,
+      "bestImportanceTier": 1,
+      "maxPopulation": 618124,
+      "bounds": {
+        "west": -61.4608,
+        "south": -17.83614,
+        "east": -50.51359,
+        "north": -9.40917,
+        "wrapsAntimeridian": false
+      },
+      "file": "admin1/14.json"
+    },
+    {
+      "admin1Code": "15",
+      "admin1Name": "Minas Gerais",
+      "admin1SourceRef": "geonames:3457153",
+      "recordCount": 859,
+      "bestImportanceTier": 1,
+      "maxPopulation": 2721564,
+      "bounds": {
+        "west": -50.68806,
+        "south": -22.86417,
+        "east": -39.94694,
+        "north": -14.2625,
+        "wrapsAntimeridian": false
+      },
+      "file": "admin1/15.json"
+    },
+    {
+      "admin1Code": "16",
+      "admin1Name": "Pará",
+      "admin1SourceRef": "geonames:3393129",
+      "recordCount": 155,
+      "bestImportanceTier": 1,
+      "maxPopulation": 1499641,
+      "bounds": {
+        "west": -57.75278,
+        "south": -9.335,
+        "east": -46.14,
+        "north": -0.15491,
+        "wrapsAntimeridian": false
+      },
+      "file": "admin1/16.json"
+    },
+    {
+      "admin1Code": "17",
+      "admin1Name": "Paraíba",
+      "admin1SourceRef": "geonames:3393098",
+      "recordCount": 227,
+      "bestImportanceTier": 1,
+      "maxPopulation": 817511,
+      "bounds": {
+        "west": -38.67417,
+        "south": -8.15222,
+        "east": -34.80861,
+        "north": -6.18861,
+        "wrapsAntimeridian": false
+      },
+      "file": "admin1/17.json"
+    },
+    {
+      "admin1Code": "18",
+      "admin1Name": "Paraná",
+      "admin1SourceRef": "geonames:3455077",
+      "recordCount": 401,
+      "bestImportanceTier": 1,
+      "maxPopulation": 1948626,
+      "bounds": {
+        "west": -54.58806,
+        "south": -26.48417,
+        "east": -48.32889,
+        "north": -22.54972,
+        "wrapsAntimeridian": false
+      },
+      "file": "admin1/18.json"
+    },
+    {
+      "admin1Code": "20",
+      "admin1Name": "Piauí",
+      "admin1SourceRef": "geonames:3392213",
+      "recordCount": 225,
+      "bestImportanceTier": 1,
+      "maxPopulation": 871126,
+      "bounds": {
+        "west": -45.92222,
+        "south": -10.81722,
+        "east": -40.45,
+        "north": -2.85205,
+        "wrapsAntimeridian": false
+      },
+      "file": "admin1/20.json"
+    },
+    {
+      "admin1Code": "21",
+      "admin1Name": "Rio de Janeiro",
+      "admin1SourceRef": "geonames:3451189",
+      "recordCount": 117,
+      "bestImportanceTier": 1,
+      "maxPopulation": 6747815,
+      "bounds": {
+        "west": -44.71306,
+        "south": -23.21778,
+        "east": -40.96139,
+        "north": -20.93111,
+        "wrapsAntimeridian": false
+      },
+      "file": "admin1/21.json"
+    },
+    {
+      "admin1Code": "22",
+      "admin1Name": "Rio Grande do Norte",
+      "admin1SourceRef": "geonames:3390290",
+      "recordCount": 186,
+      "bestImportanceTier": 1,
+      "maxPopulation": 896708,
+      "bounds": {
+        "west": -38.49694,
+        "south": -6.945,
+        "east": -35.00778,
+        "north": -4.83722,
+        "wrapsAntimeridian": false
+      },
+      "file": "admin1/22.json"
+    },
+    {
+      "admin1Code": "23",
+      "admin1Name": "Rio Grande do Sul",
+      "admin1SourceRef": "geonames:3451133",
+      "recordCount": 504,
+      "bestImportanceTier": 1,
+      "maxPopulation": 1488252,
+      "bounds": {
+        "west": -57.55472,
+        "south": -33.69111,
+        "east": -49.72694,
+        "north": -27.16194,
+        "wrapsAntimeridian": false
+      },
+      "file": "admin1/23.json"
+    },
+    {
+      "admin1Code": "24",
+      "admin1Name": "Rondônia",
+      "admin1SourceRef": "geonames:3924825",
+      "recordCount": 62,
+      "bestImportanceTier": 1,
+      "maxPopulation": 548952,
+      "bounds": {
+        "west": -66.35583,
+        "south": -13.49778,
+        "east": -60.14583,
+        "north": -8.76194,
+        "wrapsAntimeridian": false
+      },
+      "file": "admin1/24.json"
+    },
+    {
+      "admin1Code": "25",
+      "admin1Name": "Roraima",
+      "admin1SourceRef": "geonames:3662560",
+      "recordCount": 17,
+      "bestImportanceTier": 1,
+      "maxPopulation": 419652,
+      "bounds": {
+        "west": -61.4975,
+        "south": 0.88389,
+        "east": -59.62278,
+        "north": 4.59556,
+        "wrapsAntimeridian": false
+      },
+      "file": "admin1/25.json"
+    },
+    {
+      "admin1Code": "26",
+      "admin1Name": "Santa Catarina",
+      "admin1SourceRef": "geonames:3450387",
+      "recordCount": 320,
+      "bestImportanceTier": 1,
+      "maxPopulation": 664500,
+      "bounds": {
+        "west": -53.71222,
+        "south": -29.32111,
+        "east": -48.46713,
+        "north": -26.02667,
+        "wrapsAntimeridian": false
+      },
+      "file": "admin1/26.json"
+    },
+    {
+      "admin1Code": "27",
+      "admin1Name": "São Paulo",
+      "admin1SourceRef": "geonames:3448433",
+      "recordCount": 748,
+      "bestImportanceTier": 1,
+      "maxPopulation": 12400232,
+      "bounds": {
+        "west": -53.05917,
+        "south": -25.01472,
+        "east": -44.32333,
+        "north": -19.93278,
+        "wrapsAntimeridian": false
+      },
+      "file": "admin1/27.json"
+    },
+    {
+      "admin1Code": "28",
+      "admin1Name": "Sergipe",
+      "admin1SourceRef": "geonames:3447799",
+      "recordCount": 76,
+      "bestImportanceTier": 1,
+      "maxPopulation": 664908,
+      "bounds": {
+        "west": -38.18333,
+        "south": -11.51917,
+        "east": -36.46611,
+        "north": -9.66,
+        "wrapsAntimeridian": false
+      },
+      "file": "admin1/28.json"
+    },
+    {
+      "admin1Code": "29",
+      "admin1Name": "Goiás",
+      "admin1SourceRef": "geonames:3462372",
+      "recordCount": 248,
+      "bestImportanceTier": 1,
+      "maxPopulation": 1536097,
+      "bounds": {
+        "west": -53.20528,
+        "south": -19.18347,
+        "east": -46.11306,
+        "north": -13.03667,
+        "wrapsAntimeridian": false
+      },
+      "file": "admin1/29.json"
+    },
+    {
+      "admin1Code": "30",
+      "admin1Name": "Pernambuco",
+      "admin1SourceRef": "geonames:3392268",
+      "recordCount": 189,
+      "bestImportanceTier": 1,
+      "maxPopulation": 1653461,
+      "bounds": {
+        "west": -41.005,
+        "south": -9.39861,
+        "east": -32.4107,
+        "north": -3.84028,
+        "wrapsAntimeridian": false
+      },
+      "file": "admin1/30.json"
+    },
+    {
+      "admin1Code": "31",
+      "admin1Name": "Tocantins",
+      "admin1SourceRef": "geonames:3474575",
+      "recordCount": 143,
+      "bestImportanceTier": 1,
+      "maxPopulation": 306296,
+      "bounds": {
+        "west": -49.95556,
+        "south": -13.04389,
+        "east": -46.40642,
+        "north": -5.25722,
+        "wrapsAntimeridian": false
+      },
+      "file": "admin1/31.json"
+    }
+  ],
+  "anchorReconciliation": {
+    "globalAnchorCount": 9,
+    "matchedCount": 9,
+    "unmatchedCount": 0,
+    "entries": [
+      {
+        "anchorName": "Brasilia",
+        "anchorSector": "CAPITAL",
+        "anchorRole": "capital",
+        "status": "MATCHED",
+        "localityId": "dropi:locality:geonames:3469058",
+        "sourceRef": "geonames:3469058",
+        "distanceKm": 1.268
+      },
+      {
+        "anchorName": "Belem",
+        "anchorSector": "N",
+        "anchorRole": "urban",
+        "status": "MATCHED",
+        "localityId": "dropi:locality:geonames:3405870",
+        "sourceRef": "geonames:3405870",
+        "distanceKm": 2.643
+      },
+      {
+        "anchorName": "Salvador",
+        "anchorSector": "E",
+        "anchorRole": "urban",
+        "status": "MATCHED",
+        "localityId": "dropi:locality:geonames:3450554",
+        "sourceRef": "geonames:3450554",
+        "distanceKm": 1.293
+      },
+      {
+        "anchorName": "Porto Alegre",
+        "anchorSector": "S",
+        "anchorRole": "urban",
+        "status": "MATCHED",
+        "localityId": "dropi:locality:geonames:3452925",
+        "sourceRef": "geonames:3452925",
+        "distanceKm": 3.203
+      },
+      {
+        "anchorName": "Cuiaba",
+        "anchorSector": "W",
+        "anchorRole": "urban",
+        "status": "MATCHED",
+        "localityId": "dropi:locality:geonames:3465038",
+        "sourceRef": "geonames:3465038",
+        "distanceKm": 3.331
+      },
+      {
+        "anchorName": "Rosario",
+        "anchorSector": "NE",
+        "anchorRole": "secondary",
+        "status": "MATCHED",
+        "localityId": "dropi:locality:geonames:3390188",
+        "sourceRef": "geonames:3390188",
+        "distanceKm": 1.227
+      },
+      {
+        "anchorName": "Iguape",
+        "anchorSector": "SE",
+        "anchorRole": "secondary",
+        "status": "MATCHED",
+        "localityId": "dropi:locality:geonames:3461465",
+        "sourceRef": "geonames:3461465",
+        "distanceKm": 1.99
+      },
+      {
+        "anchorName": "Corumba",
+        "anchorSector": "SW",
+        "anchorRole": "secondary",
+        "status": "MATCHED",
+        "localityId": "dropi:locality:geonames:3465342",
+        "sourceRef": "geonames:3465342",
+        "distanceKm": 0.837
+      },
+      {
+        "anchorName": "Tonantins",
+        "anchorSector": "NW",
+        "anchorRole": "secondary",
+        "status": "MATCHED",
+        "localityId": "dropi:locality:geonames:3661894",
+        "sourceRef": "geonames:3661894",
+        "distanceKm": 0.053
+      }
+    ]
+  }
+}
