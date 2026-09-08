@@ -1,5 +1,5 @@
 {
-  "version": "1.0.0",
+  "version": "1.1.0",
   "reviewedOn": "2026-09-08",
   "purpose": "Player-facing semantic metadata for country and territory cases where a single generic capital label or geographic rendering could misstate political, constitutional, administrative or recognition reality.",
   "governance": {
@@ -55,6 +55,42 @@
       "publishedOn": "2026-06-17",
       "accessedOn": "2026-09-08",
       "note": "The Knesset describes Israel's official recognition of Somaliland on 26 December 2025 and subsequent diplomatic relations."
+    },
+    "japan-government-profile": {
+      "publisher": "The Government of Japan",
+      "title": "About Japan",
+      "url": "https://www.japan.go.jp/japan/index.html",
+      "accessedOn": "2026-09-08",
+      "note": "The current JapanGov country profile identifies Tokyo as Japan's capital."
+    },
+    "myanmar-moi-capital": {
+      "publisher": "Myanmar Ministry of Information",
+      "title": "Nay Pyi Taw capital must be neat and tidy with operation of smokeless industries",
+      "url": "https://www.moi.gov.mm/moi%3Aeng/news/4356",
+      "publishedOn": "2021-08-18",
+      "accessedOn": "2026-09-08",
+      "note": "The Ministry identifies Nay Pyi Taw as the capital and Yangon as a commercial hub."
+    },
+    "sri-lanka-government-overview": {
+      "publisher": "Government of Sri Lanka",
+      "title": "Country Overview",
+      "url": "https://www.gov.lk/sri-lanka/country-overview",
+      "accessedOn": "2026-09-08",
+      "note": "The government overview identifies Sri Jayewardenepura as the capital and Colombo as the commercial capital."
+    },
+    "chile-government-santiago": {
+      "publisher": "Government of Chile",
+      "title": "Región Metropolitana",
+      "url": "https://www.gob.cl/regiones/region-metropolitana/",
+      "accessedOn": "2026-09-08",
+      "note": "The Government of Chile identifies Santiago as both the regional capital and the national capital."
+    },
+    "chile-senate-valparaiso": {
+      "publisher": "Senate of Chile",
+      "title": "Edificio del Congreso Nacional de Valparaíso",
+      "url": "https://cdn.senado.cl/portal-senado-produccion/s3fs-public/2024-07/congreso-valparaiso.pdf",
+      "accessedOn": "2026-09-08",
+      "note": "The Senate describes the National Congress building in Valparaíso and its Senate and Chamber session halls."
     }
   },
   "entries": {
@@ -104,6 +140,91 @@
         "un-somaliland-governance",
         "un-somaliland-recognition-briefing",
         "israel-knesset-somaliland"
+      ]
+    },
+    "392": {
+      "issue": 464,
+      "renderedName": "Japan",
+      "statusLabel": "Current capital roles",
+      "statusSummary": "Tokyo is Japan's current national capital. The pinned locality source remains authoritative for coordinates; the governed override corrects which source-backed node carries the current capital role.",
+      "placeRoles": [
+        {
+          "locality": "Tokyo",
+          "role": "national-capital",
+          "label": "National capital"
+        },
+        {
+          "locality": "Kyoto",
+          "role": "representative-city",
+          "label": "Representative city"
+        }
+      ],
+      "sourceRefs": [
+        "japan-government-profile"
+      ]
+    },
+    "104": {
+      "issue": 465,
+      "renderedName": "Myanmar",
+      "statusLabel": "Current capital roles",
+      "statusSummary": "Nay Pyi Taw is Myanmar's capital. Yangon remains a major commercial hub and is not presented as the national capital.",
+      "placeRoles": [
+        {
+          "locality": "Nay Pyi Taw",
+          "role": "national-capital",
+          "label": "National capital"
+        },
+        {
+          "locality": "Yangon",
+          "role": "commercial-hub",
+          "label": "Commercial hub"
+        }
+      ],
+      "sourceRefs": [
+        "myanmar-moi-capital"
+      ]
+    },
+    "144": {
+      "issue": 466,
+      "renderedName": "Sri Lanka",
+      "statusLabel": "Capital role split",
+      "statusSummary": "Sri Jayewardenepura Kotte is the administrative/national capital while Colombo is the commercial capital. DROPi represents both roles instead of collapsing them into one generic capital label.",
+      "placeRoles": [
+        {
+          "locality": "Sri Jayewardenepura Kotte",
+          "role": "administrative-capital",
+          "label": "Administrative / national capital"
+        },
+        {
+          "locality": "Colombo",
+          "role": "commercial-capital",
+          "label": "Commercial capital"
+        }
+      ],
+      "sourceRefs": [
+        "sri-lanka-government-overview"
+      ]
+    },
+    "152": {
+      "issue": 473,
+      "renderedName": "Chile",
+      "statusLabel": "Capital and legislative roles",
+      "statusSummary": "Santiago is Chile's national capital. Valparaíso hosts the National Congress and remains represented separately rather than being labeled as the national capital.",
+      "placeRoles": [
+        {
+          "locality": "Santiago",
+          "role": "national-capital",
+          "label": "National capital"
+        },
+        {
+          "locality": "Valparaíso",
+          "role": "legislative-seat",
+          "label": "National Congress seat / representative city"
+        }
+      ],
+      "sourceRefs": [
+        "chile-government-santiago",
+        "chile-senate-valparaiso"
       ]
     }
   }
