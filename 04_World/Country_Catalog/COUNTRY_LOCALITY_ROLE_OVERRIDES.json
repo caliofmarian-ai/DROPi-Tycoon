@@ -1,0 +1,82 @@
+{
+  "version": "1.0.0",
+  "source": {
+    "name": "Natural Earth 1:10m populated places simple",
+    "upstreamCommit": "ca96624a56bd078437bca8184e78163e5039ad19"
+  },
+  "purpose": "Govern current-reality locality role corrections without hardcoding coordinates or mutating pinned Natural Earth provenance.",
+  "rules": {
+    "coordinatesMustComeFromPinnedSource": true,
+    "sourceLocalityMustResolveUniquely": true,
+    "displayNameMayBeGovernedSeparately": true,
+    "missingSourceLocalityIsAnError": true
+  },
+  "entries": {
+    "392": {
+      "issue": 464,
+      "country": "Japan",
+      "currentCapital": {
+        "sourceNames": ["Tokyo"],
+        "displayName": "Tokyo"
+      },
+      "requiredRepresentatives": [
+        {
+          "sourceNames": ["Kyoto"],
+          "displayName": "Kyoto",
+          "role": "urban"
+        }
+      ]
+    },
+    "104": {
+      "issue": 465,
+      "country": "Myanmar",
+      "currentCapital": {
+        "sourceNames": ["Nay Pyi Taw", "Naypyidaw", "Naypyitaw"],
+        "displayName": "Nay Pyi Taw"
+      },
+      "requiredRepresentatives": [
+        {
+          "sourceNames": ["Yangon", "Rangoon"],
+          "displayName": "Yangon",
+          "role": "urban"
+        }
+      ]
+    },
+    "144": {
+      "issue": 466,
+      "country": "Sri Lanka",
+      "currentCapital": {
+        "sourceNames": [
+          "Sri Jayewardenepura Kotte",
+          "Sri Jayewardenepura",
+          "Sri Jayawardanapura Kotte",
+          "Sri Jayawardhanapura Kotte",
+          "Kotte"
+        ],
+        "displayName": "Sri Jayewardenepura Kotte"
+      },
+      "requiredRepresentatives": [
+        {
+          "sourceNames": ["Colombo"],
+          "displayName": "Colombo",
+          "role": "urban"
+        }
+      ]
+    },
+    "152": {
+      "issue": 473,
+      "country": "Chile",
+      "currentCapital": {
+        "sourceNames": ["Santiago"],
+        "displayName": "Santiago"
+      },
+      "requiredRepresentatives": [
+        {
+          "sourceNames": ["Valparaiso", "Valparaíso"],
+          "displayName": "Valparaíso",
+          "role": "urban"
+        }
+      ]
+    }
+  }
+}
