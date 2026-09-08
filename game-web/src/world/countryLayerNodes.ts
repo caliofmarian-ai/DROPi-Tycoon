@@ -12,6 +12,17 @@ export interface CountryLocalityNode {
   populationReference: number
   admin1: string
   sourceFeatureClass: string
+  functions?: string[]
+}
+
+export interface CountryEntitySemantics {
+  entityKind?: string
+  kindLabel?: string
+  displayName?: string
+  capitalMode?: string
+  capitalSummary?: string
+  statusNote?: string
+  issue?: number
 }
 
 export interface CountryLocalityCatalog {
@@ -25,6 +36,8 @@ export interface CountryLocalityCatalog {
     registryVersion: string
     byRenderedName: Record<string, string>
   }
+  semanticsVersion?: string
+  semantics?: Record<string, CountryEntitySemantics>
   stats: {
     renderedCountries: number
     countriesWithRepresentativeNodes: number
@@ -39,6 +52,11 @@ export const localityNodesForCountry = (
   catalog: CountryLocalityCatalog | null | undefined,
   countryId: string,
 ): CountryLocalityNode[] => catalog?.countries?.[countryId] ?? []
+
+export const countrySemanticsFor = (
+  catalog: CountryLocalityCatalog | null | undefined,
+  countryId: string,
+): CountryEntitySemantics | null => catalog?.semantics?.[countryId] ?? null
 
 export const geometryIdentityByRenderedName = (
   catalog: CountryLocalityCatalog | null | undefined,
