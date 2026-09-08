@@ -18,7 +18,7 @@ The pinned geometry/locality source remains Natural Earth at upstream commit `ca
 | 732 | W. Sahara | Africa | indeterminate/disputed territory | REVIEW | #462 — neutral territory-status semantics required |
 | 376 | Israel | Asia | special disputed-status semantics in source | REVIEW | #467 — capital/status semantics require neutral handling |
 | 275 | Palestine | Asia | indeterminate/disputed status in source | REVIEW | #468 — capital/status semantics require neutral handling |
-| None | Kosovo | Europe | disputed/non-standard geometry identity | REVIEW | #478 — replace unsafe `None` catalog identity and preserve neutral status semantics |
+| XKX | Kosovo | Europe | disputed/non-standard source identity; stable DROPi project key | REVIEW | #478 — `XKX` is project-owned/non-ISO; neutral status semantics still required |
 | 304 | Greenland | North America | territory within the Kingdom of Denmark | PASS | remain geographically in North America; do not infer independent sovereignty from chapter placement |
 | 630 | Puerto Rico | North America | United States dependency/territory | PASS | remain geographically in North America; do not infer independent sovereignty from chapter placement |
 | 540 | New Caledonia | Oceania | French dependency / sui-generis territory | PASS | remain geographically in Oceania; do not infer independent sovereignty from chapter placement |
@@ -43,6 +43,10 @@ Antarctica must not expose a national-capital concept. Real research/logistics s
 
 The current zero-node result is intentional. The audited TAAF source states that the territory has no permanent population. The catalog must not fabricate a town or capital merely to satisfy a visual pattern. Future scientific/logistics facilities may only be added through an authoritative facility-level source contract.
 
+## Kosovo identity rule
+
+`XKX` is a stable DROPi project-owned geometry/catalog key used only because the rendered source geometry has no usable stable numeric ID. It is **not** an ISO numeric identifier and must never be presented as evidence of universally settled recognition or sovereignty. Geographic placement remains Europe; political/status semantics remain explicitly neutral and governed by #478.
+
 ## Cross-chapter reconciliation rule
 
 A special-status geometry appears in exactly one geographic manifest. This ledger references it but does not duplicate it into the `Special` chapter unless the continent mapper itself classifies the geometry as `Special`.
@@ -65,6 +69,6 @@ The Special chapter is complete when:
 
 1. Antarctica is REVIEW-linked to #477 rather than silently accepted as having a capital;
 2. French Southern and Antarctic Lands remains an intentional documented GAP;
-3. Kosovo's non-numeric identity is REVIEW-linked to #478;
+3. Kosovo uses stable project-owned ID `XKX` while neutral status semantics remain REVIEW-linked to #478;
 4. all cross-region special-status geometries above are classified without duplication;
 5. temporary audit artifacts/workflows are absent from the final PR diff.
