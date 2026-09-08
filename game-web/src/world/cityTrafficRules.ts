@@ -1,10 +1,13 @@
 import type { UrbanFacing, UrbanPoint } from './urbanWorld'
+import { isUrbanWalkable } from './urbanWorld'
+import { PLAYER_START, WORLD_ROADS } from './worldLayout'
 
 export interface ControlledCrossing {
   id: string
   x: number
   y: number
   pedestrianAxis: 'vertical' | 'horizontal'
+  roadAngle?: number
   halfLength: number
   halfWidth: number
   approachStopOffset: number
@@ -16,15 +19,34 @@ export interface CrossingPedestrianPose extends UrbanPoint {
   moving: boolean
 }
 
+/** Local crossing coordinates rotate with the source street. */
+export const crossingPoint = (crossing: Pick<ControlledCrossing, 'x' | 'y' | 'roadAngle'>, x: number, y: number): UrbanPoint => {
+  const angle = crossing.roadAngle ?? 0, c = Math.cos(angle), s = Math.sin(angle)
+  return { x: crossing.x + x * c - y * s, y: crossing.y + x * s + y * c }
+}
+const crossingLocalPoint = (crossing: ControlledCrossing, point: UrbanPoint): UrbanPoint => {
+  const angle = crossing.roadAngle ?? 0, c = Math.cos(angle), s = Math.sin(angle)
+  const x = point.x - crossing.x, y = point.y - crossing.y
+  return { x: x * c + y * s, y: -x * s + y * c }
+}
+
+// A game control on a validated source segment; no claim about real traffic signals.
+const crossingSites = WORLD_ROADS.flatMap(road => (road.centerline ?? []).slice(1).map((b, i) => {
+  const a = road.centerline![i], dx = b.x - a.x, dy = b.y - a.y
+  return { x: (a.x + b.x) / 2, y: (a.y + b.y) / 2, halfLength: (road.roadWidth ?? 32) / 2 + 6,
+    length: Math.hypot(dx, dy), roadAngle: Math.atan2(dy * Math.sign(dx), Math.abs(dx)) }
+})).filter(p => p.length > 190 && Math.abs(p.roadAngle) < Math.PI / 5)
+  .sort((a, b) => Math.hypot(a.x - PLAYER_START.x, a.y - PLAYER_START.y) - Math.hypot(b.x - PLAYER_START.x, b.y - PLAYER_START.y))
+const crossingSite = crossingSites.find(p => {
+  for (let x = -80; x <= 80; x += 8) { const v = crossingPoint(p, x, 0); if (!isUrbanWalkable(v.x, v.y, true, 6)) return false }
+  for (let y = -p.halfLength; y <= p.halfLength; y += 2) { const v = crossingPoint(p, 0, y); if (!isUrbanWalkable(v.x, v.y, false, 6)) return false }
+  return true
+})
+if (!crossingSite) throw new Error('City plan needs a safe controlled crossing')
 export const CENTRAL_CONTROLLED_CROSSING: ControlledCrossing = {
-  id: 'central-station-crossing',
-  x: 800,
-  y: 600,
-  pedestrianAxis: 'vertical',
-  halfLength: 84,
-  halfWidth: 24,
-  approachStopOffset: 86,
-  cycleSeconds: 12,
+  id: 'central-station-crossing', x: crossingSite.x, y: crossingSite.y, roadAngle: crossingSite.roadAngle,
+  pedestrianAxis: 'vertical', halfLength: crossingSite.halfLength, halfWidth: 24,
+  approachStopOffset: 60, cycleSeconds: 12,
 }
 
 export const CONTROLLED_CROSSINGS: readonly ControlledCrossing[] = [CENTRAL_CONTROLLED_CROSSING]
@@ -49,49 +71,50 @@ export const sampleControlledCrossingPedestrian = (
   target: CrossingPedestrianPose,
 ): CrossingPedestrianPose => {
   const t = crossingCycleTime(crossing, seconds)
-  const north = crossing.y - crossing.halfLength
-  const south = crossing.y + crossing.halfLength
+  const north = -crossing.halfLength
+  const south = crossing.halfLength
 
-  target.x = crossing.x
+  target.x = 0
   target.moving = false
 
   if (t < 1) {
     target.y = north
     target.facing = 'down'
-    return target
+    return Object.assign(target, crossingPoint(crossing, 0, target.y))
   }
   if (t < 4) {
     const progress = (t - 1) / 3
     target.y = north + (south - north) * progress
     target.facing = 'down'
     target.moving = true
-    return target
+    return Object.assign(target, crossingPoint(crossing, 0, target.y))
   }
   if (t < 7) {
     target.y = south
     target.facing = 'up'
-    return target
+    return Object.assign(target, crossingPoint(crossing, 0, target.y))
   }
   if (t < 10) {
     const progress = (t - 7) / 3
     target.y = south - (south - north) * progress
     target.facing = 'up'
     target.moving = true
-    return target
+    return Object.assign(target, crossingPoint(crossing, 0, target.y))
   }
 
   target.y = north
   target.facing = 'down'
-  return target
+  return Object.assign(target, crossingPoint(crossing, 0, target.y))
 }
 
 export const isPointInsideControlledCrossing = (crossing: ControlledCrossing, point: UrbanPoint): boolean => {
+  point = crossingLocalPoint(crossing, point)
   if (crossing.pedestrianAxis === 'vertical') {
-    return Math.abs(point.x - crossing.x) <= crossing.halfWidth &&
-      Math.abs(point.y - crossing.y) <= crossing.halfLength
+    return Math.abs(point.x) <= crossing.halfWidth &&
+      Math.abs(point.y) <= crossing.halfLength
   }
-  return Math.abs(point.y - crossing.y) <= crossing.halfWidth &&
-    Math.abs(point.x - crossing.x) <= crossing.halfLength
+  return Math.abs(point.y) <= crossing.halfWidth &&
+    Math.abs(point.x) <= crossing.halfLength
 }
 
 /**
@@ -105,16 +128,17 @@ export const yieldHorizontalTrafficAtCrossing = (
 ): CrossingPedestrianPose => {
   if (crossing.pedestrianAxis !== 'vertical' || !pedestrianHasCrossingPriority(crossing, seconds)) return pose
 
-  const leftStop = crossing.x - crossing.approachStopOffset
-  const rightStop = crossing.x + crossing.approachStopOffset
-  const crossingLeft = crossing.x - crossing.halfWidth
-  const crossingRight = crossing.x + crossing.halfWidth
+  const point = crossingLocalPoint(crossing, pose)
+  const leftStop = -crossing.approachStopOffset
+  const rightStop = crossing.approachStopOffset
+  const crossingLeft = -crossing.halfWidth
+  const crossingRight = crossing.halfWidth
 
-  if (pose.facing === 'right' && pose.x >= leftStop && pose.x <= crossingRight) {
-    pose.x = leftStop
+  if (pose.facing === 'right' && point.x >= leftStop && point.x <= crossingRight) {
+    Object.assign(pose, crossingPoint(crossing, leftStop, point.y))
     pose.moving = false
-  } else if (pose.facing === 'left' && pose.x <= rightStop && pose.x >= crossingLeft) {
-    pose.x = rightStop
+  } else if (pose.facing === 'left' && point.x <= rightStop && point.x >= crossingLeft) {
+    Object.assign(pose, crossingPoint(crossing, rightStop, point.y))
     pose.moving = false
   }
   return pose

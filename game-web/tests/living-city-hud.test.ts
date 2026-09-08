@@ -6,7 +6,7 @@ import { createOrderForSequence } from '../src/systems/orderGeneration'
 import {
   isUrbanHUDPoint, UrbanDPadInput, urbanDistrictCaption, urbanHUDLayout, urbanMapMarkers, urbanMapViewport, urbanStatusText,
 } from '../src/ui/UrbanHUD'
-import { WORLD_HEIGHT, WORLD_WIDTH } from '../src/world/worldLayout'
+import { WORLD_HEIGHT, WORLD_WIDTH, WORLD_ZONES, WORLD_CITY_NAME } from '../src/world/worldLayout'
 import { CAMERA_MAX_ZOOM, CAMERA_MIN_ZOOM } from '../src/ui/cameraControls'
 import { UrbanZoomGesture, urbanZoomStep } from '../src/ui/urbanZoom'
 import { minimapPoint } from '../src/world/urbanWorld'
@@ -56,16 +56,16 @@ describe('living city screen-space navigation', () => {
 
   it('clips the camera footprint inside the minimap even at world edges', () => {
     expect(urbanMapViewport({ x: -100, y: -200, width: 900, height: 800 }, 160, 120))
-      .toEqual({ x: 0, y: 0, width: 40, height: 30 })
+      .toEqual({ x: 0, y: 0, width: 800 / WORLD_WIDTH * 160, height: 600 / WORLD_HEIGHT * 120 })
     expect(urbanMapViewport({
       x: WORLD_WIDTH - 400, y: WORLD_HEIGHT - 200, width: 900, height: 600,
-    }, 160, 120)).toEqual({ x: 140, y: 110, width: 20, height: 10 })
+    }, 160, 120)).toEqual({ x: (WORLD_WIDTH - 400) / WORLD_WIDTH * 160, y: (WORLD_HEIGHT - 200) / WORLD_HEIGHT * 120, width: 160 - (WORLD_WIDTH - 400) / WORLD_WIDTH * 160, height: 120 - (WORLD_HEIGHT - 200) / WORLD_HEIGHT * 120 })
   })
 
   it('names the current district, with a city fallback on connecting streets', () => {
-    expect(urbanDistrictCaption({ x: 380, y: 270 })).toBe('OLD TOWN')
-    expect(urbanDistrictCaption({ x: 2020, y: 1490 })).toBe('GARDEN BOROUGH')
-    expect(urbanDistrictCaption({ x: 800, y: 600 })).toBe('CEDAR CITY')
+    const zone = WORLD_ZONES[0]
+    expect(urbanDistrictCaption({ x: zone.x + 1, y: zone.y + 1 })).toBe(zone.label.toUpperCase())
+    expect(urbanDistrictCaption({ x: WORLD_WIDTH - 2, y: WORLD_HEIGHT - 2 })).toBe(WORLD_CITY_NAME.toUpperCase())
   })
 
   it('uses actual money, reputation, selected transport and carried cargo', () => {

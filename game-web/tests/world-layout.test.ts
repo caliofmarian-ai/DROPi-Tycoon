@@ -23,10 +23,10 @@ const sceneSource = readFileSync(
 )
 
 describe('release blocker #273 — explorable first-map structure', () => {
-  it('quadruples the former 1600x1200 neighborhood footprint', () => {
-    expect(WORLD_WIDTH).toBe(3200)
-    expect(WORLD_HEIGHT).toBe(2400)
-    expect(WORLD_WIDTH * WORLD_HEIGHT).toBe(1600 * 1200 * 4)
+  it('fits the retained Brăila source extent with room for the Danube', () => {
+    expect(WORLD_WIDTH).toBeGreaterThan(3200)
+    expect(WORLD_HEIGHT).toBeGreaterThan(2400)
+    expect(WORLD_WIDTH / WORLD_HEIGHT).toBeGreaterThan(1)
   })
 
   it('retains the four legacy zone IDs and adds two distinct districts inside world bounds', () => {
@@ -98,7 +98,8 @@ describe('release blocker #273 — scene integration contract', () => {
       expect(presentationSource).toContain(token)
     }
     expect(presentationSource).toContain('ensureCityGroundTexture')
-    expect(presentationSource).toContain('drawCityPavement(g, URBAN_ROADS, URBAN_SIDEWALKS)')
+    expect(presentationSource).toContain('drawCityGround(g)')
+    expect(presentationSource).toContain('URBAN_ROADS.filter(visible)')
     const sidewalks = pavementSource.indexOf('for (const sidewalk of sidewalks)')
     const roads = pavementSource.indexOf('for (const road of roads)')
     expect(sidewalks).toBeGreaterThanOrEqual(0)

@@ -7,11 +7,11 @@ import {
 } from '../src/world/cityArt'
 import { cityDistrictAccents, drawCityDistrictAccents, drawCityPavement, roadCrossings } from '../src/world/cityGround'
 import {
-  CITY_GROUND_TEXTURE_SCALE, drawNeighborhoodNPC, getHQGrowth, renderUrbanNeighborhood,
+  CITY_GROUND_TEXTURE_SCALE, drawCityGround, drawNeighborhoodNPC, getHQGrowth, renderUrbanNeighborhood,
 } from '../src/world/urbanPresentation'
 import { isUrbanWalkable, URBAN_BUILDINGS, URBAN_ROADS, URBAN_SIDEWALKS } from '../src/world/urbanWorld'
 import {
-  WORLD_DECORATIONS, WORLD_HEIGHT, WORLD_ROUTE_POINTS, WORLD_WIDTH, WORLD_ZONES,
+  WORLD_LANDSCAPE, WORLD_CONTEXT_BUILDINGS, WORLD_DECORATIONS, WORLD_HEIGHT, WORLD_ROUTE_POINTS, WORLD_WIDTH, WORLD_ZONES,
 } from '../src/world/worldLayout'
 import { createInitialCompanyState } from '../src/state/gameState'
 
@@ -158,45 +158,27 @@ describe('original dimensional city architecture', () => {
     const mock = mockCityScene()
     drawCityPavement(mock.graphics() as Phaser.GameObjects.Graphics, URBAN_ROADS, URBAN_SIDEWALKS)
     for (const road of URBAN_ROADS) {
-      expect(mock.calls.some(call => call.method === 'fillRect' &&
-        JSON.stringify(call.args) === JSON.stringify([road.x - road.width / 2, road.y - road.height / 2, road.width, road.height]))).toBe(true)
+      expect(mock.calls.some(call => call.method === 'strokePoints' &&
+        JSON.stringify(call.args[0]) === JSON.stringify(road.centerline))).toBe(true)
     }
     for (const color of [CITY_COLORS.road, CITY_COLORS.sidewalk, CITY_COLORS.curb]) {
-      expect(mock.calls.some(call => call.method === 'fillStyle' && call.args[0] === color)).toBe(true)
+      expect(mock.calls.some(call => (call.method === 'fillStyle' && call.args[0] === color) ||
+        (call.method === 'lineStyle' && call.args[1] === color))).toBe(true)
     }
   })
 
-  it('places original canals and garden beds only in non-traversable district gaps', () => {
-    const accents = cityDistrictAccents(WORLD_ZONES, URBAN_SIDEWALKS, URBAN_BUILDINGS, WORLD_DECORATIONS)
-    expect(accents.filter(accent => accent.kind === 'canal')).toHaveLength(2)
-    expect(accents.filter(accent => accent.kind === 'garden')).toHaveLength(2)
-    expect(cityDistrictAccents(WORLD_ZONES, URBAN_SIDEWALKS, URBAN_BUILDINGS, WORLD_DECORATIONS)).toEqual(accents)
-    for (const accent of accents) {
-      for (let x = accent.x - accent.width / 2; x <= accent.x + accent.width / 2; x += 16) {
-        for (let y = accent.y - accent.height / 2; y <= accent.y + accent.height / 2; y += 8) {
-          expect(isUrbanWalkable(x, y, false, 0), `${accent.id}: ${x},${y}`).toBe(false)
-        }
-      }
-    }
+  it('draws source river/park geometry and city massing below playable streets', () => {
     const mock = mockCityScene()
-    drawCityDistrictAccents(mock.graphics() as Phaser.GameObjects.Graphics, accents)
-    for (const color of [CITY_COLORS.water, CITY_COLORS.waterLight, CITY_COLORS.flowerPink, CITY_COLORS.leafSun]) {
-      expect(mock.calls.some(call => ['fillStyle', 'lineStyle'].includes(call.method) && call.args.includes(color))).toBe(true)
-    }
+    drawCityGround(mock.graphics() as Phaser.GameObjects.Graphics)
+    const river = WORLD_LANDSCAPE.find(f => f.kind === 'river')!
+    expect(river.name).toMatch(/Dunărea|Danube/)
+    expect(mock.calls.some(c => c.method === 'strokePoints' && JSON.stringify(c.args[0]) === JSON.stringify(river.points))).toBe(true)
+    expect(WORLD_LANDSCAPE.some(f => f.kind === 'park')).toBe(true)
+    expect(WORLD_CONTEXT_BUILDINGS.length).toBeGreaterThan(5000)
+    const building = WORLD_CONTEXT_BUILDINGS[0]
+    expect(mock.calls.some(c => c.method === 'fillPoints' && JSON.stringify(c.args[0]) === JSON.stringify(building.points))).toBe(true)
   })
 
-  it('omits a landscape pocket if a new path, building or tree occupies it', () => {
-    const accents = cityDistrictAccents(WORLD_ZONES, URBAN_SIDEWALKS, URBAN_BUILDINGS, WORLD_DECORATIONS)
-    const pocket = accents[0]
-    const intrusion = { id: 'new-path', x: pocket.x, y: pocket.y, width: 5, height: 5 }
-    expect(cityDistrictAccents(WORLD_ZONES, [...URBAN_SIDEWALKS, intrusion], URBAN_BUILDINGS, WORLD_DECORATIONS))
-      .not.toContainEqual(pocket)
-    expect(cityDistrictAccents(WORLD_ZONES, URBAN_SIDEWALKS, [...URBAN_BUILDINGS, intrusion], WORLD_DECORATIONS))
-      .not.toContainEqual(pocket)
-    expect(cityDistrictAccents(WORLD_ZONES, URBAN_SIDEWALKS, URBAN_BUILDINGS, [...WORLD_DECORATIONS, {
-      id: 'new-tree', x: pocket.x, y: pocket.y, radius: 14, zoneId: 'waterfront',
-    }])).not.toContainEqual(pocket)
-  })
 
   it('caches static ground and keeps only local HQ Graphics with shared facade sprites', () => {
     const mock = mockCityScene()
@@ -210,9 +192,9 @@ describe('original dimensional city architecture', () => {
     expect(labels.some(([, , text]) => text === 'PARCEL STAGING')).toBe(true)
     expect(mock.textures.size).toBeLessThanOrEqual(49)
     const groundTexture = mock.calls.find(call => call.method === 'generateTexture' &&
-      call.args[0] === 'dropi-city-static-ground-v1')
+      call.args[0] === 'dropi-braila-static-ground-v1')
     expect(groundTexture?.args).toEqual([
-      'dropi-city-static-ground-v1',
+      'dropi-braila-static-ground-v1',
       Math.ceil(WORLD_WIDTH * CITY_GROUND_TEXTURE_SCALE),
       Math.ceil(WORLD_HEIGHT * CITY_GROUND_TEXTURE_SCALE),
     ])
@@ -221,7 +203,7 @@ describe('original dimensional city architecture', () => {
     expect(generatedBytes).toBeLessThan(12 * 1024 * 1024)
     expect(mock.raw.add.image).toHaveBeenCalledTimes(1 + URBAN_BUILDINGS.length +
       WORLD_DECORATIONS.length + WORLD_ROUTE_POINTS.length)
-    expect(mock.raw.add.image).toHaveBeenCalledWith(0, 0, 'dropi-city-static-ground-v1')
+    expect(mock.raw.add.image).toHaveBeenCalledWith(0, 0, 'dropi-braila-static-ground-v1')
     for (const tree of WORLD_DECORATIONS) {
       const index = mock.raw.add.image.mock.calls.findIndex(args => (args as unknown[])[0] === tree.x &&
         (args as unknown[])[1] === tree.y)
