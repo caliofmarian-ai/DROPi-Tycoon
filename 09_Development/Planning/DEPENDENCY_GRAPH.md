@@ -2,7 +2,7 @@
 
 Document: DEPENDENCY_GRAPH.md
 Project: DROPi Tycoon
-Version: 2.0.0
+Version: 2.0.1
 Status: Planning — Canonical
 Author: Marian Caliof & OpenAI
 Language: English
@@ -39,15 +39,16 @@ CANON-BASELINE
 +-- WORLD-INSTANCE/ACTOR (#421) ------------+---------------------------+
 |                                                                        |
 +-- AUTHORITATIVE-TIME (#420) --------------+--> HUMAN-ECONOMIC-LIFE --+--> CAUSAL-LOCAL-ECONOMY (#419)
-|                                                 | Personal Money        |     | inventory/demand
-|                                                 | wage/living costs     |     | cargo/custody
-|                                                 | Work Capacity         |     | settlement
-|                                                 | recovery              |     | visible consequence
+|                                                 | #436                  |     | inventory/demand
+|                                                 | Personal Money        |     | cargo/custody
+|                                                 | living costs          |     | settlement
+|                                                 | Work Capacity         |     | visible consequence
+|                                                 | wages                 |     |
 |                                                                        |     |
 +-- EXISTING-CITY/HQ/VEHICLE FOUNDATION --------------------------------+-----+
                                                                               |
-                                                                              +--> PROFESSIONS/EQUIPMENT
-                                                                              +--> COMPANY-FORMATION
+                                                                              +--> PROFESSIONS/EQUIPMENT (#437)
+                                                                              +--> COMPANY-FORMATION (#438)
                                                                                          |
 CAUSAL-LOCAL-ECONOMY + PROFESSIONS + COMPANY-FORMATION -----------------------------> LIVING-CITY/PRODUCTION
 
@@ -70,11 +71,11 @@ The Global Map is the first major visible checkpoint. Invisible foundations may 
 | Global Map UI | geography/data | #418 | first major visible checkpoint; no fake economy |
 | World Instance + world actor | Phase-1 baseline | #421 | can run parallel to map |
 | Authoritative clock | Phase-1 baseline | #420 | clock first; slow cycles later |
-| Personal Money/lifecycle | World actor + clock + economy ledger | new executable slice required | employee-first start, living costs, Work Capacity |
+| Personal Money/lifecycle | World actor + clock + economy ledger | #436 | employee-first start, living costs, Work Capacity |
 | Causal inventory/order/cargo | economy canon + time interfaces | #419 first slice | replace arbitrary reward causality progressively |
 | Smartphone/GPS hierarchy | stable map hierarchy + existing phone canon | #349 | one map truth |
-| Professions/equipment | personal lifecycle + time/economy | new executable slice required | earned capability |
-| Company formation | Personal Money + professions + economy | new executable slice required | no automatic founder start |
+| Professions/equipment | personal lifecycle + time/economy | #437 | earned capability |
+| Company formation | Personal Money + professions + economy | #438 | no automatic founder start |
 | Living city/production | causal economy + labor/company foundation | #419/#420 | population/production/waste/competition |
 | Shared multiplayer authority | world actor + settlement domains | #348 + technical canon | migrate state family by family |
 | Regional/global operations | map + local economy + authority/custody | #344 | no teleport; multi-leg logistics |
