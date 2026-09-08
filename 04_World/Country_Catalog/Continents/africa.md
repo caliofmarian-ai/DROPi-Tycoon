@@ -5,7 +5,7 @@ Status: Generated audit manifest; country-by-country maintenance surface.
 Parent: #446
 
 ## Source contract
-- runtime catalog version: `1.5.0`
+- runtime catalog version: `1.6.0`
 - Natural Earth upstream commit: `ca96624a56bd078437bca8184e78163e5039ad19`
 - every node coordinate remains a source coordinate; this manifest does not reposition places.
 
@@ -64,7 +64,7 @@ Parent: #446
 | XSL | Somaliland | Hargeysa | 7 | CAPITAL, N, E, S, W, NE, SE | **REVIEW** | #482: current special-status semantics required: XSL is a DROPi project-owned non-ISO key for the rendered Somaliland geometry; de facto administration and current recognition developments must remain distinct from universally settled sovereignty |
 | 710 | South Africa | Pretoria | 9 | CAPITAL, SW, SE, NE, N, E, S, W, NW | **REVIEW** | #460: three-capital semantics implemented: Pretoria administrative, Cape Town legislative, Bloemfontein judicial; Johannesburg retained as major city / Constitutional Court; owner Android Country Layer acceptance pending |
 | 729 | Sudan | Khartoum | 9 | CAPITAL, N, E, S, W, NE, SE, SW, NW | **PASS** | structural/source checks passed |
-| 834 | Tanzania | Dar es Salaam | 9 | CAPITAL, N, E, S, W, NE, SE, SW, NW | **REVIEW** | #461: capital-role semantics: Dodoma is the national capital while Dar es Salaam remains a major economic/port metropolis |
+| 834 | Tanzania | Dodoma | 9 | CAPITAL, E, N, S, W, NE, SE, SW, NW | **REVIEW** | #461: Dodoma capital override implemented; Dar es Salaam retained as commercial capital / major seaport; owner Android Country Layer acceptance pending |
 | 768 | Togo | Lome | 7 | CAPITAL, N, E, S, W, NE, NW | **PASS** | structural/source checks passed |
 | 788 | Tunisia | Tunis | 9 | CAPITAL, N, E, S, W, NE, SE, SW, NW | **PASS** | structural/source checks passed |
 | 800 | Uganda | Kampala | 9 | CAPITAL, N, E, S, W, NE, SE, SW, NW | **PASS** | structural/source checks passed |

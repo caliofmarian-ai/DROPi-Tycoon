@@ -1,5 +1,5 @@
 {
-  "version": "1.2.0",
+  "version": "1.3.0",
   "source": {
     "name": "Natural Earth 1:10m populated places simple",
     "upstreamCommit": "ca96624a56bd078437bca8184e78163e5039ad19"
@@ -16,12 +16,16 @@
       "issue": 464,
       "country": "Japan",
       "currentCapital": {
-        "sourceNames": ["Tokyo"],
+        "sourceNames": [
+          "Tokyo"
+        ],
         "displayName": "Tokyo"
       },
       "requiredRepresentatives": [
         {
-          "sourceNames": ["Kyoto"],
+          "sourceNames": [
+            "Kyoto"
+          ],
           "displayName": "Kyoto",
           "role": "urban"
         }
@@ -31,12 +35,19 @@
       "issue": 465,
       "country": "Myanmar",
       "currentCapital": {
-        "sourceNames": ["Nay Pyi Taw", "Naypyidaw", "Naypyitaw"],
+        "sourceNames": [
+          "Nay Pyi Taw",
+          "Naypyidaw",
+          "Naypyitaw"
+        ],
         "displayName": "Nay Pyi Taw"
       },
       "requiredRepresentatives": [
         {
-          "sourceNames": ["Yangon", "Rangoon"],
+          "sourceNames": [
+            "Yangon",
+            "Rangoon"
+          ],
           "displayName": "Yangon",
           "role": "urban"
         }
@@ -58,7 +69,9 @@
       },
       "requiredRepresentatives": [
         {
-          "sourceNames": ["Colombo"],
+          "sourceNames": [
+            "Colombo"
+          ],
           "displayName": "Colombo",
           "role": "urban"
         }
@@ -68,12 +81,17 @@
       "issue": 473,
       "country": "Chile",
       "currentCapital": {
-        "sourceNames": ["Santiago"],
+        "sourceNames": [
+          "Santiago"
+        ],
         "displayName": "Santiago"
       },
       "requiredRepresentatives": [
         {
-          "sourceNames": ["Valparaiso", "Valparaíso"],
+          "sourceNames": [
+            "Valparaiso",
+            "Valparaíso"
+          ],
           "displayName": "Valparaíso",
           "role": "urban"
         }
@@ -88,7 +106,9 @@
       },
       "requiredRepresentatives": [
         {
-          "sourceNames": ["Malabo"],
+          "sourceNames": [
+            "Malabo"
+          ],
           "displayName": "Malabo",
           "role": "urban"
         }
@@ -98,23 +118,50 @@
       "issue": 460,
       "country": "South Africa",
       "currentCapital": {
-        "sourceNames": ["Pretoria"],
+        "sourceNames": [
+          "Pretoria"
+        ],
         "displayName": "Pretoria"
       },
       "requiredRepresentatives": [
         {
-          "sourceNames": ["Cape Town"],
+          "sourceNames": [
+            "Cape Town"
+          ],
           "displayName": "Cape Town",
           "role": "urban"
         },
         {
-          "sourceNames": ["Bloemfontein"],
+          "sourceNames": [
+            "Bloemfontein"
+          ],
           "displayName": "Bloemfontein",
           "role": "urban"
         },
         {
-          "sourceNames": ["Johannesburg"],
+          "sourceNames": [
+            "Johannesburg"
+          ],
           "displayName": "Johannesburg",
+          "role": "urban"
+        }
+      ]
+    },
+    "834": {
+      "issue": 461,
+      "country": "Tanzania",
+      "currentCapital": {
+        "sourceNames": [
+          "Dodoma"
+        ],
+        "displayName": "Dodoma"
+      },
+      "requiredRepresentatives": [
+        {
+          "sourceNames": [
+            "Dar es Salaam"
+          ],
+          "displayName": "Dar es Salaam",
           "role": "urban"
         }
       ]

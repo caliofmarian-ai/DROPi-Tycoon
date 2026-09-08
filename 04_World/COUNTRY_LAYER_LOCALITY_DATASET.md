@@ -39,6 +39,7 @@ The source-backed governed corrections are:
 - Sri Lanka (`144`): source-backed Sri Jayewardenepura Kotte receives the structural capital slot while Colombo remains represented separately; player-facing administrative/commercial distinctions live in the semantic metadata layer (#466).
 - Chile (`152`): Santiago receives the current structural capital role; source-backed Valparaíso remains represented separately with its legislative-seat semantics (#473).
 - South Africa (`710`): Pretoria receives the structural capital slot while source-backed Cape Town, Bloemfontein and Johannesburg are all retained as required representative nodes. Semantic metadata exposes Pretoria as administrative capital, Cape Town as legislative capital, Bloemfontein as judicial capital and Johannesburg as a major city hosting the Constitutional Court (#460).
+- Tanzania (`834`): Dodoma receives the structural national-capital slot while source-backed Dar es Salaam is retained as the commercial capital / major seaport. The correction changes locality roles only and does not activate or alter logistics/economy simulation (#461).
 
 `game-web/public/data/country-semantic-metadata-v1.json` governs the player-facing meaning of these roles. This separation permits constitutional, administrative, legislative, judicial, commercial, claimed-capital, research/logistics and special-status semantics without changing geographic coordinates or forcing reality into one generic `capital` label.
 
@@ -79,7 +80,7 @@ This is not permission to replace stale or inconvenient Natural Earth values wit
 
 The current rendered topology contains 177 distinct geometries. Three source-null geometries use stable DROPi-owned, non-ISO catalog keys defined in `04_World/Country_Catalog/GEOMETRY_ID_REGISTRY.json`: `XNC` (N. Cyprus), `XSL` (Somaliland) and `XKX` (Kosovo). These keys are serialization identities only and do not assert sovereignty or recognition.
 
-Dataset v1.5.0 provides representative nodes for 175 of the 177 rendered geometries and 1,356 nodes in total, with at most nine per geometry. The two explicit coverage gaps are:
+Dataset v1.6.0 provides representative nodes for 175 of the 177 rendered geometries and 1,356 nodes in total, with at most nine per geometry. The two explicit coverage gaps are:
 - `260` — Fr. S. Antarctic Lands: the pinned populated-place source does not provide a truthful supported settlement node.
 - `XNC` — N. Cyprus: the pinned source does not currently map representative localities safely to the separately rendered geometry.
 
