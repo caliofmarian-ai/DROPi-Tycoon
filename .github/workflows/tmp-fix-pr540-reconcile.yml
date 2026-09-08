@@ -1,0 +1,39 @@
+name: Temporary fix PR 540 reconciliation workflow
+
+on:
+  push:
+    branches:
+      - openai/issue-539-district-identity-streets
+
+permissions:
+  contents: write
+
+jobs:
+  fix-reconciler:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: openai/issue-539-district-identity-streets
+      - name: Fix address-label injection target
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          from pathlib import Path
+          p = Path('.github/workflows/tmp-reconcile-pr540-braila.yml')
+          text = p.read_text()
+          old = '''          render_marker = "  WORLD_DECORATIONS.forEach((tree, index) => {\\n"\n          if 'renderBrailaAddressLabels(scene)' not in text:\n              text = text.replace(render_marker, "  renderBrailaAddressLabels(scene)\\n\\n" + render_marker, 1)'''
+          new = '''          render_marker = "  WORLD_DECORATIONS.forEach((tree, index) => {\\n"\n          if 'renderBrailaAddressLabels(scene)' not in text:\n              render_start = text.index('export const renderUrbanNeighborhood')\n              before, after = text[:render_start], text[render_start:]\n              after = after.replace(render_marker, "  renderBrailaAddressLabels(scene)\\n\\n" + render_marker, 1)\n              text = before + after'''
+          if old not in text:
+              raise SystemExit('expected reconciler block not found')
+          p.write_text(text.replace(old, new))
+          PY
+          git config user.name 'dropi-reconciliation-bot'
+          git config user.email 'actions@users.noreply.github.com'
+          git add .github/workflows/tmp-reconcile-pr540-braila.yml
+          if git diff --cached --quiet; then
+            exit 0
+          fi
+          git commit -m 'Fix PR 540 reconciliation injection target'
+          git push origin HEAD:openai/issue-539-district-identity-streets
