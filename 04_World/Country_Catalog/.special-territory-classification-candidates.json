@@ -1,0 +1,137 @@
+{
+  "sourceCommit": "ca96624a56bd078437bca8184e78163e5039ad19",
+  "candidates": [
+    {
+      "id": "732",
+      "renderedName": "W. Sahara",
+      "continentChapter": "Africa",
+      "admin": "Western Sahara",
+      "sovereign": "Western Sahara",
+      "type": "Indeterminate",
+      "geounit": "Western Sahara",
+      "homepart": "1",
+      "noteAdm0": ""
+    },
+    {
+      "id": "376",
+      "renderedName": "Israel",
+      "continentChapter": "Asia",
+      "admin": "Israel",
+      "sovereign": "Israel",
+      "type": "Disputed",
+      "geounit": "Israel",
+      "homepart": "1",
+      "noteAdm0": ""
+    },
+    {
+      "id": "398",
+      "renderedName": "Kazakhstan",
+      "continentChapter": "Asia",
+      "admin": "Kazakhstan",
+      "sovereign": "Kazakhstan",
+      "type": "Sovereignty",
+      "geounit": "Kazakhstan",
+      "homepart": "1",
+      "noteAdm0": ""
+    },
+    {
+      "id": "275",
+      "renderedName": "Palestine",
+      "continentChapter": "Asia",
+      "admin": "Palestine",
+      "sovereign": "Israel",
+      "type": "Indeterminate",
+      "geounit": "Palestine",
+      "homepart": "-99",
+      "noteAdm0": ""
+    },
+    {
+      "id": "None",
+      "renderedName": "Kosovo",
+      "continentChapter": "Europe",
+      "admin": "Kosovo",
+      "sovereign": "Kosovo",
+      "type": "Disputed",
+      "geounit": "Kosovo",
+      "homepart": "1",
+      "noteAdm0": ""
+    },
+    {
+      "id": "192",
+      "renderedName": "Cuba",
+      "continentChapter": "North America",
+      "admin": "Cuba",
+      "sovereign": "Cuba",
+      "type": "Sovereignty",
+      "geounit": "Cuba",
+      "homepart": "1",
+      "noteAdm0": ""
+    },
+    {
+      "id": "304",
+      "renderedName": "Greenland",
+      "continentChapter": "North America",
+      "admin": "Greenland",
+      "sovereign": "Denmark",
+      "type": "Country",
+      "geounit": "Greenland",
+      "homepart": "-99",
+      "noteAdm0": "Den."
+    },
+    {
+      "id": "630",
+      "renderedName": "Puerto Rico",
+      "continentChapter": "North America",
+      "admin": "Puerto Rico",
+      "sovereign": "United States of America",
+      "type": "Dependency",
+      "geounit": "Puerto Rico",
+      "homepart": "-99",
+      "noteAdm0": "U.S.A."
+    },
+    {
+      "id": "540",
+      "renderedName": "New Caledonia",
+      "continentChapter": "Oceania",
+      "admin": "New Caledonia",
+      "sovereign": "France",
+      "type": "Dependency",
+      "geounit": "New Caledonia",
+      "homepart": "-99",
+      "noteAdm0": "Fr."
+    },
+    {
+      "id": "238",
+      "renderedName": "Falkland Is.",
+      "continentChapter": "South America",
+      "admin": "Falkland Islands",
+      "sovereign": "United Kingdom",
+      "type": "Disputed",
+      "geounit": "Falkland Islands",
+      "homepart": "-99",
+      "noteAdm0": "U.K."
+    },
+    {
+      "id": "010",
+      "renderedName": "Antarctica",
+      "continentChapter": "Special",
+      "admin": "Antarctica",
+      "sovereign": "Antarctica",
+      "type": "Indeterminate",
+      "geounit": "Antarctica",
+      "homepart": "1",
+      "noteAdm0": "By treaty"
+    },
+    {
+      "id": "260",
+      "renderedName": "Fr. S. Antarctic Lands",
+      "continentChapter": "Special",
+      "admin": "French Southern and Antarctic Lands",
+      "sovereign": "France",
+      "type": "Dependency",
+      "geounit": "French Southern and Antarctic Lands",
+      "homepart": "-99",
+      "noteAdm0": "Fr."
+    }
+  ]
+}

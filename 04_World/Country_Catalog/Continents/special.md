@@ -12,15 +12,15 @@ Parent: #446
 ## Chapter summary
 - countries/territories: **2**
 - representative nodes: **5**
-- structural PASS: **1**
-- REVIEW: **0**
+- structural PASS: **0**
+- REVIEW: **1**
 - documented GAP: **1**
 
 ## Country-by-country manifest
 
 | ID | Country / territory | Capital | Nodes | Slots | State | Notes |
 |---:|---|---|---:|---|---|---|
-| 010 | Antarctica | McMurdo Station | 5 | CAPITAL, NE, SE, SW, NW | **PASS** | structural/source checks passed |
+| 010 | Antarctica | McMurdo Station | 5 | CAPITAL, NE, SE, SW, NW | **REVIEW** | #477: Antarctic Treaty semantics required: McMurdo Station is a research/logistics station, not a sovereign national capital; Antarctic territorial positions must remain neutral |
 | 260 | Fr. S. Antarctic Lands | — | 0 | — | **GAP** | documented source coverage gap |
 
 ## Interpretation
