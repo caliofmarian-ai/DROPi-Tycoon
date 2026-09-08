@@ -1,5 +1,5 @@
 {
-  "version": "1.2.2",
+  "version": "1.3.0",
   "purpose": "Manual semantic review flags discovered during continent-by-continent audit. These do not silently rewrite pinned Natural Earth source data.",
   "reviews": {
     "204": {
@@ -50,10 +50,6 @@
       "issue": 468,
       "reason": "capital/status semantics: Gaza must not be labeled the State of Palestine's national capital; East Jerusalem claim and Ramallah administrative role require neutral handling"
     },
-    "826": {
-      "issue": 469,
-      "reason": "country-identity bleed: Hamilton from a British overseas territory must not be grouped as the United Kingdom national capital"
-    },
     "068": {
       "issue": 472,
       "reason": "capital-role semantics: Sucre is Bolivia's constitutional/national capital while La Paz is the principal executive and legislative government seat"
@@ -70,9 +66,9 @@
       "issue": 477,
       "reason": "Antarctic Treaty semantics required: McMurdo Station is a research/logistics station, not a sovereign national capital; Antarctic territorial positions must remain neutral"
     },
-    "None": {
+    "XKX": {
       "issue": 478,
-      "reason": "nonstandard geometry identity and neutral status semantics required: Kosovo must not depend on a None catalog key or an implied universally settled sovereignty position"
+      "reason": "neutral status semantics remain required after stable project-owned geometry identity migration; XKX is a DROPi project key, not an ISO numeric code or sovereignty assertion"
     }
   }
 }
