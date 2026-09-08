@@ -18,7 +18,7 @@ const sparseCatalog = JSON.parse(readFileSync(
 
 describe('expanded locality source contract #502', () => {
   it('selects GeoNames cities500 under an explicit commercial-use attribution license', () => {
-    expect(registry.version).toBe('1.0.0')
+    expect(registry.version).toBe('1.1.0')
     expect(registry.issue).toBe(502)
     expect(registry.selectedSourceId).toBe('geonames-cities500')
     const source = registry.sources['geonames-cities500']
