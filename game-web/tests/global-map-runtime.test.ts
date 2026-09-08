@@ -44,6 +44,7 @@ const hudSource = readFileSync(new URL('../src/ui/UrbanHUD.ts', import.meta.url)
 const mapSource = readFileSync(new URL('../src/scenes/GlobalMapScene.ts', import.meta.url), 'utf8')
 
 const PINNED_POPULATED_PLACES_COMMIT = 'ca96624a56bd078437bca8184e78163e5039ad19'
+const CAPITAL_ROLE_OVERRIDE_IDS = ['104', '108', '144', '152', '204', '226', '384', '392', '710', '834']
 
 describe('Global Map runtime #418', () => {
   it('materializes sparse real-world locality nodes for country drill-down', () => {
@@ -89,16 +90,16 @@ describe('Global Map runtime #418', () => {
   })
 
   it('governs source-backed capital corrections without hardcoded coordinates', () => {
-    expect(roleOverrideRegistry.version).toBe('1.3.0')
+    expect(roleOverrideRegistry.version).toBe('1.4.0')
     expect(roleOverrideRegistry.source.upstreamCommit).toBe(PINNED_POPULATED_PLACES_COMMIT)
-    expect(Object.keys(roleOverrideRegistry.entries).sort()).toEqual(['104', '144', '152', '226', '392', '710', '834'])
+    expect(Object.keys(roleOverrideRegistry.entries).sort()).toEqual(CAPITAL_ROLE_OVERRIDE_IDS)
     expect(JSON.stringify(roleOverrideRegistry)).not.toContain('longitude')
     expect(JSON.stringify(roleOverrideRegistry)).not.toContain('latitude')
 
-    expect(localityCatalog.version).toBe('1.6.0')
+    expect(localityCatalog.version).toBe('1.7.0')
     expect(localityCatalog.localityRoleOverrides?.registryVersion).toBe(roleOverrideRegistry.version)
     expect(localityCatalog.localityRoleOverrides?.sourceCommit).toBe(PINNED_POPULATED_PLACES_COMMIT)
-    expect(localityCatalog.localityRoleOverrides?.countryIds).toEqual(['104', '144', '152', '226', '392', '710', '834'])
+    expect(localityCatalog.localityRoleOverrides?.countryIds).toEqual(CAPITAL_ROLE_OVERRIDE_IDS)
   })
 
   it('keeps special-status and current-capital semantics source-governed', () => {
@@ -110,7 +111,7 @@ describe('Global Map runtime #418', () => {
     const sriLanka = semanticEntryForCountry(semanticCatalog, '144')
     const chile = semanticEntryForCountry(semanticCatalog, '152')
 
-    expect(semanticCatalog.version).toBe('1.5.0')
+    expect(semanticCatalog.version).toBe('1.6.0')
     expect(semanticCatalog.governance.geographyDoesNotAssertSovereignty).toBe(true)
     expect(semanticCatalog.governance.projectGeometryIdsAreNonISO).toBe(true)
     expect(semanticCatalog.governance.localityCoordinatesRemainSourceBacked).toBe(true)

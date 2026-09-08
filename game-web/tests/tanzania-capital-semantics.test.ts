@@ -51,7 +51,7 @@ describe('Tanzania Dodoma capital semantics #461', () => {
   it('governs Dodoma and retains Dar es Salaam without embedding coordinates', () => {
     const override = roleOverrideRegistry.entries['834']
 
-    expect(roleOverrideRegistry.version).toBe('1.3.0')
+    expect(roleOverrideRegistry.version).toBe('1.4.0')
     expect(override.issue).toBe(461)
     expect(override.currentCapital).toEqual({ sourceNames: ['Dodoma'], displayName: 'Dodoma' })
     expect(override.requiredRepresentatives).toEqual([
@@ -66,8 +66,8 @@ describe('Tanzania Dodoma capital semantics #461', () => {
     const dodoma = nodes.find(node => node.name === 'Dodoma')
     const dar = nodes.find(node => node.name === 'Dar es Salaam')
 
-    expect(localityCatalog.version).toBe('1.6.0')
-    expect(localityCatalog.localityRoleOverrides?.registryVersion).toBe('1.3.0')
+    expect(localityCatalog.version).toBe('1.7.0')
+    expect(localityCatalog.localityRoleOverrides?.registryVersion).toBe('1.4.0')
     expect(localityCatalog.localityRoleOverrides?.countryIds).toContain('834')
     expect(nodes.length).toBeLessThanOrEqual(9)
     expect(nodes.filter(node => node.role === 'capital')).toHaveLength(1)
@@ -88,7 +88,7 @@ describe('Tanzania Dodoma capital semantics #461', () => {
     const act = semanticCatalog.sources['tanzania-dodoma-capital-act']
     const profile = semanticCatalog.sources['tanzania-government-country-profile']
 
-    expect(semanticCatalog.version).toBe('1.5.0')
+    expect(semanticCatalog.version).toBe('1.6.0')
     expect(entry.issue).toBe(461)
     expect(entry.statusLabel).toBe('National and commercial capital roles')
     expect(entry.statusSummary).toContain('Dodoma')

@@ -39,7 +39,7 @@ const specialLedger = readFileSync(
 describe('Western Sahara neutral territory-status semantics #462', () => {
   it('keeps Bir Lehlou source-backed without changing the sparse locality catalog', () => {
     const nodes = localityCatalog.countries['732'] ?? []
-    expect(localityCatalog.version).toBe('1.6.0')
+    expect(localityCatalog.version).toBe('1.7.0')
     expect(nodes).toHaveLength(1)
     expect(nodes[0]?.name).toBe('Bir Lehlou')
     expect(Number.isFinite(nodes[0]?.longitude)).toBe(true)
@@ -50,7 +50,7 @@ describe('Western Sahara neutral territory-status semantics #462', () => {
 
   it('classifies the geometry as a UN Non-Self-Governing Territory with unresolved final status', () => {
     const entry = semanticEntryForCountry(semanticCatalog, '732')
-    expect(semanticCatalog.version).toBe('1.5.0')
+    expect(semanticCatalog.version).toBe('1.6.0')
     expect(entry?.issue).toBe(462)
     expect(entry?.statusLabel).toBe('UN Non-Self-Governing Territory')
     expect(entry?.territoryStatus).toEqual({

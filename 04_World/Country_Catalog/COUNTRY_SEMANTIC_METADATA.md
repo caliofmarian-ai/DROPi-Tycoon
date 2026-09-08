@@ -171,3 +171,7 @@ A supplement may not be created from a visual map estimate, generic search-resul
 - research/logistics station.
 
 This layer is the required path for the remaining multi-capital and politically sensitive Country Catalog reviews. It must be extended instead of encoding those distinctions as arbitrary hardcoded UI strings.
+
+## Africa multi-role capital corrections — #456 #457 #458
+
+Benin, Burundi and Côte d’Ivoire use the governed locality-role override registry to distinguish the source-backed structural capital node from a separately retained economic/government city. Porto-Novo/Cotonou, Gitega/Bujumbura and Yamoussoukro/Abidjan remain source-backed Natural Earth localities; player-facing role labels are governed by official national sources.

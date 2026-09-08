@@ -4,15 +4,15 @@
   "reviews": {
     "204": {
       "issue": 456,
-      "reason": "capital-role semantics: Porto-Novo is the political/national capital while Cotonou hosts major government and economic functions"
+      "reason": "Porto-Novo national/political capital override implemented; Cotonou retained as economic capital / government centre; owner Android Country Layer acceptance pending"
     },
     "108": {
       "issue": 457,
-      "reason": "capital-role semantics: Gitega is the political capital and Bujumbura is the economic capital"
+      "reason": "Gitega political-capital override implemented; Bujumbura retained as economic capital; owner Android Country Layer acceptance pending"
     },
     "384": {
       "issue": 458,
-      "reason": "capital-role semantics: Yamoussoukro is the political/administrative capital while Abidjan is the dominant economic/metropolitan centre"
+      "reason": "Yamoussoukro political-capital override implemented; Abidjan retained as economic capital / major metropolitan centre; owner Android Country Layer acceptance pending"
     },
     "226": {
       "issue": 459,
