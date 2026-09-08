@@ -145,7 +145,15 @@ export const worldClockDayOrdinal = (
 export const worldClockMinuteOrdinal = (
   clock: WorldClockState,
   policy: WorldClockPolicy = PROTOTYPE_WORLD_CLOCK_POLICY,
-): number => worldClockDayOrdinal(clock, policy) * MINUTES_PER_DAY + clock.hour * MINUTES_PER_HOUR + clock.minute
+): number => {
+  assertPolicy(policy)
+  const safe = sanitizeWorldClockState(clock, clock.worldInstanceId, policy).clock
+  return ((safe.year - 1) * daysPerYear(policy)
+    + WORLD_SEASONS.indexOf(safe.season as WorldSeason) * policy.daysPerSeason
+    + (safe.dayOfSeason - 1)) * MINUTES_PER_DAY
+    + safe.hour * MINUTES_PER_HOUR
+    + safe.minute
+}
 
 export const worldClockFromMinuteOrdinal = (
   worldInstanceId: string,
@@ -193,7 +201,11 @@ export const workShiftPosition = (
   assertPolicy(policy)
   const starts = [...policy.shiftStartMinutes].sort((a, b) => a - b)
   const minuteOfDay = clock.hour * MINUTES_PER_HOUR + clock.minute
-  let shiftIndex = starts.findLastIndex(start => start <= minuteOfDay)
+  let shiftIndex = -1
+  for (let index = 0; index < starts.length; index += 1) {
+    if (starts[index] <= minuteOfDay) shiftIndex = index
+    else break
+  }
   let dayIndex = operatingDayIndex(clock, policy)
   if (shiftIndex < 0) {
     shiftIndex = starts.length - 1
@@ -234,7 +246,6 @@ export const advanceWorldClock = (
   const endDay = Math.floor(endMinute / MINUTES_PER_DAY)
   const seasonMinutes = policy.daysPerSeason * MINUTES_PER_DAY
   const yearMinutes = daysPerYear(policy) * MINUTES_PER_DAY
-  const marketMinutes = policy.marketCycleDays * MINUTES_PER_DAY
   return {
     clock: worldClockFromMinuteOrdinal(safeClock.worldInstanceId, endMinute, policy),
     requestedMinutes: requested,
