@@ -19,6 +19,8 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
+      - name: Install country catalog dependency
+        run: python -m pip install --disable-pip-version-check pycountry
       - name: Apply governed status semantics
         run: |
           set -euo pipefail
