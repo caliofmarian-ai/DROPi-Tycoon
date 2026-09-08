@@ -1,0 +1,80 @@
+name: TEMP Apply South Africa Three Capitals
+
+on:
+  push:
+    branches:
+      - openai/south-africa-three-capitals-460
+    paths:
+      - '04_World/Country_Catalog/COUNTRY_LOCALITY_ROLE_OVERRIDES.json'
+      - '04_World/Country_Catalog/COUNTRY_REVIEW_REGISTRY.json'
+      - 'game-web/public/data/country-semantic-metadata-v1.json'
+      - 'game-web/tests/south-africa-capital-semantics.test.ts'
+      - '.github/workflows/apply-south-africa-three-capitals-temp.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  regenerate:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: openai/south-africa-three-capitals-460
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install generator dependency
+        run: python -m pip install --disable-pip-version-check pycountry
+      - name: Align generator and regression contract versions
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+
+          generator = Path('scripts/build_country_locality_catalog.py')
+          text = generator.read_text()
+          text = text.replace("assert capital('226') == 'Ciudad de la Paz'\n", "assert capital('226') == 'Ciudad de la Paz'\nassert capital('710') == 'Pretoria'\n")
+          text = text.replace("assert node('226', 'Malabo') and node('226', 'Malabo')['role'] != 'capital'\n", "assert node('226', 'Malabo') and node('226', 'Malabo')['role'] != 'capital'\nassert node('710', 'Cape Town') and node('710', 'Cape Town')['role'] != 'capital'\nassert node('710', 'Bloemfontein') and node('710', 'Bloemfontein')['role'] != 'capital'\nassert node('710', 'Johannesburg') and node('710', 'Johannesburg')['role'] != 'capital'\n")
+          text = text.replace("'version': '1.4.0',", "'version': '1.5.0',")
+          generator.write_text(text)
+
+          test = Path('game-web/tests/global-map-runtime.test.ts')
+          text = test.read_text()
+          text = text.replace("expect(roleOverrideRegistry.version).toBe('1.1.0')", "expect(roleOverrideRegistry.version).toBe('1.2.0')")
+          text = text.replace("['104', '144', '152', '226', '392']", "['104', '144', '152', '226', '392', '710']")
+          text = text.replace("expect(localityCatalog.version).toBe('1.4.0')", "expect(localityCatalog.version).toBe('1.5.0')")
+          text = text.replace("expect(semanticCatalog.version).toBe('1.2.0')", "expect(semanticCatalog.version).toBe('1.3.0')")
+          test.write_text(text)
+          PY
+          git diff --check
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add scripts/build_country_locality_catalog.py game-web/tests/global-map-runtime.test.ts
+          if ! git diff --cached --quiet; then
+            git commit -m 'test: align South Africa locality contract versions'
+            git push origin HEAD:openai/south-africa-three-capitals-460
+          fi
+      - name: Regenerate governed country data
+        run: |
+          set -euo pipefail
+          python scripts/build_country_locality_catalog.py
+          python scripts/build_country_catalog_chapters.py --all
+          python scripts/verify_country_catalog_chapters.py --write-report
+          git diff --check
+      - name: Commit deterministic outputs
+        run: |
+          set -euo pipefail
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add \
+            game-web/public/data/country-representative-localities-v1.json \
+            04_World/Country_Catalog/Continents \
+            04_World/Country_Catalog/GLOBAL_COUNTRY_CATALOG_AUDIT.md
+          if git diff --cached --quiet; then
+            echo 'No generated output changes.'
+            exit 0
+          fi
+          git commit -m 'chore: regenerate South Africa country catalog outputs'
+          git push origin HEAD:openai/south-africa-three-capitals-460
