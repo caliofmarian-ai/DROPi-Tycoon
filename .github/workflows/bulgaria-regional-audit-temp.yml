@@ -1,0 +1,75 @@
+name: TEMP Bulgaria Regional Audit
+
+on:
+  push:
+    branches:
+      - openai/europe-bulgaria-regional-localities-524
+    paths:
+      - .github/workflows/bulgaria-regional-audit-temp.yml
+
+permissions:
+  contents: read
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Audit retained Bulgaria source hierarchy
+        run: |
+          set -euo pipefail
+          base='https://github.com/caliofmarian-ai/DROPi-Tycoon/releases/download/source-geonames-cities500-2026-09-08-f3cda4f9'
+          curl -fsSL "$base/cities500.zip" -o /tmp/cities500.zip
+          curl -fsSL "$base/admin1CodesASCII.txt" -o /tmp/admin1CodesASCII.txt
+          printf '%s  %s\n' 'f3cda4f9d256d90045121fb8eebad3ed91695c32370ed93b50fbe0cb616e2bbd' /tmp/cities500.zip | sha256sum -c -
+          printf '%s  %s\n' '590651498043f674accda2b7f46d21286cda0e290b02f8561c5005eee9a5448c' /tmp/admin1CodesASCII.txt | sha256sum -c -
+          python - <<'PY'
+          import collections, io, json, zipfile
+          from pathlib import Path
+
+          admin = {}
+          for line in Path('/tmp/admin1CodesASCII.txt').read_text(encoding='utf-8').splitlines():
+              if line.startswith('BG.'):
+                  f = line.split('\t')
+                  code = f[0].split('.', 1)[1]
+                  admin[code] = {'name': f[1], 'asciiName': f[2], 'sourceRef': f'geonames:{f[3]}'}
+
+          fields = [
+              'geonameid','name','asciiname','alternatenames','latitude','longitude',
+              'feature_class','feature_code','country_code','cc2','admin1_code',
+              'admin2_code','admin3_code','admin4_code','population','elevation',
+              'dem','timezone','modification_date'
+          ]
+          groups = collections.defaultdict(list)
+          with zipfile.ZipFile('/tmp/cities500.zip') as zf:
+              with zf.open('cities500.txt') as raw:
+                  for line in io.TextIOWrapper(raw, encoding='utf-8'):
+                      row = dict(zip(fields, line.rstrip('\n').split('\t')))
+                      if row['country_code'] == 'BG':
+                          groups[row['admin1_code']].append(row)
+
+          print('BULGARIA_ADMIN1_COUNT', len(admin))
+          print('BULGARIA_SOURCE_LOCALITIES', sum(len(rows) for rows in groups.values()))
+          print('BULGARIA_ADMIN1_WITH_LOCALITIES', sum(bool(groups.get(code)) for code in admin))
+          priority = {'PPLC': 0, 'PPLA': 1, 'PPLA2': 2, 'PPLA3': 3, 'PPLA4': 4, 'PPL': 5}
+          for code in sorted(admin, key=lambda value: int(value) if value.isdigit() else value):
+              rows = groups.get(code, [])
+              ranked = [r for r in rows if r['feature_code'] in priority]
+              ranked.sort(key=lambda r: (priority[r['feature_code']], -int(r['population'] or 0), r['name'].casefold(), int(r['geonameid'])))
+              top = sorted(rows, key=lambda r: (-int(r['population'] or 0), r['name'].casefold(), int(r['geonameid'])))[:8]
+              def compact(r):
+                  return {
+                      'name': r['name'], 'asciiName': r['asciiname'], 'featureCode': r['feature_code'],
+                      'population': int(r['population'] or 0), 'sourceRef': f"geonames:{r['geonameid']}",
+                      'lat': float(r['latitude']), 'lon': float(r['longitude'])
+                  }
+              print(json.dumps({
+                  'code': code,
+                  'district': admin[code]['name'],
+                  'districtAscii': admin[code]['asciiName'],
+                  'districtSourceRef': admin[code]['sourceRef'],
+                  'candidateCount': len(rows),
+                  'adminCandidates': [compact(r) for r in ranked[:8]],
+                  'topPopulation': [compact(r) for r in top],
+              }, ensure_ascii=False))
+          PY
