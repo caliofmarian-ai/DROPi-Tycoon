@@ -1,5 +1,5 @@
 {
-  "version": "1.2.1",
+  "version": "1.2.2",
   "purpose": "Manual semantic review flags discovered during continent-by-continent audit. These do not silently rewrite pinned Natural Earth source data.",
   "reviews": {
     "204": {
@@ -69,6 +69,10 @@
     "010": {
       "issue": 477,
       "reason": "Antarctic Treaty semantics required: McMurdo Station is a research/logistics station, not a sovereign national capital; Antarctic territorial positions must remain neutral"
+    },
+    "None": {
+      "issue": 478,
+      "reason": "nonstandard geometry identity and neutral status semantics required: Kosovo must not depend on a None catalog key or an implied universally settled sovereignty position"
     }
   }
 }
