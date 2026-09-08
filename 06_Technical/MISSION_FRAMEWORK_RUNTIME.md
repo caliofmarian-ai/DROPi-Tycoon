@@ -1,7 +1,7 @@
 # Mission / Quest / Campaign Runtime
 
-Status: Phase-1 mission architecture for #553  
-Parent: #552 Narrative  
+Status: Phase-1 mission architecture for #553
+Parent: #552 Narrative
 Last updated: 2026-09-08
 
 ## Purpose
@@ -118,7 +118,7 @@ Supported policies are:
 - `DelayedSecondChance` — temporarily lock the mission until authoritative world time advances;
 - `FailedBranch` — terminate this mission safely while unlocking a recovery/alternate mission.
 
-One failed parcel therefore does not need to destroy the campaign graph.
+Failure event IDs are recorded before the failure policy is applied, so replaying the same failure cannot increment the failure count twice. One failed parcel therefore does not need to destroy the campaign graph.
 
 ## Graph safety
 
@@ -133,11 +133,9 @@ One failed parcel therefore does not need to destroy the campaign graph.
 - unknown prerequisite/unlock mission IDs;
 - invalid delays;
 - unmarked stage cycles;
-- unmarked mission-unlock cycles.
+- unmarked mission dependency/unlock cycles.
 
-Cycles are permitted only on an edge explicitly marked `allowCycle`, intended for designed retry/repeat structures rather than accidental infinite loops.
-
-For chained authored content, use one causal gate for the same relationship: either explicit unlock or `missionCompleted` prerequisite. Do not redundantly encode the same A -> B edge in both forms.
+Cycles are permitted only on an edge explicitly marked `allowCycle`, intended for designed retry/repeat structures rather than accidental infinite loops. A `missionCompleted` prerequisite is oriented causally from prerequisite to dependent mission, so an authored A -> B chain is not mistaken for a cycle when A also explicitly unlocks B.
 
 ## Persistence boundary
 
@@ -147,9 +145,26 @@ For chained authored content, use one causal gate for the same relationship: eit
 
 This PR deliberately does not modify legacy browser Save v2 or PostgreSQL. World Instance B2 owns durable authority and is concurrently active. When the canonical World Instance persistence shape is ready, this payload can be attached as one mission aggregate instead of introducing a competing save/database model.
 
+## Agent 8 narrative coordination
+
+Before finalization, Agent 9 inspected Agent 8 branch `agent/narrative-story-bible` and open PR #557, including `STORY_BIBLE.md` and `CAMPAIGN_STRUCTURE.md`.
+
+That narrative work establishes the campaign spine `THE ROUTES WE LEAVE BEHIND`, Northstar Parcel Logistics as the opening employer, Ana Stoica as dispatcher/mentor, Radu Marin as coworker, Mirela Stan as the first recurring merchant, Petru Neagu as the early household contrast, and the first delivery beat `One Small Thing`.
+
+The mission runtime is compatible with those beats:
+
+- the Northstar/Ana opening is an authored Employer/Campaign mission;
+- `One Small Thing` references an authoritative order, parcel/custody state and existing `DeliveryMission`;
+- Mirela/Petru memory is represented through external relationship/history consequence intents rather than copied ledgers;
+- Radu/Work Capacity pressure is gated by authoritative player-economy/capability facts;
+- first pay remains an external economic settlement, never quest money;
+- later shortage/production beats can be systemic missions carrying a real Agent 7 `causeRef`.
+
+PR #557 is still open and its design documents do not define stable runtime actor/entity IDs. Agent 9 therefore does not invent permanent technical IDs or dialogue in this PR. The structural blueprint stays replaceable until the narrative entity-ID/content layer is authoritative.
+
 ## Neutral first-hour Brăila blueprint
 
-`buildNeutralBrailaFirstHourBlueprint(...)` proves the architecture needed for the first-hour experience without canonizing Agent 8's characters or dialogue.
+`buildNeutralBrailaFirstHourBlueprint(...)` proves the architecture needed for the first-hour experience without canonizing new character IDs or dialogue.
 
 Bindings are supplied for the dispatcher actor/location, recurring local actor/location, existing first `DeliveryMission`, and the external economic settlement reference.
 
@@ -164,7 +179,7 @@ The placeholder flow demonstrates:
 7. return/report;
 8. unlock a delayed next opportunity.
 
-All placeholder story IDs are replaceable. `agent8-canon-pending` makes that status explicit.
+The blueprint is deliberately data-bound so Agent 8's final authored first-hour content can replace labels/actors/choices without replacing the mission engine.
 
 ## UI boundary
 
@@ -191,13 +206,13 @@ After this slice, the project has architecture for:
 - **Agent 3 / #436:** adapter from mission work/completion to Personal Money, Work Capacity and authoritative wage/settlement events.
 - **Agent 6 / #437:** richer activity/capability eligibility adapter and capability-opportunity consumption.
 - **Agent 7 / #419:** adapter that materializes real systemic missions from supply/demand opportunities and producer logistics contracts.
-- **Agent 8 / #552:** permanent story bible, recurring cast, dialogue tone, authored arc IDs, final first-hour choices/consequences and narrative canon.
+- **Agent 8 / #552 / PR #557:** merge/stabilization of story bible and campaign content plus stable narrative entity IDs for authored runtime binding.
 - **Agent 10:** player-facing mission/narrative presentation, notifications and smartphone/world UX.
 - **World Instance B2 / #421:** durable world-local persistence ownership for mission payloads and other authoritative aggregates.
 
 ## Tests
 
-`game-web/tests/mission-framework.test.ts` covers:
+`game-web/tests/mission-framework.test.ts` and `game-web/tests/mission-framework-hardening.test.ts` cover:
 
 - authored and systemic missions on one engine;
 - prerequisite evaluation;
@@ -205,10 +220,12 @@ After this slice, the project has architecture for:
 - branch selection;
 - exactly-once completion;
 - duplicate completion consequence safety;
-- retry and delayed-second-chance failure;
+- duplicate failure-event safety;
+- retry, alternate outcome and delayed-second-chance failure;
 - failed-branch campaign safety;
 - existing `DeliveryMission` reference integrity;
 - persistence round-trip and malformed-payload repair;
+- prerequisite/unlock causal direction;
 - invalid graph detection;
 - stage and mission cycle validation;
 - explicit cycle permission;
