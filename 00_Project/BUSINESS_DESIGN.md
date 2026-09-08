@@ -2,11 +2,11 @@
 
 Document: BUSINESS_DESIGN.md
 Project: DROPi Tycoon
-Version: 1.0.1
+Version: 1.1.0
 Status: Canonical — Business Design Authority
 Author: Marian Caliof & OpenAI
 Language: English
-Last Updated: 2026-09-07
+Last Updated: 2026-09-08
 
 ---
 
@@ -16,11 +16,13 @@ Last Updated: 2026-09-07
 
 This document is the canonical Business Design owner for DROPi Tycoon.
 
-It defines how companies and economic organizations exist, grow, compete, employ people, own productive assets, interact with institutions, attract investment, and create legacy inside the universe.
+It defines how companies and economic organizations exist, form, grow, compete, employ people, own productive assets, interact with institutions, attract investment, fail/restructure, and create legacy inside the universe.
 
 Authority order:
 
 `VISION` -> `UNIVERSE_DESIGN` -> `BUSINESS_DESIGN` -> `LOGISTICS_DESIGN` -> `GDD` -> domain specializations.
+
+This document is reconciled with `00_Project/PHASE1_GAME_ARCHITECTURE_DECISION_BASELINE.md`.
 
 Detailed economy calculations remain owned by `02_Economy/*`. Detailed employee mechanics remain owned by `02_Economy/EMPLOYEES.md`. Detailed gameplay presentation remains owned by Game Design and UI documents.
 
@@ -32,17 +34,18 @@ A company is a persistent organization inside the world, not a menu container.
 
 A company may own or control:
 
-- money and financial obligations;
+- Company Money and financial obligations;
 - employees and member roles;
-- vehicles;
+- vehicles/equipment;
 - headquarters and departments;
 - warehouses and logistics infrastructure;
-- equipment;
 - products and inventory;
+- farms/factories/industrial assets when legitimately acquired;
 - customer relationships;
 - contracts;
 - research and technology;
 - shares/governance rights when those systems exist;
+- concessions/access rights where governed;
 - historical identity and founder legacy.
 
 Company state should increasingly have visible operational consequences in the world.
@@ -51,11 +54,13 @@ Company state should increasingly have visible operational consequences in the w
 
 # 2. Player Relationship to Business
 
-The player is not permanently restricted to one business role.
+The player is a person before being a company owner.
+
+The canonical start is a poor pedestrian employee of a large fictional incumbent logistics employer, not a mature company founder.
 
 A player may eventually be:
 
-- independent courier;
+- independent citizen;
 - employee;
 - specialist;
 - company member;
@@ -64,9 +69,17 @@ A player may eventually be:
 - infrastructure operator;
 - producer/merchant;
 - investor/shareholder;
-- independent citizen with no active company membership.
+- independent worker/contractor where rules allow.
 
-Current single-player gameplay may use one starter company/operation for compatibility. Future multiplayer identity separation must use explicit migration rather than silently pretending that the existing local company model already represents every future personal/business distinction.
+Canonical relationship rules:
+
+- one economic hero per account per World Instance;
+- one primary Internal/Member company relationship at a time;
+- compatible multiple jobs/contracts may exist when schedules, permissions and conflicts allow them;
+- External investment is separate from operational membership;
+- broader corporate control grows through legitimate shares, acquisitions and subsidiaries rather than unlimited shell companies used to manufacture fake competition or bypass territorial limits.
+
+The current single-player runtime uses a starter company/operation for compatibility. That is legacy implementation truth until a migration is completed; it is not the canonical starting identity.
 
 ---
 
@@ -76,12 +89,14 @@ Creating a company is a progression milestone, not an unrestricted global menu a
 
 A future company-formation path may require multiple conditions, including:
 
-- sufficient Company Money or authorized startup resources;
+- sufficient legitimate startup capital/resources from Personal Money, investors, authorized grants or other governed sources;
 - entrepreneurship/business qualification;
-- an available local business authorization or company-capacity slot;
-- minimum specialist capability for the chosen service model;
+- an available local business authorization/capacity opportunity;
+- minimum specialist capability for the chosen service/industry model;
 - an appropriate physical registration location or civic institution;
-- compliance with gameplay rules for the target city/world.
+- compliance with gameplay rules for the target locality/World Instance.
+
+Company formation creates a distinct Company Money treasury/accounting domain; it does not convert the founder's entire Personal Money balance into Company Money automatically.
 
 Exact numbers are balancing decisions unless separately made canonical.
 
@@ -93,11 +108,14 @@ Municipal/company registration is a fictional gameplay abstraction, not a real l
 
 Cities or districts may limit active company density to create meaningful competition and believable local economies.
 
+Roughly five meaningful last-mile competitors is an urban design target; rural localities normally support one to two meaningful competitors. These are capacity/balance targets, not permanently hardcoded universal counts.
+
 Capacity rules must:
 
+- reflect demand, population, infrastructure and market viability;
 - create scarcity without permanent player exclusion;
 - support NPC and future real-player companies;
-- permit new entrants through turnover, expansion, alternative districts, auctions/permissions, or other recoverable systems;
+- permit new entrants through turnover, expansion, alternative districts, auctions/permissions, failing-firm acquisition or other recoverable systems;
 - avoid permanent monopoly lockout.
 
 Business authorization is a world/economy mechanic, not a real-world licensing simulation.
@@ -108,14 +126,16 @@ Business authorization is a world/economy mechanic, not a real-world licensing s
 
 A company may include both real players and simulated/NPC workers.
 
-The same economic role should use one authoritative workforce model regardless of whether control comes from a human player or simulation AI.
+The same economic role should use compatible authoritative workforce semantics regardless of whether control comes from a human player or simulation AI.
 
 Possible long-term participation includes:
 
-- Couriers;
+- couriers;
 - dispatch/operations specialists;
 - maintenance specialists;
 - warehouse/sorting staff;
+- agricultural/production staff;
+- industrial specialists;
 - drone specialists;
 - multimodal transport specialists;
 - finance/administration;
@@ -131,7 +151,7 @@ The current runtime must not fabricate unsupported specialist roles merely for v
 
 Employees are productive company resources, not decorative costs.
 
-When qualified staff, valid assignments, infrastructure, demand, and operational capacity exist, employees should be capable of creating useful company output such as:
+When qualified staff, valid assignments, infrastructure, demand, inputs and operational capacity exist, employees should be capable of creating useful output such as:
 
 - deliveries;
 - sorting/handling;
@@ -139,11 +159,14 @@ When qualified staff, valid assignments, infrastructure, demand, and operational
 - dispatch support;
 - infrastructure operation;
 - production;
+- agricultural work;
 - specialist services.
 
 Productivity must remain tied to authoritative state and costs.
 
 No employee should generate unexplained money merely because they exist.
+
+Starter player wages require actual work; offline absence does not manufacture salary.
 
 ---
 
@@ -161,6 +184,7 @@ Examples:
 - research -> research capability;
 - drone operations -> valid DronePort/control facility;
 - company registration -> civic/registration institution;
+- production -> relevant farm/factory/industrial site;
 - major infrastructure actions -> corresponding facility or world location.
 
 The smartphone may show information, planning, communication, and unlocked remote controls, but it does not automatically bypass physical requirements.
@@ -169,21 +193,15 @@ The smartphone may show information, planning, communication, and unlocked remot
 
 # 8. Headquarters as Business Capability
 
-The HQ is the physical embodiment of company maturity.
+A private company HQ is not a starting entitlement of the poor-employee phase.
 
-It starts with only the minimum viable footprint and expands through governed construction.
+When a company legitimately owns/operates an HQ, that HQ is the physical embodiment of company maturity.
+
+It starts with only the minimum viable operational footprint and expands through governed construction.
 
 Departments create capability, capacity, specialist workplaces, equipment, and visual growth.
 
-Money alone does not automatically make every department operational. Future departments may require:
-
-- qualified staff;
-- company stage;
-- reputation;
-- research;
-- fleet scale;
-- permits;
-- prerequisite infrastructure.
+Money alone does not automatically make every department operational. Departments may require qualified staff, company maturity, reputation, research, fleet scale, permits/authorizations, prerequisite infrastructure or operating demand.
 
 See `01_GameDesign/HQ_PROGRESSION.md`.
 
@@ -191,7 +209,7 @@ See `01_GameDesign/HQ_PROGRESSION.md`.
 
 # 9. Customer Market and Competition
 
-Multiple companies may compete for customers in the same city/world.
+Multiple companies may compete for customers in the same locality/world.
 
 Customer acquisition and retention may respond to:
 
@@ -207,7 +225,8 @@ Customer acquisition and retention may respond to:
 - support quality;
 - loyalty programs;
 - reputation;
-- company history and trust.
+- company history/trust;
+- inventory/production availability where relevant.
 
 A company can lose customers because its actual simulated performance deteriorates.
 
@@ -217,252 +236,225 @@ Competition should emerge from understandable business consequences rather than 
 
 # 10. Competitive Pressure and Anti-Griefing
 
-Competitive mechanics may include:
+Competitive mechanics may include price competition, marketing, contract bidding, technology, improved service quality, loyalty strategies, workforce recruitment, infrastructure advantage and bounded fictional disruption.
 
-- price competition;
-- marketing campaigns;
-- contract bidding;
-- better technology;
-- improved service quality;
-- customer loyalty strategies;
-- workforce recruitment;
-- infrastructure advantages;
-- bounded fictional competitive disruption.
+Any serious negative mechanic must remain reversible and include counterplay, cost, defense, cooldown, expiration, alternative access, restructuring or recovery.
 
-Any serious negative mechanic must remain reversible and include counterplay, cost, defense, cooldown, or expiration.
-
-No business mechanic may permanently destroy another player's account/company identity or make recovery impossible.
+No business mechanic may permanently destroy another player's account/person identity or make recovery impossible.
 
 ---
 
 # 11. Products, Production and Commerce
 
-A mature company may create or operate proprietary product lines in addition to logistics services.
+A mature company may create/source/operate product lines in addition to logistics services.
 
 Business capability may include:
 
 - research/design;
-- sourcing;
-- manufacturing/production;
+- sourcing/procurement;
+- agriculture/extraction relationships;
+- manufacturing/processing;
 - quality improvement;
 - inventory/storage;
 - marketing;
 - transport;
 - local/international sale.
 
-Product systems must connect to real logistics demand and regional economic differences rather than exist as isolated passive income.
+Product systems must connect to real inputs, inventory, consumption/demand, logistics and regional economic differences rather than exist as isolated passive income.
 
 ---
 
 # 12. Company Money
 
-Company Money is the authoritative normal gameplay financial resource.
+Company Money is the financial ownership/accounting domain belonging to a company.
 
-It may be used for:
+It may be used for wages, inventory/procurement, vehicles, fuel/energy, maintenance, infrastructure, construction, employer-funded training, research, operating costs, expansion and authorized investments/acquisitions.
 
-- wages;
-- vehicles;
-- maintenance;
-- infrastructure;
-- construction;
-- training;
-- research;
-- operating costs;
-- expansion;
-- authorized investments.
+Company Money is distinct from Personal Money.
 
-Company Money must remain sufficient for normal game progression.
+`Company Money` is not a permanent universal currency claim. Future national currencies may give company balances currency denomination while preserving company ownership.
 
-A future ecosystem asset must not replace it or create pay-to-win bypasses.
-
-Detailed accounting and economic rules are owned by `02_Economy/ECONOMY.md` and its specializations.
+Detailed accounting rules are owned by `02_Economy/ECONOMY.md`.
 
 ---
 
-# 13. Company Valuation
+# 13. Company Lifecycle and Failure
 
-A mature company may have an in-game valuation.
+Companies can grow, stagnate, restructure, be acquired, or fail.
 
-Valuation must respond to a basket of business fundamentals rather than a single manipulable number.
+Possible distress consequences include:
 
-Potential factors include:
+- cash-flow shortage;
+- inability to pay wages/suppliers;
+- loss of customers/contracts;
+- asset sale;
+- workforce reduction;
+- restructuring;
+- equity/control change;
+- acquisition/merger;
+- liquidation/closure.
 
-- revenue;
-- sustainable profit;
-- cash flow;
-- assets;
-- debt/liabilities;
-- customer base;
-- reputation;
-- growth;
-- infrastructure;
-- technology;
-- specialist capability;
-- service reliability;
-- market demand;
-- operational risk;
-- strategic position.
+Company failure does not delete the human player's identity. A former founder/executive may return to employment or other productive work and rebuild.
 
-Exact formulas remain future economy design.
+Detailed liquidation priority and settlement remain Economy/Technical specializations.
 
 ---
 
-# 14. Equity Structure
+# 14. Productive Asset Relationships and Acquisition
 
-The owner-approved design starting point for a mature listed company is:
+A company may progress through relationships with productive facilities:
+
+**occasional service -> recurring contract -> strategic investment -> governed acquisition/concession/control**, where eligible.
+
+Eligible targets may include farms, factories, processing plants, warehouses, energy/industrial facilities and other productive nodes.
+
+Acquisition/control requires appropriate combinations of:
+
+- capital;
+- transaction/sale/auction/concession availability;
+- specialist workforce;
+- authorizations;
+- infrastructure;
+- operating capability;
+- ongoing inputs/maintenance.
+
+Ownership does not create free production and does not bypass capacity/input requirements.
+
+---
+
+# 15. Company Valuation
+
+A mature company may have an in-game valuation based on a basket of fundamentals such as revenue, sustainable profit, cash flow, assets, liabilities, customers, reputation, growth, infrastructure, technology, specialists, reliability, market demand, operational risk and strategic position.
+
+Exact formulas remain detailed economy design.
+
+---
+
+# 16. Equity Structure
+
+The owner-approved design starting point for a mature listed company remains:
 
 - **51% internal/member pool**;
 - **49% external/non-member market pool**.
 
-This structure expresses two principles:
+This expresses a protected participation pool for active members and meaningful outside investment access.
 
-1. active members retain a structurally protected participation pool;
-2. outside investors can participate materially in company value.
-
-Detailed issuance, pricing, dilution, voting classes, anti-collusion, market-making, and legal abstractions require separate economic design.
+Detailed issuance, pricing, dilution, voting classes, anti-collusion, market-making and legal abstractions require separate economic design.
 
 ---
 
-# 15. Member Shares and Exit
+# 17. Member Shares and Exit
 
-Internal/member-restricted shares represent active participation in the company and require current membership eligibility.
+Internal/member-restricted shares require current membership eligibility.
 
-The owner-approved exit rule is explicit:
+The owner-approved exit rule remains:
 
-- when a player definitively leaves the company, all remaining **Internal/Member** shares held in that company are forfeited;
-- the forfeited Internal/Member units return to the company's internal treasury pool;
-- they are not destroyed and are not redistributed for free;
-- other eligible active company members may later purchase those treasury shares through an explicit paid transaction once valuation/pricing and settlement rules are implemented;
-- the departing player receives no automatic right to keep Internal/Member shares after final exit;
-- unrelated **External** portfolio holdings remain the player's investment assets and are not confiscated merely because operational membership changes.
+- when a player definitively leaves the company, all remaining Internal/Member shares held in that company are forfeited;
+- forfeited units return to the company internal treasury pool;
+- they are not destroyed or redistributed for free;
+- eligible active members may later purchase treasury shares through an explicit paid Personal Money -> Company Money settlement;
+- the departing player has no automatic right to keep Internal/Member shares after final exit;
+- unrelated External portfolio holdings remain the player's investment assets.
 
-The purchase price and settlement mechanism for returned treasury shares must be governed by the later valuation/market system. Treasury availability by itself does not grant free ownership.
-
-Company equipment, employment rights, internal membership shares, and external portfolio ownership are distinct concepts.
+Company equipment, employment rights, membership shares, executive control and external portfolio ownership are distinct.
 
 ---
 
-# 16. Dividends
+# 18. Dividends
 
 Companies may distribute dividends only from actual distributable game profit/cash under future economy rules.
 
-The default design target is **end-of-season settlement**.
+The current design target is end-of-season settlement.
 
-Alternative cadences may later be governed or unlocked if balancing permits.
-
-Dividends are not guaranteed rewards.
+Dividends are not guaranteed rewards and must settle company-to-person without creating money from nothing.
 
 ---
 
-# 17. Governance
+# 19. Governance
 
-Future governance may influence:
+Future governance may influence executive appointment/removal, strategic investment, infrastructure projects, dividend policy, expansion, high-value asset sales, mergers/acquisitions and founder-artifact decisions.
 
-- executive appointment/removal;
-- strategic investment;
-- infrastructure projects;
-- dividend policy;
-- expansion;
-- high-value asset sales;
-- mergers/acquisitions when separately designed;
-- founder-artifact decisions.
-
-Voting power may depend on eligible voting shares, but governance must avoid permanent deadlock and griefing.
+Voting power may depend on eligible voting shares, but governance must avoid permanent deadlock/griefing.
 
 The founder can lose executive control through legitimate governance without losing historical Founder identity.
 
 ---
 
-# 18. Founder and Executive Identity
+# 20. Founder and Executive Identity
 
 The creator of a company becomes its permanent historical **Founder**.
 
 Founder and executive control are separate.
 
-The founder may begin as the dominant owner/executive but can later lose active leadership through legitimate company governance or investment changes.
+The founder may begin as dominant owner/executive but can later lose active leadership through legitimate governance or investment changes.
 
-The Founder historical identity remains part of company history.
+Founder historical identity remains part of company history.
 
-Late-game founder-continuity mechanics may exist only as fictional gameplay systems with recovery paths; they must never claim to recreate a real human identity.
+Late-game continuity mechanics may exist only as fictional gameplay systems with recovery paths; they must never claim to recreate a real human identity.
 
 ---
 
-# 19. Company Heart / Founder Artifact
+# 21. Company Heart / Founder Artifact
 
 A mature company may create a unique historical collectible: the Company Heart / Founder Artifact.
 
-It may function as:
+It may function as a prestige/history object, museum exhibit, governed tradable in-game collectible, or source of bounded temporary morale/brand effects.
 
-- a prestige object;
-- company-history object;
-- museum exhibit;
-- governed tradable in-game collectible;
-- source of bounded temporary morale/brand effects.
+Loss/sale may create a temporary company shock, but company identity/history cannot be deleted, effects cannot be permanent, and recovery/replica/restoration must remain possible.
 
-Loss/sale may create a temporary company shock, but:
-
-- company identity/history can never be deleted;
-- effects cannot be permanent;
-- recovery/replica/restoration must remain possible;
-- no blockchain/NFT system is required.
-
-The Economic Museum belongs to Universe/World Design; artifact ownership/governance belongs here and in detailed gameplay/economy specializations.
+No blockchain/NFT system is required.
 
 ---
 
-# 20. Infrastructure Ownership and Business Advantage
+# 22. Infrastructure Ownership and Business Advantage
 
-Companies may eventually build, finance, lease, operate, or obtain concessions around infrastructure.
+Companies may build, finance, lease, operate, own or obtain concessions around infrastructure where the world/economy permits.
 
-Business advantages may include:
+Business advantages may include capacity, lower internal costs, routing priority, service revenue, market reach and access to new transport modes.
 
-- capacity;
-- lower internal costs;
-- routing priority;
-- service revenue;
-- market reach;
-- access to new transport modes.
-
-Critical shared infrastructure remains subject to the fair-access rules in `UNIVERSE_DESIGN.md`.
+Essential infrastructure remains subject to fair-access safeguards. One company must not permanently softlock a locality/country by denying essential corridors or utilities.
 
 ---
 
-# 21. Multiplayer Business Authority
+# 23. World Instance Boundary
 
-Real player employment, membership, ownership, share trading, governance, and contested assets require server-authoritative business state.
+Companies, shares, productive assets, reputation, contracts and Company Money are World-Instance-local economic power by default.
 
-Before activation, Technical Design must provide:
+A fresh World Instance does not import a mature world's company empire.
 
-- stable identity;
-- transaction integrity;
-- concurrency/conflict resolution;
-- anti-duplication;
-- anti-cheat;
-- moderation where communication exists;
-- durable persistence and recovery.
+Prototype/local company state may be preserved historically but requires explicit migration and cannot silently become authoritative economic power in a fresh shared world.
+
+---
+
+# 24. Multiplayer Business Authority
+
+Real-player employment, membership, ownership, share trading, governance, acquisitions and contested assets require trusted/server-authoritative business state.
+
+Before activation, Technical Design must provide stable person/world identity, transaction integrity, concurrency/conflict resolution, anti-duplication, anti-cheat, moderation where communication exists, durable persistence and recovery.
 
 Single-player/local simulation should establish business rules first where practical so multiplayer extends the same model rather than creating a second economy.
 
 ---
 
-# 22. Relationship to Real DROPi
+# 25. Relationship to Real DROPi
 
 Tycoon business systems are fictional gameplay abstractions.
 
-Company permits, shares, Company Heart, founder governance, products, concessions, and other Tycoon mechanics must not be represented as real DROPi product/legal/business features unless separately confirmed by real DROPi canon.
+Company permits, shares, Company Heart, founder governance, products, concessions and other Tycoon mechanics must not be represented as real DROPi legal/business features unless separately confirmed by real DROPi canon.
+
+The starting incumbent logistics employer is fictional by default unless a separate real-brand permission/licensing review explicitly authorizes otherwise.
 
 ---
 
-# 23. Specialization Ownership
-
-This document owns business-level organizational truths.
+# 26. Specialization Ownership
 
 Detailed owners include:
 
-- `02_Economy/ECONOMY.md` — financial economy;
+- `02_Economy/ECONOMY.md` — stock-flow financial/economic authority;
+- `02_Economy/PERSONAL_FINANCE.md` — personal money/living/insolvency;
 - `02_Economy/EMPLOYEES.md` — workforce rules;
 - `02_Economy/MARKET.md` and `PRICING.md` — market/pricing detail;
-- `01_GameDesign/COMPANY_SOCIETY_AND_MULTIPLAYER.md` — player-facing company society and multiplayer specialization;
+- `01_GameDesign/COMPANY_SOCIETY_AND_MULTIPLAYER.md` — player-facing company society/multiplayer;
 - `01_GameDesign/HQ_PROGRESSION.md` — HQ progression;
 - `03_Logistics/*` — logistics execution;
 - `04_World/*` — physical company/world representation;
@@ -472,7 +464,7 @@ Detailed owners include:
 
 # Canonical Rule
 
-**A DROPi Tycoon company is a living organization made of people, productive assets, customers, infrastructure, knowledge, risk, ownership, and history. Money matters, but money alone must never substitute for people, qualifications, infrastructure, operational performance, or legitimate governance.**
+**A DROPi Tycoon company is a living organization made of people, money, inventory, productive assets, customers, contracts, infrastructure, knowledge, risk, ownership and history. The person is distinct from the company; company growth must be legitimate and operational; productive facilities may be contracted/invested/acquired; and neither money nor ownership alone may bypass people, inputs, qualifications, infrastructure, capacity, fair access or governance.**
 
 ---
 
