@@ -1,0 +1,62 @@
+name: Patch Global Map Viewport Separation
+
+on:
+  push:
+    branches:
+      - openai/global-map-runtime-v1
+    paths:
+      - .github/workflows/patch-global-map-viewport.yml
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: openai/global-map-runtime-v1
+          fetch-depth: 0
+      - name: Separate Phaser-free viewport helpers
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          from pathlib import Path
+
+          scene_path = Path('game-web/src/scenes/GlobalMapScene.ts')
+          scene = scene_path.read_text()
+
+          old_import = "import { COLORS, RADII, TOUCH_TARGET_MIN_PX, TYPOGRAPHY } from '../ui/theme'\n\nconst MAP_WIDTH = 1440\nconst MAP_HEIGHT = 720\n"
+          new_import = "import { COLORS, RADII, TOUCH_TARGET_MIN_PX, TYPOGRAPHY } from '../ui/theme'\nimport {\n  fitGlobalMapScale,\n  GLOBAL_MAP_HEIGHT as MAP_HEIGHT,\n  GLOBAL_MAP_WIDTH as MAP_WIDTH,\n  globalMapViewport,\n  type GlobalMapViewportRect as ViewportRect,\n} from '../world/globalMapViewport'\n\n"
+          if old_import not in scene:
+              raise SystemExit('GlobalMapScene import/constants anchor missing')
+          scene = scene.replace(old_import, new_import, 1)
+
+          old_block = "interface ViewportRect {\n  left: number\n  top: number\n  width: number\n  height: number\n}\n\n"
+          if old_block not in scene:
+              raise SystemExit('ViewportRect block missing')
+          scene = scene.replace(old_block, '', 1)
+
+          old_helpers = "export const globalMapViewport = (width: number, height: number): ViewportRect => {\n  const sideWidth = clamp(Math.round(width * 0.27), 228, 316)\n  return {\n    left: 12,\n    top: 62,\n    width: Math.max(240, width - sideWidth - 36),\n    height: Math.max(160, height - 74),\n  }\n}\n\nexport const fitGlobalMapScale = (viewport: ViewportRect): number =>\n  Math.min(viewport.width / MAP_WIDTH, viewport.height / MAP_HEIGHT)\n\n"
+          if old_helpers not in scene:
+              raise SystemExit('Viewport helper block missing')
+          scene = scene.replace(old_helpers, '', 1)
+          scene_path.write_text(scene)
+
+          test_path = Path('game-web/tests/global-map-runtime.test.ts')
+          test = test_path.read_text()
+          old = "import { fitGlobalMapScale, globalMapViewport } from '../src/scenes/GlobalMapScene'\n"
+          new = "import { fitGlobalMapScale, globalMapViewport } from '../src/world/globalMapViewport'\n"
+          if old not in test:
+              raise SystemExit('Test scene-helper import missing')
+          test_path.write_text(test.replace(old, new, 1))
+          PY
+
+          git config user.name 'DROPi Tycoon automation'
+          git config user.email 'actions@users.noreply.github.com'
+          git add game-web/src/scenes/GlobalMapScene.ts game-web/tests/global-map-runtime.test.ts
+          git diff --cached --check
+          git commit -m 'test: isolate global map viewport math from Phaser'
+          git push origin HEAD:openai/global-map-runtime-v1
