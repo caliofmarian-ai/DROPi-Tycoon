@@ -35,7 +35,9 @@ jobs:
           grep -F '#464: Tokyo current-capital override implemented' 04_World/Country_Catalog/Continents/asia.md
           grep -F '#473: Santiago national-capital and Valparaíso National Congress-seat' 04_World/Country_Catalog/Continents/southamerica.md
           grep -F '#478: Stable DROPi XKX geometry identity and neutral status-sensitive Kosovo semantics implemented' 04_World/Country_Catalog/Continents/europe.md
-          grep -F '#481: Stable DROPi XNC geometry identity and neutral northern-Cyprus special-status semantics implemented' 04_World/Country_Catalog/Continents/asia.md
+          grep -F '| XNC | N. Cyprus | — | 0 | — | **GAP** | documented source coverage gap |' 04_World/Country_Catalog/Continents/asia.md
+          grep -F 'Stable DROPi XNC geometry identity and neutral northern-Cyprus special-status semantics implemented' 04_World/Country_Catalog/COUNTRY_REVIEW_REGISTRY.json
+          grep -F '#481 — neutral special-status semantics implemented; no source-safe locality nodes are invented; owner Android acceptance pending' 04_World/Country_Catalog/SPECIAL_TERRITORY_CLASSIFICATION.md
           grep -F '#482: Stable DROPi XSL geometry identity, Hargeysa principal-administrative-centre role' 04_World/Country_Catalog/Continents/africa.md
       - name: Commit canonical reconciliation and remove temporary runners
         run: |
