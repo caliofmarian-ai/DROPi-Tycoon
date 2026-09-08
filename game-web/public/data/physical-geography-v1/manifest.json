@@ -1,0 +1,515 @@
+{
+  "version": "1.0.0",
+  "projection": "equirectangular",
+  "sourceRegistry": "04_World/Physical_Geography/SOURCES.json",
+  "overviewUrl": "data/physical-geography-v1/relief-overview.webp",
+  "tilePixels": 1080,
+  "maximumActiveTiles": 6,
+  "tiles": [
+    {
+      "id": "0-0",
+      "url": "data/physical-geography-v1/relief-0-0.webp",
+      "bounds": [
+        -180,
+        54,
+        -144,
+        90
+      ]
+    },
+    {
+      "id": "1-0",
+      "url": "data/physical-geography-v1/relief-1-0.webp",
+      "bounds": [
+        -144,
+        54,
+        -108,
+        90
+      ]
+    },
+    {
+      "id": "2-0",
+      "url": "data/physical-geography-v1/relief-2-0.webp",
+      "bounds": [
+        -108,
+        54,
+        -72,
+        90
+      ]
+    },
+    {
+      "id": "3-0",
+      "url": "data/physical-geography-v1/relief-3-0.webp",
+      "bounds": [
+        -72,
+        54,
+        -36,
+        90
+      ]
+    },
+    {
+      "id": "4-0",
+      "url": "data/physical-geography-v1/relief-4-0.webp",
+      "bounds": [
+        -36,
+        54,
+        0,
+        90
+      ]
+    },
+    {
+      "id": "5-0",
+      "url": "data/physical-geography-v1/relief-5-0.webp",
+      "bounds": [
+        0,
+        54,
+        36,
+        90
+      ]
+    },
+    {
+      "id": "6-0",
+      "url": "data/physical-geography-v1/relief-6-0.webp",
+      "bounds": [
+        36,
+        54,
+        72,
+        90
+      ]
+    },
+    {
+      "id": "7-0",
+      "url": "data/physical-geography-v1/relief-7-0.webp",
+      "bounds": [
+        72,
+        54,
+        108,
+        90
+      ]
+    },
+    {
+      "id": "8-0",
+      "url": "data/physical-geography-v1/relief-8-0.webp",
+      "bounds": [
+        108,
+        54,
+        144,
+        90
+      ]
+    },
+    {
+      "id": "9-0",
+      "url": "data/physical-geography-v1/relief-9-0.webp",
+      "bounds": [
+        144,
+        54,
+        180,
+        90
+      ]
+    },
+    {
+      "id": "0-1",
+      "url": "data/physical-geography-v1/relief-0-1.webp",
+      "bounds": [
+        -180,
+        18,
+        -144,
+        54
+      ]
+    },
+    {
+      "id": "1-1",
+      "url": "data/physical-geography-v1/relief-1-1.webp",
+      "bounds": [
+        -144,
+        18,
+        -108,
+        54
+      ]
+    },
+    {
+      "id": "2-1",
+      "url": "data/physical-geography-v1/relief-2-1.webp",
+      "bounds": [
+        -108,
+        18,
+        -72,
+        54
+      ]
+    },
+    {
+      "id": "3-1",
+      "url": "data/physical-geography-v1/relief-3-1.webp",
+      "bounds": [
+        -72,
+        18,
+        -36,
+        54
+      ]
+    },
+    {
+      "id": "4-1",
+      "url": "data/physical-geography-v1/relief-4-1.webp",
+      "bounds": [
+        -36,
+        18,
+        0,
+        54
+      ]
+    },
+    {
+      "id": "5-1",
+      "url": "data/physical-geography-v1/relief-5-1.webp",
+      "bounds": [
+        0,
+        18,
+        36,
+        54
+      ]
+    },
+    {
+      "id": "6-1",
+      "url": "data/physical-geography-v1/relief-6-1.webp",
+      "bounds": [
+        36,
+        18,
+        72,
+        54
+      ]
+    },
+    {
+      "id": "7-1",
+      "url": "data/physical-geography-v1/relief-7-1.webp",
+      "bounds": [
+        72,
+        18,
+        108,
+        54
+      ]
+    },
+    {
+      "id": "8-1",
+      "url": "data/physical-geography-v1/relief-8-1.webp",
+      "bounds": [
+        108,
+        18,
+        144,
+        54
+      ]
+    },
+    {
+      "id": "9-1",
+      "url": "data/physical-geography-v1/relief-9-1.webp",
+      "bounds": [
+        144,
+        18,
+        180,
+        54
+      ]
+    },
+    {
+      "id": "0-2",
+      "url": "data/physical-geography-v1/relief-0-2.webp",
+      "bounds": [
+        -180,
+        -18,
+        -144,
+        18
+      ]
+    },
+    {
+      "id": "1-2",
+      "url": "data/physical-geography-v1/relief-1-2.webp",
+      "bounds": [
+        -144,
+        -18,
+        -108,
+        18
+      ]
+    },
+    {
+      "id": "2-2",
+      "url": "data/physical-geography-v1/relief-2-2.webp",
+      "bounds": [
+        -108,
+        -18,
+        -72,
+        18
+      ]
+    },
+    {
+      "id": "3-2",
+      "url": "data/physical-geography-v1/relief-3-2.webp",
+      "bounds": [
+        -72,
+        -18,
+        -36,
+        18
+      ]
+    },
+    {
+      "id": "4-2",
+      "url": "data/physical-geography-v1/relief-4-2.webp",
+      "bounds": [
+        -36,
+        -18,
+        0,
+        18
+      ]
+    },
+    {
+      "id": "5-2",
+      "url": "data/physical-geography-v1/relief-5-2.webp",
+      "bounds": [
+        0,
+        -18,
+        36,
+        18
+      ]
+    },
+    {
+      "id": "6-2",
+      "url": "data/physical-geography-v1/relief-6-2.webp",
+      "bounds": [
+        36,
+        -18,
+        72,
+        18
+      ]
+    },
+    {
+      "id": "7-2",
+      "url": "data/physical-geography-v1/relief-7-2.webp",
+      "bounds": [
+        72,
+        -18,
+        108,
+        18
+      ]
+    },
+    {
+      "id": "8-2",
+      "url": "data/physical-geography-v1/relief-8-2.webp",
+      "bounds": [
+        108,
+        -18,
+        144,
+        18
+      ]
+    },
+    {
+      "id": "9-2",
+      "url": "data/physical-geography-v1/relief-9-2.webp",
+      "bounds": [
+        144,
+        -18,
+        180,
+        18
+      ]
+    },
+    {
+      "id": "0-3",
+      "url": "data/physical-geography-v1/relief-0-3.webp",
+      "bounds": [
+        -180,
+        -54,
+        -144,
+        -18
+      ]
+    },
+    {
+      "id": "1-3",
+      "url": "data/physical-geography-v1/relief-1-3.webp",
+      "bounds": [
+        -144,
+        -54,
+        -108,
+        -18
+      ]
+    },
+    {
+      "id": "2-3",
+      "url": "data/physical-geography-v1/relief-2-3.webp",
+      "bounds": [
+        -108,
+        -54,
+        -72,
+        -18
+      ]
+    },
+    {
+      "id": "3-3",
+      "url": "data/physical-geography-v1/relief-3-3.webp",
+      "bounds": [
+        -72,
+        -54,
+        -36,
+        -18
+      ]
+    },
+    {
+      "id": "4-3",
+      "url": "data/physical-geography-v1/relief-4-3.webp",
+      "bounds": [
+        -36,
+        -54,
+        0,
+        -18
+      ]
+    },
+    {
+      "id": "5-3",
+      "url": "data/physical-geography-v1/relief-5-3.webp",
+      "bounds": [
+        0,
+        -54,
+        36,
+        -18
+      ]
+    },
+    {
+      "id": "6-3",
+      "url": "data/physical-geography-v1/relief-6-3.webp",
+      "bounds": [
+        36,
+        -54,
+        72,
+        -18
+      ]
+    },
+    {
+      "id": "7-3",
+      "url": "data/physical-geography-v1/relief-7-3.webp",
+      "bounds": [
+        72,
+        -54,
+        108,
+        -18
+      ]
+    },
+    {
+      "id": "8-3",
+      "url": "data/physical-geography-v1/relief-8-3.webp",
+      "bounds": [
+        108,
+        -54,
+        144,
+        -18
+      ]
+    },
+    {
+      "id": "9-3",
+      "url": "data/physical-geography-v1/relief-9-3.webp",
+      "bounds": [
+        144,
+        -54,
+        180,
+        -18
+      ]
+    },
+    {
+      "id": "0-4",
+      "url": "data/physical-geography-v1/relief-0-4.webp",
+      "bounds": [
+        -180,
+        -90,
+        -144,
+        -54
+      ]
+    },
+    {
+      "id": "1-4",
+      "url": "data/physical-geography-v1/relief-1-4.webp",
+      "bounds": [
+        -144,
+        -90,
+        -108,
+        -54
+      ]
+    },
+    {
+      "id": "2-4",
+      "url": "data/physical-geography-v1/relief-2-4.webp",
+      "bounds": [
+        -108,
+        -90,
+        -72,
+        -54
+      ]
+    },
+    {
+      "id": "3-4",
+      "url": "data/physical-geography-v1/relief-3-4.webp",
+      "bounds": [
+        -72,
+        -90,
+        -36,
+        -54
+      ]
+    },
+    {
+      "id": "4-4",
+      "url": "data/physical-geography-v1/relief-4-4.webp",
+      "bounds": [
+        -36,
+        -90,
+        0,
+        -54
+      ]
+    },
+    {
+      "id": "5-4",
+      "url": "data/physical-geography-v1/relief-5-4.webp",
+      "bounds": [
+        0,
+        -90,
+        36,
+        -54
+      ]
+    },
+    {
+      "id": "6-4",
+      "url": "data/physical-geography-v1/relief-6-4.webp",
+      "bounds": [
+        36,
+        -90,
+        72,
+        -54
+      ]
+    },
+    {
+      "id": "7-4",
+      "url": "data/physical-geography-v1/relief-7-4.webp",
+      "bounds": [
+        72,
+        -90,
+        108,
+        -54
+      ]
+    },
+    {
+      "id": "8-4",
+      "url": "data/physical-geography-v1/relief-8-4.webp",
+      "bounds": [
+        108,
+        -90,
+        144,
+        -54
+      ]
+    },
+    {
+      "id": "9-4",
+      "url": "data/physical-geography-v1/relief-9-4.webp",
+      "bounds": [
+        144,
+        -90,
+        180,
+        -54
+      ]
+    }
+  ],
+  "counts": {
+    "river": 449,
+    "lake": 326,
+    "landform": 406
+  }
+}

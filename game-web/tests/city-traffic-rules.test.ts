@@ -9,7 +9,7 @@ import {
 } from '../src/world/cityTrafficRules'
 
 describe('controlled city crossing rules', () => {
-  const crossing = CENTRAL_CONTROLLED_CROSSING
+  const crossing = { ...CENTRAL_CONTROLLED_CROSSING, roadAngle: 0 }
 
   it('has deterministic bounded cycle semantics', () => {
     expect(crossingCycleTime(crossing, 0)).toBe(0)

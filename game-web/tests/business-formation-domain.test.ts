@@ -16,7 +16,7 @@ import type { LocalBusinessCapacityRule, LocalBusinessRegistryState } from '../s
 import { BUSINESS_SERVICE_MODEL_IDS } from '../src/types/business'
 import { createInitialPersonalProgressionState } from '../src/systems/personalCapabilitySystem'
 
-const AREA = 'area:cedar-city:central'
+const AREA = 'area:braila:central'
 const capacityRules: readonly LocalBusinessCapacityRule[] = [
   { operatingAreaId: AREA, serviceModelId: 'LocalCourier', maxActiveCompanies: 1 },
 ]

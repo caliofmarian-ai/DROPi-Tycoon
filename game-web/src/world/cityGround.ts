@@ -77,8 +77,8 @@ export interface CityCrossing { x: number; y: number; width: number; height: num
 export const roadCrossings = (roads: readonly WorldRectLayout[]): readonly CityCrossing[] => {
   const crossings: CityCrossing[] = []
   const seen = new Set<string>()
-  roads.filter(road => road.width > road.height).forEach(horizontal => {
-    roads.filter(road => road.height > road.width).forEach(vertical => {
+  roads.filter(road => !road.centerline && road.width > road.height).forEach(horizontal => {
+    roads.filter(road => !road.centerline && road.height > road.width).forEach(vertical => {
       if (Math.abs(horizontal.x - vertical.x) > (horizontal.width + vertical.width) / 2 ||
         Math.abs(horizontal.y - vertical.y) > (horizontal.height + vertical.height) / 2) return
       const key = `${vertical.x}:${horizontal.y}`
@@ -93,6 +93,38 @@ export const roadCrossings = (roads: readonly WorldRectLayout[]): readonly CityC
 export const drawCityPavement = (
   g: Phaser.GameObjects.Graphics, roads: readonly WorldRectLayout[], sidewalks: readonly WorldRectLayout[],
 ): void => {
+  if (roads.some(road => road.centerline)) {
+    for (const sidewalk of sidewalks) {
+      if (sidewalk.centerline) {
+        g.lineStyle(sidewalk.roadWidth! + 4, C.pavingLine).strokePoints([...sidewalk.centerline], false)
+        for (const p of sidewalk.centerline) g.fillStyle(C.pavingLine).fillCircle(p.x, p.y, sidewalk.roadWidth! / 2 + 2)
+        g.lineStyle(sidewalk.roadWidth!, C.sidewalk).strokePoints([...sidewalk.centerline], false)
+        for (const p of sidewalk.centerline) g.fillStyle(C.sidewalk).fillCircle(p.x, p.y, sidewalk.roadWidth! / 2)
+      } else {
+        g.fillStyle(C.sidewalk).fillRect(sidewalk.x - sidewalk.width / 2, sidewalk.y - sidewalk.height / 2, sidewalk.width, sidewalk.height)
+      }
+    }
+    for (const road of roads) {
+      g.lineStyle(road.roadWidth! + 4, C.curb).strokePoints([...road.centerline!], false)
+      for (const p of road.centerline!) g.fillStyle(C.curb).fillCircle(p.x, p.y, road.roadWidth! / 2 + 2)
+    }
+    for (const road of roads) {
+      g.lineStyle(road.roadWidth!, C.road).strokePoints([...road.centerline!], false)
+      for (const p of road.centerline!) g.fillStyle(C.road).fillCircle(p.x, p.y, road.roadWidth! / 2)
+    }
+    for (const road of roads) {
+      const points = road.centerline!
+      g.lineStyle(2, C.lane, 0.68)
+      for (let i = 1; i < points.length; i++) {
+        const a = points[i - 1], b = points[i], length = Math.hypot(b.x - a.x, b.y - a.y)
+        for (let offset = 20; offset + 14 < length - 15; offset += 42) {
+          g.lineBetween(a.x + (b.x - a.x) * offset / length, a.y + (b.y - a.y) * offset / length,
+            a.x + (b.x - a.x) * (offset + 14) / length, a.y + (b.y - a.y) * (offset + 14) / length)
+        }
+      }
+    }
+    return
+  }
   for (const sidewalk of sidewalks) {
     const left = sidewalk.x - sidewalk.width / 2
     const top = sidewalk.y - sidewalk.height / 2

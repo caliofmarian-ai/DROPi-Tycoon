@@ -16,8 +16,8 @@ import {
   validateCompetitionFactorWeights,
 } from '../src/systems/localCompetitionSystem'
 
-const AREA = 'area:cedar-city:central'
-const OTHER_AREA = 'area:cedar-city:north'
+const AREA = 'area:braila:central'
+const OTHER_AREA = 'area:braila:north'
 
 const company = (
   id: string,

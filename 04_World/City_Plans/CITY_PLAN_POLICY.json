@@ -1,0 +1,13 @@
+{
+  "version": "1.0.0",
+  "ownerDirective": "09_Development/Owner_Directives/2026-09-08_MASTER_OWNER_DIRECTIVE_006_REAL_MAP_CITY_PLANS.md",
+  "issue": 535,
+  "startingNodeTargetPerCountry": { "capital": 1, "majorCity": 4, "smallLocality": 4 },
+  "realMapInspirationRequiredFor": ["capital", "majorCity"],
+  "requiredVisualIdentity": ["street pattern", "waterfront and rivers", "urban massing", "parks and open space", "locally recognizable architectural character"],
+  "sharedArtStyle": "Reuse the established DROPi stylized city palette, dimensional buildings, soft shadows and character art.",
+  "sourceContract": ["canonical locality ID", "country geometry ID", "retained source and checksum", "source extent", "projection", "license and visible attribution", "documented gameplay adaptations"],
+  "runtimeContract": ["shared visual/collision/navigation streets", "bounded active detail", "safe playable entrances", "stable business and save IDs", "inspection does not move the hero"],
+  "selectionBoundary": "Starting nine are distinct from the expanded regional source catalog; source gaps and governed capital exceptions remain explicit.",
+  "pilot": { "localityId": "dropi:locality:geonames:683902", "name": "Brăila", "countryId": "642", "status": "implemented-pending-visible-review", "config": "04_World/City_Plans/BRAILA_CONFIG.json" }
+}

@@ -1,4 +1,5 @@
 import type { WorldRectLayout } from './worldLayout'
+import { projectOnSegment, distanceToSegment } from './worldSurfaces'
 
 export interface RoadPoint { x: number; y: number }
 export interface RoadNode extends RoadPoint { id: string }
@@ -18,6 +19,7 @@ export const buildRoadNetwork = (
   roads: readonly WorldRectLayout[], entrances: readonly RoadPoint[] = [],
   isNavigable: (x: number, y: number) => boolean = () => true,
 ): RoadNetwork => {
+  if (roads.some(road => road.centerline)) return buildSourceStreetNetwork(roads, entrances, isNavigable)
   const nodes = new Map<string, RoadNode>()
   const edges: RoadEdge[] = []
   const addNode = (point: RoadPoint): string => {
@@ -94,32 +96,104 @@ export const buildRoadNetwork = (
   return { nodes: [...nodes.values()], edges }
 }
 
+/** Shared source vertices form junctions. Crossing over a river/bridge is never inferred from bounding boxes. */
+export const buildSourceStreetNetwork = (
+  roads: readonly WorldRectLayout[], entrances: readonly RoadPoint[], isNavigable: (x: number, y: number) => boolean,
+): RoadNetwork => {
+  const nodes = new Map<string, RoadNode>(), edges: RoadEdge[] = []
+  const rounded = (p: RoadPoint): RoadPoint => ({ x: Math.round(p.x * 1000) / 1000, y: Math.round(p.y * 1000) / 1000 })
+  const node = (p: RoadPoint): string => { const id = key(p); nodes.set(id, { ...p, id }); return id }
+  const edge = (a: RoadPoint, b: RoadPoint, roadId: string): void => {
+    const distance = Math.hypot(b.x - a.x, b.y - a.y)
+    if (distance === 0) return
+    const steps = Math.ceil(distance / 12)
+    for (let i = 0; i <= steps; i++) if (!isNavigable(a.x + (b.x - a.x) * i / steps, a.y + (b.y - a.y) * i / steps)) return
+    edges.push({ from: node(a), to: node(b), distance, roadId })
+  }
+  const segments = roads.flatMap(road => (road.centerline ?? []).slice(1).map((b, i) =>
+    ({ road, a: road.centerline![i], b, points: [road.centerline![i], b] })))
+  for (const entrance of entrances) {
+    if (!finite(entrance) || !isNavigable(entrance.x, entrance.y)) continue
+    let best: typeof segments[number] | undefined, gap = Infinity
+    for (const segment of segments) {
+      const d = distanceToSegment(entrance, segment.a, segment.b)
+      if (d < gap) { best = segment; gap = d }
+    }
+    if (!best || gap > (best.road.roadWidth ?? 32) / 2) continue
+    const projection = rounded(projectOnSegment(entrance, best.a, best.b))
+    best.points.push(projection)
+    // Keep the exact entrance identity even when its projection rounds by a few centimetres.
+    node(entrance)
+    if (key(entrance) !== key(projection)) edge(entrance, projection, best.road.id)
+  }
+  for (const segment of segments) {
+    const points = [...new Map(segment.points.map(p => [key(p), p])).values()]
+      .sort((a, b) => Math.hypot(a.x - segment.a.x, a.y - segment.a.y) - Math.hypot(b.x - segment.a.x, b.y - segment.a.y))
+    for (let i = 1; i < points.length; i++) edge(points[i - 1], points[i], segment.road.id)
+  }
+  return { nodes: [...nodes.values()], edges }
+}
+
 /** Returns actual connected street waypoints, never a cross-block distance shortcut. */
+const networkIndexes = new WeakMap<RoadNetwork, {
+  nodes: Map<string, RoadNode>
+  neighbors: Map<string, { id: string; distance: number }[]>
+}>()
+
 export const findRoadRoute = (
   network: RoadNetwork, from: RoadPoint, to: RoadPoint,
 ): RoadRoute | null => {
   if (!finite(from) || !finite(to)) return null
-  const nodes = new Map(network.nodes.map(node => [node.id, node]))
+  let index = networkIndexes.get(network)
+  if (!index) {
+    const nodes = new Map(network.nodes.map(node => [node.id, node]))
+    const neighbors = new Map<string, { id: string; distance: number }[]>()
+    for (const edge of network.edges) {
+      if (!nodes.has(edge.from) || !nodes.has(edge.to) || !Number.isFinite(edge.distance) || edge.distance < 0) continue
+      for (const [from, to] of [[edge.from, edge.to], [edge.to, edge.from]]) {
+        const bucket = neighbors.get(from) ?? []
+        bucket.push({ id: to, distance: edge.distance }); neighbors.set(from, bucket)
+      }
+    }
+    index = { nodes, neighbors }; networkIndexes.set(network, index)
+  }
+  const { nodes, neighbors } = index
   const start = key(from)
   const finish = key(to)
   if (!nodes.has(start) || !nodes.has(finish)) return null
-  const neighbors = new Map<string, { id: string; distance: number }[]>()
-  for (const edge of network.edges) {
-    if (!nodes.has(edge.from) || !nodes.has(edge.to) || !Number.isFinite(edge.distance) || edge.distance < 0) continue
-    neighbors.set(edge.from, [...neighbors.get(edge.from) ?? [], { id: edge.to, distance: edge.distance }])
-    neighbors.set(edge.to, [...neighbors.get(edge.to) ?? [], { id: edge.from, distance: edge.distance }])
-  }
   const distance = new Map<string, number>([[start, 0]])
   const previous = new Map<string, string>()
-  const pending = new Set(nodes.keys())
-  while (pending.size > 0) {
-    let current: string | undefined
-    let best = Infinity
-    for (const id of pending) {
-      const candidate = distance.get(id) ?? Infinity
-      if (candidate < best) { best = candidate; current = id }
+  // Source street graphs have thousands of vertices. A binary heap avoids a full node scan
+  // on every step, while retaining Dijkstra semantics for arbitrary nonnegative edge weights.
+  const pending: { id: string; distance: number }[] = []
+  const push = (entry: typeof pending[number]): void => {
+    pending.push(entry)
+    let i = pending.length - 1
+    while (i > 0) {
+      const parent = (i - 1) >> 1
+      if (pending[parent].distance <= entry.distance) break
+      pending[i] = pending[parent]; i = parent
     }
-    if (current === undefined) return null
+    pending[i] = entry
+  }
+  const pop = (): typeof pending[number] => {
+    const first = pending[0], last = pending.pop()!
+    if (pending.length) {
+      let i = 0
+      while (i * 2 + 1 < pending.length) {
+        let child = i * 2 + 1
+        if (child + 1 < pending.length && pending[child + 1].distance < pending[child].distance) child++
+        if (pending[child].distance >= last.distance) break
+        pending[i] = pending[child]; i = child
+      }
+      pending[i] = last
+    }
+    return first
+  }
+  push({ id: start, distance: 0 })
+  while (pending.length > 0) {
+    const { id: current, distance: best } = pop()
+    if (best !== distance.get(current)) continue
     if (current === finish) {
       const points: RoadPoint[] = []
       let cursor: string | undefined = finish
@@ -130,11 +204,11 @@ export const findRoadRoute = (
       }
       return { distance: best, points }
     }
-    pending.delete(current)
     for (const neighbor of neighbors.get(current) ?? []) {
-      if (pending.has(neighbor.id) && best + neighbor.distance < (distance.get(neighbor.id) ?? Infinity)) {
+      if (best + neighbor.distance < (distance.get(neighbor.id) ?? Infinity)) {
         distance.set(neighbor.id, best + neighbor.distance)
         previous.set(neighbor.id, current)
+        push({ id: neighbor.id, distance: best + neighbor.distance })
       }
     }
   }

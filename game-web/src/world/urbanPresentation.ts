@@ -7,14 +7,14 @@ import {
   URBAN_BUILDINGS, URBAN_HQ, URBAN_MARKETPLACE, URBAN_MARKETPLACE_BUILDING_ID, URBAN_ROADS, URBAN_SIDEWALKS,
 } from './urbanWorld'
 import {
-  WORLD_DECORATIONS, WORLD_HEIGHT, WORLD_ROUTE_POINTS, WORLD_WIDTH, WORLD_ZONES,
+  WORLD_DECORATIONS, WORLD_HEIGHT, WORLD_ROUTE_POINTS, WORLD_WIDTH, WORLD_ZONES, WORLD_LANDSCAPE, WORLD_ROADS, WORLD_CONTEXT_BUILDINGS,
 } from './worldLayout'
 import {
   cityBuildingSign, cityLabel, drawBench, drawFlowerBox, drawLamp,
   ensureBuildingTexture, ensureNeighborTexture, ensureTreeTexture, NEIGHBOR_ANCHOR, NEIGHBOR_CELL, storefrontIdentity,
 } from './cityArt'
-import { cityDistrictAccents, drawCityDistrictAccents, drawCityPavement } from './cityGround'
-import { drawDistrictIdentityGround, renderCityStreetAndAddressLabels } from './cityIdentity'
+import { drawCityPavement } from './cityGround'
+import { drawBrailaDistrictIdentity, renderBrailaAddressLabels } from './brailaIdentity'
 import { drawParcel } from './courierArt'
 
 export const HQ_EXPANSION_POINT = URBAN_HQ
@@ -25,8 +25,8 @@ export const HQ_EXPANSION_POINT = URBAN_HQ
  * commands alive, so Phaser had to submit the complete city road/grass geometry every frame even
  * when the camera only showed one neighborhood.
  */
-export const CITY_GROUND_TEXTURE_SCALE = 0.5
-const CITY_GROUND_TEXTURE_KEY = 'dropi-city-static-ground-v1'
+export const CITY_GROUND_TEXTURE_SCALE = Math.min(0.5, 1536 / WORLD_WIDTH, 1536 / WORLD_HEIGHT)
+const CITY_GROUND_TEXTURE_KEY = 'dropi-braila-static-ground-v1'
 
 export const getHQGrowth = (company?: CompanyState) => ({
   level: company?.level ?? 1,
@@ -45,31 +45,41 @@ export const drawNeighborhoodNPC = (
 
 const fallbackShopNames = ['SUNBEAM CAFÉ', 'CITY PHARMACY', 'CORNER GOODS', 'BLOOM & STEM', 'BAKERY', 'PANTRY']
 
-/**
- * Produce one reusable static ground texture. This work occurs once for the Phaser texture manager;
- * scene restarts reuse the cached texture instead of retaining/replaying the full vector command list.
- */
-export const ensureCityGroundTexture = (scene: Phaser.Scene): string => {
-  if (scene.textures.exists(CITY_GROUND_TEXTURE_KEY)) return CITY_GROUND_TEXTURE_KEY
-  const g = scene.make.graphics({ x: 0, y: 0 })
-  g.save().scaleCanvas(CITY_GROUND_TEXTURE_SCALE, CITY_GROUND_TEXTURE_SCALE)
+export interface GroundBounds { left: number; top: number; right: number; bottom: number }
+export const drawCityGround = (g: Phaser.GameObjects.Graphics, bounds?: GroundBounds): void => {
+  const visible = (r: { x: number; y: number; width: number; height: number }): boolean => !bounds ||
+    r.x + r.width / 2 + 100 >= bounds.left && r.x - r.width / 2 - 100 <= bounds.right &&
+    r.y + r.height / 2 + 100 >= bounds.top && r.y - r.height / 2 - 100 <= bounds.bottom
   g.fillStyle(C.grass).fillRect(0, 0, WORLD_WIDTH, WORLD_HEIGHT)
-  for (const zone of WORLD_ZONES) {
-    g.fillStyle(C.lawn).fillRoundedRect(zone.x - 8, zone.y - 8, zone.width + 16, zone.height + 16, 36)
-    g.fillStyle(zone.fillColor, 0.35).fillRoundedRect(zone.x + 10, zone.y + 15, zone.width - 20, zone.height - 30, 26)
+  for (const feature of WORLD_LANDSCAPE) {
+    if (feature.kind === 'river') {
+      g.lineStyle(820, C.water, 1).strokePoints(feature.points, false)
+      g.lineStyle(360, C.waterLight, .22).strokePoints(feature.points, false)
+    } else if (feature.points.length > 2) g.fillStyle(C.lawn, .9).fillPoints(feature.points, true)
   }
-  drawDistrictIdentityGround(g, WORLD_ZONES)
-  drawCityDistrictAccents(g,
-    cityDistrictAccents(WORLD_ZONES, URBAN_SIDEWALKS, URBAN_BUILDINGS, WORLD_DECORATIONS))
-  drawCityPavement(g, URBAN_ROADS, URBAN_SIDEWALKS)
+  for (const [index, building] of WORLD_CONTEXT_BUILDINGS.entries()) {
+    if (!visible(building)) continue
+    const roof = [0xc98862, 0xa56f58, 0xcab394, 0xd9bc90, 0x9caca3][index % 5]
+    g.fillStyle(C.shadow, .19).fillPoints(building.points.map(p => ({ x: p.x + 9, y: p.y + 12 })), true)
+    g.fillStyle(0xe1cdaa).fillPoints(building.points, true)
+    const raised = building.points.map(p => ({ x: p.x, y: p.y - 7 }))
+    g.fillStyle(roof).fillPoints(raised, true)
+    g.lineStyle(1.4, 0x805d48, .65).strokePoints(raised, true)
+  }
+  drawBrailaDistrictIdentity(g, WORLD_ZONES)
+
+  // Real city water and parks replace the former artificial canal pockets.
+  drawCityPavement(g, bounds ? URBAN_ROADS.filter(visible) : URBAN_ROADS, bounds ? URBAN_SIDEWALKS.filter(visible) : URBAN_SIDEWALKS)
 
   // Shadows and low street furniture are static ground decoration and are therefore baked too.
   WORLD_DECORATIONS.forEach((tree, index) => {
+    if (!visible({ ...tree, width: 100, height: 100 })) return;
     g.fillStyle(C.shadow, 0.13).fillEllipse(tree.x + tree.radius * 0.4,
       tree.y + 3, tree.radius * 4.6, tree.radius * 1.5)
     if (index % 4 === 0) drawFlowerBox(g, tree.x + tree.radius + 12, tree.y + tree.radius * 0.65, 24)
   })
   for (const zone of WORLD_ZONES) {
+    if (!visible({ ...zone, x: zone.x + zone.width / 2, y: zone.y + zone.height / 2 })) continue
     const x = zone.x + zone.width / 2
     const y = zone.y + 34
     drawBench(g, x, y)
@@ -78,6 +88,7 @@ export const ensureCityGroundTexture = (scene: Phaser.Scene): string => {
 
   // Door markers are static. The active objective remains a separate dynamic marker in GameWorld.
   WORLD_ROUTE_POINTS.forEach(point => {
+    if (!visible({ ...point, width: 100, height: 100 })) return
     const merchant = point.kind === 'pickup'
     g.fillStyle(merchant ? COLORS.gold : COLORS.accent, 0.16).fillEllipse(point.x, point.y + 2, 40, 25)
     g.lineStyle(2, merchant ? COLORS.gold : COLORS.accent, 0.85).strokeEllipse(point.x, point.y + 2, 40, 25)
@@ -88,6 +99,17 @@ export const ensureCityGroundTexture = (scene: Phaser.Scene): string => {
       g.fillStyle(C.curb, 0.85).fillCircle(point.x, point.y + 2, 3)
     }
   })
+ }
+
+/**
+ * Produce one reusable static ground texture. This work occurs once for the Phaser texture manager;
+ * scene restarts reuse the cached texture instead of retaining/replaying the full vector command list.
+ */
+export const ensureCityGroundTexture = (scene: Phaser.Scene): string => {
+  if (scene.textures.exists(CITY_GROUND_TEXTURE_KEY)) return CITY_GROUND_TEXTURE_KEY
+  const g = scene.make.graphics({ x: 0, y: 0 })
+  g.save().scaleCanvas(CITY_GROUND_TEXTURE_SCALE, CITY_GROUND_TEXTURE_SCALE)
+  drawCityGround(g)
   g.restore()
   g.generateTexture(
     CITY_GROUND_TEXTURE_KEY,
@@ -137,7 +159,7 @@ export const renderUrbanNeighborhood = (
     }
   })
 
-  renderCityStreetAndAddressLabels(scene)
+  renderBrailaAddressLabels(scene)
 
   WORLD_DECORATIONS.forEach((tree, index) => {
     // The collision disk covers the trunk; the substantial canopy hangs above it.
@@ -148,6 +170,12 @@ export const renderUrbanNeighborhood = (
     const x = zone.x + zone.width / 2
     const y = zone.y + 34
     cityLabel(scene, x, y - 48, zone.label.toUpperCase(), 13, '#247c48').setDepth(2).setAlpha(0.8)
+  }
+  const streetNames = new Set<string>()
+  for (const road of WORLD_ROADS) {
+    if (!road.name || streetNames.has(road.name) || (road.roadWidth ?? 0) < 42) continue
+    streetNames.add(road.name)
+    cityLabel(scene, road.x, road.y - 30, road.name, 12, '#fff4ce', '#344e69').setDepth(4)
   }
 
   const hq = URBAN_BUILDINGS.find(building => building.kind === 'hq')!

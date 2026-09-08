@@ -1,7 +1,9 @@
 import {
   PLAYER_START, WORLD_BUILDINGS, WORLD_DECORATIONS, WORLD_HEIGHT, WORLD_ROADS,
   WORLD_ROUTE_POINTS, WORLD_SIDEWALKS, WORLD_WIDTH, type WorldBuildingLayout, type WorldRectLayout,
+  WORLD_MARKETPLACE,
 } from './worldLayout'
+import { surfaceContains } from './worldSurfaces'
 
 export interface UrbanPoint { x: number; y: number }
 export type UrbanFacing = 'up' | 'down' | 'left' | 'right'
@@ -10,9 +12,11 @@ export type UrbanBuilding = WorldBuildingLayout
 export const URBAN_HQ: Readonly<UrbanPoint> = PLAYER_START
 export const URBAN_MARKETPLACE_BUILDING_ID = 'business-1'
 /** Reachable pavement anchor directly outside the dedicated DROPi Marketplace entrance. */
-export const URBAN_MARKETPLACE: Readonly<UrbanPoint> = { x: 960, y: 245 }
-export const URBAN_MERCHANT: Readonly<UrbanPoint> = { x: 620, y: 910 }
-export const URBAN_CUSTOMER: Readonly<UrbanPoint> = { x: 560, y: 290 }
+export const URBAN_MARKETPLACE: Readonly<UrbanPoint> = WORLD_MARKETPLACE
+const merchantPoint = WORLD_ROUTE_POINTS.find(p => p.label === 'PickupZone')!
+export const URBAN_MERCHANT: Readonly<UrbanPoint> = { x: merchantPoint.x, y: merchantPoint.y }
+const customerPoint = WORLD_ROUTE_POINTS.find(p => p.label === 'DeliveryZone')!
+export const URBAN_CUSTOMER: Readonly<UrbanPoint> = { x: customerPoint.x, y: customerPoint.y }
 export const URBAN_ROADS = WORLD_ROADS
 
 export const URBAN_BUILDINGS: readonly UrbanBuilding[] = WORLD_BUILDINGS
@@ -29,9 +33,7 @@ const finitePoint = (point: UrbanPoint): boolean =>
   Number.isFinite(point.x) && Number.isFinite(point.y)
 const finiteCoordinates = (x: number, y: number): boolean => Number.isFinite(x) && Number.isFinite(y)
 
-const contains = (rect: WorldRectLayout, x: number, y: number, padding = 0): boolean =>
-  Math.abs(x - rect.x) <= rect.width / 2 + padding &&
-  Math.abs(y - rect.y) <= rect.height / 2 + padding
+const contains = surfaceContains
 
 /**
  * Static city geometry is indexed once at module initialization. Android gameplay used to scan

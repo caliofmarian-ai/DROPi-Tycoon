@@ -5,7 +5,7 @@ import { sanitizeOwnershipEconomyState } from '../systems/ownershipEconomySystem
 import type { UrbanObjective } from '../systems/urbanInteractions'
 import type { CompanyState, WorldState } from '../types/game'
 import type { OwnershipEconomyState } from '../types/ownershipEconomy'
-import { WORLD_ZONES } from '../world/worldLayout'
+import { WORLD_ZONES, WORLD_CITY_NAME } from '../world/worldLayout'
 import { COLORS, formatMoney, RADII, TOUCH_TARGET_MIN_PX, TYPOGRAPHY } from './theme'
 
 export const SMARTPHONE_LIVE_APPS = [
@@ -40,7 +40,7 @@ const districtForPoint = (point: { x: number; y: number }): string =>
   WORLD_ZONES.find(zone =>
     point.x >= zone.x && point.x <= zone.x + zone.width &&
     point.y >= zone.y && point.y <= zone.y + zone.height,
-  )?.label ?? 'Cedar City'
+  )?.label ?? WORLD_CITY_NAME
 
 const parcelStatus = (world: WorldState): string => {
   if (world.player.carryingPackage) return 'Parcel in hand'

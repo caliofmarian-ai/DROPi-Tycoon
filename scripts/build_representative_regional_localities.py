@@ -83,51 +83,102 @@ def choose_representative(rows, primary_codes, fallback_codes):
 def build(config, cities_zip, admin1_path):
     country = config['country']
     country_code = country['sourceCountryCode']
-    admin = load_admin1(admin1_path, country_code)
-    groups = load_country_places(cities_zip, country_code)
     expected_regions = config['expectedRegions']
     expected_codes = [str(item['admin1Code']) for item in expected_regions]
+    source_country_codes = list(config['source'].get('candidateCountryCodes', [country_code]))
 
+    if country_code not in source_country_codes:
+        raise RuntimeError('primary country source code must be included in candidateCountryCodes')
     if len(expected_regions) != int(config['administrativeModel']['unitCount']):
         raise RuntimeError('expectedRegions count does not match administrativeModel.unitCount')
     if len(set(expected_codes)) != len(expected_codes):
-        raise RuntimeError('expectedRegions contains duplicate admin1 codes')
+        raise RuntimeError('expectedRegions contains duplicate canonical admin1 codes')
+    if len(set(source_country_codes)) != len(source_country_codes):
+        raise RuntimeError('candidateCountryCodes contains duplicates')
+
+    admins = {code: load_admin1(admin1_path, code) for code in source_country_codes}
+    groups_by_country = {code: load_country_places(cities_zip, code) for code in source_country_codes}
+    resolved = []
 
     for expected in expected_regions:
         code = str(expected['admin1Code'])
-        source = admin.get(code)
-        if not source:
-            raise RuntimeError(f'{country_code}.{code}: missing retained admin1 source row')
+        region_override = expected.get('regionSourceOverride')
+        if region_override:
+            source = {
+                'sourceName': region_override.get('sourceName', expected['sourceName']),
+                'asciiName': region_override.get('asciiName', expected['sourceName']),
+                'sourceRef': region_override['sourceRef'],
+            }
+        else:
+            region_country_code = expected.get('regionSourceCountryCode', country_code)
+            region_admin1_code = str(expected.get('regionSourceAdmin1Code', code))
+            if region_country_code not in admins:
+                raise RuntimeError(f'{region_country_code}: region source country is not in candidateCountryCodes')
+            source = admins[region_country_code].get(region_admin1_code)
+            if not source:
+                raise RuntimeError(f'{region_country_code}.{region_admin1_code}: missing retained admin1 source row')
+
         if norm(source['sourceName']) != norm(expected['sourceName']):
             raise RuntimeError(
-                f'{country_code}.{code}: retained admin1 name {source["sourceName"]!r} '
+                f'{country_code}.{code}: regional source name {source["sourceName"]!r} '
                 f'does not match configured sourceName {expected["sourceName"]!r}'
             )
-        if not groups.get(code):
-            raise RuntimeError(f'{country_code}.{code}: no retained locality candidates')
 
-    source_count = sum(len(rows) for rows in groups.values())
+        locality_country_code = expected.get('localitySourceCountryCode', country_code)
+        if locality_country_code not in groups_by_country:
+            raise RuntimeError(f'{locality_country_code}: locality source country is not in candidateCountryCodes')
+        locality_scope = expected.get('localitySourceScope', 'admin1')
+        locality_admin1_code = str(expected.get('localitySourceAdmin1Code', code))
+        if locality_scope == 'country':
+            rows = [
+                row
+                for admin_rows in groups_by_country[locality_country_code].values()
+                for row in admin_rows
+            ]
+        elif locality_scope == 'admin1':
+            rows = groups_by_country[locality_country_code].get(locality_admin1_code, [])
+        else:
+            raise RuntimeError(f'{country_code}.{code}: unsupported localitySourceScope {locality_scope!r}')
+        if not rows:
+            raise RuntimeError(f'{country_code}.{code}: no retained locality candidates')
+        resolved.append((expected, source, locality_country_code, locality_scope, rows))
+
+    source_count = sum(
+        len(rows)
+        for source_code in source_country_codes
+        for rows in groups_by_country[source_code].values()
+    )
     expected_source_count = int(config['source']['expectedCountryCandidateCount'])
     if source_count != expected_source_count:
-        raise RuntimeError(f'{country_code}: retained candidate count drift {source_count} != {expected_source_count}')
+        raise RuntimeError(
+            f'{country_code}: retained candidate count drift {source_count} != {expected_source_count}'
+        )
 
     policy = config['selectionPolicy']
     primary_codes = list(policy['primaryFeatureCodes'])
     fallback_codes = list(policy['fallbackFeatureCodes'])
     units = []
-    for expected in expected_regions:
+    for expected, source, locality_country_code, locality_scope, rows in resolved:
         code = str(expected['admin1Code'])
-        chosen, basis = choose_representative(groups[code], primary_codes, fallback_codes)
-        is_capital = chosen['feature_code'] == 'PPLC'
+        chosen, basis = choose_representative(rows, primary_codes, fallback_codes)
+        default_role = (
+            'national-capital-and-regional-node'
+            if chosen['feature_code'] == 'PPLC' and locality_country_code == country_code
+            else 'regional-representative-locality'
+        )
+        presentation_role = expected.get('presentationRole', default_role)
         units.append({
             'admin1Code': code,
             'regionName': expected['canonicalName'],
-            'regionSourceName': admin[code]['sourceName'],
-            'regionAsciiName': admin[code]['asciiName'],
-            'regionSourceRef': admin[code]['sourceRef'],
+            'regionSourceName': source['sourceName'],
+            'regionAsciiName': source['asciiName'],
+            'regionSourceRef': source['sourceRef'],
             'representativeLocality': {
                 'localityId': f"dropi:locality:geonames:{chosen['geonameid']}",
                 'sourceRef': f"geonames:{chosen['geonameid']}",
+                'sourceCountryCode': locality_country_code,
+                'sourceAdmin1Code': chosen['admin1_code'],
+                'sourceScope': locality_scope,
                 'name': chosen['name'],
                 'asciiName': chosen['asciiname'] or chosen['name'],
                 'latitude': round(float(chosen['latitude']), 6),
@@ -135,7 +186,7 @@ def build(config, cities_zip, admin1_path):
                 'featureCode': chosen['feature_code'],
                 'populationSourceValue': int(chosen['population'] or 0),
                 'selectionBasis': basis,
-                'presentationRole': 'national-capital-and-regional-node' if is_capital else 'regional-representative-locality',
+                'presentationRole': presentation_role,
             },
             'economicEmergence': {
                 'authority': config['economicEmergence']['authority'],
@@ -147,7 +198,10 @@ def build(config, cities_zip, admin1_path):
 
     if len({unit['representativeLocality']['localityId'] for unit in units}) != len(units):
         raise RuntimeError('representative locality identities must be unique')
-    primary_count = sum(unit['representativeLocality']['selectionBasis'] == 'source-first-order-seat-role' for unit in units)
+    primary_count = sum(
+        unit['representativeLocality']['selectionBasis'] == 'source-first-order-seat-role'
+        for unit in units
+    )
     fallback_count = len(units) - primary_count
     if primary_count != int(policy['expectedPrimarySelections']):
         raise RuntimeError(f'primary selection count drift {primary_count}')

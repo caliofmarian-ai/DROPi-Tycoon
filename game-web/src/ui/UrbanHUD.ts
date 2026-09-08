@@ -7,7 +7,8 @@ import { getUrbanCargo, type UrbanObjective } from '../systems/urbanInteractions
 import {
   URBAN_BUILDINGS, URBAN_ROADS, URBAN_HQ, minimapPoint, inInteractionRange,
 } from '../world/urbanWorld'
-import { findWorldRoutePoint, WORLD_HEIGHT, WORLD_WIDTH, WORLD_ZONES } from '../world/worldLayout'
+import { findWorldRoutePoint, WORLD_HEIGHT, WORLD_WIDTH, WORLD_ZONES, WORLD_CITY_NAME, WORLD_LANDSCAPE } from '../world/worldLayout'
+import { cityScaleLevel, cityFitZoom } from '../world/semanticMapCamera'
 import {
   ANALOG_JOYSTICK_HIT_DIAMETER,
   ANALOG_JOYSTICK_KNOB_RADIUS,
@@ -110,7 +111,7 @@ export const urbanMapViewport = (
 
 export const urbanDistrictCaption = (point: { x: number; y: number }): string =>
   (WORLD_ZONES.find(zone => point.x >= zone.x && point.x <= zone.x + zone.width &&
-    point.y >= zone.y && point.y <= zone.y + zone.height)?.label ?? 'Cedar City').toUpperCase()
+    point.y >= zone.y && point.y <= zone.y + zone.height)?.label ?? WORLD_CITY_NAME).toUpperCase()
 
 /** Legacy exported cardinal model retained only for backward compatibility/tests; Android runtime uses analog input. */
 export class UrbanDPadInput {
@@ -215,13 +216,17 @@ export class UrbanHUD {
     this.mapTarget = this.add(scene.add.circle(0, 0, 5, COLORS.gold).setStrokeStyle(2, COLORS.surface))
     this.mapPlayer = this.add(scene.add.circle(0, 0, 4, CITY_COLORS.curb))
       .setStrokeStyle(2, COLORS.accentStrong)
-    this.mapCaption = this.text(map.x + map.width / 2, map.y + map.height + 5, 'CEDAR CITY', 9, COLORS.textPrimary)
+    this.mapCaption = this.text(map.x + map.width / 2, map.y + map.height + 5, WORLD_CITY_NAME.toUpperCase(), 9, COLORS.textPrimary)
       .setOrigin(0.5, 0).setFontStyle('bold')
     const zoom = this.layout.zoom
     this.button(zoom.x - 38, zoom.y, zoom.size, zoom.size, '−', () => callbacks.zoom('out'))
     this.button(zoom.x, zoom.y, zoom.size, zoom.size, '⌖', callbacks.recenter)
     this.button(zoom.x + 38, zoom.y, zoom.size, zoom.size, '+', () => callbacks.zoom('in'))
     this.button(zoom.x, zoom.y + 48, 112, 40, 'World map', callbacks.worldMap)
+
+    this.text(width / 2, height - 16, '© OpenStreetMap contributors · ODbL', 9, COLORS.textPrimary)
+      .setOrigin(.5, 0).setBackgroundColor('#073354').setPadding(4, 2)
+      .setInteractive({ useHandCursor: true }).on('pointerdown', () => window.open('https://www.openstreetmap.org/copyright', '_blank', 'noopener,noreferrer'))
 
     this.createDPad()
     const a = this.layout.action
@@ -366,12 +371,19 @@ export class UrbanHUD {
     this.panel(x - 4, y - 4, width + 8, height + 24)
     const g = this.add(this.scene.add.graphics())
     g.fillStyle(CITY_COLORS.grass).fillRect(x, y, width, height)
-    for (const district of WORLD_ZONES) {
-      const p = minimapPoint(district, width, height)
-      g.fillStyle(district.fillColor, 0.5)
-        .fillRect(x + p.x, y + p.y, district.width / WORLD_WIDTH * width, district.height / WORLD_HEIGHT * height)
+    for (const feature of WORLD_LANDSCAPE) {
+      if (feature.kind !== 'river') continue
+      g.lineStyle(820 / WORLD_WIDTH * width, CITY_COLORS.water).strokePoints(feature.points.map(point => {
+        const p = minimapPoint(point, width, height)
+        return { x: x + p.x, y: y + p.y }
+      }), false)
     }
     for (const road of URBAN_ROADS) {
+      if (road.centerline) {
+        g.lineStyle(Math.max(.45, (road.roadWidth ?? 32) / WORLD_WIDTH * width), CITY_COLORS.road).strokePoints(
+          road.centerline.map(point => { const p = minimapPoint(point, width, height); return { x: x + p.x, y: y + p.y } }), false)
+        continue
+      }
       const p = minimapPoint(road, width, height)
       const w = road.width / WORLD_WIDTH * width
       const h = road.height / WORLD_HEIGHT * height
@@ -426,7 +438,8 @@ export class UrbanHUD {
     const captionPoint = cameraView
       ? { x: cameraView.x + cameraView.width / 2, y: cameraView.y + cameraView.height / 2 }
       : world.player
-    this.mapCaption.setText(urbanDistrictCaption(captionPoint))
+    const level = cityScaleLevel(this.scene.cameras.main.zoom, cityFitZoom(this.scene.scale.width, this.scene.scale.height, WORLD_WIDTH, WORLD_HEIGHT))
+    this.mapCaption.setText(`${level.toUpperCase()} · ${level === 'City' ? WORLD_CITY_NAME : urbanDistrictCaption(captionPoint)}`)
     this.mapCaption.setScale(Math.min(1, map.width / Math.max(1, this.mapCaption.width)))
     if (cameraView) {
       const view = urbanMapViewport(cameraView, map.width, map.height)

@@ -1,3 +1,4 @@
+import { PLAYER_START } from '../src/world/worldLayout'
 import { describe, expect, it } from 'vitest'
 import {
   createInitialCompanyState,
@@ -253,8 +254,8 @@ describe('ISSUE-015 / ISSUE-017 / RBATCH-018 — validation and load', () => {
     expect(restored.company.payroll.lastProcessedCycle).toBe(2)
     expect(restored.settings.tutorialCompleted).toBe(true)
 
-    expect(restored.world.player.x).toBe(380)
-    expect(restored.world.player.y).toBe(270)
+    expect(restored.world.player.x).toBe(PLAYER_START.x)
+    expect(restored.world.player.y).toBe(PLAYER_START.y)
     expect(restored.world.player.currentOrder).toBe('')
     expect(restored.world.player.carryingPackage).toBe(false)
     expect(restored.world.activeOrder.status).toBe('Available')

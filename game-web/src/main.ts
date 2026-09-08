@@ -23,6 +23,13 @@ const handleNativeBack = (): void => {
   const target = resolveNativeBackTarget(activeScene.scene.key)
   if (!target) return
 
+  if (activeScene.scene.key === 'GlobalMap' && activeScene.scene.isSleeping('GameWorld')) {
+    activeScene.registry.set('map-local-view', 'Hero')
+    activeScene.scene.wake('GameWorld')
+    activeScene.scene.stop()
+    return
+  }
+
   activeScene.scene.start(target)
 }
 

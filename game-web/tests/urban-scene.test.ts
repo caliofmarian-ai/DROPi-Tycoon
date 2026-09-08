@@ -245,7 +245,7 @@ describe('urban physical delivery scene', () => {
     const world = createInitialWorldState()
     const company = createInitialCompanyState()
     world.urban = { merchantOnboarded: true, activeTransport: 'walking' }
-    world.activeOrder.destination = 'CompanyDelivery'
+    const activeDestination = world.activeOrder.destination
     world.activeOrder.status = status
     world.player.currentOrder = world.activeOrder.orderId
     world.player.carryingPackage = status === 'PickedUp'
@@ -263,7 +263,7 @@ describe('urban physical delivery scene', () => {
       restored = performUrbanInteraction(at(restored, getUrbanObjective(restored).point), company).world
     }
     expect(restored.player.carryingPackage).toBe(true)
-    const destination = findWorldRoutePoint('CompanyDelivery')!
+    const destination = findWorldRoutePoint(activeDestination)!
     const delivered = performUrbanInteraction(at(restored, destination), company)
     expect(delivered.settled).toBe(true)
     expect(delivered.company.money).toBe(company.money + world.activeOrder.reward)
