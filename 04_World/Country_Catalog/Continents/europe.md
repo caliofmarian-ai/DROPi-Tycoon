@@ -39,7 +39,7 @@ Parent: #446
 | 352 | Iceland | Reykjavik | 8 | CAPITAL, N, E, S, W, NE, SW, NW | **PASS** | structural/source checks passed |
 | 372 | Ireland | Dublin | 9 | CAPITAL, N, E, S, W, NE, SE, SW, NW | **PASS** | structural/source checks passed |
 | 380 | Italy | Rome | 9 | CAPITAL, N, E, S, W, NE, SE, SW, NW | **PASS** | structural/source checks passed |
-| XKX | Kosovo | Pristina | 3 | CAPITAL, N, S | **REVIEW** | #478: neutral status semantics remain required after stable project-owned geometry identity migration; XKX is a DROPi project key, not an ISO numeric code or sovereignty assertion |
+| XKX | Kosovo | Pristina | 3 | CAPITAL, N, S | **REVIEW** | #478: Stable DROPi XKX geometry identity and neutral status-sensitive Kosovo semantics implemented; Pristina retained as capital / administrative centre without a DROPi sovereignty assertion; owner Android Country Layer acceptance pending |
 | 428 | Latvia | Riga | 6 | CAPITAL, N, E, W, NE, SW | **PASS** | structural/source checks passed |
 | 440 | Lithuania | Vilnius | 5 | CAPITAL, N, E, W, NE | **PASS** | structural/source checks passed |
 | 442 | Luxembourg | Luxembourg | 3 | CAPITAL, N, E | **PASS** | structural/source checks passed |

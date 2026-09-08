@@ -36,7 +36,7 @@ Parent: #446
 | 364 | Iran | Tehran | 9 | CAPITAL, N, E, S, W, NE, SE, SW, NW | **PASS** | structural/source checks passed |
 | 368 | Iraq | Baghdad | 9 | CAPITAL, N, E, S, W, NE, SE, SW, NW | **PASS** | structural/source checks passed |
 | 376 | Israel | Jerusalem | 6 | CAPITAL, W, N, E, S, SW | **REVIEW** | #467: Jerusalem source-backed structural role implemented with Israeli institutional semantics and UN final-status context; Tel Aviv-Yafo retained as major economic/metropolitan centre; owner Android acceptance pending |
-| 392 | Japan | Tokyo | 9 | CAPITAL, W, N, E, S, NE, SE, SW, NW | **REVIEW** | #464: current-capital mismatch: Tokyo is Japan's current capital; Kyoto must not retain the capital role |
+| 392 | Japan | Tokyo | 9 | CAPITAL, W, N, E, S, NE, SE, SW, NW | **REVIEW** | #464: Tokyo current-capital override implemented; Kyoto retained as a non-capital representative city; owner Android Country Layer acceptance pending |
 | 400 | Jordan | Amman | 8 | CAPITAL, N, E, S, W, NE, SE, NW | **PASS** | structural/source checks passed |
 | 398 | Kazakhstan | Astana | 9 | CAPITAL, N, E, S, W, NE, SE, SW, NW | **PASS** | structural/source checks passed |
 | 414 | Kuwait | Kuwait City | 4 | CAPITAL, N, E, W | **PASS** | structural/source checks passed |
@@ -45,7 +45,7 @@ Parent: #446
 | 422 | Lebanon | Beirut | 6 | CAPITAL, N, E, S, W, SW | **PASS** | structural/source checks passed |
 | 458 | Malaysia | Kuala Lumpur | 9 | CAPITAL, N, E, S, W, NE, SE, SW, NW | **PASS** | structural/source checks passed |
 | 496 | Mongolia | Ulaanbaatar | 9 | CAPITAL, N, E, S, W, NE, SE, SW, NW | **PASS** | structural/source checks passed |
-| 104 | Myanmar | Nay Pyi Taw | 9 | CAPITAL, SE, N, E, S, W, NE, SW, NW | **REVIEW** | #465: current-capital mismatch: Nay Pyi Taw is Myanmar's capital while Yangon/Rangoon is a major commercial city |
+| 104 | Myanmar | Nay Pyi Taw | 9 | CAPITAL, SE, N, E, S, W, NE, SW, NW | **REVIEW** | #465: Nay Pyi Taw capital override implemented; Yangon retained as a major commercial city; owner Android Country Layer acceptance pending |
 | XNC | N. Cyprus | — | 0 | — | **GAP** | documented source coverage gap |
 | 524 | Nepal | Kathmandu | 9 | CAPITAL, N, E, S, W, NE, SE, SW, NW | **PASS** | structural/source checks passed |
 | 408 | North Korea | Pyongyang | 9 | CAPITAL, N, E, S, W, NE, SE, SW, NW | **PASS** | structural/source checks passed |
@@ -56,7 +56,7 @@ Parent: #446
 | 634 | Qatar | Doha | 1 | CAPITAL | **PASS** | structural/source checks passed |
 | 682 | Saudi Arabia | Riyadh | 9 | CAPITAL, N, E, S, W, NE, SE, SW, NW | **PASS** | structural/source checks passed |
 | 410 | South Korea | Seoul | 9 | CAPITAL, N, E, S, W, NE, SE, SW, NW | **PASS** | structural/source checks passed |
-| 144 | Sri Lanka | Sri Jayewardenepura Kotte | 9 | CAPITAL, SW, N, E, S, W, NE, SE, NW | **REVIEW** | #466: capital-role semantics: Sri Jayewardenepura Kotte is the national/administrative capital while Colombo is the commercial capital and major government-services city |
+| 144 | Sri Lanka | Sri Jayewardenepura Kotte | 9 | CAPITAL, SW, N, E, S, W, NE, SE, NW | **REVIEW** | #466: Sri Jayewardenepura Kotte administrative/national-capital and Colombo commercial-capital semantics implemented; owner Android Country Layer acceptance pending |
 | 760 | Syria | Damascus | 9 | CAPITAL, N, E, S, W, NE, SE, SW, NW | **PASS** | structural/source checks passed |
 | 158 | Taiwan | Taipei | 9 | CAPITAL, N, E, S, W, NE, SE, SW, NW | **PASS** | structural/source checks passed |
 | 762 | Tajikistan | Dushanbe | 8 | CAPITAL, N, E, S, W, NE, SW, NW | **PASS** | structural/source checks passed |
