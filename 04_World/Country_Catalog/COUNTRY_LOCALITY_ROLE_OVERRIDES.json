@@ -1,5 +1,5 @@
 {
-  "version": "1.0.0",
+  "version": "1.1.0",
   "source": {
     "name": "Natural Earth 1:10m populated places simple",
     "upstreamCommit": "ca96624a56bd078437bca8184e78163e5039ad19"
@@ -75,6 +75,21 @@
         {
           "sourceNames": ["Valparaiso", "Valparaíso"],
           "displayName": "Valparaíso",
+          "role": "urban"
+        }
+      ]
+    },
+    "226": {
+      "issue": 459,
+      "country": "Equatorial Guinea",
+      "currentCapital": {
+        "sourceNames": ["Ciudad de la Paz", "Ciudad de La Paz", "Oyala", "Djibloho"],
+        "displayName": "Ciudad de la Paz"
+      },
+      "requiredRepresentatives": [
+        {
+          "sourceNames": ["Malabo"],
+          "displayName": "Malabo",
           "role": "urban"
         }
       ]
