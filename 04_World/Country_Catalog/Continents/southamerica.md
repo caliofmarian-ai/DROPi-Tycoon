@@ -24,7 +24,7 @@ Parent: #446
 | 032 | Argentina | Buenos Aires | 9 | CAPITAL, N, E, S, W, NE, SE, SW, NW | **PASS** | structural/source checks passed |
 | 068 | Bolivia | Sucre | 9 | CAPITAL, W, N, E, S, NE, SE, SW, NW | **REVIEW** | #472: Sucre constitutional/national-capital override implemented; La Paz retained as government seat / executive and legislative centre; owner Android Country Layer acceptance pending |
 | 076 | Brazil | Brasilia | 9 | CAPITAL, N, E, S, W, NE, SE, SW, NW | **PASS** | structural/source checks passed |
-| 152 | Chile | Santiago | 9 | CAPITAL, NW, N, E, S, W, NE, SE, SW | **REVIEW** | #473: current-capital mismatch: Santiago is Chile's national capital while Valparaiso is the seat of the National Congress and a major port |
+| 152 | Chile | Santiago | 9 | CAPITAL, NW, N, E, S, W, NE, SE, SW | **REVIEW** | #473: Santiago national-capital and Valparaíso National Congress-seat / representative-city semantics implemented; owner Android Country Layer acceptance pending |
 | 170 | Colombia | Bogota | 9 | CAPITAL, N, E, S, W, NE, SE, SW, NW | **PASS** | structural/source checks passed |
 | 218 | Ecuador | Quito | 9 | CAPITAL, N, E, S, W, NE, SE, SW, NW | **PASS** | structural/source checks passed |
 | 238 | Falkland Is. | Stanley | 2 | CAPITAL, SW | **REVIEW** | #474: UN Non-Self-Governing Territory / unresolved Argentina–United Kingdom sovereignty-dispute semantics implemented; Stanley retained only as current administrative centre; owner Android acceptance pending |

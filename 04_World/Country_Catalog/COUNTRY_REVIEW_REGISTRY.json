@@ -1,5 +1,5 @@
 {
-  "version": "1.10.0",
+  "version": "1.11.0",
   "purpose": "Manual semantic review flags discovered during continent-by-continent audit. These do not silently rewrite pinned Natural Earth source data.",
   "reviews": {
     "204": {
@@ -32,15 +32,15 @@
     },
     "392": {
       "issue": 464,
-      "reason": "current-capital mismatch: Tokyo is Japan's current capital; Kyoto must not retain the capital role"
+      "reason": "Tokyo current-capital override implemented; Kyoto retained as a non-capital representative city; owner Android Country Layer acceptance pending"
     },
     "104": {
       "issue": 465,
-      "reason": "current-capital mismatch: Nay Pyi Taw is Myanmar's capital while Yangon/Rangoon is a major commercial city"
+      "reason": "Nay Pyi Taw capital override implemented; Yangon retained as a major commercial city; owner Android Country Layer acceptance pending"
     },
     "144": {
       "issue": 466,
-      "reason": "capital-role semantics: Sri Jayewardenepura Kotte is the national/administrative capital while Colombo is the commercial capital and major government-services city"
+      "reason": "Sri Jayewardenepura Kotte administrative/national-capital and Colombo commercial-capital semantics implemented; owner Android Country Layer acceptance pending"
     },
     "376": {
       "issue": 467,
@@ -56,7 +56,7 @@
     },
     "152": {
       "issue": 473,
-      "reason": "current-capital mismatch: Santiago is Chile's national capital while Valparaiso is the seat of the National Congress and a major port"
+      "reason": "Santiago national-capital and Valparaíso National Congress-seat / representative-city semantics implemented; owner Android Country Layer acceptance pending"
     },
     "238": {
       "issue": 474,
@@ -68,15 +68,15 @@
     },
     "XKX": {
       "issue": 478,
-      "reason": "neutral status semantics remain required after stable project-owned geometry identity migration; XKX is a DROPi project key, not an ISO numeric code or sovereignty assertion"
+      "reason": "Stable DROPi XKX geometry identity and neutral status-sensitive Kosovo semantics implemented; Pristina retained as capital / administrative centre without a DROPi sovereignty assertion; owner Android Country Layer acceptance pending"
     },
     "XNC": {
       "issue": 481,
-      "reason": "special-status semantics required: XNC is a DROPi project-owned non-ISO key for the rendered N. Cyprus geometry; geographic rendering must not imply uncontested sovereignty or recognition"
+      "reason": "Stable DROPi XNC geometry identity and neutral northern-Cyprus special-status semantics implemented; locality coverage intentionally remains empty rather than inventing source-unsafe nodes; owner Android Country Layer acceptance pending"
     },
     "XSL": {
       "issue": 482,
-      "reason": "current special-status semantics required: XSL is a DROPi project-owned non-ISO key for the rendered Somaliland geometry; de facto administration and current recognition developments must remain distinct from universally settled sovereignty"
+      "reason": "Stable DROPi XSL geometry identity, Hargeysa principal-administrative-centre role and current recognition-contested Somaliland semantics implemented; owner Android Country Layer acceptance pending"
     }
   }
 }

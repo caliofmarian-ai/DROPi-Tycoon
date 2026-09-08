@@ -62,7 +62,7 @@ Parent: #446
 | 686 | Senegal | Dakar | 8 | CAPITAL, N, E, S, W, SE, SW, NW | **PASS** | structural/source checks passed |
 | 694 | Sierra Leone | Freetown | 5 | CAPITAL, N, E, S, NE | **PASS** | structural/source checks passed |
 | 706 | Somalia | Mogadishu | 9 | CAPITAL, N, E, S, W, NE, SE, SW, NW | **PASS** | structural/source checks passed |
-| XSL | Somaliland | Hargeysa | 7 | CAPITAL, N, E, S, W, NE, SE | **REVIEW** | #482: current special-status semantics required: XSL is a DROPi project-owned non-ISO key for the rendered Somaliland geometry; de facto administration and current recognition developments must remain distinct from universally settled sovereignty |
+| XSL | Somaliland | Hargeysa | 7 | CAPITAL, N, E, S, W, NE, SE | **REVIEW** | #482: Stable DROPi XSL geometry identity, Hargeysa principal-administrative-centre role and current recognition-contested Somaliland semantics implemented; owner Android Country Layer acceptance pending |
 | 710 | South Africa | Pretoria | 9 | CAPITAL, SW, SE, NE, N, E, S, W, NW | **REVIEW** | #460: three-capital semantics implemented: Pretoria administrative, Cape Town legislative, Bloemfontein judicial; Johannesburg retained as major city / Constitutional Court; owner Android Country Layer acceptance pending |
 | 729 | Sudan | Khartoum | 9 | CAPITAL, N, E, S, W, NE, SE, SW, NW | **PASS** | structural/source checks passed |
 | 834 | Tanzania | Dodoma | 9 | CAPITAL, E, N, S, W, NE, SE, SW, NW | **REVIEW** | #461: Dodoma capital override implemented; Dar es Salaam retained as commercial capital / major seaport; owner Android Country Layer acceptance pending |
