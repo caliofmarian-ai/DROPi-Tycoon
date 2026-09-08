@@ -284,7 +284,8 @@
         "status": "MATCHED",
         "localityId": "dropi:locality:geonames:2950159",
         "sourceRef": "geonames:2950159",
-        "distanceKm": 0.742
+        "distanceKm": 0.742,
+        "matchBasis": "primary-name"
       },
       {
         "anchorName": "Hamburg",
@@ -293,7 +294,8 @@
         "status": "MATCHED",
         "localityId": "dropi:locality:geonames:2911298",
         "sourceRef": "geonames:2911298",
-        "distanceKm": 0.36
+        "distanceKm": 0.36,
+        "matchBasis": "primary-name"
       },
       {
         "anchorName": "Dresden",
@@ -302,7 +304,8 @@
         "status": "MATCHED",
         "localityId": "dropi:locality:geonames:2935022",
         "sourceRef": "geonames:2935022",
-        "distanceKm": 0.823
+        "distanceKm": 0.823,
+        "matchBasis": "primary-name"
       },
       {
         "anchorName": "Munich",
@@ -311,7 +314,8 @@
         "status": "MATCHED",
         "localityId": "dropi:locality:geonames:2867714",
         "sourceRef": "geonames:2867714",
-        "distanceKm": 0.642
+        "distanceKm": 0.642,
+        "matchBasis": "primary-name"
       },
       {
         "anchorName": "Dusseldorf",
@@ -320,7 +324,8 @@
         "status": "MATCHED",
         "localityId": "dropi:locality:geonames:2934246",
         "sourceRef": "geonames:2934246",
-        "distanceKm": 0.317
+        "distanceKm": 0.317,
+        "matchBasis": "primary-name"
       },
       {
         "anchorName": "Stralsund",
@@ -329,7 +334,8 @@
         "status": "MATCHED",
         "localityId": "dropi:locality:geonames:2826287",
         "sourceRef": "geonames:2826287",
-        "distanceKm": 1.527
+        "distanceKm": 1.527,
+        "matchBasis": "primary-name"
       },
       {
         "anchorName": "Passau",
@@ -338,7 +344,8 @@
         "status": "MATCHED",
         "localityId": "dropi:locality:geonames:2855328",
         "sourceRef": "geonames:2855328",
-        "distanceKm": 1.237
+        "distanceKm": 1.237,
+        "matchBasis": "primary-name"
       },
       {
         "anchorName": "Mainz",
@@ -347,7 +354,8 @@
         "status": "MATCHED",
         "localityId": "dropi:locality:geonames:2874225",
         "sourceRef": "geonames:2874225",
-        "distanceKm": 0.495
+        "distanceKm": 0.495,
+        "matchBasis": "primary-name"
       },
       {
         "anchorName": "Emden",
@@ -356,7 +364,8 @@
         "status": "MATCHED",
         "localityId": "dropi:locality:geonames:2930596",
         "sourceRef": "geonames:2930596",
-        "distanceKm": 0.55
+        "distanceKm": 0.55,
+        "matchBasis": "primary-name"
       }
     ]
   }

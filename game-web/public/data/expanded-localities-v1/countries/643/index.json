@@ -1346,8 +1346,8 @@
   ],
   "anchorReconciliation": {
     "globalAnchorCount": 8,
-    "matchedCount": 3,
-    "unmatchedCount": 5,
+    "matchedCount": 5,
+    "unmatchedCount": 3,
     "entries": [
       {
         "anchorName": "Moscow",
@@ -1356,7 +1356,8 @@
         "status": "MATCHED",
         "localityId": "dropi:locality:geonames:524901",
         "sourceRef": "geonames:524901",
-        "distanceKm": 0.351
+        "distanceKm": 0.351,
+        "matchBasis": "primary-name"
       },
       {
         "anchorName": "Murmansk",
@@ -1365,19 +1366,28 @@
         "status": "MATCHED",
         "localityId": "dropi:locality:geonames:524305",
         "sourceRef": "geonames:524305",
-        "distanceKm": 0.248
+        "distanceKm": 0.248,
+        "matchBasis": "primary-name"
       },
       {
         "anchorName": "St. Petersburg",
         "anchorSector": "E",
         "anchorRole": "urban",
-        "status": "UNMATCHED"
+        "status": "MATCHED",
+        "localityId": "dropi:locality:geonames:498817",
+        "sourceRef": "geonames:498817",
+        "distanceKm": 0.259,
+        "matchBasis": "alternate-name"
       },
       {
         "anchorName": "Rostov",
         "anchorSector": "S",
         "anchorRole": "urban",
-        "status": "UNMATCHED"
+        "status": "MATCHED",
+        "localityId": "dropi:locality:geonames:501175",
+        "sourceRef": "geonames:501175",
+        "distanceKm": 1.863,
+        "matchBasis": "alternate-name"
       },
       {
         "anchorName": "Zemlya Bunge",
@@ -1398,7 +1408,8 @@
         "status": "MATCHED",
         "localityId": "dropi:locality:geonames:4031574",
         "sourceRef": "geonames:4031574",
-        "distanceKm": 0.073
+        "distanceKm": 0.073,
+        "matchBasis": "primary-name"
       },
       {
         "anchorName": "Zvezdnyj",

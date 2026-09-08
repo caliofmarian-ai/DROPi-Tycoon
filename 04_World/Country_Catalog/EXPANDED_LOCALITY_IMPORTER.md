@@ -87,8 +87,9 @@ Country LOD must not double-render a real locality already visible as a Natural 
 
 The importer therefore performs deterministic reconciliation:
 
-- normalize anchor and GeoNames names without accents/case/punctuation;
-- consider only same-normalized-name candidates in the same country;
+- normalize anchor names and GeoNames `name`, `asciiname`, and source-provided `alternatenames` without accents/case/punctuation;
+- consider only candidates whose normalized primary or alternate source name matches in the same country;
+- record whether a successful link used a `primary-name` or `alternate-name` match basis;
 - require <= 40 km source-coordinate distance;
 - choose the nearest candidate, then population and stable source ID as deterministic tie-breakers;
 - record `MATCHED` or `UNMATCHED` rather than fabricating a relationship.

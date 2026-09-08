@@ -156,7 +156,8 @@
         "status": "MATCHED",
         "localityId": "dropi:locality:geonames:2172517",
         "sourceRef": "geonames:2172517",
-        "distanceKm": 0.099
+        "distanceKm": 0.099,
+        "matchBasis": "primary-name"
       },
       {
         "anchorName": "Darwin",
@@ -165,7 +166,8 @@
         "status": "MATCHED",
         "localityId": "dropi:locality:geonames:2073124",
         "sourceRef": "geonames:2073124",
-        "distanceKm": 4.076
+        "distanceKm": 4.076,
+        "matchBasis": "primary-name"
       },
       {
         "anchorName": "Brisbane",
@@ -174,7 +176,8 @@
         "status": "MATCHED",
         "localityId": "dropi:locality:geonames:2174003",
         "sourceRef": "geonames:2174003",
-        "distanceKm": 1.726
+        "distanceKm": 1.726,
+        "matchBasis": "primary-name"
       },
       {
         "anchorName": "Melbourne",
@@ -183,7 +186,8 @@
         "status": "MATCHED",
         "localityId": "dropi:locality:geonames:2158177",
         "sourceRef": "geonames:2158177",
-        "distanceKm": 0.97
+        "distanceKm": 0.97,
+        "matchBasis": "primary-name"
       },
       {
         "anchorName": "Perth",
@@ -192,7 +196,8 @@
         "status": "MATCHED",
         "localityId": "dropi:locality:geonames:2063523",
         "sourceRef": "geonames:2063523",
-        "distanceKm": 2.205
+        "distanceKm": 2.205,
+        "matchBasis": "primary-name"
       },
       {
         "anchorName": "Richmond",
@@ -201,7 +206,8 @@
         "status": "MATCHED",
         "localityId": "dropi:locality:geonames:2151651",
         "sourceRef": "geonames:2151651",
-        "distanceKm": 2.088
+        "distanceKm": 2.088,
+        "matchBasis": "primary-name"
       },
       {
         "anchorName": "Bicheno",
@@ -210,7 +216,8 @@
         "status": "MATCHED",
         "localityId": "dropi:locality:geonames:2175958",
         "sourceRef": "geonames:2175958",
-        "distanceKm": 1.228
+        "distanceKm": 1.228,
+        "matchBasis": "primary-name"
       },
       {
         "anchorName": "Mount Barker",
@@ -219,7 +226,8 @@
         "status": "MATCHED",
         "localityId": "dropi:locality:geonames:2065666",
         "sourceRef": "geonames:2065666",
-        "distanceKm": 0.222
+        "distanceKm": 0.222,
+        "matchBasis": "primary-name"
       },
       {
         "anchorName": "Onslow",
@@ -228,7 +236,8 @@
         "status": "MATCHED",
         "localityId": "dropi:locality:geonames:2064155",
         "sourceRef": "geonames:2064155",
-        "distanceKm": 2.762
+        "distanceKm": 2.762,
+        "matchBasis": "primary-name"
       }
     ]
   }

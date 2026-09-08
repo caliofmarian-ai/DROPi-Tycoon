@@ -236,7 +236,8 @@
         "status": "MATCHED",
         "localityId": "dropi:locality:geonames:6094817",
         "sourceRef": "geonames:6094817",
-        "distanceKm": 0.883
+        "distanceKm": 0.883,
+        "matchBasis": "primary-name"
       },
       {
         "anchorName": "St. John's",
@@ -245,7 +246,8 @@
         "status": "MATCHED",
         "localityId": "dropi:locality:geonames:6324733",
         "sourceRef": "geonames:6324733",
-        "distanceKm": 3.079
+        "distanceKm": 3.079,
+        "matchBasis": "primary-name"
       },
       {
         "anchorName": "Toronto",
@@ -254,7 +256,8 @@
         "status": "MATCHED",
         "localityId": "dropi:locality:geonames:6167865",
         "sourceRef": "geonames:6167865",
-        "distanceKm": 4.705
+        "distanceKm": 4.705,
+        "matchBasis": "primary-name"
       },
       {
         "anchorName": "Whitehorse",
@@ -263,7 +266,8 @@
         "status": "MATCHED",
         "localityId": "dropi:locality:geonames:6180550",
         "sourceRef": "geonames:6180550",
-        "distanceKm": 0.216
+        "distanceKm": 0.216,
+        "matchBasis": "primary-name"
       },
       {
         "anchorName": "Alert",

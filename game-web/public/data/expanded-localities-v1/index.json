@@ -18,7 +18,7 @@
   "globalLodAnchorCatalogVersion": "1.9.0",
   "countryCount": 5,
   "localityCount": 31337,
-  "matchedGlobalAnchorCount": 34,
+  "matchedGlobalAnchorCount": 36,
   "countries": [
     {
       "geometryId": "036",
@@ -98,7 +98,7 @@
         "wrapsAntimeridian": true
       },
       "indexFile": "countries/643/index.json",
-      "matchedGlobalAnchors": 3
+      "matchedGlobalAnchors": 5
     }
   ]
 }

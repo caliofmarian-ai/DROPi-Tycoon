@@ -180,35 +180,39 @@ def haversine_km(lon1, lat1, lon2, lat2):
 def reconcile_anchors(anchors, localities):
     by_name = {}
     for locality in localities:
-        for candidate in {norm(locality['name']), norm(locality['asciiName'])}:
-            if candidate:
-                by_name.setdefault(candidate, []).append(locality)
+        primary_keys = {norm(locality['name']), norm(locality['asciiName'])}
+        for candidate in locality.get('_matchNames', primary_keys):
+            if not candidate:
+                continue
+            basis = 'primary-name' if candidate in primary_keys else 'alternate-name'
+            by_name.setdefault(candidate, []).append((locality, basis))
 
     reconciliations = []
     for anchor in anchors:
         key = norm(anchor.get('name'))
         candidates = by_name.get(key, [])
         ranked = []
-        for candidate in candidates:
+        for candidate, basis in candidates:
             distance = haversine_km(
                 float(anchor['longitude']), float(anchor['latitude']),
                 candidate['longitude'], candidate['latitude'],
             )
             if distance <= 40.0:
-                ranked.append((distance, candidate))
-        ranked.sort(key=lambda item: (item[0], -item[1]['population'], item[1]['localityId']))
+                ranked.append((distance, candidate, basis))
+        ranked.sort(key=lambda item: (item[0], -item[1]['population'], item[1]['localityId'], item[2]))
         base = {
             'anchorName': anchor.get('name'),
             'anchorSector': anchor.get('sector'),
             'anchorRole': anchor.get('role'),
         }
         if ranked:
-            distance, locality = ranked[0]
+            distance, locality, basis = ranked[0]
             base.update({
                 'status': 'MATCHED',
                 'localityId': locality['localityId'],
                 'sourceRef': locality['sourceRef'],
                 'distanceKm': round(distance, 3),
+                'matchBasis': basis,
             })
         else:
             base['status'] = 'UNMATCHED'
@@ -270,6 +274,13 @@ def parse_source(cities_zip, wanted_codes, geometry_by_code, expected_snapshot):
                     'sourceId': source_id,
                     'name': row['name'],
                     'asciiName': row['asciiname'] or row['name'],
+                    '_matchNames': sorted({
+                        key for key in (
+                            norm(row['name']),
+                            norm(row['asciiname']),
+                            *(norm(alias) for alias in row['alternatenames'].split(',') if alias),
+                        ) if key
+                    }),
                     'latitude': round(latitude, 6),
                     'longitude': round(longitude, 6),
                     'featureCode': row['feature_code'],
@@ -336,6 +347,12 @@ def build(args):
         if expected_count is not None and len(localities) != int(expected_count):
             raise RuntimeError(f'{country_code}: retained count drift {len(localities)} != {expected_count}')
         total_localities += len(localities)
+        reconciliations = reconcile_anchors(
+            anchors_catalog.get('countries', {}).get(geometry_id, []),
+            localities,
+        )
+        for locality in localities:
+            locality.pop('_matchNames', None)
         partitions = {}
         for locality in localities:
             partitions.setdefault(locality['admin1Code'], []).append(locality)
@@ -373,7 +390,6 @@ def build(args):
                 'file': filename,
             })
 
-        reconciliations = reconcile_anchors(anchors_catalog.get('countries', {}).get(geometry_id, []), localities)
         matched_count = sum(item['status'] == 'MATCHED' for item in reconciliations)
         total_anchor_matches += matched_count
         if not any(item.get('anchorSector') == 'CAPITAL' and item['status'] == 'MATCHED' for item in reconciliations):

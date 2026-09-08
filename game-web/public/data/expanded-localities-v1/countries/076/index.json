@@ -460,7 +460,8 @@
         "status": "MATCHED",
         "localityId": "dropi:locality:geonames:3469058",
         "sourceRef": "geonames:3469058",
-        "distanceKm": 1.268
+        "distanceKm": 1.268,
+        "matchBasis": "primary-name"
       },
       {
         "anchorName": "Belem",
@@ -469,7 +470,8 @@
         "status": "MATCHED",
         "localityId": "dropi:locality:geonames:3405870",
         "sourceRef": "geonames:3405870",
-        "distanceKm": 2.643
+        "distanceKm": 2.643,
+        "matchBasis": "primary-name"
       },
       {
         "anchorName": "Salvador",
@@ -478,7 +480,8 @@
         "status": "MATCHED",
         "localityId": "dropi:locality:geonames:3450554",
         "sourceRef": "geonames:3450554",
-        "distanceKm": 1.293
+        "distanceKm": 1.293,
+        "matchBasis": "primary-name"
       },
       {
         "anchorName": "Porto Alegre",
@@ -487,7 +490,8 @@
         "status": "MATCHED",
         "localityId": "dropi:locality:geonames:3452925",
         "sourceRef": "geonames:3452925",
-        "distanceKm": 3.203
+        "distanceKm": 3.203,
+        "matchBasis": "primary-name"
       },
       {
         "anchorName": "Cuiaba",
@@ -496,7 +500,8 @@
         "status": "MATCHED",
         "localityId": "dropi:locality:geonames:3465038",
         "sourceRef": "geonames:3465038",
-        "distanceKm": 3.331
+        "distanceKm": 3.331,
+        "matchBasis": "primary-name"
       },
       {
         "anchorName": "Rosario",
@@ -505,7 +510,8 @@
         "status": "MATCHED",
         "localityId": "dropi:locality:geonames:3390188",
         "sourceRef": "geonames:3390188",
-        "distanceKm": 1.227
+        "distanceKm": 1.227,
+        "matchBasis": "primary-name"
       },
       {
         "anchorName": "Iguape",
@@ -514,7 +520,8 @@
         "status": "MATCHED",
         "localityId": "dropi:locality:geonames:3461465",
         "sourceRef": "geonames:3461465",
-        "distanceKm": 1.99
+        "distanceKm": 1.99,
+        "matchBasis": "primary-name"
       },
       {
         "anchorName": "Corumba",
@@ -523,7 +530,8 @@
         "status": "MATCHED",
         "localityId": "dropi:locality:geonames:3465342",
         "sourceRef": "geonames:3465342",
-        "distanceKm": 0.837
+        "distanceKm": 0.837,
+        "matchBasis": "primary-name"
       },
       {
         "anchorName": "Tonantins",
@@ -532,7 +540,8 @@
         "status": "MATCHED",
         "localityId": "dropi:locality:geonames:3661894",
         "sourceRef": "geonames:3661894",
-        "distanceKm": 0.053
+        "distanceKm": 0.053,
+        "matchBasis": "primary-name"
       }
     ]
   }
