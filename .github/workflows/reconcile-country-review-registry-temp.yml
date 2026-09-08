@@ -1,0 +1,50 @@
+name: TEMP Reconcile Country Review Registry
+
+on:
+  push:
+    branches:
+      - openai/country-review-registry-reconcile-464-482
+
+permissions:
+  contents: write
+
+jobs:
+  reconcile:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: openai/country-review-registry-reconcile-464-482
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install country catalog dependency
+        run: python -m pip install --disable-pip-version-check pycountry
+      - name: Reconcile stale review notes
+        run: |
+          set -euo pipefail
+          python scripts/reconcile_country_review_registry_temp.py
+          git diff --check
+      - name: Regenerate manifests and verify
+        run: |
+          set -euo pipefail
+          python scripts/build_country_catalog_chapters.py --all
+          python scripts/verify_country_catalog_chapters.py --write-report
+          git diff --check
+          grep -F '#464: Tokyo current-capital override implemented' 04_World/Country_Catalog/Continents/asia.md
+          grep -F '#473: Santiago national-capital and Valparaíso National Congress-seat' 04_World/Country_Catalog/Continents/southamerica.md
+          grep -F '#478: Stable DROPi XKX geometry identity and neutral status-sensitive Kosovo semantics implemented' 04_World/Country_Catalog/Continents/europe.md
+          grep -F '#481: Stable DROPi XNC geometry identity and neutral northern-Cyprus special-status semantics implemented' 04_World/Country_Catalog/Continents/asia.md
+          grep -F '#482: Stable DROPi XSL geometry identity, Hargeysa principal-administrative-centre role' 04_World/Country_Catalog/Continents/africa.md
+      - name: Commit canonical reconciliation and remove temporary runners
+        run: |
+          set -euo pipefail
+          find scripts -type d -name __pycache__ -prune -exec rm -rf {} +
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git rm scripts/reconcile_country_review_registry_temp.py .github/workflows/reconcile-country-review-registry-temp.yml
+          git add 04_World
+          git diff --cached --check
+          git commit -m 'docs: reconcile implemented country review states'
+          git push origin HEAD:openai/country-review-registry-reconcile-464-482
