@@ -89,16 +89,16 @@ describe('Global Map runtime #418', () => {
   })
 
   it('governs source-backed capital corrections without hardcoded coordinates', () => {
-    expect(roleOverrideRegistry.version).toBe('1.0.0')
+    expect(roleOverrideRegistry.version).toBe('1.1.0')
     expect(roleOverrideRegistry.source.upstreamCommit).toBe(PINNED_POPULATED_PLACES_COMMIT)
-    expect(Object.keys(roleOverrideRegistry.entries).sort()).toEqual(['104', '144', '152', '392'])
+    expect(Object.keys(roleOverrideRegistry.entries).sort()).toEqual(['104', '144', '152', '226', '392'])
     expect(JSON.stringify(roleOverrideRegistry)).not.toContain('longitude')
     expect(JSON.stringify(roleOverrideRegistry)).not.toContain('latitude')
 
-    expect(localityCatalog.version).toBe('1.3.0')
+    expect(localityCatalog.version).toBe('1.4.0')
     expect(localityCatalog.localityRoleOverrides?.registryVersion).toBe(roleOverrideRegistry.version)
     expect(localityCatalog.localityRoleOverrides?.sourceCommit).toBe(PINNED_POPULATED_PLACES_COMMIT)
-    expect(localityCatalog.localityRoleOverrides?.countryIds).toEqual(['104', '144', '152', '392'])
+    expect(localityCatalog.localityRoleOverrides?.countryIds).toEqual(['104', '144', '152', '226', '392'])
   })
 
   it('keeps special-status and current-capital semantics source-governed', () => {
@@ -110,7 +110,7 @@ describe('Global Map runtime #418', () => {
     const sriLanka = semanticEntryForCountry(semanticCatalog, '144')
     const chile = semanticEntryForCountry(semanticCatalog, '152')
 
-    expect(semanticCatalog.version).toBe('1.1.0')
+    expect(semanticCatalog.version).toBe('1.2.0')
     expect(semanticCatalog.governance.geographyDoesNotAssertSovereignty).toBe(true)
     expect(semanticCatalog.governance.projectGeometryIdsAreNonISO).toBe(true)
     expect(semanticCatalog.governance.localityCoordinatesRemainSourceBacked).toBe(true)
