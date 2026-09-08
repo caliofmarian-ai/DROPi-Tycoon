@@ -1,0 +1,49 @@
+name: TEMP Apply Tanzania Capital Reconciliation v2
+
+on:
+  push:
+    branches:
+      - openai/tanzania-dodoma-capital-461
+    paths:
+      - 'scripts/apply_tanzania_461_temp.py'
+      - '.github/workflows/apply-tanzania-capital-461-temp-v2.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  reconcile:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: openai/tanzania-dodoma-capital-461
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install generator dependency
+        run: python -m pip install --disable-pip-version-check pycountry
+      - name: Apply governed correction
+        run: |
+          set -euo pipefail
+          python scripts/apply_tanzania_461_temp.py
+          git diff --check
+      - name: Regenerate and verify country catalog
+        run: |
+          set -euo pipefail
+          python scripts/build_country_locality_catalog.py
+          python scripts/build_country_catalog_chapters.py --all
+          python scripts/verify_country_catalog_chapters.py --write-report
+          git diff --check
+      - name: Commit product changes and remove temporary runners
+        run: |
+          set -euo pipefail
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git rm scripts/apply_tanzania_461_temp.py .github/workflows/apply-tanzania-capital-461-temp-v2.yml
+          git add -A
+          git diff --cached --check
+          git commit -m 'fix: reconcile Tanzania capital roles'
+          git push origin HEAD:openai/tanzania-dodoma-capital-461
