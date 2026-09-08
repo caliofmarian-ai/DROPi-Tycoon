@@ -5,15 +5,15 @@ Status: Generated audit manifest; country-by-country maintenance surface.
 Parent: #446
 
 ## Source contract
-- runtime catalog version: `1.1.0`
+- runtime catalog version: `1.2.0`
 - Natural Earth upstream commit: `ca96624a56bd078437bca8184e78163e5039ad19`
 - every node coordinate remains a source coordinate; this manifest does not reposition places.
 
 ## Chapter summary
-- countries/territories: **50**
-- representative nodes: **416**
+- countries/territories: **51**
+- representative nodes: **423**
 - structural PASS: **43**
-- REVIEW: **7**
+- REVIEW: **8**
 - documented GAP: **0**
 
 ## Country-by-country manifest
@@ -61,6 +61,7 @@ Parent: #446
 | 686 | Senegal | Dakar | 8 | CAPITAL, N, E, S, W, SE, SW, NW | **PASS** | structural/source checks passed |
 | 694 | Sierra Leone | Freetown | 5 | CAPITAL, N, E, S, NE | **PASS** | structural/source checks passed |
 | 706 | Somalia | Mogadishu | 9 | CAPITAL, N, E, S, W, NE, SE, SW, NW | **PASS** | structural/source checks passed |
+| XSL | Somaliland | Hargeysa | 7 | CAPITAL, N, E, S, W, NE, SE | **REVIEW** | #482: current special-status semantics required: XSL is a DROPi project-owned non-ISO key for the rendered Somaliland geometry; de facto administration and current recognition developments must remain distinct from universally settled sovereignty |
 | 710 | South Africa | Johannesburg | 9 | CAPITAL, N, E, S, W, NE, SE, SW, NW | **REVIEW** | #460: multi-capital semantics required: Pretoria administrative, Cape Town legislative, Bloemfontein judicial; Johannesburg is not the sole national capital |
 | 729 | Sudan | Khartoum | 9 | CAPITAL, N, E, S, W, NE, SE, SW, NW | **PASS** | structural/source checks passed |
 | 834 | Tanzania | Dar es Salaam | 9 | CAPITAL, N, E, S, W, NE, SE, SW, NW | **REVIEW** | #461: capital-role semantics: Dodoma is the national capital while Dar es Salaam remains a major economic/port metropolis |
