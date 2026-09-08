@@ -1,0 +1,13 @@
+{
+  "version": "1.0.0",
+  "purpose": "Stable project-owned geometry identities for rendered map geometries that do not have a usable source ID. Project IDs are not ISO numeric codes and must not be presented as such.",
+  "entries": {
+    "Kosovo": {
+      "projectGeometryId": "XKX",
+      "sourceGeometryId": null,
+      "issue": 478,
+      "classification": "project-owned-non-ISO-identifier",
+      "note": "Stable DROPi geometry/catalog key for serialization and locality lookup. This identifier does not assert universally settled sovereignty or ISO recognition."
+    }
+  }
+}
