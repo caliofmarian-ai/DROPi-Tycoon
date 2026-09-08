@@ -1,0 +1,46 @@
+name: TEMP Apply Bolivia Capital Roles 472
+on:
+  push:
+    branches:
+      - openai/bolivia-capital-roles-472
+    paths:
+      - scripts/apply_bolivia_capital_roles_472_temp.py
+      - .github/workflows/apply-bolivia-capital-roles-472-temp.yml
+permissions:
+  contents: write
+jobs:
+  reconcile:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: openai/bolivia-capital-roles-472
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install generator dependency
+        run: python -m pip install --disable-pip-version-check pycountry
+      - name: Apply governed Bolivia correction
+        run: |
+          set -euo pipefail
+          python scripts/apply_bolivia_capital_roles_472_temp.py
+          git diff --check
+      - name: Regenerate locality catalog and audit manifests
+        run: |
+          set -euo pipefail
+          python scripts/build_country_locality_catalog.py
+          python scripts/build_country_catalog_chapters.py --all
+          python scripts/verify_country_catalog_chapters.py --write-report
+          git diff --check
+      - name: Commit product changes and remove temporary runners
+        run: |
+          set -euo pipefail
+          find scripts -type d -name __pycache__ -prune -exec rm -rf {} +
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git rm scripts/apply_bolivia_capital_roles_472_temp.py .github/workflows/apply-bolivia-capital-roles-472-temp.yml
+          git add 04_World game-web scripts/build_country_locality_catalog.py
+          git diff --cached --check
+          git commit -m 'fix: reconcile Bolivia capital roles'
+          git push origin HEAD:openai/bolivia-capital-roles-472
