@@ -138,23 +138,16 @@ export const expandedPartitionsForViewport = (
   && expandedBoundsIntersect(partition.bounds, viewport)
 ))
 
-const localityRank = (locality: ExpandedLocality): [number, number, string, number] => [
-  locality.importanceTier,
-  -locality.population,
-  locality.name.toLocaleLowerCase('en'),
-  locality.sourceId,
-]
-
 const compareRank = (left: ExpandedLocality, right: ExpandedLocality): number => {
-  const a = localityRank(left)
-  const b = localityRank(right)
-  for (let index = 0; index < a.length; index += 1) {
-    const leftValue = a[index]
-    const rightValue = b[index]
-    if (leftValue < rightValue) return -1
-    if (leftValue > rightValue) return 1
+  if (left.importanceTier !== right.importanceTier) {
+    return left.importanceTier - right.importanceTier
   }
-  return 0
+  if (left.population !== right.population) {
+    return right.population - left.population
+  }
+  const nameOrder = left.name.localeCompare(right.name, 'en')
+  if (nameOrder !== 0) return nameOrder
+  return left.sourceId - right.sourceId
 }
 
 export const selectExpandedLocalities = (
