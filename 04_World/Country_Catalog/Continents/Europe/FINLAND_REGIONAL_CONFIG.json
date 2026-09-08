@@ -1,0 +1,172 @@
+{
+  "version": "1.0.0",
+  "issue": 538,
+  "continent": "Europe",
+  "country": {
+    "geometryId": "246",
+    "sourceCountryCode": "FI",
+    "renderedName": "Finland"
+  },
+  "administrativeModel": {
+    "level": "first-order-region-with-autonomous-special-case",
+    "nativeTermSingular": "maakunta",
+    "nativeTermPlural": "maakunnat",
+    "englishTerm": "region",
+    "unitCount": 19,
+    "officialReferences": [
+      "https://stat.fi/en/luokitukset/maakunta/maakunta_1_20260101",
+      "https://www.aland.ax/en/facts-about-aland"
+    ],
+    "specialCases": [
+      {
+        "type": "aland-autonomous-region",
+        "canonicalRegionCode": "21",
+        "note": "Åland is one of Statistics Finland’s 19 regions and has autonomous legislative and budgetary powers under Finland’s constitutional/legal order. DROPi preserves that autonomy semantically without creating duplicate territorial ownership."
+      },
+      {
+        "type": "cross-source-locality-ownership",
+        "canonicalRegionCode": "21",
+        "note": "GeoNames publishes Åland localities under country code AX rather than FI. The Finland regional layer therefore crosswalks official region 21 Åland to the retained AX locality corpus and selects Mariehamn without fabricating coordinates or pretending an AX internal admin1 row is the Finnish region itself."
+      }
+    ]
+  },
+  "source": {
+    "provider": "GeoNames",
+    "license": "Creative Commons Attribution 4.0",
+    "releaseTag": "source-geonames-cities500-2026-09-08-f3cda4f9",
+    "cities500Sha256": "f3cda4f9d256d90045121fb8eebad3ed91695c32370ed93b50fbe0cb616e2bbd",
+    "admin1Sha256": "590651498043f674accda2b7f46d21286cda0e290b02f8561c5005eee9a5448c",
+    "candidateCountryCodes": [
+      "FI",
+      "AX"
+    ],
+    "expectedCountryCandidateCount": 951,
+    "regionalCrosswalkProvider": "Statistics Finland",
+    "regionalCrosswalkReference": "https://stat.fi/en/luokitukset/maakunta/maakunta_1_20260101"
+  },
+  "selectionPolicy": {
+    "primaryFeatureCodes": [
+      "PPLC",
+      "PPLA"
+    ],
+    "fallbackFeatureCodes": [
+      "PPLA2",
+      "PPLA3",
+      "PPL"
+    ],
+    "expectedPrimarySelections": 19,
+    "expectedFallbackSelections": 0,
+    "highDensityGameplayImport": false,
+    "hardcodedCoordinates": false
+  },
+  "economicEmergence": {
+    "authority": "shared-regional-national-multiplayer-economy",
+    "personalPlayerProgressionUnlock": false,
+    "numericThresholdsDefined": false
+  },
+  "expectedRegions": [
+    {
+      "admin1Code": "01",
+      "canonicalName": "Uusimaa",
+      "sourceName": "Uusimaa"
+    },
+    {
+      "admin1Code": "02",
+      "canonicalName": "Southwest Finland",
+      "sourceName": "Southwest Finland"
+    },
+    {
+      "admin1Code": "04",
+      "canonicalName": "Satakunta",
+      "sourceName": "Satakunta"
+    },
+    {
+      "admin1Code": "05",
+      "canonicalName": "Kanta-Häme",
+      "sourceName": "Kanta-Häme"
+    },
+    {
+      "admin1Code": "06",
+      "canonicalName": "Pirkanmaa",
+      "sourceName": "Pirkanmaa"
+    },
+    {
+      "admin1Code": "07",
+      "canonicalName": "Päijät-Häme",
+      "sourceName": "Paijat-Hame"
+    },
+    {
+      "admin1Code": "08",
+      "canonicalName": "Kymenlaakso",
+      "sourceName": "Kymenlaakso"
+    },
+    {
+      "admin1Code": "09",
+      "canonicalName": "South Karelia",
+      "sourceName": "South Karelia"
+    },
+    {
+      "admin1Code": "10",
+      "canonicalName": "South Savo",
+      "sourceName": "South Savo"
+    },
+    {
+      "admin1Code": "11",
+      "canonicalName": "North Savo",
+      "sourceName": "North Savo"
+    },
+    {
+      "admin1Code": "12",
+      "canonicalName": "North Karelia",
+      "sourceName": "North Karelia"
+    },
+    {
+      "admin1Code": "13",
+      "canonicalName": "Central Finland",
+      "sourceName": "Central Finland"
+    },
+    {
+      "admin1Code": "14",
+      "canonicalName": "South Ostrobothnia",
+      "sourceName": "South Ostrobothnia"
+    },
+    {
+      "admin1Code": "15",
+      "canonicalName": "Ostrobothnia",
+      "sourceName": "Ostrobothnia"
+    },
+    {
+      "admin1Code": "16",
+      "canonicalName": "Central Ostrobothnia",
+      "sourceName": "Central Ostrobothnia"
+    },
+    {
+      "admin1Code": "17",
+      "canonicalName": "North Ostrobothnia",
+      "sourceName": "North Ostrobothnia"
+    },
+    {
+      "admin1Code": "18",
+      "canonicalName": "Kainuu",
+      "sourceName": "Kainuu"
+    },
+    {
+      "admin1Code": "19",
+      "canonicalName": "Lapland",
+      "sourceName": "Lapland"
+    },
+    {
+      "admin1Code": "21",
+      "canonicalName": "Åland",
+      "sourceName": "Åland",
+      "regionSourceOverride": {
+        "sourceName": "Åland",
+        "asciiName": "Aland",
+        "sourceRef": "https://stat.fi/en/luokitukset/maakunta/maakunta_1_20260101"
+      },
+      "localitySourceCountryCode": "AX",
+      "localitySourceScope": "country",
+      "presentationRole": "autonomous-region-capital-and-regional-node"
+    }
+  ]
+}
