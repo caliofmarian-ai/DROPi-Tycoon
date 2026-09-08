@@ -1,0 +1,155 @@
+name: Agent 11 France source audit
+
+on:
+  push:
+    branches:
+      - agent/world-localities-france-543
+
+permissions:
+  contents: read
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Download retained GeoNames snapshot
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          mkdir -p .tmp/france-source
+          gh release download source-geonames-cities500-2026-09-08-f3cda4f9 \
+            --repo caliofmarian-ai/DROPi-Tycoon \
+            --pattern cities500.zip \
+            --pattern admin1CodesASCII.txt \
+            --dir .tmp/france-source
+          unzip -q .tmp/france-source/cities500.zip -d .tmp/france-source
+      - name: Audit France sources and runtime geometry
+        run: |
+          python - <<'PY'
+          import json
+          from collections import defaultdict
+          from pathlib import Path
+
+          root = Path('.tmp/france-source')
+          country_codes = ['FR', 'GF', 'GP', 'MQ', 'RE', 'YT']
+          mappings = [
+              ('84','FR','84','Auvergne-Rhône-Alpes'),
+              ('27','FR','27','Bourgogne-Franche-Comté'),
+              ('53','FR','53','Bretagne'),
+              ('24','FR','24','Centre-Val de Loire'),
+              ('94','FR','94','Corse'),
+              ('44','FR','44','Grand Est'),
+              ('32','FR','32','Hauts-de-France'),
+              ('11','FR','11','Île-de-France'),
+              ('28','FR','28','Normandie'),
+              ('75','FR','75','Nouvelle-Aquitaine'),
+              ('76','FR','76','Occitanie'),
+              ('52','FR','52','Pays de la Loire'),
+              ('93','FR','93','Provence-Alpes-Côte d’Azur'),
+              ('01','GP','GP','Guadeloupe'),
+              ('02','MQ','MQ','Martinique'),
+              ('03','GF','00','Guyane'),
+              ('04','RE','RE','La Réunion'),
+              ('06','YT','976','Mayotte'),
+          ]
+
+          admin = {}
+          for line in (root / 'admin1CodesASCII.txt').read_text(encoding='utf-8').splitlines():
+              parts = line.split('\t')
+              if len(parts) >= 4:
+                  admin[parts[0]] = {'name': parts[1], 'ascii': parts[2], 'geonameId': parts[3]}
+
+          rows = []
+          counts = defaultdict(int)
+          with (root / 'cities500.txt').open(encoding='utf-8') as handle:
+              for line in handle:
+                  p = line.rstrip('\n').split('\t')
+                  if len(p) < 15 or p[6] != 'P' or p[8] not in country_codes:
+                      continue
+                  row = {
+                      'geonameId': p[0], 'name': p[1], 'ascii': p[2],
+                      'latitude': float(p[4]), 'longitude': float(p[5]),
+                      'featureCode': p[7], 'countryCode': p[8],
+                      'admin1Code': p[10], 'population': int(p[14] or 0),
+                  }
+                  rows.append(row)
+                  counts[p[8]] += 1
+
+          def choose(group):
+              rank = {'PPLC': 0, 'PPLA': 1}
+              primary = [r for r in group if r['featureCode'] in rank]
+              primary.sort(key=lambda r: (rank[r['featureCode']], -r['population'], r['geonameId']))
+              if primary:
+                  return primary[0]
+              fallrank = {'PPLA2': 0, 'PPLA3': 1, 'PPL': 2}
+              fallback = [r for r in group if r['featureCode'] in fallrank]
+              fallback.sort(key=lambda r: (fallrank[r['featureCode']], -r['population'], r['geonameId']))
+              return fallback[0] if fallback else None
+
+          regions = []
+          for canonical, cc, source_admin1, name in mappings:
+              key = f'{cc}.{source_admin1}'
+              group = [r for r in rows if r['countryCode'] == cc and r['admin1Code'] == source_admin1]
+              selected = choose(group)
+              regions.append({
+                  'canonicalCode': canonical, 'canonicalName': name,
+                  'sourceCountryCode': cc, 'sourceAdmin1Code': source_admin1,
+                  'admin1': admin.get(key), 'candidateCount': len(group),
+                  'selected': selected,
+              })
+
+          topo = json.loads(Path('game-web/public/data/world-atlas-countries-110m.json').read_text(encoding='utf-8'))
+          geometry = next(g for g in topo['objects']['countries']['geometries'] if str(g.get('id')).zfill(3) == '250')
+          transform = topo.get('transform')
+
+          decoded = []
+          for arc in topo['arcs']:
+              x = y = 0
+              pts = []
+              for dx, dy in arc:
+                  x += dx; y += dy
+                  if transform:
+                      lon = x * transform['scale'][0] + transform['translate'][0]
+                      lat = y * transform['scale'][1] + transform['translate'][1]
+                  else:
+                      lon, lat = x, y
+                  pts.append((lon, lat))
+              decoded.append(pts)
+
+          def arc_points(ref):
+              if ref >= 0:
+                  return decoded[ref]
+              return list(reversed(decoded[-ref - 1]))
+
+          components = []
+          polygons = geometry['arcs'] if geometry['type'] == 'MultiPolygon' else [geometry['arcs']]
+          for idx, polygon in enumerate(polygons, 1):
+              pts = []
+              for ring in polygon:
+                  for ref in ring:
+                      pts.extend(arc_points(ref))
+              xs = [p[0] for p in pts]; ys = [p[1] for p in pts]
+              components.append({
+                  'component': idx,
+                  'bbox': {
+                      'west': min(xs), 'south': min(ys),
+                      'east': max(xs), 'north': max(ys),
+                  },
+                  'pointCount': len(pts),
+              })
+
+          result = {
+              'candidateCountsByCountry': dict(counts),
+              'expectedCountryCandidateCount': sum(counts.values()),
+              'regions': regions,
+              'geometry250': {
+                  'type': geometry['type'],
+                  'componentCount': len(components),
+                  'components': components,
+              },
+          }
+          print('FRANCE_AUDIT_JSON_START')
+          print(json.dumps(result, ensure_ascii=False, indent=2))
+          print('FRANCE_AUDIT_JSON_END')
+          PY
