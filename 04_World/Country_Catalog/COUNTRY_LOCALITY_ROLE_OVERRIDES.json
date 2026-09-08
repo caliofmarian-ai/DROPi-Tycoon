@@ -1,5 +1,5 @@
 {
-  "version": "1.4.0",
+  "version": "1.5.0",
   "source": {
     "name": "Natural Earth 1:10m populated places simple",
     "upstreamCommit": "ca96624a56bd078437bca8184e78163e5039ad19"
@@ -220,6 +220,25 @@
             "Abidjan"
           ],
           "displayName": "Abidjan",
+          "role": "urban"
+        }
+      ]
+    },
+    "068": {
+      "issue": 472,
+      "country": "Bolivia",
+      "currentCapital": {
+        "sourceNames": [
+          "Sucre"
+        ],
+        "displayName": "Sucre"
+      },
+      "requiredRepresentatives": [
+        {
+          "sourceNames": [
+            "La Paz"
+          ],
+          "displayName": "La Paz",
           "role": "urban"
         }
       ]

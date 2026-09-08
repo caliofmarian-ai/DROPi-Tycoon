@@ -1,5 +1,5 @@
 {
-  "version": "1.7.0",
+  "version": "1.8.0",
   "purpose": "Manual semantic review flags discovered during continent-by-continent audit. These do not silently rewrite pinned Natural Earth source data.",
   "reviews": {
     "204": {
@@ -52,7 +52,7 @@
     },
     "068": {
       "issue": 472,
-      "reason": "capital-role semantics: Sucre is Bolivia's constitutional/national capital while La Paz is the principal executive and legislative government seat"
+      "reason": "Sucre constitutional/national-capital override implemented; La Paz retained as government seat / executive and legislative centre; owner Android Country Layer acceptance pending"
     },
     "152": {
       "issue": 473,

@@ -102,3 +102,5 @@ A valid regeneration must run:
 The generated runtime catalog records the geometry-identity registry version, locality-role-override registry/source commit and any authoritative supplement refs actually used. This makes the committed output traceable to every governing geographic input rather than presenting all coordinates as though they came from one source.
 
 - Current country locality catalog version `1.7.0` adds source-backed capital-role corrections for Benin, Burundi and Côte d’Ivoire without adding manual coordinates.
+
+- Current country locality catalog version `1.8.0` adds the source-backed Bolivia Sucre/La Paz capital-role correction without manual coordinates.

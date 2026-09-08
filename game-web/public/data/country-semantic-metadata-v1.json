@@ -1,5 +1,5 @@
 {
-  "version": "1.6.0",
+  "version": "1.7.0",
   "reviewedOn": "2026-09-08",
   "purpose": "Player-facing semantic metadata for country and territory cases where a single generic capital label or geographic rendering could misstate political, constitutional, administrative or recognition reality.",
   "governance": {
@@ -180,6 +180,29 @@
       "url": "https://www.eco.diplomatie.gouv.ci/",
       "accessedOn": "2026-09-08",
       "note": "The official economic-diplomacy profile identifies Yamoussoukro as the political capital and Abidjan as the economic capital."
+    },
+    "bolivia-oep-constitution": {
+      "publisher": "Órgano Electoral Plurinacional de Bolivia",
+      "title": "Constitución Política del Estado",
+      "url": "https://web.oep.org.bo/marco-normativo/constitucion-politica-del-estado/",
+      "accessedOn": "2026-09-08",
+      "note": "The OEP publishes the current 2009 Constitution as Bolivia’s fundamental legal norm; current Bolivian institutional material identifies Sucre as the constitutional capital."
+    },
+    "bolivia-deputies-sucre-capital": {
+      "publisher": "Cámara de Diputados, Asamblea Legislativa Plurinacional de Bolivia",
+      "title": "Autoridades nacionales participan de actos protocolares conmemorando los 199 años de independencia de Bolivia",
+      "url": "https://diputados.gob.bo/noticias/autoridades-nacionales-participan-de-actos-protocolares-conmemorando-los-199-anos-de-independencia-de-bolivia/",
+      "publishedOn": "2024-08-06",
+      "accessedOn": "2026-09-08",
+      "note": "The Chamber of Deputies explicitly describes Sucre as the constitutional capital of Bolivia."
+    },
+    "bolivia-legislative-government-seat": {
+      "publisher": "Cámara de Diputados, Asamblea Legislativa Plurinacional de Bolivia",
+      "title": "Memoria histórica del nuevo edificio de la Asamblea Legislativa Plurinacional",
+      "url": "https://diputados.gob.bo/wp-content/uploads/2022/05/Formato-editable-libro-Memoria-historica-del-nuevo-edificio-de-la-Asamblea-Legislativa-Plurinacional.pdf",
+      "publishedOn": "2022-05-01",
+      "accessedOn": "2026-09-08",
+      "note": "The legislative institutional history identifies La Paz as Bolivia’s political centre, locating the Executive and Legislative branches and the President’s residence there, while Sucre is the capital and judicial seat."
     }
   },
   "entries": {
@@ -479,6 +502,29 @@
       ],
       "sourceRefs": [
         "cote-divoire-economic-diplomacy-capitals"
+      ]
+    },
+    "068": {
+      "issue": 472,
+      "renderedName": "Bolivia",
+      "statusLabel": "Constitutional capital and government-seat roles",
+      "statusSummary": "Sucre is Bolivia’s constitutional/national capital. La Paz is the principal seat of government and political centre where the Executive and Legislative branches operate. DROPi represents both roles instead of treating La Paz as the sole national capital.",
+      "placeRoles": [
+        {
+          "locality": "Sucre",
+          "role": "constitutional-national-capital",
+          "label": "Constitutional / national capital"
+        },
+        {
+          "locality": "La Paz",
+          "role": "government-seat",
+          "label": "Government seat / executive & legislative centre"
+        }
+      ],
+      "sourceRefs": [
+        "bolivia-oep-constitution",
+        "bolivia-deputies-sucre-capital",
+        "bolivia-legislative-government-seat"
       ]
     }
   }
