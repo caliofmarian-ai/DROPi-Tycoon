@@ -9,6 +9,7 @@ import urllib.request
 import pycountry
 
 from country_geometry_identity import load_geometry_id_registry, topology_names
+from country_semantics import load_country_semantics
 
 ROOT = pathlib.Path(__file__).resolve().parents[1]
 CATALOG = ROOT / 'game-web/public/data/country-representative-localities-v1.json'
@@ -110,8 +111,19 @@ def node_key(node):
     )
 
 
-def audit_country(cid, name, nodes, coverage_gap=False, manual_review=None, project_owned_ids=None):
+def expected_capital_count(semantic):
+    semantic = semantic or {}
+    mode = str(semantic.get('capitalMode') or 'single')
+    if mode in {'none', 'status-sensitive'}:
+        return 0
+    if semantic.get('demoteSourceCapital') and not semantic.get('primaryCapital'):
+        return 0
+    return 1
+
+
+def audit_country(cid, name, nodes, coverage_gap=False, manual_review=None, project_owned_ids=None, semantic=None):
     project_owned_ids = project_owned_ids or set()
+    semantic = semantic or {}
     reasons = []
     if manual_review:
         issue = manual_review.get('issue')
@@ -125,8 +137,9 @@ def audit_country(cid, name, nodes, coverage_gap=False, manual_review=None, proj
         reasons.append('duplicate locality')
 
     capitals = [node for node in nodes if node.get('role') == 'capital']
-    if nodes and len(capitals) != 1:
-        reasons.append(f'capital count={len(capitals)}')
+    expected_capitals = expected_capital_count(semantic)
+    if nodes and len(capitals) != expected_capitals:
+        reasons.append(f'capital count={len(capitals)} expected={expected_capitals}')
 
     used_slots = set()
     for node in nodes:
@@ -149,30 +162,36 @@ def audit_country(cid, name, nodes, coverage_gap=False, manual_review=None, proj
         if role == 'urban':
             population = int(node.get('populationReference') or 0)
             feature_class = str(node.get('sourceFeatureClass') or '')
-            if population < 15000 and 'Admin-1 capital' not in feature_class:
+            functions = set(node.get('functions') or [])
+            governance_node = bool(functions & {
+                'government-seat', 'administrative-centre', 'administrative-capital',
+                'legislative-capital', 'judicial-capital', 'legislative-seat',
+                'economic-capital', 'commercial-capital',
+            })
+            if population < 15000 and 'Admin-1 capital' not in feature_class and not governance_node:
                 reasons.append(f'urban significance rule failed for {node.get("name")}')
 
     if not nodes:
         return {
             'id': cid,
-            'name': name,
-            'capital': '—',
+            'name': semantic.get('displayName') or name,
+            'capital': semantic.get('capitalSummary') or '—',
             'nodeCount': 0,
             'slots': '—',
             'status': 'GAP' if coverage_gap else 'REVIEW',
             'notes': 'documented source coverage gap' if coverage_gap else 'no representative nodes',
         }
 
-    capital = capitals[0].get('name') if capitals else '—'
+    capital = semantic.get('capitalSummary') or (capitals[0].get('name') if capitals else '—')
     slots = ', '.join(str(node.get('sector') or node.get('role') or '?') for node in nodes)
     return {
         'id': cid,
-        'name': name,
+        'name': semantic.get('displayName') or name,
         'capital': capital,
         'nodeCount': len(nodes),
         'slots': slots,
         'status': 'PASS' if not reasons else 'REVIEW',
-        'notes': '; '.join(sorted(set(reasons))) if reasons else 'structural/source checks passed',
+        'notes': '; '.join(sorted(set(reasons))) if reasons else ('structural/source/semantic checks passed' if semantic else 'structural/source checks passed'),
     }
 
 
@@ -190,6 +209,7 @@ def markdown_for_continent(continent, rows, catalog):
         '',
         '## Source contract',
         f'- runtime catalog version: `{catalog.get("version", "unknown")}`',
+        f'- semantics registry version: `{catalog.get("semanticsVersion", "none")}`',
         f'- Natural Earth upstream commit: `{catalog.get("source", {}).get("upstreamCommit", SRC_COMMIT)}`',
         '- every node coordinate remains a source coordinate; this manifest does not reposition places.',
         '',
@@ -202,7 +222,7 @@ def markdown_for_continent(continent, rows, catalog):
         '',
         '## Country-by-country manifest',
         '',
-        '| ID | Country / territory | Capital | Nodes | Slots | State | Notes |',
+        '| ID | Country / territory | Capital / governance | Nodes | Slots | State | Notes |',
         '|---:|---|---|---:|---|---|---|',
     ]
     for row in sorted(rows, key=lambda item: item['name'].casefold()):
@@ -214,7 +234,7 @@ def markdown_for_continent(continent, rows, catalog):
     lines.extend([
         '',
         '## Interpretation',
-        '- `PASS` means automated structural and pinned-source checks pass; it does not claim final economy/transport simulation is active.',
+        '- `PASS` means structural, pinned-source and declared semantic checks pass; it does not assert that a disputed political status is settled.',
         '- `REVIEW` requires a dedicated country-level investigation before correction.',
         '- `GAP` means the pinned source has no truthful representative locality and no place is invented to fill the pattern.',
         '',
@@ -231,20 +251,22 @@ def country_markdown(continent, row, nodes, catalog):
         f"Audit state: **{row['status']}**",
         '',
         f"Runtime catalog version: `{catalog.get('version', 'unknown')}`",
+        f"Semantics registry version: `{catalog.get('semanticsVersion', 'none')}`",
         '',
         '## Representative nodes',
         '',
-        '| Role | Sector | Locality | Admin-1 | Population reference | Longitude | Latitude |',
-        '|---|---|---|---|---:|---:|---:|',
+        '| Role | Sector | Locality | Functions | Admin-1 | Population reference | Longitude | Latitude |',
+        '|---|---|---|---|---|---:|---:|---:|',
     ]
     for node in nodes:
+        functions = ', '.join(node.get('functions') or []) or '—'
         lines.append(
-            f"| {node.get('role','')} | {node.get('sector','')} | {node.get('name','')} | "
+            f"| {node.get('role','')} | {node.get('sector','')} | {node.get('name','')} | {functions} | "
             f"{node.get('admin1','')} | {node.get('populationReference',0)} | "
             f"{node.get('longitude','')} | {node.get('latitude','')} |"
         )
     if not nodes:
-        lines.append('| — | — | — | — | 0 | — | — |')
+        lines.append('| — | — | — | — | — | 0 | — | — |')
     lines.extend(['', '## Audit notes', row['notes'], ''])
     return '\n'.join(lines)
 
@@ -262,6 +284,7 @@ def main():
     catalog = load_json(CATALOG)
     topology = load_json(TOPOLOGY)
     _, identity_by_name = load_geometry_id_registry()
+    _, semantics_by_id = load_country_semantics()
     rendered = topology_names(topology, identity_by_name)
     project_owned_ids = set(identity_by_name.values())
     admin0 = fetch_admin0()
@@ -281,6 +304,7 @@ def main():
             cid in coverage_gap_ids,
             review_registry.get(cid),
             project_owned_ids,
+            semantics_by_id.get(cid),
         )
         continent = continents.get(cid, 'Special')
         rows_by_continent.setdefault(continent, []).append(row)
