@@ -1,0 +1,74 @@
+{
+  "version": "1.0.0",
+  "issue": 526,
+  "continent": "Europe",
+  "country": {
+    "geometryId": "191",
+    "sourceCountryCode": "HR",
+    "renderedName": "Croatia"
+  },
+  "administrativeModel": {
+    "level": "first-order",
+    "nativeTermSingular": "županija / Grad Zagreb",
+    "nativeTermPlural": "županije plus Grad Zagreb",
+    "englishTerm": "county-level unit",
+    "unitCount": 21,
+    "officialReferences": [
+      "https://podaci.dzs.hr/2026/en/121448",
+      "https://podaci.dzs.hr/2026/en/121350",
+      "https://www.zagrebacka-zupanija.hr/zupanija/"
+    ],
+    "specialCases": [
+      {
+        "admin1Code": "20",
+        "type": "administrative-seat-outside-source-ownership",
+        "label": "Zagreb County seat exception",
+        "note": "Zagreb County officially has its seat in Zagreb, while the City of Zagreb is a separate county-level unit. GeoNames source-owns Zagreb under HR.21, so DROPi keeps Zagreb there as the unique national-capital locality and uses a separate source-backed representative inside HR.20 without relabeling that representative as the county seat."
+      }
+    ]
+  },
+  "source": {
+    "provider": "GeoNames",
+    "license": "Creative Commons Attribution 4.0",
+    "releaseTag": "source-geonames-cities500-2026-09-08-f3cda4f9",
+    "cities500Sha256": "f3cda4f9d256d90045121fb8eebad3ed91695c32370ed93b50fbe0cb616e2bbd",
+    "admin1Sha256": "590651498043f674accda2b7f46d21286cda0e290b02f8561c5005eee9a5448c",
+    "expectedCountryCandidateCount": 1215
+  },
+  "selectionPolicy": {
+    "primaryFeatureCodes": ["PPLC", "PPLA"],
+    "fallbackFeatureCodes": ["PPLA2"],
+    "expectedPrimarySelections": 20,
+    "expectedFallbackSelections": 1,
+    "highDensityGameplayImport": false,
+    "hardcodedCoordinates": false
+  },
+  "economicEmergence": {
+    "authority": "shared-regional-national-multiplayer-economy",
+    "personalPlayerProgressionUnlock": false,
+    "numericThresholdsDefined": false
+  },
+  "expectedRegions": [
+    {"admin1Code": "01", "canonicalName": "County of Bjelovar-Bilogora", "sourceName": "Bjelovar-Bilogora"},
+    {"admin1Code": "02", "canonicalName": "County of Slavonski Brod-Posavina", "sourceName": "Brod-Posavina"},
+    {"admin1Code": "03", "canonicalName": "County of Dubrovnik-Neretva", "sourceName": "Dubrovnik-Neretva"},
+    {"admin1Code": "04", "canonicalName": "County of Istria", "sourceName": "Istria"},
+    {"admin1Code": "05", "canonicalName": "County of Karlovac", "sourceName": "Karlovac"},
+    {"admin1Code": "06", "canonicalName": "County of Koprivnica-Križevci", "sourceName": "Koprivnica-Križevci"},
+    {"admin1Code": "07", "canonicalName": "County of Krapina-Zagorje", "sourceName": "Krapina-Zagorje"},
+    {"admin1Code": "08", "canonicalName": "County of Lika-Senj", "sourceName": "Lika-Senj"},
+    {"admin1Code": "09", "canonicalName": "County of Međimurje", "sourceName": "Međimurje"},
+    {"admin1Code": "10", "canonicalName": "County of Osijek-Baranja", "sourceName": "County of Osijek-Baranja"},
+    {"admin1Code": "11", "canonicalName": "County of Požega-Slavonija", "sourceName": "Požega-Slavonia"},
+    {"admin1Code": "12", "canonicalName": "County of Primorje-Gorski Kotar", "sourceName": "Primorje-Gorski Kotar"},
+    {"admin1Code": "13", "canonicalName": "County of Šibenik-Knin", "sourceName": "Šibenik-Knin"},
+    {"admin1Code": "14", "canonicalName": "County of Sisak-Moslavina", "sourceName": "Sisak-Moslavina"},
+    {"admin1Code": "15", "canonicalName": "County of Split-Dalmatia", "sourceName": "Split-Dalmatia"},
+    {"admin1Code": "16", "canonicalName": "County of Varaždin", "sourceName": "Varaždin"},
+    {"admin1Code": "17", "canonicalName": "County of Virovitica-Podravina", "sourceName": "Virovitica-Podravina"},
+    {"admin1Code": "18", "canonicalName": "County of Vukovar-Srijem", "sourceName": "Vukovar-Srijem"},
+    {"admin1Code": "19", "canonicalName": "County of Zadar", "sourceName": "Zadar"},
+    {"admin1Code": "20", "canonicalName": "County of Zagreb", "sourceName": "Zagreb County"},
+    {"admin1Code": "21", "canonicalName": "City of Zagreb", "sourceName": "Zagreb"}
+  ]
+}
