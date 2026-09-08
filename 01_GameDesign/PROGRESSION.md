@@ -2,11 +2,11 @@
 
 Document: PROGRESSION.md
 Project: DROPi Tycoon
-Version: 2.0.0
+Version: 2.1.0
 Status: Canonical
 Author: Marian Caliof & OpenAI
 Language: English
-Last Updated: 2026-09-07
+Last Updated: 2026-09-08
 
 ---
 
@@ -20,11 +20,13 @@ Progression is not one company level and is not measured only by money.
 
 The canonical progression model has three coupled axes:
 
-1. **Personal Capability** — what the player knows and is qualified to do;
+1. **Personal Capability** — what the player knows, can physically/economically sustain, and is qualified/authorized to do;
 2. **Company Capability** — what an organization can legitimately operate and sustain;
-3. **World Access** — which locations, markets, institutions, infrastructure, and logistics networks are available.
+3. **World Access** — which locations, markets, institutions, infrastructure, and logistics networks are reachable and usable.
 
 A mature feature should normally connect to at least one of these axes and must not bypass the others when they are legitimate prerequisites.
+
+This document is reconciled with `00_Project/PHASE1_GAME_ARCHITECTURE_DECISION_BASELINE.md`.
 
 ---
 
@@ -32,13 +34,15 @@ A mature feature should normally connect to at least one of these axes and must 
 
 DROPi Tycoon uses vertical and horizontal progression.
 
-**Vertical progression** increases capability, capacity, efficiency, reach, and responsibility.
+**Vertical progression** increases capability, capacity, efficiency, reach, stability, and responsibility.
 
-**Horizontal progression** opens new professions, company roles, transport modes, strategies, institutions, technologies, markets, and infrastructure.
+**Horizontal progression** opens new professions, employers, company roles, transport modes, strategies, institutions, technologies, markets, industries, and infrastructure.
 
-Growth should always create a meaningful new decision or responsibility.
+Growth should create a meaningful new decision, freedom, responsibility, or world consequence.
 
 The player should not merely earn larger numbers while repeating the same action forever.
+
+The player should also remain capable of setbacks and recovery; progress is history/capability plus current economic position, not an irreversible upward XP staircase.
 
 ---
 
@@ -46,11 +50,13 @@ The player should not merely earn larger numbers while repeating the same action
 
 ## Personal Capability
 
-Represents the player's own knowledge, qualifications, experience, and usable professions.
+Represents the player's own knowledge, qualifications, authorizations, experience, current economic stability, and usable professions.
 
 Examples:
 
 - delivery literacy;
+- local navigation;
+- parcel/cargo handling;
 - bicycle operation;
 - vehicle operation;
 - maintenance;
@@ -60,28 +66,32 @@ Examples:
 - drone operations;
 - air, maritime, or rail specialization;
 - finance/investment knowledge;
-- research/technical capability.
+- research/technical capability;
+- Work Capacity/recovery state;
+- access to personal equipment required for a task.
 
 ## Company Capability
 
-Represents what the company can actually provide because it owns the required combination of:
+Represents what the company can actually provide because it owns or legitimately controls the required combination of:
 
-- money/cash flow;
+- Company Money/cash flow;
 - qualified people;
 - vehicles/equipment;
+- inventory;
 - departments;
 - infrastructure;
 - research/technology;
 - reputation;
 - permits/authorizations where modeled;
-- operational capacity.
+- operational capacity;
+- productive inputs and facilities.
 
 ## World Access
 
 Represents the player's/company's legitimate access to:
 
-- districts;
-- cities;
+- neighborhoods/districts;
+- localities/cities;
 - regions;
 - civic institutions;
 - training facilities;
@@ -96,47 +106,78 @@ These axes influence one another but are not interchangeable.
 
 ---
 
-# 3. Starting State
+# 3. Canonical Starting State
 
-The intended human-scale starting fantasy is a person with very limited capability.
+The canonical human-scale starting fantasy is a person with very limited economic and productive capability.
 
-The canonical starter assets include:
+The player begins:
 
-- a visible player character;
-- a backpack/basic delivery capability;
-- a smartphone with only early unlocked functions;
-- access to introductory local work.
+- as one visible human economic actor in the current World Instance;
+- poor/financially constrained;
+- on foot;
+- as an employee of a large fictional incumbent delivery/logistics employer;
+- with basic clothing/equipment and a backpack/basic carrying capability;
+- with a smartphone whose early functions are limited to what the character can legitimately use;
+- with access to introductory light local work such as flyers, letters, and small parcels;
+- without a privately owned mature delivery company or private HQ.
 
 Walking is the initial transport mode.
 
-The Bicycle is earned/purchased later and is not starting equipment.
+The Bicycle is an earned/purchased progression goal and is not starting equipment.
 
-The current playable runtime already contains a starter company state so the existing prototype can support employees, fleet, money, reviews, and HQ systems. This is a compatibility foundation, not proof that every future player begins as a fully registered mature company owner.
+Starting compensation is primarily a day/shift wage for real work rather than arbitrary money created per drop.
 
-When personal identity, company formation, and multiplayer membership are implemented, migration must explicitly reconcile existing saves rather than destroying progress or silently redefining historical ownership.
+The current playable runtime still contains a starter company, Company Money, fleet, employees, reviews, and HQ state because those systems were developed before the employee-first lifecycle was approved. They remain compatibility/legacy runtime truth until a dedicated migration changes save/economy behavior. They are not evidence that the canonical player starts as a company owner.
 
 ---
 
-# 4. Personal Experience and Progression Resources
+# 4. Personal Economic Stability
 
-Personal progression may be driven by multiple signals, including:
+Personal progression is coupled to ordinary living/economic constraints.
 
-- completed work;
-- experience;
-- progression points;
+Canonical concepts include:
+
+- Personal Money;
+- wages and other legitimate personal income;
+- food;
+- water;
+- housing/living costs;
+- finite Work Capacity;
+- rest/recovery;
+- education/training costs;
+- personally owned equipment/transport costs where applicable;
+- poverty, housing loss, insolvency, bankruptcy, and recovery.
+
+The exact rates are balancing data.
+
+A player may become more qualified while temporarily becoming poorer. A player may own valuable knowledge/history while losing current assets. This distinction is intentional.
+
+---
+
+# 5. Personal Experience and Progression Resources
+
+Personal progression may be driven by multiple governed signals, including:
+
+- completed legitimate work;
+- experience/practical mastery;
+- progression points where useful;
 - reputation/track record where appropriate;
 - course completion;
 - practical assessment;
-- Company Money or personal money if a separate personal economy is later canonically introduced;
+- Personal Money for personal purchases/training;
 - access to instructors/facilities;
-- company membership;
-- prerequisite qualifications.
+- employment/company membership;
+- prerequisite qualifications;
+- authorizations;
+- equipment and infrastructure.
 
-Exact experience values, point costs, course prices, and thresholds are balancing data unless separately approved as permanent canon.
+Company Money cannot be treated as the player's personal wallet.
+
+Exact experience values, point costs, course prices, wages, and thresholds are balancing data unless separately approved as permanent canon.
 
 ---
 
-# 5. Education and Qualification Model
+# 6. Education and Qualification Model
 
 Education is gameplay progression, not decorative lore.
 
@@ -147,7 +188,8 @@ A qualification can contain one or more of:
 - supervised experience;
 - assessment;
 - equipment/facility requirements;
-- prerequisite qualifications.
+- prerequisite qualifications;
+- authorization/renewal where later needed.
 
 ## Remote Theory
 
@@ -180,7 +222,7 @@ Completing theory alone does not automatically grant every practical capability.
 
 ---
 
-# 6. Personal Specialization Families
+# 7. Personal Specialization Families
 
 The long-term specialization catalog may include the following families.
 
@@ -191,7 +233,8 @@ A listed family is a canonical direction, not proof that it is currently impleme
 - smartphone and delivery-app literacy;
 - local navigation;
 - parcel handling basics;
-- walking courier fundamentals.
+- walking courier fundamentals;
+- basic workplace/customer-service literacy.
 
 ## Bicycle
 
@@ -227,7 +270,7 @@ A listed family is a canonical direction, not proof that it is currently impleme
 - vehicle maintenance;
 - equipment maintenance;
 - future drone maintenance;
-- future facility/technical specialization.
+- facility/technical specialization.
 
 ## Business
 
@@ -236,7 +279,16 @@ A listed family is a canonical direction, not proof that it is currently impleme
 - finance;
 - investment/governance literacy;
 - customer/service management;
-- commercial strategy.
+- commercial strategy;
+- procurement/supply-chain management.
+
+## Production / Industry
+
+- agriculture/farm operations;
+- manufacturing/processing roles;
+- industrial maintenance;
+- quality/production supervision;
+- utilities/energy operations where modeled.
 
 ## Drone
 
@@ -277,43 +329,51 @@ New professions require deliberate canonical extension. Scenes must not invent u
 
 ---
 
-# 7. Player Roles
+# 8. Player Roles and Membership Rules
 
 Progression can change the player's role in the economy.
 
 Long-term roles may include:
 
 - independent citizen;
-- courier;
+- employee/courier;
 - skilled transport operator;
 - maintenance specialist;
 - dispatcher;
 - warehouse/sorting specialist;
-- company employee/member;
+- producer/industrial worker;
+- company member;
 - entrepreneur/founder;
 - executive;
 - investor/shareholder;
 - infrastructure operator;
 - advanced multimodal specialist.
 
-A player may hold compatible identities simultaneously where gameplay rules permit, for example employee + external investor.
+A player may hold compatible roles simultaneously where rules permit, for example employee + external investor or two compatible jobs/contracts.
 
-Membership, operational authority, employment, and investment ownership remain distinct concepts.
+Canonical identity boundaries:
+
+- one economic hero per account per World Instance;
+- one primary Internal/Member company relationship at a time;
+- employment, Internal/Member relationship, executive authority, and external investment are distinct;
+- broader corporate control grows through legitimate shares, acquisitions, and subsidiaries rather than unlimited shell companies used to manufacture fake competitors.
 
 ---
 
-# 8. Company Capability Progression
+# 9. Company Capability Progression
 
 A company grows because its real capabilities grow.
 
 Company progression may consider:
 
 - revenue/profit/cash flow;
+- liabilities and financial resilience;
 - reputation;
-- customer base;
+- customer base/contracts;
 - employees;
 - specialist qualifications;
 - fleet;
+- inventory;
 - HQ departments;
 - warehouses;
 - technology/research;
@@ -321,40 +381,58 @@ Company progression may consider:
 - service quality;
 - market access;
 - authorizations;
-- products and productive capacity.
+- products and productive capacity;
+- farms/factories/industrial assets where legitimately owned/controlled.
 
 No single number determines company maturity.
 
 ---
 
-# 9. Company Progression Horizons
+# 10. Company Progression Horizons
 
 The following horizons replace the old rigid assumption that one numbered company stage alone governs every system.
 
 Systems may overlap between horizons when prerequisites make sense.
 
-## Horizon A — Individual / Starter Work
+## Horizon A — Poor Employee / Starter Work
 
 Core experience:
 
 - walking;
-- smartphone/delivery app;
-- simple local deliveries;
-- basic money/reputation feedback;
-- first vehicle goal.
+- smartphone/work app;
+- light local delivery/service work;
+- wage settlement;
+- basic food/water/living-cost pressure;
+- finite Work Capacity;
+- first equipment/bicycle/training goal;
+- clear visible consequences of useful work.
 
-## Horizon B — Local Operator
+## Horizon B — Skilled Individual / Local Operator
 
 Growth may include:
 
 - Bicycle and other early transport;
-- starter HQ/Core operations;
+- improved work equipment;
+- qualifications;
+- access to better employers/contracts;
+- compatible side work;
+- stronger personal financial stability;
+- first entrepreneurial preparation.
+
+## Horizon C — Entrepreneur / Starter Organization
+
+Growth may include:
+
+- entrepreneurship/registration prerequisites;
+- legitimate startup capital/resources;
+- company formation or entry into primary Internal/Member control;
+- starter HQ/Core operations when a company actually exists;
 - first employees;
 - basic fleet;
-- basic financial/review visibility;
+- basic finance/review/market visibility;
 - first productive company delegation.
 
-## Horizon C — Structured Local Company
+## Horizon D — Structured Local Company
 
 Growth may include:
 
@@ -363,10 +441,11 @@ Growth may include:
 - larger terrestrial fleet;
 - trained specialists;
 - dispatch and parcel handling;
-- formal company formation/authorization when that system is introduced;
-- multiple local service strategies.
+- multiple local service strategies;
+- procurement/inventory management;
+- formal local authorizations where modeled.
 
-## Horizon D — Competitive City Company
+## Horizon E — Competitive City Company
 
 Growth may include:
 
@@ -377,9 +456,10 @@ Growth may include:
 - local products/marketplace depth;
 - stronger specialization;
 - technology differentiation;
-- local infrastructure investment.
+- local infrastructure investment;
+- contracts with productive facilities.
 
-## Horizon E — Mature Company / Ownership Economy
+## Horizon F — Mature Company / Productive Ownership Economy
 
 Growth may include:
 
@@ -389,17 +469,18 @@ Growth may include:
 - dividends;
 - governance;
 - founder/executive separation;
-- advanced financial instruments;
+- acquisitions/subsidiaries;
+- governed purchase/concession of eligible farms/factories/industrial assets;
 - larger infrastructure decisions.
 
 These systems should first have deterministic simulation rules before being made contested multiplayer transactions.
 
-## Horizon F — Shared-World Organization
+## Horizon G — Shared-World Organization
 
 Growth may include:
 
 - stable online identity;
-- server-authoritative company/economy state;
+- server-authoritative person/company/economy state;
 - real-player employment/membership;
 - communication;
 - authoritative marketplace transactions;
@@ -408,7 +489,7 @@ Growth may include:
 
 Technical authority and migration are prerequisites, not optional polish.
 
-## Horizon G — Regional / Multi-City Operator
+## Horizon H — Regional / Multi-City Operator
 
 Growth may include:
 
@@ -418,9 +499,10 @@ Growth may include:
 - rail;
 - DronePort networks;
 - inter-city cargo;
-- regional contracts and supply relationships.
+- regional contracts and supply relationships;
+- infrastructure concessions/ownership where governed.
 
-## Horizon H — International Multimodal Corporation
+## Horizon I — International Multimodal Corporation
 
 Growth may include:
 
@@ -430,9 +512,10 @@ Growth may include:
 - country/world access;
 - customs/regulatory gameplay abstractions;
 - aircraft, ships, rail, and multimodal chains;
-- global products/trade.
+- global products/trade;
+- later multi-currency exposure when implemented.
 
-## Horizon I — Global / Frontier Network
+## Horizon J — Global / Frontier Network
 
 Growth may include:
 
@@ -445,11 +528,11 @@ Growth may include:
 
 ---
 
-# 10. Two-Way Player / Company Gating
+# 11. Two-Way Player / Company Gating
 
 The canonical relationship is:
 
-**Player capability grows the company -> company growth creates new learning/work opportunities -> specialists unlock new company capability.**
+**Player capability grows organizations -> organizational growth creates new learning/work opportunities -> specialists/infrastructure unlock new company capability.**
 
 Examples:
 
@@ -459,15 +542,19 @@ Examples:
 - qualified drone staff make the infrastructure productive;
 - a warehouse creates sorting/operations jobs;
 - trained warehouse staff improve capacity;
-- entrepreneurship qualification enables company formation when other requirements are met.
+- entrepreneurship qualification enables company formation when other requirements are met;
+- a productive facility creates industrial jobs and supply-chain demand;
+- qualified specialists and inputs make the productive facility operate.
 
 Company Money alone does not replace these relationships.
 
 ---
 
-# 11. HQ Progression
+# 12. HQ Progression
 
-The HQ begins with the minimum viable operational footprint.
+The HQ is not a starting entitlement of the poor employee phase.
+
+Once a player legitimately belongs to/controls a company with an HQ, that HQ begins with the minimum viable operational footprint and expands through governed construction.
 
 Departments are constructed/unlocked progressively.
 
@@ -488,11 +575,11 @@ See `HQ_PROGRESSION.md`.
 
 ---
 
-# 12. Smartphone Progression
+# 13. Smartphone Progression
 
 The smartphone exists from the beginning, but its apps/capabilities unlock progressively.
 
-Early phone capability may include work and navigation.
+Early phone capability may include work, navigation, messages, and essential personal information.
 
 Later capability may include:
 
@@ -511,7 +598,7 @@ See `07_UI/PLAYER_SMARTPHONE.md`.
 
 ---
 
-# 13. Vehicle Progression
+# 14. Vehicle Progression
 
 New vehicles solve different problems rather than simply replacing the previous vehicle with a bigger number.
 
@@ -519,19 +606,20 @@ Transport choice may trade off:
 
 - speed;
 - capacity;
-- cost;
+- purchase/rental cost;
 - route access;
 - maintenance;
 - energy/fuel;
 - qualification;
 - infrastructure;
-- service type.
+- service type;
+- cargo requirements.
 
 Walking, bicycles, scooters, motorcycles, cars/vans, drones, rail, air, and maritime modes remain situationally useful.
 
 ---
 
-# 14. World Access Progression
+# 15. World Access and Travel Progression
 
 The player/world expands gradually:
 
@@ -548,11 +636,41 @@ World access may depend on:
 - progression goals;
 - network connections.
 
+Strategic map selection does not grant free economic teleportation. Physical presence changes through available walking/road/public transport/rail/air/sea infrastructure with time/cost, using time compression where necessary for usability.
+
 Large world access does not require rendering all locations simultaneously.
 
 ---
 
-# 15. Multiplayer Progression Boundary
+# 16. World Instance Progression Boundary
+
+Each World Instance is an independent economic history.
+
+A fresh world may inherit only explicitly non-economic account information by default, such as:
+
+- settings;
+- cosmetics;
+- account achievements/history;
+- tutorial familiarity.
+
+Economic progression is world-local by default:
+
+- Personal Money/Company Money;
+- productive qualifications/capability;
+- reputation;
+- vehicles/equipment;
+- inventory/property;
+- companies/shares;
+- contracts;
+- infrastructure/productive assets.
+
+Prototype/local saves do not silently inject economic power into a fresh shared world.
+
+The human identity persists within a World Instance even through normal long-term time progression and bankruptcy.
+
+---
+
+# 17. Multiplayer Progression Boundary
 
 Multiplayer is not simply a reward unlocked at the last company level.
 
@@ -560,38 +678,44 @@ Some online foundations must arrive before mature shared ownership/markets can e
 
 The progression order is:
 
-1. establish stable single-player/local domain rules;
-2. establish stable player identity;
-3. establish server-authoritative persistence/economy/company state and migration;
-4. enable real-player membership/employment/communication;
+1. establish stable local domain rules;
+2. establish stable person/account/World Instance identity;
+3. establish server-authoritative persistence, time, economy, inventory/custody, company state, and migration;
+4. enable real-player employment/membership/communication;
 5. enable contested/shared transactions and assets only when authority is safe;
-6. expand shared worlds and markets without breaking offline/low-population play.
+6. expand shared worlds and markets without breaking low-population play.
 
-NPC/simulated participants remain valid at every world population level.
+Bounded NPC/simulated participants remain valid at every world population level but must obey real economic constraints rather than supply infinite free resources.
 
 ---
 
-# 16. Failure and Recovery
+# 18. Failure and Recovery
 
-Progression may include setbacks.
+Progression may include severe setbacks.
 
 Examples:
 
+- Personal Money depletion;
+- inability to meet living costs;
+- loss of housing / Emergency Housing state;
 - lost customers;
-- financial distress;
 - failed contracts;
+- vehicle/asset loss through legitimate economic processes;
 - maintenance problems;
 - company leadership change;
+- company insolvency/bankruptcy;
 - temporary infrastructure disruption;
 - temporary reputation damage.
 
 Setbacks should create decisions and recovery work.
 
-Core identity, essential access, and normal progression must not be permanently destroyed by ordinary competition or griefing.
+Normal failure does not delete the human identity, history, or valid earned qualification merely because current wealth collapses.
+
+The game must preserve a legitimate productive path back from severe poverty/bankruptcy, including access to basic work when the player still satisfies ordinary requirements.
 
 ---
 
-# 17. Endless Progression
+# 19. Endless Progression
 
 There is no fixed maximum company or player potential.
 
@@ -600,32 +724,59 @@ After major horizons, players can continue improving:
 - expertise;
 - efficiency;
 - resilience;
+- personal stability/quality-of-life;
 - customer trust;
 - infrastructure;
 - automation;
 - sustainability where modeled;
 - products;
 - investment portfolios;
+- productive assets;
 - governance influence;
 - regional/global networks;
-- legacy and collections.
+- legacy and collections;
+- contribution to persistent World Instance history.
 
 ---
 
-# 18. Implementation and Balancing Boundary
+# 20. Playability Integration Rule
+
+Progression is not complete merely because a prerequisite graph works.
+
+Player-facing progression should regularly provide:
+
+- meaningful choice;
+- understandable feedback;
+- noticeable capability change;
+- physical/visual consequence;
+- self-authored next goals;
+- recovery paths;
+- attachment to people/places/assets/organizations.
+
+Until replaced by a later canonical implementation policy, player-facing slices should be evaluated against `09_Development/Research/GAME_LOGIC/R9_PLAYABILITY_INTEGRATION_GATE.md`.
+
+---
+
+# 21. Implementation and Balancing Boundary
 
 This document defines progression relationships, not permanent prototype numbers.
 
 Replaceable balancing values include:
 
 - experience amounts;
+- wages;
 - money costs;
 - unlock thresholds;
+- food/water rates;
+- Work Capacity rates;
+- fuel/energy consumption;
 - required counts;
 - training duration;
 - exact company levels;
 - course prices;
-- cooldowns.
+- cooldowns;
+- competitor density thresholds;
+- travel duration/time compression.
 
 Such values should be centralized and testable.
 
@@ -633,9 +784,9 @@ A temporary implementation value is not permanent canon unless explicitly approv
 
 ---
 
-# 19. Relationship to Current Runtime
+# 22. Relationship to Current Runtime
 
-The current runtime already provides important pieces of these horizons:
+The current runtime already provides important foundations:
 
 - embodied city movement;
 - deliveries;
@@ -649,15 +800,15 @@ The current runtime already provides important pieces of these horizons:
 - Save/Continue;
 - Android-installed game shell.
 
-These systems are retained.
+These systems are retained as implementation history.
 
-Future work should extend them into the three-axis model rather than restart the project.
+However, the current starter-company ownership and per-delivery Company Money reward loop are legacy/prototype behaviors. Future work should migrate them into the employee-first personal economy and stock-flow model without restarting the project or silently destroying existing saves.
 
 ---
 
 # Canonical Rule
 
-**DROPi Tycoon progression is the coupled growth of the person, the organization, and access to the wider world. Advanced capability is earned through the right combination of experience, education, people, money, equipment, infrastructure, reputation, and authority; no single number may substitute for the whole progression system.**
+**DROPi Tycoon progression is the coupled evolution of a real person, productive organizations, and access to the wider world. The player begins with limited means, survives through legitimate work, learns and earns capability through the right combination of experience, education, people, money, equipment, infrastructure, reputation and authority, and can suffer recoverable economic setbacks without losing their identity.**
 
 ---
 

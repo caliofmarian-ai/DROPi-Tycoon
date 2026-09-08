@@ -2,11 +2,11 @@
 
 Document: MARKET.md
 Project: DROPi Tycoon
-Version: 1.0.0
-Status: Canonical
+Version: 2.0.0
+Status: Canonical — Market Specialization
 Author: Marian Caliof & OpenAI
 Language: English
-Last Updated: 2026-07-12
+Last Updated: 2026-09-08
 
 ---
 
@@ -14,214 +14,246 @@ Last Updated: 2026-07-12
 
 ## Purpose
 
-This document defines the market simulation system of DROPi Tycoon.
+This document defines how supply, demand, buyers, sellers, service providers, prices, procurement and competition interact inside the stock-flow economy defined by `02_Economy/ECONOMY.md`.
 
-The market represents the relationship between customers, businesses, demand, and logistics opportunities.
-
-The purpose of the market system is to create a dynamic environment where companies must adapt their strategies instead of following a fixed path.
+The market exists to expose real economic needs/opportunities and strategic choices. It is not an independent mission generator.
 
 ---
 
-# Market Philosophy
+# 1. Market Philosophy
 
-The market should feel alive.
+The market should feel alive because the underlying world changes.
 
-Customer demand should change over time based on:
+Demand and supply may change through:
 
-- Time
-- Location
-- Events
-- Company reputation
-- Available services
-- Economic conditions
+- consumption;
+- production/input requirements;
+- inventory depletion/replenishment;
+- population and migration;
+- time/season;
+- weather/events;
+- business openings/closures;
+- infrastructure/capacity;
+- local income/employment;
+- logistics cost/reliability;
+- regional shortage/surplus;
+- competition and reputation.
 
-The player should constantly analyze opportunities and make strategic decisions.
-
----
-
-# Market Entities
-
-The market contains several important entities.
-
-## Customers
-
-Customers generate delivery demand.
-
-Customer types include:
-
-- Individual customers
-- Restaurants
-- Shops
-- Pharmacies
-- Businesses
-- Organizations
-
-Each customer type has different needs and expectations.
+A number called `demand` must not be disconnected from the stocks/flows it represents.
 
 ---
 
-## Businesses
+# 2. Market Participants
 
-Businesses create larger delivery opportunities.
+Participants may include:
 
-Examples:
+- people/households or population cohorts;
+- merchants/shops/restaurants/pharmacies;
+- service companies;
+- logistics companies;
+- farms;
+- factories/processing facilities;
+- warehouses/distributors;
+- utilities/energy providers;
+- construction/projects;
+- infrastructure operators;
+- public/institutional buyers when later modeled;
+- NPC and human economic actors.
 
-- Restaurants require frequent short-distance deliveries.
-- Pharmacies require reliability.
-- Companies require scheduled logistics.
-- Retail stores require volume capacity.
-
----
-
-## Delivery Zones
-
-The city is divided into operational zones.
-
-Each zone has:
-
-- Population
-- Business density
-- Demand level
-- Traffic conditions
-- Expansion potential
-
-Zones create strategic decisions for company growth.
+Actors may buy, sell, procure, contract, bid, supply, consume or provide capacity according to their actual state.
 
 ---
 
-# Demand System
+# 3. Demand Formation
 
-Demand determines how many delivery opportunities exist.
+Demand is caused by a real requirement such as:
 
-Demand is influenced by:
+- household consumption;
+- shop inventory below target;
+- business/industrial input requirement;
+- construction material requirement;
+- maintenance/fuel/energy requirement;
+- medical/service stock requirement;
+- warehouse rebalancing;
+- waste/reverse-logistics requirement;
+- regional shortage;
+- event/recovery need.
 
-- Population
-- Time of day
-- Weather
-- Events
-- Holidays
-- Company reputation
-- Service availability
-
----
-
-# Demand Examples
-
-Morning:
-
-High demand from businesses and offices.
-
-Lunch:
-
-High food delivery demand.
-
-Evening:
-
-High residential demand.
-
-Weekend:
-
-Different customer behavior.
+Demand may be aggregated for performance, but any resulting order/contract/procurement opportunity must correspond to a modeled payer, quantity/capacity need, or governed public source.
 
 ---
 
-# Market Growth
+# 4. Supply Formation
 
-As the company improves, the market can expand.
+Supply comes from actual available capability such as:
 
-Growth factors:
+- merchant/warehouse inventory;
+- farm/factory output;
+- service-company capacity;
+- transport capacity;
+- infrastructure capacity;
+- imports/other regions;
+- recovered/recycled material where valid.
 
-- Fast deliveries
-- High reputation
-- Reliable service
-- New partnerships
-- Infrastructure investment
-
-A successful company creates more opportunities.
-
----
-
-# Competition
-
-Future versions may include competing companies.
-
-Competitors can:
-
-- Enter new zones
-- Reduce prices
-- Offer faster delivery
-- Attract customers
-
-Competition should create strategic pressure without making the game frustrating.
+NPC fallback may provide bounded market continuity, but it obeys inventories, costs and production. It cannot create infinite free supply.
 
 ---
 
-# Market Events
+# 5. Procurement and Opportunity Creation
 
-Dynamic events can temporarily affect the market.
+When a buyer/consumer requires supply, the market may create or surface:
 
-Examples:
+- purchase requests;
+- delivery/logistics orders;
+- service requests;
+- recurring contracts;
+- tenders/bids;
+- supplier relationships;
+- emergency/recovery procurement.
 
-- Local festivals
-- Weather conditions
-- Business openings
-- Seasonal demand
-- Economic changes
-
-Events should create opportunities as well as challenges.
-
----
-
-# Market Information
-
-Players should have access to understandable market information.
-
-Examples:
-
-- Demand level
-- Most profitable zones
-- Customer satisfaction
-- Growth opportunities
-
-Information should help decision-making without removing uncertainty.
+The market may aggregate/queue these opportunities for usability, but it cannot invent economic value unrelated to the underlying requirement.
 
 ---
 
-# MVP Market Scope
+# 6. Pricing
 
-The first playable version will include:
+Prices may respond to a governed combination of:
 
-- One city
-- Limited zones
-- Basic customer demand
-- Simple business partnerships
-- Static market values
+- available inventory/supply;
+- demand intensity;
+- production/procurement cost;
+- transport/logistics cost;
+- service quality/reliability;
+- scarcity;
+- competitor offers;
+- contract volume/duration;
+- local income/economic conditions;
+- disruption/events;
+- later currency/inflation/FX effects.
 
-Advanced market simulation will be added in future versions.
+Exact formulas belong to `02_Economy/PRICING.md` and balancing data.
+
+The market should not permit trivial infinite arbitrage caused by disconnected local prices or free teleportation.
 
 ---
 
-# Future Expansion
+# 7. Competition and Market Capacity
 
-Possible future systems:
+Companies compete by offering real value/capability, including:
 
-- Dynamic economy
-- Competitor AI
-- Global markets
-- International trade
-- Currency systems
-- Market crises
-- Investment opportunities
+- price;
+- availability;
+- quality;
+- speed;
+- reliability;
+- capacity;
+- specialization;
+- geographic coverage;
+- infrastructure;
+- reputation/trust.
+
+For last-mile delivery, roughly five meaningful competitors is an urban design target and normally one to two is a rural target.
+
+These are not universal hardcoded caps. Entry/exit should respond to locality demand, population, infrastructure, company viability and authorization rules while preserving recovery and alternative opportunities.
+
+---
+
+# 8. Market Information
+
+The player should receive information appropriate to their role.
+
+Useful market surfaces may show:
+
+- what is scarce and why;
+- current/expected inventory pressure;
+- buyer requirements;
+- supply sources;
+- price/cost ranges;
+- route/logistics burden;
+- competitor capacity;
+- contract opportunities;
+- regional surplus/deficit;
+- historical trend;
+- uncertainty/limitations where information is incomplete.
+
+The interface should help the player make decisions without revealing omniscient perfect future knowledge.
+
+---
+
+# 9. Local, Regional and Global Markets
+
+Markets are geographically connected rather than independent random tables.
+
+A local shortage may be addressed by:
+
+- another local supplier;
+- nearby rural production;
+- another city/region;
+- national supply;
+- international trade.
+
+The delivered price/opportunity should reflect relevant production, inventory, distance, transport, infrastructure, time and risk.
+
+Strategic map selection does not teleport goods; trade requires logistics capacity.
+
+---
+
+# 10. Contracts and Relationships
+
+Repeated successful exchange may develop into stronger commercial relationships, including recurring contracts, preferred-supplier relationships, strategic partnerships, investment and, where eligible, acquisition/concession.
+
+Contracts must define real counterparties, obligations, quantities/service capacity, settlement, deadlines/quality conditions and failure consequences.
+
+---
+
+# 11. Events and Market Change
+
+Events may alter real market state through:
+
+- demand changes;
+- supply loss/surplus;
+- transport disruption;
+- labor shortage;
+- infrastructure failure;
+- seasonal production;
+- tourism/festival demand;
+- reconstruction/emergency needs.
+
+Events do not simply multiply mission rewards. They change the causal economy from which opportunities emerge.
+
+---
+
+# 12. World Instance Isolation
+
+Each World Instance owns its own market history, prices, inventories, companies, contracts and productive capacity.
+
+A mature world's market power cannot be imported into a fresh world.
+
+Future national currencies/FX remain World-Instance-local economic state.
+
+---
+
+# 13. Historical Prototype Boundary
+
+Early Prototype scopes used limited zones, basic customer demand and static market values.
+
+Those remain historical/legacy implementation assumptions only.
+
+The target canonical market is dynamic and stock-flow driven. Runtime migration must occur in staged tested slices rather than silently reinterpreting old save data.
+
+---
+
+# 14. Playability Boundary
+
+The market exists to create meaningful choices, not compulsory spreadsheet analysis.
+
+Early players should see simple work/need information. Advanced procurement, pricing, regional trade and analytics should become visible when the player's profession/company capability requires them.
 
 ---
 
 # Canonical Rule
 
-The market system exists to create meaningful strategic choices.
-
-It should never become unnecessary complexity.
-
-Every market mechanic must improve gameplay decisions.
+**DROPi Tycoon markets expose and match real modeled supply, demand, inventory, production, service and logistics capacity. Opportunities arise because economic actors need or offer something; prices and competition respond to actual conditions; and the market may surface opportunities but may not invent unexplained rewards, infinite supply, infinite demand or teleported trade.**
 
 ---
 

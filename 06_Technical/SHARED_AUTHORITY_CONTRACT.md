@@ -2,11 +2,11 @@
 
 Document: SHARED_AUTHORITY_CONTRACT.md
 Project: DROPi Tycoon
-Version: 1.0.0
+Version: 1.1.0
 Status: Canonical — Shared Authority Migration Contract
 Author: Marian Caliof & OpenAI
 Language: English
-Last Updated: 2026-09-07
+Last Updated: 2026-09-08
 
 ---
 
@@ -14,268 +14,336 @@ Last Updated: 2026-09-07
 
 ## Purpose
 
-This document defines how DROPi Tycoon can migrate from the current offline/local authoritative game toward future shared economic society without making the client authoritative for identity, ownership, balances, permissions or shared settlement.
+This document defines how DROPi Tycoon migrates from current local/offline authority toward a persistent shared economic society without making the client authoritative for identity, World Instance membership, money, inventory, custody, ownership, permissions, time or settlement.
 
-It is a migration contract, not an authorization to implement full multiplayer at once.
+It is a migration contract, not authorization to implement full multiplayer in one step.
 
-The current single-player/offline game remains valid while shared systems are introduced in governed slices.
+Current offline/local gameplay remains valid while selected state families migrate in governed slices.
 
 ---
 
 # 1. Authority Principle
 
-The installed client may own presentation and input.
+The installed client owns presentation and player input/intent.
 
-It must not become the final authority for shared economic truth.
+It does not become final authority for contested shared economic truth.
 
-The canonical future command path is:
+Canonical future path:
 
 ```text
 Client intent
 -> command envelope
--> authority validation
--> exactly-once command receipt
--> authoritative event/state revision
--> client projection/presentation
+-> identity / World Instance / permission validation
+-> domain and expected-revision validation
+-> idempotent command receipt
+-> atomic authoritative state/event settlement
+-> resulting revision
+-> client projection / presentation
 ```
 
-A UI action is never proof of ownership, permission, balance, membership or settlement.
+A UI action is never proof of ownership, capability, balance, membership, cargo custody, work completion or payment.
 
 ---
 
-# 2. State-Family Authority Inventory
+# 2. Identity and World Scope
 
-## Local presentation/input authority
+Shared authority must distinguish:
 
-The following remain local presentation concerns unless a later design explicitly changes them:
+- account identity;
+- World Instance identity;
+- one economic hero/person identity for that account in that World Instance;
+- employer/company identities;
+- membership/employment/investment relationships.
 
-- camera presentation;
+A client cannot create economic alts, choose another World Instance's economic state, or import mature-world power by declaring identifiers locally.
+
+Portable account state and World-Instance-local economic state must remain explicitly separated.
+
+---
+
+# 3. State-Family Authority Inventory
+
+## Local presentation/input concerns
+
+Examples:
+
+- camera;
 - touch/joystick input;
-- local HUD presentation;
-- audio preferences;
-- non-economic visual interpolation;
-- local accessibility/presentation preferences.
+- local HUD layout;
+- audio/accessibility preferences;
+- non-economic interpolation/animation;
+- local presentation caches.
 
-These may read authoritative shared state but do not write shared economic truth.
+They may display authoritative state but do not settle shared economic truth.
 
-## Future server-authoritative shared state
+## Trusted/server-authoritative shared economic state
 
-Before real multiplayer economy, the following state families must move behind server authority or an equivalent trusted shared authority:
+Before a state family becomes contested between real players, trusted authority must own its canonical truth. Relevant families include:
 
-- player/account identity;
-- company identity and membership;
-- shared Company Money or any shared-account economic balance;
-- company ownership and shares;
-- shared marketplace listings and settlement;
-- company permissions and roles;
-- world/shard presence where it affects shared interactions;
-- shared economic transactions and settlement history.
+- account/person/World Instance membership;
+- Personal Money and personal transaction ledger;
+- Company Money and company transaction ledger;
+- employment, shifts, work records and wage settlement;
+- company identity, membership, roles and permissions;
+- company ownership/shares/governance;
+- inventory and product stocks;
+- cargo identity/custody/location/transfer;
+- orders/contracts/procurement commitments;
+- marketplace listings/bids/trades/settlement;
+- assets/vehicles/property/productive facilities;
+- infrastructure ownership/concessions/access;
+- production/consumption/waste settlement where shared;
+- authoritative world time and offline catch-up;
+- world events that change contested economic state;
+- reputation/history where it changes eligibility/economics.
 
-The current local runtime may continue to simulate these concepts offline until each selected family is migrated atomically.
-
----
-
-# 3. Stable Identity Semantics
-
-IDs are opaque identifiers.
-
-Consumers must never derive authority, geography, provider, ownership, permissions or business meaning from ID string format.
-
-Required identifier families include:
-
-- actor/account identity;
-- company/aggregate identity;
-- asset identity;
-- employee/member identity;
-- command identity;
-- event identity;
-- transaction/settlement identity where introduced.
-
-Future server issuers must use collision-safe generation appropriate to the selected datastore/topology.
-
-Local-only deterministic factories may use a caller-provided collision-resistant installation/session namespace for tests and offline adapters. That local representation does not constrain the future server ID format.
+Current local runtime may simulate selected families offline until each migration is deliberate.
 
 ---
 
-# 4. Command Contract
+# 4. Stable Identifier Semantics
+
+IDs are opaque.
+
+Consumers must never derive authority, geography, provider, ownership or permissions from string format.
+
+Identifier families may include:
+
+- account ID;
+- World Instance ID;
+- person/economic-actor ID;
+- company/aggregate ID;
+- employee/employment/member ID;
+- asset/infrastructure/product/inventory/cargo/order/contract IDs;
+- command/event ID;
+- transaction/settlement ID.
+
+Server issuers use collision-safe generation appropriate to chosen infrastructure. Local deterministic factories used in tests/offline adapters do not constrain future server formats.
+
+---
+
+# 5. Command Contract
 
 Every future shared write uses a command envelope containing at minimum:
 
-- globally unique/opaque `commandId` within the authority domain;
+- unique/opaque `commandId` within authority scope;
+- `worldInstanceId`;
 - requesting `actorId`;
-- target `aggregateId`;
+- target aggregate/domain ID;
 - command type;
-- client-observed `expectedRevision`;
+- client-observed `expectedRevision` where applicable;
 - command payload.
 
-The authority validates identity, permissions, ownership, balance/capacity and domain rules from authoritative state.
+Authority validates from authoritative state:
 
-The authority must not trust client-provided claims such as:
+- actor/world membership;
+- role/permission;
+- ownership;
+- qualification/capability;
+- balance;
+- inventory/custody;
+- capacity;
+- time/eligibility;
+- domain rules.
 
-- current Company Money;
-- share ownership;
-- company role;
-- membership;
-- marketplace ownership;
-- settlement result;
-- authorization status.
-
----
-
-# 5. Revision and Conflict Semantics
-
-Each authoritative aggregate has a monotonic revision.
-
-A command may apply only when its `expectedRevision` matches the current authoritative revision, unless a later command type explicitly defines commutative/conflict-free behavior.
-
-For the baseline contract:
-
-- matching revision -> validate and apply;
-- stale revision -> reject with current revision;
-- accepted write -> increment aggregate revision;
-- rejected write -> aggregate revision does not change.
-
-This prevents a stale client from silently overwriting newer shared state.
+The authority must not trust client-provided claims such as current money, work completed, share ownership, cargo custody, company role, world-local reputation, successful delivery, or settlement result.
 
 ---
 
-# 6. Idempotency / Replay Contract
+# 6. Revision and Conflict Semantics
+
+Each mutable authoritative aggregate/domain uses monotonic revision or an explicitly equivalent concurrency strategy.
+
+Baseline optimistic rule:
+
+- matching revision -> validate/apply;
+- stale revision -> reject/refresh;
+- accepted write -> advance revision;
+- rejected write -> no state mutation/revision advance.
+
+A future command may use an explicitly designed commutative/transactional model, but scenes may not invent alternate conflict behavior ad hoc.
+
+---
+
+# 7. Idempotency / Replay
 
 `commandId` is the replay key.
 
 The first-seen command receives one stored authoritative receipt.
 
-If the same `commandId` is received again:
+A retry with the same command ID must not:
 
-- do not run settlement again;
-- do not debit/credit money again;
-- do not transfer ownership again;
-- do not create another listing/order/share event;
-- return the original receipt/event outcome.
+- debit/credit money twice;
+- pay wage/dividend twice;
+- consume/produce inventory twice;
+- transfer cargo/assets/shares twice;
+- complete an order twice;
+- charge an offline obligation twice;
+- create another company/member/contract record.
 
-Rejected first-seen commands are also idempotent. A retry with the same command ID does not transform a prior rejection into a later acceptance.
+The original accepted/rejected outcome is returned.
 
-The client must create a new command ID for a genuinely new intent after refreshing authoritative state.
+A genuinely new intent after refreshed state uses a new command ID.
 
 ---
 
-# 7. Authoritative Receipt and Event
+# 8. Atomic Economic Settlement
 
-The authority returns a receipt containing:
+Where one action changes multiple ownership domains, the authoritative operation must behave atomically or use an equivalent durable transactional workflow.
+
+Examples:
+
+## Wage
+
+`employer Company Money debit -> worker Personal Money credit -> work/payroll record settled`
+
+## Delivery/service settlement
+
+`order completion -> cargo/inventory custody finalization -> payer debit -> provider/company credit -> reputation/history updates`
+
+## Share purchase
+
+`buyer Personal Money debit -> company/seller credit -> share ownership transfer`
+
+## Procurement
+
+`buyer payment commitment -> seller inventory reservation/transfer -> cargo/order linkage`
+
+Partial success must not leave duplicated money/cargo/ownership.
+
+---
+
+# 9. Authoritative Receipt and Event
+
+Receipts should identify:
 
 - command ID;
-- aggregate ID;
+- world/aggregate context;
 - accepted/rejected outcome;
-- resulting revision;
-- authoritative processing order;
-- event ID when an event was emitted;
-- deterministic rejection reason when rejected.
+- resulting revision/order;
+- emitted event/transaction identifiers;
+- deterministic rejection reason where relevant.
 
-Accepted writes may emit an authoritative event containing:
-
-- event ID;
-- source command ID;
-- aggregate ID;
-- resulting revision;
-- authoritative order;
-- event type;
-- event payload.
-
-Clients project these outcomes into gameplay presentation. Clients do not invent authoritative events locally for shared state.
+Clients project authoritative results into gameplay. They do not invent successful shared economic events locally.
 
 ---
 
-# 8. Reconnect Contract
+# 10. Reconnect and Recovery
 
-After disconnect/reconnect the client must be able to reconcile pending commands by command ID and aggregate revision.
+After disconnect/reconnect the client must reconcile:
 
-Baseline flow:
+1. identity/World Instance/session;
+2. authoritative aggregate revisions/state;
+3. pending command receipts;
+4. already-committed transactions/events;
+5. authoritative world time/offline catch-up state.
 
-1. reconnect;
-2. refresh authoritative aggregate revision/state;
-3. query/receive receipts for pending command IDs;
-4. mark already-received commands complete;
-5. do not replay completed economic effects locally;
-6. create a new command only when the user performs a new intent against refreshed state.
-
-This contract avoids duplicate settlement when network acknowledgement is lost after the authority already committed the write.
+Completed economic effects are never replayed merely because acknowledgement was lost.
 
 ---
 
-# 9. Offline Compatibility Adapter
+# 11. Authoritative Time / Offline Catch-Up
+
+World Instance time belongs to trusted authority when shared worlds are active.
+
+Catch-up must be deterministic/idempotent and may settle only causally valid processes.
+
+Examples:
+
+- fixed living obligations/basic consumption may continue;
+- scheduled payroll/company obligations may settle if valid;
+- production may progress only with valid inputs/workforce/capacity;
+- active driving fuel does not accrue without driving;
+- starter wages do not accrue without work;
+- NPC activity cannot generate infinite supply/demand/money.
+
+A client-provided elapsed-time claim is not sufficient authority for economic settlement.
+
+---
+
+# 12. World Instance Economic Isolation
+
+Trusted authority enforces the boundary between worlds.
+
+A fresh world cannot receive mature-world balances, productive qualifications, inventory, companies, shares, reputation, assets or infrastructure power through client save/import commands.
+
+Only explicitly approved non-economic account state may be projected across worlds.
+
+Legacy/local saves require governed migration and are not automatically authoritative for a fresh shared world.
+
+---
+
+# 13. Offline Compatibility Adapter
 
 The current game remains playable offline/single-player.
 
-`game-web/src/systems/localSharedAuthorityAdapter.ts` implements the same command/revision/idempotency boundary in memory for tests and future staged migration.
+`game-web/src/systems/localSharedAuthorityAdapter.ts` provides a local command/revision/idempotency boundary for tests and staged migration.
 
-It is not a production multiplayer server and does not replace the current Save v2 or economy systems in this slice.
+It is not a production multiplayer server and does not by itself convert local Save into shared authority.
 
-Its purpose is to make the future network boundary testable before choosing transport, authentication provider, database or deployment topology.
+Future local adapters should preserve the same domain semantics where practical so online authority extends rather than replaces gameplay rules.
 
 ---
 
-# 10. Security and Privacy Boundary
+# 14. Security and Privacy
 
-Never place service secrets, private signing keys, database credentials or privileged API tokens in:
-
-- game saves;
-- client bundles;
-- mobile application assets;
-- browser-delivered code;
-- player-visible configuration.
+Never place service secrets, private signing keys, privileged API tokens or database credentials in saves, client bundles, mobile assets, browser code or player-visible configuration.
 
 Public profile/presence data must remain separable from private account/security data.
 
-Authentication/provider selection requires an explicit technical design and must not be invented ad hoc by a gameplay scene.
+Authentication/provider selection requires dedicated Technical Design.
 
-The server/shared authority validates all privileged shared writes.
-
----
-
-# 11. Topology Boundary
-
-A player-facing country/world/shard must not be hard-bound to exactly one physical server.
-
-Logical world identity and physical deployment topology are separate concerns.
-
-Future implementations may use partitioning, replication, regional services or other topologies without changing the gameplay meaning of company/player/world IDs.
+Trusted authority validates privileged writes.
 
 ---
 
-# 12. Migration Staging
+# 15. Logical World vs Deployment Topology
 
-The governed migration order is:
+A country, region, shard label or World Instance is not hard-bound to one physical server.
 
-1. authority inventory and contracts;
-2. stable identifier/command/event/repository boundaries;
-3. local adapter compatible with offline play;
-4. select one shared state family;
-5. implement trusted server authority for that family;
-6. migrate client writes to commands;
-7. add reconnect/conflict/idempotency evidence;
-8. only then expand to additional shared company/market/world state.
+Future implementations may partition/replicate/route services without changing gameplay identity semantics.
 
-Do not migrate all economic systems in one PR.
+Multi-resolution simulation and server-side catch-up protect scale; Android clients never need to own/render the complete global economic state.
 
 ---
 
-# 13. Explicit Non-Goals of This Contract
+# 16. Migration Staging
+
+The governed migration principle is **one coherent state family / transaction chain at a time**.
+
+Recommended causal order after Phase-1 reconciliation:
+
+1. stable account/World Instance/person identity contracts;
+2. Personal Money ledger and explicit company/person ownership boundaries;
+3. authoritative world-time/catch-up boundary needed by economic settlement;
+4. employee-first wage/work settlement;
+5. inventory/demand/order/cargo custody transaction chain;
+6. company formation/membership/permissions;
+7. selected real multiplayer market/company state;
+8. production/infrastructure/large-world contested state;
+9. later complex equity/finance systems.
+
+Do not migrate the entire economy in one PR.
+
+---
+
+# 17. Explicit Non-Goals
 
 This document does not select or implement:
 
-- Firebase, Supabase or another backend vendor;
-- an authentication provider;
+- backend vendor;
+- authentication provider;
 - WebSocket/real-time transport;
-- a production database;
+- production database;
 - player login UI;
-- multiplayer chat;
-- company shares/marketplace runtime;
-- blockchain, wallets or token settlement.
+- chat;
+- blockchain/wallet/token settlement;
+- full multiplayer in one step.
 
-Those require dedicated governed implementation slices.
+Those require dedicated implementation decisions.
 
 ---
 
 # Canonical Rule
 
-**Shared economic truth must be validated and settled exactly once by trusted authority. The client expresses intent and presents results; it does not grant itself identity, ownership, permission or money.**
+**Shared economic truth is World-Instance scoped, validated and settled exactly once by trusted authority. The client expresses intent and presents results; it cannot grant itself identity, money, work, inventory, cargo custody, ownership, permissions, elapsed economic time or cross-world power.**
