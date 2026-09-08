@@ -2,11 +2,11 @@
 
 Document: EMPLOYEES.md
 Project: DROPi Tycoon
-Version: 1.0.0
-Status: Canonical Phase-2 Detail
+Version: 1.1.0
+Status: Canonical — Workforce and Payroll Specialization
 Author: Marian Caliof & OpenAI
 Language: English
-Last Updated: 2026-09-02
+Last Updated: 2026-09-08
 
 ---
 
@@ -14,13 +14,39 @@ Last Updated: 2026-09-02
 
 ## Purpose
 
-This document details the first executable employee model for M-009 / E-018 / RBATCH-018 while remaining aligned with `04_World/NPC.md`, `02_Economy/ECONOMY.md`, and `06_Technical/SAVE_SYSTEM.md`.
+This document defines the canonical workforce/payroll specialization while preserving the existing RBATCH-018 employee implementation as runtime compatibility truth.
 
-Employees are company workforce. They are progression state, not decorative NPCs.
+It aligns with `02_Economy/ECONOMY.md`, `02_Economy/PERSONAL_FINANCE.md`, `04_World/WORLD.md`, `06_Technical/WORLD_INSTANCES.md`, and `06_Technical/SAVE_SYSTEM.md`.
 
-## RBATCH-018 Model
+Employees are productive economic actors, not decorative NPCs or automatic money generators.
 
-Each hired employee has one authoritative record containing:
+---
+
+# 1. Workforce Identity
+
+A worker record must be tied to a stable economic actor identity appropriate to the implementation stage.
+
+Canonical workforce concepts include:
+
+- stable worker identity;
+- employer/company identity;
+- role/profession;
+- employment/onboarding status;
+- qualifications/authorizations;
+- schedule/shift/availability where implemented;
+- wage/salary basis;
+- assigned workplace/equipment/vehicle where relevant;
+- work/output history required for settlement.
+
+Human and NPC workers should use compatible economic semantics even when their control/input differs.
+
+---
+
+# 2. Existing RBATCH-018 Runtime Contract
+
+The current executable employee model remains valid implementation history.
+
+Each hired employee currently stores:
 
 - stable employee identity;
 - display name;
@@ -28,75 +54,187 @@ Each hired employee has one authoritative record containing:
 - employment/onboarding status;
 - salary cost per salary cycle.
 
-The initial executable role is `Courier`.
+Current executable role: `Courier`.
 
-The initial executable employment states are:
+Current executable states:
 
-1. `Onboarding` — hired but not yet salary-eligible;
-2. `Active` — onboarding completed and salary-eligible.
+1. `Onboarding`;
+2. `Active`.
 
-Candidate data exists outside CompanyState until hiring succeeds. Hiring creates the employee record exactly once.
+Candidate data remains outside CompanyState until hiring succeeds. Hiring creates the employee exactly once.
 
-## Hiring
+These implementation details are retained until explicitly migrated; they do not limit the final profession/labor model.
+
+---
+
+# 3. Hiring
 
 Hiring must:
 
-- resolve a known candidate;
-- reject duplicate hiring of the same employee identity;
-- verify the company can afford the hiring cost;
-- deduct the hiring cost exactly once;
-- create the employee in `Onboarding` state;
-- trigger an approved autosave after successful state mutation.
+- resolve a known candidate/economic actor;
+- reject duplicate employment creation for the same intended contract;
+- verify employer capability and hiring/commitment cost where applicable;
+- create employment exactly once;
+- preserve authoritative employer/worker identity;
+- trigger persistence after successful material state mutation.
 
-Numeric hiring costs are centralized balancing values. They are replaceable implementation details, not permanent canon.
+Numeric costs are balancing data.
 
-## Onboarding
+Future human-player employment must not silently reuse NPC-only candidate assumptions when account/world identity is required.
+
+---
+
+# 4. Onboarding and Qualification
 
 Onboarding is an explicit state transition.
 
-A hired employee moves from `Onboarding` to `Active` exactly once. Repeating the completion action must not duplicate state or economic effects.
+Repeating completion must not duplicate economic effects.
 
-## Salary Processing
+Future roles may require qualifications, practical training, authorizations, facilities, equipment, instructors, or prior experience. A company cannot make an unqualified worker productive in a specialist role merely by changing a label.
 
-Salary cost is stored on the employee record as a non-negative integer amount per salary cycle.
+---
 
-Company payroll state stores `lastProcessedCycle`.
+# 5. Work, Shifts and Availability
 
-A salary cycle must:
+The canonical world now has authoritative time.
 
-- use a positive integer cycle identifier;
-- be processed sequentially;
-- charge only `Active` employees;
-- calculate the total from employee salary records;
-- reject duplicate or skipped cycles;
-- reject processing when company money is insufficient;
-- deduct the total once and advance `lastProcessedCycle` only after successful processing.
+Work may therefore be organized into shifts, schedules, assignments, contracts, or other explicit availability periods.
 
-RBATCH-018 implements this deterministic payroll boundary but does not invent a game clock or daily-expense cadence. A later authorized system may call this boundary when its canonical time/cycle trigger exists.
+A worker can be productive only when the required combination exists, such as:
 
-## Economy Boundary
+- valid employment/contract;
+- availability/shift;
+- qualification;
+- assignment;
+- workplace/infrastructure;
+- equipment/vehicle;
+- demand/input/cargo;
+- operational capacity.
 
-Employee hiring and salaries consume Company Money and therefore remain inside the canonical economy model from `02_Economy/ECONOMY.md`.
+The previous RBATCH-018 statement that payroll must not invent a game clock remains historically correct for that implementation batch, but the canonical time authority now exists in `04_World/WORLD.md` and `06_Technical/WORLD_INSTANCES.md`.
 
-RBATCH-019 owns daily operational expenses and financial reporting. RBATCH-018 must not pull those systems forward.
+---
 
-## Persistence
+# 6. Payroll and Wage Settlement
 
-Employee and payroll progression is meaningful company progress and is persisted in the Phase-2 save schema.
+Payroll is not a free reward loop.
 
-Save format v2 adds:
+For NPC/simulated workers, current CompanyState payroll may continue to aggregate salary costs until a broader actor-ledger migration is implemented.
+
+For a human player, wage settlement must eventually be one balanced transaction:
+
+`employer Company Money -> worker Personal Money`
+
+A human starter wage requires actual eligible work/shift participation. Offline absence does not manufacture salary.
+
+Salary/payroll settlement must be deterministic, exactly-once/idempotent under shared authority, and must not debit/credit twice after retry/reconnect.
+
+---
+
+# 7. Current Deterministic Payroll Boundary
+
+The existing runtime stores `lastProcessedCycle`.
+
+Until migrated, an RBATCH-018 salary cycle:
+
+- uses a positive integer cycle identifier;
+- is processed sequentially;
+- charges only current `Active` employee records;
+- calculates total from salary records;
+- rejects duplicate/skipped cycles;
+- rejects processing when Company Money is insufficient;
+- deducts once and advances `lastProcessedCycle` only after success.
+
+This remains a valid local deterministic implementation boundary.
+
+Future time integration should call/migrate this behavior against authoritative operating-day/shift semantics rather than create a second payroll truth.
+
+---
+
+# 8. Multiple Jobs and Membership
+
+A person may hold compatible multiple jobs/contracts when schedules, permissions and conflict rules allow them.
+
+This is distinct from company membership:
+
+- employment = labor relationship;
+- Internal/Member relationship = primary organizational membership/governance relationship;
+- executive authority = management power;
+- External investment = portfolio ownership.
+
+A person has one primary Internal/Member company relationship at a time but may have compatible employment/contract relationships under canonical rules.
+
+---
+
+# 9. Productive Workforce Rule
+
+Workers do not create money merely by existing.
+
+Valid work may create or enable:
+
+- deliveries;
+- sorting/handling;
+- dispatch;
+- maintenance;
+- production;
+- agriculture;
+- infrastructure operation;
+- specialist services;
+- management/coordination effects where causally modeled.
+
+Output still requires the relevant demand, inputs, capacity and facilities.
+
+---
+
+# 10. Employer Distress
+
+An employer may become unable to pay wages or maintain operations.
+
+Possible consequences include:
+
+- arrears/default state;
+- reduced/paused hiring;
+- employee departure;
+- restructuring;
+- asset sale;
+- acquisition;
+- company bankruptcy/closure.
+
+Failure must settle through the economy rather than delete workers or fabricate payment.
+
+A human worker retains their person identity and valid personal qualifications if an employer fails.
+
+---
+
+# 11. World Instance and NPC Boundary
+
+Employment is World-Instance-local economic state.
+
+NPC workers may preserve low-population playability, but they obey wages/costs, qualifications, availability and productive constraints. They cannot provide infinite free labor.
+
+---
+
+# 12. Persistence
+
+Employee and payroll progression is meaningful company state and is currently persisted in Save v2 through:
 
 - `company.employees`;
 - `company.payroll.lastProcessedCycle`.
 
-Existing Prototype v0.1 save-format v1 data is migrated forward by preserving all recoverable v1 company/settings progression and initializing employee/payroll state safely. The migration writes the normalized current format on the next successful save/load normalization path.
+Existing v1 data migrates forward by preserving recoverable company/settings progression and safely initializing employee/payroll state.
 
-World position, active orders, and other transient runtime data remain outside the save contract unless separately approved.
+Future human employment, Personal Money wage settlement, shifts, qualifications and World Instance identity require an explicit save/server migration rather than silent reinterpretation of these current fields.
 
-## Future Expansion
+---
 
-Later authorized batches may add employee performance, assignment, training, equipment, experience, availability schedules, or automation. Those systems must extend this model rather than create parallel workforce truth.
+# 13. Authority
 
-## Canonical Rule
+When multiplayer/shared economic state is activated, trusted/server authority must validate employment, role/permission, completed work, payroll eligibility and money settlement.
 
-CompanyState is the authoritative runtime owner of hired employees and payroll progression. No scene may maintain a parallel employee ownership flag or independent salary ledger.
+The client cannot declare that a wage was earned or paid.
+
+---
+
+# Canonical Rule
+
+**Workers are real productive economic actors. Employment, work, time, qualification, assignment and pay must connect causally; human wages move money from employer Company Money to worker Personal Money; NPC and human labor share compatible semantics; and no employee record creates free output or money merely by existing.**
