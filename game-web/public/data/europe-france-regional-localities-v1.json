@@ -1,0 +1,668 @@
+{
+  "version": "1.0.0",
+  "issue": 543,
+  "continent": "Europe",
+  "country": {
+    "geometryId": "250",
+    "sourceCountryCode": "FR",
+    "renderedName": "France"
+  },
+  "administrativeModel": {
+    "level": "regional-level-surfaces-with-overseas-and-special-status-cases",
+    "nativeTermSingular": "région / surface régionale équivalente",
+    "nativeTermPlural": "régions / surfaces régionales équivalentes",
+    "englishTerm": "region / regional-equivalent surface",
+    "unitCount": 18,
+    "officialReferences": [
+      "https://www.insee.fr/fr/metadonnees/definition/c1502",
+      "https://www.insee.fr/fr/metadonnees/definition/c1696",
+      "https://www.insee.fr/fr/information/8740222",
+      "https://www.legifrance.gouv.fr/codes/article_lc/LEGIARTI000052092591/2026-05-13"
+    ],
+    "specialCases": [
+      {
+        "type": "institutional-versus-statistical-regional-surface-model",
+        "note": "INSEE records 17 institutional regions, including five overseas regions, while the France regional/statistical field used by the COG exposes 18 regional-level surfaces. DROPi governs the 18 current COG regional codes as navigation/economic attachment surfaces without claiming that all 18 have identical institutions."
+      },
+      {
+        "type": "corsica-special-status-collectivity",
+        "canonicalRegionCode": "94",
+        "note": "Corse remains a COG regional-level surface but is governed as the Collectivité de Corse, a special-status collectivity generally assimilated to a region for statistical/territorial purposes rather than an ordinary regional council model."
+      },
+      {
+        "type": "overseas-department-region-surfaces",
+        "canonicalRegionCodes": [
+          "01",
+          "04"
+        ],
+        "note": "Guadeloupe and La Réunion are retained as overseas regional-level surfaces while preserving their département-et-région d’outre-mer semantics rather than flattening them into ordinary metropolitan regions."
+      },
+      {
+        "type": "martinique-guyane-single-territorial-collectivities",
+        "canonicalRegionCodes": [
+          "02",
+          "03"
+        ],
+        "note": "Martinique and Guyane remain COG regional-level surfaces while their current single territorial collectivities exercise competences formerly split between department and region."
+      },
+      {
+        "type": "mayotte-departement-region-2026",
+        "canonicalRegionCode": "06",
+        "legalCollectivityCode": "976R",
+        "effectiveDate": "2026-01-01",
+        "note": "From 1 January 2026 the collectivity is named Département-Région de Mayotte. DROPi keeps current COG regional surface code 06 for the regional navigation layer and records 976R as the current legal collectivity code; the change is not activated retroactively or early."
+      },
+      {
+        "type": "overseas-cross-source-locality-ownership",
+        "canonicalRegionCodes": [
+          "01",
+          "02",
+          "03",
+          "04",
+          "06"
+        ],
+        "note": "GeoNames publishes the retained locality corpora under GP, MQ, GF, RE and YT rather than FR. DROPi crosswalks those source identities to current INSEE/COG France regional surfaces, uses each territory corpus as the locality scope, and does not fabricate FR source ownership or duplicate the same geographic locality."
+      },
+      {
+        "type": "runtime-geometry-lod-reconciliation",
+        "geometryId": "250",
+        "geometryType": "MultiPolygon",
+        "componentCount": 3,
+        "representedComponents": [
+          {
+            "surface": "Guyane",
+            "bounds": {
+              "west": -54.524345,
+              "south": 2.05365,
+              "east": -51.658717,
+              "north": 5.756968
+            }
+          },
+          {
+            "surface": "Metropolitan France",
+            "bounds": {
+              "west": -4.591846,
+              "south": 42.343315,
+              "east": 8.098281,
+              "north": 51.148005
+            }
+          },
+          {
+            "surface": "Corse",
+            "bounds": {
+              "west": 8.544685,
+              "south": 41.380249,
+              "east": 9.559896,
+              "north": 43.010183
+            }
+          }
+        ],
+        "notSeparatelyRenderedAtThisLod": [
+          "Guadeloupe",
+          "Martinique",
+          "La Réunion",
+          "Mayotte"
+        ],
+        "note": "The current DROPi 110m runtime geometry for Natural Earth/ISO numeric 250 contains metropolitan France, Corse and Guyane only. The other four overseas regional surfaces remain canonical geographic/catalog identities even though this coarse runtime LOD does not contain separate polygons for them; no polygon is invented."
+      }
+    ]
+  },
+  "source": {
+    "provider": "GeoNames",
+    "license": "Creative Commons Attribution 4.0",
+    "releaseTag": "source-geonames-cities500-2026-09-08-f3cda4f9",
+    "cities500Sha256": "f3cda4f9d256d90045121fb8eebad3ed91695c32370ed93b50fbe0cb616e2bbd",
+    "admin1Sha256": "590651498043f674accda2b7f46d21286cda0e290b02f8561c5005eee9a5448c",
+    "candidateCountryCodes": [
+      "FR",
+      "GF",
+      "GP",
+      "MQ",
+      "RE",
+      "YT"
+    ],
+    "expectedCountryCandidateCount": 15525,
+    "regionalCrosswalkProvider": "INSEE Code officiel géographique (COG) 2026",
+    "regionalCrosswalkReference": "https://www.insee.fr/fr/information/8740222",
+    "publishedGameplayRepresentativeCount": 18
+  },
+  "selectionModel": {
+    "primaryFeatureCodes": [
+      "PPLC",
+      "PPLA"
+    ],
+    "fallbackFeatureCodes": [
+      "PPLA2",
+      "PPLA3",
+      "PPL"
+    ],
+    "expectedPrimarySelections": 18,
+    "expectedFallbackSelections": 0,
+    "highDensityGameplayImport": false,
+    "hardcodedCoordinates": false,
+    "rule": "One source-backed representative locality per governed first-order region; retained high-density source remains reference-only."
+  },
+  "developmentModel": {
+    "authority": "shared-regional-national-multiplayer-economy",
+    "personalPlayerProgressionUnlock": false,
+    "numericThresholdsDefined": false,
+    "signalsPlanned": [
+      "company-activity",
+      "employment-demand",
+      "production",
+      "logistics-throughput",
+      "construction-investment",
+      "transport-connectivity",
+      "trade-volume",
+      "population-economic-simulation",
+      "regional-national-policy"
+    ],
+    "rule": "Representative locality prominence and development are shared-world economic outcomes, not personal progression rewards."
+  },
+  "units": [
+    {
+      "admin1Code": "84",
+      "regionName": "Auvergne-Rhône-Alpes",
+      "regionSourceName": "Auvergne-Rhône-Alpes",
+      "regionAsciiName": "Auvergne-Rhone-Alpes",
+      "regionSourceRef": "https://www.insee.fr/fr/metadonnees/geographie/region/84-auvergne-rhone-alpes",
+      "representativeLocality": {
+        "localityId": "dropi:locality:geonames:2996944",
+        "sourceRef": "geonames:2996944",
+        "sourceCountryCode": "FR",
+        "sourceAdmin1Code": "84",
+        "sourceScope": "admin1",
+        "name": "Lyon",
+        "asciiName": "Lyon",
+        "latitude": 45.74906,
+        "longitude": 4.84789,
+        "featureCode": "PPLA",
+        "populationSourceValue": 520774,
+        "selectionBasis": "source-first-order-seat-role",
+        "presentationRole": "regional-representative-locality"
+      },
+      "economicEmergence": {
+        "authority": "shared-regional-national-multiplayer-economy",
+        "personalPlayerProgressionUnlock": false,
+        "numericThresholdsDefined": false,
+        "presentationState": "economy-system-governed"
+      }
+    },
+    {
+      "admin1Code": "27",
+      "regionName": "Bourgogne-Franche-Comté",
+      "regionSourceName": "Bourgogne-Franche-Comté",
+      "regionAsciiName": "Bourgogne-Franche-Comte",
+      "regionSourceRef": "https://www.insee.fr/fr/metadonnees/geographie/region/27-bourgogne-franche-comte",
+      "representativeLocality": {
+        "localityId": "dropi:locality:geonames:3021372",
+        "sourceRef": "geonames:3021372",
+        "sourceCountryCode": "FR",
+        "sourceAdmin1Code": "27",
+        "sourceScope": "admin1",
+        "name": "Dijon",
+        "asciiName": "Dijon",
+        "latitude": 47.31344,
+        "longitude": 5.01391,
+        "featureCode": "PPLA",
+        "populationSourceValue": 159941,
+        "selectionBasis": "source-first-order-seat-role",
+        "presentationRole": "regional-representative-locality"
+      },
+      "economicEmergence": {
+        "authority": "shared-regional-national-multiplayer-economy",
+        "personalPlayerProgressionUnlock": false,
+        "numericThresholdsDefined": false,
+        "presentationState": "economy-system-governed"
+      }
+    },
+    {
+      "admin1Code": "53",
+      "regionName": "Bretagne",
+      "regionSourceName": "Bretagne",
+      "regionAsciiName": "Bretagne",
+      "regionSourceRef": "https://www.insee.fr/fr/metadonnees/geographie/region/53-bretagne",
+      "representativeLocality": {
+        "localityId": "dropi:locality:geonames:2983990",
+        "sourceRef": "geonames:2983990",
+        "sourceCountryCode": "FR",
+        "sourceAdmin1Code": "53",
+        "sourceScope": "admin1",
+        "name": "Rennes",
+        "asciiName": "Rennes",
+        "latitude": 48.11109,
+        "longitude": -1.67431,
+        "featureCode": "PPLA",
+        "populationSourceValue": 227830,
+        "selectionBasis": "source-first-order-seat-role",
+        "presentationRole": "regional-representative-locality"
+      },
+      "economicEmergence": {
+        "authority": "shared-regional-national-multiplayer-economy",
+        "personalPlayerProgressionUnlock": false,
+        "numericThresholdsDefined": false,
+        "presentationState": "economy-system-governed"
+      }
+    },
+    {
+      "admin1Code": "24",
+      "regionName": "Centre-Val de Loire",
+      "regionSourceName": "Centre-Val de Loire",
+      "regionAsciiName": "Centre-Val de Loire",
+      "regionSourceRef": "https://www.insee.fr/fr/metadonnees/geographie/region/24-centre-val-de-loire",
+      "representativeLocality": {
+        "localityId": "dropi:locality:geonames:2989317",
+        "sourceRef": "geonames:2989317",
+        "sourceCountryCode": "FR",
+        "sourceAdmin1Code": "24",
+        "sourceScope": "admin1",
+        "name": "Orléans",
+        "asciiName": "Orleans",
+        "latitude": 47.90248,
+        "longitude": 1.90407,
+        "featureCode": "PPLA",
+        "populationSourceValue": 116344,
+        "selectionBasis": "source-first-order-seat-role",
+        "presentationRole": "regional-representative-locality"
+      },
+      "economicEmergence": {
+        "authority": "shared-regional-national-multiplayer-economy",
+        "personalPlayerProgressionUnlock": false,
+        "numericThresholdsDefined": false,
+        "presentationState": "economy-system-governed"
+      }
+    },
+    {
+      "admin1Code": "94",
+      "regionName": "Corse",
+      "regionSourceName": "Corse",
+      "regionAsciiName": "Corse",
+      "regionSourceRef": "https://www.insee.fr/fr/metadonnees/geographie/region/94-corse",
+      "representativeLocality": {
+        "localityId": "dropi:locality:geonames:3038334",
+        "sourceRef": "geonames:3038334",
+        "sourceCountryCode": "FR",
+        "sourceAdmin1Code": "94",
+        "sourceScope": "admin1",
+        "name": "Ajaccio",
+        "asciiName": "Ajaccio",
+        "latitude": 41.91886,
+        "longitude": 8.73812,
+        "featureCode": "PPLA",
+        "populationSourceValue": 54364,
+        "selectionBasis": "source-first-order-seat-role",
+        "presentationRole": "special-status-collectivity-capital-and-regional-node"
+      },
+      "economicEmergence": {
+        "authority": "shared-regional-national-multiplayer-economy",
+        "personalPlayerProgressionUnlock": false,
+        "numericThresholdsDefined": false,
+        "presentationState": "economy-system-governed"
+      }
+    },
+    {
+      "admin1Code": "44",
+      "regionName": "Grand Est",
+      "regionSourceName": "Grand Est",
+      "regionAsciiName": "Grand Est",
+      "regionSourceRef": "https://www.insee.fr/fr/metadonnees/geographie/region/44-grand-est",
+      "representativeLocality": {
+        "localityId": "dropi:locality:geonames:2973783",
+        "sourceRef": "geonames:2973783",
+        "sourceCountryCode": "FR",
+        "sourceAdmin1Code": "44",
+        "sourceScope": "admin1",
+        "name": "Strasbourg",
+        "asciiName": "Strasbourg",
+        "latitude": 48.58392,
+        "longitude": 7.74553,
+        "featureCode": "PPLA",
+        "populationSourceValue": 274845,
+        "selectionBasis": "source-first-order-seat-role",
+        "presentationRole": "regional-representative-locality"
+      },
+      "economicEmergence": {
+        "authority": "shared-regional-national-multiplayer-economy",
+        "personalPlayerProgressionUnlock": false,
+        "numericThresholdsDefined": false,
+        "presentationState": "economy-system-governed"
+      }
+    },
+    {
+      "admin1Code": "32",
+      "regionName": "Hauts-de-France",
+      "regionSourceName": "Hauts-de-France",
+      "regionAsciiName": "Hauts-de-France",
+      "regionSourceRef": "https://www.insee.fr/fr/metadonnees/geographie/region/32-hauts-de-france",
+      "representativeLocality": {
+        "localityId": "dropi:locality:geonames:2998324",
+        "sourceRef": "geonames:2998324",
+        "sourceCountryCode": "FR",
+        "sourceAdmin1Code": "32",
+        "sourceScope": "admin1",
+        "name": "Lille",
+        "asciiName": "Lille",
+        "latitude": 50.63391,
+        "longitude": 3.05512,
+        "featureCode": "PPLA",
+        "populationSourceValue": 238695,
+        "selectionBasis": "source-first-order-seat-role",
+        "presentationRole": "regional-representative-locality"
+      },
+      "economicEmergence": {
+        "authority": "shared-regional-national-multiplayer-economy",
+        "personalPlayerProgressionUnlock": false,
+        "numericThresholdsDefined": false,
+        "presentationState": "economy-system-governed"
+      }
+    },
+    {
+      "admin1Code": "11",
+      "regionName": "Île-de-France",
+      "regionSourceName": "Île-de-France",
+      "regionAsciiName": "Ile-de-France",
+      "regionSourceRef": "https://www.insee.fr/fr/metadonnees/geographie/region/11-ile-de-france",
+      "representativeLocality": {
+        "localityId": "dropi:locality:geonames:2988507",
+        "sourceRef": "geonames:2988507",
+        "sourceCountryCode": "FR",
+        "sourceAdmin1Code": "11",
+        "sourceScope": "admin1",
+        "name": "Paris",
+        "asciiName": "Paris",
+        "latitude": 48.85341,
+        "longitude": 2.3488,
+        "featureCode": "PPLC",
+        "populationSourceValue": 2138551,
+        "selectionBasis": "source-first-order-seat-role",
+        "presentationRole": "national-capital-and-regional-node"
+      },
+      "economicEmergence": {
+        "authority": "shared-regional-national-multiplayer-economy",
+        "personalPlayerProgressionUnlock": false,
+        "numericThresholdsDefined": false,
+        "presentationState": "economy-system-governed"
+      }
+    },
+    {
+      "admin1Code": "28",
+      "regionName": "Normandie",
+      "regionSourceName": "Normandie",
+      "regionAsciiName": "Normandie",
+      "regionSourceRef": "https://www.insee.fr/fr/metadonnees/geographie/region/28-normandie",
+      "representativeLocality": {
+        "localityId": "dropi:locality:geonames:2982652",
+        "sourceRef": "geonames:2982652",
+        "sourceCountryCode": "FR",
+        "sourceAdmin1Code": "28",
+        "sourceScope": "admin1",
+        "name": "Rouen",
+        "asciiName": "Rouen",
+        "latitude": 49.44313,
+        "longitude": 1.09932,
+        "featureCode": "PPLA",
+        "populationSourceValue": 116331,
+        "selectionBasis": "source-first-order-seat-role",
+        "presentationRole": "regional-representative-locality"
+      },
+      "economicEmergence": {
+        "authority": "shared-regional-national-multiplayer-economy",
+        "personalPlayerProgressionUnlock": false,
+        "numericThresholdsDefined": false,
+        "presentationState": "economy-system-governed"
+      }
+    },
+    {
+      "admin1Code": "75",
+      "regionName": "Nouvelle-Aquitaine",
+      "regionSourceName": "Nouvelle-Aquitaine",
+      "regionAsciiName": "Nouvelle-Aquitaine",
+      "regionSourceRef": "https://www.insee.fr/fr/metadonnees/geographie/region/75-nouvelle-aquitaine",
+      "representativeLocality": {
+        "localityId": "dropi:locality:geonames:3031582",
+        "sourceRef": "geonames:3031582",
+        "sourceCountryCode": "FR",
+        "sourceAdmin1Code": "75",
+        "sourceScope": "admin1",
+        "name": "Bordeaux",
+        "asciiName": "Bordeaux",
+        "latitude": 44.84124,
+        "longitude": -0.58046,
+        "featureCode": "PPLA",
+        "populationSourceValue": 265328,
+        "selectionBasis": "source-first-order-seat-role",
+        "presentationRole": "regional-representative-locality"
+      },
+      "economicEmergence": {
+        "authority": "shared-regional-national-multiplayer-economy",
+        "personalPlayerProgressionUnlock": false,
+        "numericThresholdsDefined": false,
+        "presentationState": "economy-system-governed"
+      }
+    },
+    {
+      "admin1Code": "76",
+      "regionName": "Occitanie",
+      "regionSourceName": "Occitanie",
+      "regionAsciiName": "Occitanie",
+      "regionSourceRef": "https://www.insee.fr/fr/metadonnees/geographie/region/76-occitanie",
+      "representativeLocality": {
+        "localityId": "dropi:locality:geonames:2972315",
+        "sourceRef": "geonames:2972315",
+        "sourceCountryCode": "FR",
+        "sourceAdmin1Code": "76",
+        "sourceScope": "admin1",
+        "name": "Toulouse",
+        "asciiName": "Toulouse",
+        "latitude": 43.60426,
+        "longitude": 1.44367,
+        "featureCode": "PPLA",
+        "populationSourceValue": 511684,
+        "selectionBasis": "source-first-order-seat-role",
+        "presentationRole": "regional-representative-locality"
+      },
+      "economicEmergence": {
+        "authority": "shared-regional-national-multiplayer-economy",
+        "personalPlayerProgressionUnlock": false,
+        "numericThresholdsDefined": false,
+        "presentationState": "economy-system-governed"
+      }
+    },
+    {
+      "admin1Code": "52",
+      "regionName": "Pays de la Loire",
+      "regionSourceName": "Pays de la Loire",
+      "regionAsciiName": "Pays de la Loire",
+      "regionSourceRef": "https://www.insee.fr/fr/metadonnees/geographie/region/52-pays-de-la-loire",
+      "representativeLocality": {
+        "localityId": "dropi:locality:geonames:2990969",
+        "sourceRef": "geonames:2990969",
+        "sourceCountryCode": "FR",
+        "sourceAdmin1Code": "52",
+        "sourceScope": "admin1",
+        "name": "Nantes",
+        "asciiName": "Nantes",
+        "latitude": 47.21725,
+        "longitude": -1.55336,
+        "featureCode": "PPLA",
+        "populationSourceValue": 325070,
+        "selectionBasis": "source-first-order-seat-role",
+        "presentationRole": "regional-representative-locality"
+      },
+      "economicEmergence": {
+        "authority": "shared-regional-national-multiplayer-economy",
+        "personalPlayerProgressionUnlock": false,
+        "numericThresholdsDefined": false,
+        "presentationState": "economy-system-governed"
+      }
+    },
+    {
+      "admin1Code": "93",
+      "regionName": "Provence-Alpes-Côte d'Azur",
+      "regionSourceName": "Provence-Alpes-Côte d'Azur",
+      "regionAsciiName": "Provence-Alpes-Cote d'Azur",
+      "regionSourceRef": "https://www.insee.fr/fr/metadonnees/geographie/region/93-provence-alpes-cote-d-azur",
+      "representativeLocality": {
+        "localityId": "dropi:locality:geonames:2995469",
+        "sourceRef": "geonames:2995469",
+        "sourceCountryCode": "FR",
+        "sourceAdmin1Code": "93",
+        "sourceScope": "admin1",
+        "name": "Marseille",
+        "asciiName": "Marseille",
+        "latitude": 43.29695,
+        "longitude": 5.38107,
+        "featureCode": "PPLA",
+        "populationSourceValue": 877215,
+        "selectionBasis": "source-first-order-seat-role",
+        "presentationRole": "regional-representative-locality"
+      },
+      "economicEmergence": {
+        "authority": "shared-regional-national-multiplayer-economy",
+        "personalPlayerProgressionUnlock": false,
+        "numericThresholdsDefined": false,
+        "presentationState": "economy-system-governed"
+      }
+    },
+    {
+      "admin1Code": "01",
+      "regionName": "Guadeloupe",
+      "regionSourceName": "Guadeloupe",
+      "regionAsciiName": "Guadeloupe",
+      "regionSourceRef": "https://www.insee.fr/fr/metadonnees/geographie/region/01-guadeloupe",
+      "representativeLocality": {
+        "localityId": "dropi:locality:geonames:3579732",
+        "sourceRef": "geonames:3579732",
+        "sourceCountryCode": "GP",
+        "sourceAdmin1Code": "GP",
+        "sourceScope": "country",
+        "name": "Basse-Terre",
+        "asciiName": "Basse-Terre",
+        "latitude": 15.99714,
+        "longitude": -61.73214,
+        "featureCode": "PPLC",
+        "populationSourceValue": 11472,
+        "selectionBasis": "source-first-order-seat-role",
+        "presentationRole": "overseas-region-capital-and-regional-node"
+      },
+      "economicEmergence": {
+        "authority": "shared-regional-national-multiplayer-economy",
+        "personalPlayerProgressionUnlock": false,
+        "numericThresholdsDefined": false,
+        "presentationState": "economy-system-governed"
+      }
+    },
+    {
+      "admin1Code": "02",
+      "regionName": "Martinique",
+      "regionSourceName": "Martinique",
+      "regionAsciiName": "Martinique",
+      "regionSourceRef": "https://www.insee.fr/fr/metadonnees/geographie/region/02-martinique",
+      "representativeLocality": {
+        "localityId": "dropi:locality:geonames:3570675",
+        "sourceRef": "geonames:3570675",
+        "sourceCountryCode": "MQ",
+        "sourceAdmin1Code": "MQ",
+        "sourceScope": "country",
+        "name": "Fort-de-France",
+        "asciiName": "Fort-de-France",
+        "latitude": 14.60365,
+        "longitude": -61.07418,
+        "featureCode": "PPLC",
+        "populationSourceValue": 89995,
+        "selectionBasis": "source-first-order-seat-role",
+        "presentationRole": "single-territorial-collectivity-capital-and-regional-node"
+      },
+      "economicEmergence": {
+        "authority": "shared-regional-national-multiplayer-economy",
+        "personalPlayerProgressionUnlock": false,
+        "numericThresholdsDefined": false,
+        "presentationState": "economy-system-governed"
+      }
+    },
+    {
+      "admin1Code": "03",
+      "regionName": "Guyane",
+      "regionSourceName": "Guyane",
+      "regionAsciiName": "Guyane",
+      "regionSourceRef": "https://www.insee.fr/fr/metadonnees/geographie/region/03-guyane",
+      "representativeLocality": {
+        "localityId": "dropi:locality:geonames:3382160",
+        "sourceRef": "geonames:3382160",
+        "sourceCountryCode": "GF",
+        "sourceAdmin1Code": "GF",
+        "sourceScope": "country",
+        "name": "Cayenne",
+        "asciiName": "Cayenne",
+        "latitude": 4.9381,
+        "longitude": -52.33455,
+        "featureCode": "PPLC",
+        "populationSourceValue": 61550,
+        "selectionBasis": "source-first-order-seat-role",
+        "presentationRole": "single-territorial-collectivity-capital-and-regional-node"
+      },
+      "economicEmergence": {
+        "authority": "shared-regional-national-multiplayer-economy",
+        "personalPlayerProgressionUnlock": false,
+        "numericThresholdsDefined": false,
+        "presentationState": "economy-system-governed"
+      }
+    },
+    {
+      "admin1Code": "04",
+      "regionName": "La Réunion",
+      "regionSourceName": "La Réunion",
+      "regionAsciiName": "La Reunion",
+      "regionSourceRef": "https://www.insee.fr/fr/metadonnees/geographie/region/04-la-reunion",
+      "representativeLocality": {
+        "localityId": "dropi:locality:geonames:935264",
+        "sourceRef": "geonames:935264",
+        "sourceCountryCode": "RE",
+        "sourceAdmin1Code": "RE",
+        "sourceScope": "country",
+        "name": "Saint-Denis",
+        "asciiName": "Saint-Denis",
+        "latitude": -20.88231,
+        "longitude": 55.4504,
+        "featureCode": "PPLC",
+        "populationSourceValue": 154765,
+        "selectionBasis": "source-first-order-seat-role",
+        "presentationRole": "overseas-region-capital-and-regional-node"
+      },
+      "economicEmergence": {
+        "authority": "shared-regional-national-multiplayer-economy",
+        "personalPlayerProgressionUnlock": false,
+        "numericThresholdsDefined": false,
+        "presentationState": "economy-system-governed"
+      }
+    },
+    {
+      "admin1Code": "06",
+      "regionName": "Mayotte",
+      "regionSourceName": "Mayotte",
+      "regionAsciiName": "Mayotte",
+      "regionSourceRef": "https://www.insee.fr/fr/metadonnees/geographie/region/06-mayotte",
+      "representativeLocality": {
+        "localityId": "dropi:locality:geonames:921815",
+        "sourceRef": "geonames:921815",
+        "sourceCountryCode": "YT",
+        "sourceAdmin1Code": "97611",
+        "sourceScope": "country",
+        "name": "Mamoudzou",
+        "asciiName": "Mamoudzou",
+        "latitude": -12.78234,
+        "longitude": 45.22878,
+        "featureCode": "PPLC",
+        "populationSourceValue": 54831,
+        "selectionBasis": "source-first-order-seat-role",
+        "presentationRole": "departement-region-capital-and-regional-node"
+      },
+      "economicEmergence": {
+        "authority": "shared-regional-national-multiplayer-economy",
+        "personalPlayerProgressionUnlock": false,
+        "numericThresholdsDefined": false,
+        "presentationState": "economy-system-governed"
+      }
+    }
+  ]
+}
