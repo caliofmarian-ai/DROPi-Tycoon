@@ -114,6 +114,8 @@ def node_key(node):
 
 def audit_country(cid, name, nodes, coverage_gap=False):
     reasons = []
+    if not str(cid).isdigit():
+        reasons.append('unstable/non-numeric geometry ID')
     if len(nodes) > 9:
         reasons.append('more than 9 nodes')
     if len({node_key(node) for node in nodes}) != len(nodes):

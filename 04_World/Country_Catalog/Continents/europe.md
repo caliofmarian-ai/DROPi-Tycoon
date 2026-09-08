@@ -12,8 +12,8 @@ Parent: #446
 ## Chapter summary
 - countries/territories: **37**
 - representative nodes: **274**
-- structural PASS: **37**
-- REVIEW: **0**
+- structural PASS: **36**
+- REVIEW: **1**
 - documented GAP: **0**
 
 ## Country-by-country manifest
@@ -38,7 +38,7 @@ Parent: #446
 | 352 | Iceland | Reykjavik | 8 | CAPITAL, N, E, S, W, NE, SW, NW | **PASS** | structural/source checks passed |
 | 372 | Ireland | Dublin | 9 | CAPITAL, N, E, S, W, NE, SE, SW, NW | **PASS** | structural/source checks passed |
 | 380 | Italy | Rome | 9 | CAPITAL, N, E, S, W, NE, SE, SW, NW | **PASS** | structural/source checks passed |
-| None | Kosovo | Pristina | 3 | CAPITAL, N, S | **PASS** | structural/source checks passed |
+| None | Kosovo | Pristina | 3 | CAPITAL, N, S | **REVIEW** | unstable/non-numeric geometry ID |
 | 428 | Latvia | Riga | 6 | CAPITAL, N, E, W, NE, SW | **PASS** | structural/source checks passed |
 | 440 | Lithuania | Vilnius | 5 | CAPITAL, N, E, W, NE | **PASS** | structural/source checks passed |
 | 442 | Luxembourg | Luxembourg | 3 | CAPITAL, N, E | **PASS** | structural/source checks passed |
