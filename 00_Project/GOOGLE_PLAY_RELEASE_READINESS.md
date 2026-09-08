@@ -1,796 +1,658 @@
 # DROPi Tycoon — Google Play / Android Release Readiness
 
-**Owner lane:** Agent 14 — Google Play / Android Release / Store Compliance  
-**Verified:** 2026-09-08  
-**Repository:** `caliofmarian-ai/DROPi-Tycoon`  
-**Audited main:** `8e340b7131c4bdc890c38ba34e88d94858897cb3`  
-**Primary platform:** Android, landscape  
-**Authoritative gameplay runtime:** Phaser  
-**Mobile shell:** React Native / Expo  
-**Distribution target:** Google Play  
+**Owner lane:** Agent 14 — Google Play / Android Release / Store Compliance
+**Verified:** 2026-09-09
+**Repository:** `caliofmarian-ai/DROPi-Tycoon`
+**Audited main:** `8e340b7131c4bdc890c38ba34e88d94858897cb3`
+**Primary platform:** Android, landscape
+**Authoritative gameplay runtime:** Phaser
+**Mobile shell:** React Native / Expo
+**Distribution target:** Google Play
 
-This file is the canonical release-readiness checklist for moving DROPi Tycoon from a validated Git commit to a Play-distributed Android release.
-
-It is an engineering/compliance control document, not legal advice. Privacy, minors, consumer-protection, account/data-retention, intellectual-property and commercial terms that require legal interpretation must receive Agent 13 review and, where Agent 13 flags it, qualified professional legal review before commercial launch.
+This is the canonical engineering and store-compliance control document for moving DROPi Tycoon from a validated Git commit to a Play-distributed Android release. It is not legal advice. Agent 13 owns privacy/legal analysis and must identify matters requiring qualified professional counsel before commercial launch.
 
 ---
 
-## 1. Executive status
+## 1. Current state
 
-### Current Play readiness: **40%**
+### Play readiness: **40%**
 
-This is a project readiness score, not a Google-generated score.
+This is a repository readiness score, not a Google-generated score.
 
 | Domain | Weight | Current score | Weighted result | Main reason |
 |---|---:|---:|---:|---|
-| App identity / versioning | 15% | 85% | 12.75 | Package, name, version and EAS identity exist; Play developer/account state is unverified. |
-| Build / artifact readiness | 25% | 50% | 12.50 | Production AAB profile and API-36-capable SDK exist; production runtime is still remote-Railway, lockfile is missing, final AAB has not been attested. |
-| Policy / App Content | 25% | 20% | 5.00 | No publishable privacy policy, Data Safety, target audience, IARC, ads declaration or final permission declaration exists yet. |
-| Store listing | 15% | 20% | 3.00 | Approved brand sources exist; Play-specific dimensions, feature graphic, screenshots and listing copy are incomplete/unverified. |
-| Testing | 10% | 30% | 3.00 | Preview Android testing exists, but no Play internal/closed/pre-launch release evidence or complete device matrix exists. |
-| Release / monitoring / rollback | 10% | 35% | 3.50 | Version ledger exists; production track, vitals gate and rollback evidence do not. |
+| App identity / versioning | 15% | 85% | 12.75 | Package, name, version and EAS identity exist; Play account state is unverified. |
+| Build / artifact readiness | 25% | 50% | 12.50 | Production AAB profile exists; production runtime is still remote-WebView, mobile lockfile is missing, final AAB is unattested. |
+| Policy / App Content | 25% | 20% | 5.00 | Privacy policy, Data Safety, audience, IARC and declarations are incomplete. |
+| Store listing | 15% | 20% | 3.00 | Approved brand sources exist; compliant export pack and truthful release screenshots remain incomplete. |
+| Testing | 10% | 30% | 3.00 | Physical preview testing exists; no Play internal/closed/pre-launch release evidence exists. |
+| Release / monitoring / rollback | 10% | 35% | 3.50 | Version ledger exists; production/vitals/rollback evidence does not. |
 | **Total** | **100%** |  | **39.75 ≈ 40%** |  |
 
-### Current release verdict
+**Current verdict: NOT READY FOR GOOGLE PLAY PRODUCTION.**
 
-**NOT READY FOR GOOGLE PLAY PRODUCTION.**
+### Already implemented
 
-The project has a real Android foundation rather than a placeholder, but it still has production-architecture, reproducibility, Play-account, policy, testing and store-listing blockers.
+- App name: `DROPi Tycoon`.
+- Android package/application ID: `com.dropi.tycoon`.
+- Expo slug: `dropi-tycoon`.
+- Android-only Expo shell.
+- Landscape configuration and runtime landscape lock.
+- EAS project ID: `972b831b-78d0-46ab-8cb8-2b13745a8df7`.
+- Semantic version starts at `0.0.0` and is validated between `app.json` and `package.json`.
+- Android `versionCode` is governed remotely by EAS and auto-incremented.
+- Development and preview profiles build APKs.
+- Production profile is configured as `android.buildType: app-bundle`.
+- Phaser remains authoritative; React Native/Expo is the native shell.
+- Android Back integration exists.
+- Owner-approved launcher/logo/splash sources exist.
+- A controlled preview APK exists in the mobile build ledger, but it is not a Play production AAB attestation.
 
-### Focused blocker issues
+### Prototype-only / incomplete
+
+- `game-mobile/App.tsx` currently loads `runtime.gameUrl` in `react-native-webview`.
+- `game-mobile/src/runtimeConfig.ts` requires `EXPO_PUBLIC_DROPITYCOON_GAME_URL` over HTTPS.
+- Therefore ordinary startup still depends on a remote public webpage rather than a bundled Phaser document.
+- `game-mobile/package-lock.json` is absent.
+- No canonical production AAB build ID/hash/manifest/ABI/permission attestation exists.
+- Play App Signing state is unknown from repository evidence.
+- Developer account type, creation date, identity verification, production access and package registration are unknown from repository evidence.
+- No publishable DROPi Tycoon privacy policy is present on audited `main`.
+- Data Safety, ads declaration, target audience and IARC content rating are incomplete.
+- No Play internal/closed/pre-launch release evidence exists.
+- Store listing exports and release-candidate screenshots are incomplete.
+
+---
+
+## 2. Focused blocker issues and cross-agent reconciliation
+
+Agent 14 created only the release-specific issues needed for this lane:
 
 - #567 — bundle the Phaser runtime inside the production Android app;
 - #568 — produce a reproducible Play AAB and release attestation;
 - #569 — complete privacy, Data Safety and App Content declarations;
-- #570 — produce the compliant Play listing asset/metadata pack;
-- #571 — complete Play Console verification, signing and test-to-production gate.
+- #570 — technical/policy-compliant Play listing pack;
+- #571 — owner/account-specific Play verification, signing, testing and production-access gate.
 
-No substantial mobile architecture change belongs in the initial Agent 14 audit PR. #567 owns that dedicated implementation slice.
+Specialist issues created after the first audit are dependencies, not duplicates:
 
----
+- #560 — authenticated public-profile authority before durable online identity. This becomes a Play privacy/security dependency if online identity is activated for the submitted release.
+- #561 — Agent 15 truthful Google Play creative capture pack. This owns creative production; #570 remains Agent 14's technical/store compliance gate and should consume #561 rather than duplicate it.
+- #562 — Agent 13 account deletion, retention and data-rights lifecycle. If production account creation is enabled, #569 cannot close until this lifecycle is implemented and reflected in Play declarations.
+- #564 — Agent 13 UGC/chat safety gate. If multiplayer chat/UGC is enabled, it becomes a release blocker; otherwise the release record must explicitly state chat/UGC is absent.
+- #565 — Agent 13 third-party notices and runtime asset/data provenance release gate. This is a commercial-release blocker because Play listing rights, OSM/GeoNames attribution and dependency licensing must match the shipped artifact.
+- #566 — Agent 16 active player/mission/cargo save-load continuity. This is an Android release-quality blocker because process kill/relaunch, upgrade and save/restore must not lose active authoritative state.
 
-## 2. Audit scope and coordination
+Agent 4 owns CI/Railway and currently has active work in PR #549. Agent 14 must not modify `.github/workflows/**`, Railway configuration or production deployment topology in this audit PR.
 
-The audit covered:
+Agent 12 owns monetization strategy. Agent 14 only owns the Play-compliance gate for any ads, digital purchases or subscriptions that Agent 12 later activates.
 
-- latest `main`;
-- latest 30 merged PRs available at audit time;
-- current open PRs;
-- active agent branches;
-- #295 Android application foundation;
-- #317 owner quality gate;
-- `game-mobile/`;
-- Expo/EAS configuration;
-- Android identity/versioning assumptions;
-- mobile dependencies and runtime loading;
-- current branding assets;
-- privacy/account/chat/analytics/ads/billing surfaces in current canon/runtime;
-- signing/secret boundaries;
-- current official Google Play / Android release requirements.
+Agent 13 owns privacy/legal analysis. Agent 14 owns Play Console completeness and binary/backend-to-declaration consistency.
 
-### Active coordination boundaries at audit time
+Agent 15 owns store positioning and creative production. Agent 14 owns asset dimensions, metadata limits, truthfulness and technical compliance.
 
-Agent 4 has active CI/Railway work in PR #549. This release-readiness slice therefore does **not** modify `.github/workflows/**`, Railway configuration, production Docker configuration or deployment topology.
-
-Agent 12 owns monetization strategy. Agent 14 only defines the Play-compliant release gate for digital purchases/ads/subscriptions.
-
-Agent 13 owns privacy/legal/compliance analysis. Agent 14 owns the requirement that Play declarations match the actual submitted artifact and backend behavior.
-
-Agent 15 owns marketing/creative store positioning. Agent 14 owns the technical dimensions, policy constraints and truthfulness gate for store assets.
-
-Agent 16 should independently verify the final release candidate before production.
+Agent 16 independently audits the release candidate before production.
 
 ---
 
-## 3. Current Android implementation state
+## 3. Current official Google Play / Android requirements
 
-### Implemented and usable
-
-| Area | State | Evidence / implication |
-|---|---|---|
-| App name | PASS | `DROPi Tycoon` in `game-mobile/app.json`. |
-| Expo slug | PASS | `dropi-tycoon`. |
-| Android package | PASS | `com.dropi.tycoon`. Treat this as immutable after Play publication except through an intentionally new app identity. |
-| URL scheme | PASS | `dropitycoon`. |
-| Platform | PASS | Android only in Expo platform configuration. |
-| Orientation | PASS | Landscape locked in Expo configuration. |
-| Expo/EAS project identity | PASS | EAS project ID `972b831b-78d0-46ab-8cb8-2b13745a8df7`. |
-| Semantic version | PASS / PRE-1.0 | `0.0.0` synchronized between `app.json` and `package.json`. |
-| Android versionCode policy | PASS | EAS remote app version source + `autoIncrement: true`; do not hardcode `android.versionCode` while this policy remains canonical. |
-| Preview build | PASS as prototype evidence | Build record exists for `0.0.0`, versionCode 2, EAS preview APK. This is not a Play production AAB attestation. |
-| Production build profile | PASS configuration | `eas.json` uses `android.buildType: app-bundle` for `production`. |
-| Target API baseline | EXPECTED PASS | Expo SDK 57 official platform table reports `compileSdkVersion=36`, `targetSdkVersion=36`. Final AAB still must be inspected. |
-| Minimum Android baseline | EXPECTED | Expo SDK 57 supports Android 7+; record the exact generated `minSdkVersion` from the final AAB before release. |
-| Phaser authority | PASS architecture intent | Phaser remains authoritative; React Native is the native shell. |
-| Android Back integration | IMPLEMENTED | Existing mobile shell routes Back behavior into game navigation. Release candidate must re-test it. |
-| Branding sources | PARTIAL | Owner-approved launcher/logo/splash files exist; store-specific dimensions/format compliance are not yet proven. |
-
-### Prototype-only / incomplete
-
-| Area | State | Release consequence |
-|---|---|---|
-| Production runtime loading | **BLOCKER** | `App.tsx` currently loads an HTTPS `gameUrl` in WebView; `runtimeConfig.ts` requires `EXPO_PUBLIC_DROPITYCOON_GAME_URL`. Ordinary production startup therefore still depends on the public Railway webpage. See #567. |
-| Dependency lockfile | **BLOCKER** | `game-mobile/package-lock.json` is absent even though the mobile release README requires a committed lockfile for controlled EAS builds. See #568. |
-| Production AAB evidence | **BLOCKER** | No canonical production AAB build ID/hash/manifest/ABI/permission attestation exists. See #568. |
-| Play signing | **BLOCKER / OWNER STATE UNKNOWN** | Repository cannot prove Play App Signing enrollment or upload-key state. See #571. |
-| Play developer verification | **BLOCKER / OWNER STATE UNKNOWN** | Account identity/contact/package registration status must be checked in Play Console. See #571. |
-| Privacy policy | **BLOCKER before closed/public Play track** | No publishable DROPi Tycoon privacy policy found on `main`. See #569. |
-| Data Safety | **BLOCKER before closed/public Play track** | Not completed. See #569. |
-| IARC content rating | **BLOCKER** | Not completed. See #569. |
-| Target audience | **BLOCKER** | Not selected. See #569. |
-| Ads declaration | **BLOCKER declaration** | Current code audit found no AdMob/current ads SDK, but Play declaration still must be completed from the final artifact. See #569. |
-| Store listing | **BLOCKER** | Feature graphic, authentic release screenshots, final copy, support details and privacy URL incomplete. See #570. |
-| Play testing tracks | **BLOCKER** | No evidence of internal/closed test, pre-launch report or production access. See #571. |
-
-### Current privacy / monetization / social observations
-
-At `main` audited on 2026-09-08:
-
-- mobile dependencies do not include an ad SDK, analytics SDK or Play Billing SDK;
-- `game-web` runtime dependencies are Phaser and PostgreSQL client only;
-- player analytics are described as future/staged in project documents, not active telemetry;
-- multiplayer chat/UGC is described as future/staged and is not an active current release feature;
-- Better Auth / production account creation / email-password-social login are explicitly not activated in current technical canon;
-- a local World Instance/account identity model exists, but it is not proof of authentication or production user-account creation.
-
-These observations are **not** permission to permanently answer Play forms “No.” The Data Safety/App Content audit must be repeated against the exact release candidate, all bundled SDKs and all active backend/network behavior.
-
----
-
-## 4. Current official Google Play / Android requirements
-
-All requirements below were re-checked against official Google/Android/Expo documentation on **2026-09-08**.
+Requirements below were rechecked against official Google/Android documentation on **2026-09-09**. Re-check them again immediately before any production submission.
 
 ### Target API
 
-For ordinary phone/tablet apps, new apps and updates submitted from **2026-08-31** must target **Android 16 / API 36 or higher**.
+Starting **2026-08-31**, ordinary new phone/tablet apps and app updates submitted to Google Play must target **Android 16 / API level 36 or higher**.
 
-Current Expo SDK 57 documentation reports `targetSdkVersion=36` and `compileSdkVersion=36`, so the selected SDK is capable of compliance. The final submitted AAB remains authoritative and must be inspected.
+Expo SDK 57 is API-36-capable, but source configuration is not final proof. #568 must inspect the actual release AAB and record target, compile and minimum SDK values.
 
-### Android App Bundle
+### Android App Bundle and signing
 
-New Play apps must publish with an **Android App Bundle (`.aab`)**. DROPi Tycoon already configures EAS `production` for `app-bundle`, but a release AAB has not yet been attested.
+New Play apps use Android App Bundles. The repository already configures EAS production builds as `.aab`.
 
-### Play App Signing
+A production candidate still requires:
 
-Play App Signing is required for new apps using AABs. Private app signing keys, upload keys, keystores and passwords must never be committed.
+- exact source SHA;
+- exact semantic version and monotonic versionCode;
+- production EAS build ID;
+- AAB SHA-256;
+- final package ID;
+- merged permissions;
+- ABI/native-library inventory;
+- 64-bit compatibility;
+- 16 KB page-size compatibility;
+- upload certificate SHA-256;
+- Play App Signing enrollment/state.
 
-### 64-bit
-
-Apps containing native code must support Play's 64-bit requirements. React Native/Expo includes native components, so the final AAB must be inspected rather than assuming compatibility from JavaScript source.
-
-### 16 KB memory page sizes
-
-The current Android compatibility documentation says apps targeting API 35+ must support 16 KB memory page sizes on 64-bit devices and identifies **2027-02-01** as the current update-release enforcement milestone for incompatible updates. DROPi Tycoon should verify support now in #568 rather than wait for enforcement.
+Never commit app-signing keys, upload private keys, keystores, passwords, service-account credentials, Play tokens or credential exports.
 
 ### Newer personal developer account testing
 
 Do not assume this applies to the owner.
 
-If the Play Console account is **Personal** and was created after **2023-11-13**, current production-access rules require:
+If and only if the Play developer account is **Personal** and was created after **2023-11-13**, current Google Play guidance requires:
 
+- app setup completed;
 - a closed test;
-- at least **12 testers**;
-- testers continuously opted in for **at least 14 days**;
-- then an application for production access with Play's testing/app/readiness questions.
+- at least **12 testers** continuously opted in for **at least 14 days**;
+- then an application for production access with truthful testing/app/readiness answers.
 
-Internal testing is recommended but does not replace this requirement for an affected account. Open testing becomes available after production access under the current rule.
+Internal testing is recommended but does not replace that closed-test requirement for affected accounts. Open testing becomes available after production access under the current rule.
 
-### Android developer verification — September 2026
+### Android developer verification / package registration
 
-Google states that effective **2026-09-30**, Play packages must be registered for Android developer verification. Google attempts to auto-register most Play apps, but the owner must verify the actual state for `com.dropi.tycoon` in Play Console. Identity verification must also be complete.
+Google's current Play guidance requires developer identity verification and package-name registration. Effective **2026-09-30**, Play packages must be registered under the Android developer verification requirements. Google attempts to auto-register eligible Play packages, but `com.dropi.tycoon` must be confirmed in the owner's Play Console rather than assumed from Git.
 
-### Data Safety
+### Data Safety and privacy policy
 
-Data Safety is required for apps published on **closed, open or production** tracks. Apps active exclusively on internal testing are exempt. Even an app that collects no user data must complete the form and provide a privacy-policy link.
+Apps published on closed, open or production tracks must complete Data Safety. Apps exclusively active on internal testing are exempt. Even an app that collects no user data must complete the form and provide a privacy-policy link.
+
+The final declaration must be built from the exact production artifact, all SDKs and every active backend/network flow. Repository absence of an analytics/ad SDK is evidence, not permanent permission to answer future Play forms “No.”
 
 ### Account deletion
 
-If the submitted app allows users to create an account in-app, it must provide a readily discoverable account-deletion request path **inside the app and outside the app through a web resource**. Associated user data must be deleted except for transparently disclosed legitimate retention.
+If the submitted app allows in-app account creation, account deletion must be readily discoverable inside the app and through an external web resource. Associated user data must be deleted except where legitimate retention is transparently disclosed.
 
-Current `main` does not activate production account creation, so this is currently conditional. It becomes a hard release blocker if account creation lands before the release candidate.
+Current audited `main` does not activate production account creation. This requirement becomes a hard blocker if account creation lands before release. #562 and #569 govern the dependency.
 
-### Content rating / audience / ads
+### Content rating, audience and ads
 
-- every Play app must have an IARC content rating;
-- target age groups must be declared;
-- including children in the target audience invokes additional Families policy obligations;
-- Play Console requires a declaration whether the app contains ads;
-- ads, if added, must comply with the app's content rating and applicable audience rules.
+Before release:
+
+- complete IARC content rating from actual submitted content;
+- deliberately select target age groups;
+- satisfy Families requirements if child age groups are included;
+- declare whether the app contains ads;
+- re-audit audience/rating/Data Safety whenever monetization or social features change.
 
 ### Permissions
 
-Sensitive/high-risk permissions must be necessary for current, disclosed core functionality. Play may require a permission declaration, reviewer instructions and video evidence. DROPi Tycoon must not request permissions “for future use.”
-
-Current `app.json` has no explicit dangerous-permission request, but the generated `android/` directory is intentionally not committed, so the final merged permission set must be read from the release AAB.
+Every permission in the final AAB must have a current core-use requirement. Remove unjustified sensitive/high-risk permissions. Do not request permissions for speculative future features.
 
 ### Digital purchases / subscriptions
 
-If Agent 12 activates in-app payment for digital items, virtual currency, game features or subscriptions in the Play-distributed app, the release must use Google Play's billing system except where a specific current policy exception/program lawfully applies. Do not implement a payment shortcut intended to bypass Play policy.
+If the Play-distributed app sells digital goods, virtual currency, game features or subscriptions, use Google Play's billing system where current policy requires it. Do not add a payment shortcut intended to bypass Play policy.
 
-Billing is not active in the audited current mobile dependency set, so it is a **conditional future release blocker**, not a reason to add Billing prematurely.
+Billing is not active in the audited mobile dependency set, so it is a conditional future blocker, not a reason to add Billing prematurely.
 
-### Pre-launch report and Android vitals
+### Third-party rights and notices
 
-Play pre-launch reports are automatically generated for eligible uploaded artifacts and can detect stability, Android compatibility, performance and accessibility problems. Landscape-locked apps are supported.
-
-Current Android vitals bad-behavior thresholds include:
-
-- user-perceived ANR rate: **0.47% overall**, 8% per phone model;
-- user-perceived crash rate: **1.09% overall**, 8% per phone model.
-
-Release monitoring must use real Play data; do not fabricate “pass” metrics before enough data exists.
+#565 must be complete before commercial publication. Store screenshots, listing text, shipped assets and runtime data must not imply rights the project does not possess. OSM/GeoNames and other required attribution/notices must be preserved in a release-appropriate form.
 
 ---
 
-## 5. Canonical Play Console release checklist
+## 4. Canonical Play Console checklist
 
-A release may only be marked `PLAY_READY` when all applicable boxes are complete.
+A release may be marked `PLAY_READY` only when all applicable items below are complete.
 
-### A. App identity
+### App identity
 
-- [x] App name: `DROPi Tycoon`.
-- [x] Package/application ID: `com.dropi.tycoon`.
-- [x] Expo slug: `dropi-tycoon`.
-- [x] Android-only mobile shell configured.
-- [x] Landscape orientation configured.
-- [x] EAS project ID recorded.
-- [x] `versionName` source controlled by `app.json` / `package.json` semantic version.
-- [x] `versionCode` governed remotely by EAS with auto-increment.
+- [x] App name `DROPi Tycoon`.
+- [x] Package `com.dropi.tycoon`.
+- [x] Expo slug `dropi-tycoon`.
+- [x] Android-only shell.
+- [x] Landscape configuration.
+- [x] EAS project identity recorded.
+- [x] Semantic version validation exists.
+- [x] Remote monotonic Android versionCode policy exists.
 - [ ] Developer account type confirmed in Play Console.
+- [ ] Account creation date confirmed if relevant to personal-account testing rules.
 - [ ] Developer identity/contact verification confirmed.
-- [ ] Package registration for `com.dropi.tycoon` confirmed.
+- [ ] `com.dropi.tycoon` package registration confirmed.
 - [ ] Public developer/store contact details finalized.
 
-### B. Build / artifact
+### Build / AAB
 
-- [x] EAS `production` profile produces AAB by configuration.
-- [x] Expo SDK 57 selected; official SDK table is API-36 capable.
+- [x] EAS `production` profile configured as app-bundle.
+- [x] Selected Expo SDK is API-36-capable.
 - [ ] `game-mobile/package-lock.json` committed and clean `npm ci` reproducible.
 - [ ] Production Phaser runtime bundled; ordinary startup independent of the public Railway webpage.
-- [ ] Exact release commit frozen and recorded.
-- [ ] Production EAS AAB produced from that commit.
+- [ ] Exact release SHA frozen.
+- [ ] Production AAB produced from exact SHA.
 - [ ] AAB SHA-256 recorded.
-- [ ] EAS build ID recorded.
-- [ ] Package ID verified from final artifact.
-- [ ] `versionName` verified from final artifact.
-- [ ] monotonic `versionCode` verified from final artifact.
-- [ ] target SDK verified >=36 for current submission requirements.
-- [ ] compile SDK recorded.
-- [ ] min SDK recorded.
-- [ ] merged permissions recorded.
-- [ ] no unjustified sensitive/high-risk permission.
-- [ ] release build non-debuggable.
-- [ ] no development-client/debug-only runtime surface in release artifact.
-- [ ] 64-bit support verified.
-- [ ] 16 KB page-size compatibility verified for native libraries.
-- [ ] App Bundle Explorer shows intended device compatibility.
-- [ ] Bundle size reviewed; if Play delivery limits are exceeded, use an approved Play delivery mechanism rather than arbitrary external asset downloading.
-- [ ] JavaScript/native symbolication/source-map handling documented where needed for actionable crash diagnostics.
+- [ ] EAS production build ID recorded.
+- [ ] Final package ID verified.
+- [ ] `versionName` verified.
+- [ ] monotonic `versionCode` verified.
+- [ ] target SDK verified compliant with current Play deadline.
+- [ ] compile SDK and min SDK recorded.
+- [ ] merged permissions recorded and justified.
+- [ ] release artifact is non-debuggable.
+- [ ] no dev-client/debug-only surface ships in production.
+- [ ] 64-bit compatibility verified.
+- [ ] 16 KB page-size compatibility verified.
+- [ ] App Bundle Explorer compatibility reviewed.
+- [ ] source maps/symbolication strategy sufficient for actionable crash diagnosis.
 
-### C. Signing / credentials
+### Signing / security
 
 - [ ] Play App Signing configured.
-- [ ] Upload-key ownership/recovery process documented outside Git.
-- [ ] Upload certificate SHA-256 recorded as public evidence only.
-- [x] `.gitignore` rejects common AAB/APK/signing/service-account artifacts in the mobile directory.
-- [ ] Secret scan confirms no keystore, private key, password, service-account credential or Play token in Git history/release branch.
-- [ ] Any Play Developer API service account, if later used, stored only in approved secret storage.
+- [ ] Upload-key ownership and recovery process controlled outside Git.
+- [ ] Public upload certificate fingerprint recorded without private material.
+- [x] Mobile `.gitignore` rejects common AAB/APK/signing/credential artifacts.
+- [ ] Secret scan confirms no signing/Play credentials in release branch/history.
+- [ ] Any later Play API service account remains in approved secret storage only.
 
-### D. Policy / App Content
+### Privacy / App Content
 
-- [ ] Stable HTTPS privacy-policy URL.
-- [ ] Privacy policy matches actual production data flow and SDKs.
-- [ ] Data Safety completed from final artifact/backend behavior.
-- [ ] Ads declaration completed and accurate.
-- [ ] Target audience/age groups selected deliberately.
-- [ ] Families requirements satisfied if any child age group is included.
-- [ ] IARC content-rating questionnaire completed accurately.
-- [ ] App access/reviewer credentials supplied if restricted content exists.
-- [ ] Final AAB permissions reconciled with Play declarations.
-- [ ] Account-deletion path complete if in-app account creation exists.
-- [ ] UGC/chat moderation/report/block requirements complete if UGC/chat exists.
-- [ ] News/financial/other special declarations answered only if actually applicable to release content.
-- [ ] Agent 13 legal/privacy launch review complete.
+- [ ] Stable public HTTPS privacy-policy URL.
+- [ ] Agent 13 production data-flow and retention review complete.
+- [ ] Data Safety matches exact binary/backend behavior.
+- [ ] Ads declaration accurate.
+- [ ] Target audience selected deliberately.
+- [ ] Families requirements complete if applicable.
+- [ ] IARC completed accurately.
+- [ ] Reviewer access instructions supplied if restricted content exists.
+- [ ] Final permission list reconciled with Play declarations.
+- [ ] #562 deletion/retention lifecycle complete if account creation exists.
+- [ ] #564 moderation/report/block controls complete if UGC/chat exists.
+- [ ] #565 licensing/attribution gate complete.
 
-### E. Monetization
+### Monetization
 
-- [ ] Agent 12 release monetization scope frozen for the candidate.
-- [ ] If no paid digital content exists, no unused Billing implementation is added merely for future use.
-- [ ] If digital purchases/subscriptions exist, compliant Play billing architecture is implemented and tested.
-- [ ] Server-side purchase verification/entitlement state is authoritative where purchases exist.
-- [ ] Refund/cancel/revoke/restore behavior tested where applicable.
-- [ ] Data Safety/privacy/ads/audience declarations re-audited after monetization SDK additions.
+- [ ] Agent 12 release monetization scope frozen for candidate.
+- [ ] No unused Billing implementation added merely for future use.
+- [ ] If digital purchases/subscriptions exist, compliant billing is implemented and tested.
+- [ ] Purchase verification and entitlement authority are trustworthy where applicable.
+- [ ] Refund/cancel/revoke/restore paths tested where applicable.
+- [ ] Privacy/Data Safety/audience re-audited after monetization SDK changes.
 
-### F. Store listing
+### Store listing
 
-- [ ] Play icon: 512x512, 32-bit PNG with alpha, <=1024 KB.
-- [ ] Feature graphic: 1024x500, JPEG or 24-bit PNG without alpha.
-- [ ] Minimum two valid screenshots overall.
-- [ ] For this game, at least three authentic 16:9 landscape gameplay screenshots at >=1920x1080 prepared for Google's recommended game presentation.
-- [ ] Tablet/large-screen screenshot set prepared if tablet distribution/promotion is retained and the app is genuinely tablet-compatible.
-- [ ] Screenshots depict the actual submitted game, not mock future systems.
-- [ ] Alt text supplied where supported/recommended.
 - [ ] App title <=30 characters.
 - [ ] Short description <=80 characters.
 - [ ] Full description <=4000 characters.
-- [ ] No unverifiable “best/#1/top/new/free/download-count/award” claims.
+- [ ] Play app icon 512x512, 32-bit PNG with alpha, <=1024 KB.
+- [ ] Feature graphic 1024x500, JPEG or 24-bit PNG without alpha.
+- [ ] Minimum two valid screenshots overall.
+- [ ] For this landscape game, prepare at least three authentic 16:9 gameplay screenshots at >=1920x1080 as the baseline recommendation.
+- [ ] #561 creative capture pack reconciled with #570 technical compliance gate.
+- [ ] Tablet/large-screen screenshot set prepared if genuine tablet distribution/promotion is retained.
+- [ ] Screenshots depict the submitted build, not roadmap mockups.
+- [ ] Alt text supplied where supported/recommended.
 - [ ] Support/contact details complete.
 - [ ] Privacy-policy link complete.
-- [ ] Preview video decision recorded; if used, meets current YouTube/Play requirements and shows predominantly real gameplay.
-- [ ] Third-party IP/licensing/attribution cleared with Agent 13 where required.
-
-### G. Testing
-
-- [ ] Clean fresh install from Play internal track.
-- [ ] Upgrade from previous Play-delivered test build.
-- [ ] Cold launch.
-- [ ] Warm launch/resume.
-- [ ] Android Back.
-- [ ] Landscape lock / orientation behavior.
-- [ ] Insets/safe areas.
-- [ ] Touch controls.
-- [ ] Pinch/zoom.
-- [ ] Camera/navigation behavior.
-- [ ] Save state across app kill/relaunch.
-- [ ] Background/foreground transition.
-- [ ] Offline startup behavior.
-- [ ] Network loss during session.
-- [ ] Network recovery.
-- [ ] Low-memory/process recreation behavior where practical.
-- [ ] Performance/frame pacing on owner device.
-- [ ] Memory pressure reviewed.
-- [ ] At least one modern 64-bit-only device/environment test.
-- [ ] 16 KB page-size environment test where practical.
-- [ ] Phone compatibility range reviewed in App Bundle Explorer.
-- [ ] Tablet/large-screen behavior tested if distributed there.
-- [ ] Play pre-launch report reviewed: stability, compatibility, performance, accessibility.
-- [ ] No release-blocking crash/ANR issue remains.
-- [ ] Closed-test requirement completed if owner account is subject to it.
-
-### H. Release control
-
-- [ ] Release notes written from actual changes.
-- [ ] Release candidate SHA/AAB hash/Play version recorded.
-- [ ] Policy declarations rechecked after final artifact upload.
-- [ ] Country availability explicitly reviewed.
-- [ ] Managed publishing decision recorded.
-- [ ] First-production-release limitation understood: staged rollout percentages are not available for the first production release.
-- [ ] Subsequent updates use staged rollout unless release owner records a reason not to.
-- [ ] Android vitals monitored after release.
-- [ ] Crash/ANR/user feedback monitored.
-- [ ] Rollback/halt path documented and owner knows the Play Console location.
+- [ ] Preview video decision recorded; if used, it is truthful and predominantly real gameplay.
+- [ ] #565 third-party rights/attribution complete.
 
 ---
 
-## 6. Build pipeline — canonical target
+## 5. Build pipeline
 
 ### Current first-stage path
 
 ```text
 GitHub main
-  -> game-web Phaser/Vite runtime
-  -> Railway public webpage
+  -> Phaser/Vite runtime
+  -> public Railway webpage
   -> Expo/React Native WebView
-  -> installed Android APK/AAB shell
+  -> installed Android shell
 ```
 
-This is acceptable for development/preview but is **not** the canonical long-term production startup architecture.
+This is acceptable for development/preview. It is not the canonical final production startup architecture.
 
 ### Required production path
 
 ```text
-GitHub main (frozen release SHA)
+GitHub main / frozen release SHA
   -> deterministic game-web production build
-  -> Phaser web assets bundled into game-mobile production artifact
-  -> clean dependency-locked Expo/EAS build
-  -> signed production AAB
-  -> artifact attestation (SHA, version, SDK, permissions, ABI, signing certificate)
-  -> Google Play internal test
-  -> Play pre-launch report + owner device matrix
+  -> Phaser web assets bundled into game-mobile
+  -> dependency-locked clean mobile build
+  -> EAS production AAB
+  -> artifact attestation
+  -> Google Play internal track
+  -> App Bundle Explorer + pre-launch report
+  -> owner Android landscape matrix
   -> closed test / production-access gate when applicable
-  -> production release
+  -> final policy/listing reconciliation
+  -> owner-authorized production publication
 ```
 
-Railway can remain the authorized backend/server endpoint for server-authoritative systems. The boundary is that **the installed game's document/assets must not require the public Railway webpage just to start ordinary gameplay**.
+Railway may remain a backend/API dependency where server-authoritative systems require it. The ordinary game document/assets must not require the public Railway webpage simply to start.
 
-### Deterministic build evidence
+### Required candidate record
 
-Each Play candidate must record at least:
+Each candidate must record:
 
-- Git commit SHA;
+- source SHA;
 - semantic version;
 - Android versionCode;
-- EAS project ID;
-- EAS build profile;
-- EAS build ID;
+- EAS project/profile/build ID;
 - AAB SHA-256;
-- target/compile/min SDK;
 - package ID;
-- permission list;
-- ABI/native-library result;
+- target/compile/min SDK;
+- merged permission list;
+- ABI/native-library inventory;
+- 64-bit result;
 - 16 KB compatibility result;
-- upload certificate SHA-256;
-- Play track uploaded to;
+- public signing/upload certificate fingerprints where appropriate;
+- Play track;
 - pre-launch report outcome;
 - owner Android acceptance outcome.
 
 ---
 
-## 7. Permissions policy
+## 6. Policy dependencies
 
-Current source configuration does not declare a future-sensitive permission merely “just in case.” Preserve that principle.
-
-For every release:
-
-1. read permissions from the final AAB/Play artifact, not only `app.json`;
-2. classify each permission as normal or sensitive/high-risk;
-3. map it to a current, player-visible feature;
-4. remove it if no current feature requires it;
-5. if Play requires a declaration, provide the exact core-use-case justification and reviewer evidence;
-6. update privacy/Data Safety if data behavior changes.
-
-Do not add broad file access, installed-app visibility, SMS/call-log, location, microphone, camera, contacts or background permissions for speculative future systems.
-
-Network access needed by the game/backend is expected, but final manifest verification remains mandatory.
-
----
-
-## 8. Store asset requirements
-
-Agent 15 owns creative positioning; Agent 14 verifies these technical constraints.
-
-### Mandatory / baseline
-
-| Asset | Current Play requirement checked 2026-09-08 | DROPi state |
+| Release feature/state | Play consequence | Dependency |
 |---|---|---|
-| Play app icon | 512x512, 32-bit PNG with alpha, <=1024 KB | Owner-approved icon source exists; exact store export dimensions not yet proven. |
-| Feature graphic | 1024x500, JPEG or 24-bit PNG, no alpha | Missing/unverified. |
-| Screenshots | Minimum 2 across device types; JPEG or 24-bit PNG, 320-3840 px, max dimension <=2x min dimension | Missing release-candidate set. |
-| Game recommendation set | At least 3 authentic 16:9 landscape screenshots at minimum 1920x1080 is highly recommended for games | Missing. |
-| Large-screen set | For tablet/Chromebook promotion, Google recommends minimum 4 at 1080-7680 px, 16:9 landscape | Conditional; only from genuine large-screen-compatible build. |
-| Title | <=30 chars | `DROPi Tycoon` fits; final listing still must be submitted. |
-| Short description | <=80 chars | Missing final copy. |
-| Full description | <=4000 chars | Missing final copy. |
-| Preview video | Optional; strongly useful for games; public/unlisted embeddable YouTube, non-age-restricted, no ad interference | Not required for first release; decision pending. |
-
-All screenshots and video claims must match the submitted build. Future multiplayer, chat, global economy, monetization, story or other roadmap features must not be presented as shipped features until verified in that release candidate.
-
----
-
-## 9. Testing plan and owner Android acceptance matrix
-
-The owner-facing acceptance surface remains **physical Android landscape**.
-
-### Required minimum matrix
-
-| Test | Internal track | Closed track | Production candidate |
-|---|---:|---:|---:|
-| Fresh install | Required | Required | Required |
-| Upgrade install | Required after first test version | Required | Required for updates |
-| Cold launch | Required | Required | Required |
-| Resume | Required | Required | Required |
-| Android Back | Required | Required | Required |
-| Landscape/orientation | Required | Required | Required |
-| Safe areas/insets | Required | Required | Required |
-| Touch/tap/drag | Required | Required | Required |
-| Pinch/zoom | Required | Required | Required |
-| Save/restore | Required | Required | Required |
-| Background/foreground | Required | Required | Required |
-| Offline startup | Required | Required | Required |
-| Mid-session network loss | Required | Required | Required |
-| Network recovery | Required | Required | Required |
-| Performance/frame pacing | Baseline | Required | Required |
-| Memory pressure/process recreation | Baseline | Required | Required |
-| 64-bit-only environment | Required before production | Recheck if artifact changes | Required evidence |
-| 16 KB page-size environment | Required before enforcement / preferably now | Recheck if native deps change | Required evidence before affected release |
-| Play pre-launch report | After AAB upload | Required review | No unresolved blocker |
-| Crash/ANR review | Baseline | Required | Required |
-
-### Historical preview evidence boundary
-
-The repository contains a `0.0.0` preview APK build record and #295 records substantial physical Android foundation testing. The build record itself still labels physical validation pending. Therefore historical preview testing is valuable but **not sufficient release evidence** for a future Play AAB. The exact release candidate must be tested again.
-
-### Personal-account tester plan, if applicable
-
-If #571 confirms the owner is subject to the newer personal-account rule:
-
-- recruit more than the bare minimum where practical so a single opt-out does not break continuity;
-- ensure at least 12 remain opted in continuously for the full 14-day period;
-- give testers a concise real test script based on this matrix;
-- collect genuine feedback/issues and record changes made;
-- keep all policy/store information accurate during the closed test;
-- apply for production access only after the continuous requirement is actually met.
-
-Do not fabricate tester activity or feedback.
+| No ads | Ads declaration still required | Agent 14 + Agent 13 evidence |
+| Ads enabled | Re-audit ads policy, Data Safety, audience/rating and SDK behavior | Agent 12 + 13 + 14 |
+| No production account creation | Account-deletion rule not activated by account creation | Agent 13 + 14 confirm candidate |
+| Account creation enabled | In-app + web deletion lifecycle required | #562 + #569 |
+| No chat/UGC | UGC moderation declarations not activated | Agent 13 + 14 confirm candidate |
+| Chat/UGC enabled | Moderation/report/block/safety becomes release blocker | #564 + #569 |
+| No digital purchases | Do not add Billing speculatively | Agent 12 + 14 |
+| Digital goods/subscription enabled | Play billing compliance required where applicable | Agent 12 + 14 |
+| Online durable identity enabled | Authentication/privacy/security gate applies | #560 + Agent 13 + 14 |
+| Third-party datasets/assets shipped | License/notice/attribution gate applies | #565 |
+| Children included in audience | Families obligations activate | Agent 13 + 14 + owner |
+| Sensitive permission added | Core-use declaration/review may be required | Implementation owner + 13 + 14 |
 
 ---
 
-## 10. Signing and release security
+## 7. Store asset requirements
 
-### Never commit
+Agent 15 owns creative positioning and #561. Agent 14 verifies technical/store compliance through #570.
 
-- `.jks` / `.keystore` files;
-- signing private keys;
-- upload/app-signing private key material;
-- keystore passwords;
-- EAS credential exports;
-- Play service-account credentials;
-- OAuth/client secrets used as secrets;
-- Play Console tokens;
-- recovery codes;
-- production `.env.*` files containing secrets;
-- generated release APK/AAB binaries.
-
-The Agent 14 initial PR extends `game-mobile/.gitignore` to reject common release artifacts and credential files.
-
-### Allowed repository evidence
-
-It is safe and useful to record:
-
-- public package ID;
-- public EAS project ID;
-- public certificate SHA-256 fingerprint;
-- build ID;
-- artifact SHA-256;
-- versionCode/versionName;
-- source commit;
-- non-secret Play track/status evidence.
-
-### Key ownership
-
-Play App Signing should protect the app-signing key. The upload key still requires controlled ownership/recovery. Do not let an agent silently create a key and make itself the only holder of recovery information.
-
----
-
-## 11. Policy dependency matrix
-
-| Feature/state in release candidate | Play consequence | Owner |
+| Asset | Release requirement / baseline | Current state |
 |---|---|---|
-| No ads | Ads declaration still required; answer must match artifact | Agent 14 / Agent 13 evidence |
-| Ads added | Ads declaration, Data Safety, audience/content-rating and ad SDK compliance re-audit | Agent 12 + 13 + 14 |
-| No account creation | Account-deletion rule not triggered by account creation | Agent 13 + 14 confirm release state |
-| Account creation added | In-app + web deletion request path required; data deletion/retention policy | Agent 13 + implementation owner + 14 |
-| No chat/UGC | UGC moderation requirements not activated | Agent 13 + 14 confirm release state |
-| Chat/UGC added | Moderation/report/block and safety/legal controls become release blockers | Agent 13 + multiplayer owner + 14 |
-| No digital purchases | Do not add Billing only for future use | Agent 12 + 14 |
-| Digital products/virtual currency/subscription added | Play billing policy/integration required unless a current explicit exception/program applies | Agent 12 + 14 |
-| Children included in target audience | Families policy requirements activate | Agent 13 + 14 + owner |
-| Sensitive permission added | Core-use-case declaration/review may be required | Implementation owner + 13 + 14 |
+| Play icon | 512x512, 32-bit PNG with alpha, <=1024 KB | Owner-approved source exists; Play export not yet attested. |
+| Feature graphic | 1024x500, JPEG or 24-bit PNG without alpha | Missing/unverified. |
+| Screenshots | At least 2 valid images overall | Release-candidate set missing. |
+| Landscape game set | At least 3 authentic 16:9 gameplay screenshots at >=1920x1080 baseline | Missing. |
+| Large-screen set | Prepare only if genuine tablet/large-screen distribution is retained | Conditional. |
+| App title | <=30 chars | `DROPi Tycoon` fits. |
+| Short description | <=80 chars | Final copy pending. |
+| Full description | <=4000 chars | Final copy pending. |
+| Preview video | Optional | Decision pending. |
 
-### Professional legal review required before commercial launch for
+Truthfulness rules:
 
-At minimum, Agent 13 must decide whether counsel review is required for:
-
-- privacy-policy legal sufficiency and GDPR/EEA handling;
-- child/minor targeting or age assurance;
-- user-account deletion/retention exceptions;
-- player chat/UGC moderation terms;
-- paid digital goods/subscription consumer terms/refunds;
-- trademark/IP and third-party asset/data licensing;
-- any real-money, token, cryptocurrency or regulated financial feature if ever introduced.
+- use the actual submitted build;
+- do not show future systems as currently available;
+- do not make unsupported ranking, award, download-count, price or promotion claims;
+- do not stretch phone screenshots into fake tablet evidence;
+- preserve third-party rights and attribution from #565.
 
 ---
 
-## 12. Release tracks and production-access plan
+## 8. Release tracks and tester plan
 
 ### Internal testing
 
-Use first for Play-delivered AAB installation, package/signing, update-path, device compatibility and basic owner acceptance. Internal-only apps are currently exempt from Data Safety display requirements, making this the earliest safe Play artifact test surface.
+Use first for Play-delivered AAB installation, package/signing, update-path, device compatibility and basic owner acceptance. Internal-only distribution can begin before Data Safety is required for a closed/public track.
 
 ### Closed testing
 
-Use after app setup/policy surfaces are complete enough for the track. Data Safety applies on closed testing.
+Use after enough app setup and policy surfaces exist. Data Safety applies.
 
-If #571 confirms the newer personal-account rule applies, this track must satisfy the 12-tester / continuous-14-day production-access requirement.
+If #571 proves the newer personal-account rule applies, closed testing must maintain at least 12 continuously opted-in testers for 14 days before production-access application. Recruit above the bare minimum where practical so one tester leaving does not break continuity. Record real feedback and actual changes; never fabricate participation.
 
 ### Open testing
 
-Current personal-account guidance says open testing becomes available after production access for affected newer personal accounts. Do not treat open testing as a substitute for the required closed test.
+For affected newer personal accounts, current guidance makes open testing available after production access. It does not substitute for the required closed test.
 
 ### Production
 
-Production is allowed only after all applicable blockers are closed and owner acceptance is recorded.
+Production is permitted only when all applicable blockers are closed and owner authorization is explicit. Do not perform Play Console publication from an agent without that owner-only authorization.
 
-**Important:** Google currently does not offer staged rollout percentages for an app's **first production release**. The first production release is published to all eligible users in the selected production countries/regions once released. Risk must therefore be reduced through internal/closed testing and controlled country availability before first public launch.
-
-For **subsequent updates**, use staged rollout and manually increase the percentage after reviewing vitals, crashes/ANRs and feedback. Do not auto-promote an unhealthy release.
+For the first production release, do not rely on a staged-percentage rollback strategy as though an older production version already exists. Reduce risk through internal/closed testing and controlled release scope. For later updates, use staged rollout where appropriate and monitor real Play health data before increasing exposure.
 
 ---
 
-## 13. Production release procedure
+## 9. Owner Android acceptance matrix
 
-### Pre-release gate
+Landscape Android remains the primary owner-facing acceptance surface.
 
-1. Freeze a candidate from current `main`; record SHA.
-2. Confirm #567 architecture is complete.
-3. Confirm #568 reproducible build/AAB attestation is complete.
-4. Confirm #569 policy/App Content is complete.
-5. Confirm #570 listing package is complete.
-6. Confirm #571 signing/account/testing gate is complete.
-7. Confirm Agent 12 monetization scope has not introduced undeclared ads/billing behavior.
-8. Confirm Agent 13 release review is complete.
-9. Run Agent 16 independent release audit.
-10. Build one final production AAB from the frozen SHA; any code/config change invalidates prior artifact evidence and requires a new build.
+The exact Play-delivered candidate must test:
 
-### Play internal/closed gate
+- fresh install;
+- upgrade from a prior Play-delivered test build;
+- cold launch;
+- warm launch/resume;
+- Android Back;
+- landscape/orientation behavior;
+- safe areas/insets;
+- touch/tap/drag;
+- pinch/zoom;
+- camera/navigation;
+- save/restore;
+- #566 active player/mission/cargo continuity;
+- background/foreground transition;
+- process kill/relaunch;
+- offline startup;
+- mid-session network loss;
+- network recovery;
+- low-memory/process recreation where practical;
+- frame pacing/performance;
+- memory pressure;
+- modern 64-bit device/environment;
+- 16 KB page-size environment where practical;
+- App Bundle Explorer compatibility;
+- tablet/large-screen behavior if distributed there;
+- pre-launch report stability/compatibility/performance/accessibility findings;
+- crash/ANR review.
 
-1. Upload the exact attested AAB.
-2. Verify App Bundle Explorer identity, SDKs, device support and warnings.
-3. Review generated pre-launch report.
-4. Complete the owner physical Android landscape matrix using the Play-delivered build.
+Historical preview APK validation is useful evidence but never substitutes for testing the exact production AAB candidate.
+
+---
+
+## 10. Signing and security
+
+### Never commit
+
+- `.jks`, `.keystore`, `.p12` or private signing material;
+- upload/app-signing private keys;
+- keystore passwords;
+- EAS credential exports;
+- Play service-account JSON/credentials;
+- OAuth/client secrets used as secrets;
+- Play Console tokens;
+- recovery codes;
+- production `.env*` files containing secrets;
+- generated APK/AAB binaries.
+
+### Safe repository evidence
+
+- package ID;
+- EAS project ID;
+- public certificate fingerprints;
+- build IDs;
+- artifact SHA-256;
+- versionName/versionCode;
+- source commit;
+- non-secret Play track/status notes.
+
+Play App Signing should protect the app-signing key. Upload-key ownership and recovery must remain controlled by the owner/project, never by an agent as the only holder.
+
+---
+
+## 11. Release blocker matrix
+
+| ID | Blocker | Severity | Internal | Closed | Production | Owner / dependency |
+|---|---|---:|---:|---:|---:|---|
+| #567 | Production still loads remote public game document | P0 | Early technical test allowed | Resolve for release-candidate testing | **Blocks** | Android/mobile implementation |
+| #568 | Missing lockfile + no production AAB attestation | P0 | Production-AAB test blocked | **Blocks** | **Blocks** | Agent 14 + Agent 4 coordination |
+| #569 | Privacy/Data Safety/App Content incomplete | P0 | Internal-only can begin | **Blocks** | **Blocks** | Agent 13 + Agent 14 |
+| #571 | Play account/signing/verification/testing state unknown | P0 | Real Play test requires app/signing setup | **Blocks** | **Blocks** | Owner + Agent 14 |
+| #562 | Account deletion/retention lifecycle | P0 if accounts activated | Conditional | **Blocks if applicable** | **Blocks if applicable** | Agent 13 |
+| #565 | Third-party notices/provenance/licensing incomplete | P0 commercial release | Does not block early technical test | Must be closed before commercial RC | **Blocks** | Agent 13 + asset/data owners |
+| #566 | Active mission/cargo/save continuity incomplete | P0 release quality | Testable | **Blocks RC acceptance** | **Blocks** | Agent 16 + gameplay/persistence owner |
+| #560 | Online identity auth/privacy incomplete | P0 if online identity activated | Conditional | **Blocks if applicable** | **Blocks if applicable** | Agent 13 + authority owner |
+| #564 | UGC/chat safety incomplete | P0 if UGC/chat activated | Conditional | **Blocks if applicable** | **Blocks if applicable** | Agent 13 + multiplayer owner |
+| #561/#570 | Store creative + technical listing pack incomplete | P1 until publication | No | Setup dependency | **Blocks listing completion** | Agent 15 + Agent 14 |
+| Conditional | Billing/ads activated without re-audit | P0 if activated | Depends | **Blocks** | **Blocks** | Agent 12 + 13 + 14 |
+
+---
+
+## 12. Production release procedure
+
+### Pre-release
+
+1. Freeze exact current `main` SHA for the candidate.
+2. Close #567 bundled-runtime requirement.
+3. Close #568 reproducible AAB/attestation requirement.
+4. Close #569 and applicable #560/#562/#564 privacy/security dependencies.
+5. Close #565 licensing/attribution gate.
+6. Close #566 save/mission/cargo continuity release gate.
+7. Complete #561 creative pack and #570 technical listing compliance.
+8. Complete #571 owner/account/signing/testing gate.
+9. Freeze Agent 12 monetization scope and re-audit any ads/billing changes.
+10. Complete Agent 13 release review.
+11. Run Agent 16 independent release audit.
+12. Build one final AAB from the frozen SHA. Any code/config change invalidates prior artifact evidence and requires a new candidate build.
+
+### Internal / closed gate
+
+1. Upload the exact attested AAB to the approved Play test track.
+2. Verify App Bundle Explorer identity, SDKs, signing, device support and warnings.
+3. Review pre-launch report.
+4. Complete the owner Android matrix using the Play-delivered build.
 5. Complete closed testing and production-access requirement if applicable.
-6. Reconcile Data Safety/App Content after the final AAB is visible in Play Console.
+6. Reconcile Data Safety/App Content with the exact uploaded artifact.
+7. Reconcile store screenshots/listing with the exact candidate.
 
 ### Production gate
 
-1. Confirm listing and country availability.
+1. Confirm listing and countries/regions.
 2. Confirm release notes.
 3. Confirm no unresolved policy warning.
-4. Confirm package registration / Android developer verification state.
-5. Confirm signing and versionCode continuity.
-6. For first release, explicitly acknowledge that staged percentage rollout is unavailable.
-7. Submit/start production publication only with owner authorization.
-8. Record release version, source SHA, AAB hash and publication status in repository release evidence.
+4. Confirm developer verification/package registration.
+5. Confirm signing/versionCode continuity.
+6. Confirm no P0 release blocker remains.
+7. Obtain explicit owner authorization for production publication.
+8. Publish through Play Console only after that authorization.
+9. Record release version, source SHA, AAB hash and publication status.
 
 ### Post-release
 
-- monitor crashes/ANRs and Android vitals;
-- inspect ratings/reviews and support feedback;
-- monitor backend health through Agent 4's operational lane;
-- do not silently change Data Safety/ads/audience claims after runtime/SDK changes;
-- use staged rollout for subsequent updates unless the release owner records a reason to use another supported Play path.
+- monitor crashes, ANRs and Android vitals;
+- inspect ratings/reviews/support feedback;
+- monitor backend health through Agent 4's lane;
+- re-open release review if SDKs, privacy behavior, billing, ads, permissions or social features change;
+- use staged rollout for later updates where appropriate and supported.
 
 ---
 
-## 14. Rollback / emergency procedure
+## 13. Rollback / emergency procedure
 
-### During a staged update rollout
+For a staged update, halt rollout when a serious regression appears so additional eligible users do not receive it.
 
-For a post-launch update, **halt the staged rollout** immediately if a serious regression appears. Users already on that update remain on it; the halt prevents additional eligible users from receiving it.
+For a release where a previous eligible version can be restored through Play's supported controls, verify the actual Play Console state before relying on rollback behavior.
 
-### After a fully rolled update
+For a critical first-production defect where no previous production version exists:
 
-Google Play now supports halting a fully rolled-out release on supported tracks when a previous eligible release exists; the previous release can resume serving new/eligible users. Verify the Play Console state before relying on this path.
+1. stop pending publication where possible;
+2. if already live and user harm warrants it, unpublish to stop new discovery/downloads;
+3. understand existing installs may continue to run;
+4. build a corrected candidate with the same package/signing identity and a greater versionCode;
+5. keep backend emergency changes in Agent 4's governed lane;
+6. repeat release attestation/policy/acceptance gates;
+7. document the incident and regression test before republishing.
 
-### First production release limitation
-
-A first release on a track has no previous version to restore and cannot use the normal “halt back to previous release” behavior. If a critical defect reaches the first production release:
-
-1. stop any pending publication where still possible;
-2. if already live and user harm warrants it, **unpublish** the app to stop new users finding/downloading it;
-3. understand that existing users can still use the installed app;
-4. build and submit a corrected version with the same package/signing identity and a greater versionCode;
-5. keep server/backend emergency changes in Agent 4's governed lane;
-6. document the incident and regression test before republishing/continuing rollout.
-
-Never attempt rollback by re-uploading a lower `versionCode` or changing the package/signing identity.
+Never attempt rollback by uploading a lower versionCode or changing package/signing identity.
 
 ---
 
-## 15. What can and cannot be automated
+## 14. What can be automated
 
-### Good automation candidates
+Good automation candidates, coordinated with Agent 4 before workflow edits:
 
 - semantic version consistency;
 - dependency-lock presence and `npm ci` reproducibility;
 - production AAB build invocation;
-- source SHA/build ID/AAB SHA recording;
-- package/version/SDK manifest extraction;
+- source SHA/build ID/AAB hash recording;
+- manifest package/version/SDK extraction;
 - permission diffing;
 - ABI/native-library inventory;
-- 64-bit/16 KB compatibility checks;
-- debug/release manifest checks;
+- 64-bit and 16 KB compatibility checks;
+- debug/release checks;
 - secret-pattern scanning;
 - unit/type/build tests;
-- Play Developer API upload/status retrieval if an explicitly authorized service account is later configured in secret storage;
+- Play API upload/status retrieval only after an explicitly authorized service account exists in secret storage;
 - Android vitals/report retrieval where APIs and authorization permit it.
 
-Agent 4 coordination is required before adding CI workflow automation.
+### Cannot be inferred or autonomously approved
 
-### Owner/manual actions that cannot be safely inferred from Git
-
-- Play developer account type and creation date;
-- legal/developer identity verification;
-- package-registration state where Play requires account UI action;
-- Play App Signing enrollment/key decisions;
-- accepting Play agreements;
-- selecting target audience and answering content-rating questionnaires truthfully;
+- Play developer account type/creation date;
+- legal/developer identity verification state;
+- owner agreements and Play App Signing decisions;
+- private signing/recovery material;
+- target audience and IARC answers;
 - final Data Safety attestation;
-- private reviewer/test credentials;
-- recruiting and retaining real closed-test users;
+- tester recruitment and genuine feedback;
 - production-access application answers;
-- owner physical-device visual/gameplay acceptance;
-- final production publication authorization.
+- owner physical-device acceptance;
+- legal representation/counsel decisions;
+- production publication authorization.
 
 Never automate policy answers from guesses.
 
 ---
 
-## 16. Official source registry — verified 2026-09-08
+## 15. Official source registry — verified 2026-09-09
 
 | Topic | Official source |
 |---|---|
 | Target API level | https://developer.android.com/google/play/requirements/target-sdk |
 | Target API Play Help | https://support.google.com/googleplay/android-developer/answer/11926878 |
-| Expo SDK 57 Android SDK table | https://docs.expo.dev/versions/latest/ |
-| Expo SDK 57 release | https://expo.dev/changelog/sdk-57 |
+| Expo SDK Android version table | https://docs.expo.dev/versions/latest/ |
 | Android App Bundle | https://support.google.com/googleplay/android-developer/answer/9844279 |
 | App Bundle architecture | https://developer.android.com/guide/app-bundle |
-| AAB / Play App Signing FAQ | https://developer.android.com/guide/app-bundle/faq |
 | Play App Signing | https://support.google.com/googleplay/android-developer/answer/9842756 |
 | 64-bit support | https://developer.android.com/google/play/requirements/64-bit |
 | 16 KB page sizes | https://developer.android.com/guide/practices/page-sizes |
-| Play technical quality / vitals thresholds | https://support.google.com/googleplay/android-developer/answer/17492799 |
-| Android vitals | https://support.google.com/googleplay/android-developer/answer/9844486 |
-| Pre-launch report | https://support.google.com/googleplay/android-developer/answer/9842757 |
 | New personal-account testing | https://support.google.com/googleplay/android-developer/answer/14151465 |
 | Internal/closed/open tests | https://support.google.com/googleplay/android-developer/answer/9845334 |
 | Data Safety | https://support.google.com/googleplay/android-developer/answer/10787469 |
 | User Data / account deletion | https://support.google.com/googleplay/android-developer/answer/10144311 |
-| App Content / review preparation | https://support.google.com/googleplay/android-developer/answer/9859455 |
+| App Content | https://support.google.com/googleplay/android-developer/answer/9859455 |
 | Permissions declaration | https://support.google.com/googleplay/android-developer/answer/9214102 |
-| Sensitive permissions/APIs policy | https://support.google.com/googleplay/android-developer/answer/16558241 |
 | Target audience | https://support.google.com/googleplay/android-developer/answer/9867159 |
 | Content ratings | https://support.google.com/googleplay/android-developer/answer/9898843 |
 | Ads policy | https://support.google.com/googleplay/android-developer/answer/9857753 |
 | Payments policy | https://support.google.com/googleplay/android-developer/answer/9858738 |
-| Payments explainer | https://support.google.com/googleplay/android-developer/answer/10281818 |
 | Play Billing | https://developer.android.com/google/play/billing |
-| Play Billing backend | https://developer.android.com/google/play/billing/backend |
 | Store listing limits | https://support.google.com/googleplay/android-developer/answer/9859152 |
 | Store preview assets | https://support.google.com/googleplay/android-developer/answer/9866151 |
-| Package-name verification | https://support.google.com/googleplay/android-developer/answer/16984799 |
+| Registering Play package names | https://support.google.com/googleplay/android-developer/answer/16984799 |
 | Android developer verification | https://developer.android.com/developer-verification |
+| Play Console verification guide | https://developer.android.com/developer-verification/guides/google-play-console |
 | Staged rollouts | https://support.google.com/googleplay/android-developer/answer/6346149 |
 | Prepare/roll out release | https://support.google.com/googleplay/android-developer/answer/9859348 |
-| Halt fully rolled release | https://support.google.com/googleplay/android-developer/answer/16285429 |
 | Update/unpublish app | https://support.google.com/googleplay/android-developer/answer/9859350 |
 
 ### Freshness rule
 
-Before every production release, Agent 14 must re-check at minimum:
+Immediately before every production release, Agent 14 must re-check at minimum:
 
 - target API deadline;
-- Play testing/production-access requirements;
-- Android developer verification requirements;
+- personal-account testing/production-access requirements;
+- Android developer verification/package-registration requirements;
 - Data Safety/App Content requirements;
-- Play Billing requirements if monetization is enabled;
+- Play Billing rules if monetization is enabled;
 - store asset dimensions/metadata rules;
-- any new technical-quality requirement shown in Play Console.
+- technical-quality requirements shown in Play Console.
 
-Do not treat this 2026-09-08 snapshot as permanently valid policy.
-
----
-
-## 17. Release blocker matrix
-
-| ID | Blocker | Severity | Blocks internal test? | Blocks closed test? | Blocks production? | Owner |
-|---|---|---:|---:|---:|---:|---|
-| #567 | Production still loads public Railway game page | P0 | No for early technical test | Should be resolved before release-candidate closed test | **Yes** | Agent 14/mobile implementation |
-| #568 | Missing lockfile + no production AAB attestation | P0 | Production-AAB internal test: **Yes** | **Yes** | **Yes** | Agent 14 + Agent 4 coordination |
-| #569 | Privacy/Data Safety/App Content incomplete | P0 | Internal-only can begin | **Yes** | **Yes** | Agent 13 + Agent 14 |
-| #570 | Store listing asset/metadata pack incomplete | P1 | No | App setup/listing may constrain track readiness | **Yes** | Agent 15 + Agent 14 |
-| #571 | Play account/signing/verification/testing state unknown | P0 | Signing/app setup required for real Play internal test | **Yes** | **Yes** | Owner + Agent 14 |
-| Conditional | Billing/ads SDK added without compliance re-audit | P0 if activated | Depends | **Yes** | **Yes** | Agent 12 + 13 + 14 |
-| Conditional | Account creation added without deletion path | P0 if activated | No | **Yes** | **Yes** | Auth owner + Agent 13 + 14 |
-| Conditional | Chat/UGC added without moderation/safety controls | P0 if activated | No | **Yes** | **Yes** | Multiplayer owner + Agent 13 + 14 |
+Do not treat this snapshot as permanently valid policy.
 
 ---
 
-## 18. Definition of done
+## 16. Definition of done
 
 DROPi Tycoon is **Google Play production ready** only when:
 
-- all current P0 blockers are closed with evidence;
+- all applicable P0 blockers are closed with evidence;
 - Play Console account/package/signing state is verified without exposing secrets;
 - the exact final production AAB is reproducible and attested;
-- the app starts its bundled Phaser runtime without depending on the public Railway webpage;
-- policy declarations match the exact binary/backend behavior;
-- store material is compliant and truthful;
-- required testing, including any account-specific closed-test production-access rule, is complete;
+- the app starts its bundled Phaser runtime without requiring the public Railway webpage as the game document;
+- policy declarations match exact binary/backend behavior;
+- #565 licensing/attribution is complete;
+- store material is compliant, truthful and generated from the submitted build;
+- required testing, including any account-specific closed-test rule, is complete;
+- #566 active player/mission/cargo continuity is accepted on Android;
 - owner physical Android landscape acceptance is recorded;
 - Agent 13 legal/privacy gate and Agent 16 independent release audit are complete;
 - the owner explicitly authorizes production publication.
 
-Until then, use `NOT_PLAY_READY` as the canonical state.
+Until then, the canonical state is `NOT_PLAY_READY`.
