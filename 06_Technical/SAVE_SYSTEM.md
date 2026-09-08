@@ -2,265 +2,287 @@
 
 Document: SAVE_SYSTEM.md
 Project: DROPi Tycoon
-Version: 1.0.0
-Status: Canonical
+Version: 2.0.0
+Status: Canonical — Local Save and Migration Specialization
 Author: Marian Caliof & OpenAI
 Language: English
-Last Updated: 2026-07-12
+Last Updated: 2026-09-08
 
 ---
 
 # Save System
 
-## Urban foundation additive Save v2 extension
-
-The current runtime extends Save v2 without changing storage keys or fleet IDs.
-An optional `urban` section stores only merchant-onboarding progress and the
-selected walking/bicycle preference. Older v1/v2 saves default to not-onboarded
-and walking; malformed preferences are repaired, and a bicycle selection requires
-legacy upgrade ownership or a compatible owned fleet entry.
-
-Decode, sanitization, serialization and restore apply the same validation.
-Company identity, money, reputation, upgrades, employees, payroll, financials,
-reviews, fleet and settings retain their existing persistence paths.
-
-Position, active orders and runtime cargo remain transient under the established
-reset-on-load policy. The world respawns at accessible HQ ground; the owner does
-not need Start New Game to access the district. Returning from management screens
-within the live session retains the active order. Future DronePort entities,
-coverage, drone state and lockers are not persisted until gameplay requires them.
-
 ## Purpose
 
-This document defines the canonical in-game Save & Load system for DROPi Tycoon.
+This document defines local in-game persistence for the current installed/offline runtime and the migration boundary toward future trusted World Instance persistence.
 
-It specifies what game state is persisted, when saves occur, how the game loads, and how the system behaves when save data is missing or corrupted.
+It owns local save schema/validation/restore decisions. It does **not** make a device-local save authoritative for a shared multiplayer economy.
 
-Development and project-level safety and stability governance is owned by `06_Technical/SAFE_SYSTEM.md`. This document covers only in-game persistence.
+Shared contested persistence is governed by `06_Technical/SHARED_AUTHORITY_CONTRACT.md` and `06_Technical/WORLD_INSTANCES.md`.
 
 ---
 
-# Save System Philosophy
+# 1. Persistence Philosophy
 
-The save system must protect player progress without adding unnecessary complexity.
+Persistence must:
+
+- protect meaningful progress;
+- preserve compatible historical state through explicit migration;
+- validate/sanitize all loaded data;
+- fail safely when state is missing/corrupt/incompatible;
+- avoid duplicate economic settlement;
+- distinguish durable progression from transient scene state;
+- distinguish local legacy authority from future shared-world authority.
+
+A documentation change never silently reinterprets old economic ownership.
+
+---
+
+# 2. Current Runtime Save v2
+
+The current runtime remains based on local Save v2 and existing storage adapters.
+
+Current durable company/progression state includes, where implemented:
+
+- company identity/money/reputation/level or progression compatibility state;
+- upgrades;
+- employees/payroll;
+- financial/review state;
+- fleet ownership/selection;
+- settings;
+- tutorial/progression state;
+- current `urban` extension for merchant onboarding and walking/Bicycle preference.
+
+Existing IDs/storage keys are preserved unless a dedicated migration says otherwise.
+
+The current starter-company and Company Money state remain valid **legacy runtime data**. They must not be silently relabelled as Personal Money or future human starting ownership.
+
+---
+
+# 3. Urban Additive Save Extension
+
+The existing optional `urban` section stores only the approved urban-foundation state, including merchant onboarding and selected walking/Bicycle preference.
+
+Older saves default safely. Malformed preferences are repaired; Bicycle selection requires compatible ownership/progression.
+
+Decode, sanitization, serialization and restore must apply equivalent validation.
+
+---
+
+# 4. Durable vs Transient Current State
+
+Current save scope intentionally does not persist every live scene entity.
+
+Existing transient/reset-on-load examples include:
+
+- active runtime order;
+- current cargo associated only with that transient order;
+- some world position/scene state according to the active runtime contract;
+- regenerated runtime customers/simulation entities.
+
+Within a live session, navigation to internal management/HQ screens should preserve the session state governed by the relevant runtime systems.
+
+Future persistent World Instance cargo/orders/inventory cannot use this reset model once they become shared economic truth; that requires an explicit schema/authority migration.
+
+---
+
+# 5. Save Triggers
+
+Local autosave should occur after meaningful durable state mutations supported by the current schema, such as:
+
+- completed legacy delivery effects;
+- purchases/upgrades;
+- employee/onboarding/payroll changes;
+- progression/reputation changes;
+- merchant onboarding;
+- transport preference/ownership changes where durable;
+- explicit exit/save lifecycle events implemented by the mobile/runtime contract.
+
+Future Personal Money, wages, consumption, World Instance time or cargo settlement must not be added to the old save merely by copying scene values. Their authority/migration must be designed first.
+
+---
+
+# 6. Load / Continue
+
+When a compatible valid local save exists, Continue restores the validated durable local progression defined by the current schema.
+
+The system must not silently overwrite a valid save.
+
+When no valid save exists, the game may initialize a new local game according to the current runtime version/start contract.
+
+When the future employee-first canonical lifecycle is implemented, the new-game initializer and old-save migration must be changed together in a dedicated PR.
+
+---
+
+# 7. Missing / Corrupted State
+
+The game must not crash because local save data is missing or invalid.
 
 Rules:
 
-- Save the minimum state required to restore meaningful progression.
-- Never lose completed progress due to normal game exit.
-- Never crash or produce undefined behavior because save data is absent or invalid.
-- Keep the implementation minimal for Prototype v0.1 and expand incrementally.
+- missing save -> initialize safely;
+- recoverable malformed fields -> sanitize/default according to schema;
+- structurally unreadable/incompatible save -> inform the player before destructive replacement when recoverable progress may exist;
+- preserve diagnostic/recovery evidence where technically feasible;
+- never accept invalid economic values merely to avoid an error.
 
 ---
 
-# Prototype v0.1 Scope
+# 8. Schema Versioning and Migration
 
-The following save/load behavior is required before Prototype v0.1 release.
+Every durable save format uses an explicit version.
 
-No save/load features beyond this scope are approved for v0.1.
+A migration must define:
 
----
+- source version/meaning;
+- target version/meaning;
+- field transformations/defaults;
+- ownership interpretation;
+- validation rules;
+- rollback/failure behavior where relevant;
+- tests using representative old saves.
 
-# Required Saved Data
+Existing v1 -> v2 migration remains valid historical implementation behavior.
 
-The following data must be persisted for Prototype v0.1.
+Future major migrations may include:
 
-## Company Data
+- starter-company legacy state -> employee-first person/company separation;
+- Personal Money introduction;
+- person identity / World Instance linkage;
+- authoritative time/offline settlement checkpointing;
+- inventory/cargo/order persistence;
+- cloud/shared authority adoption.
 
-- Company name (if implemented in v0.1)
-- Company money
-- Company level
-- Company reputation (if implemented in v0.1)
-- Purchased upgrade levels
-
-## Progression State
-
-- Tutorial completion status
-- Current or unlocked progression state
-
-## Player State
-
-- Player position only if required for the chosen prototype flow
-
-## Active Order
-
-- The current active order is cancelled and reset on load.
-- Active orders are not restored from save in Prototype v0.1.
-
-## Transient Runtime Data
-
-WorldData, active customers, and all runtime-generated simulation state are not persisted.
-
-They are regenerated on load.
+No field may be silently reinterpreted from company-owned value to person-owned value.
 
 ---
 
-# Save Triggers
+# 9. Canonical Employee-First Migration Principle
 
-The game saves automatically after meaningful completed actions.
+The approved target starting state is a poor pedestrian employee, while old saves may represent the player through an early starter company.
 
-## Autosave Events
+A future migration must explicitly decide how an existing save is presented/preserved, for example through a legacy local world/history or a governed compatibility conversion.
 
-- Delivery completion
-- Upgrade purchase
-- Progression state change (level up, reputation change)
-- Tutorial step completion (if tutorial is implemented)
+What is forbidden:
 
-## Manual Save
-
-- No manual save UI is required for Prototype v0.1.
-- If a manual save option is added later, it must follow the same data scope.
+- deleting old progress without an explicit rule;
+- pretending old Company Money was always Personal Money;
+- importing legacy economic power into a fresh shared World Instance;
+- duplicating assets/money across both legacy and new authoritative state.
 
 ---
 
-# Load Behavior
+# 10. Local Save vs World Instance Authority
 
-## Continue Game
+A future shared World Instance owns authoritative economic state independently from the device save.
 
-When a valid save exists, the game loads it automatically on Continue.
+World-local shared state may include:
 
-The player resumes from the saved progression state.
+- person/economic-actor identity;
+- Personal Money/Company Money ledgers;
+- company membership/ownership;
+- inventory/cargo/contracts/orders;
+- assets/shares/property;
+- production/infrastructure state;
+- authoritative world time/offline settlement;
+- reputation/history with economic effect.
 
-## Start New Game
-
-Start Game creates new data only when:
-
-- No valid save exists on the device, or
-- The player explicitly confirms replacing the existing save.
-
-The game must never silently overwrite a valid save without confirmation.
-
----
-
-# New Game Behavior
-
-When creating a new game:
-
-- Initialize all required data fields with defined starting values.
-- Do not carry over data from a previous save unless the player explicitly requested a new game.
+The client may cache/project such state for usability, but a cache is not authority.
 
 ---
 
-# Save Slot Policy
+# 11. Fresh-World Isolation
 
-Prototype v0.1 uses one local save slot.
+A local/prototype save cannot be submitted as proof of money, qualifications, company ownership, shares, property, inventory or infrastructure in a fresh multiplayer World Instance.
 
-- One save profile per device.
-- No multiple slots.
-- No named saves.
-- No cross-device synchronization.
-- No cloud save.
-- No account linking.
+Only explicitly approved non-economic account history may cross worlds by default.
+
+Migration/import APIs must enforce this boundary.
 
 ---
 
-# Autosave Policy
+# 12. Offline Settlement Checkpoints
 
-- Autosave triggers after each meaningful completed action as defined above.
-- Autosave is silent and requires no player interaction.
-- The player must not be able to accidentally skip an autosave by force-closing the game after a meaningful action.
+When authoritative world time/economy is implemented, persistence must support idempotent catch-up.
 
----
+The saved/server checkpoint must make it possible to determine which economic interval/obligation has already been settled so reconnect/reload does not duplicate:
 
-# Manual Save Policy
+- living costs;
+- consumption;
+- wages;
+- payroll;
+- production;
+- contract payments;
+- other periodic economic effects.
 
-- No manual save is required for Prototype v0.1.
-- Future versions may add a manual save option within the same one-slot local policy.
-
----
-
-# Data Validation
-
-On load, the save system must validate required fields before using them.
-
-Required fields to validate:
-
-- Company money (must be a valid number, zero or greater)
-- Company level (must be a valid positive integer)
-- Purchased upgrade levels (must be valid non-negative integers)
-- Tutorial completion status (must be a valid boolean or equivalent)
-
-If a required field is missing, apply the defined safe default for that field.
-
-Do not use unvalidated values directly from save data.
+Elapsed wall-clock time from the client alone is not authoritative in a shared world.
 
 ---
 
-# Missing or Corrupted Save Behavior
+# 13. Mobile Lifecycle
 
-- The game must never crash because save data is missing or invalid.
-- If no save file exists, start a new game without notification.
-- If the save file exists but is unreadable or structurally invalid, inform the player that progress cannot be restored.
-- Require player confirmation before replacing a corrupted save with a new game.
-- If technically possible, preserve the corrupted save file for debugging before overwriting.
-- Apply safe defaults only for fields that cannot be recovered, and only after informing the player.
+The installed Android application can be interrupted by OS lifecycle, incoming calls, low battery, process termination or network loss.
 
----
+Persistence design must:
 
-# Version Compatibility
+- keep writes recoverable;
+- avoid assuming one write is perfectly atomic;
+- use versioned/sanitized data;
+- autosave meaningful current local progress;
+- reconcile pending authoritative commands by receipt/idempotency when shared systems arrive.
 
-- Save data must include a save format version field.
-- On load, validate that the save format version is compatible with the current game version.
-- If the save format version is unknown or incompatible, treat the save as unreadable and follow the corrupted save behavior above.
-- Future format migrations may be added but are not required for Prototype v0.1.
+Platform-local storage remains behind a replaceable adapter.
 
 ---
 
-# Mobile Considerations
+# 14. Save Slot Policy
 
-- Save data is stored on local device storage.
-- The active web runtime uses browser-local storage through a replaceable adapter; future packaged mobile runtimes must provide equivalent device-local storage behind the same canonical save contract.
-- The system must tolerate interrupted saves caused by incoming calls, OS interruptions, or low battery.
-- Do not assume save operations are atomic; design save data to be recoverable even if a write is interrupted.
+The current prototype/local implementation may continue using its existing single local profile/slot policy.
 
----
+This is an implementation-era constraint, not a permanent rule that one account can never participate in multiple World Instances.
 
-# Platform-Local Implementation Boundary
-
-The Save System is implemented through a replaceable platform-local storage adapter. The active web runtime uses browser-local storage; future Android packaging may substitute an equivalent device-local adapter without changing the save schema or domain logic.
-
-No external backend, server, or cloud API is used.
-
-Implementation must reference this document as the canonical contract for what is saved, when, and how.
+Future account/world selection requires dedicated UX/technical design and must not be simulated by unsafe multiple copies of local economic saves.
 
 ---
 
-# Testing Requirements
+# 15. Testing Requirements
 
-The following must be verified before Prototype v0.1 release:
+Persistence work should test, as applicable:
 
-- Save after delivery completion: progress is restored on next launch.
-- Save after upgrade purchase: upgrade state is restored on next launch.
-- Close game mid-session without a save trigger: last saved state is restored correctly.
-- Start new game when no save exists: new game initializes correctly.
-- Start new game when a valid save exists: confirmation required; no silent overwrite.
-- Corrupted save file: game does not crash; player is informed; confirmation required before new game.
-- Missing save file: game starts new game without error.
-
-See `09_Development/PROTOTYPE_TESTING_PLAN.md` for full persistence test cases.
+- round-trip encode/decode;
+- old-version migration;
+- malformed/corrupted data;
+- interrupted/partial write behavior;
+- no silent overwrite;
+- stable IDs/ownership semantics;
+- legacy company-money preservation without personal-money reinterpretation;
+- duplicate settlement prevention;
+- world isolation/import rejection;
+- Android close/relaunch/Continue behavior;
+- compatibility with current runtime state not yet migrated.
 
 ---
 
-# Future Expansion
+# 16. Explicit Current Non-Goals
 
-The following are intentionally deferred beyond Prototype v0.1:
+This document does not itself implement:
 
-- Multiple save slots
-- Named saves
-- Cloud save
-- Cross-device synchronization
-- Multiple player profiles
-- Full simulation state snapshot
-- Complex mid-session world restoration
-- Analytics or telemetry around saves
+- cloud save;
+- production multiplayer persistence;
+- account login;
+- cross-device synchronization;
+- Personal Money runtime;
+- world-time runtime;
+- universal inventory/cargo persistence;
+- backend vendor/database selection.
+
+Those require implementation slices under the approved architecture.
 
 ---
 
 # Canonical Rule
 
-The Save System owns all in-game persistence decisions.
-
-No other document may define save data scope, save triggers, or load behavior without referencing and aligning with this document.
+**The current local Save preserves validated legacy/offline progression; it must never silently redefine ownership or become proof of economic power in a fresh shared World Instance. Every schema/authority migration must explicitly preserve, transform or isolate old state, and shared economic truth ultimately belongs to trusted World Instance authority rather than the device.**
 
 ---
 
