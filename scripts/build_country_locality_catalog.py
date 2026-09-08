@@ -9,6 +9,7 @@ SRC_URL = f'https://raw.githubusercontent.com/nvkelso/natural-earth-vector/{SRC_
 OUT = ROOT / 'game-web/public/data/country-representative-localities-v1.json'
 TOPOLOGY = ROOT / 'game-web/public/data/world-atlas-countries-110m.json'
 ROLE_OVERRIDES = ROOT / '04_World/Country_Catalog/COUNTRY_LOCALITY_ROLE_OVERRIDES.json'
+AUTHORITATIVE_SUPPLEMENTS = ROOT / '04_World/Country_Catalog/COUNTRY_LOCALITY_AUTHORITATIVE_SUPPLEMENTS.json'
 W, H = 1440.0, 720.0
 
 
@@ -22,9 +23,12 @@ with urllib.request.urlopen(SRC_URL, timeout=60) as r:
 topology = json.loads(TOPOLOGY.read_text())
 identity_registry, identity_by_name = load_geometry_id_registry()
 role_override_registry = json.loads(ROLE_OVERRIDES.read_text())
+supplement_registry = json.loads(AUTHORITATIVE_SUPPLEMENTS.read_text())
 if role_override_registry.get('source', {}).get('upstreamCommit') != SRC_COMMIT:
     raise RuntimeError('COUNTRY_LOCALITY_ROLE_OVERRIDES.json must target the pinned populated-place source commit')
 role_overrides = role_override_registry.get('entries') or {}
+supplement_sources = supplement_registry.get('sources') or {}
+supplements = supplement_registry.get('entries') or {}
 rendered = topology_names(topology, identity_by_name)
 ids = set(rendered)
 name_to_id = {norm(name): cid for cid, name in rendered.items() if name}
@@ -97,13 +101,55 @@ def unique_source_place(places, source_names, country_id_value, purpose):
     return hits[0]
 
 
+def authoritative_supplement(ref, country_id_value):
+    entry = supplements.get(ref)
+    if not entry:
+        raise RuntimeError(f'{country_id_value}: unknown authoritative supplement {ref!r}')
+    if str(entry.get('countryId')) != country_id_value:
+        raise RuntimeError(f'{country_id_value}: supplement {ref!r} targets countryId {entry.get("countryId")!r}')
+    source_ref = str(entry.get('sourceRef') or '')
+    source_meta = supplement_sources.get(source_ref)
+    if not source_meta or not str(source_meta.get('url') or '').startswith('https://'):
+        raise RuntimeError(f'{country_id_value}: supplement {ref!r} has invalid institutional source {source_ref!r}')
+    if not entry.get('sourceCoordinateText') or not entry.get('issue'):
+        raise RuntimeError(f'{country_id_value}: supplement {ref!r} lacks coordinate/review provenance')
+    try:
+        lon = float(entry['longitude'])
+        lat = float(entry['latitude'])
+    except Exception as exc:
+        raise RuntimeError(f'{country_id_value}: supplement {ref!r} has invalid coordinates') from exc
+    if not (-180 <= lon <= 180 and -90 <= lat <= 90):
+        raise RuntimeError(f'{country_id_value}: supplement {ref!r} coordinates are out of range')
+    return {
+        'name': str(entry.get('name') or '').strip(),
+        'lon': lon,
+        'lat': lat,
+        'population': 0,
+        'scalerank': 0,
+        'featureClass': str(entry.get('featureClass') or 'Authoritative locality supplement'),
+        'admin1': str(entry.get('admin1') or '').strip(),
+        'isCapital': True,
+        'isAdmin1': False,
+        'sourceKind': 'authoritative-supplement',
+        'supplementRef': ref,
+        'sourceRef': source_ref,
+        'sourceCoordinateText': str(entry.get('sourceCoordinateText')),
+        'effectiveOn': str(entry.get('effectiveOn') or ''),
+    }
+
+
 def choose(places, country_id_value, override=None):
-    if not places:
+    current_capital = (override or {}).get('currentCapital') or {}
+    supplement_ref = str(current_capital.get('supplementRef') or '')
+    if not places and not supplement_ref:
         if override:
             raise RuntimeError(f'{country_id_value}: governed role override has no pinned-source locality pool')
         return []
 
-    xs, ys = zip(*(point(p) for p in places))
+    extent_places = list(places)
+    if supplement_ref:
+        extent_places.append(authoritative_supplement(supplement_ref, country_id_value))
+    xs, ys = zip(*(point(p) for p in extent_places))
     cx, cy = (min(xs) + max(xs)) / 2, (min(ys) + max(ys)) / 2
     hw, hh = max(8, (max(xs) - min(xs)) / 2), max(8, (max(ys) - min(ys)) / 2)
 
@@ -114,13 +160,15 @@ def choose(places, country_id_value, override=None):
         return dx / mag, dy / mag, min(2.5, mag)
 
     if override:
-        current_capital = override.get('currentCapital') or {}
-        capital = unique_source_place(
-            places,
-            current_capital.get('sourceNames') or [],
-            country_id_value,
-            'currentCapital',
-        )
+        if supplement_ref:
+            capital = authoritative_supplement(supplement_ref, country_id_value)
+        else:
+            capital = unique_source_place(
+                places,
+                current_capital.get('sourceNames') or [],
+                country_id_value,
+                'currentCapital',
+            )
         capital_display_name = str(current_capital.get('displayName') or capital['name']).strip()
     else:
         capitals = [p for p in places if p['isCapital']]
@@ -138,7 +186,7 @@ def choose(places, country_id_value, override=None):
             return False
         used.add(k)
         used_sectors.add(sector)
-        selected.append({
+        node = {
             'name': str(display_name or p['name']).strip(),
             'role': role,
             'sector': sector,
@@ -147,7 +195,16 @@ def choose(places, country_id_value, override=None):
             'populationReference': p['population'],
             'admin1': p['admin1'],
             'sourceFeatureClass': p['featureClass'],
-        })
+        }
+        if p.get('sourceKind') == 'authoritative-supplement':
+            node.update({
+                'sourceKind': p['sourceKind'],
+                'supplementRef': p['supplementRef'],
+                'sourceRef': p['sourceRef'],
+                'sourceCoordinateText': p['sourceCoordinateText'],
+                'effectiveOn': p['effectiveOn'],
+            })
+        selected.append(node)
         return True
 
     add(capital, 'capital', 'CAPITAL', capital_display_name)
@@ -245,17 +302,26 @@ assert capital('392') == 'Tokyo'
 assert capital('104') == 'Nay Pyi Taw'
 assert capital('144') == 'Sri Jayewardenepura Kotte'
 assert capital('152') == 'Santiago'
+assert capital('226') == 'Ciudad de la Paz'
 assert node('392', 'Kyoto') and node('392', 'Kyoto')['role'] != 'capital'
 assert node('104', 'Yangon') and node('104', 'Yangon')['role'] != 'capital'
 assert node('144', 'Colombo') and node('144', 'Colombo')['role'] != 'capital'
 assert node('152', 'Valparaíso') and node('152', 'Valparaíso')['role'] != 'capital'
+assert node('226', 'Malabo') and node('226', 'Malabo')['role'] != 'capital'
+assert node('226', 'Ciudad de la Paz')['sourceKind'] == 'authoritative-supplement'
 assert all(n['name'] != 'Hamilton' for n in countries.get('826', []))
 assert all(len(v) <= 9 for v in countries.values())
 ireland_n = next((n for n in countries['372'] if n['role'] == 'urban' and n['sector'] == 'N'), None)
 assert ireland_n is None or ireland_n['populationReference'] >= 15000 or 'Admin-1 capital' in ireland_n['sourceFeatureClass']
 
+used_supplements = sorted({
+    str((override.get('currentCapital') or {}).get('supplementRef'))
+    for override in role_overrides.values()
+    if (override.get('currentCapital') or {}).get('supplementRef')
+})
+
 payload = {
-    'version': '1.3.0',
+    'version': '1.4.0',
     'source': {
         'name': 'Natural Earth 1:10m populated places simple',
         'upstreamCommit': SRC_COMMIT,
@@ -269,6 +335,10 @@ payload = {
         'registryVersion': role_override_registry.get('version', 'unknown'),
         'sourceCommit': role_override_registry.get('source', {}).get('upstreamCommit'),
         'countryIds': sorted(role_overrides),
+    },
+    'localityAuthoritativeSupplements': {
+        'registryVersion': supplement_registry.get('version', 'unknown'),
+        'refs': used_supplements,
     },
     'stats': {
         'renderedCountries': len(ids),
