@@ -110,7 +110,7 @@ describe('Global Map runtime #418', () => {
     const sriLanka = semanticEntryForCountry(semanticCatalog, '144')
     const chile = semanticEntryForCountry(semanticCatalog, '152')
 
-    expect(semanticCatalog.version).toBe('1.4.0')
+    expect(semanticCatalog.version).toBe('1.5.0')
     expect(semanticCatalog.governance.geographyDoesNotAssertSovereignty).toBe(true)
     expect(semanticCatalog.governance.projectGeometryIdsAreNonISO).toBe(true)
     expect(semanticCatalog.governance.localityCoordinatesRemainSourceBacked).toBe(true)

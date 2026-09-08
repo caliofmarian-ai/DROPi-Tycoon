@@ -2,7 +2,7 @@
 
 Status: Canonical audit ledger for special and non-standard world geometries.
 
-Coordinates: #418 #453 #480 #481 #482
+Coordinates: #418 #453 #462 #480 #481 #482
 
 ## Governing rule
 
@@ -16,7 +16,7 @@ Project-owned geometry IDs beginning with `X` in this ledger are internal DROPi 
 
 | Geometry ID | Rendered geometry | Geographic chapter | Classification | Audit state | Governance |
 |---:|---|---|---|---|---|
-| 732 | W. Sahara | Africa | indeterminate/disputed territory | REVIEW | #462 — neutral territory-status semantics required |
+| 732 | W. Sahara | Africa | UN Non-Self-Governing Territory / unresolved final status | REVIEW | #462 — UN territory-status semantics implemented; Bir Lehlou player-facing capital claim suppressed; owner Android acceptance pending |
 | XSL | Somaliland | Africa | de facto administration / internationally contested status; stable DROPi project key | REVIEW | #482 — current neutral status semantics and updateable recognition metadata required |
 | 376 | Israel | Asia | special disputed-status semantics in source | REVIEW | #467 — capital/status semantics require neutral handling |
 | 275 | Palestine | Asia | indeterminate/disputed status in source | REVIEW | #468 — capital/status semantics require neutral handling |

@@ -14,11 +14,19 @@ export interface CountrySemanticPlaceRole {
   note?: string
 }
 
+export interface CountrySemanticTerritoryStatus {
+  classification: string
+  label: string
+  finalStatusResolved: boolean
+  note?: string
+}
+
 export interface CountrySemanticEntry {
   issue: number
   renderedName: string
   statusLabel: string
   statusSummary: string
+  territoryStatus?: CountrySemanticTerritoryStatus
   coverageNote?: string
   placeRoles: CountrySemanticPlaceRole[]
   sourceRefs: string[]

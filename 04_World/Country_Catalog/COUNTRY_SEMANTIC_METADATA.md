@@ -2,7 +2,7 @@
 
 Status: Canonical runtime semantics contract for country and territory presentation.
 
-Coordinates: #418 #459 #460 #461 #464 #465 #466 #473 #478 #481 #482
+Coordinates: #418 #453 #459 #460 #461 #462 #464 #465 #466 #473 #478 #481 #482
 
 Runtime data: `game-web/public/data/country-semantic-metadata-v1.json`
 
@@ -25,6 +25,7 @@ DROPi therefore keeps political/status and role semantics in a separate source-g
 3. Locality coordinates must remain source-backed. The normal path is the pinned Natural Earth feature; a reviewed locality absent from that snapshot may use an explicitly governed authoritative supplement carrying its own institutional provenance and original coordinate text.
 4. Politically sensitive wording must cite authoritative or institutional sources and record an access/review date.
 5. The runtime may display multiple place roles for one geometry when reality requires them.
+5a. `territoryStatus`, when present, records a source-governed territory classification separately from locality roles and must state whether final status is resolved.
 6. A node marked `capital` by the structural locality dataset must not automatically be rendered to players as `National capital` when semantic metadata provides a more accurate role label.
 7. Missing locality coverage remains explicit. Semantic metadata must not fabricate a capital solely to remove a GAP.
 8. Source changes and contemporary political-status changes require a new review and metadata version update.
@@ -46,6 +47,16 @@ The runtime describes the rendered northern part of Cyprus using the European Co
 ### Somaliland (`XSL`) — #482
 
 The runtime distinguishes de facto administration from universally settled recognition. UN material documents Somaliland institutions and administration. Israel officially recognized Somaliland on 26 December 2025; UN Security Council proceedings also record Somalia's rejection and sovereignty/territorial-integrity position. The runtime therefore presents Hargeysa as a principal administrative centre rather than silently turning the source `capital` flag into an uncontested national-capital claim.
+
+### Western Sahara (`732`) — #462
+
+Western Sahara remains geographically in the Africa chapter under the one-geometry/one-chapter rule established by #453. The United Nations continues to list Western Sahara as a Non-Self-Governing Territory, and the 2026 C-24 working-paper index includes Western Sahara as A/AC.109/2026/17. MINURSO remains an active United Nations peacekeeping mission in the Territory.
+
+DROPi therefore records a structured `territoryStatus` classification of `un-non-self-governing-territory` with `finalStatusResolved: false`. The runtime status label is `UN Non-Self-Governing Territory`. This is a source-governed UN classification, not a DROPi sovereignty decision.
+
+The pinned Natural Earth locality catalog contains only Bir Lehlou for geometry `732` and assigns it the structural sparse-map capital slot. DROPi preserves that source-backed locality and coordinate, but semantic metadata overrides its player-facing role to `Source-backed representative locality`. The source structural flag must never be surfaced as an uncontested `National capital` claim.
+
+This reconciles #462 with the Special Territory and Cross-Region Classification ledger from #453: special political/status governance does not require moving or duplicating a geometry into the generated `Special` continent chapter.
 
 ## Current-reality capital corrections
 

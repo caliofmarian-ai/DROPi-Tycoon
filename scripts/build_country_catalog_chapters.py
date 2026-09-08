@@ -192,6 +192,7 @@ def markdown_for_continent(continent, rows, catalog):
         f'- runtime catalog version: `{catalog.get("version", "unknown")}`',
         f'- Natural Earth upstream commit: `{catalog.get("source", {}).get("upstreamCommit", SRC_COMMIT)}`',
         '- every node coordinate remains a source coordinate; this manifest does not reposition places.',
+        '- Structural capital slot is a sparse-map data role only; player-facing political/territory semantics are governed by `game-web/public/data/country-semantic-metadata-v1.json`.',
         '',
         '## Chapter summary',
         f'- countries/territories: **{len(rows)}**',
@@ -202,7 +203,7 @@ def markdown_for_continent(continent, rows, catalog):
         '',
         '## Country-by-country manifest',
         '',
-        '| ID | Country / territory | Capital | Nodes | Slots | State | Notes |',
+        '| ID | Country / territory | Structural capital slot | Nodes | Slots | State | Notes |',
         '|---:|---|---|---:|---|---|---|',
     ]
     for row in sorted(rows, key=lambda item: item['name'].casefold()):
@@ -215,6 +216,7 @@ def markdown_for_continent(continent, rows, catalog):
         '',
         '## Interpretation',
         '- `PASS` means automated structural and pinned-source checks pass; it does not claim final economy/transport simulation is active.',
+        '- A structural `CAPITAL` slot is not automatically a player-facing national-capital claim; semantic metadata overrides the label where political, constitutional or territory status requires it.',
         '- `REVIEW` requires a dedicated country-level investigation before correction.',
         '- `GAP` means the pinned source has no truthful representative locality and no place is invented to fill the pattern.',
         '',

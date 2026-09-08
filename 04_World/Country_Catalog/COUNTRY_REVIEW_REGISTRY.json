@@ -1,5 +1,5 @@
 {
-  "version": "1.6.0",
+  "version": "1.7.0",
   "purpose": "Manual semantic review flags discovered during continent-by-continent audit. These do not silently rewrite pinned Natural Earth source data.",
   "reviews": {
     "204": {
@@ -28,7 +28,7 @@
     },
     "732": {
       "issue": 462,
-      "reason": "territory-status semantics required: Western Sahara remains a disputed Non-Self-Governing Territory and must not be reduced to an uncontested single-capital claim"
+      "reason": "UN Non-Self-Governing Territory semantics implemented; Bir Lehlou retained only as source-backed representative locality; owner Android Country Layer acceptance pending"
     },
     "392": {
       "issue": 464,

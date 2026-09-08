@@ -1,5 +1,5 @@
 {
-  "version": "1.4.0",
+  "version": "1.5.0",
   "reviewedOn": "2026-09-08",
   "purpose": "Player-facing semantic metadata for country and territory cases where a single generic capital label or geographic rendering could misstate political, constitutional, administrative or recognition reality.",
   "governance": {
@@ -129,6 +129,28 @@
       "url": "https://www.un.tzembassy.go.tz/tanzania/about-tanzania",
       "accessedOn": "2026-09-08",
       "note": "The official Tanzania profile identifies Dodoma as the capital city and Dar es Salaam as the commercial capital and major seaport for Tanzania Mainland."
+    },
+    "un-western-sahara-nsgt": {
+      "publisher": "United Nations and Decolonization",
+      "title": "Western Sahara",
+      "url": "https://www.un.org/dppa/decolonization/en/nsgt/western-sahara",
+      "accessedOn": "2026-09-08",
+      "note": "The United Nations lists Western Sahara as a Non-Self-Governing Territory since 1963 and treats the question as an unfinished decolonization matter rather than a settled sovereignty outcome."
+    },
+    "un-western-sahara-working-paper-2026": {
+      "publisher": "United Nations Special Committee on Decolonization",
+      "title": "Working papers on Non-Self-Governing Territories — Western Sahara, 2026 session",
+      "url": "https://www.un.org/dppa/decolonization/en/Documents/Workingpapersonnon-self-governingterritories",
+      "publishedOn": "2026-01-13",
+      "accessedOn": "2026-09-08",
+      "note": "The 2026 C-24 working-paper index lists A/AC.109/2026/17 for Western Sahara, confirming that the Territory remains on the Committee's active 2026 agenda."
+    },
+    "un-minurso-current": {
+      "publisher": "United Nations Peacekeeping",
+      "title": "MINURSO Fact Sheet",
+      "url": "https://peacekeeping.un.org/en/factsheet/minurso",
+      "accessedOn": "2026-09-08",
+      "note": "MINURSO remains the United Nations Mission for the Referendum in Western Sahara and continues operating with Morocco and Frente Polisario as parties to the unresolved settlement process."
     }
   },
   "entries": {
@@ -339,6 +361,31 @@
       "sourceRefs": [
         "tanzania-dodoma-capital-act",
         "tanzania-government-country-profile"
+      ]
+    },
+    "732": {
+      "issue": 462,
+      "renderedName": "W. Sahara",
+      "statusLabel": "UN Non-Self-Governing Territory",
+      "statusSummary": "Western Sahara has remained on the United Nations list of Non-Self-Governing Territories since 1963. Its final status remains unresolved, and MINURSO continues operating in the Territory in the context of the settlement process involving Morocco and Frente Polisario. DROPi renders the geography and its source-backed locality without choosing a sovereignty or governance claim.",
+      "territoryStatus": {
+        "classification": "un-non-self-governing-territory",
+        "label": "UN Non-Self-Governing Territory",
+        "finalStatusResolved": false,
+        "note": "Geographic chapter placement and sparse locality roles do not adjudicate sovereignty, recognition, administration or final status."
+      },
+      "placeRoles": [
+        {
+          "locality": "Bir Lehlou",
+          "role": "status-sensitive-representative-locality",
+          "label": "Source-backed representative locality",
+          "note": "The Natural Earth locality is retained for sparse geographic representation. DROPi does not surface its structural source capital flag as an uncontested national-capital claim."
+        }
+      ],
+      "sourceRefs": [
+        "un-western-sahara-nsgt",
+        "un-western-sahara-working-paper-2026",
+        "un-minurso-current"
       ]
     }
   }
