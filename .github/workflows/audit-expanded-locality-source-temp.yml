@@ -1,0 +1,55 @@
+name: TEMP Audit Expanded Locality Source
+
+on:
+  push:
+    branches:
+      - openai/expanded-locality-source-contract-502
+
+permissions:
+  contents: write
+
+jobs:
+  audit:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: openai/expanded-locality-source-contract-502
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Download and audit selected GeoNames source
+        run: |
+          set -euo pipefail
+          python scripts/audit_expanded_locality_source_temp.py
+          git diff --check
+      - name: Validate source-contract outputs
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          r = json.loads(Path('04_World/Country_Catalog/EXPANDED_LOCALITY_SOURCE_REGISTRY.json').read_text())
+          s = r['observedSnapshot']['cities500']
+          assert s['records'] > 150000
+          assert s['uniqueGeonameIds'] == s['records']
+          assert len(s['sha256']) == 64
+          assert r['sources']['geonames-cities500']['license'] == 'Creative Commons Attribution 4.0'
+          assert r['governance']['rawSnapshotRetentionRequiredBeforeProductionCatalogMerge'] is True
+          print('PASS source registry', s['records'], s['sha256'])
+          PY
+          grep -F 'LOD 0 — Global anchors' 04_World/LOCALITY_LOD_ARCHITECTURE.md
+          grep -F 'GeoNames `cities500.zip`' 04_World/Country_Catalog/EXPANDED_LOCALITY_SOURCE_AUDIT.md
+          git diff --check
+      - name: Commit source contract and remove temporary runners
+        run: |
+          set -euo pipefail
+          find scripts -type d -name __pycache__ -prune -exec rm -rf {} +
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git rm scripts/audit_expanded_locality_source_temp.py .github/workflows/audit-expanded-locality-source-temp.yml
+          git add 04_World game-web/tests/expanded-locality-source-contract.test.ts
+          git diff --cached --check
+          git commit -m 'docs: define expanded locality source and LOD contract'
+          git push origin HEAD:openai/expanded-locality-source-contract-502
