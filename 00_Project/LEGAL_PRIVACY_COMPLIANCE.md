@@ -1,15 +1,16 @@
 # DROPi Tycoon — Legal, Privacy & Compliance Dossier
 
-Version: 1.0.0  
-Status: CANONICAL COMPLIANCE BASELINE — **DRAFT FOR PROFESSIONAL LEGAL REVIEW BEFORE COMMERCIAL LAUNCH**  
-Audit date: 2026-09-08  
-Audit baseline: `main` at `8e340b7131c4bdc890c38ba34e88d94858897cb3`  
-Owner lane: Agent 13 — Legal / Privacy / Compliance / Intellectual Property  
-Coordinates: #328, #330, #335, #348, #363, #409, #411, #412, #560, #562, #564, #565
+Version: 1.1.0
+Status: CANONICAL COMPLIANCE BASELINE — **DRAFT FOR PROFESSIONAL LEGAL REVIEW BEFORE COMMERCIAL LAUNCH**
+Audit date: 2026-09-08
+Continuation review: 2026-09-09
+Audit baseline: `main` at `8e340b7131c4bdc890c38ba34e88d94858897cb3`
+Owner lane: Agent 13 — Legal / Privacy / Compliance / Intellectual Property
+Coordinates: #328, #330, #335, #348, #363, #409, #411, #412, #560, #561, #562, #563, #564, #565, #568, #569, #570, #571
 
 ---
 
-## 1. Purpose and boundary
+## 1. Purpose and legal boundary
 
 This document is the canonical engineering compliance baseline for the real-world commercial operation and distribution of DROPi Tycoon.
 
@@ -17,134 +18,154 @@ It covers:
 
 - privacy and GDPR readiness;
 - Google Play policy dependencies;
-- accounts, profiles and deletion;
-- minors and age strategy;
+- accounts, profiles, deletion and data-subject rights;
+- minors and target-age decisions;
 - multiplayer, chat and user-generated content;
-- advertising, analytics and purchases;
+- analytics, crash reporting and advertising;
+- purchases, subscriptions and promotions;
 - security/privacy by design;
 - intellectual property, trademarks and third-party licensing;
 - source/data provenance;
-- release evidence and professional legal-review gates.
+- release evidence and legal-review gates.
 
-It does **not** implement or interpret fictional in-game law. It is not legal advice and is not a substitute for qualified counsel. Jurisdiction-specific conclusions, final consumer contracts, trademark clearance, child-safety obligations and material licensing questions must be reviewed professionally before commercial launch.
+It does **not** implement or interpret fictional in-game law. It is structured legal/compliance research and engineering guidance, not legal advice and not a substitute for qualified counsel.
 
-The future DROPi token/crypto project is out of scope. Any future blockchain, wallet, crypto-payment, NFT or token-reward integration requires a separate financial/regulatory review before implementation.
+The future DROPi token/crypto project is out of scope. Any later blockchain, wallet, crypto-payment, NFT or token-reward integration requires a separate financial/regulatory review before implementation.
 
 ---
 
-## 2. Audit snapshot — 2026-09-08
+## 2. Audited repository and production state
 
-### 2.1 Repository and production state reviewed
+### 2.1 Repository state
 
-The audit reviewed the latest `main`, the latest merged-PR stream, current open PRs and active `agent/*` branches as of the audit date.
+The original audit and continuation checkpoint reviewed:
 
-Relevant active work includes:
+- latest `main`;
+- the latest merged-PR stream;
+- all current open PRs;
+- active specialist branches;
+- issues #328, #330, #335, #348, #363, #409, #411 and #412;
+- current account/profile authority;
+- browser save/persistence;
+- World Instance and server-authority work;
+- smartphone, multiplayer, chat, analytics, advertising and monetization references;
+- `08_Assets/**` and `game-web/public/assets/**`;
+- world-data provenance including GeoNames, OpenStreetMap-derived data and Natural Earth;
+- `game-web/package.json` and the production lockfile;
+- Railway production configuration.
 
-- #545 World Instance B2 durable PostgreSQL persistence;
-- #548 player economy / employee-first identity-adjacent state;
-- #549 CI/Railway production hardening;
-- #555 personal capability/professions;
-- #556 production/supply chain;
-- #557 narrative;
-- active world/locality, Brăila visual and visual-storytelling branches.
+At the continuation checkpoint, `main` remained at `8e340b7131c4bdc890c38ba34e88d94858897cb3`, so this branch remains based on the current `main` baseline.
 
-The current production Railway service is sourced from `caliofmarian-ai/DROPi-Tycoon`, branch `main`, root `/game-web`, and uses the normal `npm run build` / `npm run start` path. At audit time no Railway service variable selected a PostgreSQL authority store, so the server defaults to the session authority registry.
+### 2.2 Production runtime boundary
 
-### 2.2 Current account/profile authority boundary
+The Railway production service is sourced from `caliofmarian-ai/DROPi-Tycoon`, branch `main`, root `/game-web`.
 
-Current `game-web/server/server.mjs` exposes `/api/authority/*` and defaults to the session authority registry.
+At audit time no production variable selected the PostgreSQL authority store. `game-web/server/server.mjs` therefore defaults to the in-memory session authority registry.
 
-`game-web/server/session-authority.mjs` currently supports:
+The current production service must not be described as having a production-grade authenticated account system merely because authority endpoints exist.
+
+### 2.3 Account/profile prototype finding
+
+`game-web/server/session-authority.mjs` supports a public-profile prototype including:
 
 - `CreatePublicProfile`;
 - `SetDisplayName`;
-- read of a public profile by aggregate ID;
+- public profile reads;
 - command receipts;
-- client-supplied `actorId`, `aggregateId` and `commandId`;
+- client-provided `actorId`, `aggregateId` and `commandId`;
 - `authentication: not-configured`.
 
-The session implementation is process-memory only. The PostgreSQL implementation exists in `game-web/server/postgres-authority.mjs` and can persist profile, command and event records, but it also declares `authentication: not-configured`.
+`game-web/server/postgres-authority.mjs` can durably persist profile, command and event records but also declares `authentication: not-configured`.
 
-**Compliance conclusion:** this is an explicit prototype boundary, not a production account system. It may remain available for non-sensitive prototype testing only while it stores no private account data and is not represented as secure identity. Durable or commercially relied-on online identity is blocked by #560 until authenticated server-side ownership/authorization exists.
+**Release conclusion:** the current authority surface is a prototype, not a commercial account authority. Durable or commercially relied-on identity is blocked by #560 until authenticated server-side ownership and authorization exist.
 
-### 2.3 Current save boundary
+### 2.4 Local save boundary
 
-The active web runtime has browser-local persistence through `game-web/src/persistence/browserSaveStorage.ts`, which returns `window.localStorage` when available.
+`game-web/src/persistence/browserSaveStorage.ts` uses `window.localStorage` when available.
 
-This means ordinary game save/progression data is presently device/browser-local unless another system explicitly sends it to the server. Local save state must not be conflated with a cloud account record.
+Current local game save/progression is therefore device/browser-local unless another implementation explicitly transmits it. Local save deletion/reset must remain conceptually separate from deletion of a future online account.
 
-### 2.4 Current analytics, advertising and chat boundary
+### 2.5 Analytics, ads, crash reporting and chat boundary
 
-No production analytics, advertising, crash-reporting, ad-identifier or chat SDK implementation was identified in the audited runtime dependency set.
+No production analytics, advertising, crash-reporting, advertising-identifier or chat SDK was identified in the audited runtime dependency set.
 
-Repository references to player analytics, A/B testing, advertising, rewarded systems, multiplayer chat and world-market communication are future/planned capabilities.
+References to analytics, A/B testing, advertising, rewarded systems and multiplayer chat are currently planned/future capabilities.
 
-Therefore:
+Every new auth, analytics, crash, ads, attribution, chat or support SDK is a compliance-triggering change. Its data behavior must be audited before release and Google Play declarations must be updated to match the shipped build.
 
-- do not declare that such collection occurs today if the build does not do it;
-- do not declare that it never occurs after an SDK is added;
-- adding any auth/analytics/crash/ads/chat SDK is a compliance-triggering change requiring data-map and Google Play declaration review.
+### 2.6 Cross-agent reconciliation
+
+The continuation review found new specialist work that should consume this dossier rather than duplicate it:
+
+- **#569 / Agent 14:** owns publication of the production Privacy Policy and completion of Play Data Safety / App Content declarations. It must use this dossier's actual-data map and may not claim unimplemented behavior.
+- **#571 / Agent 14:** owns owner-only Play Console submission/publishing actions. Agent 13 supplies legal/privacy/IP evidence but does not perform Play Console actions.
+- **#570 and #561 / Agents 14 and 15:** store listing and launch creative require Agent 13 IP, trademark, attribution and disclosure review before publication.
+- **#563 and #564 / Agents 15 and 13:** creator/community launch rules and in-product chat/UGC must share one acceptable-use, moderation, reporting, blocking and minor-safety baseline.
+- **#568 / Agent 16:** governed analytics/error evidence remains subject to this dossier's purpose, minimization, processor, retention, age, consent/lawful-basis and Data Safety requirements.
+- **Agent 12 / monetization:** ads, IAP and subscriptions remain gated by the privacy, consumer-protection and Play declarations defined here and in #569.
+
+No duplicate issues are required for those findings.
 
 ---
 
-## 3. Compliance severity model
+## 3. Severity model
 
 | Severity | Meaning |
 |---|---|
-| **BLOCKER** | Must be resolved before the affected commercial capability or store release can ship. |
-| **HIGH** | Material legal/policy/security exposure; should normally be treated as a release gate unless the affected feature is disabled. |
-| **MEDIUM** | Required governance or hardening work that may not block the current prototype but must be planned before scale. |
-| **LOW** | Cleanup/documentation improvement with limited immediate exposure. |
-| **INFORMATIONAL** | Boundary or evidence note; no defect by itself. |
+| **BLOCKER** | Must be resolved before the affected capability or commercial release can ship. |
+| **HIGH** | Material legal, policy, security or commercial exposure; normally a release gate unless the affected feature is disabled. |
+| **MEDIUM** | Governance/hardening required before scale but not necessarily a current prototype blocker. |
+| **LOW** | Limited immediate exposure; cleanup/documentation improvement. |
+| **INFORMATIONAL** | Boundary/evidence note rather than a defect. |
 
-A feature-specific BLOCKER does not require removing unrelated offline gameplay. The preferred response is to keep the affected online/monetized/UGC capability disabled until its gate is satisfied.
+A feature-specific blocker does not require removal of unrelated offline gameplay. The preferred response is to keep the affected feature disabled until its gate is satisfied.
 
 ---
 
 ## 4. Real data inventory
 
-The following inventory distinguishes **CURRENT**, **CURRENT PROTOTYPE**, **PLANNED**, and **NOT FOUND**. Storage/retention values must be updated when implementation changes.
+The state labels below mean **CURRENT**, **CURRENT PROTOTYPE**, **PLANNED**, or **NOT FOUND** in the audited build/repository.
 
-| Data category | State now | Purpose | Storage / exposure | Retention / deletion | Controller / processor considerations | Dependency / risk |
-|---|---|---|---|---|---|---|
-| Local account identifier | **CURRENT** | Bind account/world/hero identity in local world-instance model | Local save/runtime state | Save lifetime; explicit user-facing reset/delete behavior must remain distinguishable from account deletion | If never transmitted it remains local-device data; once synced, publisher becomes controller for server copy | **MEDIUM** — update map when sync/auth arrives |
-| World instance ID / hero actor ID | **CURRENT** | World identity and deterministic hero identity | Local save/runtime state | Save lifetime today | Can become online identifier if transmitted | **MEDIUM** |
-| Server public-profile aggregate/actor/command IDs | **CURRENT PROTOTYPE** | Authority prototype | Server process memory by default; PostgreSQL code path exists but is not production-authenticated | Session memory until process ends in current production default; durable path would be indefinite absent policy | Publisher controls purpose if activated; hosting/database vendors become processors or service providers subject to contract/role review | **BLOCKER before durable activation** — #560 |
-| Display name | **CURRENT PROTOTYPE capability** | Public player profile label | `/api/authority/*`; public profile intentionally readable if created | Session-only in current default; durable PG path exists | Public visibility must be clearly disclosed; username/display-name moderation needed | **HIGH** |
-| Username | **PLANNED** (#328) | Stable player identity / social systems | TBD server account system | TBD | Public/private separation required | **BLOCKER before production account** |
-| Avatar | **PLANNED** (#328/#335) | Public profile expression | TBD object storage/CDN | Replacement/deletion lifecycle required | File validation, access control, content/moderation and provider DPA required | **BLOCKER before upload launch** |
-| Email | **NOT FOUND / MAY BE INTRODUCED** | Authentication, recovery, support | Must remain private server-side | Purpose-specific retention; delete unless required by documented exception | Direct personal data; do not expose in public profile | **BLOCKER to document before collection** |
-| Authentication credentials/tokens | **NOT CONFIGURED** | Account authentication | Future secure server/session/auth provider | Shortest practical token/session lifetime; secrets never in public save | Processor/subprocessor and transfer review may apply | **BLOCKER before accounts** |
-| Device identifiers | **NOT FOUND** | No current justified purpose | None identified | N/A today | Do not add persistent identifiers merely because an SDK offers them | **HIGH if introduced** |
-| IP/network request metadata | **INHERENT HOSTING LAYER / APP DOES NOT EXPLICITLY LOG REQUEST IP** | Network delivery, abuse/security, infrastructure operation | Railway/proxy/server infrastructure may process connection metadata | Provider/configuration-specific; must be documented before launch | Hosting processor/service-provider role and DPA/transfer review required | **HIGH documentation item** |
-| Browser/local game save | **CURRENT** | Offline continuity and progression | `window.localStorage` on user device/browser | Until overwritten, app/site data is cleared, or a future reset flow removes it | Not server-held unless synced | **LOW current privacy exposure; HIGH once cloud sync exists** |
-| Player progression/economy state | **CURRENT locally; online authority expanding** | Core gameplay | Local save now; future server authority planned | TBD for cloud state | If tied to an account it is personal data/online identifier-linked state | **HIGH before cloud persistence** |
-| Purchases/subscriptions | **PLANNED** | Commercial monetization | Google Play + publisher entitlement records when implemented | Financial/legal/accounting retention may differ from gameplay data | Google/payment roles must be documented; exact legal basis/retention requires counsel | **BLOCKER before IAP** |
-| Analytics / A-B testing | **PLANNED; SDK NOT FOUND** | Product measurement | TBD vendor/server | TBD | Lawful basis/consent/ePrivacy and processor/transfer review required | **BLOCKER before collection without approved design** |
-| Crash reports | **NOT FOUND / likely future** | Reliability and security | TBD vendor/server | Minimize stack metadata and retention | Ensure reports do not accidentally include messages, email, auth tokens or precise location | **HIGH if introduced** |
-| Chat messages | **PLANNED** (#330/#348) | Multiplayer communication | Future server storage | Retention/deletion/moderation evidence policy TBD | UGC, minors, moderation, safety and privacy rights apply | **BLOCKER before enablement** — #564 |
-| Moderation reports / sanctions | **PLANNED** | Safety and policy enforcement | Future moderation backend | Separate retention for evidence/appeals; must be justified | May include sensitive allegations; least-access controls required | **BLOCKER before chat/UGC** |
-| User-generated content | **PLANNED** | Social/gameplay interaction | Future server/CDN | Content-specific lifecycle | Terms acceptance, report/block/moderation required | **BLOCKER before enablement** |
-| Support communications | **NOT IMPLEMENTED as product system** | Customer support | Future support provider/email | Purpose-based retention | Processor and support-access controls required | **MEDIUM** |
-| User precise/approximate location | **NOT FOUND** | No current user-location purpose | None identified | N/A | Real-world map geography is not the same as collecting a player device's location | **HIGH if permission/collection is added** |
-| Advertising identifier / ad profile | **NOT FOUND** | No current ad SDK | None identified | N/A | Especially sensitive to age/consent/Google Families constraints | **BLOCKER before personalized ads** |
-| Real-world geographic datasets | **CURRENT, non-user data** | Build authentic game world | Repository/runtime datasets | Versioned source snapshots | Licensing/provenance obligation, not player privacy by itself | **BLOCKER if attribution/license obligations unresolved** — #565 |
+| Data category | State | Purpose | Storage / exposure | Retention / deletion | Compliance dependency |
+|---|---|---|---|---|---|
+| Local account identifier | CURRENT | Local World Instance identity | Local save/runtime | Save lifetime today | Re-audit when server sync begins |
+| World Instance ID / hero actor ID | CURRENT | World/hero identity | Local save/runtime | Save lifetime today | Becomes online identifier if transmitted |
+| Public-profile aggregate/actor/command IDs | CURRENT PROTOTYPE | Authority prototype | Server process memory by default; PG path exists | Session-only in current default; durable path needs policy | #560 before durable activation |
+| Display name | CURRENT PROTOTYPE capability | Public profile label | Public-profile API if created | Session-only in current production default | Moderation/privacy rules before production |
+| Username | PLANNED | Stable social identity | Future account service | TBD | #560/#562 before production |
+| Avatar | PLANNED (#335) | Public profile expression | Future object storage/CDN | Replace/delete lifecycle required | File safety, moderation, DPA, deletion |
+| Email | NOT FOUND / MAY BE INTRODUCED | Auth/recovery/support | Must remain private server-side | Purpose-specific | Notice, lawful basis, deletion/retention before collection |
+| Passwords/auth tokens | NOT CONFIGURED | Authentication | Future secure auth/session service | Minimized/short-lived as applicable | Never expose in saves/public profiles |
+| Device identifiers | NOT FOUND | No current justified purpose | None identified | N/A | Re-audit before introduction |
+| IP/network metadata | INFRASTRUCTURE-INHERENT | Delivery/security | Hosting/proxy layer may process | Provider/configuration-specific | Processor/retention/transfer review |
+| Local game save | CURRENT | Offline continuity | Browser `localStorage` | Until reset/cleared/overwritten | Separate from account deletion |
+| Progression/economy state | CURRENT locally | Core gameplay | Local save; server authority planned | TBD for cloud | Personal data when account-linked |
+| Purchase/subscription data | PLANNED | Monetization/entitlements | Play + publisher records when implemented | Accounting/legal needs may differ | Consumer/payment/privacy review |
+| Analytics/A-B data | PLANNED; SDK NOT FOUND | Measurement | TBD | TBD | #568 + lawful-basis/consent/Play review |
+| Crash reports | NOT FOUND / FUTURE | Reliability/security | TBD vendor/server | Minimize and bound | Do not include tokens/messages/private data |
+| Chat messages | PLANNED | Multiplayer communication | Future server | TBD moderation/privacy retention | #564 blocker |
+| Moderation reports/sanctions | PLANNED | Safety enforcement | Future moderation backend | Evidence/appeal retention must be justified | #564 blocker |
+| User-generated content | PLANNED | Social interaction | Future backend/CDN | Content lifecycle required | Terms/report/block/moderation gate |
+| Support communications | NOT IMPLEMENTED as product system | Support | Future provider/email | Purpose-based | Provider/access/retention review |
+| Player real-world location | NOT FOUND | No current purpose | None identified | N/A | Permission/data map required before collection |
+| Advertising ID/ad profile | NOT FOUND | No current ad SDK | None identified | N/A | Age/consent/Families/ads review before use |
+| Geographic world datasets | CURRENT, non-user data | Authentic world | Repo/runtime | Versioned snapshots | License/provenance gate #565 |
 
-### Data-map invariant
+### 4.1 Data-map invariant
 
-Every new external SDK/service must be registered **before merge to a release branch** with:
+Before a new external SDK/service merges into a release branch, record:
 
-1. exact SDK/service and version;
-2. data categories collected/generated;
+1. provider and exact SDK/service/version;
+2. data categories collected or generated;
 3. purpose;
-4. server/vendor destinations;
-5. controller/processor or other role analysis;
+4. destination/recipient;
+5. controller/processor/other role assessment;
 6. retention/deletion behavior;
 7. international transfer path where applicable;
-8. consent/lawful-basis dependency;
-9. age/minor dependency;
-10. Play Data safety impact;
-11. opt-out/deletion propagation behavior.
+8. lawful basis/consent dependency;
+9. minor/target-age dependency;
+10. Google Play Data Safety impact;
+11. opt-out/account-deletion propagation behavior.
 
 ---
 
@@ -152,607 +173,468 @@ Every new external SDK/service must be registered **before merge to a release br
 
 ### 5.1 Core principles
 
-For EU/EEA personal-data processing, engineering must support the GDPR principles of lawfulness/fairness/transparency, purpose limitation, data minimization, accuracy, storage limitation, integrity/confidentiality and accountability.
+For EU/EEA personal-data processing, engineering must support lawfulness, fairness and transparency; purpose limitation; data minimization; accuracy; storage limitation; integrity/confidentiality; and accountability.
 
-Canonical source: Regulation (EU) 2016/679, Article 5:  
+Canonical source: Regulation (EU) 2016/679, Article 5.
+
 https://eur-lex.europa.eu/eli/reg/2016/679/oj/eng
 
-The product must not collect data merely because it might be useful later. A purpose and retention rule must exist before collection begins.
+The application must not collect information merely because it may be useful later.
 
 ### 5.2 Privacy notice
 
-Before production personal-data collection, a public Privacy Policy / notice must accurately describe at least:
+Before production personal-data collection, a public privacy notice must accurately describe, as applicable:
 
-- controller identity and contact;
-- DPO/contact where legally applicable;
-- categories/purposes of processing;
-- lawful basis for each purpose;
+- controller identity/contact;
+- privacy/DPO contact where required;
+- processing purposes;
+- approved lawful basis per purpose;
 - recipients/categories of recipients;
-- international transfer mechanism where applicable;
-- retention period or criteria;
+- international transfers and safeguards;
+- retention periods or criteria;
 - access, rectification, erasure, restriction, objection and portability rights where applicable;
 - consent withdrawal where consent is used;
-- complaint right to the competent supervisory authority;
-- automated decision-making/profiling where applicable;
-- child/minor handling;
+- supervisory-authority complaint right;
+- material automated decision-making/profiling where applicable;
+- minor/age handling;
 - account deletion route;
-- material processors/subprocessors or a maintained subprocessor disclosure route.
+- material processors/subprocessors or a maintained disclosure route.
 
-Canonical source: GDPR Article 13.
+#569 is the Play/release implementation owner for publishing the production policy and declarations. Final legal wording requires qualified review.
 
-**Never publish a notice that describes planned behavior as if it already exists, or omits behavior that a shipped SDK actually performs.**
+### 5.3 Lawful basis
 
-### 5.3 Lawful basis register
+Lawful basis is a legal/privacy decision, not a code constant. Engineering must maintain a purpose-to-basis register after professional approval.
 
-The final lawful basis is a legal decision, not a code constant. An engineering register must nevertheless map each production purpose to the basis approved by counsel/privacy owner.
+Do not:
 
-Illustrative decision areas:
+- use consent as a blanket basis for all processing;
+- make unnecessary processing mandatory by burying it in Terms;
+- introduce analytics/ads/device storage without reviewing ePrivacy/consent implications;
+- assume security/fraud, marketing and core service processing all use the same basis.
 
-- core account/game service may often depend on contract necessity for genuinely necessary processing;
-- security/abuse prevention may involve legitimate interests and/or legal obligations depending on the activity;
-- marketing, certain analytics/device storage technologies and personalized advertising may require consent under applicable data-protection/ePrivacy rules;
-- financial records may have statutory retention obligations.
+### 5.4 Rights and account deletion
 
-Do not use consent as a blanket basis for processing that is actually necessary to perform the service, and do not make unnecessary processing mandatory merely by placing it in Terms.
+Production architecture must support applicable rights including access, correction, erasure, restriction/objection and portability where Article 20 applies.
 
-### 5.4 Data subject rights
+Before account creation is commercially enabled:
 
-The production system must be able to operationalize applicable rights, including:
+- provide an in-app account deletion path;
+- provide the external deletion/request mechanism required for the Play listing when applicable;
+- delete or irreversibly de-identify associated personal data unless a documented legal exception applies;
+- propagate deletion to relevant processors/subprocessors;
+- define backup expiry behavior;
+- keep local save reset distinct from online account deletion;
+- produce auditable deletion/retention evidence.
 
-- access;
-- correction;
-- erasure;
-- restriction/objection where applicable;
-- portability where the Article 20 conditions are met.
+#562 owns the engineering lifecycle gate.
 
-Account deletion is not identical to all GDPR erasure rights, but the engineering architecture should share a controlled deletion pipeline.
+Google Play account-deletion policy reference:
 
-#562 owns the implementation gate before production account creation.
+https://support.google.com/googleplay/android-developer/answer/13327111
 
 ### 5.5 Retention
 
-No production server table/bucket/log category containing personal data may have `indefinite` as an accidental default.
+No production personal-data store may acquire accidental indefinite retention.
 
-Each category needs:
+Each data family needs:
 
 - purpose;
-- active retention period or retention criterion;
+- retention period or criterion;
 - deletion/anonymization trigger;
-- backup expiration behavior;
-- litigation/security/fraud hold exception if legally justified;
+- backup expiry behavior;
+- justified legal/security hold exception if applicable;
 - owner;
 - test/evidence path.
 
 ### 5.6 Privacy by design/default
 
-GDPR Article 25 requires data protection by design and by default. For DROPi Tycoon this means, at minimum:
+At minimum:
 
-- private account data is not public by default;
-- public profile fields are a separate allowlist;
-- only necessary data is collected;
-- retention is bounded;
-- access is least privilege;
-- identifiers are not needlessly exposed;
-- deletion propagates across active stores and expires from backups according to policy;
-- new SDKs default to the least-data configuration;
-- telemetry payloads are schema-controlled, not arbitrary object dumps.
+- private account data is private by default;
+- public profile fields are a positive allowlist;
+- collect only necessary information;
+- use least privilege;
+- avoid exposing internal identifiers without need;
+- schema-control telemetry rather than sending arbitrary object dumps;
+- configure new SDKs for least data by default;
+- propagate deletion to active stores and bounded backups;
+- keep secrets and private keys out of clients and saves.
 
 ### 5.7 Processors/subprocessors and transfers
 
-Before production use of Railway, database/auth/object-storage/analytics/ads/crash/support providers for personal data, maintain:
+Before a production provider handles personal data, record:
 
-- provider legal entity/service;
-- processing purpose;
-- data categories;
+- legal entity/service;
+- purpose and data categories;
 - processing locations;
 - DPA/data-processing terms;
 - subprocessors;
 - deletion/return terms;
 - security commitments;
-- transfer mechanism for third-country transfers where required.
+- international transfer mechanism where required.
 
-GDPR Article 28 requires processors offering sufficient guarantees and contractual controls. Chapter V governs transfers to third countries/international organizations.
-
-This dossier does not conclude that any particular provider configuration is sufficient; that requires review of the actual account, region and contract at launch.
+This dossier does not conclude that any particular Railway/database/auth/analytics/ads/support configuration is legally sufficient; the actual commercial configuration and contract require review.
 
 ---
 
-## 6. Accounts, deletion and profile privacy
+## 6. Account/profile security gate
 
-### 6.1 Production account release gate
+Before durable online identity is enabled:
 
-Before an authenticated account can be enabled commercially:
+1. authenticate the account server-side;
+2. derive/authorize ownership server-side rather than trusting client ownership fields;
+3. separate public profile from private account data;
+4. enforce authorization for profile mutation;
+5. rate-limit and abuse-protect public endpoints;
+6. prevent enumeration where it exposes non-public information;
+7. test impersonation, replay, stale commands and unauthorized mutation;
+8. define deletion/retention before durable persistence;
+9. update privacy notice/Data Safety to match behavior.
 
-1. server-authenticated account identity exists;
-2. authorization does not trust client-supplied ownership IDs;
-3. public profile and private account schemas are separate;
-4. privacy notice is live;
-5. retention is defined;
-6. account deletion exists in-app;
-7. an external web deletion/request route exists for Google Play;
-8. deletion propagates to applicable processors/stores;
-9. access/correction/export operations exist where applicable;
-10. abuse/rate limits protect public endpoints;
-11. Data safety declarations match runtime behavior.
+#560 is a **BLOCKER before durable production identity**.
 
-Google Play's current account-deletion policy requires an in-app path and an external web route when an app enables account creation.
-
-Official reference:  
-https://support.google.com/googleplay/android-developer/answer/13327111
-
-### 6.2 Current authority prototype
-
-The existing unauthenticated authority prototype must not accept:
-
-- email;
-- passwords;
-- access/refresh tokens;
-- payment identifiers;
-- private settings;
-- real names as required identity;
-- private support/moderation data.
-
-If production cannot guarantee this boundary, disable the public prototype routes until #560 is resolved.
+The current unauthenticated prototype must not be extended to collect passwords, email, payment IDs, private settings, access/refresh tokens, private support data or private moderation data.
 
 ---
 
-## 7. Children, minors and target-age strategy
+## 7. Children, minors and target audience
 
-### 7.1 Unresolved product decision
+### 7.1 Decision still required before commercial launch
 
-The repository does not yet contain a final, legally reviewed commercial target-age declaration.
+The repository does not yet establish a professionally reviewed commercial target-age strategy.
 
-**Release blocker:** Agent 14 / product owner / qualified counsel must align:
+The lowest-complexity initial release posture is to **avoid intentionally targeting children** unless the owner deliberately chooses a child-inclusive product and funds/designs the corresponding safeguards. This is a product recommendation, not a legal conclusion that age declarations alone eliminate minor obligations.
 
-- actual game content;
-- store imagery and marketing;
-- Play Console Target Audience and Content selections;
-- IARC content rating;
-- account/chat/ads behavior;
-- privacy notice and age safeguards.
+Store listing, imagery, wording, marketing channels and actual design must be consistent with the declared audience.
 
-A declaration must reflect the product as actually designed and marketed. Selecting an older audience solely to avoid child rules is not an acceptable compliance strategy if the product is in fact directed at children.
+### 7.2 If minors are permitted
 
-### 7.2 Initial risk-minimizing product position
+The release design must address, as applicable:
 
-For the first commercial release, the lowest-complexity engineering path is to **avoid intentionally targeting children** and avoid child-directed marketing/creative unless the owner deliberately chooses to build the additional child-safety/compliance stack.
+- Google Play target-audience/Families rules;
+- age-appropriate privacy disclosures;
+- restrictions on behavioral/personalized advertising;
+- age-appropriate SDK selection/configuration;
+- account/profile discoverability;
+- default privacy settings;
+- chat/contact risks;
+- reporting/blocking/moderation;
+- parental-consent requirements where the chosen lawful basis/jurisdiction requires them;
+- data minimization and retention.
 
-This is a product recommendation, not a final legal classification. A game can still have teen users even if it is not child-directed, and minors retain heightened protections.
+Google Play Families reference:
 
-### 7.3 Google Play Families dependency
-
-Google Play requires accurate target-audience declarations. If a selected target audience includes children, the Families requirements apply, including specific data/SDK/advertising restrictions. Google also states that imagery/terminology can affect its assessment of the declared audience.
-
-Official reference:  
 https://support.google.com/googleplay/android-developer/answer/9893335
 
-If children are included:
-
-- child personal/sensitive data collection must be accurately disclosed;
-- restricted identifiers must not be transmitted from children/users of unknown age as applicable;
-- child-directed ads require compliant/certified SDK handling and no personalized advertising to children;
-- mixed-audience ad designs need an appropriate neutral age screen and child-safe SDK configuration;
-- location and social/chat features face additional restrictions;
-- child safety must be reviewed country-by-country where law differs.
-
-### 7.4 GDPR child consent
-
-GDPR Article 8 states that where consent is the Article 6(1)(a) basis for an information-society service offered directly to a child, the default EU threshold is 16, while Member States may lower it to no less than 13. Reasonable efforts to verify parental authorization are required in the cases covered by that rule.
-
-This does **not** mean every game processing operation must use consent or that age 13 is a universal global threshold. Counsel must map relevant countries and legal bases.
-
-Official reference:  
-https://eur-lex.europa.eu/eli/reg/2016/679/oj/eng
+GDPR Article 8 provides special rules where consent is relied upon for an information-society service offered directly to a child. The Member State/jurisdiction and actual service design require professional review.
 
 ---
 
-## 8. Multiplayer, chat and user-generated content
+## 8. Multiplayer, chat and UGC
 
-### 8.1 No launch before safety stack
+#330 may not ship public chat/UGC merely because transport and message schemas work.
 
-#330 defines important technical extension points, but chat/UGC must remain disabled until #564 is satisfied.
+Before enablement, #564 requires:
 
-The minimum production stack is:
-
-- Community Guidelines / Acceptable Use policy;
 - Terms/User Policy acceptance before UGC creation;
-- report user;
-- report message/content;
-- mute and block;
-- server-enforced block semantics;
-- spam/rate limits;
-- moderation queue and operator workflow;
-- sanction model;
-- evidence retention with access controls;
-- escalation route for threats/child-safety/illegal content as legally required;
-- appeal/review mechanism appropriate to the sanctions offered;
-- chat/report retention and deletion rules;
-- minor/age safeguards;
-- abuse metrics that do not create unnecessary surveillance.
+- Community Guidelines / Acceptable Use rules;
+- rules against harassment, threats, hate/abuse, sexual exploitation, spam, scams, impersonation and unlawful content;
+- report-user and report-message/content paths;
+- mute/block controls with server-enforced semantics;
+- rate limits/spam controls;
+- moderation queue and responsible operator;
+- sanctions and evidence-retention rules;
+- appeal/review path where appropriate;
+- privacy handling for chat/report records;
+- minor-safety rules tied to target age;
+- separation of private account fields from public chat/profile payloads;
+- tests proving report/block/sanction behavior.
 
-Google Play's UGC policy requires robust, effective and ongoing moderation, Terms/User Policy acceptance before UGC creation, in-app reporting and appropriate blocking/reporting behavior for interactive experiences.
+Google Play UGC policy reference:
 
-Official reference:  
 https://support.google.com/googleplay/android-developer/answer/9876937
 
-### 8.2 Public/private separation
-
-Chat presence may expose only approved public identity fields. It must never expose by default:
-
-- email;
-- authentication identifiers/tokens;
-- purchase/payment details;
-- IP address;
-- private moderation notes;
-- private support messages;
-- internal anti-abuse scores;
-- device identifiers.
-
-### 8.3 Chat retention
-
-Retention must balance:
-
-- user privacy;
-- moderation evidence;
-- abuse investigations;
-- legal obligations;
-- storage limitation.
-
-The exact period is a professional legal/product decision. Engineering must make the period configurable, documented and enforceable rather than accidental.
+#563's creator/community launch policy must not establish a second contradictory moderation policy. It should reference the same canonical rules.
 
 ---
 
-## 9. Advertising, analytics and monetization
+## 9. Analytics, crash reporting and measurement
 
-### 9.1 General rule
+No analytics/crash SDK is currently treated as approved merely because product/QA teams want measurement.
 
-Agent 12 owns business strategy; Agent 14 owns Play implementation/declarations; Agent 13 owns legal/privacy review.
+Before #568 or another analytics implementation becomes production-visible, define:
 
-No ads/analytics/IAP SDK may be added to a commercial build without updating:
+- exact questions the telemetry answers;
+- minimum event schema;
+- account/device identifiers, if any;
+- payload fields prohibited from telemetry;
+- vendor and processor role;
+- region/transfers;
+- retention;
+- lawful basis and consent/opt-out where applicable;
+- target-age/minor impact;
+- account deletion propagation;
+- Play Data Safety impact.
 
-- data inventory;
-- processor/subprocessor register;
-- privacy notice;
-- consent/lawful-basis design;
-- age/minor analysis;
-- Play Data safety answers;
-- SDK version/license/security review.
-
-### 9.2 Ads
-
-The preferred first-release privacy posture is contextual/non-personalized advertising, if ads are used at all, until age/consent and data flows are mature.
-
-Personalized advertising creates materially higher consent, profiling and minor-safety complexity and must be separately approved.
-
-If children are in the Play target audience, Families ads restrictions apply. Google currently requires Families-compliant ad handling and prohibits interest-based advertising/remarketing to children.
-
-### 9.3 Rewarded ads
-
-Rewarded ads must be clearly identifiable as advertising, optional, and must not manipulate the user into accidental engagement. The in-game reward must not falsely imply a real-world financial return.
-
-### 9.4 In-app purchases/subscriptions
-
-Digital goods/features/subscriptions distributed through Google Play generally require Google Play billing unless a current policy exception/program applies. Pricing, subscription terms and cancellation behavior must be clear and consistent with the store flow.
-
-Official reference:  
-https://support.google.com/googleplay/android-developer/answer/9858738
-
-Agent 12 must not finalize a monetization mechanic that assumes an external payment route inside the Play-distributed app without Agent 14/current policy review.
-
-### 9.5 Loot/randomized purchases
-
-If paid randomized virtual items are ever introduced, Google Play currently requires odds disclosure. DROPi Tycoon should avoid introducing paid randomization without an explicit consumer-protection, age-rating and jurisdictional review.
+Logs and crash reports must not contain credentials, auth tokens, message bodies, email addresses, precise location or complete save-state dumps unless specifically justified and protected.
 
 ---
 
-## 10. Security / privacy by design requirements
+## 10. Advertising and monetization compliance
 
-The following are canonical release requirements:
+Coordinate with Agent 12 and Agent 14.
 
-- no secrets, private keys or privileged API credentials in client bundles;
-- no passwords/private tokens in local game saves;
-- authenticated server authority for sensitive shared/account/economic actions;
-- client IDs are identifiers, not authorization evidence;
-- public profile is an explicit field allowlist;
-- private account data is deny-by-default;
-- rate limiting on public/auth/account/UGC endpoints;
-- input/body/file-size limits;
-- avatar/file MIME validation and safe storage keys;
-- security headers/TLS through production infrastructure;
-- structured audit logs without unnecessary message bodies or private data;
-- log redaction for auth, email, payment and secrets;
-- defined breach-response owner/process before production personal-data storage;
-- least-privilege database/service credentials;
-- dependency/security update process;
-- deletion propagation and backup expiry;
-- privacy/security regression tests around account/profile/chat/delete surfaces.
+### 10.1 Ads
 
-GDPR Article 32 requires security measures appropriate to the risk, including appropriate confidentiality/integrity/availability and regular testing/evaluation.
+Before any ad or rewarded-ad SDK ships:
+
+- audit SDK/vendor data collection;
+- determine contextual vs personalized behavior;
+- determine lawful basis/consent requirements;
+- account for target age/Families restrictions;
+- update privacy notice and Data Safety;
+- ensure rewards are truthful and actually granted;
+- prohibit disguised real-world advertising inside required gameplay;
+- keep fictional in-world advertising distinct from paid external advertising.
+
+### 10.2 IAP/subscriptions
+
+Before paid digital goods/subscriptions ship:
+
+- use the required Google Play billing path where policy applies;
+- state price, renewal, duration and material limitations clearly;
+- provide entitlement/restoration handling;
+- do not misrepresent probability, scarcity or benefits;
+- define refund/cancellation/support handoff;
+- ensure paid mechanics match the actual store listing;
+- document financial/accounting retention separately from ordinary game data.
+
+Final EU/EEA consumer-contract, cancellation/refund and promotional wording requires professional review.
 
 ---
 
-## 11. Intellectual property and branding
+## 11. Terms and player-facing legal documents
 
-### 11.1 Trademark clearance
+Engineering-ready requirements may be drafted in-repository, but final launch contracts must be marked:
 
-The repository contains approved `DROPi Tycoon` branding, logo, icon and splash assets. Owner approval of a design does not replace trademark clearance.
+**DRAFT FOR PROFESSIONAL LEGAL REVIEW.**
 
-Before commercial launch, qualified trademark/IP review must assess at least:
+Required document families as features activate:
+
+1. Privacy Policy / Privacy Notice;
+2. Terms of Service / End User Terms;
+3. Community Guidelines / Acceptable Use;
+4. account deletion/data-rights instructions;
+5. purchase/subscription terms;
+6. UGC licence/moderation rules;
+7. future marketplace rules;
+8. third-party notices/licence acknowledgements.
+
+Terms should address, where applicable:
+
+- eligibility/age;
+- account obligations;
+- licence to use the game;
+- prohibited conduct;
+- UGC rights and moderation;
+- virtual goods/currency;
+- purchases/subscriptions;
+- service changes/termination;
+- disclaimers and liability only as legally appropriate;
+- governing law/dispute terms only after qualified jurisdiction-specific review.
+
+Do not invent a final jurisdiction-specific contract and represent it as lawyer-approved.
+
+---
+
+## 12. Security / privacy by design
+
+Required architecture rules:
+
+- no service secrets/private keys in client bundles or saves;
+- no client-authoritative account ownership or sensitive economic settlement;
+- server authority for shared account/economic actions;
+- separate public/private profile schemas;
+- least-privilege database/service access;
+- secure transport;
+- bounded request bodies and abuse/rate controls;
+- no unnecessary personal data in logs;
+- deletion propagation across stores/processors;
+- authenticated support/admin operations;
+- security incident logging without excessive content collection;
+- dependency/security scanning appropriate to production.
+
+Agent 13 does not own the technical implementation of #560 but treats it as a legal/privacy release dependency.
+
+---
+
+## 13. Intellectual property and real brands
+
+### 13.1 Project identity
+
+Before commercial launch, obtain qualified trademark/name clearance for at least:
 
 - `DROPi`;
 - `DROPi Tycoon`;
-- logo/device marks;
+- logo/wordmark;
 - app icon;
-- major recurring commercial brand/company names intended to function as source identifiers;
-- priority launch jurisdictions/classes.
+- material recurring commercial/company names that will be promoted externally.
 
-**Status: HIGH / commercial-launch blocker until clearance decision is recorded.**
+Repository ownership or domain use does not establish trademark clearance.
 
-### 11.2 Real-world companies and brands
+### 13.2 Real companies and brands
 
-Real geographic identity does not grant trademark permission.
+Default game-content rule:
 
-Canonical content rule:
+- use fictionalized commercial companies/products;
+- do not reproduce real logos, packaging, storefront trade dress or vehicle liveries without explicit rights review;
+- real geographic/city identity does not grant permission to use private trademarks;
+- store screenshots/trailers/creator materials must follow the same rule.
 
-- use real city/road/geographic information only where data/source rights permit;
-- use fictional companies, products, store branding, packaging and vehicle liveries by default;
-- do not reproduce real logos/trade dress/brand packaging as game partners without explicit lawful authorization;
-- do not imply sponsorship, endorsement or partnership with real businesses unless documented.
+#561 and #570 require Agent 13 IP/disclosure review before public launch creative/listing publication.
 
-`08_Assets/Production/Manifests/BATCH_001_WORLD_FOUNDATION_MANIFEST.md` already requires generic fictional product/cargo art rather than copied real-world brand packaging; that rule is now also a legal release invariant.
+### 13.3 Assets and generated art
 
-### 11.3 Generated artwork
+Every material shipped asset family needs provenance sufficient to answer:
 
-Generated art requires provenance even when no third-party image was intentionally copied.
-
-For each production/runtime generated asset or source family, record where feasible:
-
-- provider/tool/model family;
-- generation date;
-- account/plan or governing terms version/reference;
-- prompt/project instruction reference;
-- input/reference-image provenance;
-- whether a real person/brand/character/reference image was involved;
-- human edits/derivatives;
-- source and runtime hashes;
-- promotion/approval state.
-
-Do not claim universal copyright ownership/protectability of AI-generated material. Those questions vary by jurisdiction and by human authorship. Key brand art and final commercial character art require professional IP review.
-
-### 11.4 Fonts, icons, audio/music
-
-No assumption of `free online = commercially reusable` is permitted.
-
-Before any font, icon pack, music, sound effect, voice or external reference image enters a production/runtime path, register:
-
+- who/what created it;
 - source/provider;
-- exact license/terms;
-- commercial-use right;
-- redistribution/embedding right;
-- modification right;
-- attribution requirement;
-- prohibited uses;
-- proof/source snapshot where practical.
+- licence or provider terms applicable at creation/acquisition;
+- commercial-use status;
+- modification and redistribution rights;
+- attribution requirements;
+- reference/input provenance;
+- human edits/derivatives;
+- source/runtime hashes where feasible.
+
+Owner visual approval is a product-quality decision, not by itself a complete chain-of-title analysis.
+
+#565 owns the release-facing third-party/provenance closure gate.
 
 ---
 
-## 12. Geographic and third-party data
+## 14. Google Play consistency gate
 
-The canonical release register is `00_Project/THIRD_PARTY_LICENSE_REGISTER.md`.
+Coordinate with Agent 14.
 
-### 12.1 GeoNames
+Before submission, Play Console declarations must match the exact shipped artifact and live backend behavior.
 
-Current locality governance identifies GeoNames under Creative Commons Attribution 4.0 and preserves source snapshots/references.
+Required consistency checks include:
 
-A shipped legal/about/third-party notices surface must carry required attribution and identify modifications/derived use appropriately.
-
-Official provider reference:  
-https://www.geonames.org/
-
-### 12.2 OpenStreetMap
-
-Brăila uses OpenStreetMap-derived geographic/layout data under ODbL 1.0. Existing implementation already displays `© OpenStreetMap contributors · ODbL` in the Urban HUD and retains source/transformation metadata.
-
-That is a strong baseline but not by itself a final legal conclusion about every distributed derivative database/produced work.
-
-Before commercial release containing OSM-derived databases:
-
-- preserve visible attribution appropriate to the medium;
-- make clear that OSM data is available under ODbL;
-- preserve source/licence links/notices;
-- identify which shipped artifacts are databases, derivative databases or produced works;
-- document any share-alike/source-offer obligation triggered by the actual distribution form;
-- keep retained source inputs and deterministic transformation scripts available as required by the approved compliance design.
-
-Official reference:  
-https://www.openstreetmap.org/copyright
-
-**Professional ODbL review required before final binary distribution.**
-
-### 12.3 Natural Earth
-
-Natural Earth is recorded in world-data governance as a pinned public-domain source. Preserve provenance/version/source hashes even where attribution is not legally required. This helps reproducibility and prevents later accidental substitution with a differently licensed dataset.
-
----
-
-## 13. Terms and policy document set
-
-The following are required before the corresponding capabilities ship.
-
-All final legal texts are **DRAFT FOR PROFESSIONAL LEGAL REVIEW** until counsel approval is recorded.
-
-| Document | Required before | Minimum engineering/content dependency |
-|---|---|---|
-| Privacy Policy / Privacy Notice | Any production personal-data collection and Play submission | Actual data map, controller details, vendors, retention, rights, transfers, age handling |
-| Terms of Service / End User Terms | Production account/commercial service | Service description, account rules, license, suspension/termination, disclaimers, governing-law/country-specific review |
-| Community Guidelines / Acceptable Use | Chat/UGC | Prohibited conduct/content, reports, blocks, sanctions, escalation |
-| Account Deletion help page | Production accounts / Play listing | In-app deletion path, external request route, what is deleted/retained and why |
-| Purchase/subscription terms | IAP/subscriptions | SKU, price, renewal/cancel/refund behavior, Play billing alignment |
-| UGC license/rules | UGC upload/posting | User rights/permissions to content, moderation/removal, complaints |
-| Marketplace rules | Any future player marketplace with user offers | Fraud/abuse, prohibited goods/content, settlement rules, consumer-law analysis |
-| Third-party notices | Any commercial build containing third-party licensed material | `THIRD_PARTY_LICENSE_REGISTER.md` and generated notice output |
-
-No agent may invent a statement such as “we never collect X” unless the release build and all SDKs support that statement.
-
----
-
-## 14. Google Play declaration alignment
-
-Agent 14 owns store-policy execution, but Agent 13 establishes the consistency gate.
-
-Before each production Play submission, compare the actual release artifact against:
-
-- Data safety form;
-- Target Audience and Content;
+- target audience/content declarations;
+- Data Safety categories and purposes;
+- data sharing/processing declarations;
+- account creation/deletion behavior;
 - ads declaration;
-- IARC content rating;
-- account deletion declaration/link;
-- privacy-policy URL;
 - permissions;
-- SDK inventory;
-- in-app purchases/subscriptions;
 - UGC/chat behavior;
-- location behavior;
-- child/family status.
+- purchases/subscriptions;
+- privacy-policy URL/content;
+- developer/contact information;
+- third-party SDK behavior.
 
-**Release rule:** declarations must describe the submitted binary, not the roadmap.
+#569 owns the Privacy Policy/Data Safety/App Content release work. #571 owns the owner-only Play Console submission/publishing gates.
+
+Agent 13 may provide review evidence, but must not represent a Play Console declaration as completed without actual Console evidence.
 
 ---
 
-## 15. Compliance matrix
+## 15. Third-party data and dependency rule
 
-| REQUIREMENT | CURRENT STATE | RISK | REQUIRED ACTION | OWNER | RELEASE BLOCKER? | EVIDENCE |
+The canonical release register is:
+
+`00_Project/THIRD_PARTY_LICENSE_REGISTER.md`
+
+Key governed families include:
+
+- OpenStreetMap-derived Brăila data — ODbL 1.0, with visible attribution already present in the audited HUD;
+- GeoNames locality data — CC BY 4.0, requiring attribution/compliance in shipped notices;
+- Natural Earth — public-domain source, with provenance still retained;
+- direct and transitive software dependencies;
+- generated art and runtime derivatives;
+- fonts/icons/audio/reference imagery when introduced.
+
+Do not assume that material found online is commercially reusable merely because it is publicly accessible.
+
+---
+
+## 16. Compliance matrix
+
+| Requirement | Current state | Risk | Required action | Owner | Release blocker? | Evidence |
 |---|---|---|---|---|---|---|
-| Authenticated account/profile authority | Prototype authority is unauthenticated; session default in production | **BLOCKER** | Implement server-authenticated ownership and authorization; isolate/disable unsafe production use | Server/identity engineering + Agent 13 review | **YES before durable online identity** | `server.mjs`, `session-authority.mjs`, `postgres-authority.mjs`, #560 |
-| Public/private profile separation | Canon requires separation; prototype exposes only aggregate/revision/displayName | **HIGH** | Keep explicit public allowlist and private account schema | #328/#363 owners | **YES before accounts** | #328, #363 |
-| Privacy notice | No canonical public Privacy Policy found | **BLOCKER** | Draft from actual data map; professional review; publish and link in app/store | Agent 13 + counsel + Agent 14 | **YES before personal-data production launch** | Repository search + this dossier |
-| Account deletion | Not implemented | **BLOCKER** | In-app + external web route; deletion propagation and evidence | Account engineering | **YES before account creation** | #562; Google Play deletion policy |
-| GDPR rights operations | Not implemented | **HIGH** | Access/correction/erasure/export where applicable; request verification/audit | Account/backend engineering + privacy owner | **YES before scaled production accounts** | GDPR Arts. 12–22; #562 |
-| Retention schedule | No product-wide schedule | **HIGH** | Define/test retention by category and backup expiry | Agent 13 + data owners | **YES for server-held personal data** | Data inventory above |
-| Processor/subprocessor register | Not canonical | **HIGH** | Record Railway/auth/db/storage/analytics/ads/support roles, DPA, locations, subprocessors | Agent 13 + owner | **YES before relevant provider processes personal data** | GDPR Art. 28 |
-| International transfers | Not assessed for launch configuration | **HIGH** | Review actual service regions/contracts/transfer mechanisms | Qualified privacy counsel | **YES where applicable** | GDPR Chapter V |
-| Target-age strategy | Not finalized | **BLOCKER** | Product decision + counsel + Agent 14 declarations aligned to content/marketing | Owner + Agent 13 + Agent 14 + counsel | **YES before Play submission** | Google Play Families/Target Audience policy |
-| Children data/ads handling | Not implemented because target strategy unresolved | **BLOCKER if children included** | Age-appropriate design, SDK restrictions, consent/parental rules as applicable | Agent 13/14 + engineering | **YES if children targeted/permitted under applicable rules** | Google Families; GDPR Art. 8 |
-| Chat/UGC moderation | Planned only | **BLOCKER** | Terms acceptance, report, block, moderation, sanctions, retention, appeals as appropriate | #330 owner + Agent 13 | **YES before chat/UGC** | #330, #564, Google UGC policy |
-| Advertising privacy | No production ad SDK found | **INFORMATIONAL now / HIGH future** | Vendor/data/consent/age review before SDK integration | Agent 12 + Agent 13/14 | **YES before ads if unresolved** | Current package audit |
-| Analytics/crash privacy | No production analytics/crash SDK found | **INFORMATIONAL now / HIGH future** | Event schema, minimization, lawful basis/consent, vendor review | Product analytics + Agent 13 | **YES before collection if unresolved** | Current package/code audit |
-| IAP/subscriptions | Not implemented | **HIGH future** | Play Billing/current program review, pricing/cancel/refund disclosures, entitlement security | Agent 12 + Agent 14 | **YES before monetized release** | Google Payments policy |
-| GeoNames attribution | Source governance is strong; release-facing notice not yet canonical | **HIGH** | Add shipped attribution/change/source notice | World data + Agent 13 | **YES if GeoNames data ships** | Country Catalog audits; CC BY 4.0 |
-| OSM ODbL | Visible HUD attribution + retained source/transforms exist | **HIGH** | Final derived-DB/produced-work distribution analysis and notice/source path | World data + qualified IP/data counsel | **YES if OSM-derived DB ships unresolved** | City Plans + UrbanHUD + #565 |
-| Natural Earth | Pinned public-domain provenance | **LOW** | Preserve version/source evidence | World data | No, if provenance remains valid | World-data audit history |
-| Generated art provenance | Family registries exist but legal chain-of-title/tool-terms fields are incomplete | **HIGH** | Extend provenance records; review key commercial art | Asset governance + Agent 13/counsel | **YES for unresolved runtime assets** | `08_Assets/Production/Approved_Sources/*`, #565 |
-| Runtime `icon-orders.webp` | Approved generated runtime asset; legal provenance not complete in current source register | **HIGH** | Link exact source/generation/tool/terms/hash chain | Asset governance | **YES before commercial release if unresolved** | `game-web/public/assets/production/icon-orders.webp`, #565 |
-| Dependency licenses | `package-lock.json` contains license metadata; no generated release notice found | **MEDIUM** | Produce repeatable dependency license inventory/notices and review exceptions | Build/release + Agent 13 | **YES if required notices unresolved** | `game-web/package.json`, lockfile, #565 |
-| Real brands/trade dress | Canon trends toward fictional goods; no global legal gate previously | **HIGH** | Automated/manual brand audit before runtime promotion; licenses for exceptions | Assets/narrative/world + Agent 13 | **YES for unlicensed material** | #409/#411 + this dossier |
-| DROPi / DROPi Tycoon trademark clearance | No professional clearance evidence found | **HIGH** | Professional search/filing strategy in launch jurisdictions | Owner + qualified trademark counsel | **YES before commercial brand launch** | Branding registry + this dossier |
-| Security logs / IP metadata | App does not explicitly log request IP; host infrastructure may process it | **MEDIUM** | Provider/log retention/data-map review; avoid unnecessary application logging | Infra + Agent 13 | Before personal-data launch | Railway architecture + GDPR online identifier rules |
-| Crypto/token | Out of scope | **INFORMATIONAL** | Separate financial/regulatory review before any integration | Separate future program | **YES before any crypto feature** | Owner boundary |
+| Authenticated production identity | Prototype is unauthenticated | BLOCKER | Implement authenticated server authorization | Account/server owner; #560 | Yes before durable accounts | `session-authority.mjs`, `postgres-authority.mjs` |
+| Account deletion/data rights | Not production-ready | BLOCKER | Implement deletion, retention, rights and propagation | Account/privacy; #562 | Yes before accounts | #562 |
+| Privacy Policy + Play Data Safety/App Content | Not release-complete | BLOCKER | Publish truthful policy and declarations | Agent 14 + Agent 13; #569 | Yes before Play submission | #569 |
+| Target-age strategy | Unresolved | HIGH | Owner/product choice + legal review + matching store/design | Owner + Agent 13/14 | Yes before commercial launch | This dossier |
+| Chat/UGC safety | Planned, not ready | BLOCKER | Terms, report, block, moderation, retention, minors | Multiplayer + Agent 13; #564 | Yes before UGC | #330/#564 |
+| Creator/community rules | Planned | HIGH | Align launch/community rules to canonical moderation baseline | Agent 15 + Agent 13; #563 | Yes before creator/community launch if UGC/social interaction is enabled | #563/#564 |
+| Analytics/error telemetry | Not implemented | HIGH if introduced | Govern purpose/schema/vendor/retention/consent/Play declarations | Agent 16/engineering + Agent 13; #568 | Yes before production telemetry lacking approval | #568 |
+| Ads | Not implemented | BLOCKER if introduced without design | SDK/privacy/age/consent/Data Safety review | Agent 12/13/14 | Yes before ads | Monetization + #569 |
+| IAP/subscriptions | Planned | HIGH | Billing, entitlement, disclosure, privacy and consumer review | Agent 12/14 + Agent 13 | Yes before paid launch | Monetization dossier |
+| Third-party data/assets | Governance exists; release register incomplete | BLOCKER | Close notices/provenance/licence obligations | Agent 13/assets; #565 | Yes before unresolved material ships | Third-party register |
+| OSM | Attribution visible; exact distribution boundary needs review | HIGH | Preserve attribution and professionally review ODbL distribution obligations | Agent 13/world-data | Yes before commercial distribution if unresolved | Brăila source/layout/HUD |
+| GeoNames | Source/licence recorded | HIGH | Include shipped attribution/source/change record | Agent 13/world-data | Yes before relevant data ships | Country Catalog audit |
+| Natural Earth | Public-domain provenance recorded | LOW | Retain source/version/hash evidence | World-data + Agent 13 | No if provenance intact | World-data governance |
+| Generated runtime art | Governance exists; legal chain needs strengthening | HIGH | Provider/terms/input/edit/hash record per shipped family | Assets + Agent 13; #565 | Yes for unresolved runtime asset | Asset registries |
+| Trademark/name clearance | Not professionally completed | HIGH | Qualified clearance for product marks | Owner + qualified IP counsel | Yes before commercial brand launch | This dossier |
+| Store/launch creative rights | Planned | HIGH | Review screenshots/video/music/logos/claims/disclosures | Agents 14/15 + Agent 13; #561/#570 | Yes before publication | #561/#570 |
+| Processor/subprocessor/transfer register | Not final | HIGH | Review actual commercial vendors/regions/contracts | Agent 13 + owner/operator | Yes before personal-data production | This dossier |
+| Secrets in client | Architecture forbids | HIGH | Continue CI/code review enforcement | Security/architecture | Yes if violated | #363/shared authority canon |
+| DROPi token/crypto | Explicitly out of scope | INFORMATIONAL | Separate regulatory review if ever proposed | Separate future project | N/A now | #348 boundary |
 
 ---
 
-## 16. Release compliance gates
+## 17. Professional legal-review checklist
 
-A commercial release candidate is **NOT LEGAL/PRIVACY READY** until all applicable gates below have evidence:
+The following items require qualified legal/IP/privacy review before commercial launch:
 
-### Gate A — offline-only prototype
+- final Privacy Policy and Terms;
+- controller identity/contact and jurisdiction-specific notices;
+- target-age/minor strategy;
+- GDPR lawful bases and ePrivacy/consent design;
+- international transfer mechanisms for actual providers;
+- consumer terms for IAP/subscriptions/promotions;
+- UGC/community terms and child-safety obligations;
+- trademark clearance for `DROPi`, `DROPi Tycoon`, logo/icon and promoted names;
+- exact ODbL treatment of distributed databases/derived databases/produced works;
+- generated-art chain-of-title/protectability for material brand/runtime art;
+- dispute/governing-law/liability language;
+- any future real-money marketplace or financial feature.
 
-May proceed while:
+Engineering can directly implement, without pretending to make final legal conclusions:
 
-- no production account claim is made;
-- no sensitive user data is collected;
-- no ads/analytics SDK silently collects data;
-- third-party assets/data used in the distributed build have valid provenance/licensing;
-- Play declarations accurately match the binary.
-
-### Gate B — accounts/cloud save
-
-Requires #560 and #562 plus:
-
-- privacy notice;
-- auth/security review;
-- deletion/rights/retention;
-- processor/transfer register;
-- Play Data safety alignment.
-
-### Gate C — multiplayer/chat/UGC
-
-Requires #564 plus:
-
-- Community Guidelines;
-- Terms acceptance;
-- report/block/moderation operations;
-- minor safety decision;
-- retention/deletion and appeals/escalation design.
-
-### Gate D — ads/analytics
-
-Requires:
-
-- SDK/vendor register;
-- data/consent/lawful-basis analysis;
-- age handling;
-- Data safety update;
-- Agent 12/13/14 sign-off boundary.
-
-### Gate E — purchases/subscriptions
-
-Requires:
-
-- current Google Play billing-policy compliance;
-- clear price/renewal/cancellation/refund information;
-- entitlement security;
-- consumer-law review for target markets.
-
-### Gate F — commercial IP/data release
-
-Requires #565 plus:
-
-- third-party notices;
-- dependency license report;
-- GeoNames/OSM compliance evidence;
-- runtime asset provenance;
-- real-brand audit;
-- trademark clearance decision.
+- authentication/authorization;
+- public/private schema separation;
+- deletion/retention/export tooling;
+- processor inventory plumbing;
+- telemetry minimization controls;
+- reporting/blocking/moderation mechanics;
+- third-party notices surface;
+- provenance hashes/manifests;
+- dependency licence inventory;
+- feature flags that keep non-compliant capabilities disabled;
+- tests and release evidence.
 
 ---
 
-## 17. Professional legal review required
+## 18. Release rule
 
-The following cannot be closed solely by engineering assertions:
+DROPi Tycoon is not **LEGAL/PRIVACY RELEASE READY** merely because this dossier exists.
 
-1. final Privacy Policy and Terms in the publisher's actual legal entity/jurisdictions;
-2. lawful-basis and cookie/ePrivacy/consent design for analytics/ads;
-3. child/minor target-age, consent and parental requirements across launch countries;
-4. OSM ODbL characterization/share-alike obligations for the exact shipped derived databases/produced works;
-5. `DROPi` / `DROPi Tycoon` trademark clearance and filing strategy;
-6. rights/protectability and infringement risk for key AI-generated commercial artwork;
-7. international-transfer mechanism for actual processor configurations;
-8. consumer-law terms for subscriptions, refunds, promotions and randomized purchases if any;
-9. UGC moderation/escalation obligations in launch jurisdictions;
-10. any future crypto/token integration.
+A commercial release may be marked compliant only when:
 
-Engineering can and should solve the factual architecture, controls, evidence, data map, deletion mechanics, moderation tooling, provenance register and declaration accuracy before counsel review.
+1. the exact shipped build and backend are re-audited;
+2. all applicable blocker rows are closed or the affected features are disabled;
+3. #569 declarations match actual behavior;
+4. third-party notices/provenance are complete;
+5. target-age and store content are settled;
+6. owner-only Play Console steps are evidenced by Agent 14/#571;
+7. required professional legal review is documented;
+8. no document claims functionality, collection, consent or safeguards that the build does not actually provide.
 
----
-
-## 18. Official policy/legal references checked for this baseline
-
-- EU GDPR — Regulation (EU) 2016/679: https://eur-lex.europa.eu/eli/reg/2016/679/oj/eng
-- Google Play Families Policies: https://support.google.com/googleplay/android-developer/answer/9893335
-- Google Play account deletion requirements: https://support.google.com/googleplay/android-developer/answer/13327111
-- Google Play User Generated Content policy: https://support.google.com/googleplay/android-developer/answer/9876937
-- Google Play Payments policy: https://support.google.com/googleplay/android-developer/answer/9858738
-- OpenStreetMap copyright/licensing: https://www.openstreetmap.org/copyright
-- GeoNames: https://www.geonames.org/
-
-These references are time-sensitive. Agent 13/14 must re-check current policies before each store release rather than relying permanently on the 2026-09-08 snapshot.
+Any material change to accounts, SDKs, ads, analytics, chat, payments, location, UGC, processors or shipped third-party assets reopens the relevant compliance review.
 
 ---
 
-## 19. Canonical compliance invariant
-
-**Implementation, documentation and store declarations must always agree.**
-
-No roadmap promise, legal template, privacy notice, Data safety answer, age declaration, attribution notice or Terms clause is evidence of compliance unless the shipped system actually behaves as described.
-
-When behavior changes, compliance documentation changes in the same release program.
+End of canonical dossier.
