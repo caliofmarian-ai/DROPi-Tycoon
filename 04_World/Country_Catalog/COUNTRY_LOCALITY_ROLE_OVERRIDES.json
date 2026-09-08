@@ -4,12 +4,12 @@
     "name": "Natural Earth 1:10m populated places simple",
     "upstreamCommit": "ca96624a56bd078437bca8184e78163e5039ad19"
   },
-  "purpose": "Govern current-reality locality role corrections without hardcoding coordinates or mutating pinned Natural Earth provenance.",
+  "purpose": "Govern current-reality locality role corrections without hardcoding arbitrary coordinates or mutating pinned Natural Earth provenance.",
   "rules": {
-    "coordinatesMustComeFromPinnedSource": true,
+    "coordinatesMustComeFromPinnedSourceOrAuthoritativeSupplement": true,
     "sourceLocalityMustResolveUniquely": true,
     "displayNameMayBeGovernedSeparately": true,
-    "missingSourceLocalityIsAnError": true
+    "missingSourceLocalityIsAnErrorUnlessSupplementDeclared": true
   },
   "entries": {
     "392": {
@@ -83,7 +83,7 @@
       "issue": 459,
       "country": "Equatorial Guinea",
       "currentCapital": {
-        "sourceNames": ["Ciudad de la Paz", "Ciudad de La Paz", "Oyala", "Djibloho"],
+        "supplementRef": "equatorial-guinea-ciudad-de-la-paz-2026",
         "displayName": "Ciudad de la Paz"
       },
       "requiredRepresentatives": [
