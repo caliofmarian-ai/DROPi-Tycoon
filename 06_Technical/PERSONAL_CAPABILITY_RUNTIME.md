@@ -1,6 +1,6 @@
 # Personal Capability Runtime
 
-Status: Phase-1 implementation contract for #437 / #359.  
+Status: Phase-1 implementation contract for #437 / #359.
 Last updated: 2026-09-08.
 
 ## Purpose
