@@ -62,4 +62,3 @@ Parent: #446
 - `PASS` means automated structural and pinned-source checks pass; it does not claim final economy/transport simulation is active.
 - `REVIEW` requires a dedicated country-level investigation before correction.
 - `GAP` means the pinned source has no truthful representative locality and no place is invented to fill the pattern.
-

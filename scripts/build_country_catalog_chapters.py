@@ -287,14 +287,14 @@ def main():
             raise SystemExit(f'country geometry ID not found: {cid}')
         continent, row, nodes = rows_by_id[cid]
         path = OUT_ROOT / 'Countries' / f"{cid}-{slug(row['name'])}.md"
-        path.write_text(country_markdown(continent, row, nodes, catalog) + '\n')
+        path.write_text(country_markdown(continent, row, nodes, catalog).rstrip() + '\n')
         print(f'WROTE {path.relative_to(ROOT)} state={row["status"]}')
         return
 
     for continent in targets:
         rows = rows_by_continent.get(continent, [])
         path = OUT_ROOT / 'Continents' / f"{slug(continent)}.md"
-        path.write_text(markdown_for_continent(continent, rows, catalog) + '\n')
+        path.write_text(markdown_for_continent(continent, rows, catalog).rstrip() + '\n')
         print(f'WROTE {path.relative_to(ROOT)} countries={len(rows)}')
 
 
