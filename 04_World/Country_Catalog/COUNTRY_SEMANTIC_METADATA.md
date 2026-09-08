@@ -2,7 +2,7 @@
 
 Status: Canonical runtime semantics contract for country and territory presentation.
 
-Coordinates: #418 #459 #464 #465 #466 #473 #478 #481 #482
+Coordinates: #418 #459 #460 #464 #465 #466 #473 #478 #481 #482
 
 Runtime data: `game-web/public/data/country-semantic-metadata-v1.json`
 
@@ -14,7 +14,7 @@ Authoritative locality supplements: `04_World/Country_Catalog/COUNTRY_LOCALITY_A
 
 The representative-locality catalog intentionally keeps a small structural role vocabulary (`capital`, `urban`, `secondary`) because it is used for sparse map placement and is normally derived from the pinned Natural Earth populated-place source.
 
-That structural role is not sufficient to describe current real-world semantics. Some geometries require distinctions such as constitutional capital, administrative capital, legislative seat, principal administrative centre, commercial capital, claimed capital, research/logistics station, territory status, de facto administration, or disputed recognition.
+That structural role is not sufficient to describe current real-world semantics. Some geometries require distinctions such as constitutional capital, administrative capital, legislative seat, judicial capital, principal administrative centre, commercial capital, claimed capital, research/logistics station, territory status, de facto administration, or disputed recognition.
 
 DROPi therefore keeps political/status and role semantics in a separate source-governed metadata layer rather than forcing every case into one generic `capital` field.
 
@@ -31,6 +31,7 @@ DROPi therefore keeps political/status and role semantics in a separate source-g
 9. A current-reality capital correction may change which locality receives the structural `capital` role only through the governed role-override registry. The locality must either resolve uniquely in the pinned source snapshot or reference an approved authoritative supplement.
 10. Governed display names may normalize a source-backed locality name, but the underlying coordinate and provenance must remain unchanged. A supplement must preserve its source coordinate text and deterministic decimal conversion.
 11. An authoritative supplement is exceptional current-reality gap remediation, not a second free-form map database and not a license to add estimated coordinates.
+12. Multi-capital countries may use one structural `capital` slot for sparse-map stability, but player-facing semantics must preserve every official capital function and must not describe that structural slot as the only national capital when reality is plural.
 
 ## Stable special-status entries
 
@@ -76,6 +77,20 @@ The governed role override therefore references `equatorial-guinea-ciudad-de-la-
 
 The legal-capital effective date and the institutional-transition period are deliberately kept distinct: the runtime must not continue calling Malabo the current national capital merely because institutional relocation may continue during the transition.
 
+### South Africa (`710`) — #460
+
+The South African Government identifies three national capital functions: Pretoria is the administrative capital, Cape Town is the legislative capital where Parliament is located, and Bloemfontein is the judicial capital and home to the Supreme Court of Appeal. The same official government overview states that the Constitutional Court is located in Johannesburg.
+
+Natural Earth's pinned locality source contains Pretoria, Cape Town, Bloemfontein and Johannesburg as distinct source-backed localities. DROPi therefore does not need an authoritative supplement. The governed override assigns Pretoria the one structural `capital` slot used by the sparse-map model and forces all three other cities to remain in the <=9 representative-node budget.
+
+Player-facing semantics are authoritative over the structural slot:
+- Pretoria — `Administrative capital`;
+- Cape Town — `Legislative capital / Parliament`;
+- Bloemfontein — `Judicial capital / Supreme Court of Appeal`;
+- Johannesburg — `Major city / Constitutional Court`.
+
+Johannesburg must never be described as South Africa's sole national capital simply because Natural Earth marks it with a capital-class feature. Likewise, Cape Town and Bloemfontein must not disappear from the sparse Country Layer merely because only one structural `capital` slot exists.
+
 ## Role-override registry contract
 
 `COUNTRY_LOCALITY_ROLE_OVERRIDES.json` is deliberately narrower than semantic metadata. It governs which reviewed localities occupy sparse-map structural roles but does not contain arbitrary longitude/latitude fields.
@@ -87,9 +102,22 @@ The generator enforces:
 - every source-backed required representative also resolves exactly once;
 - coordinates for ordinary overrides are copied from the pinned feature and are never stored in the role-override registry;
 - a current capital absent from Natural Earth must reference an existing authoritative supplement rather than embedding coordinates in the role override;
-- current capitals receive the structural `capital` role and `CAPITAL` sector;
-- required former/secondary role cities are retained without receiving `capital` by inertia;
+- current structural capitals receive the `capital` role and `CAPITAL` sector;
+- required former, secondary, multi-capital or role-bearing cities are retained without receiving `capital` by inertia;
 - at most nine representative nodes remain allowed per geometry.
+
+## Multi-capital semantic contract
+
+The runtime semantic layer, not the single structural `capital` flag, is authoritative for a country's constitutional and functional capital model.
+
+For a multi-capital geometry:
+- every official capital locality required by reviewed sources must be present in the sparse node set when source coverage allows it;
+- each official function must receive a separate `placeRoles` entry;
+- major non-capital institutional cities may receive their own role where that distinction prevents a misleading capital label;
+- UI rendering must prefer a matching semantic place-role label over the generic structural role;
+- regression tests must verify both the retained locality set and the semantic labels.
+
+South Africa is the reference implementation for three simultaneous national capital functions.
 
 ## Authoritative supplement contract
 

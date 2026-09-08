@@ -1,5 +1,5 @@
 {
-  "version": "1.1.0",
+  "version": "1.2.0",
   "source": {
     "name": "Natural Earth 1:10m populated places simple",
     "upstreamCommit": "ca96624a56bd078437bca8184e78163e5039ad19"
@@ -90,6 +90,31 @@
         {
           "sourceNames": ["Malabo"],
           "displayName": "Malabo",
+          "role": "urban"
+        }
+      ]
+    },
+    "710": {
+      "issue": 460,
+      "country": "South Africa",
+      "currentCapital": {
+        "sourceNames": ["Pretoria"],
+        "displayName": "Pretoria"
+      },
+      "requiredRepresentatives": [
+        {
+          "sourceNames": ["Cape Town"],
+          "displayName": "Cape Town",
+          "role": "urban"
+        },
+        {
+          "sourceNames": ["Bloemfontein"],
+          "displayName": "Bloemfontein",
+          "role": "urban"
+        },
+        {
+          "sourceNames": ["Johannesburg"],
+          "displayName": "Johannesburg",
           "role": "urban"
         }
       ]

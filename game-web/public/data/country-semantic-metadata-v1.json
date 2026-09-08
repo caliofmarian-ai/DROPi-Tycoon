@@ -1,5 +1,5 @@
 {
-  "version": "1.2.0",
+  "version": "1.3.0",
   "reviewedOn": "2026-09-08",
   "purpose": "Player-facing semantic metadata for country and territory cases where a single generic capital label or geographic rendering could misstate political, constitutional, administrative or recognition reality.",
   "governance": {
@@ -107,6 +107,13 @@
       "publishedOn": "2026-01-08",
       "accessedOn": "2026-09-08",
       "note": "The official factfile lists Ciudad de la Paz as the administrative centre of Djibloho at 01°35′33″N 10°49′25″E, states that it was formerly known as Oyala, and records its January 2026 capital status."
+    },
+    "south-africa-government-capitals": {
+      "publisher": "South African Government",
+      "title": "South Africa at a glance",
+      "url": "https://www.gov.za/about-sa/south-africa-glance",
+      "accessedOn": "2026-09-08",
+      "note": "The South African Government lists Pretoria as the administrative capital, Cape Town as the legislative capital and Bloemfontein as the judicial capital, and states that the Constitutional Court is located in Johannesburg."
     }
   },
   "entries": {
@@ -212,6 +219,35 @@
         }
       ],
       "sourceRefs": ["equatorial-guinea-decree-2026", "uk-pcgn-equatorial-guinea-2026"]
+    },
+    "710": {
+      "issue": 460,
+      "renderedName": "South Africa",
+      "statusLabel": "Three national capital functions",
+      "statusSummary": "South Africa has three capitals with distinct national functions: Pretoria is the administrative capital, Cape Town is the legislative capital and Bloemfontein is the judicial capital. Johannesburg remains a major national city and hosts the Constitutional Court, but DROPi does not present it as the sole national capital.",
+      "placeRoles": [
+        {
+          "locality": "Pretoria",
+          "role": "administrative-capital",
+          "label": "Administrative capital"
+        },
+        {
+          "locality": "Cape Town",
+          "role": "legislative-capital",
+          "label": "Legislative capital / Parliament"
+        },
+        {
+          "locality": "Bloemfontein",
+          "role": "judicial-capital",
+          "label": "Judicial capital / Supreme Court of Appeal"
+        },
+        {
+          "locality": "Johannesburg",
+          "role": "major-city-constitutional-court",
+          "label": "Major city / Constitutional Court"
+        }
+      ],
+      "sourceRefs": ["south-africa-government-capitals"]
     }
   }
 }

@@ -93,7 +93,7 @@ describe('authoritative locality supplements', () => {
   it('uses the supplement only through the governed Equatorial Guinea capital override', () => {
     const override = roleOverrideRegistry.entries['226']
 
-    expect(roleOverrideRegistry.version).toBe('1.1.0')
+    expect(roleOverrideRegistry.version).toBe('1.2.0')
     expect(override.issue).toBe(459)
     expect(override.currentCapital.supplementRef).toBe('equatorial-guinea-ciudad-de-la-paz-2026')
     expect(override.currentCapital.displayName).toBe('Ciudad de la Paz')
@@ -111,7 +111,7 @@ describe('authoritative locality supplements', () => {
     const capital = nodes.find(node => node.role === 'capital')
     const malabo = nodes.find(node => node.name === 'Malabo')
 
-    expect(localityCatalog.version).toBe('1.4.0')
+    expect(localityCatalog.version).toBe('1.5.0')
     expect(localityCatalog.localityAuthoritativeSupplements?.registryVersion).toBe(supplementRegistry.version)
     expect(localityCatalog.localityAuthoritativeSupplements?.refs).toEqual([
       'equatorial-guinea-ciudad-de-la-paz-2026',
@@ -131,7 +131,7 @@ describe('authoritative locality supplements', () => {
   it('keeps the legal-capital and transition-city semantics explicit', () => {
     const entry = semanticCatalog.entries['226']
 
-    expect(semanticCatalog.version).toBe('1.2.0')
+    expect(semanticCatalog.version).toBe('1.3.0')
     expect(entry.issue).toBe(459)
     expect(entry.statusSummary).toContain('2 January 2026')
     expect(entry.statusSummary).toContain('one-year transition')

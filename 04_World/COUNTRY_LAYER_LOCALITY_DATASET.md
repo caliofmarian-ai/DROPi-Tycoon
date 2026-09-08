@@ -38,8 +38,21 @@ The source-backed governed corrections are:
 - Myanmar (`104`): Nay Pyi Taw receives the current structural capital role; source-backed Yangon remains a commercial/representative city (#465).
 - Sri Lanka (`144`): source-backed Sri Jayewardenepura Kotte receives the structural capital slot while Colombo remains represented separately; player-facing administrative/commercial distinctions live in the semantic metadata layer (#466).
 - Chile (`152`): Santiago receives the current structural capital role; source-backed Valparaíso remains represented separately with its legislative-seat semantics (#473).
+- South Africa (`710`): Pretoria receives the structural capital slot while source-backed Cape Town, Bloemfontein and Johannesburg are all retained as required representative nodes. Semantic metadata exposes Pretoria as administrative capital, Cape Town as legislative capital, Bloemfontein as judicial capital and Johannesburg as a major city hosting the Constitutional Court (#460).
 
-`game-web/public/data/country-semantic-metadata-v1.json` governs the player-facing meaning of these roles. This separation permits constitutional, administrative, legislative, commercial, claimed-capital, research/logistics and special-status semantics without changing geographic coordinates or forcing reality into one generic `capital` label.
+`game-web/public/data/country-semantic-metadata-v1.json` governs the player-facing meaning of these roles. This separation permits constitutional, administrative, legislative, judicial, commercial, claimed-capital, research/logistics and special-status semantics without changing geographic coordinates or forcing reality into one generic `capital` label.
+
+## Multi-capital structural rule
+
+The sparse locality catalog deliberately permits only one structural `capital` slot because that field is used for deterministic map placement and legacy structural selection. It must not be interpreted as a claim that every country has only one capital function.
+
+For a reviewed multi-capital country:
+- one source-backed locality may occupy the structural `capital` slot for stable sparse-map behavior;
+- every other official capital locality required for truthful presentation must be retained within the same <=9 node budget;
+- `country-semantic-metadata-v1.json` is authoritative for the player-facing function of each capital locality;
+- the structural slot must never cause a retained official capital or major city to be mislabeled as the sole national capital.
+
+South Africa is the first explicit three-capital implementation of this rule. The pinned source resolves Pretoria, Cape Town, Bloemfontein and Johannesburg uniquely, so no authoritative supplement is needed.
 
 ## Authoritative locality supplement contract
 
@@ -66,7 +79,7 @@ This is not permission to replace stale or inconvenient Natural Earth values wit
 
 The current rendered topology contains 177 distinct geometries. Three source-null geometries use stable DROPi-owned, non-ISO catalog keys defined in `04_World/Country_Catalog/GEOMETRY_ID_REGISTRY.json`: `XNC` (N. Cyprus), `XSL` (Somaliland) and `XKX` (Kosovo). These keys are serialization identities only and do not assert sovereignty or recognition.
 
-Dataset v1.4.0 provides representative nodes for 175 of the 177 rendered geometries and 1,356 nodes in total, with at most nine per geometry. The two explicit coverage gaps are:
+Dataset v1.5.0 provides representative nodes for 175 of the 177 rendered geometries and 1,356 nodes in total, with at most nine per geometry. The two explicit coverage gaps are:
 - `260` — Fr. S. Antarctic Lands: the pinned populated-place source does not provide a truthful supported settlement node.
 - `XNC` — N. Cyprus: the pinned source does not currently map representative localities safely to the separately rendered geometry.
 
