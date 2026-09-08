@@ -25,6 +25,8 @@ const worldSource = readFileSync(new URL('../src/scenes/GameWorldScene.ts', impo
 const hudSource = readFileSync(new URL('../src/ui/UrbanHUD.ts', import.meta.url), 'utf8')
 const mapSource = readFileSync(new URL('../src/scenes/GlobalMapScene.ts', import.meta.url), 'utf8')
 
+const PINNED_POPULATED_PLACES_COMMIT = 'ca96624a56bd078437bca8184e78163e5039ad19'
+
 describe('Global Map runtime #418', () => {
   it('materializes sparse real-world locality nodes for country drill-down', () => {
     const romania = localityCatalog.countries['642'] ?? []
@@ -35,7 +37,7 @@ describe('Global Map runtime #418', () => {
     expect(ireland.length).toBeLessThanOrEqual(9)
     expect(Object.values(localityCatalog.countries).every(nodes => nodes.length <= 9)).toBe(true)
     expect(localityCatalog.stats.countriesWithRepresentativeNodes).toBeGreaterThan(150)
-    expect(localityCatalog.source.upstreamCommit).toBe('ca96624a56bd078437bca8184e78163e5039ad19')
+    expect(localityCatalog.source.upstreamCommit === PINNED_POPULATED_PLACES_COMMIT).toBe(true)
     const northIreland = ireland.find(node => node.role === 'urban' && node.sector === 'N')
     expect(!northIreland || northIreland.populationReference >= 15000 || northIreland.sourceFeatureClass.includes('Admin-1 capital')).toBe(true)
   })
@@ -95,11 +97,10 @@ describe('Global Map runtime #418', () => {
     expect(resolveNativeBackTarget('GlobalMap')).toBe('GameWorld')
   })
 
-  it('keeps strategic map inspection non-teleporting and honest about inactive economy overlays', () => {
-    expect(mapSource).toContain("simulation: 'GeometryOnly'")
-    expect(mapSource).toContain("economy: 'NotActivated'")
-    expect(mapSource).toContain("logistics: 'NotActivated'")
-    expect(mapSource).toContain('No player, cargo or company state is moved by map inspection.')
+  it('keeps strategic inspection non-teleporting and honest about simulation boundaries', () => {
+    expect(mapSource).toContain('Country layers use real geography.')
+    expect(mapSource).toContain('Economy and transport overlays will appear only when authoritative simulation is connected.')
+    expect(mapSource).toContain('Opening the map never moves the player, cargo or company.')
     expect(mapSource).not.toContain('player.x =')
     expect(mapSource).not.toContain('player.y =')
     expect(mapSource).toContain('repaintCountryLocalities')
