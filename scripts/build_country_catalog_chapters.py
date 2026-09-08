@@ -64,13 +64,13 @@ def numeric_country_id(properties, valid_ids, name_to_id):
         if hit and hit.numeric in valid_ids:
             return hit.numeric
 
-    alpha3 = str(prop(properties, 'ADM0_A3', 'adm0_a3', 'SOV_A3', 'sov_a3') or '').upper()
+    alpha3 = str(prop(properties, 'ADM0_A3', 'adm0_a3') or '').upper()
     if len(alpha3) == 3:
         hit = pycountry.countries.get(alpha_3=alpha3)
         if hit and hit.numeric in valid_ids:
             return hit.numeric
 
-    for key in ('ADMIN', 'NAME', 'NAME_LONG', 'SOVEREIGNT', 'BRK_NAME', 'FORMAL_EN'):
+    for key in ('ADMIN', 'NAME', 'NAME_LONG', 'BRK_NAME', 'FORMAL_EN'):
         hit = name_to_id.get(norm(prop(properties, key)))
         if hit:
             return hit

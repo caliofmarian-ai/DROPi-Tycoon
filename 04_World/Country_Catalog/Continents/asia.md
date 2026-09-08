@@ -10,9 +10,9 @@ Parent: #446
 - every node coordinate remains a source coordinate; this manifest does not reposition places.
 
 ## Chapter summary
-- countries/territories: **47**
-- representative nodes: **363**
-- structural PASS: **47**
+- countries/territories: **46**
+- representative nodes: **356**
+- structural PASS: **46**
 - REVIEW: **0**
 - documented GAP: **0**
 
@@ -63,7 +63,6 @@ Parent: #446
 | 792 | Turkey | Ankara | 9 | CAPITAL, N, E, S, W, NE, SE, SW, NW | **PASS** | structural/source checks passed |
 | 795 | Turkmenistan | Ashgabat | 9 | CAPITAL, N, E, S, W, NE, SE, SW, NW | **PASS** | structural/source checks passed |
 | 784 | United Arab Emirates | Abu Dhabi | 7 | CAPITAL, N, E, S, W, NE, NW | **PASS** | structural/source checks passed |
-| 826 | United Kingdom | Hamilton | 7 | CAPITAL, N, E, S, NE, SW, NW | **PASS** | structural/source checks passed |
 | 860 | Uzbekistan | Tashkent | 9 | CAPITAL, N, E, S, W, NE, SE, SW, NW | **PASS** | structural/source checks passed |
 | 704 | Vietnam | Hanoi | 9 | CAPITAL, N, E, S, W, NE, SE, SW, NW | **PASS** | structural/source checks passed |
 | 887 | Yemen | Sanaa | 9 | CAPITAL, N, E, S, W, NE, SE, SW, NW | **PASS** | structural/source checks passed |
