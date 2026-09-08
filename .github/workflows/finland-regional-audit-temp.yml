@@ -1,4 +1,4 @@
-name: TEMP Finland Regional Audit
+name: TEMP Finland and Åland Regional Audit
 
 on:
   push:
@@ -15,7 +15,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Audit retained Finland source hierarchy
+      - name: Audit retained Finland and Åland source hierarchy
         run: |
           set -euo pipefail
           base='https://github.com/caliofmarian-ai/DROPi-Tycoon/releases/download/source-geonames-cities500-2026-09-08-f3cda4f9'
@@ -27,47 +27,49 @@ jobs:
           import collections, io, json, zipfile
           from pathlib import Path
 
-          admin = {}
-          for line in Path('/tmp/admin1CodesASCII.txt').read_text(encoding='utf-8').splitlines():
-              if line.startswith('FI.'):
-                  f = line.split('\t')
-                  code = f[0].split('.', 1)[1]
-                  admin[code] = {'name': f[1], 'asciiName': f[2], 'sourceRef': f'geonames:{f[3]}'}
-
           fields = [
               'geonameid','name','asciiname','alternatenames','latitude','longitude',
               'feature_class','feature_code','country_code','cc2','admin1_code',
               'admin2_code','admin3_code','admin4_code','population','elevation',
               'dem','timezone','modification_date'
           ]
+          admin_rows = {}
+          for line in Path('/tmp/admin1CodesASCII.txt').read_text(encoding='utf-8').splitlines():
+              if line.startswith(('FI.', 'AX.')):
+                  f = line.split('\t')
+                  cc, code = f[0].split('.', 1)
+                  admin_rows[(cc, code)] = {'name': f[1], 'asciiName': f[2], 'sourceRef': f'geonames:{f[3]}'}
+
           groups = collections.defaultdict(list)
           with zipfile.ZipFile('/tmp/cities500.zip') as zf:
               with zf.open('cities500.txt') as raw:
                   for line in io.TextIOWrapper(raw, encoding='utf-8'):
                       row = dict(zip(fields, line.rstrip('\n').split('\t')))
-                      if row['country_code'] == 'FI':
-                          groups[row['admin1_code']].append(row)
+                      if row['country_code'] in {'FI', 'AX'}:
+                          groups[(row['country_code'], row['admin1_code'])].append(row)
 
-          print('FINLAND_ADMIN1_COUNT', len(admin))
-          print('FINLAND_SOURCE_LOCALITIES', sum(len(rows) for rows in groups.values()))
-          print('FINLAND_ADMIN1_WITH_LOCALITIES', sum(bool(groups.get(code)) for code in admin))
           priority = {'PPLC': 0, 'PPLA': 1, 'PPLA2': 2, 'PPLA3': 3, 'PPLA4': 4, 'PPL': 5}
-          for code in sorted(admin):
-              rows = groups.get(code, [])
-              ranked = [r for r in rows if r['feature_code'] in priority]
-              ranked.sort(key=lambda r: (priority[r['feature_code']], -int(r['population'] or 0), r['name'].casefold(), int(r['geonameid'])))
-              def compact(r):
-                  return {
-                      'name': r['name'], 'asciiName': r['asciiname'], 'featureCode': r['feature_code'],
-                      'population': int(r['population'] or 0), 'sourceRef': f"geonames:{r['geonameid']}",
-                      'lat': float(r['latitude']), 'lon': float(r['longitude'])
-                  }
-              print(json.dumps({
-                  'code': code,
-                  'region': admin[code]['name'],
-                  'regionAscii': admin[code]['asciiName'],
-                  'regionSourceRef': admin[code]['sourceRef'],
-                  'candidateCount': len(rows),
-                  'adminCandidates': [compact(r) for r in ranked[:8]],
-              }, ensure_ascii=False))
+          for cc in ('FI', 'AX'):
+              admin = {code: data for (country, code), data in admin_rows.items() if country == cc}
+              country_groups = {code: rows for (country, code), rows in groups.items() if country == cc}
+              print(f'{cc}_ADMIN1_COUNT', len(admin))
+              print(f'{cc}_SOURCE_LOCALITIES', sum(len(rows) for rows in country_groups.values()))
+              print(f'{cc}_ADMIN1_WITH_LOCALITIES', sum(bool(country_groups.get(code)) for code in admin))
+              for code in sorted(admin):
+                  rows = country_groups.get(code, [])
+                  ranked = [r for r in rows if r['feature_code'] in priority]
+                  ranked.sort(key=lambda r: (priority[r['feature_code']], -int(r['population'] or 0), r['name'].casefold(), int(r['geonameid'])))
+                  print(json.dumps({
+                      'countryCode': cc,
+                      'code': code,
+                      'region': admin[code]['name'],
+                      'regionAscii': admin[code]['asciiName'],
+                      'regionSourceRef': admin[code]['sourceRef'],
+                      'candidateCount': len(rows),
+                      'adminCandidates': [{
+                          'name': r['name'], 'asciiName': r['asciiname'], 'featureCode': r['feature_code'],
+                          'population': int(r['population'] or 0), 'sourceRef': f"geonames:{r['geonameid']}",
+                          'lat': float(r['latitude']), 'lon': float(r['longitude'])
+                      } for r in ranked[:10]],
+                  }, ensure_ascii=False))
           PY
