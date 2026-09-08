@@ -2,7 +2,7 @@
 
 Status: Canonical audit ledger for special and non-standard world geometries.
 
-Coordinates: #418 #453 #462 #480 #481 #482
+Coordinates: #418 #453 #462 #474 #477 #480 #481 #482
 
 ## Governing rule
 
@@ -25,8 +25,8 @@ Project-owned geometry IDs beginning with `X` in this ledger are internal DROPi 
 | 304 | Greenland | North America | territory within the Kingdom of Denmark | PASS | remain geographically in North America; do not infer independent sovereignty from chapter placement |
 | 630 | Puerto Rico | North America | United States dependency/territory | PASS | remain geographically in North America; do not infer independent sovereignty from chapter placement |
 | 540 | New Caledonia | Oceania | French dependency / sui-generis territory | PASS | remain geographically in Oceania; do not infer independent sovereignty from chapter placement |
-| 238 | Falkland Is. / Malvinas | South America | disputed territory | REVIEW | #474 — neutral unresolved-sovereignty semantics required |
-| 010 | Antarctica | Special | Antarctic Treaty / indeterminate sovereignty geometry | REVIEW | #477 — McMurdo is a research/logistics station, not a sovereign national capital |
+| 238 | Falkland Is. / Malvinas | South America | UN Non-Self-Governing Territory / unresolved Argentina–United Kingdom sovereignty dispute | REVIEW | #474 — neutral UN status semantics implemented; Stanley retained as current administrative centre; owner Android acceptance pending |
+| 010 | Antarctica | Special | Antarctic Treaty System / sovereignty positions safeguarded | REVIEW | #477 — no national-capital semantics; McMurdo and other nodes use research/logistics/locality roles; owner Android acceptance pending |
 | 260 | Fr. S. Antarctic Lands | Special | French dependency with no permanent population in the audited source contract | GAP | intentional geometry-only coverage until a truthful supported facility/locality contract is adopted |
 
 ## Stable identity rule for source-null geometries

@@ -27,7 +27,7 @@ Parent: #446
 | 152 | Chile | Santiago | 9 | CAPITAL, NW, N, E, S, W, NE, SE, SW | **REVIEW** | #473: current-capital mismatch: Santiago is Chile's national capital while Valparaiso is the seat of the National Congress and a major port |
 | 170 | Colombia | Bogota | 9 | CAPITAL, N, E, S, W, NE, SE, SW, NW | **PASS** | structural/source checks passed |
 | 218 | Ecuador | Quito | 9 | CAPITAL, N, E, S, W, NE, SE, SW, NW | **PASS** | structural/source checks passed |
-| 238 | Falkland Is. | Stanley | 2 | CAPITAL, SW | **REVIEW** | #474: territory-status semantics required: the Falkland Islands/Malvinas remain subject to an unresolved sovereignty dispute and must be presented neutrally |
+| 238 | Falkland Is. | Stanley | 2 | CAPITAL, SW | **REVIEW** | #474: UN Non-Self-Governing Territory / unresolved Argentina–United Kingdom sovereignty-dispute semantics implemented; Stanley retained only as current administrative centre; owner Android acceptance pending |
 | 328 | Guyana | Georgetown | 7 | CAPITAL, N, E, NE, SE, SW, NW | **PASS** | structural/source checks passed |
 | 600 | Paraguay | Asuncion | 9 | CAPITAL, N, E, S, W, NE, SE, SW, NW | **PASS** | structural/source checks passed |
 | 604 | Peru | Lima | 9 | CAPITAL, N, E, S, W, NE, SE, SW, NW | **PASS** | structural/source checks passed |

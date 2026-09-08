@@ -36,7 +36,7 @@ describe('Jerusalem status semantics #467 #468', () => {
   })
 
   it('keeps Jerusalem final-status semantics explicit and symmetric', () => {
-    expect(semantics.version).toBe('1.8.0')
+    expect(semantics.version).toBe('1.9.0')
     expect(semantics.entries['376'].territoryStatus.finalStatusResolved).toBe(false)
     expect(semantics.entries['275'].territoryStatus.finalStatusResolved).toBe(false)
     expect(label('376', 'Jerusalem')).toBe('Capital under Israeli law / seat of state institutions')

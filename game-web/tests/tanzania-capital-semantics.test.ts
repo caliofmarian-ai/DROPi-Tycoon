@@ -88,7 +88,7 @@ describe('Tanzania Dodoma capital semantics #461', () => {
     const act = semanticCatalog.sources['tanzania-dodoma-capital-act']
     const profile = semanticCatalog.sources['tanzania-government-country-profile']
 
-    expect(semanticCatalog.version).toBe('1.8.0')
+    expect(semanticCatalog.version).toBe('1.9.0')
     expect(entry.issue).toBe(461)
     expect(entry.statusLabel).toBe('National and commercial capital roles')
     expect(entry.statusSummary).toContain('Dodoma')

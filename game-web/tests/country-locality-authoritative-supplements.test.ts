@@ -131,7 +131,7 @@ describe('authoritative locality supplements', () => {
   it('keeps the legal-capital and transition-city semantics explicit', () => {
     const entry = semanticCatalog.entries['226']
 
-    expect(semanticCatalog.version).toBe('1.8.0')
+    expect(semanticCatalog.version).toBe('1.9.0')
     expect(entry.issue).toBe(459)
     expect(entry.statusSummary).toContain('2 January 2026')
     expect(entry.statusSummary).toContain('one-year transition')

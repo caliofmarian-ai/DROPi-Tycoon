@@ -31,7 +31,7 @@ describe('Bolivia capital semantics #472', () => {
 
   it('exposes constitutional-capital and government-seat roles from Bolivian institutional sources', () => {
     const entry = semantics.entries['068']
-    expect(semantics.version).toBe('1.8.0')
+    expect(semantics.version).toBe('1.9.0')
     expect(entry.issue).toBe(472)
     expect(label('Sucre')).toBe('Constitutional / national capital')
     expect(label('La Paz')).toBe('Government seat / executive & legislative centre')

@@ -1,5 +1,5 @@
 {
-  "version": "1.9.0",
+  "version": "1.10.0",
   "purpose": "Manual semantic review flags discovered during continent-by-continent audit. These do not silently rewrite pinned Natural Earth source data.",
   "reviews": {
     "204": {
@@ -60,11 +60,11 @@
     },
     "238": {
       "issue": 474,
-      "reason": "territory-status semantics required: the Falkland Islands/Malvinas remain subject to an unresolved sovereignty dispute and must be presented neutrally"
+      "reason": "UN Non-Self-Governing Territory / unresolved Argentina–United Kingdom sovereignty-dispute semantics implemented; Stanley retained only as current administrative centre; owner Android acceptance pending"
     },
     "010": {
       "issue": 477,
-      "reason": "Antarctic Treaty semantics required: McMurdo Station is a research/logistics station, not a sovereign national capital; Antarctic territorial positions must remain neutral"
+      "reason": "Antarctic Treaty semantics implemented; McMurdo and other source-backed Antarctic facilities/localities are not exposed as a sovereign national capital; owner Android acceptance pending"
     },
     "XKX": {
       "issue": 478,

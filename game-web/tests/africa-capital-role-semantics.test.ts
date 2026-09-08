@@ -37,7 +37,7 @@ describe('Africa capital-role semantics #456 #457 #458', () => {
   })
 
   it('exposes player-facing multi-role capital semantics from official sources', () => {
-    expect(semantics.version).toBe('1.8.0')
+    expect(semantics.version).toBe('1.9.0')
     expect(label('204', 'Porto-Novo')).toBe('National / political capital')
     expect(label('204', 'Cotonou')).toBe('Economic capital / government centre')
     expect(label('108', 'Gitega')).toBe('Political capital')
