@@ -1,0 +1,42 @@
+name: Index Global Map Dataset
+
+on:
+  push:
+    branches:
+      - openai/global-map-runtime-v1
+    paths:
+      - .github/workflows/index-global-map-dataset.yml
+
+permissions:
+  contents: write
+
+jobs:
+  index:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: openai/global-map-runtime-v1
+          fetch-depth: 0
+      - name: Register world dataset provenance document
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          from pathlib import Path
+          path = Path('00_Project/DOCUMENT_INDEX.md')
+          text = path.read_text()
+          line = '- `04_World/GLOBAL_MAP_DATASET.md` — versioned Natural Earth/world-atlas provenance, license and runtime-truth boundary for the strategic Global Map.\n'
+          if line not in text:
+              anchor = '- `04_World/MAP.md` — Global -> Country -> Administrative Region -> Representative Locality / External Economic Node -> Detailed Local Scene; strategic map is observation/planning/travel, not teleportation.\n'
+              if anchor not in text:
+                  raise SystemExit('04_World MAP.md index anchor missing')
+              text = text.replace(anchor, anchor + line, 1)
+              path.write_text(text)
+          PY
+          git config user.name 'DROPi Tycoon automation'
+          git config user.email 'actions@users.noreply.github.com'
+          git add 00_Project/DOCUMENT_INDEX.md
+          git diff --cached --check
+          git commit -m 'docs: index global map dataset provenance'
+          git push origin HEAD:openai/global-map-runtime-v1
