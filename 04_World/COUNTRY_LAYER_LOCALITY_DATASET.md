@@ -13,12 +13,21 @@ Natural Earth provides real city/town coordinates, capital classification, admin
 ## Selection contract
 Per country:
 1. one national capital where source coverage provides it;
-2. up to four representative urban nodes in N/E/S/W sectors;
+2. up to four representative city nodes in N/E/S/W sectors;
 3. up to four smaller secondary-locality nodes in NE/SE/SW/NW sectors;
 4. fewer nodes are preserved honestly when source coverage is insufficient;
 5. every stored coordinate is a real source coordinate; no locality point is manually invented or repositioned.
 
+A cardinal `urban` candidate must be an Admin-1 capital or have a Natural Earth population reference of at least 15,000. Directional alignment and relative importance then select a representative city for the sector. If no truthful qualifying candidate exists, the sector may remain empty instead of promoting a tiny settlement merely to complete the pattern.
+
+Secondary diagonal nodes intentionally permit smaller towns/localities because their purpose is to represent the rural/smaller-settlement layer requested by the product model.
+
 Directional selection uses each country's source settlement extent only to score geographic sectors. It does not move the source coordinates and it does not claim that the selected places are the only important settlements in that country.
+
+## Coverage
+The pinned global geometry contains 175 country/territory geometries. Dataset v1.1.0 provides representative nodes for 174 of them and 1,344 nodes in total, with at most nine per country/territory.
+
+The intentional current coverage gap is `Fr. S. Antarctic Lands` (numeric geography ID `260`). Natural Earth has no populated-place records to support a truthful locality node there. The runtime therefore shows the real territory geometry without inventing a settlement. Coverage gaps are persisted in the generated JSON so they remain auditable.
 
 ## Runtime purpose
 The catalog powers Country Map inspection. It is not yet an economy, route, travel or ownership model. Future administrative, transport, industry and economy overlays must attach authoritative simulation state to these or later-refined geographic entities rather than turning them into decorative traffic.
