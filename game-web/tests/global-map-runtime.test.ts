@@ -36,6 +36,8 @@ describe('Global Map runtime #418', () => {
     expect(Object.values(localityCatalog.countries).every(nodes => nodes.length <= 9)).toBe(true)
     expect(localityCatalog.stats.countriesWithRepresentativeNodes).toBeGreaterThan(150)
     expect(localityCatalog.source.upstreamCommit).toBe('ca96624a56bd078437bca8184e78163e5039ad19')
+    const northIreland = ireland.find(node => node.role === 'urban' && node.sector === 'N')
+    expect(!northIreland || northIreland.populationReference >= 15000 || northIreland.sourceFeatureClass.includes('Admin-1 capital')).toBe(true)
   })
 
   it('loads the pinned local country topology as real selectable geography', () => {
@@ -102,6 +104,8 @@ describe('Global Map runtime #418', () => {
     expect(mapSource).not.toContain('player.y =')
     expect(mapSource).toContain('repaintCountryLocalities')
     expect(mapSource).toContain('selectedLocality')
+    const applyTransform = mapSource.slice(mapSource.indexOf('private applyMapTransform'), mapSource.indexOf('private screenToMap'))
+    expect(applyTransform).not.toContain('repaintCountryLocalities()')
     expect(mapSource).not.toContain('GeometryOnly')
     expect(mapSource).not.toContain('NotActivated')
   })

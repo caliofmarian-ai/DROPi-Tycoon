@@ -298,7 +298,7 @@ export class GlobalMapScene extends Phaser.Scene {
       this.selectionBody.setText([
         capital ? `Capital: ${capital.name}` : 'Capital: source coverage unavailable',
         `Representative places: ${nodes.length}`,
-        `Major city nodes: ${urbanCount}`,
+        `Representative city nodes: ${urbanCount}`,
         `Smaller locality nodes: ${secondaryCount}`,
         '',
         this.level === 'Country'
@@ -399,14 +399,17 @@ export class GlobalMapScene extends Phaser.Scene {
     this.mapY = this.viewport.top + this.viewport.height / 2 - center.y * this.mapScale
     this.clampMapPosition()
     this.applyMapTransform()
+    this.repaintCountryLocalities()
   }
 
   private fitWorld(): void {
     this.level = 'Global'
+    this.selectedLocality = null
     this.mapScale = this.fitScale
     this.mapX = this.viewport.left + (this.viewport.width - MAP_WIDTH * this.mapScale) / 2
     this.mapY = this.viewport.top + (this.viewport.height - MAP_HEIGHT * this.mapScale) / 2
     this.applyMapTransform()
+    this.repaintCountryLocalities()
     if (this.selectionTitle) this.refreshSelectionPanel()
   }
 
@@ -427,6 +430,7 @@ export class GlobalMapScene extends Phaser.Scene {
     this.mapY = screenY - localY * nextScale
     this.clampMapPosition()
     this.applyMapTransform()
+    this.repaintCountryLocalities()
   }
 
   private clampMapPosition(): void {
@@ -446,7 +450,6 @@ export class GlobalMapScene extends Phaser.Scene {
 
   private applyMapTransform(): void {
     this.mapLayer.setPosition(this.mapX, this.mapY).setScale(this.mapScale)
-    this.repaintCountryLocalities()
   }
 
   private screenToMap(x: number, y: number): MapPoint {

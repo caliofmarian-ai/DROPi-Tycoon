@@ -8,7 +8,7 @@ Status: Runtime data contract for Issue #442.
 - pinned upstream commit: `ca96624a56bd078437bca8184e78163e5039ad19`
 - license: Public Domain
 
-Natural Earth provides real city/town coordinates, capital classification, administrative context and population reference fields. DROPi Tycoon does not ship the full source layer at runtime. A deterministic build step reduces it to a sparse catalog bounded to nine representative locality nodes per rendered country.
+Natural Earth provides real city/town coordinates, capital classification, administrative context and population reference fields. DROPi Tycoon does not ship the full source layer at runtime. `scripts/build_country_locality_catalog.py` deterministically reduces it to a sparse catalog bounded to nine representative locality nodes per rendered country.
 
 ## Selection contract
 Per country:
@@ -22,3 +22,6 @@ Directional selection uses each country's source settlement extent only to score
 
 ## Runtime purpose
 The catalog powers Country Map inspection. It is not yet an economy, route, travel or ownership model. Future administrative, transport, industry and economy overlays must attach authoritative simulation state to these or later-refined geographic entities rather than turning them into decorative traffic.
+
+## Generator requirements
+The committed runtime catalog has no Python/runtime dependency. Regeneration is an offline build-time maintenance task and requires Python plus `pycountry` to reconcile Natural Earth ISO alpha-2 values with the numeric ISO country IDs used by the pinned world-atlas topology.
