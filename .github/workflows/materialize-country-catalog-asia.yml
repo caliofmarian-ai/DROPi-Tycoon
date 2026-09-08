@@ -22,43 +22,33 @@ jobs:
         with:
           python-version: '3.12'
       - run: python -m pip install --disable-pip-version-check pycountry
-      - name: Repair exact country identity mapping
-        run: |
-          set -euo pipefail
-          python - <<'PY'
-          from pathlib import Path
-          path = Path('scripts/build_country_catalog_chapters.py')
-          text = path.read_text()
-          old = "alpha3 = str(prop(properties, 'ADM0_A3', 'adm0_a3', 'SOV_A3', 'sov_a3') or '').upper()"
-          new = "alpha3 = str(prop(properties, 'ADM0_A3', 'adm0_a3') or '').upper()"
-          if old not in text:
-              raise SystemExit('expected alpha3 mapping expression not found')
-          text = text.replace(old, new, 1)
-          old_names = "for key in ('ADMIN', 'NAME', 'NAME_LONG', 'SOVEREIGNT', 'BRK_NAME', 'FORMAL_EN'):"
-          new_names = "for key in ('ADMIN', 'NAME', 'NAME_LONG', 'BRK_NAME', 'FORMAL_EN'):"
-          if old_names not in text:
-              raise SystemExit('expected sovereign-name fallback not found')
-          text = text.replace(old_names, new_names, 1)
-          path.write_text(text)
-          PY
-      - name: Regenerate Europe and Asia chapters
+      - name: Regenerate corrected Europe and audited Asia chapters
         run: |
           set -euo pipefail
           python scripts/build_country_catalog_chapters.py --continent Europe
           python scripts/build_country_catalog_chapters.py --continent Asia
           grep -Fq '| 826 | United Kingdom |' 04_World/Country_Catalog/Continents/europe.md
           if grep -Fq '| 826 | United Kingdom |' 04_World/Country_Catalog/Continents/asia.md; then
-            echo 'FAIL: United Kingdom still classified in Asia'
+            echo 'FAIL: United Kingdom classified in Asia'
             exit 1
           fi
+          grep -Fq -- '- countries/territories: **46**' 04_World/Country_Catalog/Continents/asia.md
+          grep -Fq -- '- structural PASS: **41**' 04_World/Country_Catalog/Continents/asia.md
+          grep -Fq -- '- REVIEW: **5**' 04_World/Country_Catalog/Continents/asia.md
+          for issue in 464 465 466 467 468; do
+            grep -Fq "#$issue:" 04_World/Country_Catalog/Continents/asia.md
+          done
           git diff --check
-      - name: Commit repaired mapping and generated manifests
+      - name: Commit generated manifests
         run: |
           set -euo pipefail
           git config user.name 'DROPi Tycoon automation'
           git config user.email 'actions@users.noreply.github.com'
-          git add scripts/build_country_catalog_chapters.py \
-                  04_World/Country_Catalog/Continents/europe.md \
+          git add 04_World/Country_Catalog/Continents/europe.md \
                   04_World/Country_Catalog/Continents/asia.md
-          git commit -m 'world-data: fix continent identity mapping and regenerate Europe Asia'
+          if git diff --cached --quiet; then
+            echo 'No generated manifest changes required.'
+            exit 0
+          fi
+          git commit -m 'world-data: apply Asia semantic reviews to chapter manifest'
           git push origin HEAD:openai/country-catalog-asia-v1
