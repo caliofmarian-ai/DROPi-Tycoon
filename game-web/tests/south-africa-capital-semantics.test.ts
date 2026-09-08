@@ -70,7 +70,7 @@ describe('South Africa three-capital semantics #460', () => {
     const byName = Object.fromEntries(nodes.map(node => [node.name, node]))
 
     expect(localityCatalog.version).toBe('1.6.0')
-    expect(localityCatalog.localityRoleOverrides?.registryVersion).toBe('1.2.0')
+    expect(localityCatalog.localityRoleOverrides?.registryVersion).toBe('1.3.0')
     expect(localityCatalog.localityRoleOverrides?.countryIds).toContain('710')
     expect(nodes.length).toBeLessThanOrEqual(9)
     expect(nodes.filter(node => node.role === 'capital')).toHaveLength(1)
