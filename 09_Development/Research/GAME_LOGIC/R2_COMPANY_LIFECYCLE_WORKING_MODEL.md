@@ -1,7 +1,7 @@
 # R2 — Company Life-Cycle Working Model
 
-Status: **RESEARCH WORKING PAPER — NON-CANONICAL**  
-Parent: #423  
+Status: **RESEARCH WORKING PAPER — NON-CANONICAL**
+Parent: #423
 Depends on: #424 / provisional R1 owner direction
 
 ## Purpose

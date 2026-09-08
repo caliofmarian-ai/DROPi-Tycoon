@@ -1,7 +1,7 @@
 # R6 — Country and Macroeconomy Working Model
 
-Status: **RESEARCH WORKING PAPER — NON-CANONICAL**  
-Parent: #423  
+Status: **RESEARCH WORKING PAPER — NON-CANONICAL**
+Parent: #423
 Track: #430
 
 ## Purpose

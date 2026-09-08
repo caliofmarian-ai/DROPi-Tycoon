@@ -1,7 +1,7 @@
 # R1 — Role and Transition Matrix
 
-Status: **RESEARCH ONLY — NON-CANONICAL**  
-Parent: #423  
+Status: **RESEARCH ONLY — NON-CANONICAL**
+Parent: #423
 Track: #424
 
 ## Purpose

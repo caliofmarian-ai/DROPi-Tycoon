@@ -1,6 +1,6 @@
 # Game Logic Research — Dependency and Causal Model
 
-Status: **RESEARCH ONLY — NON-CANONICAL**  
+Status: **RESEARCH ONLY — NON-CANONICAL**
 Parent: #423
 
 ## Purpose

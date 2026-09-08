@@ -1,7 +1,7 @@
 # R4 — Stock-and-Flow Economy Working Model
 
-Status: **RESEARCH WORKING PAPER — NON-CANONICAL**  
-Parent: #423  
+Status: **RESEARCH WORKING PAPER — NON-CANONICAL**
+Parent: #423
 Track: #428
 
 ## Purpose

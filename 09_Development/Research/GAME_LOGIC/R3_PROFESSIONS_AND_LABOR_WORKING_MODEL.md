@@ -1,7 +1,7 @@
 # R3 — Professions, Qualifications and Labor Economy Working Model
 
-Status: **RESEARCH WORKING PAPER — NON-CANONICAL**  
-Parent: #423  
+Status: **RESEARCH WORKING PAPER — NON-CANONICAL**
+Parent: #423
 Track: #427
 
 ## Purpose

@@ -1,6 +1,6 @@
 # Game Logic Research — Master Owner Decision Register (Phase 1)
 
-Status: **RESEARCH ONLY — OWNER DECISIONS REQUIRED BEFORE CANON RECONCILIATION**  
+Status: **RESEARCH ONLY — OWNER DECISIONS REQUIRED BEFORE CANON RECONCILIATION**
 Parent: #423
 
 ## Purpose

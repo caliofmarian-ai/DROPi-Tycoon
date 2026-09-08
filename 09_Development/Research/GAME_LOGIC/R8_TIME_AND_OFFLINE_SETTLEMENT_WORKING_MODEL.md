@@ -1,7 +1,7 @@
 # R8 — Authoritative Time and Offline Settlement Working Model
 
-Status: **RESEARCH WORKING PAPER — NON-CANONICAL**  
-Parent: #423  
+Status: **RESEARCH WORKING PAPER — NON-CANONICAL**
+Parent: #423
 Track: #432
 
 ## Purpose

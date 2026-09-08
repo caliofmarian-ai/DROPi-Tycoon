@@ -1,8 +1,8 @@
 # R1 — Metabolism, Starter Economy and Capability-Gated Work
 
-Status: **RESEARCH WORKING PAPER — NON-CANONICAL**  
-Parent: #423  
-Track: #424  
+Status: **RESEARCH WORKING PAPER — NON-CANONICAL**
+Parent: #423
+Track: #424
 Owner direction recorded: 2026-09-08
 
 ## Purpose

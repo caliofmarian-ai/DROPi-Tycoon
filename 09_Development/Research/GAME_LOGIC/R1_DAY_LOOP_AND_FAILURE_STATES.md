@@ -1,7 +1,7 @@
 # R1 — Hero Day Loop and Failure Ladder
 
-Status: **RESEARCH WORKING PAPER — NON-CANONICAL**  
-Parent: #423  
+Status: **RESEARCH WORKING PAPER — NON-CANONICAL**
+Parent: #423
 Track: #424
 
 ## Purpose

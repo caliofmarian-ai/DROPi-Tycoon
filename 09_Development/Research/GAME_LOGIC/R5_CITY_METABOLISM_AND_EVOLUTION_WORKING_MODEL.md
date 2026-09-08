@@ -1,7 +1,7 @@
 # R5 — City Metabolism and Settlement Evolution Working Model
 
-Status: **RESEARCH WORKING PAPER — NON-CANONICAL**  
-Parent: #423  
+Status: **RESEARCH WORKING PAPER — NON-CANONICAL**
+Parent: #423
 Track: #429
 
 ## Purpose

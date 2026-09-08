@@ -1,7 +1,7 @@
 # DROPi Tycoon — GAME LOGIC MASTER MODEL v0.1
 
-Status: **RESEARCH SYNTHESIS — NON-CANONICAL**  
-Parent: #423  
+Status: **RESEARCH SYNTHESIS — NON-CANONICAL**
+Parent: #423
 Inputs: R1–R8 working models and Phase-1 canon conflict/gap audit
 
 ## Purpose

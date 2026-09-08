@@ -1,7 +1,7 @@
 # R7 — Multiplayer Society, Competition and Authority Working Model
 
-Status: **RESEARCH WORKING PAPER — NON-CANONICAL**  
-Parent: #423  
+Status: **RESEARCH WORKING PAPER — NON-CANONICAL**
+Parent: #423
 Track: #431
 
 ## Purpose

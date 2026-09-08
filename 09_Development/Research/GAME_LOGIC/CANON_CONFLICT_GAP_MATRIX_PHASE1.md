@@ -1,6 +1,6 @@
 # Game Logic Research — Canon Conflict and Gap Matrix (Phase 1)
 
-Status: **RESEARCH ONLY — NON-CANONICAL**  
+Status: **RESEARCH ONLY — NON-CANONICAL**
 Parent: #423
 
 ## Purpose

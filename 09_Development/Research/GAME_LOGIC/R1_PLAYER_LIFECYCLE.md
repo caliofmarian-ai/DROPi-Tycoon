@@ -1,8 +1,8 @@
 # R1 — Human Player / Hero Life-Cycle Research
 
-Status: **RESEARCH WORKING PAPER — NON-CANONICAL**  
-Parent: #423  
-Track: #424  
+Status: **RESEARCH WORKING PAPER — NON-CANONICAL**
+Parent: #423
+Track: #424
 Last updated: 2026-09-08
 
 ## 1. Research question

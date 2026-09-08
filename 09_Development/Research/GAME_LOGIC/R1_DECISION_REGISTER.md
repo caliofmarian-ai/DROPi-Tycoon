@@ -1,7 +1,7 @@
 # R1 — Owner Decision Register
 
-Status: **RESEARCH ONLY — PARTIALLY DECIDED BY OWNER**  
-Parent: #423  
+Status: **RESEARCH ONLY — PARTIALLY DECIDED BY OWNER**
+Parent: #423
 Track: #424
 
 These decisions are intentionally not canonical yet. Owner statements recorded here guide the research model and will be reconciled into canon only after the full Game Logic Research exit gate.
