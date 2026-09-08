@@ -20,6 +20,7 @@ Per geometry:
 3. up to four smaller secondary-locality nodes in NE/SE/SW/NW sectors;
 4. fewer nodes are preserved honestly when source coverage is insufficient;
 5. every stored coordinate must be source-backed either by the pinned Natural Earth feature or by an explicitly governed authoritative supplement; no locality point is manually invented, estimated from a map image or repositioned.
+6. the structural `capital` slot is a sparse-map selection role, not automatically a player-facing sovereignty or national-capital assertion; `country-semantic-metadata-v1.json` must override that meaning for disputed, non-self-governing, treaty-governed or otherwise status-sensitive geometries.
 
 A cardinal `urban` candidate must be an Admin-1 capital or have a Natural Earth population reference of at least 15,000. Directional alignment and relative importance then select a representative city for the sector. If no truthful qualifying candidate exists, the sector may remain empty instead of promoting a tiny settlement merely to complete the pattern.
 

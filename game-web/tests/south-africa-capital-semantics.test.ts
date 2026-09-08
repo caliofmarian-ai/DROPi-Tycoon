@@ -94,7 +94,7 @@ describe('South Africa three-capital semantics #460', () => {
     const entry = semanticCatalog.entries['710']
     const source = semanticCatalog.sources['south-africa-government-capitals']
 
-    expect(semanticCatalog.version).toBe('1.4.0')
+    expect(semanticCatalog.version).toBe('1.5.0')
     expect(entry.issue).toBe(460)
     expect(entry.statusLabel).toBe('Three national capital functions')
     expect(entry.statusSummary).toContain('Pretoria is the administrative capital')
