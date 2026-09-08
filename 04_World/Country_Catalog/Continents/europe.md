@@ -5,15 +5,15 @@ Status: Generated audit manifest; country-by-country maintenance surface.
 Parent: #446
 
 ## Source contract
-- runtime catalog version: `1.1.0`
+- runtime catalog version: `1.2.0`
 - Natural Earth upstream commit: `ca96624a56bd078437bca8184e78163e5039ad19`
 - every node coordinate remains a source coordinate; this manifest does not reposition places.
 
 ## Chapter summary
 - countries/territories: **39**
-- representative nodes: **290**
-- structural PASS: **37**
-- REVIEW: **2**
+- representative nodes: **294**
+- structural PASS: **38**
+- REVIEW: **1**
 - documented GAP: **0**
 
 ## Country-by-country manifest
@@ -28,7 +28,7 @@ Parent: #446
 | 100 | Bulgaria | Sofia | 9 | CAPITAL, N, E, S, W, NE, SE, SW, NW | **PASS** | structural/source checks passed |
 | 191 | Croatia | Zagreb | 9 | CAPITAL, N, E, S, W, NE, SE, SW, NW | **PASS** | structural/source checks passed |
 | 203 | Czechia | Prague | 9 | CAPITAL, N, E, S, W, NE, SE, SW, NW | **PASS** | structural/source checks passed |
-| 208 | Denmark | Kobenhavn | 7 | CAPITAL, N, E, S, W, NE, SE | **PASS** | structural/source checks passed |
+| 208 | Denmark | Kobenhavn | 9 | CAPITAL, N, E, S, W, NE, SE, SW, NW | **PASS** | structural/source checks passed |
 | 233 | Estonia | Tallinn | 7 | CAPITAL, N, E, S, W, NE, SW | **PASS** | structural/source checks passed |
 | 246 | Finland | Helsinki | 9 | CAPITAL, N, E, S, W, NE, SE, SW, NW | **PASS** | structural/source checks passed |
 | 250 | France | Paris | 9 | CAPITAL, N, E, S, W, NE, SE, SW, NW | **PASS** | structural/source checks passed |
@@ -38,7 +38,7 @@ Parent: #446
 | 352 | Iceland | Reykjavik | 8 | CAPITAL, N, E, S, W, NE, SW, NW | **PASS** | structural/source checks passed |
 | 372 | Ireland | Dublin | 9 | CAPITAL, N, E, S, W, NE, SE, SW, NW | **PASS** | structural/source checks passed |
 | 380 | Italy | Rome | 9 | CAPITAL, N, E, S, W, NE, SE, SW, NW | **PASS** | structural/source checks passed |
-| None | Kosovo | Pristina | 3 | CAPITAL, N, S | **REVIEW** | #478: nonstandard geometry identity and neutral status semantics required: Kosovo must not depend on a None catalog key or an implied universally settled sovereignty position; unstable/non-numeric geometry ID |
+| XKX | Kosovo | Pristina | 3 | CAPITAL, N, S | **REVIEW** | #478: neutral status semantics remain required after stable project-owned geometry identity migration; XKX is a DROPi project key, not an ISO numeric code or sovereignty assertion |
 | 428 | Latvia | Riga | 6 | CAPITAL, N, E, W, NE, SW | **PASS** | structural/source checks passed |
 | 440 | Lithuania | Vilnius | 5 | CAPITAL, N, E, W, NE | **PASS** | structural/source checks passed |
 | 442 | Luxembourg | Luxembourg | 3 | CAPITAL, N, E | **PASS** | structural/source checks passed |
@@ -58,7 +58,7 @@ Parent: #446
 | 752 | Sweden | Stockholm | 9 | CAPITAL, N, E, S, W, NE, SE, SW, NW | **PASS** | structural/source checks passed |
 | 756 | Switzerland | Bern | 9 | CAPITAL, N, E, S, W, NE, SE, SW, NW | **PASS** | structural/source checks passed |
 | 804 | Ukraine | Kiev | 9 | CAPITAL, N, E, S, W, NE, SE, SW, NW | **PASS** | structural/source checks passed |
-| 826 | United Kingdom | Hamilton | 7 | CAPITAL, N, E, S, NE, SW, NW | **REVIEW** | #469: country-identity bleed: Hamilton from a British overseas territory must not be grouped as the United Kingdom national capital |
+| 826 | United Kingdom | London | 9 | CAPITAL, N, E, S, W, NE, SE, SW, NW | **PASS** | structural/source checks passed |
 
 ## Interpretation
 - `PASS` means automated structural and pinned-source checks pass; it does not claim final economy/transport simulation is active.

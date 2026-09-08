@@ -1,30 +1,45 @@
 # Special Territory and Cross-Region Classification
 
-Status: Canonical audit ledger for #453.
+Status: Canonical audit ledger for special and non-standard world geometries.
 
-Parent: #446
-Special-territory audit: #453
+Coordinates: #418 #453 #480 #481 #482
 
 ## Governing rule
 
-Geographic chapter placement does **not** assert sovereignty or statehood. The Country Catalog may keep a territory, dependency or disputed geometry in the populated-continent chapter where it is geographically rendered, while this ledger preserves its non-standard political/data classification.
+Geographic chapter placement does **not** assert sovereignty or statehood. The Country Catalog may keep a territory, dependency, de facto administration or disputed geometry in the populated-continent chapter where it is geographically rendered, while this ledger preserves its non-standard political/data classification.
 
 The pinned geometry/locality source remains Natural Earth at upstream commit `ca96624a56bd078437bca8184e78163e5039ad19`. Manual semantic review issues do not silently rewrite that source.
+
+Project-owned geometry IDs beginning with `X` in this ledger are internal DROPi keys. They are not ISO numeric identifiers and must never be displayed as evidence of recognition, sovereignty or statehood.
 
 ## Explicit classification
 
 | Geometry ID | Rendered geometry | Geographic chapter | Classification | Audit state | Governance |
 |---:|---|---|---|---|---|
 | 732 | W. Sahara | Africa | indeterminate/disputed territory | REVIEW | #462 — neutral territory-status semantics required |
+| XSL | Somaliland | Africa | de facto administration / internationally contested status; stable DROPi project key | REVIEW | #482 — current neutral status semantics and updateable recognition metadata required |
 | 376 | Israel | Asia | special disputed-status semantics in source | REVIEW | #467 — capital/status semantics require neutral handling |
 | 275 | Palestine | Asia | indeterminate/disputed status in source | REVIEW | #468 — capital/status semantics require neutral handling |
-| None | Kosovo | Europe | disputed/non-standard geometry identity | REVIEW | #478 — replace unsafe `None` catalog identity and preserve neutral status semantics |
+| XNC | N. Cyprus | Asia | non-standard/disputed source geometry; stable DROPi project key | REVIEW | #481 — neutral status semantics required; geography must not imply uncontested sovereignty |
+| XKX | Kosovo | Europe | disputed/non-standard source identity; stable DROPi project key | REVIEW | #478 — neutral status semantics still required |
 | 304 | Greenland | North America | territory within the Kingdom of Denmark | PASS | remain geographically in North America; do not infer independent sovereignty from chapter placement |
 | 630 | Puerto Rico | North America | United States dependency/territory | PASS | remain geographically in North America; do not infer independent sovereignty from chapter placement |
 | 540 | New Caledonia | Oceania | French dependency / sui-generis territory | PASS | remain geographically in Oceania; do not infer independent sovereignty from chapter placement |
 | 238 | Falkland Is. / Malvinas | South America | disputed territory | REVIEW | #474 — neutral unresolved-sovereignty semantics required |
 | 010 | Antarctica | Special | Antarctic Treaty / indeterminate sovereignty geometry | REVIEW | #477 — McMurdo is a research/logistics station, not a sovereign national capital |
 | 260 | Fr. S. Antarctic Lands | Special | French dependency with no permanent population in the audited source contract | GAP | intentional geometry-only coverage until a truthful supported facility/locality contract is adopted |
+
+## Stable identity rule for source-null geometries
+
+The committed TopoJSON contains three distinct rendered geometries with no usable source `id`: `N. Cyprus`, `Somaliland`, and `Kosovo`. Treating all three as the string key `None` collapses separate geometries and corrupts catalog accounting.
+
+DROPi therefore assigns the following internal keys:
+
+- `XNC` — `N. Cyprus`, governed by #481;
+- `XSL` — `Somaliland`, governed by #482;
+- `XKX` — `Kosovo`, governed by #478.
+
+These are serialization/catalog identities only. They are deliberately non-numeric and non-ISO. The exact source geometry, coordinates and geographic rendering remain unchanged.
 
 ## Source-field false positives excluded from Special governance
 
@@ -49,22 +64,12 @@ A special-status geometry appears in exactly one geographic manifest. This ledge
 
 Consequently:
 
-- Western Sahara remains in Africa;
-- Israel and Palestine remain in Asia;
-- Kosovo remains in Europe;
+- Western Sahara and Somaliland remain geographically in Africa;
+- Israel, Palestine and N. Cyprus remain geographically in Asia;
+- Kosovo remains geographically in Europe;
 - Greenland and Puerto Rico remain in North America;
 - New Caledonia remains in Oceania;
 - Falkland Islands/Malvinas remain in South America;
 - Antarctica and French Southern and Antarctic Lands remain in Special.
 
 This preserves one-geometry/one-chapter accounting while keeping political/status semantics explicit.
-
-## Exit gate for #453
-
-The Special chapter is complete when:
-
-1. Antarctica is REVIEW-linked to #477 rather than silently accepted as having a capital;
-2. French Southern and Antarctic Lands remains an intentional documented GAP;
-3. Kosovo's non-numeric identity is REVIEW-linked to #478;
-4. all cross-region special-status geometries above are classified without duplication;
-5. temporary audit artifacts/workflows are absent from the final PR diff.

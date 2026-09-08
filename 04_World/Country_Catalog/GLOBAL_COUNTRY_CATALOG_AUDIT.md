@@ -6,12 +6,12 @@ Parent: #446
 
 ## Global accounting
 
-- rendered topology geometries: **175**
-- chapter entries: **175**
-- representative locality nodes: **1344**
-- PASS: **156**
+- rendered topology geometries: **177**
+- chapter entries: **177**
+- representative locality nodes: **1355**
+- PASS: **157**
 - REVIEW: **18**
-- GAP: **1**
+- GAP: **2**
 - duplicate geometry assignments: **0**
 - missing geometry assignments: **0**
 
@@ -19,9 +19,9 @@ Parent: #446
 
 | Chapter | Geometries | Nodes | PASS | REVIEW | GAP |
 |---|---:|---:|---:|---:|---:|
-| Africa | 50 | 416 | 43 | 7 | 0 |
-| Asia | 46 | 356 | 41 | 5 | 0 |
-| Europe | 39 | 290 | 37 | 2 | 0 |
+| Africa | 51 | 423 | 43 | 8 | 0 |
+| Asia | 47 | 356 | 41 | 5 | 1 |
+| Europe | 39 | 294 | 38 | 1 | 0 |
 | North America | 18 | 133 | 18 | 0 | 0 |
 | South America | 13 | 107 | 10 | 3 | 0 |
 | Oceania | 7 | 37 | 7 | 0 | 0 |
@@ -31,7 +31,7 @@ Parent: #446
 
 Every unresolved REVIEW entry has a dedicated issue and a matching persistent entry in `COUNTRY_REVIEW_REGISTRY.json`.
 
-#456, #457, #458, #459, #460, #461, #462, #464, #465, #466, #467, #468, #469, #472, #473, #474, #477, #478
+#456, #457, #458, #459, #460, #461, #462, #464, #465, #466, #467, #468, #472, #473, #474, #477, #478, #482
 
 ## Exit-gate proof for #446
 

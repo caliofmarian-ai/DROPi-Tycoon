@@ -21,6 +21,10 @@ export interface CountryLocalityCatalog {
     upstreamCommit: string
     license: string
   }
+  geometryIdentity?: {
+    registryVersion: string
+    byRenderedName: Record<string, string>
+  }
   stats: {
     renderedCountries: number
     countriesWithRepresentativeNodes: number
@@ -35,6 +39,10 @@ export const localityNodesForCountry = (
   catalog: CountryLocalityCatalog | null | undefined,
   countryId: string,
 ): CountryLocalityNode[] => catalog?.countries?.[countryId] ?? []
+
+export const geometryIdentityByRenderedName = (
+  catalog: CountryLocalityCatalog | null | undefined,
+): Record<string, string> => catalog?.geometryIdentity?.byRenderedName ?? {}
 
 export const projectLocalityToGlobalMap = (
   node: Pick<CountryLocalityNode, 'longitude' | 'latitude'>,

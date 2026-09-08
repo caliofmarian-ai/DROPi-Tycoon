@@ -31,8 +31,17 @@ describe('Global Map runtime #418', () => {
   it('materializes sparse real-world locality nodes for country drill-down', () => {
     const romania = localityCatalog.countries['642'] ?? []
     const ireland = localityCatalog.countries['372'] ?? []
+    const unitedKingdom = localityCatalog.countries['826'] ?? []
+    const kosovo = localityCatalog.countries['XKX'] ?? []
     expect(romania.find(node => node.role === 'capital')?.name).toMatch(/Bucharest|Bucuresti/)
     expect(ireland.find(node => node.role === 'capital')?.name).toBe('Dublin')
+    expect(unitedKingdom.find(node => node.role === 'capital')?.name).toBe('London')
+    expect(unitedKingdom.some(node => node.name === 'Hamilton')).toBe(false)
+    expect(kosovo.find(node => node.role === 'capital')?.name).toBe('Pristina')
+    expect(localityCatalog.geometryIdentity?.byRenderedName['N. Cyprus']).toBe('XNC')
+    expect(localityCatalog.geometryIdentity?.byRenderedName.Somaliland).toBe('XSL')
+    expect(localityCatalog.geometryIdentity?.byRenderedName.Kosovo).toBe('XKX')
+    expect(localityCatalog.countries.None).toBeUndefined()
     expect(romania.length).toBeLessThanOrEqual(9)
     expect(ireland.length).toBeLessThanOrEqual(9)
     expect(Object.values(localityCatalog.countries).every(nodes => nodes.length <= 9)).toBe(true)
@@ -43,12 +52,16 @@ describe('Global Map runtime #418', () => {
   })
 
   it('loads the pinned local country topology as real selectable geography', () => {
-    const countries = decodeWorldTopology(topology, 1440, 720)
+    const countries = decodeWorldTopology(topology, 1440, 720, localityCatalog.geometryIdentity?.byRenderedName ?? {})
     const names = new Set(countries.map(country => country.name))
 
     expect(countries.length).toBeGreaterThan(150)
     expect(names.has('Ireland')).toBe(true)
     expect(names.has('Romania')).toBe(true)
+    expect(countries.find(country => country.name === 'N. Cyprus')?.id).toBe('XNC')
+    expect(countries.find(country => country.name === 'Somaliland')?.id).toBe('XSL')
+    expect(countries.find(country => country.name === 'Kosovo')?.id).toBe('XKX')
+    expect(countries.every(country => !country.id.startsWith('unresolved:'))).toBe(true)
     expect(countries.every(country => country.polygons.length > 0)).toBe(true)
     expect(countries.every(country => Number.isFinite(country.area) && country.area > 0)).toBe(true)
   })

@@ -5,16 +5,16 @@ Status: Generated audit manifest; country-by-country maintenance surface.
 Parent: #446
 
 ## Source contract
-- runtime catalog version: `1.1.0`
+- runtime catalog version: `1.2.0`
 - Natural Earth upstream commit: `ca96624a56bd078437bca8184e78163e5039ad19`
 - every node coordinate remains a source coordinate; this manifest does not reposition places.
 
 ## Chapter summary
-- countries/territories: **46**
+- countries/territories: **47**
 - representative nodes: **356**
 - structural PASS: **41**
 - REVIEW: **5**
-- documented GAP: **0**
+- documented GAP: **1**
 
 ## Country-by-country manifest
 
@@ -45,6 +45,7 @@ Parent: #446
 | 458 | Malaysia | Kuala Lumpur | 9 | CAPITAL, N, E, S, W, NE, SE, SW, NW | **PASS** | structural/source checks passed |
 | 496 | Mongolia | Ulaanbaatar | 9 | CAPITAL, N, E, S, W, NE, SE, SW, NW | **PASS** | structural/source checks passed |
 | 104 | Myanmar | Rangoon | 9 | CAPITAL, N, E, S, W, NE, SE, SW, NW | **REVIEW** | #465: current-capital mismatch: Nay Pyi Taw is Myanmar's capital while Yangon/Rangoon is a major commercial city |
+| XNC | N. Cyprus | — | 0 | — | **GAP** | documented source coverage gap |
 | 524 | Nepal | Kathmandu | 9 | CAPITAL, N, E, S, W, NE, SE, SW, NW | **PASS** | structural/source checks passed |
 | 408 | North Korea | Pyongyang | 9 | CAPITAL, N, E, S, W, NE, SE, SW, NW | **PASS** | structural/source checks passed |
 | 512 | Oman | Muscat | 9 | CAPITAL, N, E, S, W, NE, SE, SW, NW | **PASS** | structural/source checks passed |

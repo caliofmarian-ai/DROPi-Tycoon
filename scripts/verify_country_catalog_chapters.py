@@ -8,6 +8,8 @@ import re
 import sys
 from collections import Counter, defaultdict
 
+from country_geometry_identity import load_geometry_id_registry, topology_names as stable_topology_names
+
 ROOT = pathlib.Path(__file__).resolve().parents[1]
 CATALOG_ROOT = ROOT / "04_World/Country_Catalog"
 CONTINENT_ROOT = CATALOG_ROOT / "Continents"
@@ -32,11 +34,8 @@ VALID_STATES = {"PASS", "REVIEW", "GAP"}
 
 def topology_names():
     data = json.loads(TOPOLOGY.read_text())
-    geometries = data["objects"]["countries"]["geometries"]
-    return {
-        str(geometry.get("id")): str((geometry.get("properties") or {}).get("name") or "").strip()
-        for geometry in geometries
-    }
+    _, identity_by_name = load_geometry_id_registry()
+    return stable_topology_names(data, identity_by_name)
 
 
 def parse_chapter(chapter_name, filename):
@@ -160,7 +159,7 @@ def verify():
         }
     )
 
-    result = {
+    return {
         "topology_count": len(expected),
         "row_count": len(rows),
         "total_nodes": total_nodes,
@@ -169,7 +168,6 @@ def verify():
         "chapters": chapter_summaries,
         "errors": errors,
     }
-    return result
 
 
 def report_text(result):

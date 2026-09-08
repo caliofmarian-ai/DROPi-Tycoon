@@ -1,0 +1,27 @@
+{
+  "version": "1.1.0",
+  "purpose": "Stable project-owned geometry identities for rendered map geometries that do not have a usable source ID. Project IDs are not ISO numeric codes and must not be presented as such.",
+  "entries": {
+    "N. Cyprus": {
+      "projectGeometryId": "XNC",
+      "sourceGeometryId": null,
+      "issue": 481,
+      "classification": "project-owned-non-ISO-identifier",
+      "note": "Stable DROPi geometry/catalog key for serialization and locality lookup. Geographic rendering does not assert universally settled sovereignty or recognition."
+    },
+    "Somaliland": {
+      "projectGeometryId": "XSL",
+      "sourceGeometryId": null,
+      "issue": 482,
+      "classification": "project-owned-non-ISO-identifier",
+      "note": "Stable DROPi geometry/catalog key for serialization and locality lookup. This key represents the rendered geography only and does not assert universally settled sovereignty or recognition."
+    },
+    "Kosovo": {
+      "projectGeometryId": "XKX",
+      "sourceGeometryId": null,
+      "issue": 478,
+      "classification": "project-owned-non-ISO-identifier",
+      "note": "Stable DROPi geometry/catalog key for serialization and locality lookup. This identifier does not assert universally settled sovereignty or ISO recognition."
+    }
+  }
+}

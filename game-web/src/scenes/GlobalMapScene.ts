@@ -11,6 +11,7 @@ import {
 } from '../world/globalMapTopology'
 import { COLORS, RADII, TOUCH_TARGET_MIN_PX, TYPOGRAPHY } from '../ui/theme'
 import {
+  geometryIdentityByRenderedName,
   localityNodesForCountry,
   nearestLocalityNode,
   projectLocalityToGlobalMap,
@@ -78,8 +79,10 @@ export class GlobalMapScene extends Phaser.Scene {
 
   create(): void {
     const topology = this.cache.json.get(COUNTRY_DATA_KEY) as WorldTopology | undefined
-    this.countries = topology ? decodeWorldTopology(topology, MAP_WIDTH, MAP_HEIGHT) : []
     this.localityCatalog = (this.cache.json.get(LOCALITY_DATA_KEY) as CountryLocalityCatalog | undefined) ?? null
+    this.countries = topology
+      ? decodeWorldTopology(topology, MAP_WIDTH, MAP_HEIGHT, geometryIdentityByRenderedName(this.localityCatalog))
+      : []
     this.viewport = globalMapViewport(this.scale.width, this.scale.height)
     this.fitScale = fitGlobalMapScale(this.viewport)
     this.mapScale = this.fitScale

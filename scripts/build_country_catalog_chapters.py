@@ -8,6 +8,8 @@ import urllib.request
 
 import pycountry
 
+from country_geometry_identity import load_geometry_id_registry, topology_names
+
 ROOT = pathlib.Path(__file__).resolve().parents[1]
 CATALOG = ROOT / 'game-web/public/data/country-representative-localities-v1.json'
 TOPOLOGY = ROOT / 'game-web/public/data/world-atlas-countries-110m.json'
@@ -44,11 +46,6 @@ def load_json(path):
 def fetch_admin0():
     with urllib.request.urlopen(ADMIN0_URL, timeout=60) as response:
         return json.load(response)
-
-
-def topology_names(topology):
-    geometries = topology['objects']['countries']['geometries']
-    return {str(g.get('id')): str((g.get('properties') or {}).get('name') or '').strip() for g in geometries}
 
 
 def numeric_country_id(properties, valid_ids, name_to_id):
@@ -113,13 +110,14 @@ def node_key(node):
     )
 
 
-def audit_country(cid, name, nodes, coverage_gap=False, manual_review=None):
+def audit_country(cid, name, nodes, coverage_gap=False, manual_review=None, project_owned_ids=None):
+    project_owned_ids = project_owned_ids or set()
     reasons = []
     if manual_review:
         issue = manual_review.get('issue')
         reason = str(manual_review.get('reason') or 'manual semantic review required')
         reasons.append(f"#{issue}: {reason}" if issue else reason)
-    if not str(cid).isdigit():
+    if not str(cid).isdigit() and cid not in project_owned_ids:
         reasons.append('unstable/non-numeric geometry ID')
     if len(nodes) > 9:
         reasons.append('more than 9 nodes')
@@ -188,7 +186,7 @@ def markdown_for_continent(continent, rows, catalog):
         '',
         'Status: Generated audit manifest; country-by-country maintenance surface.',
         '',
-        f'Parent: #446',
+        'Parent: #446',
         '',
         '## Source contract',
         f'- runtime catalog version: `{catalog.get("version", "unknown")}`',
@@ -254,7 +252,7 @@ def country_markdown(continent, row, nodes, catalog):
 def main():
     parser = argparse.ArgumentParser(description='Build continent/country audit chapters from the committed sparse locality catalog.')
     parser.add_argument('--continent', choices=CONTINENTS)
-    parser.add_argument('--country', help='Numeric country geometry ID, e.g. 642 for Romania')
+    parser.add_argument('--country', help='Country geometry ID, e.g. 642 for Romania or a registered project-owned ID')
     parser.add_argument('--all', action='store_true', help='Generate all continent manifests')
     args = parser.parse_args()
 
@@ -263,7 +261,9 @@ def main():
 
     catalog = load_json(CATALOG)
     topology = load_json(TOPOLOGY)
-    rendered = topology_names(topology)
+    _, identity_by_name = load_geometry_id_registry()
+    rendered = topology_names(topology, identity_by_name)
+    project_owned_ids = set(identity_by_name.values())
     admin0 = fetch_admin0()
     continents = build_continent_map(admin0, rendered)
     coverage_gap_ids = {str(item.get('id')) for item in catalog.get('coverageGaps', [])}
@@ -274,7 +274,14 @@ def main():
     rows_by_id = {}
     for cid, name in rendered.items():
         nodes = countries.get(cid, [])
-        row = audit_country(cid, name, nodes, cid in coverage_gap_ids, review_registry.get(cid))
+        row = audit_country(
+            cid,
+            name,
+            nodes,
+            cid in coverage_gap_ids,
+            review_registry.get(cid),
+            project_owned_ids,
+        )
         continent = continents.get(cid, 'Special')
         rows_by_continent.setdefault(continent, []).append(row)
         rows_by_id[cid] = (continent, row, nodes)
@@ -288,7 +295,8 @@ def main():
     elif args.continent:
         targets = (args.continent,)
     else:
-        cid = str(args.country).zfill(3)
+        raw = str(args.country).strip()
+        cid = raw.zfill(3) if raw.isdigit() else raw
         if cid not in rows_by_id:
             raise SystemExit(f'country geometry ID not found: {cid}')
         continent, row, nodes = rows_by_id[cid]

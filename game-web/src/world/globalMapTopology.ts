@@ -27,7 +27,7 @@ interface TopologyTransform {
 }
 
 interface TopologyBaseGeometry {
-  id?: string | number
+  id?: string | number | null
   properties?: { name?: string }
 }
 
@@ -154,10 +154,24 @@ const decodePolygon = (
   .map(refs => projectRing(stitchRing(topology, refs), width, height))
   .filter(ring => ring.length >= 3)
 
+const stableGeometryId = (
+  geometry: TopologyCountryGeometry,
+  name: string,
+  index: number,
+  identityByRenderedName: Record<string, string>,
+): string => {
+  if (geometry.id !== undefined && geometry.id !== null) {
+    const sourceId = String(geometry.id).trim()
+    if (sourceId && sourceId.toLowerCase() !== 'none' && sourceId.toLowerCase() !== 'null') return sourceId
+  }
+  return identityByRenderedName[name] ?? `unresolved:${index}`
+}
+
 export const decodeWorldTopology = (
   topology: WorldTopology,
   width: number,
   height: number,
+  identityByRenderedName: Record<string, string> = {},
 ): GlobalCountryGeometry[] => {
   if (topology.type !== 'Topology' || !Array.isArray(topology.arcs)) return []
   const geometries = topology.objects?.countries?.geometries
@@ -183,9 +197,10 @@ export const decodeWorldTopology = (
       }
     }
 
+    const name = geometry.properties?.name?.trim() || `Country ${geometry.id ?? index}`
     return [{
-      id: String(geometry.id ?? index),
-      name: geometry.properties?.name?.trim() || `Country ${geometry.id ?? index}`,
+      id: stableGeometryId(geometry, name, index, identityByRenderedName),
+      name,
       polygons: valid,
       primaryBounds: ringBounds(primary),
       area,
