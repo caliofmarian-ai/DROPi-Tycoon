@@ -1,5 +1,5 @@
 {
-  "version": "1.1.0",
+  "version": "1.1.1",
   "purpose": "Manual semantic review flags discovered during continent-by-continent audit. These do not silently rewrite pinned Natural Earth source data.",
   "reviews": {
     "204": {
@@ -49,6 +49,10 @@
     "275": {
       "issue": 468,
       "reason": "capital/status semantics: Gaza must not be labeled the State of Palestine's national capital; East Jerusalem claim and Ramallah administrative role require neutral handling"
+    },
+    "826": {
+      "issue": 469,
+      "reason": "country-identity bleed: Hamilton from a British overseas territory must not be grouped as the United Kingdom national capital"
     }
   }
 }
