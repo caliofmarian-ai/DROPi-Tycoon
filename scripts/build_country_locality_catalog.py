@@ -349,6 +349,7 @@ assert capital('834') == 'Dodoma'
 assert capital('204') == 'Porto-Novo'
 assert capital('108') == 'Gitega'
 assert capital('384') == 'Yamoussoukro'
+assert capital('068') == 'Sucre'
 assert node('392', 'Kyoto') and node('392', 'Kyoto')['role'] != 'capital'
 assert node('104', 'Yangon') and node('104', 'Yangon')['role'] != 'capital'
 assert node('144', 'Colombo') and node('144', 'Colombo')['role'] != 'capital'
@@ -361,6 +362,7 @@ assert node('834', 'Dar es Salaam') and node('834', 'Dar es Salaam')['role'] != 
 assert node('204', 'Cotonou') and node('204', 'Cotonou')['role'] != 'capital'
 assert node('108', 'Bujumbura') and node('108', 'Bujumbura')['role'] != 'capital'
 assert node('384', 'Abidjan') and node('384', 'Abidjan')['role'] != 'capital'
+assert node('068', 'La Paz') and node('068', 'La Paz')['role'] != 'capital'
 assert node('226', 'Ciudad de la Paz')['sourceKind'] == 'authoritative-supplement'
 assert node('226', 'Ciudad de la Paz')['effectiveOn'] == '2026-01-02'
 assert all(n['name'] != 'Hamilton' for n in countries.get('826', []))
@@ -375,7 +377,7 @@ used_supplements = sorted({
 })
 
 payload = {
-    'version': '1.7.0',
+    'version': '1.8.0',
     'source': {
         'name': 'Natural Earth 1:10m populated places simple',
         'upstreamCommit': SRC_COMMIT,

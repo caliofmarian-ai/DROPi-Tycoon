@@ -5,7 +5,7 @@ Status: Generated audit manifest; country-by-country maintenance surface.
 Parent: #446
 
 ## Source contract
-- runtime catalog version: `1.7.0`
+- runtime catalog version: `1.8.0`
 - Natural Earth upstream commit: `ca96624a56bd078437bca8184e78163e5039ad19`
 - every node coordinate remains a source coordinate; this manifest does not reposition places.
 - Structural capital slot is a sparse-map data role only; player-facing political/territory semantics are governed by `game-web/public/data/country-semantic-metadata-v1.json`.
@@ -22,7 +22,7 @@ Parent: #446
 | ID | Country / territory | Structural capital slot | Nodes | Slots | State | Notes |
 |---:|---|---|---:|---|---|---|
 | 032 | Argentina | Buenos Aires | 9 | CAPITAL, N, E, S, W, NE, SE, SW, NW | **PASS** | structural/source checks passed |
-| 068 | Bolivia | La Paz | 9 | CAPITAL, N, E, S, W, NE, SE, SW, NW | **REVIEW** | #472: capital-role semantics: Sucre is Bolivia's constitutional/national capital while La Paz is the principal executive and legislative government seat |
+| 068 | Bolivia | Sucre | 9 | CAPITAL, W, N, E, S, NE, SE, SW, NW | **REVIEW** | #472: Sucre constitutional/national-capital override implemented; La Paz retained as government seat / executive and legislative centre; owner Android Country Layer acceptance pending |
 | 076 | Brazil | Brasilia | 9 | CAPITAL, N, E, S, W, NE, SE, SW, NW | **PASS** | structural/source checks passed |
 | 152 | Chile | Santiago | 9 | CAPITAL, NW, N, E, S, W, NE, SE, SW | **REVIEW** | #473: current-capital mismatch: Santiago is Chile's national capital while Valparaiso is the seat of the National Congress and a major port |
 | 170 | Colombia | Bogota | 9 | CAPITAL, N, E, S, W, NE, SE, SW, NW | **PASS** | structural/source checks passed |
