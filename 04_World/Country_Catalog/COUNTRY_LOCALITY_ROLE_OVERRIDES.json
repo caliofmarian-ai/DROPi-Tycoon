@@ -1,5 +1,5 @@
 {
-  "version": "1.3.0",
+  "version": "1.4.0",
   "source": {
     "name": "Natural Earth 1:10m populated places simple",
     "upstreamCommit": "ca96624a56bd078437bca8184e78163e5039ad19"
@@ -162,6 +162,64 @@
             "Dar es Salaam"
           ],
           "displayName": "Dar es Salaam",
+          "role": "urban"
+        }
+      ]
+    },
+    "204": {
+      "issue": 456,
+      "country": "Benin",
+      "currentCapital": {
+        "sourceNames": [
+          "Porto-Novo",
+          "Porto Novo"
+        ],
+        "displayName": "Porto-Novo"
+      },
+      "requiredRepresentatives": [
+        {
+          "sourceNames": [
+            "Cotonou"
+          ],
+          "displayName": "Cotonou",
+          "role": "urban"
+        }
+      ]
+    },
+    "108": {
+      "issue": 457,
+      "country": "Burundi",
+      "currentCapital": {
+        "sourceNames": [
+          "Gitega"
+        ],
+        "displayName": "Gitega"
+      },
+      "requiredRepresentatives": [
+        {
+          "sourceNames": [
+            "Bujumbura"
+          ],
+          "displayName": "Bujumbura",
+          "role": "urban"
+        }
+      ]
+    },
+    "384": {
+      "issue": 458,
+      "country": "Côte d'Ivoire",
+      "currentCapital": {
+        "sourceNames": [
+          "Yamoussoukro"
+        ],
+        "displayName": "Yamoussoukro"
+      },
+      "requiredRepresentatives": [
+        {
+          "sourceNames": [
+            "Abidjan"
+          ],
+          "displayName": "Abidjan",
           "role": "urban"
         }
       ]

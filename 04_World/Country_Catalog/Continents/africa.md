@@ -5,7 +5,7 @@ Status: Generated audit manifest; country-by-country maintenance surface.
 Parent: #446
 
 ## Source contract
-- runtime catalog version: `1.6.0`
+- runtime catalog version: `1.7.0`
 - Natural Earth upstream commit: `ca96624a56bd078437bca8184e78163e5039ad19`
 - every node coordinate remains a source coordinate; this manifest does not reposition places.
 - Structural capital slot is a sparse-map data role only; player-facing political/territory semantics are governed by `game-web/public/data/country-semantic-metadata-v1.json`.
@@ -23,15 +23,15 @@ Parent: #446
 |---:|---|---|---:|---|---|---|
 | 012 | Algeria | Algiers | 9 | CAPITAL, N, E, S, W, NE, SE, SW, NW | **PASS** | structural/source checks passed |
 | 024 | Angola | Luanda | 9 | CAPITAL, N, E, S, W, NE, SE, SW, NW | **PASS** | structural/source checks passed |
-| 204 | Benin | Cotonou | 8 | CAPITAL, N, E, S, W, SE, SW, NW | **REVIEW** | #456: capital-role semantics: Porto-Novo is the political/national capital while Cotonou hosts major government and economic functions |
+| 204 | Benin | Porto-Novo | 8 | CAPITAL, S, N, E, W, SE, SW, NW | **REVIEW** | #456: Porto-Novo national/political capital override implemented; Cotonou retained as economic capital / government centre; owner Android Country Layer acceptance pending |
 | 072 | Botswana | Gaborone | 9 | CAPITAL, N, E, S, W, NE, SE, SW, NW | **PASS** | structural/source checks passed |
 | 854 | Burkina Faso | Ouagadougou | 9 | CAPITAL, N, E, S, W, NE, SE, SW, NW | **PASS** | structural/source checks passed |
-| 108 | Burundi | Bujumbura | 9 | CAPITAL, N, E, S, W, NE, SE, SW, NW | **REVIEW** | #457: capital-role semantics: Gitega is the political capital and Bujumbura is the economic capital |
+| 108 | Burundi | Gitega | 9 | CAPITAL, W, N, E, S, NE, SE, SW, NW | **REVIEW** | #457: Gitega political-capital override implemented; Bujumbura retained as economic capital; owner Android Country Layer acceptance pending |
 | 120 | Cameroon | Yaounde | 9 | CAPITAL, N, E, S, W, NE, SE, SW, NW | **PASS** | structural/source checks passed |
 | 140 | Central African Rep. | Bangui | 9 | CAPITAL, N, E, S, W, NE, SE, SW, NW | **PASS** | structural/source checks passed |
 | 148 | Chad | Ndjamena | 9 | CAPITAL, N, E, S, W, NE, SE, SW, NW | **PASS** | structural/source checks passed |
 | 178 | Congo | Brazzaville | 9 | CAPITAL, N, E, S, W, NE, SE, SW, NW | **PASS** | structural/source checks passed |
-| 384 | Côte d'Ivoire | Abidjan | 9 | CAPITAL, N, E, S, W, NE, SE, SW, NW | **REVIEW** | #458: capital-role semantics: Yamoussoukro is the political/administrative capital while Abidjan is the dominant economic/metropolitan centre |
+| 384 | Côte d'Ivoire | Yamoussoukro | 9 | CAPITAL, SE, N, E, S, W, NE, SW, NW | **REVIEW** | #458: Yamoussoukro political-capital override implemented; Abidjan retained as economic capital / major metropolitan centre; owner Android Country Layer acceptance pending |
 | 180 | Dem. Rep. Congo | Kinshasa | 9 | CAPITAL, N, E, S, W, NE, SE, SW, NW | **PASS** | structural/source checks passed |
 | 262 | Djibouti | Djibouti | 5 | CAPITAL, N, E, S, W | **PASS** | structural/source checks passed |
 | 818 | Egypt | Cairo | 9 | CAPITAL, N, E, S, W, NE, SE, SW, NW | **PASS** | structural/source checks passed |

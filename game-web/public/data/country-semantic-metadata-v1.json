@@ -1,5 +1,5 @@
 {
-  "version": "1.5.0",
+  "version": "1.6.0",
   "reviewedOn": "2026-09-08",
   "purpose": "Player-facing semantic metadata for country and territory cases where a single generic capital label or geographic rendering could misstate political, constitutional, administrative or recognition reality.",
   "governance": {
@@ -151,6 +151,35 @@
       "url": "https://peacekeeping.un.org/en/factsheet/minurso",
       "accessedOn": "2026-09-08",
       "note": "MINURSO remains the United Nations Mission for the Referendum in Western Sahara and continues operating with Morocco and Frente Polisario as parties to the unresolved settlement process."
+    },
+    "benin-porto-novo-capital": {
+      "publisher": "Ministry of Decentralization and Local Governance, Republic of Benin",
+      "title": "Porto-Novo",
+      "url": "https://www.decentralisation.gouv.bj/commune/62/porto-novo/",
+      "accessedOn": "2026-09-08",
+      "note": "The official commune profile states that Porto-Novo retained its capital status after Benin independence and hosts major national political institutions."
+    },
+    "benin-cotonou-economic-capital": {
+      "publisher": "Government of the Republic of Benin",
+      "title": "Cité ministérielle de Cotonou : Le nouveau symbole d’une administration moderne et intégrée",
+      "url": "https://www.gouv.bj/article/3321/cite-ministerielle-cotonou-nouveau-symbole-administration-moderne-integree/",
+      "publishedOn": "2025-10-30",
+      "accessedOn": "2026-09-08",
+      "note": "The Government describes Cotonou as Benin’s economic capital and records the ministerial city hosting sixteen ministerial cabinets and central services."
+    },
+    "burundi-presidency-capitals": {
+      "publisher": "Presidency of the Republic of Burundi",
+      "title": "Le Pays",
+      "url": "https://presidence.gov.bi/le-pays/",
+      "accessedOn": "2026-09-08",
+      "note": "The Presidency identifies Gitega as the political capital and Bujumbura as the economic capital."
+    },
+    "cote-divoire-economic-diplomacy-capitals": {
+      "publisher": "Ministry of Foreign Affairs and International Cooperation, Republic of Côte d’Ivoire",
+      "title": "Economic Diplomacy Platform — General data",
+      "url": "https://www.eco.diplomatie.gouv.ci/",
+      "accessedOn": "2026-09-08",
+      "note": "The official economic-diplomacy profile identifies Yamoussoukro as the political capital and Abidjan as the economic capital."
     }
   },
   "entries": {
@@ -386,6 +415,70 @@
         "un-western-sahara-nsgt",
         "un-western-sahara-working-paper-2026",
         "un-minurso-current"
+      ]
+    },
+    "204": {
+      "issue": 456,
+      "renderedName": "Benin",
+      "statusLabel": "Capital and government/economic roles",
+      "statusSummary": "Porto-Novo is Benin’s national and political capital. Cotonou is the economic capital and hosts major central-government services, so DROPi represents both roles instead of treating Cotonou as the sole national capital.",
+      "placeRoles": [
+        {
+          "locality": "Porto-Novo",
+          "role": "national-political-capital",
+          "label": "National / political capital"
+        },
+        {
+          "locality": "Cotonou",
+          "role": "economic-capital-government-centre",
+          "label": "Economic capital / government centre"
+        }
+      ],
+      "sourceRefs": [
+        "benin-porto-novo-capital",
+        "benin-cotonou-economic-capital"
+      ]
+    },
+    "108": {
+      "issue": 457,
+      "renderedName": "Burundi",
+      "statusLabel": "Political and economic capital roles",
+      "statusSummary": "Gitega is Burundi’s political capital and Bujumbura is its economic capital. DROPi keeps both cities visible with distinct roles.",
+      "placeRoles": [
+        {
+          "locality": "Gitega",
+          "role": "political-capital",
+          "label": "Political capital"
+        },
+        {
+          "locality": "Bujumbura",
+          "role": "economic-capital",
+          "label": "Economic capital"
+        }
+      ],
+      "sourceRefs": [
+        "burundi-presidency-capitals"
+      ]
+    },
+    "384": {
+      "issue": 458,
+      "renderedName": "Côte d'Ivoire",
+      "statusLabel": "Political and economic capital roles",
+      "statusSummary": "Yamoussoukro is Côte d’Ivoire’s political capital and Abidjan is its economic capital. DROPi represents the two roles separately rather than preserving Abidjan as the sole capital.",
+      "placeRoles": [
+        {
+          "locality": "Yamoussoukro",
+          "role": "political-capital",
+          "label": "Political capital"
+        },
+        {
+          "locality": "Abidjan",
+          "role": "economic-capital",
+          "label": "Economic capital / major metropolitan centre"
+        }
+      ],
+      "sourceRefs": [
+        "cote-divoire-economic-diplomacy-capitals"
       ]
     }
   }
