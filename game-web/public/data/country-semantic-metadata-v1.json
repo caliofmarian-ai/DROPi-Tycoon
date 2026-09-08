@@ -1,0 +1,110 @@
+{
+  "version": "1.0.0",
+  "reviewedOn": "2026-09-08",
+  "purpose": "Player-facing semantic metadata for country and territory cases where a single generic capital label or geographic rendering could misstate political, constitutional, administrative or recognition reality.",
+  "governance": {
+    "geographyDoesNotAssertSovereignty": true,
+    "projectGeometryIdsAreNonISO": true,
+    "statusTextMustBeSourceGoverned": true,
+    "localityCoordinatesRemainSourceBacked": true
+  },
+  "sources": {
+    "eu-kosovo-status-neutral": {
+      "publisher": "Council of the European Union",
+      "title": "Framework Agreement between the European Union and Kosovo* on participation in Union programmes",
+      "url": "https://www.consilium.europa.eu/en/documents/treaties-agreements/agreement/?id=2016069",
+      "publishedOn": "2016-11-25",
+      "accessedOn": "2026-09-08",
+      "note": "The EU designation states that use of Kosovo* is without prejudice to positions on status and is aligned with UNSCR 1244 (1999) and the ICJ opinion."
+    },
+    "eu-cyprus-green-line": {
+      "publisher": "European Commission",
+      "title": "Green Line Regulation",
+      "url": "https://commission.europa.eu/about/departments-and-executive-agencies/regional-and-urban-policy/green-line-regulation_en",
+      "accessedOn": "2026-09-08",
+      "note": "The Commission states that the whole of Cyprus is in the EU and that EU legislation is suspended in the northern part where the Government of the Republic of Cyprus does not exercise effective control."
+    },
+    "eu-cyprus-protocol-10": {
+      "publisher": "European Union / EUR-Lex",
+      "title": "Protocol No 10 on Cyprus to the 2003 Act of Accession",
+      "url": "https://eur-lex.europa.eu/eli/treaty/acc_2003/act_1/pro_10/sign/eng",
+      "publishedOn": "2003-09-23",
+      "accessedOn": "2026-09-08",
+      "note": "Protocol 10 suspends the acquis in areas of the Republic of Cyprus where its Government does not exercise effective control, pending a settlement."
+    },
+    "un-somaliland-governance": {
+      "publisher": "United Nations in Somalia",
+      "title": "Final consultation on key local government law takes place in Hargeisa",
+      "url": "https://somalia.un.org/en/19660-final-consultation-key-local-government-law-takes-place-hargeisa",
+      "publishedOn": "2019-04-01",
+      "accessedOn": "2026-09-08",
+      "note": "UN-supported programming documents Somaliland ministries, parliament and local-government administration without treating programmatic geography as a sovereignty determination."
+    },
+    "un-somaliland-recognition-briefing": {
+      "publisher": "United Nations Department of Political and Peacebuilding Affairs",
+      "title": "Security Council briefing following Israel's recognition of Somaliland",
+      "url": "https://dppa.dfs.un.org/en/mtg-sc-10084-asg-khiari-29-dec-2025",
+      "publishedOn": "2025-12-29",
+      "accessedOn": "2026-09-08",
+      "note": "The briefing records Israel's 26 December 2025 recognition, Somaliland's response, and Somalia's rejection and sovereignty position."
+    },
+    "israel-knesset-somaliland": {
+      "publisher": "Knesset",
+      "title": "Knesset Speaker to visiting Somaliland President",
+      "url": "https://main.knesset.gov.il/EN/News/PressReleases/Pages/press176261.aspx",
+      "publishedOn": "2026-06-17",
+      "accessedOn": "2026-09-08",
+      "note": "The Knesset describes Israel's official recognition of Somaliland on 26 December 2025 and subsequent diplomatic relations."
+    }
+  },
+  "entries": {
+    "XKX": {
+      "issue": 478,
+      "renderedName": "Kosovo",
+      "statusLabel": "Status-sensitive geography",
+      "statusSummary": "Status and recognition positions differ internationally. DROPi represents the geography and source-backed localities without taking a sovereignty position.",
+      "placeRoles": [
+        {
+          "locality": "Pristina",
+          "role": "capital-administrative-centre",
+          "label": "Capital / administrative centre",
+          "note": "The locality label is geographic and administrative context, not a DROPi sovereignty assertion."
+        }
+      ],
+      "sourceRefs": [
+        "eu-kosovo-status-neutral"
+      ]
+    },
+    "XNC": {
+      "issue": 481,
+      "renderedName": "N. Cyprus",
+      "statusLabel": "Special-status area",
+      "statusSummary": "This geometry covers the northern part of Cyprus where the Government of the Republic of Cyprus does not exercise effective control. EU law is suspended there under Protocol 10 pending a settlement.",
+      "coverageNote": "The pinned Natural Earth populated-place source does not currently map representative locality nodes safely to this geometry, so DROPi leaves locality coverage empty rather than inventing places.",
+      "placeRoles": [],
+      "sourceRefs": [
+        "eu-cyprus-green-line",
+        "eu-cyprus-protocol-10"
+      ]
+    },
+    "XSL": {
+      "issue": 482,
+      "renderedName": "Somaliland",
+      "statusLabel": "Recognition-contested geography",
+      "statusSummary": "Somaliland has operated through separate de facto institutions. Israel officially recognized Somaliland on 26 December 2025. Wider international status remains contested, and UN proceedings continue to address the issue alongside Somalia's sovereignty and territorial-integrity position.",
+      "placeRoles": [
+        {
+          "locality": "Hargeysa",
+          "role": "principal-administrative-centre",
+          "label": "Principal administrative centre",
+          "note": "The label describes the source-backed gameplay locality and de facto administration without presenting statehood as universally settled."
+        }
+      ],
+      "sourceRefs": [
+        "un-somaliland-governance",
+        "un-somaliland-recognition-briefing",
+        "israel-knesset-somaliland"
+      ]
+    }
+  }
+}

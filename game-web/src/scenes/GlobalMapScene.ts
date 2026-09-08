@@ -19,6 +19,11 @@ import {
   type CountryLocalityNode,
 } from '../world/countryLayerNodes'
 import {
+  semanticEntryForCountry,
+  semanticPlaceRoleForLocality,
+  type CountrySemanticCatalog,
+} from '../world/countrySemanticMetadata'
+import {
   fitGlobalMapScale,
   GLOBAL_MAP_HEIGHT as MAP_HEIGHT,
   GLOBAL_MAP_WIDTH as MAP_WIDTH,
@@ -31,6 +36,8 @@ const COUNTRY_DATA_KEY = 'global-country-topology'
 const COUNTRY_DATA_URL = 'data/world-atlas-countries-110m.json'
 const LOCALITY_DATA_KEY = 'country-representative-localities'
 const LOCALITY_DATA_URL = 'data/country-representative-localities-v1.json'
+const SEMANTIC_DATA_KEY = 'country-semantic-metadata'
+const SEMANTIC_DATA_URL = 'data/country-semantic-metadata-v1.json'
 
 type MapLevel = 'Global' | 'Country'
 
@@ -48,6 +55,7 @@ const clamp = (value: number, min: number, max: number): number => Math.max(min,
 export class GlobalMapScene extends Phaser.Scene {
   private countries: GlobalCountryGeometry[] = []
   private localityCatalog: CountryLocalityCatalog | null = null
+  private semanticCatalog: CountrySemanticCatalog | null = null
   private selected: GlobalCountryGeometry | null = null
   private selectedLocality: CountryLocalityNode | null = null
   private level: MapLevel = 'Global'
@@ -75,11 +83,13 @@ export class GlobalMapScene extends Phaser.Scene {
   preload(): void {
     if (!this.cache.json.exists(COUNTRY_DATA_KEY)) this.load.json(COUNTRY_DATA_KEY, COUNTRY_DATA_URL)
     if (!this.cache.json.exists(LOCALITY_DATA_KEY)) this.load.json(LOCALITY_DATA_KEY, LOCALITY_DATA_URL)
+    if (!this.cache.json.exists(SEMANTIC_DATA_KEY)) this.load.json(SEMANTIC_DATA_KEY, SEMANTIC_DATA_URL)
   }
 
   create(): void {
     const topology = this.cache.json.get(COUNTRY_DATA_KEY) as WorldTopology | undefined
     this.localityCatalog = (this.cache.json.get(LOCALITY_DATA_KEY) as CountryLocalityCatalog | undefined) ?? null
+    this.semanticCatalog = (this.cache.json.get(SEMANTIC_DATA_KEY) as CountrySemanticCatalog | undefined) ?? null
     this.countries = topology
       ? decodeWorldTopology(topology, MAP_WIDTH, MAP_HEIGHT, geometryIdentityByRenderedName(this.localityCatalog))
       : []
@@ -283,26 +293,42 @@ export class GlobalMapScene extends Phaser.Scene {
     const capital = nodes.find(node => node.role === 'capital')
     const urbanCount = nodes.filter(node => node.role === 'urban').length
     const secondaryCount = nodes.filter(node => node.role === 'secondary').length
+    const semantics = semanticEntryForCountry(this.semanticCatalog, this.selected.id)
     if (this.selectedLocality) {
       const locality = this.selectedLocality
-      const kind = locality.role === 'capital' ? 'National capital' : locality.role === 'urban' ? 'Representative city' : 'Smaller locality'
+      const roleOverride = semanticPlaceRoleForLocality(semantics, locality.name)
+      const kind = roleOverride?.label ?? (locality.role === 'capital' ? 'National capital' : locality.role === 'urban' ? 'Representative city' : 'Smaller locality')
       this.selectionTitle.setText(locality.name.toUpperCase())
       this.selectionBody.setText([
         kind,
         locality.admin1 ? `Region: ${locality.admin1}` : this.selected.name,
         locality.populationReference > 0 ? `Population reference: ${locality.populationReference.toLocaleString('en-US')}` : 'Population reference: unavailable',
         `Geographic sector: ${locality.sector}`,
+        roleOverride?.note ?? '',
         '',
         `Part of ${this.selected.name}'s sparse strategic map.`,
         'Opening the map never moves the player, cargo or company.',
-      ].join('\n'))
+      ].filter(Boolean).join('\n'))
     } else {
+      const placeRoleLines = semantics?.placeRoles.map(place => `${place.label}: ${place.locality}`) ?? []
+      const capitalLines = placeRoleLines.length > 0
+        ? placeRoleLines
+        : [capital ? `Capital: ${capital.name}` : 'Capital: source coverage unavailable']
+      const semanticLines = semantics
+        ? [
+            '',
+            `Status: ${semantics.statusLabel}`,
+            semantics.statusSummary,
+            semantics.coverageNote ?? '',
+          ].filter(Boolean)
+        : []
       this.selectionTitle.setText(this.selected.name.toUpperCase())
       this.selectionBody.setText([
-        capital ? `Capital: ${capital.name}` : 'Capital: source coverage unavailable',
+        ...capitalLines,
         `Representative places: ${nodes.length}`,
         `Representative city nodes: ${urbanCount}`,
         `Smaller locality nodes: ${secondaryCount}`,
+        ...semanticLines,
         '',
         this.level === 'Country'
           ? 'Tap a locality marker to inspect it. Economy and transport overlays will appear only when authoritative simulation is connected.'
