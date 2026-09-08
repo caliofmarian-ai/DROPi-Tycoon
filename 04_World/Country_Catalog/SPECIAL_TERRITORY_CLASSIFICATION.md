@@ -2,7 +2,7 @@
 
 Status: Canonical audit ledger for #453.
 
-Parent: #446  
+Parent: #446
 Special-territory audit: #453
 
 ## Governing rule
