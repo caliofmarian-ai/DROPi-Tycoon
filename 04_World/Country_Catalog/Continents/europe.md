@@ -12,8 +12,8 @@ Parent: #446
 ## Chapter summary
 - countries/territories: **39**
 - representative nodes: **290**
-- structural PASS: **38**
-- REVIEW: **1**
+- structural PASS: **37**
+- REVIEW: **2**
 - documented GAP: **0**
 
 ## Country-by-country manifest
@@ -58,7 +58,7 @@ Parent: #446
 | 752 | Sweden | Stockholm | 9 | CAPITAL, N, E, S, W, NE, SE, SW, NW | **PASS** | structural/source checks passed |
 | 756 | Switzerland | Bern | 9 | CAPITAL, N, E, S, W, NE, SE, SW, NW | **PASS** | structural/source checks passed |
 | 804 | Ukraine | Kiev | 9 | CAPITAL, N, E, S, W, NE, SE, SW, NW | **PASS** | structural/source checks passed |
-| 826 | United Kingdom | Hamilton | 7 | CAPITAL, N, E, S, NE, SW, NW | **PASS** | structural/source checks passed |
+| 826 | United Kingdom | Hamilton | 7 | CAPITAL, N, E, S, NE, SW, NW | **REVIEW** | #469: country-identity bleed: Hamilton from a British overseas territory must not be grouped as the United Kingdom national capital |
 
 ## Interpretation
 - `PASS` means automated structural and pinned-source checks pass; it does not claim final economy/transport simulation is active.
