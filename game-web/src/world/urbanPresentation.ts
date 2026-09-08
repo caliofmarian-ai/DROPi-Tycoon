@@ -14,6 +14,7 @@ import {
   ensureBuildingTexture, ensureNeighborTexture, ensureTreeTexture, NEIGHBOR_ANCHOR, NEIGHBOR_CELL, storefrontIdentity,
 } from './cityArt'
 import { cityDistrictAccents, drawCityDistrictAccents, drawCityPavement } from './cityGround'
+import { drawDistrictIdentityGround, renderCityStreetAndAddressLabels } from './cityIdentity'
 import { drawParcel } from './courierArt'
 
 export const HQ_EXPANSION_POINT = URBAN_HQ
@@ -57,6 +58,7 @@ export const ensureCityGroundTexture = (scene: Phaser.Scene): string => {
     g.fillStyle(C.lawn).fillRoundedRect(zone.x - 8, zone.y - 8, zone.width + 16, zone.height + 16, 36)
     g.fillStyle(zone.fillColor, 0.35).fillRoundedRect(zone.x + 10, zone.y + 15, zone.width - 20, zone.height - 30, 26)
   }
+  drawDistrictIdentityGround(g, WORLD_ZONES)
   drawCityDistrictAccents(g,
     cityDistrictAccents(WORLD_ZONES, URBAN_SIDEWALKS, URBAN_BUILDINGS, WORLD_DECORATIONS))
   drawCityPavement(g, URBAN_ROADS, URBAN_SIDEWALKS)
@@ -134,6 +136,8 @@ export const renderUrbanNeighborhood = (
         '#175574').setDepth(7)
     }
   })
+
+  renderCityStreetAndAddressLabels(scene)
 
   WORLD_DECORATIONS.forEach((tree, index) => {
     // The collision disk covers the trunk; the substantial canopy hangs above it.
