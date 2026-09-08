@@ -139,6 +139,13 @@ export const installBrailaLabelPresentation = (
   cityWidth: number,
   cityHeight: number,
 ): void => {
+  // Some art-unit tests deliberately use a minimal scene double with no camera/event systems.
+  // In the real Phaser runtime both systems exist; presentation should remain a no-op in headless doubles.
+  const runtimeScene = scene as Partial<Phaser.Scene>
+  const events = runtimeScene.events
+  const cameras = runtimeScene.cameras
+  if (!events || !cameras?.main) return
+
   const states = labels.map((entry, index) => ({
     ...entry,
     id: `${entry.role}:${entry.text.name || entry.text.text}:${index}`,
@@ -149,7 +156,7 @@ export const installBrailaLabelPresentation = (
   let lastSignature = ''
 
   const sync = (): void => {
-    const camera = scene.cameras.main
+    const camera = cameras.main
     const signature = [
       Math.round(camera.zoom * 10000), Math.round(camera.worldView.x), Math.round(camera.worldView.y),
       Math.round(camera.width), Math.round(camera.height),
@@ -163,7 +170,7 @@ export const installBrailaLabelPresentation = (
 
     for (const state of states) {
       const rule = BRAILA_LABEL_RULES[state.role]
-      const compensation = rule.fixedScreenSize ? Math.max(0.72, Math.min(32, 1 / Math.max(0.001, camera.zoom))) : 1
+      const compensation = rule.fixedScreenSize ? Math.max(0.4, Math.min(32, 1 / Math.max(0.001, camera.zoom))) : 1
       state.text.setScale(state.baseScaleX * compensation, state.baseScaleY * compensation)
       state.text.setVisible(false).setAlpha(state.baseAlpha)
     }
@@ -183,8 +190,8 @@ export const installBrailaLabelPresentation = (
     for (const state of states) state.text.setVisible(accepted.has(state.id))
   }
 
-  const cleanup = (): void => { scene.events.off('update', sync) }
-  scene.events.on('update', sync)
-  scene.events.once('shutdown', cleanup)
+  const cleanup = (): void => { events.off('update', sync) }
+  events.on('update', sync)
+  events.once('shutdown', cleanup)
   sync()
 }
