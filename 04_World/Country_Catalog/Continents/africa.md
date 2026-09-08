@@ -5,13 +5,13 @@ Status: Generated audit manifest; country-by-country maintenance surface.
 Parent: #446
 
 ## Source contract
-- runtime catalog version: `1.3.0`
+- runtime catalog version: `1.4.0`
 - Natural Earth upstream commit: `ca96624a56bd078437bca8184e78163e5039ad19`
 - every node coordinate remains a source coordinate; this manifest does not reposition places.
 
 ## Chapter summary
 - countries/territories: **51**
-- representative nodes: **423**
+- representative nodes: **424**
 - structural PASS: **43**
 - REVIEW: **8**
 - documented GAP: **0**
@@ -34,7 +34,7 @@ Parent: #446
 | 180 | Dem. Rep. Congo | Kinshasa | 9 | CAPITAL, N, E, S, W, NE, SE, SW, NW | **PASS** | structural/source checks passed |
 | 262 | Djibouti | Djibouti | 5 | CAPITAL, N, E, S, W | **PASS** | structural/source checks passed |
 | 818 | Egypt | Cairo | 9 | CAPITAL, N, E, S, W, NE, SE, SW, NW | **PASS** | structural/source checks passed |
-| 226 | Eq. Guinea | Malabo | 6 | CAPITAL, N, E, S, SE, SW | **REVIEW** | #459: current-reality override required: Ciudad de la Paz was declared capital on 2026-01-02 after the pinned source snapshot |
+| 226 | Eq. Guinea | Ciudad de la Paz | 7 | CAPITAL, NW, N, E, S, SE, SW | **REVIEW** | #459: current-reality override required: Ciudad de la Paz was declared capital on 2026-01-02 after the pinned source snapshot |
 | 232 | Eritrea | Asmara | 6 | CAPITAL, N, E, W, SW, NW | **PASS** | structural/source checks passed |
 | 748 | eSwatini | Mbabane | 7 | CAPITAL, N, E, S, W, SE, SW | **PASS** | structural/source checks passed |
 | 231 | Ethiopia | Addis Ababa | 9 | CAPITAL, N, E, S, W, NE, SE, SW, NW | **PASS** | structural/source checks passed |
