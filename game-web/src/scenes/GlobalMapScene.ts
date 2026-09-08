@@ -10,21 +10,19 @@ import {
   wrappedRingCopies,
 } from '../world/globalMapTopology'
 import { COLORS, RADII, TOUCH_TARGET_MIN_PX, TYPOGRAPHY } from '../ui/theme'
+import {
+  fitGlobalMapScale,
+  GLOBAL_MAP_HEIGHT as MAP_HEIGHT,
+  GLOBAL_MAP_WIDTH as MAP_WIDTH,
+  globalMapViewport,
+  type GlobalMapViewportRect as ViewportRect,
+} from '../world/globalMapViewport'
 
-const MAP_WIDTH = 1440
-const MAP_HEIGHT = 720
 const MAX_ZOOM_MULTIPLIER = 8
 const COUNTRY_DATA_KEY = 'global-country-topology'
 const COUNTRY_DATA_URL = 'data/world-atlas-countries-110m.json'
 
 type MapLevel = 'Global' | 'Country'
-
-interface ViewportRect {
-  left: number
-  top: number
-  width: number
-  height: number
-}
 
 interface PointerDrag {
   pointerId: number
@@ -50,19 +48,6 @@ const countryRuntimeState = (): StrategicCountryRuntimeState => ({
 })
 
 const clamp = (value: number, min: number, max: number): number => Math.max(min, Math.min(max, value))
-
-export const globalMapViewport = (width: number, height: number): ViewportRect => {
-  const sideWidth = clamp(Math.round(width * 0.27), 228, 316)
-  return {
-    left: 12,
-    top: 62,
-    width: Math.max(240, width - sideWidth - 36),
-    height: Math.max(160, height - 74),
-  }
-}
-
-export const fitGlobalMapScale = (viewport: ViewportRect): number =>
-  Math.min(viewport.width / MAP_WIDTH, viewport.height / MAP_HEIGHT)
 
 export class GlobalMapScene extends Phaser.Scene {
   private countries: GlobalCountryGeometry[] = []

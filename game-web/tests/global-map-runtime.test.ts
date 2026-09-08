@@ -7,7 +7,7 @@ import {
   type WorldTopology,
   wrappedRingCopies,
 } from '../src/world/globalMapTopology'
-import { fitGlobalMapScale, globalMapViewport } from '../src/scenes/GlobalMapScene'
+import { fitGlobalMapScale, globalMapViewport } from '../src/world/globalMapViewport'
 import { resolveNativeBackTarget } from '../src/platform/nativeBackNavigation'
 
 const topology = JSON.parse(readFileSync(
