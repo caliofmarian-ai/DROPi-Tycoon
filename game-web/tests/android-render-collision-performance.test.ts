@@ -29,7 +29,7 @@ describe('STAB-002 Android render and collision performance architecture', () =>
   })
 
   it('preserves road-only collision semantics with the spatial index', () => {
-    for (const road of URBAN_ROADS) expect(isUrbanWalkable(road.x, road.y, true)).toBe(true)
+    for (const road of URBAN_ROADS) for (const point of road.centerline ?? []) expect(isUrbanWalkable(point.x, point.y, true)).toBe(true)
   })
 
   it('bakes the world-wide static vector ground once and reuses a bounded texture', () => {

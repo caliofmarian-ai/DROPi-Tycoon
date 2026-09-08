@@ -1,0 +1,30 @@
+{
+  "cityId": "cedar-city",
+  "name": "Brăila",
+  "countryId": "642",
+  "countryName": "Romania",
+  "continent": "Europe",
+  "localityId": "dropi:locality:geonames:683902",
+  "countySourceRef": "geonames:683901",
+  "regionName": "Sud-Est",
+  "regionCountyNames": [
+    "Brăila",
+    "Buzău",
+    "Constanța",
+    "Galați",
+    "Tulcea",
+    "Vrancea"
+  ],
+  "latitude": 45.27152,
+  "longitude": 27.97429,
+  "sourceRef": "geonames:683902",
+  "geoBounds": [
+    27.938000000000002,
+    45.254,
+    28.003999999999998,
+    45.289
+  ],
+  "width": 10342,
+  "height": 7793,
+  "sourceCatalog": "game-web/public/data/europe-romania-regional-localities-v1.json"
+}

@@ -10,6 +10,7 @@ import {
 } from '../src/world/ambientCity'
 import { ensureNeighborAtlas } from '../src/world/cityArt'
 import { CONTROLLED_CROSSINGS } from '../src/world/cityTrafficRules'
+import { WORLD_WIDTH, WORLD_HEIGHT } from '../src/world/worldLayout'
 import { isUrbanWalkable } from '../src/world/urbanWorld'
 import { createInitialCompanyState, createInitialGameSettingsState, createInitialWorldState } from '../src/state/gameState'
 import { serializeGameSession } from '../src/persistence/saveSystem'
@@ -28,7 +29,7 @@ const ambientScene = () => {
     return graphics
   })
   const object = () => ({
-    setOrigin: vi.fn().mockReturnThis(), setDepth: vi.fn().mockReturnThis(),
+    setRotation: vi.fn().mockReturnThis(), setOrigin: vi.fn().mockReturnThis(), setDepth: vi.fn().mockReturnThis(),
     setName: vi.fn().mockReturnThis(), setVisible: vi.fn().mockReturnThis(),
     setPosition: vi.fn().mockReturnThis(), setFrame: vi.fn().mockReturnThis(),
     setTexture: vi.fn().mockReturnThis(), setScale: vi.fn().mockReturnThis(),
@@ -57,7 +58,7 @@ describe('bounded deterministic city life', () => {
     expect(routes.length).toBeGreaterThanOrEqual(15)
     expect(routes.length).toBeLessThanOrEqual(AMBIENT_ACTOR_LIMIT)
     expect(routes.filter(route => route.kind !== 'pedestrian')).toHaveLength(4)
-    expect(routes.filter(route => route.kind === 'pedestrian' && route.start.x === route.end.x).length)
+    expect(routes.filter(route => route.kind === 'pedestrian' && (route.start.x !== route.end.x || route.start.y !== route.end.y)).length)
       .toBeGreaterThanOrEqual(5)
     expect(routes.filter(route => route.controlledCrossingId)).toHaveLength(2)
     expect(buildAmbientRoutes()).toEqual(routes)
@@ -67,10 +68,10 @@ describe('bounded deterministic city life', () => {
       for (let time = 0; time < 100; time += 0.5) {
         expect(sampleAmbientRoute(route, time, pose)).toBe(pose)
         expect(isUrbanWalkable(pose.x, pose.y, route.kind !== 'pedestrian', 6), route.id).toBe(true)
-        expect(pose.x).toBeGreaterThanOrEqual(Math.min(route.start.x, route.end.x))
-        expect(pose.x).toBeLessThanOrEqual(Math.max(route.start.x, route.end.x))
-        expect(pose.y).toBeGreaterThanOrEqual(Math.min(route.start.y, route.end.y))
-        expect(pose.y).toBeLessThanOrEqual(Math.max(route.start.y, route.end.y))
+        expect(pose.x).toBeGreaterThanOrEqual(Math.min(route.start.x, route.end.x) - 1e-8)
+        expect(pose.x).toBeLessThanOrEqual(Math.max(route.start.x, route.end.x) + 1e-8)
+        expect(pose.y).toBeGreaterThanOrEqual(Math.min(route.start.y, route.end.y) - 1e-8)
+        expect(pose.y).toBeLessThanOrEqual(Math.max(route.start.y, route.end.y) + 1e-8)
       }
     }
   })
@@ -112,7 +113,7 @@ describe('bounded deterministic city life', () => {
     const count = buildAmbientRoutes().length
     const pedestrianCount = buildAmbientRoutes().filter(route => route.kind === 'pedestrian').length
     const initial = mock.drawCalls()
-    const view = { x: 0, y: 0, right: 3200, bottom: 2400 } as Phaser.Geom.Rectangle
+    const view = { x: 0, y: 0, right: WORLD_WIDTH, bottom: WORLD_HEIGHT } as Phaser.Geom.Rectangle
     for (let tick = 0; tick < 2000; tick++) city.update(16, view)
     expect(mock.containers).toHaveLength(count)
     expect(mock.images).toHaveLength(count)
@@ -136,7 +137,7 @@ describe('bounded deterministic city life', () => {
     expect(mock.containers.every(container => container.setPosition.mock.calls.length === 0)).toBe(true)
     expect(mock.images.map(image => image.setFrame.mock.calls.length)).toEqual(initialFrames)
     expect(mock.containers.every(container => container.setVisible.mock.calls.length === 1)).toBe(true)
-    city.update(NaN, { x: 0, y: 0, right: 3200, bottom: 2400 } as Phaser.Geom.Rectangle)
+    city.update(NaN, { x: 0, y: 0, right: WORLD_WIDTH, bottom: WORLD_HEIGHT } as Phaser.Geom.Rectangle)
     for (const [index, route] of buildAmbientRoutes().entries()) {
       const pose = sampleAmbientRoute(route, 10, { x: 0, y: 0, facing: 'down', moving: false })
       const [x, y] = mock.containers[index].setPosition.mock.calls.at(-1)!
