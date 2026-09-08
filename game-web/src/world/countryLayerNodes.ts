@@ -12,6 +12,11 @@ export interface CountryLocalityNode {
   populationReference: number
   admin1: string
   sourceFeatureClass: string
+  sourceKind?: 'authoritative-supplement'
+  supplementRef?: string
+  sourceRef?: string
+  sourceCoordinateText?: string
+  effectiveOn?: string
 }
 
 export interface CountryLocalityCatalog {
@@ -29,6 +34,10 @@ export interface CountryLocalityCatalog {
     registryVersion: string
     sourceCommit: string
     countryIds: string[]
+  }
+  localityAuthoritativeSupplements?: {
+    registryVersion: string
+    refs: string[]
   }
   stats: {
     renderedCountries: number
