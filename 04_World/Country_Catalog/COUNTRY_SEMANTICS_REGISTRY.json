@@ -1,0 +1,226 @@
+{
+  "version": "1.0.0",
+  "verifiedAt": "2026-09-08",
+  "purpose": "Versioned current-reality overrides for capital/government roles and neutral map-entity status presentation. Coordinates are never stored here; named places must resolve against the pinned Natural Earth populated-place source.",
+  "entries": {
+    "204": {
+      "issue": 456,
+      "entityKind": "country",
+      "kindLabel": "Country",
+      "capitalMode": "single",
+      "capitalSummary": "Porto-Novo · political capital; Cotonou · government/economic centre",
+      "primaryCapital": {"displayName": "Porto-Novo", "sourceAliases": ["Porto-Novo", "Porto Novo"], "functions": ["political-capital"]},
+      "requiredCenters": [{"displayName": "Cotonou", "sourceAliases": ["Cotonou"], "functions": ["government-seat", "economic-centre"]}],
+      "sourceRefs": ["https://www.gouv.bj/"]
+    },
+    "108": {
+      "issue": 457,
+      "entityKind": "country",
+      "kindLabel": "Country",
+      "capitalMode": "single",
+      "capitalSummary": "Gitega · political capital; Bujumbura · economic capital",
+      "primaryCapital": {"displayName": "Gitega", "sourceAliases": ["Gitega"], "functions": ["political-capital"]},
+      "requiredCenters": [{"displayName": "Bujumbura", "sourceAliases": ["Bujumbura"], "functions": ["economic-capital"]}],
+      "sourceRefs": ["https://presidence.gov.bi/le-pays/"]
+    },
+    "384": {
+      "issue": 458,
+      "entityKind": "country",
+      "kindLabel": "Country",
+      "capitalMode": "single",
+      "capitalSummary": "Yamoussoukro · national capital; Abidjan · principal economic metropolis",
+      "primaryCapital": {"displayName": "Yamoussoukro", "sourceAliases": ["Yamoussoukro"], "functions": ["national-capital"]},
+      "requiredCenters": [{"displayName": "Abidjan", "sourceAliases": ["Abidjan"], "functions": ["economic-centre"]}],
+      "sourceRefs": ["https://www.diplomatie.gouv.ci/informations-utiles/presentation-de-la-c%C3%B4te-d-ivoire"]
+    },
+    "226": {
+      "issue": 459,
+      "entityKind": "country",
+      "kindLabel": "Country",
+      "capitalMode": "single",
+      "capitalSummary": "Ciudad de la Paz · national capital since 2 January 2026",
+      "primaryCapital": {"displayName": "Ciudad de la Paz", "sourceAliases": ["Ciudad de la Paz", "Oyala", "Djibloho"], "functions": ["national-capital"]},
+      "sourceRefs": ["https://www.guineaecuatorialpress.com/noticias/decreto_ley_por_el_que_se_declara_la_ciudad_de_la_paz_djibloho_capital_de_la_republica_de_guinea_ecuatorial"]
+    },
+    "710": {
+      "issue": 460,
+      "entityKind": "country",
+      "kindLabel": "Country",
+      "capitalMode": "multi",
+      "capitalSummary": "Pretoria · administrative; Cape Town · legislative; Bloemfontein · judicial",
+      "primaryCapital": {"displayName": "Pretoria", "sourceAliases": ["Pretoria"], "functions": ["administrative-capital"]},
+      "requiredCenters": [
+        {"displayName": "Cape Town", "sourceAliases": ["Cape Town"], "functions": ["legislative-capital"]},
+        {"displayName": "Bloemfontein", "sourceAliases": ["Bloemfontein"], "functions": ["judicial-capital"]}
+      ],
+      "sourceRefs": ["https://www.gov.za/about-sa/south-africa-glance"]
+    },
+    "834": {
+      "issue": 461,
+      "entityKind": "country",
+      "kindLabel": "Country",
+      "capitalMode": "single",
+      "capitalSummary": "Dodoma · national capital; Dar es Salaam · major economic/port metropolis",
+      "primaryCapital": {"displayName": "Dodoma", "sourceAliases": ["Dodoma"], "functions": ["national-capital"]},
+      "requiredCenters": [{"displayName": "Dar es Salaam", "sourceAliases": ["Dar es Salaam"], "functions": ["economic-centre", "port-metropolis"]}],
+      "sourceRefs": ["https://oagmis.oag.go.tz/portal/acts/52"]
+    },
+    "392": {
+      "issue": 464,
+      "entityKind": "country",
+      "kindLabel": "Country",
+      "capitalMode": "single",
+      "capitalSummary": "Tokyo · national capital",
+      "primaryCapital": {"displayName": "Tokyo", "sourceAliases": ["Tokyo"], "functions": ["national-capital"]},
+      "sourceRefs": ["https://www.japan.go.jp/japan/index.html"]
+    },
+    "104": {
+      "issue": 465,
+      "entityKind": "country",
+      "kindLabel": "Country",
+      "capitalMode": "single",
+      "capitalSummary": "Nay Pyi Taw · national capital; Yangon · major commercial metropolis",
+      "primaryCapital": {"displayName": "Nay Pyi Taw", "sourceAliases": ["Nay Pyi Taw", "Naypyidaw", "Naypyitaw"], "functions": ["national-capital"]},
+      "requiredCenters": [{"displayName": "Yangon", "sourceAliases": ["Yangon", "Rangoon"], "functions": ["commercial-centre"]}],
+      "sourceRefs": ["https://www.mofa.gov.mm/"]
+    },
+    "144": {
+      "issue": 466,
+      "entityKind": "country",
+      "kindLabel": "Country",
+      "capitalMode": "single",
+      "capitalSummary": "Sri Jayewardenepura Kotte · administrative capital; Colombo · commercial capital",
+      "primaryCapital": {"displayName": "Sri Jayewardenepura Kotte", "sourceAliases": ["Sri Jayewardenepura Kotte", "Sri Jayawardenepura Kotte", "Sri Jawewardenepura Kotte"], "functions": ["administrative-capital"]},
+      "requiredCenters": [{"displayName": "Colombo", "sourceAliases": ["Colombo"], "functions": ["commercial-capital"]}],
+      "sourceRefs": ["https://www.mfa.gov.lk/en/national-profile-and-geography", "https://www.gov.lk/index.php/sri-lanka/country-overview"]
+    },
+    "068": {
+      "issue": 472,
+      "entityKind": "country",
+      "kindLabel": "Country",
+      "capitalMode": "single",
+      "capitalSummary": "Sucre · constitutional capital; La Paz · principal executive/legislative government seat",
+      "primaryCapital": {"displayName": "Sucre", "sourceAliases": ["Sucre"], "functions": ["constitutional-capital"]},
+      "requiredCenters": [{"displayName": "La Paz", "sourceAliases": ["La Paz"], "functions": ["government-seat"]}],
+      "sourceRefs": ["https://diputados.gob.bo/"]
+    },
+    "152": {
+      "issue": 473,
+      "entityKind": "country",
+      "kindLabel": "Country",
+      "capitalMode": "single",
+      "capitalSummary": "Santiago · national capital; Valparaíso · seat of the National Congress",
+      "primaryCapital": {"displayName": "Santiago", "sourceAliases": ["Santiago"], "functions": ["national-capital"]},
+      "requiredCenters": [{"displayName": "Valparaíso", "sourceAliases": ["Valparaiso", "Valparaíso"], "functions": ["legislative-seat"]}],
+      "sourceRefs": ["https://www.chile.gob.cl/chile/sobre-chile/informacion-turistica/turismo/turismo", "https://www.camara.cl/formacion_ciudadana/faq.aspx"]
+    },
+    "376": {
+      "issue": 467,
+      "entityKind": "special-status-geography",
+      "kindLabel": "Country · capital/status sensitive",
+      "capitalMode": "status-sensitive",
+      "capitalSummary": "Jerusalem · capital/status subject to international dispute; Tel Aviv-Yafo remains a major metropolis",
+      "demoteSourceCapital": true,
+      "statusNote": "DROPi renders geography and logistics without asserting a position on disputed final-status questions.",
+      "sourceRefs": ["https://www.un.org/unispal/"]
+    },
+    "275": {
+      "issue": 468,
+      "entityKind": "special-status-geography",
+      "kindLabel": "Special-status geography",
+      "capitalMode": "status-sensitive",
+      "capitalSummary": "East Jerusalem is claimed as capital; Ramallah functions as a principal administrative centre",
+      "demoteSourceCapital": true,
+      "requiredCenters": [{"displayName": "Ramallah", "sourceAliases": ["Ramallah"], "functions": ["administrative-centre"]}],
+      "statusNote": "DROPi renders geography and logistics without asserting a position on disputed final-status questions.",
+      "sourceRefs": ["https://www.un.org/unispal/"]
+    },
+    "732": {
+      "issue": 462,
+      "entityKind": "non-self-governing-territory",
+      "kindLabel": "Non-Self-Governing Territory",
+      "capitalMode": "none",
+      "capitalSummary": "No uncontested national-capital concept is asserted by DROPi",
+      "demoteSourceCapital": true,
+      "statusNote": "Western Sahara remains on the United Nations list of Non-Self-Governing Territories; geographic rendering does not resolve its final status.",
+      "sourceRefs": ["https://www.un.org/dppa/decolonization/en/nsgt/western-sahara"]
+    },
+    "238": {
+      "issue": 474,
+      "entityKind": "non-self-governing-territory",
+      "kindLabel": "Non-Self-Governing Territory · sovereignty dispute",
+      "displayName": "Falkland Islands (Malvinas)",
+      "capitalMode": "none",
+      "capitalSummary": "Local administrative centre is shown as a locality, not as an uncontested national capital",
+      "demoteSourceCapital": true,
+      "statusNote": "The United Nations records a sovereignty dispute between Argentina and the United Kingdom; DROPi takes no position on that dispute.",
+      "sourceRefs": ["https://www.un.org/dppa/decolonization/en/content/falkland-islands-malvinas"]
+    },
+    "010": {
+      "issue": 477,
+      "entityKind": "antarctic-geography",
+      "kindLabel": "Antarctic Treaty geography",
+      "capitalMode": "none",
+      "capitalSummary": "No national capital; mapped points are research/logistics stations",
+      "demoteSourceCapital": true,
+      "statusNote": "Research-station geography is shown without converting a station or territorial position into a sovereignty claim.",
+      "sourceRefs": ["https://www.ats.aq/"]
+    },
+    "XKX": {
+      "issue": 478,
+      "entityKind": "special-status-geography",
+      "kindLabel": "Special-status geography",
+      "capitalMode": "administrative",
+      "capitalSummary": "Pristina · principal administrative/capital centre",
+      "statusNote": "`XKX` is a DROPi project-owned map key, not an ISO code or sovereignty assertion.",
+      "sourceRefs": []
+    },
+    "XNC": {
+      "issue": 481,
+      "entityKind": "special-status-geography",
+      "kindLabel": "Special-status geography",
+      "capitalMode": "none",
+      "capitalSummary": "No capital node is fabricated because the pinned source has no truthful representative locality coverage for this geometry",
+      "statusNote": "`XNC` is a DROPi project-owned map key. Geographic rendering does not assert uncontested sovereignty or recognition.",
+      "sourceRefs": []
+    },
+    "XSL": {
+      "issue": 482,
+      "entityKind": "special-status-geography",
+      "kindLabel": "Special-status geography",
+      "capitalMode": "administrative",
+      "capitalSummary": "Hargeysa · principal administrative centre",
+      "demoteSourceCapital": true,
+      "statusNote": "`XSL` is a DROPi project-owned map key. Geographic rendering and administrative reality are kept distinct from universally settled sovereignty/recognition semantics.",
+      "sourceRefs": []
+    },
+    "304": {
+      "entityKind": "territory",
+      "kindLabel": "Territory within the Kingdom of Denmark",
+      "capitalMode": "administrative",
+      "capitalSummary": "Nuuk · administrative capital/centre",
+      "statusNote": "Geographic chapter placement does not imply independent sovereignty."
+    },
+    "630": {
+      "entityKind": "territory",
+      "kindLabel": "United States territory",
+      "capitalMode": "administrative",
+      "capitalSummary": "San Juan · capital/administrative centre",
+      "statusNote": "Geographic chapter placement does not imply independent sovereignty."
+    },
+    "540": {
+      "entityKind": "territory",
+      "kindLabel": "French sui-generis territory",
+      "capitalMode": "administrative",
+      "capitalSummary": "Nouméa · administrative centre",
+      "statusNote": "Geographic chapter placement does not imply independent sovereignty."
+    },
+    "260": {
+      "entityKind": "territory",
+      "kindLabel": "French Southern and Antarctic territory",
+      "capitalMode": "none",
+      "capitalSummary": "No permanent-population capital/locality node is fabricated",
+      "statusNote": "Geometry-only until a truthful facility-level source contract is adopted."
+    }
+  }
+}
