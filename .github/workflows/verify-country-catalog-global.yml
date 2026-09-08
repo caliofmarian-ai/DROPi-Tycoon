@@ -1,33 +1,33 @@
-name: Verify Global Country Catalog Audit
+name: Verify Country Catalog Chapters
 
 on:
   push:
     branches:
-      - openai/country-catalog-global-reconciliation-v1
+      - main
     paths:
-      - .github/workflows/verify-country-catalog-global.yml
+      - '04_World/Country_Catalog/**'
+      - 'game-web/public/data/world-atlas-countries-110m.json'
+      - 'scripts/verify_country_catalog_chapters.py'
+      - '.github/workflows/verify-country-catalog-global.yml'
+  pull_request:
+    branches:
+      - main
+    paths:
+      - '04_World/Country_Catalog/**'
+      - 'game-web/public/data/world-atlas-countries-110m.json'
+      - 'scripts/verify_country_catalog_chapters.py'
+      - '.github/workflows/verify-country-catalog-global.yml'
 
 permissions:
-  contents: write
+  contents: read
 
 jobs:
   verify:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-        with:
-          ref: openai/country-catalog-global-reconciliation-v1
-          fetch-depth: 0
-      - name: Verify chapters and write global report
+      - name: Verify one-geometry/one-chapter Country Catalog accounting
         run: |
           set -euo pipefail
-          python scripts/verify_country_catalog_chapters.py --write-report
+          python scripts/verify_country_catalog_chapters.py
           git diff --check
-      - name: Commit generated global audit report
-        run: |
-          set -euo pipefail
-          git config user.name 'DROPi Tycoon automation'
-          git config user.email 'actions@users.noreply.github.com'
-          git add 04_World/Country_Catalog/GLOBAL_COUNTRY_CATALOG_AUDIT.md
-          git commit -m 'world-data: materialize global Country Catalog audit report'
-          git push origin HEAD:openai/country-catalog-global-reconciliation-v1
