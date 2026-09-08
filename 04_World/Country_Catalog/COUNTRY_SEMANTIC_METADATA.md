@@ -2,15 +2,17 @@
 
 Status: Canonical runtime semantics contract for country and territory presentation.
 
-Coordinates: #418 #464 #465 #466 #473 #478 #481 #482
+Coordinates: #418 #459 #464 #465 #466 #473 #478 #481 #482
 
 Runtime data: `game-web/public/data/country-semantic-metadata-v1.json`
 
 Source-backed locality role overrides: `04_World/Country_Catalog/COUNTRY_LOCALITY_ROLE_OVERRIDES.json`
 
+Authoritative locality supplements: `04_World/Country_Catalog/COUNTRY_LOCALITY_AUTHORITATIVE_SUPPLEMENTS.json`
+
 ## Why this layer exists
 
-The representative-locality catalog intentionally keeps a small structural role vocabulary (`capital`, `urban`, `secondary`) because it is derived from a pinned Natural Earth populated-place source and is used for sparse map placement.
+The representative-locality catalog intentionally keeps a small structural role vocabulary (`capital`, `urban`, `secondary`) because it is used for sparse map placement and is normally derived from the pinned Natural Earth populated-place source.
 
 That structural role is not sufficient to describe current real-world semantics. Some geometries require distinctions such as constitutional capital, administrative capital, legislative seat, principal administrative centre, commercial capital, claimed capital, research/logistics station, territory status, de facto administration, or disputed recognition.
 
@@ -20,14 +22,15 @@ DROPi therefore keeps political/status and role semantics in a separate source-g
 
 1. Geographic rendering does not assert sovereignty, recognition or statehood.
 2. Internal geometry IDs such as `XKX`, `XNC` and `XSL` are DROPi serialization keys, not ISO codes or political statements.
-3. Locality coordinates remain source-backed; semantic metadata may relabel the meaning of a source-backed place but must not invent coordinates or settlements.
+3. Locality coordinates must remain source-backed. The normal path is the pinned Natural Earth feature; a reviewed locality absent from that snapshot may use an explicitly governed authoritative supplement carrying its own institutional provenance and original coordinate text.
 4. Politically sensitive wording must cite authoritative or institutional sources and record an access/review date.
 5. The runtime may display multiple place roles for one geometry when reality requires them.
-6. A source-backed node marked `capital` by the locality dataset must not automatically be rendered to players as `National capital` when semantic metadata provides a more accurate role label.
+6. A node marked `capital` by the structural locality dataset must not automatically be rendered to players as `National capital` when semantic metadata provides a more accurate role label.
 7. Missing locality coverage remains explicit. Semantic metadata must not fabricate a capital solely to remove a GAP.
 8. Source changes and contemporary political-status changes require a new review and metadata version update.
-9. A current-reality capital correction may change which source-backed locality receives the structural `capital` role, but only through the governed role-override registry and only when the locality resolves uniquely in the pinned source snapshot.
-10. Governed display names may normalize a source-backed locality name, but longitude/latitude and source provenance must remain unchanged.
+9. A current-reality capital correction may change which locality receives the structural `capital` role only through the governed role-override registry. The locality must either resolve uniquely in the pinned source snapshot or reference an approved authoritative supplement.
+10. Governed display names may normalize a source-backed locality name, but the underlying coordinate and provenance must remain unchanged. A supplement must preserve its source coordinate text and deterministic decimal conversion.
+11. An authoritative supplement is exceptional current-reality gap remediation, not a second free-form map database and not a license to add estimated coordinates.
 
 ## Stable special-status entries
 
@@ -45,7 +48,9 @@ The runtime distinguishes de facto administration from universally settled recog
 
 ## Current-reality capital corrections
 
-These entries use `COUNTRY_LOCALITY_ROLE_OVERRIDES.json` to select a different locality already present in the pinned Natural Earth source. The generator fails if a governed locality cannot be resolved uniquely, so no correction may silently introduce coordinates or a synthetic settlement.
+Most entries use `COUNTRY_LOCALITY_ROLE_OVERRIDES.json` to select a different locality already present in the pinned Natural Earth source. The generator fails if a governed source locality cannot be resolved uniquely, so no ordinary correction may silently introduce coordinates or a synthetic settlement.
+
+When the reviewed current locality does not exist in the pinned snapshot at all, the role override may reference an entry from `COUNTRY_LOCALITY_AUTHORITATIVE_SUPPLEMENTS.json`. That supplement must satisfy the stricter provenance contract described below.
 
 ### Japan (`392`) — #464
 
@@ -63,19 +68,47 @@ Sri Jayewardenepura Kotte and Colombo cannot be represented truthfully by one ge
 
 Santiago is the national capital. Valparaíso hosts the National Congress. The governed override assigns the source-backed Santiago locality to the structural capital slot and preserves source-backed Valparaíso as a non-capital representative locality with an explicit legislative-seat semantic role.
 
+### Equatorial Guinea (`226`) — #459
+
+Decree-Law No. 1/2026 declared Ciudad de la Paz the capital of Equatorial Guinea on 2 January 2026 and provided a one-year transition for state institutions to take measures for transfer and effective establishment in the new capital. The pinned Natural Earth snapshot predates this current-reality change and does not contain Ciudad de la Paz / former Oyala in geometry `226`.
+
+The governed role override therefore references `equatorial-guinea-ciudad-de-la-paz-2026` from the authoritative supplement registry. The supplement uses the UK Permanent Committee on Geographical Names factfile coordinate `01°35′33″N 10°49′25″E`, preserves that original text and records the deterministic decimal conversion. Ciudad de la Paz receives the structural `capital` slot; Natural Earth-backed Malabo remains represented separately and semantic metadata labels it `Former capital / transition city`.
+
+The legal-capital effective date and the institutional-transition period are deliberately kept distinct: the runtime must not continue calling Malabo the current national capital merely because institutional relocation may continue during the transition.
+
 ## Role-override registry contract
 
-`COUNTRY_LOCALITY_ROLE_OVERRIDES.json` is deliberately narrower than semantic metadata. It may only govern which localities from the pinned source occupy sparse-map structural roles.
+`COUNTRY_LOCALITY_ROLE_OVERRIDES.json` is deliberately narrower than semantic metadata. It governs which reviewed localities occupy sparse-map structural roles but does not contain arbitrary longitude/latitude fields.
 
 The generator enforces:
 
-- the registry must target the same pinned Natural Earth commit as the locality generator;
-- each governed current capital must resolve to exactly one source locality within that geometry's locality pool;
-- every required representative must also resolve exactly once;
-- coordinates are copied from the pinned feature and are never stored in the override registry;
+- the registry's baseline source target is the same pinned Natural Earth commit as the locality generator;
+- each governed source-backed current capital resolves to exactly one locality within that geometry's Natural Earth locality pool;
+- every source-backed required representative also resolves exactly once;
+- coordinates for ordinary overrides are copied from the pinned feature and are never stored in the role-override registry;
+- a current capital absent from Natural Earth must reference an existing authoritative supplement rather than embedding coordinates in the role override;
 - current capitals receive the structural `capital` role and `CAPITAL` sector;
 - required former/secondary role cities are retained without receiving `capital` by inertia;
 - at most nine representative nodes remain allowed per geometry.
+
+## Authoritative supplement contract
+
+`COUNTRY_LOCALITY_AUTHORITATIVE_SUPPLEMENTS.json` is the exceptional coordinate-bearing registry. It exists only for reviewed current-reality localities absent from the pinned Natural Earth snapshot.
+
+Every supplement must record:
+
+- a review issue;
+- the target geometry ID;
+- the canonical locality name and relevant former names when documented;
+- an institutional source reference with an HTTPS URL;
+- the source's original coordinate text;
+- deterministic decimal longitude/latitude derived from that coordinate;
+- administrative context where available;
+- the effective date when the supplement is used to govern a time-sensitive role.
+
+Generated runtime nodes sourced from this registry must expose `sourceKind: authoritative-supplement`, `supplementRef`, `sourceRef`, `sourceCoordinateText` and `effectiveOn`. This provenance is part of the runtime data contract, not build-only commentary.
+
+A supplement may not be created from a visual map estimate, generic search-result pin, undocumented coordinate pair or a desire to fill all nine sparse-map sectors. If a trustworthy institutional coordinate cannot be established, the correct result is an explicit unresolved review/GAP rather than fabrication.
 
 ## Extensibility
 
