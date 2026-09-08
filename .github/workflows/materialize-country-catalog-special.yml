@@ -22,64 +22,27 @@ jobs:
         with:
           python-version: '3.12'
       - run: python -m pip install --disable-pip-version-check pycountry
-      - name: Generate Special chapter and classification candidate
+      - name: Generate audited Special and Europe chapters
         run: |
           set -euo pipefail
           python scripts/build_country_catalog_chapters.py --continent 'Special'
-          python - <<'PY'
-          import json
-          from scripts import build_country_catalog_chapters as b
-
-          topology = b.load_json(b.TOPOLOGY)
-          rendered = b.topology_names(topology)
-          admin0 = b.fetch_admin0()
-          valid_ids = set(rendered)
-          name_to_id = {b.norm(name): cid for cid, name in rendered.items() if name}
-          rows = []
-          seen = set()
-          for feature in admin0.get('features', []):
-              properties = feature.get('properties') or {}
-              cid = b.numeric_country_id(properties, valid_ids, name_to_id)
-              if not cid or cid in seen:
-                  continue
-              continent = b.continent_name(properties)
-              admin = str(b.prop(properties, 'ADMIN', 'NAME') or rendered.get(cid) or '')
-              sovereign = str(b.prop(properties, 'SOVEREIGNT') or '')
-              kind = str(b.prop(properties, 'TYPE') or '')
-              geounit = str(b.prop(properties, 'GEOUNIT') or '')
-              note = str(b.prop(properties, 'NOTE_ADM0') or '')
-              homepart = str(b.prop(properties, 'HOMEPART') or '')
-              nonstandard = (
-                  continent == 'Special'
-                  or (sovereign and admin and sovereign != admin)
-                  or kind.casefold() not in {'sovereign country', 'country'}
-              )
-              if nonstandard:
-                  rows.append({
-                      'id': cid,
-                      'renderedName': rendered.get(cid),
-                      'continentChapter': continent,
-                      'admin': admin,
-                      'sovereign': sovereign,
-                      'type': kind,
-                      'geounit': geounit,
-                      'homepart': homepart,
-                      'noteAdm0': note,
-                  })
-              seen.add(cid)
-          path = b.OUT_ROOT / '.special-territory-classification-candidates.json'
-          path.write_text(json.dumps({'sourceCommit': b.SRC_COMMIT, 'candidates': sorted(rows, key=lambda r: (r['continentChapter'], r['renderedName'] or ''))}, indent=2, ensure_ascii=False) + '\n')
-          print(f'WROTE {path.relative_to(b.ROOT)} candidates={len(rows)}')
-          PY
+          python scripts/build_country_catalog_chapters.py --continent 'Europe'
+          grep -Fq -- '- countries/territories: **2**' 04_World/Country_Catalog/Continents/special.md
+          grep -Fq -- '- structural PASS: **0**' 04_World/Country_Catalog/Continents/special.md
           grep -Fq -- '- REVIEW: **1**' 04_World/Country_Catalog/Continents/special.md
           grep -Fq -- '- documented GAP: **1**' 04_World/Country_Catalog/Continents/special.md
           grep -Fq '#477:' 04_World/Country_Catalog/Continents/special.md
+          grep -Fq -- '- countries/territories: **39**' 04_World/Country_Catalog/Continents/europe.md
+          grep -Fq -- '- structural PASS: **37**' 04_World/Country_Catalog/Continents/europe.md
+          grep -Fq -- '- REVIEW: **2**' 04_World/Country_Catalog/Continents/europe.md
+          grep -Fq '#478:' 04_World/Country_Catalog/Continents/europe.md
+          grep -Fq '#469:' 04_World/Country_Catalog/Continents/europe.md
           git diff --check
-      - name: Commit generated audit material
+      - name: Commit verified manifests
         run: |
           set -euo pipefail
           git config user.name 'DROPi Tycoon automation'
           git config user.email 'actions@users.noreply.github.com'
-          git add 04_World/Country_Catalog/Continents/special.md 04_World/Country_Catalog/.special-territory-classification-candidates.json
-          git commit -m 'world-data: classify Special and cross-region territory candidates'
+          git add 04_World/Country_Catalog/Continents/special.md 04_World/Country_Catalog/Continents/europe.md
+          git commit -m 'world-data: apply Special and Kosovo semantic reviews'
           git push origin HEAD:openai/country-catalog-special-v1
