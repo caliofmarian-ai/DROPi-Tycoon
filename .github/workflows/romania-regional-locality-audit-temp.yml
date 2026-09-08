@@ -1,4 +1,4 @@
-name: TEMP Romania Regional Locality Audit
+name: TEMP Materialize Romania Regional Localities
 
 on:
   push:
@@ -8,14 +8,22 @@ on:
       - .github/workflows/romania-regional-locality-audit-temp.yml
 
 permissions:
-  contents: read
+  contents: write
 
 jobs:
-  audit:
+  materialize:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Download retained GeoNames snapshot assets
+        with:
+          ref: openai/europe-romania-regional-localities-509
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22.12.0
+          cache: npm
+          cache-dependency-path: game-web/package-lock.json
+      - name: Download retained GeoNames source assets
         shell: bash
         run: |
           set -euo pipefail
@@ -24,13 +32,19 @@ jobs:
           curl -fsSL "$base/admin1CodesASCII.txt" -o /tmp/admin1CodesASCII.txt
           printf '%s  %s\n' 'f3cda4f9d256d90045121fb8eebad3ed91695c32370ed93b50fbe0cb616e2bbd' /tmp/cities500.zip | sha256sum -c -
           printf '%s  %s\n' '590651498043f674accda2b7f46d21286cda0e290b02f8561c5005eee9a5448c' /tmp/admin1CodesASCII.txt | sha256sum -c -
-      - name: Audit Romania admin1 and representative-seat candidates
+      - name: Generate Romania 42-node representative regional registry
         shell: bash
         run: |
           set -euo pipefail
           python - <<'PY'
-          import collections, csv, io, json, zipfile
+          import collections, io, json, zipfile
           from pathlib import Path
+
+          root = Path('.')
+          out = root / 'game-web/public/data/europe-romania-regional-localities-v1.json'
+          doc = root / '04_World/Country_Catalog/Continents/Europe/ROMANIA_REGIONAL_LOCALITIES.md'
+          verifier = root / 'scripts/verify_romania_regional_localities.py'
+          test = root / 'game-web/tests/romania-regional-localities.test.ts'
 
           admin = {}
           for line in Path('/tmp/admin1CodesASCII.txt').read_text(encoding='utf-8').splitlines():
@@ -38,7 +52,14 @@ jobs:
                   continue
               fields = line.split('\t')
               code = fields[0].split('.', 1)[1]
-              admin[code] = {'name': fields[1], 'asciiName': fields[2], 'geonameid': fields[3]}
+              admin[code] = {
+                  'sourceName': fields[1],
+                  'asciiName': fields[2],
+                  'sourceRef': f'geonames:{fields[3]}',
+              }
+
+          if len(admin) != 42:
+              raise SystemExit(f'expected 42 Romanian admin1 units, got {len(admin)}')
 
           fields = [
               'geonameid','name','asciiname','alternatenames','latitude','longitude',
@@ -50,51 +71,271 @@ jobs:
           with zipfile.ZipFile('/tmp/cities500.zip') as zf:
               with zf.open('cities500.txt') as raw:
                   for line in io.TextIOWrapper(raw, encoding='utf-8'):
-                      row = dict(zip(fields, line.rstrip('\n').split('\t')))
-                      if row['country_code'] != 'RO':
-                          continue
-                      groups[row['admin1_code']].append(row)
+                      parts = line.rstrip('\n').split('\t')
+                      if len(parts) != len(fields):
+                          raise SystemExit('unexpected GeoNames field count')
+                      row = dict(zip(fields, parts))
+                      if row['country_code'] == 'RO':
+                          groups[row['admin1_code']].append(row)
 
-          print('ROMANIA_ADMIN1_COUNT', len(admin))
-          print('ROMANIA_SOURCE_LOCALITIES', sum(len(v) for v in groups.values()))
-          print('ROMANIA_ADMIN1_WITH_LOCALITIES', len([c for c in admin if groups.get(c)]))
-          print('--- CANDIDATES ---')
-          priority = {'PPLC': 0, 'PPLA': 1, 'PPLA2': 2, 'PPLA3': 3, 'PPLA4': 4}
-          summary = []
-          for code in sorted(admin, key=lambda c: (admin[c]['name'].casefold(), c)):
-              rows = groups.get(code, [])
-              candidates = [r for r in rows if r['feature_code'] in priority]
-              candidates.sort(key=lambda r: (priority[r['feature_code']], -int(r['population'] or 0), r['name'].casefold(), int(r['geonameid'])))
-              best = candidates[0] if candidates else (max(rows, key=lambda r: int(r['population'] or 0)) if rows else None)
-              entry = {
+          if sum(map(len, groups.values())) != 7149:
+              raise SystemExit('retained Romania source count drift')
+          if any(code not in groups for code in admin):
+              raise SystemExit('Romanian admin1 unit missing locality coverage')
+
+          units = []
+          for code in sorted(admin, key=lambda c: int(c)):
+              rows = groups[code]
+              primary = [r for r in rows if r['feature_code'] in {'PPLC','PPLA'}]
+              primary.sort(key=lambda r: (
+                  0 if r['feature_code'] == 'PPLC' else 1,
+                  -int(r['population'] or 0),
+                  r['name'].casefold(),
+                  int(r['geonameid']),
+              ))
+              if primary:
+                  chosen = primary[0]
+                  basis = 'source-first-order-seat-role'
+              else:
+                  secondary = [r for r in rows if r['feature_code'] == 'PPLA2']
+                  if not secondary:
+                      raise SystemExit(f'RO.{code}: no PPLA/PPLC and no PPLA2 fallback')
+                  secondary.sort(key=lambda r: (-int(r['population'] or 0), r['name'].casefold(), int(r['geonameid'])))
+                  chosen = secondary[0]
+                  basis = 'fallback-largest-secondary-admin-place'
+
+              unit_type = 'capital-municipality-county-equivalent' if code == '10' else 'county'
+              presentation_role = 'national-capital-and-regional-node' if chosen['feature_code'] == 'PPLC' else 'regional-representative-locality'
+              units.append({
                   'admin1Code': code,
-                  'admin1Name': admin[code]['name'],
-                  'admin1SourceRef': f"geonames:{admin[code]['geonameid']}",
-                  'candidateCount': len(candidates),
-                  'best': None if best is None else {
-                      'name': best['name'],
-                      'asciiName': best['asciiname'],
-                      'featureCode': best['feature_code'],
-                      'population': int(best['population'] or 0),
-                      'sourceRef': f"geonames:{best['geonameid']}",
-                      'latitude': float(best['latitude']),
-                      'longitude': float(best['longitude']),
+                  'regionSourceName': admin[code]['sourceName'],
+                  'regionAsciiName': admin[code]['asciiName'],
+                  'regionSourceRef': admin[code]['sourceRef'],
+                  'unitType': unit_type,
+                  'representativeLocality': {
+                      'localityId': f"dropi:locality:geonames:{chosen['geonameid']}",
+                      'sourceRef': f"geonames:{chosen['geonameid']}",
+                      'name': chosen['name'],
+                      'asciiName': chosen['asciiname'] or chosen['name'],
+                      'latitude': round(float(chosen['latitude']), 6),
+                      'longitude': round(float(chosen['longitude']), 6),
+                      'featureCode': chosen['feature_code'],
+                      'populationSourceValue': int(chosen['population'] or 0),
+                      'selectionBasis': basis,
+                      'presentationRole': presentation_role,
                   },
-                  'topCandidates': [
-                      {
-                          'name': r['name'],
-                          'featureCode': r['feature_code'],
-                          'population': int(r['population'] or 0),
-                          'sourceRef': f"geonames:{r['geonameid']}"
-                      }
-                      for r in candidates[:4]
-                  ]
-              }
-              summary.append(entry)
-              print(json.dumps(entry, ensure_ascii=False))
+                  'economicEmergence': {
+                      'authority': 'shared-regional-national-multiplayer-economy',
+                      'personalPlayerProgressionUnlock': False,
+                      'numericThresholdsDefined': False,
+                      'presentationState': 'economy-system-governed',
+                  },
+              })
 
-          missing = [e['admin1Name'] for e in summary if e['best'] is None]
-          print('MISSING_BEST', json.dumps(missing, ensure_ascii=False))
-          print('BEST_COUNT', sum(e['best'] is not None for e in summary))
-          print('PPLA_OR_PPLC_COUNT', sum(e['best'] and e['best']['featureCode'] in {'PPLA','PPLC'} for e in summary))
+          if len(units) != 42:
+              raise SystemExit('generated unit count must equal 42')
+          if len({u['admin1Code'] for u in units}) != 42:
+              raise SystemExit('admin1 codes must be unique')
+          if len({u['representativeLocality']['localityId'] for u in units}) != 42:
+              raise SystemExit('representative locality identities must be unique')
+          primary_count = sum(u['representativeLocality']['selectionBasis'] == 'source-first-order-seat-role' for u in units)
+          fallback_count = len(units) - primary_count
+          if (primary_count, fallback_count) != (40, 2):
+              raise SystemExit(f'unexpected selection basis counts {(primary_count, fallback_count)}')
+
+          payload = {
+              'version': '1.0.0',
+              'issue': 509,
+              'continent': 'Europe',
+              'country': {
+                  'geometryId': '642',
+                  'sourceCountryCode': 'RO',
+                  'renderedName': 'Romania',
+              },
+              'administrativeModel': {
+                  'level': 'first-order',
+                  'nativeTerm': 'județ',
+                  'normalCountyCount': 41,
+                  'countyEquivalentCount': 1,
+                  'unitCount': 42,
+                  'countyEquivalent': 'Municipality of Bucharest',
+                  'officialStructureReference': 'https://schengen.mai.gov.ro/English/index10.htm',
+              },
+              'source': {
+                  'provider': 'GeoNames',
+                  'license': 'Creative Commons Attribution 4.0',
+                  'releaseTag': 'source-geonames-cities500-2026-09-08-f3cda4f9',
+                  'cities500Sha256': 'f3cda4f9d256d90045121fb8eebad3ed91695c32370ed93b50fbe0cb616e2bbd',
+                  'admin1Sha256': '590651498043f674accda2b7f46d21286cda0e290b02f8561c5005eee9a5448c',
+                  'retainedRomaniaCandidateCount': 7149,
+                  'publishedGameplayRepresentativeCount': 42,
+              },
+              'developmentModel': {
+                  'authority': 'shared-regional-national-multiplayer-economy',
+                  'personalPlayerProgressionUnlock': False,
+                  'numericThresholdsDefined': False,
+                  'signalsPlanned': [
+                      'company-activity', 'employment-demand', 'production', 'logistics-throughput',
+                      'construction-investment', 'transport-connectivity', 'trade-volume',
+                      'population-economic-simulation', 'regional-national-policy'
+                  ],
+                  'rule': 'Representative locality prominence and development are shared-world economic outcomes, not personal progression rewards.'
+              },
+              'selectionModel': {
+                  'primary': 'Choose the retained GeoNames PPLC/PPLA locality inside each Romanian admin1 unit.',
+                  'fallback': 'If no PPLC/PPLA exists, choose the highest-population retained PPLA2 locality and label it representative rather than claiming a first-order-seat role.',
+                  'hardcodedCoordinates': False,
+                  'highDensityGameplayImport': False,
+              },
+              'units': units,
+          }
+          out.parent.mkdir(parents=True, exist_ok=True)
+          out.write_text(json.dumps(payload, ensure_ascii=False, indent=2) + '\n', encoding='utf-8')
+
+          rows = []
+          for u in units:
+              loc = u['representativeLocality']
+              rows.append(
+                  f"| RO.{u['admin1Code']} | {u['regionSourceName']} | {loc['name']} | {loc['featureCode']} | {loc['selectionBasis']} | {loc['sourceRef']} |"
+              )
+          doc.parent.mkdir(parents=True, exist_ok=True)
+          doc.write_text('\n'.join([
+              '# Romania Regional Representative Localities', '',
+              'Status: country pilot for issues #502, #507, #508 and #509.', '',
+              '## Owner model', '',
+              'Romania is built as **41 counties plus Bucharest as a county-equivalent capital municipality**, for **42 first-order shared-world regional nodes**.', '',
+              'Official administrative-structure reference: Romanian Ministry of Internal Affairs — https://schengen.mai.gov.ro/English/index10.htm', '',
+              'The representative localities are not personal-player unlocks. Their prominence and future physical/economic development are governed by the aggregate multiplayer economy of the region and country.', '',
+              '## Source and selection', '',
+              '- retained source: GeoNames `cities500` release `source-geonames-cities500-2026-09-08-f3cda4f9`;',
+              '- source Romania corpus: 7,149 places;',
+              '- gameplay representative set: 42 places;',
+              '- 40 selections use a source `PPLC`/`PPLA` first-order-seat role;',
+              '- 2 selections use the deterministic highest-population `PPLA2` fallback and are labeled only as representative localities;',
+              '- no coordinate is invented or manually scattered;',
+              '- numerical economic emergence thresholds are intentionally not defined before the shared economy system is designed.', '',
+              '## Representative set', '',
+              '| Admin1 | Region source name | Representative locality | Source feature | Selection basis | Source ref |',
+              '|---|---|---|---|---|---|',
+              *rows, '',
+              '## Runtime boundary', '',
+              'This country slice materializes the governed 42-node Romania data model. It does **not** yet render all 42 nodes simultaneously or implement economic thresholds. Country/Region LOD integration must keep Android render counts bounded.', '',
+              '## Reuse rule', '',
+              'Romania is the first pattern for Europe. Other countries must reuse the concept — one representative locality per appropriate first-order region — while preserving each country’s real administrative terminology and exceptions.', ''
+          ]), encoding='utf-8')
+
+          verifier.write_text("""#!/usr/bin/env python3
+import json
+from pathlib import Path
+
+ROOT = Path(__file__).resolve().parents[1]
+DATA = ROOT / 'game-web/public/data/europe-romania-regional-localities-v1.json'
+payload = json.loads(DATA.read_text(encoding='utf-8'))
+assert payload['version'] == '1.0.0'
+assert payload['issue'] == 509
+assert payload['continent'] == 'Europe'
+assert payload['country']['geometryId'] == '642'
+assert payload['country']['sourceCountryCode'] == 'RO'
+assert payload['administrativeModel']['normalCountyCount'] == 41
+assert payload['administrativeModel']['countyEquivalentCount'] == 1
+assert payload['administrativeModel']['unitCount'] == 42
+assert payload['source']['retainedRomaniaCandidateCount'] == 7149
+assert payload['source']['publishedGameplayRepresentativeCount'] == 42
+assert payload['developmentModel']['personalPlayerProgressionUnlock'] is False
+assert payload['developmentModel']['numericThresholdsDefined'] is False
+units = payload['units']
+assert len(units) == 42
+assert len({u['admin1Code'] for u in units}) == 42
+assert len({u['regionSourceRef'] for u in units}) == 42
+assert len({u['representativeLocality']['localityId'] for u in units}) == 42
+assert len({u['representativeLocality']['sourceRef'] for u in units}) == 42
+assert sum(u['unitType'] == 'county' for u in units) == 41
+assert sum(u['unitType'] == 'capital-municipality-county-equivalent' for u in units) == 1
+assert sum(u['representativeLocality']['featureCode'] == 'PPLC' for u in units) == 1
+assert sum(u['representativeLocality']['selectionBasis'] == 'source-first-order-seat-role' for u in units) == 40
+assert sum(u['representativeLocality']['selectionBasis'] == 'fallback-largest-secondary-admin-place' for u in units) == 2
+for unit in units:
+    loc = unit['representativeLocality']
+    assert -90 <= loc['latitude'] <= 90
+    assert -180 <= loc['longitude'] <= 180
+    assert loc['localityId'].startswith('dropi:locality:geonames:')
+    assert loc['sourceRef'].startswith('geonames:')
+    assert unit['economicEmergence']['authority'] == 'shared-regional-national-multiplayer-economy'
+    assert unit['economicEmergence']['personalPlayerProgressionUnlock'] is False
+    assert unit['economicEmergence']['numericThresholdsDefined'] is False
+bucharest = [u for u in units if u['admin1Code'] == '10'][0]
+assert bucharest['representativeLocality']['name'] == 'Bucharest'
+assert bucharest['representativeLocality']['featureCode'] == 'PPLC'
+print('PASS: Romania regional locality registry verified units=42 primary=40 fallback=2')
+""", encoding='utf-8')
+
+          test.write_text("""import { describe, expect, it } from 'vitest'
+import { readFileSync } from 'node:fs'
+
+const payload = JSON.parse(readFileSync(
+  new URL('../public/data/europe-romania-regional-localities-v1.json', import.meta.url),
+  'utf8',
+))
+
+describe('Romania representative regional locality model', () => {
+  it('publishes 41 counties plus Bucharest as 42 first-order shared-world nodes', () => {
+    expect(payload.country.geometryId).toBe('642')
+    expect(payload.administrativeModel.normalCountyCount).toBe(41)
+    expect(payload.administrativeModel.countyEquivalentCount).toBe(1)
+    expect(payload.administrativeModel.unitCount).toBe(42)
+    expect(payload.units).toHaveLength(42)
+    expect(new Set(payload.units.map((unit: any) => unit.admin1Code)).size).toBe(42)
+  })
+
+  it('reduces the retained source corpus to one deterministic representative per region', () => {
+    expect(payload.source.retainedRomaniaCandidateCount).toBe(7149)
+    expect(payload.source.publishedGameplayRepresentativeCount).toBe(42)
+    expect(new Set(payload.units.map((unit: any) => unit.representativeLocality.localityId)).size).toBe(42)
+    expect(payload.units.filter((unit: any) => unit.representativeLocality.selectionBasis === 'source-first-order-seat-role')).toHaveLength(40)
+    expect(payload.units.filter((unit: any) => unit.representativeLocality.selectionBasis === 'fallback-largest-secondary-admin-place')).toHaveLength(2)
+  })
+
+  it('makes locality emergence a shared multiplayer-economic concern, never personal progression', () => {
+    expect(payload.developmentModel.authority).toBe('shared-regional-national-multiplayer-economy')
+    expect(payload.developmentModel.personalPlayerProgressionUnlock).toBe(false)
+    expect(payload.developmentModel.numericThresholdsDefined).toBe(false)
+    for (const unit of payload.units) {
+      expect(unit.economicEmergence.personalPlayerProgressionUnlock).toBe(false)
+      expect(unit.economicEmergence.numericThresholdsDefined).toBe(false)
+    }
+  })
+
+  it('preserves Bucharest as the national-capital regional node', () => {
+    const bucharest = payload.units.find((unit: any) => unit.admin1Code === '10')
+    expect(bucharest?.unitType).toBe('capital-municipality-county-equivalent')
+    expect(bucharest?.representativeLocality.name).toBe('Bucharest')
+    expect(bucharest?.representativeLocality.featureCode).toBe('PPLC')
+    expect(bucharest?.representativeLocality.presentationRole).toBe('national-capital-and-regional-node')
+  })
+})
+""", encoding='utf-8')
           PY
+          python scripts/verify_romania_regional_localities.py
+          git diff --check
+      - name: Run targeted tests and production build
+        working-directory: game-web
+        run: |
+          set -euo pipefail
+          npm ci
+          npx vitest run tests/romania-regional-localities.test.ts
+          npm run build
+      - name: Commit Romania pilot and remove temporary workflow
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git rm .github/workflows/romania-regional-locality-audit-temp.yml
+          git add \
+            game-web/public/data/europe-romania-regional-localities-v1.json \
+            04_World/Country_Catalog/Continents/Europe/ROMANIA_REGIONAL_LOCALITIES.md \
+            scripts/verify_romania_regional_localities.py \
+            game-web/tests/romania-regional-localities.test.ts
+          git diff --cached --check
+          git commit -m 'data: model Romania regional representative localities'
+          git push origin HEAD:openai/europe-romania-regional-localities-509
