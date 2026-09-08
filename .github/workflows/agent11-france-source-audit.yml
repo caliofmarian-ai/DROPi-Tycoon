@@ -50,12 +50,16 @@ jobs:
           PY
       - name: Commit generated deterministic outputs
         run: |
-          if git diff --quiet -- game-web/public/data/europe-france-regional-localities-v1.json 04_World/Country_Catalog/Continents/Europe/FRANCE_REGIONAL_LOCALITIES.md; then
+          outputs=(
+            game-web/public/data/europe-france-regional-localities-v1.json
+            04_World/Country_Catalog/Continents/Europe/FRANCE_REGIONAL_LOCALITIES.md
+          )
+          if [ -z "$(git status --porcelain -- "${outputs[@]}")" ]; then
             echo 'Generated outputs already current.'
             exit 0
           fi
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git add game-web/public/data/europe-france-regional-localities-v1.json 04_World/Country_Catalog/Continents/Europe/FRANCE_REGIONAL_LOCALITIES.md
+          git add "${outputs[@]}"
           git commit -m 'feat(world): generate France regional localities [skip agent11-audit]'
           git push origin HEAD:agent/world-localities-france-543
