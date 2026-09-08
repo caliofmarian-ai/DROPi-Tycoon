@@ -23,6 +23,8 @@ The figure is a geometry review generated from the same source layout, not a run
 - City overview is capped at 1536 pixels; detailed ground at twelve 768-pixel textures (27 MiB), one generated tile per frame. Detail is released when the city sleeps. Geographic relief uses at most six 1080-pixel detail tiles and two concurrent requests.
 - The production bundle is about 4.05 MB / 1.06 MB gzip; Vite's large-chunk advisory remains. Runtime performance on the target Android device has not been measured.
 
+The first GitHub CI run also exercised the optional PostgreSQL tests successfully and passed the production Docker smoke check. One geometry test exceeded its five-second deadline because it constructed an assertion for every building/street vertex pair. The follow-up preserves the full geometric scan and aggregates collision failures per building; it does not increase the timeout or remove geometric checks.
+
 ## Visible review still required
 
 The browser inspected the existing Railway game and the real Brăila map. The available cloud browser could not open the local preview (`ERR_BLOCKED_BY_CLIENT`), so this work does not claim new-runtime screenshot validation or Android acceptance. The generated geometry figure was rendered and inspected.

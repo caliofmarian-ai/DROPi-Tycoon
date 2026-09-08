@@ -65,14 +65,15 @@ describe('finite city and district catalog', () => {
     for (const building of URBAN_BUILDINGS) {
       const district = CITY_DISTRICTS.find(entry => entry.id === building.zoneId)!
       expect(district.buildings.some(b => b.id === building.id)).toBe(true)
-      for (const road of WORLD_ROADS) for (const point of road.centerline ?? []) {
-        expect(surfaceContains(building, point.x, point.y, (road.roadWidth ?? 32) / 2), `${building.id} blocks ${road.id}`).toBe(false)
-      }
-      for (const other of URBAN_BUILDINGS.filter(entry => entry.id !== building.id)) {
-        const overlap = Math.abs(building.x - other.x) < (building.width + other.width) / 2 &&
-          Math.abs(building.y - other.y) < (building.height + other.height) / 2
-        expect(overlap, `${building.id} overlaps ${other.id}`).toBe(false)
-      }
+      // Check the entire source vertex set, but report once per building. Hundreds of thousands
+      // of individual assertion objects can exceed CI's deadline despite cheap geometry checks.
+      const blockedRoads = WORLD_ROADS.filter(road => (road.centerline ?? []).some(point =>
+        surfaceContains(building, point.x, point.y, (road.roadWidth ?? 32) / 2))).map(road => road.id)
+      expect(blockedRoads, `${building.id} blocks streets`).toEqual([])
+      const overlaps = URBAN_BUILDINGS.filter(other => other.id !== building.id &&
+        Math.abs(building.x - other.x) < (building.width + other.width) / 2 &&
+        Math.abs(building.y - other.y) < (building.height + other.height) / 2).map(other => other.id)
+      expect(overlaps, `${building.id} overlaps buildings`).toEqual([])
     }
     for (const tree of WORLD_DECORATIONS) {
       expect(tree.x - tree.radius).toBeGreaterThanOrEqual(0)
