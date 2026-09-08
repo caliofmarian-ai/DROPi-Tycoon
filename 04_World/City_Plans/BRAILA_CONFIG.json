@@ -1,6 +1,6 @@
 {
   "version": "1.0.0",
-  "cityId": "cedar-city",
+  "cityId": "braila",
   "name": "Brăila",
   "countryId": "642",
   "countryName": "Romania",
@@ -53,7 +53,7 @@
     "Only the retained central-city extent is materialized in this first playable district set.",
     "Existing business identities, progression and delivery labels are retained; building footprints and businesses are fictional game placements.",
     "The river centerline is source-backed; its rendered ribbon width is an illustration, not surveyed river-bank geometry.",
-    "CityId cedar-city is retained as a legacy save identity; the owner has placed the playable city in Brăila, Romania."
+    "CityId braila is retained as a legacy save identity; the owner has placed the playable city in Brăila, Romania."
   ],
   "retainedBuildingSource": "04_World/City_Plans/Sources/braila-buildings-osm-2026-09-08.json",
   "buildingSourceSha256": "86b02aa1281ad8ab2d01de8675de0f8aa5c0e28cc952e4aba50b5a6cf3a92871",

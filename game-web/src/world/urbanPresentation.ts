@@ -14,6 +14,7 @@ import {
   ensureBuildingTexture, ensureNeighborTexture, ensureTreeTexture, NEIGHBOR_ANCHOR, NEIGHBOR_CELL, storefrontIdentity,
 } from './cityArt'
 import { drawCityPavement } from './cityGround'
+import { drawBrailaDistrictIdentity, renderBrailaAddressLabels } from './brailaIdentity'
 import { drawParcel } from './courierArt'
 
 export const HQ_EXPANSION_POINT = URBAN_HQ
@@ -65,6 +66,8 @@ export const drawCityGround = (g: Phaser.GameObjects.Graphics, bounds?: GroundBo
     g.fillStyle(roof).fillPoints(raised, true)
     g.lineStyle(1.4, 0x805d48, .65).strokePoints(raised, true)
   }
+  drawBrailaDistrictIdentity(g, WORLD_ZONES)
+
   // Real city water and parks replace the former artificial canal pockets.
   drawCityPavement(g, bounds ? URBAN_ROADS.filter(visible) : URBAN_ROADS, bounds ? URBAN_SIDEWALKS.filter(visible) : URBAN_SIDEWALKS)
 
@@ -155,6 +158,8 @@ export const renderUrbanNeighborhood = (
         '#175574').setDepth(7)
     }
   })
+
+  renderBrailaAddressLabels(scene)
 
   WORLD_DECORATIONS.forEach((tree, index) => {
     // The collision disk covers the trunk; the substantial canopy hangs above it.

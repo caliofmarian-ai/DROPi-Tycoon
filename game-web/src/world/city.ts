@@ -46,11 +46,11 @@ export const CITY_DISTRICTS: readonly CityDistrict[] = WORLD_ZONES.map(zone => (
 }))
 
 export const CITY: City = {
-  cityId: 'cedar-city', name: WORLD_CITY_NAME, width: WORLD_WIDTH, height: WORLD_HEIGHT, districts: CITY_DISTRICTS,
+  cityId: 'braila', name: WORLD_CITY_NAME, width: WORLD_WIDTH, height: WORLD_HEIGHT, districts: CITY_DISTRICTS,
 }
 
 const merchantIds: Readonly<Record<string, string>> = {
-  PickupZone: 'mara-market', CommercialPickup: 'cedar-bakery', ResidentialPickup: 'neighborhood-coop',
+  PickupZone: 'mara-market', CommercialPickup: 'braila-bakery', ResidentialPickup: 'neighborhood-coop',
   CanalPickup: 'canal-grocers', HarborPickup: 'quayside-kitchen', DepotPickup: 'foundry-supplies',
   GardenPickup: 'garden-florist', StationPickup: 'station-books',
 }

@@ -59,7 +59,7 @@ export const PLAYER_START = { x: 380, y: 270 } as const
 
 export const WORLD_ZONES: readonly WorldZoneLayout[] = [
   { id: 'residential', label: 'Old Town', x: 80, y: 80, width: 640, height: 420, fillColor: CITY_COLORS.lawn },
-  { id: 'business', label: 'Cedar Commerce', x: 880, y: 80, width: 640, height: 420, fillColor: CITY_COLORS.cream },
+  { id: 'business', label: 'Brăila Commerce', x: 880, y: 80, width: 640, height: 420, fillColor: CITY_COLORS.cream },
   { id: 'storage', label: 'Foundry Quarter', x: 80, y: 700, width: 640, height: 1620, fillColor: CITY_COLORS.wallShade },
   { id: 'company', label: 'Station Commons', x: 880, y: 700, width: 640, height: 1620, fillColor: CITY_COLORS.sidewalk },
   { id: 'waterfront', label: 'Canal & Quays', x: 1680, y: 80, width: 1440, height: 1020, fillColor: CITY_COLORS.waterLight },
@@ -173,9 +173,9 @@ const location = (
 /** Legacy route identifiers and their coordinates remain valid for accepted work. */
 export const WORLD_ROUTE_POINTS: readonly WorldRoutePoint[] = [
   location('PickupZone', "Mara's Market", 'storage-3', 'storage-lane', 'pickup'),
-  location('CommercialPickup', 'Cedar Bakery', 'business-2', 'business-lane', 'pickup'),
+  location('CommercialPickup', 'Brăila Bakery', 'business-2', 'business-lane', 'pickup'),
   location('ResidentialPickup', 'Neighborhood Co-op', 'residential-8', 'residential-lane', 'pickup'),
-  location('DeliveryZone', 'Noah · Cedar House', 'residential-4', 'residential-lane', 'delivery'),
+  location('DeliveryZone', 'Noah · Brăila House', 'residential-4', 'residential-lane', 'delivery'),
   location('DeliveryPoint', 'Ada · Commerce House', 'business-4', 'business-lane', 'delivery'),
   location('CompanyDelivery', 'East Yard Reception', 'company-3', 'company-lane', 'delivery'),
   location('CanalPickup', 'Canal Grocers', 'waterfront-block-1-1', 'canal-lane', 'pickup'),
@@ -183,7 +183,7 @@ export const WORLD_ROUTE_POINTS: readonly WorldRoutePoint[] = [
   location('DepotPickup', 'Foundry Supplies', 'storage-block-1-2', 'foundry-lane', 'pickup'),
   location('GardenPickup', 'Garden Florist', 'garden-block-1-2', 'garden-lane', 'pickup'),
   location('StationPickup', 'Station Books', 'company-block-3-2', 'terminal-lane', 'pickup'),
-  location('CedarApartments', 'Cedar Apartments', 'residential-1', 'residential-lane', 'delivery'),
+  location('BrăilaApartments', 'Brăila Apartments', 'residential-1', 'residential-lane', 'delivery'),
   location('WillowCourt', 'Willow Court', 'residential-6', 'residential-lane', 'delivery'),
   location('BakeryFlats', 'Bakery Flats', 'business-5', 'business-lane', 'delivery'),
   location('ArcadeOffice', 'Arcade Office', 'business-3', 'business-lane', 'delivery'),

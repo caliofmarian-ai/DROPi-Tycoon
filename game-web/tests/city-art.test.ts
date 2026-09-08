@@ -49,7 +49,7 @@ const mockCityScene = () => {
 describe('original dimensional city architecture', () => {
   it.each([
     ["Mara's Market", 'market'], ['SUNBEAM CAFÉ', 'cafe'], ['CITY PHARMACY', 'pharmacy'],
-    ['Cedar Bakery', 'bakery'], ['Garden Florist', 'flowers'], ['BLOOM & STEM', 'flowers'],
+    ['Brăila Bakery', 'bakery'], ['Garden Florist', 'flowers'], ['BLOOM & STEM', 'flowers'],
     ['Canal Grocers', 'market'], ['Neighborhood Co-op', 'market'], ['Quayside Kitchen', 'cafe'],
   ])('identifies the %s storefront', (name, expected) => {
     expect(storefrontIdentity(name)).toBe(expected)
@@ -127,7 +127,7 @@ describe('original dimensional city architecture', () => {
   it('shares small padded facade textures by appearance, not world position or shop name', () => {
     const mock = mockCityScene()
     const building = URBAN_BUILDINGS.find(entry => entry.kind === 'shop')!
-    const art = { name: 'Cedar Bakery', variant: 1 }
+    const art = { name: 'Brăila Bakery', variant: 1 }
     const key = ensureBuildingTexture(mock.scene, building, art)
     expect(ensureBuildingTexture(mock.scene, { ...building, id: 'another-bakery', x: 2000, y: 2000 },
       { ...art, name: 'Bread Shop', variant: 4 })).toBe(key)

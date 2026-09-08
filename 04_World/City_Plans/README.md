@@ -34,7 +34,7 @@ Geographic labels use screen-space font sizes and collision suppression, at most
 
 ## Compatibility and review
 
-The legacy `cedar-city` ID remains the save identity; the visible city is Brăila. Save v2 already regenerates transient world position/order state on disk load. The new reset point is the safe Brăila HQ frontage. Company money, assets, staff, progression and merchant/customer IDs are retained. Merely opening the strategic map does not trigger that reset.
+The legacy `braila` ID remains the save identity; the visible city is Brăila. Save v2 already regenerates transient world position/order state on disk load. The new reset point is the safe Brăila HQ frontage. Company money, assets, staff, progression and merchant/customer IDs are retained. Merely opening the strategic map does not trigger that reset.
 
 #317 and Directive 004 retain owner Android review for this visible milestone. Automated checks cover source identity, street connectivity, traversable entrances, delivery loops, zoom math and bounded detail. A local build is not evidence of visual approval or Android frame rate.
 

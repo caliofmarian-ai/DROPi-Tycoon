@@ -11,7 +11,7 @@ import { WORLD_WIDTH, WORLD_HEIGHT, PLAYER_START, WORLD_DECORATIONS, WORLD_ROADS
 
 describe('finite city and district catalog', () => {
   it('owns six distinct populated districts and preserves the initial reset position', () => {
-    expect(CITY).toMatchObject({ cityId: 'cedar-city', name: 'Brăila', width: WORLD_WIDTH, height: WORLD_HEIGHT })
+    expect(CITY).toMatchObject({ cityId: 'braila', name: 'Brăila', width: WORLD_WIDTH, height: WORLD_HEIGHT })
     expect(CITY.districts).toBe(CITY_DISTRICTS)
     expect(CITY_DISTRICTS).toHaveLength(6)
     expect(isUrbanWalkable(PLAYER_START.x, PLAYER_START.y, true)).toBe(true)
@@ -87,7 +87,7 @@ describe('finite city and district catalog', () => {
 
   it('delivers to physical homes as well as businesses, including the new boroughs', () => {
     const homeAddresses = [
-      'DeliveryZone', 'CedarApartments', 'WillowCourt', 'BakeryFlats',
+      'DeliveryZone', 'BrăilaApartments', 'WillowCourt', 'BakeryFlats',
       'CanalHouse', 'MarinaHouse', 'HarborLofts', 'StationFlats',
       'GardenCourt', 'ParkHouse', 'OrchardHouse', 'SouthCourt',
     ]
