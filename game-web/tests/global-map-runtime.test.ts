@@ -1,5 +1,11 @@
 import { readFileSync } from 'node:fs'
 import type { CountryLocalityCatalog } from '../src/world/countryLayerNodes'
+import {
+  semanticEntryForCountry,
+  semanticPlaceRoleForLocality,
+  validateSemanticEntrySources,
+  type CountrySemanticCatalog,
+} from '../src/world/countrySemanticMetadata'
 import { describe, expect, it } from 'vitest'
 import {
   countryAtMapPoint,
@@ -19,6 +25,10 @@ const localityCatalog = JSON.parse(readFileSync(
   new URL('../public/data/country-representative-localities-v1.json', import.meta.url),
   'utf8',
 )) as CountryLocalityCatalog
+const semanticCatalog = JSON.parse(readFileSync(
+  new URL('../public/data/country-semantic-metadata-v1.json', import.meta.url),
+  'utf8',
+)) as CountrySemanticCatalog
 
 const configSource = readFileSync(new URL('../src/config/gameConfig.ts', import.meta.url), 'utf8')
 const worldSource = readFileSync(new URL('../src/scenes/GameWorldScene.ts', import.meta.url), 'utf8')
@@ -33,11 +43,15 @@ describe('Global Map runtime #418', () => {
     const ireland = localityCatalog.countries['372'] ?? []
     const unitedKingdom = localityCatalog.countries['826'] ?? []
     const kosovo = localityCatalog.countries['XKX'] ?? []
+    const northernCyprus = localityCatalog.countries['XNC'] ?? []
+    const somaliland = localityCatalog.countries['XSL'] ?? []
     expect(romania.find(node => node.role === 'capital')?.name).toMatch(/Bucharest|Bucuresti/)
     expect(ireland.find(node => node.role === 'capital')?.name).toBe('Dublin')
     expect(unitedKingdom.find(node => node.role === 'capital')?.name).toBe('London')
     expect(unitedKingdom.some(node => node.name === 'Hamilton')).toBe(false)
     expect(kosovo.find(node => node.role === 'capital')?.name).toBe('Pristina')
+    expect(northernCyprus).toEqual([])
+    expect(somaliland.find(node => node.role === 'capital')?.name).toBe('Hargeysa')
     expect(localityCatalog.geometryIdentity?.byRenderedName['N. Cyprus']).toBe('XNC')
     expect(localityCatalog.geometryIdentity?.byRenderedName.Somaliland).toBe('XSL')
     expect(localityCatalog.geometryIdentity?.byRenderedName.Kosovo).toBe('XKX')
@@ -49,6 +63,31 @@ describe('Global Map runtime #418', () => {
     expect(localityCatalog.source.upstreamCommit === PINNED_POPULATED_PLACES_COMMIT).toBe(true)
     const northIreland = ireland.find(node => node.role === 'urban' && node.sector === 'N')
     expect(!northIreland || northIreland.populationReference >= 15000 || northIreland.sourceFeatureClass.includes('Admin-1 capital')).toBe(true)
+  })
+
+  it('keeps special-status semantics source-governed and separate from locality coordinates', () => {
+    const kosovo = semanticEntryForCountry(semanticCatalog, 'XKX')
+    const northernCyprus = semanticEntryForCountry(semanticCatalog, 'XNC')
+    const somaliland = semanticEntryForCountry(semanticCatalog, 'XSL')
+
+    expect(semanticCatalog.version).toBe('1.0.0')
+    expect(semanticCatalog.governance.geographyDoesNotAssertSovereignty).toBe(true)
+    expect(semanticCatalog.governance.projectGeometryIdsAreNonISO).toBe(true)
+    expect(semanticCatalog.governance.localityCoordinatesRemainSourceBacked).toBe(true)
+    expect(Object.values(semanticCatalog.entries).every(entry => validateSemanticEntrySources(semanticCatalog, entry))).toBe(true)
+    expect(Object.values(semanticCatalog.sources).every(source => source.url.startsWith('https://'))).toBe(true)
+
+    expect(kosovo?.issue).toBe(478)
+    expect(semanticPlaceRoleForLocality(kosovo, 'Pristina')?.label).toBe('Capital / administrative centre')
+    expect(kosovo?.statusSummary).toContain('without taking a sovereignty position')
+
+    expect(northernCyprus?.issue).toBe(481)
+    expect(northernCyprus?.placeRoles).toEqual([])
+    expect(northernCyprus?.coverageNote).toContain('leaves locality coverage empty rather than inventing places')
+
+    expect(somaliland?.issue).toBe(482)
+    expect(semanticPlaceRoleForLocality(somaliland, 'Hargeysa')?.label).toBe('Principal administrative centre')
+    expect(somaliland?.statusSummary).toContain('26 December 2025')
   })
 
   it('loads the pinned local country topology as real selectable geography', () => {
@@ -100,6 +139,9 @@ describe('Global Map runtime #418', () => {
     expect(mapSource).toContain('TOUCH_TARGET_MIN_PX')
     expect(mapSource).toContain("'Open country view'")
     expect(mapSource).toContain('event.stopPropagation()')
+    expect(mapSource).toContain('country-semantic-metadata-v1.json')
+    expect(mapSource).toContain('semanticEntryForCountry')
+    expect(mapSource).toContain('roleOverride?.label')
   })
 
   it('integrates map navigation without using the ordinary save/menu transition', () => {
