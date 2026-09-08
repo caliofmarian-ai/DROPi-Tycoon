@@ -1,0 +1,79 @@
+name: TEMP Belarus Regional Audit
+
+on:
+  push:
+    branches:
+      - openai/europe-belarus-regional-localities-517
+    paths:
+      - .github/workflows/belarus-regional-audit-temp.yml
+
+permissions:
+  contents: read
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Audit retained Belarus source
+        run: |
+          set -euo pipefail
+          base='https://github.com/caliofmarian-ai/DROPi-Tycoon/releases/download/source-geonames-cities500-2026-09-08-f3cda4f9'
+          curl -fsSL "$base/cities500.zip" -o /tmp/cities500.zip
+          curl -fsSL "$base/admin1CodesASCII.txt" -o /tmp/admin1CodesASCII.txt
+          printf '%s  %s\n' 'f3cda4f9d256d90045121fb8eebad3ed91695c32370ed93b50fbe0cb616e2bbd' /tmp/cities500.zip | sha256sum -c -
+          printf '%s  %s\n' '590651498043f674accda2b7f46d21286cda0e290b02f8561c5005eee9a5448c' /tmp/admin1CodesASCII.txt | sha256sum -c -
+          python - <<'PY'
+          import collections, io, json, zipfile
+          from pathlib import Path
+
+          admin = {}
+          for line in Path('/tmp/admin1CodesASCII.txt').read_text(encoding='utf-8').splitlines():
+              if not line.startswith('BY.'):
+                  continue
+              fields = line.split('\t')
+              code = fields[0].split('.', 1)[1]
+              admin[code] = {'name': fields[1], 'asciiName': fields[2], 'sourceRef': f'geonames:{fields[3]}'}
+
+          fields = [
+              'geonameid','name','asciiname','alternatenames','latitude','longitude',
+              'feature_class','feature_code','country_code','cc2','admin1_code',
+              'admin2_code','admin3_code','admin4_code','population','elevation',
+              'dem','timezone','modification_date'
+          ]
+          groups = collections.defaultdict(list)
+          with zipfile.ZipFile('/tmp/cities500.zip') as zf:
+              with zf.open('cities500.txt') as raw:
+                  for line in io.TextIOWrapper(raw, encoding='utf-8'):
+                      row = dict(zip(fields, line.rstrip('\n').split('\t')))
+                      if row['country_code'] == 'BY':
+                          groups[row['admin1_code']].append(row)
+
+          print('BELARUS_ADMIN1_COUNT', len(admin))
+          print('BELARUS_SOURCE_LOCALITIES', sum(len(rows) for rows in groups.values()))
+          print('BELARUS_ADMIN1_WITH_LOCALITIES', sum(bool(groups.get(code)) for code in admin))
+          for code in sorted(admin, key=lambda value: int(value) if value.isdigit() else value):
+              rows = groups.get(code, [])
+              ranked = [row for row in rows if row['feature_code'] in {'PPLC','PPLA','PPLA2'}]
+              priority = {'PPLC': 0, 'PPLA': 1, 'PPLA2': 2}
+              ranked.sort(key=lambda row: (priority[row['feature_code']], -int(row['population'] or 0), row['name'].casefold(), int(row['geonameid'])))
+              print(json.dumps({
+                  'code': code,
+                  'region': admin[code]['name'],
+                  'regionAscii': admin[code]['asciiName'],
+                  'regionSourceRef': admin[code]['sourceRef'],
+                  'candidateCount': len(rows),
+                  'adminCandidates': [
+                      {
+                          'name': row['name'],
+                          'asciiName': row['asciiname'],
+                          'featureCode': row['feature_code'],
+                          'population': int(row['population'] or 0),
+                          'sourceRef': f"geonames:{row['geonameid']}",
+                          'latitude': float(row['latitude']),
+                          'longitude': float(row['longitude']),
+                      }
+                      for row in ranked[:8]
+                  ]
+              }, ensure_ascii=False))
+          PY
