@@ -2,11 +2,11 @@
 
 Document: COMPANY_SOCIETY_AND_MULTIPLAYER.md
 Project: DROPi Tycoon
-Version: 1.0.1
+Version: 1.1.0
 Status: Canonical Gameplay Specialization
 Author: Marian Caliof & OpenAI
 Language: English
-Last Updated: 2026-09-07
+Last Updated: 2026-09-08
 
 ---
 
@@ -14,468 +14,330 @@ Last Updated: 2026-09-07
 
 ## Purpose
 
-This document canonically specializes the long-term company, society, competition, education, ownership, governance, multiplayer, and world-expansion direction of DROPi Tycoon.
+This document specializes long-term employment, company society, education, ownership, governance, multiplayer and world-expansion gameplay.
 
-It is subordinate to `00_Project/VISION.md` and `01_GameDesign/GDD.md`. It must be interpreted together with the authoritative economy, logistics, world, UI, technical, and persistence documents. It does not activate every system described here in the current runtime.
+It is subordinate to `00_Project/BUSINESS_DESIGN.md`, `01_GameDesign/GDD.md`, and `00_Project/PHASE1_GAME_ARCHITECTURE_DECISION_BASELINE.md` and must be interpreted with Economy, Logistics, World and Technical authority.
 
-The project remains:
-
-**Urban RPG + Business Tycoon + Local Marketplace + Multimodal Logistics + Infrastructure Builder + future Drone Network Simulation.**
-
-**Game first. Ecosystem second.**
-
-Company Money remains sufficient for normal gameplay. No real DROPi service, future ecosystem asset, or real-money participation is required to enjoy or progress through the game.
+It does not imply that every described system is already implemented.
 
 ---
 
 # 1. Core Social Fantasy
 
-The player begins as one visible person in a living city and can grow into a founder, specialist, employee, investor, infrastructure operator, or executive participant in a much larger logistics society.
+The player begins as one poor visible person on foot, employed by a large fictional incumbent logistics company.
 
-The world must not become a collection of detached management screens. People, companies, customers, facilities, vehicles, goods, infrastructure, and institutions must increasingly exist as visible world entities with understandable consequences.
+From that modest start the same person may become a skilled worker, specialist, member, founder, executive, producer, infrastructure operator or investor.
 
-The long-term fantasy is not simply "own the biggest delivery company." It is:
+The long-term fantasy is not simply "become CEO". It is to choose a life/career inside a persistent economic society:
 
-- learn useful professions;
-- perform work personally;
-- form or join organizations;
+- learn and perform useful work;
+- build personal stability;
+- join or create organizations;
 - specialize;
-- build productive infrastructure;
-- compete and cooperate with other companies;
-- create products and logistics networks;
-- invest in companies;
-- influence local and global economies;
-- leave a persistent company and founder legacy.
+- create/operate productive assets;
+- compete/cooperate;
+- invest;
+- connect regions through logistics;
+- contribute visibly to world development;
+- leave personal/company/world history.
 
 ---
 
-# 2. Player Identity, Education and Specialization
+# 2. Person Identity and Economic Relationships
 
-Player progression is gradual. Experience, progression points, Company Money, training access, facilities, and prerequisites may all contribute to education.
+One economic hero exists per account per World Instance.
 
-Canonical specialization families may include:
+A person may have:
 
-- smartphone and delivery-app literacy;
-- walking courier fundamentals;
-- bicycle riding;
-- bicycle repair and maintenance;
-- electric scooter operation;
-- motorcycle operation;
-- car driving;
-- van driving and cargo handling;
-- dispatch and route operations;
-- entrepreneurship and company administration;
-- drone operator/pilot qualification;
-- drone maintenance and technical operations;
-- aircraft pilot/air-cargo operations;
-- ship/fluvial/sea operations;
-- rail/locomotive operations;
-- warehouse, sorting, maintenance, finance, research, and other future specialist branches.
+- compatible multiple jobs/contracts when schedules/permissions permit;
+- one primary Internal/Member company relationship at a time;
+- executive authority when legitimately granted;
+- External investment holdings separate from membership;
+- independent economic activity where later authorized.
 
-Not every specialization is available from the beginning.
+Employment, membership, executive control and investment ownership are distinct.
 
-Some qualifications are personal and can be studied independently. Others require:
-
-- membership in a company;
-- a constructed company department;
-- specialist equipment;
-- an instructor or qualified employee;
-- research;
-- a municipal, infrastructure, or progression prerequisite.
-
-A company cannot unlock an advanced building, vehicle, service, or technology merely because it has enough money. Required trained people and required infrastructure must also exist when the relevant system calls for them.
-
-This creates a two-way progression relationship:
-
-**Player grows the company -> company unlocks learning opportunities -> specialists unlock new company capability.**
+Unlimited shell companies are not a legitimate way to manufacture competitors, evade territorial capacity or multiply player economic identity.
 
 ---
 
-# 3. Company Formation and Local Authorization
+# 3. Education and Specialization
 
-Creating a company is a major progression milestone rather than a free menu action.
+Personal progression may use experience/mastery, Personal Money, training access, facilities, instructors, practical work, prerequisites and authorizations.
 
-A future company-formation flow may require:
+**Company Money is not the player's personal training wallet.** An employer may explicitly fund training as a company expense, but personal training paid by the player uses Personal Money.
 
-- a meaningful Company Money threshold;
-- entrepreneurship/business qualification;
-- an available company slot or operating authorization in the target area;
-- required starting personnel or specialist capacity;
-- an appropriate physical registration location such as a simulated city hall or commercial registry.
+Specialization families may include delivery/navigation, bicycle, road vehicles, warehouse/dispatch, maintenance, business/finance, agriculture/industry, drones, rail, air, maritime and research/automation.
 
-Cities and districts may limit the number or density of companies that can be directly authorized in an area. Capacity must be designed for competition and world believability without permanently excluding players from progression.
-
-Municipal registration and authorization are fictional gameplay abstractions. They must not be presented as accurate real-world legal procedures.
+Advanced capability may require people + qualification + equipment + infrastructure + authorization, not money alone.
 
 ---
 
-# 4. Companies as Mixed Human and Simulated Organizations
+# 4. Company Formation
 
-DROPi Tycoon is designed to support multiplayer society in the long term.
+Creating a company is a meaningful progression milestone.
 
-Company members may eventually be:
+Startup requirements may include:
 
-- real player founders;
-- real player employees;
-- real player specialists;
-- real player executives;
-- real player investors;
-- simulated/NPC employees and operational agents.
+- legitimate startup capital/resources from Personal Money, investors, governed financing/grants or other explicit sources;
+- entrepreneurship/business capability;
+- local authorization/capacity opportunity;
+- starting workforce/specialist capability;
+- registration/civic location where modeled;
+- infrastructure/equipment appropriate to the business.
 
-The game must remain playable when a world has few human players. Therefore simulated personnel remain valid and necessary.
+A new company receives its own Company Money ownership domain through governed formation/transfer rules. A company cannot require a pre-existing Company Money balance before it exists.
 
-Real players can eventually take roles that are currently simulated, but all roles must use one authoritative company/workforce model rather than parallel "real player employee" and "NPC employee" economic truths.
-
-The current runtime contains only the authoritative employee roles already defined in `02_Economy/EMPLOYEES.md`. Future roles must be added deliberately; scenes must not fabricate managers, dispatchers, mechanics, pilots, or other specialists before the model supports them.
+Exact amounts are balancing data.
 
 ---
 
-# 5. Physical Company Operations
+# 5. Mixed Human/NPC Organizations
 
-The company is not an abstract global menu.
+Companies may contain human players and NPC/simulated workers.
 
-Company capabilities belong to physical places where appropriate:
+The world must remain viable with few humans, so NPC employers/workers/consumers remain legitimate, but they obey real wages, costs, inventory, capacity and production/consumption rules.
 
-- Hiring and onboarding -> staff/hiring area;
-- Fleet purchase and handoff -> fleet bay;
-- Dispatch and company status -> Operations & Dispatch;
-- Parcel handling -> staging/sorting;
-- Maintenance -> constructed workshop;
-- Drone operations -> compatible DronePort/control facility;
-- Advanced research -> constructed research capability;
-- Government/registration actions -> relevant simulated civic institution;
-- Airport/port/rail operations -> corresponding infrastructure.
-
-Portable information and communication belong primarily to the player's smartphone. See `07_UI/PLAYER_SMARTPHONE.md`.
-
-The smartphone may inspect, communicate, plan, monitor, study, and access remote services as unlocked, but it does not automatically bypass physical-location requirements.
+Human and NPC roles should use compatible authoritative semantics rather than two separate economies.
 
 ---
 
-# 6. Competition and Customer Acquisition
+# 6. Physical Company Operations
 
-Multiple companies may coexist in the same city and compete for customers.
+Company capabilities belong to real places where appropriate:
 
-Customer acquisition and retention may respond to:
+- hiring/onboarding -> staff area;
+- fleet -> fleet/garage context;
+- dispatch -> Operations & Dispatch;
+- parcel/cargo handling -> staging/sorting/warehouse;
+- maintenance -> workshop;
+- production -> farm/factory/industrial site;
+- drone operations -> DronePort/control capability;
+- civic registration -> relevant institution;
+- rail/air/port operations -> relevant infrastructure.
 
-- price/value;
-- service speed;
-- on-time delivery rate;
-- reliability;
-- service quality;
-- customer rating;
-- geographic coverage;
-- available vehicle and infrastructure capacity;
-- specialist services;
-- technology;
-- customer support;
-- marketing;
-- loyalty programs;
-- company reputation and history.
-
-Company rating may decrease for simulated causes such as:
-
-- repeated late deliveries;
-- failed deliveries;
-- damaged or mishandled goods;
-- poor customer experience;
-- insufficient capacity;
-- unsafe or unreliable operations;
-- financial distress that degrades service;
-- broken promises or contract failures.
-
-A company can lose customers naturally. Other companies can attract those customers by offering better value or differentiated services.
+The smartphone supports information/planning/communication and later authorized remote controls; it does not automatically bypass physical prerequisites.
 
 ---
 
-# 7. Competitive Disruption and Anti-Griefing
+# 7. Local Competition and Entry
 
-The game may later include bounded competitive disruption or "sabotage" mechanics as strategic gameplay.
+Multiple companies may compete for customers through price/value, speed, reliability, capacity, specialization, coverage, infrastructure, support, technology and reputation.
 
-Such mechanics must be fictional, non-violent, reversible, and have counterplay. Examples can focus on lawful-feeling game abstractions such as aggressive marketing, poaching contracts, price campaigns, intelligence/research advantages, temporary reputation contests, or competitive bids.
+Roughly five meaningful last-mile competitors is an urban target; normally one to two is a rural target. Local demand/capacity, company entry/exit and authorization determine actual outcomes.
 
-The system must not support:
-
-- real-world harmful instructions;
-- harassment of real players;
-- permanent destruction of another player's identity or account;
-- irreversible world lockout;
-- griefing that makes recovery impossible.
-
-Every serious negative competitive effect requires a recovery path, cost, cooldown, defense, or expiration mechanism.
+Competition must preserve counterplay/recovery and cannot permanently lock new players out of all productive paths.
 
 ---
 
-# 8. World Hierarchy and Multiplayer Worlds
+# 8. Corporate Growth and Productive Ownership
 
-The world expands in stages:
+A company may grow from service provider into a vertically integrated organization.
 
-**Neighborhood -> locality -> city -> region/county -> country -> international network -> very-late-game planetary/off-world network.**
+A relationship with a productive asset may develop as:
 
-A country may be presented to players as one logical world or shard for social identity and competition. This is a gameplay concept, not a technical requirement that one country equals one physical server.
+**occasional job -> recurring contract -> strategic investment -> governed acquisition/concession/control**.
 
-Technical server topology, sharding, replication, regional hosting, migration, and load balancing remain implementation concerns under Technical architecture.
+Eligible assets may include farms, factories, processing facilities, warehouses, industrial/energy sites and infrastructure.
 
-Active simulation and rendering remain region-scoped. The project must not attempt to keep an entire planet as one always-rendered active map.
+Control requires legitimate capital, transaction availability, specialists, infrastructure, authorization and ongoing operating inputs/costs.
 
----
-
-# 9. Inter-City and Multimodal Expansion
-
-As players and companies progress, travel and logistics expand beyond one city through staged infrastructure:
-
-- side roads and highways;
-- rail corridors and terminals;
-- airports and air cargo;
-- rivers and fluvial ports;
-- sea ports and maritime routes;
-- distribution centers and warehouses;
-- DronePorts and drone networks;
-- future space/planetary gateways.
-
-This direction extends the staged architecture in issue #344. It must not be implemented as one giant PR.
-
-Companies may build, finance, lease, operate, win concessions for, or otherwise obtain gameplay control over strategic infrastructure when the relevant system is implemented.
-
-Strategic control may grant:
-
-- capacity;
-- routing priority;
-- service revenue;
-- lower internal logistics cost;
-- access to new transport modes;
-- competitive reach.
-
-Critical shared infrastructure requires public-access or anti-monopoly safeguards so one company cannot permanently prevent an entire world from progressing.
+Ownership never creates free production.
 
 ---
 
-# 10. Goods, Production and Regional Demand
+# 9. Infrastructure and Fair Access
 
-Companies may eventually develop proprietary goods or product lines in addition to logistics services.
+Companies may build, finance, lease, operate, own or win concessions for strategic infrastructure.
 
-A company can:
+Advantages may include capacity, lower costs, routing priority, service revenue and market reach.
 
-- research a product;
-- improve it;
-- manufacture or source it;
-- store it;
-- market it;
-- transport it;
-- sell it locally or internationally.
-
-Regions can have different demand, scarcity, production capacity, and dependencies for categories of goods. These relationships create logistics opportunities and strategic trade routes.
-
-Regional dependency must generate economic pressure and opportunity, not permanent starvation or irreversible griefing. Essential systems must have alternative supply paths or recovery mechanisms.
+Essential transport corridors/utilities require public-access/anti-softlock rules. No company may permanently prevent an entire locality/country from ordinary progression by denying essential infrastructure.
 
 ---
 
-# 11. Company Valuation and Local Exchange
+# 10. Inter-City and Global Society
 
-A mature company may eventually become listed on an in-game local exchange.
+Progression expands through:
 
-The owner-approved design starting point is:
+**Neighborhood -> Locality -> City -> Region -> Country -> International Network -> very-late Frontier/Off-World**.
 
-- **51% internal/member share pool**;
-- **49% external/non-member market pool**.
+Travel and cargo movement require valid road/public transport/rail/air/sea infrastructure. Strategic map selection is not economic teleportation.
 
-This percentage model is a gameplay design baseline and may later receive detailed balancing while preserving the principle that internal members retain a structurally protected participation pool and outside investors can materially participate.
-
-A player may hold shares in multiple companies, including neighboring competitors, subject to future anti-collusion and market-integrity rules.
-
-Company valuation must not be a simplistic single linear number. It should eventually respond to a basket of factors such as:
-
-- revenue;
-- sustainable profit;
-- cash flow;
-- assets;
-- debt and liabilities;
-- reputation;
-- customer base;
-- growth rate;
-- technology;
-- infrastructure;
-- employee/specialist capability;
-- service reliability;
-- market demand;
-- operational risk;
-- strategic position.
-
-A stronger company therefore becomes more valuable and harder to displace naturally through the economy.
+A logical World Instance may span many physical services; one country is not required to equal one server/shard.
 
 ---
 
-# 12. Shares, Membership and Exit
+# 11. Products and Regional Economy
 
-Internal/member shares represent participation tied to active membership and company governance.
+Companies may design/source/produce/store/market/transport/sell goods.
 
-The owner-approved exit rule is strict: **a player who definitively leaves a company forfeits all Internal/Member shares still held in that company at the moment of exit**.
+Regional demand, scarcity, production and infrastructure create trade routes and logistics opportunities.
 
-Those forfeited shares:
+Goods must connect to real input inventory, production capacity, consumers/buyers and logistics rather than passive abstract income.
 
-- return to the company treasury/internal pool;
-- are not destroyed;
-- are not automatically redistributed for free;
-- become available for later purchase by other eligible active company members through an explicit paid transaction once valuation/pricing and settlement rules exist.
+Essential shortages require alternate supply/recovery paths and cannot become permanent griefing.
 
-The departing player does not carry those member-restricted governance rights into another company and receives no automatic right to retain Internal/Member shares after final exit.
+---
 
-This consequence must be clearly disclosed before departure.
+# 12. Equity, Membership and External Investment
 
-External market shares held as portfolio investments are separate assets and are not automatically lost merely because the player changes operational company membership.
+The owner-approved mature listed-company design starting point remains:
 
-Assigned company equipment, employment permissions, internal membership shares, and external investment ownership are distinct concepts.
+- **51% Internal/Member pool**;
+- **49% External/non-member market pool**.
+
+Internal/Member shares require eligible active membership.
+
+When a player definitively leaves a company:
+
+- remaining Internal/Member shares are forfeited to the company internal treasury pool;
+- they are not destroyed or redistributed for free;
+- eligible active members may later purchase them through explicit Personal Money -> Company Money settlement;
+- unrelated External portfolio shares remain investment assets.
+
+Assigned equipment, employment, membership, executive authority and External ownership are separate.
 
 ---
 
 # 13. Dividends and Governance
 
-Companies may distribute dividends from distributable profit.
+Dividends may only come from actual distributable company results/cash. The current design target remains end-of-season settlement.
 
-The default design target is an **end-of-season dividend settlement**, because it creates a readable business cycle and discourages high-frequency exploitation. Later governance or company progression may support alternative cadences if balancing permits.
+Governance may later affect executive appointment/removal, major investments, infrastructure, dividend policy, acquisitions, expansion and asset sales.
 
-Dividends must come from actual distributable game profit/cash under the economy rules; they are not guaranteed rewards.
-
-Voting power may scale with eligible voting shares. Governance can influence meaningful company decisions, but veto systems must not create permanent deadlocks.
-
-Future governance may include:
-
-- executive appointment/removal;
-- large capital investments;
-- infrastructure projects;
-- dividend policy;
-- mergers/acquisitions when separately designed;
-- strategic expansion;
-- high-value asset sale;
-- company-heart/artifact decisions.
+Governance must prevent permanent deadlock/griefing and must use authoritative ownership/settlement.
 
 ---
 
-# 14. Founder, Executive Control and Legacy
+# 14. Founder and Company Legacy
 
-The player who creates a company becomes its permanent historical **Founder**.
+The creator of a company remains its historical Founder even if executive control changes.
 
-Founder and executive control are not the same thing.
+Founder identity and executive control are distinct.
 
-The founder may begin with the strongest internal ownership and leadership position, but over time legitimate investment and governance can allow other players to obtain stronger executive influence or replace the founder as active executive leader.
+The Company Heart / Founder Artifact may remain a later fictional prestige/history collectible with bounded effects, recoverability and no permanent company-identity destruction.
 
-The original founder keeps the Founder historical role even after losing executive control.
+An Economic Museum/history system may preserve notable company/world history.
 
-Certain late-game legacy unlocks may require founder continuity. If the real founder becomes inactive for a sufficiently long period, a future researched and expensive **Founder Legacy / Founder Replica** system may provide continuity without pretending to recreate a real person. This is fictional gameplay technology and must be balanced so inactivity cannot permanently freeze a mature company.
-
----
-
-# 15. Company Heart and Economic Museum
-
-A sufficiently mature company may create a unique historical collectible tied to its founder and identity: the **Company Heart / Founder Artifact**.
-
-It can serve as:
-
-- a company-history object;
-- a prestige collectible;
-- a museum object;
-- a high-value tradable game asset under controlled rules;
-- a symbol that can be physically transported or protected.
-
-If the original artifact leaves company control, the company may suffer a temporary brand, morale, productivity, or valuation shock for defined seasons. The new holder may gain a bounded prestige/morale benefit.
-
-However:
-
-- the company's database identity and history can never be deleted because another player bought the artifact;
-- the penalty is never permanent;
-- a recovery, replica, restoration, or reacquisition path must exist;
-- this mechanic must not enable permanent griefing.
-
-Cities may contain an **Economic Museum** that records major company history and displays original artifacts, replicas, founder memorabilia, products, and souvenirs.
-
-The Company Heart is an in-game collectible concept. It is **not** an NFT and does not require blockchain.
+No blockchain/NFT implementation is implied.
 
 ---
 
-# 16. Multiplayer Authority and Migration Principle
+# 15. Failure and Comeback
 
-Current DROPi Tycoon gameplay is not yet a server-authoritative multiplayer economy.
+Companies can lose customers, become insolvent, restructure, be acquired or close.
 
-Before real multiplayer company ownership, trading, chat, shares, or contested world assets are activated, the project requires a dedicated technical architecture and migration stage covering at minimum:
+A human player can lose company control or wealth without losing person identity/history/valid personal qualifications.
 
-- player accounts and stable identity;
-- server-authoritative company/economy state;
-- concurrency and conflict resolution;
-- anti-cheat and anti-duplication rules;
-- authoritative market transactions;
-- moderation and reporting for player communication;
-- persistence and recovery;
-- shard/world membership;
-- migration from current local Save without corrupting existing progress;
-- offline/low-population behavior;
-- capacity and performance architecture.
+The player may return to legitimate employment or another productive role and rebuild.
 
-Single-player simulation should establish the business rules first where practical. Online authority should then extend those rules instead of creating a second economy.
+This comeback path is part of the intended social/economic simulation.
 
 ---
 
-# 17. DROPi Ecosystem Asset Boundary
+# 16. World Instance Isolation
 
-A future DROPi ecosystem token or asset may eventually have an optional role across DROPi Tycoon and the real DROPi ecosystem.
+Each World Instance contains an independent economic society.
 
-This document does **not** implement or authorize:
+A fresh world does not import mature-world money, companies, shares, reputation, productive qualifications, property, contracts or infrastructure power.
 
-- blockchain;
-- smart contracts;
-- a wallet;
-- ticker or supply;
-- tokenomics;
-- exchange functionality;
-- KYC;
-- real-money rewards;
-- cash-equivalent gameplay;
-- token-gated mandatory progression.
+Only explicitly non-economic account state may follow the account by default.
 
-Company Money remains the authoritative gameplay currency and must remain sufficient for normal progression.
-
-Any future ecosystem asset must be optional and cannot create pay-to-win power, skip specialist qualifications, bypass permits, replace earned infrastructure, or guarantee business success.
-
-The technical isolation in `06_Technical/ARCHITECTURE.md` remains binding.
+Old World Instances remain separate persistent histories when new worlds open.
 
 ---
 
-# 18. Relationship to the Real DROPi Product
+# 17. Multiplayer Authority and Migration
 
-Tycoon follows this translation rule:
+Before real contested multiplayer economy is activated, trusted/server authority must own relevant:
 
-**REAL DROPi CONCEPT -> GENERIC SIMULATION MODEL -> TYCOON GAMEPLAY ABSTRACTION**
+- person/account/World Instance identity;
+- employment/membership/permissions;
+- Personal Money and Company Money;
+- companies/shares/governance;
+- contracts/orders/inventory/cargo custody;
+- market settlement;
+- productive/infrastructure ownership;
+- world time/offline catch-up.
 
-The real DROPi repository and its canonical reference material remain authoritative for the real product.
+Required foundations include transaction integrity, revisions/conflict handling, idempotency, anti-duplication, anti-cheat, persistence/recovery and moderation where communication exists.
 
-A Tycoon invention such as a Company Heart, fictional commercial-registry slot, planetary logistics gateway, governance mechanic, or competitive disruption system must never be presented as an existing real DROPi feature.
+Prototype/local saves do not automatically become authoritative economic power in a fresh shared world.
 
 ---
 
-# 19. Staged Implementation Order
+# 18. Human/NPC Low-Population Continuity
 
-This document is long-term canon, not one implementation batch.
+A shared world must remain usable when few real players are online.
 
-The preferred staged order from the current project state is:
+NPC actors may maintain bounded employment, consumption, supply, services and market counterparties, but they cannot create infinite free resources or magical liquidity.
 
-1. productive employee/idle-vehicle economy (#346);
-2. progressive HQ departments and real specialist gates (#343);
-3. player smartphone foundation and removal of remaining abstract player-facing company-menu concepts;
-4. player education/specialization foundation;
-5. single-player company registration, territorial capacity, competition, customer loyalty and rating depth;
-6. company valuation, shares, dividends, governance and founder continuity simulation;
-7. server-authoritative multiplayer architecture and Save migration design;
-8. player accounts, company membership, communication and authoritative market transactions;
-9. staged inter-city/international multimodal expansion (#344);
-10. late world-scale infrastructure and planetary expansion;
-11. only after separate cross-project, economic, security and legal review: optional ecosystem-asset integration.
+Human participation should replace/compete/cooperate with NPC capacity naturally as population grows.
 
-Every stage must receive its own issue/batch/PR boundaries, tests, CI verification, and installed Android owner review when visible gameplay changes are involved.
+---
+
+# 19. Future Currency and Public Economy
+
+Architecture supports future national game currencies and FX without changing the distinction between Personal Money and Company Money.
+
+Banking/credit and simplified public budgets/taxation may come later after the core stock-flow economy is stable.
+
+They require separate deterministic design and are not prerequisites for early multiplayer society.
+
+---
+
+# 20. DROPi Ecosystem Asset Boundary
+
+Any future ecosystem asset is optional and separate from ordinary game economic power.
+
+It cannot buy core capability, Work Capacity, speed/cargo advantage, qualifications, infrastructure, guaranteed returns or mandatory progression.
+
+No blockchain, wallet, tokenomics, cash-out or real financial service is activated by this document.
+
+---
+
+# 21. Relationship to Real DROPi
+
+Tycoon follows:
+
+**REAL DROPi CONCEPT -> GENERIC SIMULATION MODEL -> TYCOON GAMEPLAY ABSTRACTION.**
+
+The real DROPi repository remains authoritative for the real product.
+
+Tycoon inventions such as fictional business authorization, shares/governance, Company Heart, industrial ownership or world geopolitics are not claims about deployed real DROPi functionality.
+
+The starting incumbent employer is fictional unless real-brand permission is separately approved.
+
+---
+
+# 22. Implementation Order After Phase-1 Reconciliation
+
+Long-term society systems must be implemented in causal slices rather than one giant multiplayer PR.
+
+Preferred dependency order:
+
+1. person/World Instance identity and Personal Money foundations;
+2. employee-first starter lifecycle, wage settlement, living costs and Work Capacity;
+3. local stock-flow demand/inventory and causal orders/custody;
+4. visible-consequence / first-hour playability slice under the R9 gate;
+5. professions/training and richer labor market;
+6. company formation, local competition and customer/contract depth;
+7. production/waste/city metabolism;
+8. trusted multiplayer authority and migration for selected state families;
+9. real-player employment/membership/market interactions;
+10. valuation/shares/governance/acquisitions when core transactions are stable;
+11. regional/international multimodal expansion;
+12. mature infrastructure/national/global systems;
+13. only after separate review: optional ecosystem-asset integration.
+
+Each visible implementation receives tests, CI and installed Android owner verification.
 
 ---
 
 # Canonical Rule
 
-DROPi Tycoon grows from one courier into a living society of people, companies, markets, infrastructure and logistics networks. Progression must be earned through capability, specialization, people, infrastructure, economic performance and strategic decisions—not through abstract menu unlocks or pay-to-win shortcuts.
+**DROPi Tycoon society grows from one economically real person into a persistent network of workers, organizations, markets, productive assets and infrastructure. The player chooses employment, specialization, membership, entrepreneurship, management and investment paths; human and NPC actors share one constrained economy; company power is earned legitimately; and multiplayer extends rather than replaces the same causal world.**
 
 ---
 
