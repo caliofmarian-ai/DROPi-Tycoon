@@ -1,7 +1,7 @@
 # Production, Inventory and Producer Logistics Runtime
 
-Status: Phase-1 implementation foundation  
-Anchor: #419  
+Status: Phase-1 implementation foundation
+Anchor: #419
 Coordinates: #420, #417; future #493
 
 ## Purpose
