@@ -14,6 +14,10 @@ The project must not become a correct but joyless economic spreadsheet. Economic
 
 This paper translates compatible engagement principles from successful games and motivation research into original DROPi Tycoon systems. It does not copy protected content, art, writing, maps, characters or branded mechanics.
 
+Companion operational research:
+- `R9_COMPARATIVE_DESIGN_TRANSLATION_MATRIX.md` — translates reference-game strengths into original DROPi principles and cautions;
+- `R9_PLAYABILITY_INTEGRATION_GATE.md` — defines the acceptance gate later gameplay systems and player-facing PRs must satisfy.
+
 ---
 
 # 1. Research evidence
