@@ -10,10 +10,10 @@ Parent: #446
 - every node coordinate remains a source coordinate; this manifest does not reposition places.
 
 ## Chapter summary
-- countries/territories: **37**
-- representative nodes: **274**
-- structural PASS: **36**
-- REVIEW: **1**
+- countries/territories: **39**
+- representative nodes: **290**
+- structural PASS: **37**
+- REVIEW: **2**
 - documented GAP: **0**
 
 ## Country-by-country manifest
@@ -45,6 +45,7 @@ Parent: #446
 | 807 | Macedonia | Skopje | 3 | CAPITAL, N, E | **PASS** | structural/source checks passed |
 | 498 | Moldova | Chisinau | 5 | CAPITAL, N, E, S, NE | **PASS** | structural/source checks passed |
 | 499 | Montenegro | Podgorica | 1 | CAPITAL | **PASS** | structural/source checks passed |
+| 528 | Netherlands | Amsterdam | 9 | CAPITAL, N, E, S, W, NE, SE, SW, NW | **PASS** | structural/source checks passed |
 | 578 | Norway | Oslo | 8 | CAPITAL, N, E, S, W, NE, SW, NW | **PASS** | structural/source checks passed |
 | 616 | Poland | Warsaw | 9 | CAPITAL, N, E, S, W, NE, SE, SW, NW | **PASS** | structural/source checks passed |
 | 620 | Portugal | Lisbon | 9 | CAPITAL, N, E, S, W, NE, SE, SW, NW | **PASS** | structural/source checks passed |
@@ -57,6 +58,7 @@ Parent: #446
 | 752 | Sweden | Stockholm | 9 | CAPITAL, N, E, S, W, NE, SE, SW, NW | **PASS** | structural/source checks passed |
 | 756 | Switzerland | Bern | 9 | CAPITAL, N, E, S, W, NE, SE, SW, NW | **PASS** | structural/source checks passed |
 | 804 | Ukraine | Kiev | 9 | CAPITAL, N, E, S, W, NE, SE, SW, NW | **PASS** | structural/source checks passed |
+| 826 | United Kingdom | Hamilton | 7 | CAPITAL, N, E, S, NE, SW, NW | **REVIEW** | #469: country-identity bleed: Hamilton from a British overseas territory must not be grouped as the United Kingdom national capital |
 
 ## Interpretation
 - `PASS` means automated structural and pinned-source checks pass; it does not claim final economy/transport simulation is active.
