@@ -1,0 +1,53 @@
+{
+  "version": "1.0.0",
+  "issue": 514,
+  "continent": "Europe",
+  "country": {
+    "geometryId": "040",
+    "sourceCountryCode": "AT",
+    "renderedName": "Austria"
+  },
+  "administrativeModel": {
+    "level": "first-order",
+    "nativeTermSingular": "Bundesland",
+    "nativeTermPlural": "Bundesländer",
+    "englishTerm": "federal state",
+    "unitCount": 9,
+    "officialReferences": [
+      "https://www.statistik.at/atlas/?mapid=topo_regionale_gliederung_oesterreich",
+      "https://www.statistik.at/en/services/tools/regional-international-data/regional-information/regional-divisions"
+    ]
+  },
+  "source": {
+    "provider": "GeoNames",
+    "license": "Creative Commons Attribution 4.0",
+    "releaseTag": "source-geonames-cities500-2026-09-08-f3cda4f9",
+    "cities500Sha256": "f3cda4f9d256d90045121fb8eebad3ed91695c32370ed93b50fbe0cb616e2bbd",
+    "admin1Sha256": "590651498043f674accda2b7f46d21286cda0e290b02f8561c5005eee9a5448c",
+    "expectedCountryCandidateCount": 3045
+  },
+  "selectionPolicy": {
+    "primaryFeatureCodes": ["PPLC", "PPLA"],
+    "fallbackFeatureCodes": ["PPLA2"],
+    "expectedPrimarySelections": 9,
+    "expectedFallbackSelections": 0,
+    "highDensityGameplayImport": false,
+    "hardcodedCoordinates": false
+  },
+  "economicEmergence": {
+    "authority": "shared-regional-national-multiplayer-economy",
+    "personalPlayerProgressionUnlock": false,
+    "numericThresholdsDefined": false
+  },
+  "expectedRegions": [
+    {"admin1Code": "01", "canonicalName": "Burgenland", "sourceName": "Burgenland"},
+    {"admin1Code": "02", "canonicalName": "Kärnten", "sourceName": "Carinthia"},
+    {"admin1Code": "03", "canonicalName": "Niederösterreich", "sourceName": "Lower Austria"},
+    {"admin1Code": "04", "canonicalName": "Oberösterreich", "sourceName": "Upper Austria"},
+    {"admin1Code": "05", "canonicalName": "Salzburg", "sourceName": "Salzburg"},
+    {"admin1Code": "06", "canonicalName": "Steiermark", "sourceName": "Styria"},
+    {"admin1Code": "07", "canonicalName": "Tirol", "sourceName": "Tyrol"},
+    {"admin1Code": "08", "canonicalName": "Vorarlberg", "sourceName": "Vorarlberg"},
+    {"admin1Code": "09", "canonicalName": "Wien", "sourceName": "Vienna"}
+  ]
+}

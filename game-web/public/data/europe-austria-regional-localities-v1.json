@@ -1,0 +1,288 @@
+{
+  "version": "1.0.0",
+  "issue": 514,
+  "continent": "Europe",
+  "country": {
+    "geometryId": "040",
+    "sourceCountryCode": "AT",
+    "renderedName": "Austria"
+  },
+  "administrativeModel": {
+    "level": "first-order",
+    "nativeTermSingular": "Bundesland",
+    "nativeTermPlural": "Bundesländer",
+    "englishTerm": "federal state",
+    "unitCount": 9,
+    "officialReferences": [
+      "https://www.statistik.at/atlas/?mapid=topo_regionale_gliederung_oesterreich",
+      "https://www.statistik.at/en/services/tools/regional-international-data/regional-information/regional-divisions"
+    ]
+  },
+  "source": {
+    "provider": "GeoNames",
+    "license": "Creative Commons Attribution 4.0",
+    "releaseTag": "source-geonames-cities500-2026-09-08-f3cda4f9",
+    "cities500Sha256": "f3cda4f9d256d90045121fb8eebad3ed91695c32370ed93b50fbe0cb616e2bbd",
+    "admin1Sha256": "590651498043f674accda2b7f46d21286cda0e290b02f8561c5005eee9a5448c",
+    "expectedCountryCandidateCount": 3045,
+    "publishedGameplayRepresentativeCount": 9
+  },
+  "selectionModel": {
+    "primaryFeatureCodes": [
+      "PPLC",
+      "PPLA"
+    ],
+    "fallbackFeatureCodes": [
+      "PPLA2"
+    ],
+    "expectedPrimarySelections": 9,
+    "expectedFallbackSelections": 0,
+    "highDensityGameplayImport": false,
+    "hardcodedCoordinates": false,
+    "rule": "One source-backed representative locality per governed first-order region; retained high-density source remains reference-only."
+  },
+  "developmentModel": {
+    "authority": "shared-regional-national-multiplayer-economy",
+    "personalPlayerProgressionUnlock": false,
+    "numericThresholdsDefined": false,
+    "signalsPlanned": [
+      "company-activity",
+      "employment-demand",
+      "production",
+      "logistics-throughput",
+      "construction-investment",
+      "transport-connectivity",
+      "trade-volume",
+      "population-economic-simulation",
+      "regional-national-policy"
+    ],
+    "rule": "Representative locality prominence and development are shared-world economic outcomes, not personal progression rewards."
+  },
+  "units": [
+    {
+      "admin1Code": "01",
+      "regionName": "Burgenland",
+      "regionSourceName": "Burgenland",
+      "regionAsciiName": "Burgenland",
+      "regionSourceRef": "geonames:2781194",
+      "representativeLocality": {
+        "localityId": "dropi:locality:geonames:2780190",
+        "sourceRef": "geonames:2780190",
+        "name": "Eisenstadt",
+        "asciiName": "Eisenstadt",
+        "latitude": 47.84565,
+        "longitude": 16.52327,
+        "featureCode": "PPLA",
+        "populationSourceValue": 9217,
+        "selectionBasis": "source-first-order-seat-role",
+        "presentationRole": "regional-representative-locality"
+      },
+      "economicEmergence": {
+        "authority": "shared-regional-national-multiplayer-economy",
+        "personalPlayerProgressionUnlock": false,
+        "numericThresholdsDefined": false,
+        "presentationState": "economy-system-governed"
+      }
+    },
+    {
+      "admin1Code": "02",
+      "regionName": "Kärnten",
+      "regionSourceName": "Carinthia",
+      "regionAsciiName": "Carinthia",
+      "regionSourceRef": "geonames:2774686",
+      "representativeLocality": {
+        "localityId": "dropi:locality:geonames:2774326",
+        "sourceRef": "geonames:2774326",
+        "name": "Klagenfurt am Wörthersee",
+        "asciiName": "Klagenfurt am Woerthersee",
+        "latitude": 46.62472,
+        "longitude": 14.30528,
+        "featureCode": "PPLA",
+        "populationSourceValue": 100316,
+        "selectionBasis": "source-first-order-seat-role",
+        "presentationRole": "regional-representative-locality"
+      },
+      "economicEmergence": {
+        "authority": "shared-regional-national-multiplayer-economy",
+        "personalPlayerProgressionUnlock": false,
+        "numericThresholdsDefined": false,
+        "presentationState": "economy-system-governed"
+      }
+    },
+    {
+      "admin1Code": "03",
+      "regionName": "Niederösterreich",
+      "regionSourceName": "Lower Austria",
+      "regionAsciiName": "Lower Austria",
+      "regionSourceRef": "geonames:2770542",
+      "representativeLocality": {
+        "localityId": "dropi:locality:geonames:2766429",
+        "sourceRef": "geonames:2766429",
+        "name": "Sankt Pölten",
+        "asciiName": "Sankt Poelten",
+        "latitude": 48.20762,
+        "longitude": 15.63725,
+        "featureCode": "PPLA",
+        "populationSourceValue": 21911,
+        "selectionBasis": "source-first-order-seat-role",
+        "presentationRole": "regional-representative-locality"
+      },
+      "economicEmergence": {
+        "authority": "shared-regional-national-multiplayer-economy",
+        "personalPlayerProgressionUnlock": false,
+        "numericThresholdsDefined": false,
+        "presentationState": "economy-system-governed"
+      }
+    },
+    {
+      "admin1Code": "04",
+      "regionName": "Oberösterreich",
+      "regionSourceName": "Upper Austria",
+      "regionAsciiName": "Upper Austria",
+      "regionSourceRef": "geonames:2769848",
+      "representativeLocality": {
+        "localityId": "dropi:locality:geonames:2772400",
+        "sourceRef": "geonames:2772400",
+        "name": "Linz",
+        "asciiName": "Linz",
+        "latitude": 48.30639,
+        "longitude": 14.28611,
+        "featureCode": "PPLA",
+        "populationSourceValue": 204846,
+        "selectionBasis": "source-first-order-seat-role",
+        "presentationRole": "regional-representative-locality"
+      },
+      "economicEmergence": {
+        "authority": "shared-regional-national-multiplayer-economy",
+        "personalPlayerProgressionUnlock": false,
+        "numericThresholdsDefined": false,
+        "presentationState": "economy-system-governed"
+      }
+    },
+    {
+      "admin1Code": "05",
+      "regionName": "Salzburg",
+      "regionSourceName": "Salzburg",
+      "regionAsciiName": "Salzburg",
+      "regionSourceRef": "geonames:2766823",
+      "representativeLocality": {
+        "localityId": "dropi:locality:geonames:2766824",
+        "sourceRef": "geonames:2766824",
+        "name": "Salzburg",
+        "asciiName": "Salzburg",
+        "latitude": 47.79941,
+        "longitude": 13.04399,
+        "featureCode": "PPLA",
+        "populationSourceValue": 157245,
+        "selectionBasis": "source-first-order-seat-role",
+        "presentationRole": "regional-representative-locality"
+      },
+      "economicEmergence": {
+        "authority": "shared-regional-national-multiplayer-economy",
+        "personalPlayerProgressionUnlock": false,
+        "numericThresholdsDefined": false,
+        "presentationState": "economy-system-governed"
+      }
+    },
+    {
+      "admin1Code": "06",
+      "regionName": "Steiermark",
+      "regionSourceName": "Styria",
+      "regionAsciiName": "Styria",
+      "regionSourceRef": "geonames:2764581",
+      "representativeLocality": {
+        "localityId": "dropi:locality:geonames:2778067",
+        "sourceRef": "geonames:2778067",
+        "name": "Graz",
+        "asciiName": "Graz",
+        "latitude": 47.06733,
+        "longitude": 15.44197,
+        "featureCode": "PPLA",
+        "populationSourceValue": 303270,
+        "selectionBasis": "source-first-order-seat-role",
+        "presentationRole": "regional-representative-locality"
+      },
+      "economicEmergence": {
+        "authority": "shared-regional-national-multiplayer-economy",
+        "personalPlayerProgressionUnlock": false,
+        "numericThresholdsDefined": false,
+        "presentationState": "economy-system-governed"
+      }
+    },
+    {
+      "admin1Code": "07",
+      "regionName": "Tirol",
+      "regionSourceName": "Tyrol",
+      "regionAsciiName": "Tyrol",
+      "regionSourceRef": "geonames:2763586",
+      "representativeLocality": {
+        "localityId": "dropi:locality:geonames:2775220",
+        "sourceRef": "geonames:2775220",
+        "name": "Innsbruck",
+        "asciiName": "Innsbruck",
+        "latitude": 47.26266,
+        "longitude": 11.39454,
+        "featureCode": "PPLA",
+        "populationSourceValue": 132493,
+        "selectionBasis": "source-first-order-seat-role",
+        "presentationRole": "regional-representative-locality"
+      },
+      "economicEmergence": {
+        "authority": "shared-regional-national-multiplayer-economy",
+        "personalPlayerProgressionUnlock": false,
+        "numericThresholdsDefined": false,
+        "presentationState": "economy-system-governed"
+      }
+    },
+    {
+      "admin1Code": "08",
+      "regionName": "Vorarlberg",
+      "regionSourceName": "Vorarlberg",
+      "regionAsciiName": "Vorarlberg",
+      "regionSourceRef": "geonames:2762300",
+      "representativeLocality": {
+        "localityId": "dropi:locality:geonames:2781503",
+        "sourceRef": "geonames:2781503",
+        "name": "Bregenz",
+        "asciiName": "Bregenz",
+        "latitude": 47.50311,
+        "longitude": 9.7471,
+        "featureCode": "PPLA",
+        "populationSourceValue": 29806,
+        "selectionBasis": "source-first-order-seat-role",
+        "presentationRole": "regional-representative-locality"
+      },
+      "economicEmergence": {
+        "authority": "shared-regional-national-multiplayer-economy",
+        "personalPlayerProgressionUnlock": false,
+        "numericThresholdsDefined": false,
+        "presentationState": "economy-system-governed"
+      }
+    },
+    {
+      "admin1Code": "09",
+      "regionName": "Wien",
+      "regionSourceName": "Vienna",
+      "regionAsciiName": "Vienna",
+      "regionSourceRef": "geonames:2761367",
+      "representativeLocality": {
+        "localityId": "dropi:locality:geonames:2761369",
+        "sourceRef": "geonames:2761369",
+        "name": "Vienna",
+        "asciiName": "Vienna",
+        "latitude": 48.20849,
+        "longitude": 16.37208,
+        "featureCode": "PPLC",
+        "populationSourceValue": 1691468,
+        "selectionBasis": "source-first-order-seat-role",
+        "presentationRole": "national-capital-and-regional-node"
+      },
+      "economicEmergence": {
+        "authority": "shared-regional-national-multiplayer-economy",
+        "personalPlayerProgressionUnlock": false,
+        "numericThresholdsDefined": false,
+        "presentationState": "economy-system-governed"
+      }
+    }
+  ]
+}
