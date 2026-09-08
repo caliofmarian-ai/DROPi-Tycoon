@@ -179,3 +179,7 @@ Benin, Burundi and Côte d’Ivoire use the governed locality-role override regi
 ## Bolivia capital-role correction — #472
 
 Bolivia is governed as a multi-role capital case: Sucre is the constitutional/national capital and La Paz remains the principal government seat and executive/legislative centre. Both localities remain Natural Earth-backed; the role override contains no manual coordinates.
+
+## Jerusalem final-status model — #467 #468
+
+Israel and Palestine share one neutral Jerusalem semantic model. Israel’s source-backed Jerusalem marker records the capital/institutional role established by Israeli law while the status layer preserves the current United Nations final-status context. Palestine uses Ramallah as the source-backed sparse structural slot and Gaza as a retained urban node; East Jerusalem is represented in semantic metadata as the State of Palestine capital designation without fabricating or duplicating a locality marker where the pinned source does not safely assign it to geometry `275`. Structural map roles never settle sovereignty.

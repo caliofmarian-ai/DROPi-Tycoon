@@ -1,5 +1,5 @@
 {
-  "version": "1.7.0",
+  "version": "1.8.0",
   "reviewedOn": "2026-09-08",
   "purpose": "Player-facing semantic metadata for country and territory cases where a single generic capital label or geographic rendering could misstate political, constitutional, administrative or recognition reality.",
   "governance": {
@@ -203,6 +203,43 @@
       "publishedOn": "2022-05-01",
       "accessedOn": "2026-09-08",
       "note": "The legislative institutional history identifies La Paz as Bolivia’s political centre, locating the Executive and Legislative branches and the President’s residence there, while Sucre is the capital and judicial seat."
+    },
+    "israel-knesset-jerusalem-basic-law": {
+      "publisher": "Knesset",
+      "title": "Basic Laws of the State of Israel — Basic-Law: Jerusalem, the Capital of Israel",
+      "url": "https://main.knesset.gov.il/en/activity/pages/basiclaws.aspx",
+      "accessedOn": "2026-09-08",
+      "note": "The Knesset states that Israeli Basic Law establishes Jerusalem as Israel’s capital and the seat of the President, Knesset, Government and Supreme Court."
+    },
+    "un-sg-jerusalem-two-state-2026": {
+      "publisher": "United Nations Secretary-General",
+      "title": "Implementation of Security Council resolution 2334 (2016) — Report of the Secretary-General",
+      "url": "https://www.un.org/unispal/document/sg-report-24jun26/",
+      "publishedOn": "2026-06-24",
+      "accessedOn": "2026-09-08",
+      "note": "The Secretary-General reiterates the UN two-State vision based on pre-1967 lines with Jerusalem as the capital of both States, and the report treats East Jerusalem as part of the Palestinian territory occupied since 1967."
+    },
+    "un-palestine-undata-capital": {
+      "publisher": "United Nations Statistics Division",
+      "title": "UNData country profile — State of Palestine",
+      "url": "https://data.un.org/CountryProfile.aspx?crName=State%20of%20Palestine",
+      "accessedOn": "2026-09-08",
+      "note": "UNData lists East Jerusalem as the capital city designation provided by the State of Palestine and explicitly notes that the United Nations position on Jerusalem is governed by relevant General Assembly and Security Council resolutions."
+    },
+    "palestine-basic-law-jerusalem": {
+      "publisher": "Palestinian Official Gazette / Bureau of Legal Opinion and Legislation",
+      "title": "Amended Basic Law",
+      "url": "https://mjr.ogb.gov.ps/Decrees/ViewText/26625/",
+      "accessedOn": "2026-09-08",
+      "note": "Article 3 of the Palestinian Basic Law states that Jerusalem is the capital of Palestine."
+    },
+    "palestine-cabinet-headquarters": {
+      "publisher": "Palestinian Official Gazette / Bureau of Legal Opinion and Legislation",
+      "title": "Council of Ministers Decision No. 21 of 2020 on the Prime Ministry system",
+      "url": "https://mjr.ogb.gov.ps/Decrees/ViewText/31874/",
+      "publishedOn": "2020-10-26",
+      "accessedOn": "2026-09-08",
+      "note": "Article 2 establishes the principal Council of Ministers headquarters in Jerusalem and temporary headquarters in Ramallah and Gaza; the decision was issued in Ramallah."
     }
   },
   "entries": {
@@ -525,6 +562,71 @@
         "bolivia-oep-constitution",
         "bolivia-deputies-sucre-capital",
         "bolivia-legislative-government-seat"
+      ]
+    },
+    "376": {
+      "issue": 467,
+      "renderedName": "Israel",
+      "statusLabel": "Jerusalem capital / final-status sensitive case",
+      "statusSummary": "Israeli Basic Law defines Jerusalem as Israel’s capital and seat of its principal state institutions. The United Nations continues to treat East Jerusalem as occupied Palestinian territory and supports a negotiated two-State outcome with Jerusalem as the capital of both States. DROPi records the Israeli institutional role without asserting a unilateral settlement of Jerusalem’s final territorial status.",
+      "territoryStatus": {
+        "classification": "jerusalem-final-status-sensitive",
+        "label": "Jerusalem final-status sensitive geography",
+        "finalStatusResolved": false,
+        "note": "The structural locality role is not a DROPi sovereignty determination."
+      },
+      "placeRoles": [
+        {
+          "locality": "Jerusalem",
+          "role": "israeli-law-capital-institutional-seat",
+          "label": "Capital under Israeli law / seat of state institutions",
+          "note": "This label records Israel’s domestic legal and institutional role while the status summary preserves the UN final-status context."
+        },
+        {
+          "locality": "Tel Aviv-Yafo",
+          "role": "economic-metropolitan-centre",
+          "label": "Major economic / metropolitan centre"
+        }
+      ],
+      "sourceRefs": [
+        "israel-knesset-jerusalem-basic-law",
+        "un-sg-jerusalem-two-state-2026"
+      ]
+    },
+    "275": {
+      "issue": 468,
+      "renderedName": "Palestine",
+      "statusLabel": "East Jerusalem capital designation / final-status sensitive case",
+      "statusSummary": "Palestinian law identifies Jerusalem as the capital of Palestine, and UNData records East Jerusalem as the capital designation provided by the State of Palestine while noting the separate United Nations position on Jerusalem. Palestinian regulations provide temporary Council of Ministers headquarters in Ramallah and Gaza. DROPi represents these roles without asserting a unilateral settlement of Jerusalem’s final territorial status.",
+      "territoryStatus": {
+        "classification": "east-jerusalem-final-status-sensitive",
+        "label": "East Jerusalem final-status sensitive geography",
+        "finalStatusResolved": false,
+        "note": "The East Jerusalem role is semantic/status metadata and is not fabricated as a locality marker where the pinned country-locality source does not safely assign it to geometry 275."
+      },
+      "placeRoles": [
+        {
+          "locality": "East Jerusalem",
+          "role": "palestinian-capital-designation",
+          "label": "Capital designated by State of Palestine / status sensitive",
+          "note": "Semantic role only; DROPi does not fabricate a duplicate marker for East Jerusalem."
+        },
+        {
+          "locality": "Ramallah",
+          "role": "temporary-government-administrative-seat",
+          "label": "Temporary government / administrative seat"
+        },
+        {
+          "locality": "Gaza",
+          "role": "major-urban-centre",
+          "label": "Major urban centre"
+        }
+      ],
+      "sourceRefs": [
+        "un-palestine-undata-capital",
+        "palestine-basic-law-jerusalem",
+        "palestine-cabinet-headquarters",
+        "un-sg-jerusalem-two-state-2026"
       ]
     }
   }
