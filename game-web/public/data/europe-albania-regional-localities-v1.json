@@ -1,0 +1,363 @@
+{
+  "version": "1.0.0",
+  "issue": 512,
+  "continent": "Europe",
+  "country": {
+    "geometryId": "008",
+    "sourceCountryCode": "AL",
+    "renderedName": "Albania"
+  },
+  "administrativeModel": {
+    "level": "first-order",
+    "nativeTermSingular": "qark",
+    "nativeTermPlural": "qarqe",
+    "englishTerm": "county",
+    "unitCount": 12,
+    "officialReferences": [
+      "https://www.instat.gov.al/en/documentation/classifications/version/?verId=3488",
+      "https://www.instat.gov.al/en/documentation/classifications/version/level/?levId=3840"
+    ]
+  },
+  "source": {
+    "provider": "GeoNames",
+    "license": "Creative Commons Attribution 4.0",
+    "releaseTag": "source-geonames-cities500-2026-09-08-f3cda4f9",
+    "cities500Sha256": "f3cda4f9d256d90045121fb8eebad3ed91695c32370ed93b50fbe0cb616e2bbd",
+    "admin1Sha256": "590651498043f674accda2b7f46d21286cda0e290b02f8561c5005eee9a5448c",
+    "expectedCountryCandidateCount": 419,
+    "publishedGameplayRepresentativeCount": 12
+  },
+  "selectionModel": {
+    "primaryFeatureCodes": [
+      "PPLC",
+      "PPLA"
+    ],
+    "fallbackFeatureCodes": [
+      "PPLA2"
+    ],
+    "expectedPrimarySelections": 12,
+    "expectedFallbackSelections": 0,
+    "highDensityGameplayImport": false,
+    "hardcodedCoordinates": false,
+    "rule": "One source-backed representative locality per governed first-order region; retained high-density source remains reference-only."
+  },
+  "developmentModel": {
+    "authority": "shared-regional-national-multiplayer-economy",
+    "personalPlayerProgressionUnlock": false,
+    "numericThresholdsDefined": false,
+    "signalsPlanned": [
+      "company-activity",
+      "employment-demand",
+      "production",
+      "logistics-throughput",
+      "construction-investment",
+      "transport-connectivity",
+      "trade-volume",
+      "population-economic-simulation",
+      "regional-national-policy"
+    ],
+    "rule": "Representative locality prominence and development are shared-world economic outcomes, not personal progression rewards."
+  },
+  "units": [
+    {
+      "admin1Code": "40",
+      "regionName": "Berat",
+      "regionSourceName": "Berat County",
+      "regionAsciiName": "Berat County",
+      "regionSourceRef": "geonames:865730",
+      "representativeLocality": {
+        "localityId": "dropi:locality:geonames:3186084",
+        "sourceRef": "geonames:3186084",
+        "name": "Berat",
+        "asciiName": "Berat",
+        "latitude": 40.70583,
+        "longitude": 19.95222,
+        "featureCode": "PPLA",
+        "populationSourceValue": 62232,
+        "selectionBasis": "source-first-order-seat-role",
+        "presentationRole": "regional-representative-locality"
+      },
+      "economicEmergence": {
+        "authority": "shared-regional-national-multiplayer-economy",
+        "personalPlayerProgressionUnlock": false,
+        "numericThresholdsDefined": false,
+        "presentationState": "economy-system-governed"
+      }
+    },
+    {
+      "admin1Code": "41",
+      "regionName": "Dibër",
+      "regionSourceName": "Dibër County",
+      "regionAsciiName": "Diber County",
+      "regionSourceRef": "geonames:865731",
+      "representativeLocality": {
+        "localityId": "dropi:locality:geonames:782061",
+        "sourceRef": "geonames:782061",
+        "name": "Peshkopi",
+        "asciiName": "Peshkopi",
+        "latitude": 41.685,
+        "longitude": 20.42858,
+        "featureCode": "PPLA",
+        "populationSourceValue": 14710,
+        "selectionBasis": "source-first-order-seat-role",
+        "presentationRole": "regional-representative-locality"
+      },
+      "economicEmergence": {
+        "authority": "shared-regional-national-multiplayer-economy",
+        "personalPlayerProgressionUnlock": false,
+        "numericThresholdsDefined": false,
+        "presentationState": "economy-system-governed"
+      }
+    },
+    {
+      "admin1Code": "42",
+      "regionName": "Durrës",
+      "regionSourceName": "Durrës County",
+      "regionAsciiName": "Durres County",
+      "regionSourceRef": "geonames:3344947",
+      "representativeLocality": {
+        "localityId": "dropi:locality:geonames:3185728",
+        "sourceRef": "geonames:3185728",
+        "name": "Durrës",
+        "asciiName": "Durres",
+        "latitude": 41.32355,
+        "longitude": 19.45469,
+        "featureCode": "PPLA",
+        "populationSourceValue": 195920,
+        "selectionBasis": "source-first-order-seat-role",
+        "presentationRole": "regional-representative-locality"
+      },
+      "economicEmergence": {
+        "authority": "shared-regional-national-multiplayer-economy",
+        "personalPlayerProgressionUnlock": false,
+        "numericThresholdsDefined": false,
+        "presentationState": "economy-system-governed"
+      }
+    },
+    {
+      "admin1Code": "43",
+      "regionName": "Elbasan",
+      "regionSourceName": "Elbasan County",
+      "regionAsciiName": "Elbasan County",
+      "regionSourceRef": "geonames:865732",
+      "representativeLocality": {
+        "localityId": "dropi:locality:geonames:783263",
+        "sourceRef": "geonames:783263",
+        "name": "Elbasan",
+        "asciiName": "Elbasan",
+        "latitude": 41.11138,
+        "longitude": 20.08224,
+        "featureCode": "PPLA",
+        "populationSourceValue": 100903,
+        "selectionBasis": "source-first-order-seat-role",
+        "presentationRole": "regional-representative-locality"
+      },
+      "economicEmergence": {
+        "authority": "shared-regional-national-multiplayer-economy",
+        "personalPlayerProgressionUnlock": false,
+        "numericThresholdsDefined": false,
+        "presentationState": "economy-system-governed"
+      }
+    },
+    {
+      "admin1Code": "44",
+      "regionName": "Fier",
+      "regionSourceName": "Fier County",
+      "regionAsciiName": "Fier County",
+      "regionSourceRef": "geonames:3344948",
+      "representativeLocality": {
+        "localityId": "dropi:locality:geonames:3185672",
+        "sourceRef": "geonames:3185672",
+        "name": "Fier",
+        "asciiName": "Fier",
+        "latitude": 40.7251,
+        "longitude": 19.55823,
+        "featureCode": "PPLA",
+        "populationSourceValue": 56297,
+        "selectionBasis": "source-first-order-seat-role",
+        "presentationRole": "regional-representative-locality"
+      },
+      "economicEmergence": {
+        "authority": "shared-regional-national-multiplayer-economy",
+        "personalPlayerProgressionUnlock": false,
+        "numericThresholdsDefined": false,
+        "presentationState": "economy-system-governed"
+      }
+    },
+    {
+      "admin1Code": "45",
+      "regionName": "Gjirokastër",
+      "regionSourceName": "Gjirokastër County",
+      "regionAsciiName": "Gjirokaster County",
+      "regionSourceRef": "geonames:865733",
+      "representativeLocality": {
+        "localityId": "dropi:locality:geonames:783148",
+        "sourceRef": "geonames:783148",
+        "name": "Gjirokastër",
+        "asciiName": "Gjirokaster",
+        "latitude": 40.07583,
+        "longitude": 20.13889,
+        "featureCode": "PPLA",
+        "populationSourceValue": 23437,
+        "selectionBasis": "source-first-order-seat-role",
+        "presentationRole": "regional-representative-locality"
+      },
+      "economicEmergence": {
+        "authority": "shared-regional-national-multiplayer-economy",
+        "personalPlayerProgressionUnlock": false,
+        "numericThresholdsDefined": false,
+        "presentationState": "economy-system-governed"
+      }
+    },
+    {
+      "admin1Code": "46",
+      "regionName": "Korçë",
+      "regionSourceName": "Korçë County",
+      "regionAsciiName": "Korce County",
+      "regionSourceRef": "geonames:865734",
+      "representativeLocality": {
+        "localityId": "dropi:locality:geonames:782756",
+        "sourceRef": "geonames:782756",
+        "name": "Korçë",
+        "asciiName": "Korce",
+        "latitude": 40.61861,
+        "longitude": 20.78083,
+        "featureCode": "PPLA",
+        "populationSourceValue": 58259,
+        "selectionBasis": "source-first-order-seat-role",
+        "presentationRole": "regional-representative-locality"
+      },
+      "economicEmergence": {
+        "authority": "shared-regional-national-multiplayer-economy",
+        "personalPlayerProgressionUnlock": false,
+        "numericThresholdsDefined": false,
+        "presentationState": "economy-system-governed"
+      }
+    },
+    {
+      "admin1Code": "47",
+      "regionName": "Kukës",
+      "regionSourceName": "Kukës County",
+      "regionAsciiName": "Kukes County",
+      "regionSourceRef": "geonames:865735",
+      "representativeLocality": {
+        "localityId": "dropi:locality:geonames:782661",
+        "sourceRef": "geonames:782661",
+        "name": "Kukës",
+        "asciiName": "Kukes",
+        "latitude": 42.07694,
+        "longitude": 20.42194,
+        "featureCode": "PPLA",
+        "populationSourceValue": 36125,
+        "selectionBasis": "source-first-order-seat-role",
+        "presentationRole": "regional-representative-locality"
+      },
+      "economicEmergence": {
+        "authority": "shared-regional-national-multiplayer-economy",
+        "personalPlayerProgressionUnlock": false,
+        "numericThresholdsDefined": false,
+        "presentationState": "economy-system-governed"
+      }
+    },
+    {
+      "admin1Code": "48",
+      "regionName": "Lezhë",
+      "regionSourceName": "Lezhë County",
+      "regionAsciiName": "Lezhe County",
+      "regionSourceRef": "geonames:3344949",
+      "representativeLocality": {
+        "localityId": "dropi:locality:geonames:3184935",
+        "sourceRef": "geonames:3184935",
+        "name": "Lezhë",
+        "asciiName": "Lezhe",
+        "latitude": 41.78361,
+        "longitude": 19.64361,
+        "featureCode": "PPLA",
+        "populationSourceValue": 18695,
+        "selectionBasis": "source-first-order-seat-role",
+        "presentationRole": "regional-representative-locality"
+      },
+      "economicEmergence": {
+        "authority": "shared-regional-national-multiplayer-economy",
+        "personalPlayerProgressionUnlock": false,
+        "numericThresholdsDefined": false,
+        "presentationState": "economy-system-governed"
+      }
+    },
+    {
+      "admin1Code": "49",
+      "regionName": "Shkodër",
+      "regionSourceName": "Shkodër County",
+      "regionAsciiName": "Shkoder County",
+      "regionSourceRef": "geonames:3344950",
+      "representativeLocality": {
+        "localityId": "dropi:locality:geonames:3184081",
+        "sourceRef": "geonames:3184081",
+        "name": "Shkodër",
+        "asciiName": "Shkoder",
+        "latitude": 42.06828,
+        "longitude": 19.51258,
+        "featureCode": "PPLA",
+        "populationSourceValue": 95553,
+        "selectionBasis": "source-first-order-seat-role",
+        "presentationRole": "regional-representative-locality"
+      },
+      "economicEmergence": {
+        "authority": "shared-regional-national-multiplayer-economy",
+        "personalPlayerProgressionUnlock": false,
+        "numericThresholdsDefined": false,
+        "presentationState": "economy-system-governed"
+      }
+    },
+    {
+      "admin1Code": "50",
+      "regionName": "Tiranë",
+      "regionSourceName": "Tirana",
+      "regionAsciiName": "Tirana",
+      "regionSourceRef": "geonames:3344951",
+      "representativeLocality": {
+        "localityId": "dropi:locality:geonames:3183875",
+        "sourceRef": "geonames:3183875",
+        "name": "Tirana",
+        "asciiName": "Tirana",
+        "latitude": 41.32744,
+        "longitude": 19.81866,
+        "featureCode": "PPLC",
+        "populationSourceValue": 418495,
+        "selectionBasis": "source-first-order-seat-role",
+        "presentationRole": "national-capital-and-regional-node"
+      },
+      "economicEmergence": {
+        "authority": "shared-regional-national-multiplayer-economy",
+        "personalPlayerProgressionUnlock": false,
+        "numericThresholdsDefined": false,
+        "presentationState": "economy-system-governed"
+      }
+    },
+    {
+      "admin1Code": "51",
+      "regionName": "Vlorë",
+      "regionSourceName": "Vlorë County",
+      "regionAsciiName": "Vlore County",
+      "regionSourceRef": "geonames:3344952",
+      "representativeLocality": {
+        "localityId": "dropi:locality:geonames:3183719",
+        "sourceRef": "geonames:3183719",
+        "name": "Vlorë",
+        "asciiName": "Vlore",
+        "latitude": 40.4696,
+        "longitude": 19.48379,
+        "featureCode": "PPLA",
+        "populationSourceValue": 115261,
+        "selectionBasis": "source-first-order-seat-role",
+        "presentationRole": "regional-representative-locality"
+      },
+      "economicEmergence": {
+        "authority": "shared-regional-national-multiplayer-economy",
+        "personalPlayerProgressionUnlock": false,
+        "numericThresholdsDefined": false,
+        "presentationState": "economy-system-governed"
+      }
+    }
+  ]
+}
