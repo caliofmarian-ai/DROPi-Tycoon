@@ -8,7 +8,9 @@ import {
 } from '../src/ui/UrbanHUD'
 import { WORLD_HEIGHT, WORLD_WIDTH, WORLD_ZONES, WORLD_CITY_NAME } from '../src/world/worldLayout'
 import { CAMERA_MAX_ZOOM, CAMERA_MIN_ZOOM } from '../src/ui/cameraControls'
-import { UrbanZoomGesture, urbanZoomStep } from '../src/ui/urbanZoom'
+import {
+  URBAN_PINCH_MAX_STEP_RATIO, URBAN_PINCH_MIN_STEP_RATIO, UrbanZoomGesture, urbanZoomStep,
+} from '../src/ui/urbanZoom'
 import { minimapPoint } from '../src/world/urbanWorld'
 
 describe('living city screen-space navigation', () => {
@@ -125,8 +127,21 @@ describe('bounded world-only pinch and accessible zoom buttons', () => {
     gesture.press(2, { x: 100, y: 0 })
     expect(gesture.isPinching()).toBe(true)
     expect(gesture.move(2, { x: 150, y: 0 }, 1)).toBe(1.5)
-    expect(gesture.move(2, { x: 1000, y: 0 }, 1.5)).toBe(CAMERA_MAX_ZOOM)
-    expect(gesture.move(2, { x: 30, y: 0 }, CAMERA_MAX_ZOOM)).toBe(CAMERA_MIN_ZOOM)
+    expect(gesture.move(2, { x: 1000, y: 0 }, 1.5)).toBeCloseTo(1.5 * URBAN_PINCH_MAX_STEP_RATIO)
+    expect(gesture.move(2, { x: 30, y: 0 }, 1.5 * URBAN_PINCH_MAX_STEP_RATIO))
+      .toBeCloseTo(1.5 * URBAN_PINCH_MAX_STEP_RATIO * URBAN_PINCH_MIN_STEP_RATIO)
+  })
+
+  it('damps implausible per-event touch jumps instead of snapping to a zoom boundary', () => {
+    const gesture = new UrbanZoomGesture()
+    gesture.press(1, { x: 0, y: 0 })
+    gesture.press(2, { x: 100, y: 0 })
+    const outward = gesture.move(2, { x: 1000, y: 0 }, 1)
+    expect(outward).toBe(URBAN_PINCH_MAX_STEP_RATIO)
+    expect(outward).toBeLessThan(CAMERA_MAX_ZOOM)
+    const inward = gesture.move(2, { x: 25, y: 0 }, outward)
+    expect(inward).toBeCloseTo(outward * URBAN_PINCH_MIN_STEP_RATIO)
+    expect(inward).toBeGreaterThan(CAMERA_MIN_ZOOM)
   })
 
   it('does not let a control-owned, released, or third pointer change zoom', () => {
