@@ -5,7 +5,7 @@
     "204": {"issue": 456, "reason": "capital-role semantics: Porto-Novo is the political/national capital while Cotonou hosts major government and economic functions"},
     "108": {"issue": 457, "reason": "capital-role semantics: Gitega is the political capital and Bujumbura is the economic capital"},
     "384": {"issue": 458, "reason": "capital-role semantics: Yamoussoukro is the political/administrative capital while Abidjan is the dominant economic/metropolitan centre"},
-    "226": {"issue": 459, "reason": "current-reality override required: Ciudad de la Paz was declared capital on 2026-01-02 after the pinned source snapshot"},
+    "226": {"issue": 459, "reason": "2026 capital override implemented with authoritative locality supplement; owner Android Country Layer acceptance pending"},
     "710": {"issue": 460, "reason": "multi-capital semantics required: Pretoria administrative, Cape Town legislative, Bloemfontein judicial; Johannesburg is not the sole national capital"},
     "834": {"issue": 461, "reason": "capital-role semantics: Dodoma is the national capital while Dar es Salaam remains a major economic/port metropolis"},
     "732": {"issue": 462, "reason": "territory-status semantics required: Western Sahara remains a disputed Non-Self-Governing Territory and must not be reduced to an uncontested single-capital claim"},

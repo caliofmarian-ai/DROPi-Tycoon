@@ -8,7 +8,7 @@ Parent: #446
 
 - rendered topology geometries: **177**
 - chapter entries: **177**
-- representative locality nodes: **1355**
+- representative locality nodes: **1356**
 - PASS: **157**
 - REVIEW: **18**
 - GAP: **2**
@@ -19,7 +19,7 @@ Parent: #446
 
 | Chapter | Geometries | Nodes | PASS | REVIEW | GAP |
 |---|---:|---:|---:|---:|---:|
-| Africa | 51 | 423 | 43 | 8 | 0 |
+| Africa | 51 | 424 | 43 | 8 | 0 |
 | Asia | 47 | 356 | 41 | 5 | 1 |
 | Europe | 39 | 294 | 38 | 1 | 0 |
 | North America | 18 | 133 | 18 | 0 | 0 |
