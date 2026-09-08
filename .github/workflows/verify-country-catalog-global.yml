@@ -12,6 +12,7 @@ on:
       - 'game-web/public/data/europe-albania-regional-localities-v1.json'
       - 'game-web/public/data/europe-austria-regional-localities-v1.json'
       - 'game-web/public/data/europe-belarus-regional-localities-v1.json'
+      - 'game-web/public/data/europe-belgium-regional-localities-v1.json'
       - 'scripts/verify_country_catalog_chapters.py'
       - 'scripts/verify_expanded_locality_catalog.py'
       - 'scripts/verify_romania_regional_localities.py'
@@ -28,6 +29,7 @@ on:
       - 'game-web/public/data/europe-albania-regional-localities-v1.json'
       - 'game-web/public/data/europe-austria-regional-localities-v1.json'
       - 'game-web/public/data/europe-belarus-regional-localities-v1.json'
+      - 'game-web/public/data/europe-belgium-regional-localities-v1.json'
       - 'scripts/verify_country_catalog_chapters.py'
       - 'scripts/verify_expanded_locality_catalog.py'
       - 'scripts/verify_romania_regional_localities.py'
@@ -57,4 +59,7 @@ jobs:
           python scripts/verify_representative_regional_localities.py \
             --config 04_World/Country_Catalog/Continents/Europe/BELARUS_REGIONAL_CONFIG.json \
             --data game-web/public/data/europe-belarus-regional-localities-v1.json
+          python scripts/verify_representative_regional_localities.py \
+            --config 04_World/Country_Catalog/Continents/Europe/BELGIUM_REGIONAL_CONFIG.json \
+            --data game-web/public/data/europe-belgium-regional-localities-v1.json
           git diff --check
