@@ -2,7 +2,7 @@
 
 Document: DOCUMENT_INDEX.md
 Project: DROPi Tycoon
-Version: 2.2.1
+Version: 2.3.0
 Status: Documentation Control
 Author: Marian Caliof & OpenAI
 Language: English
@@ -85,7 +85,7 @@ Strategic design authority, project identity, governance, architecture decisions
 - `00_Project/BUSINESS_DESIGN.md` — Level 3 Business Design Authority: organizations, workforce, competition, ownership/governance, productive assets, and business/infrastructure relationships.
 - `00_Project/LOGISTICS_DESIGN.md` — Level 4 Logistics Design Authority: demand/cargo/custody, multimodal transport, hubs, qualifications, capacity, and local-to-global logistics.
 - `00_Project/PHASE1_GAME_ARCHITECTURE_DECISION_BASELINE.md` — owner-approved Phase-1 architecture baseline produced from Game Logic Research #423 and approval gate #434. It binds player/world identity, employment/membership, travel, insolvency/offline life, staged currency/banking/public-economy direction, productive/infrastructure ownership, persistent multiplayer continuity, and the Phase-1 playability direction.
-- `00_Project/ROADMAP.md` — canonical strategic development order.
+- `00_Project/ROADMAP.md` — canonical strategic development order; v4 maps the approved Phase-1 architecture into causal implementation waves.
 
 ## Other Stable Project Documents
 
@@ -345,15 +345,16 @@ Rules:
 
 ## Managed Planning Directory
 
-- `09_Development/Planning/` — planning-canonical milestone/epic/batch/issue architecture.
+- `09_Development/Planning/` — planning-canonical milestone/epic/batch/issue architecture and current causal execution crosswalk.
 
 Stable planning documents:
 
 - `09_Development/Planning/MILESTONE_ARCHITECTURE.md`
 - `09_Development/Planning/EPIC_CATALOG.md`
 - `09_Development/Planning/BATCH_ARCHITECTURE.md`
-- `09_Development/Planning/ISSUE_CATALOG.md`
-- `09_Development/Planning/DEPENDENCY_GRAPH.md`
+- `09_Development/Planning/ISSUE_CATALOG.md` — historical/current catalog identities; old execution status/order does not override Roadmap v4.
+- `09_Development/Planning/DEPENDENCY_GRAPH.md` — v2 current causal graph plus preserved legacy graph.
+- `09_Development/Planning/PHASE1_IMPLEMENTATION_SEQUENCE.md` — canonical execution crosswalk from approved Phase-1 architecture to active implementation tracks/issues.
 - `09_Development/Planning/LABEL_TAXONOMY.md`
 - `09_Development/Planning/GITHUB_CREATION_PLAN.md`
 - `09_Development/Planning/github_creation_plan.yaml`
@@ -375,7 +376,7 @@ These documents cannot override current mobile-first or shared-authority canon.
 ## Managed Owner Directives Directory
 
 - `09_Development/Owner_Directives/` — binding owner input requiring deliberate canonical integration.
-- `09_Development/Owner_Directives/2026-09-08_MASTER_OWNER_DIRECTIVE_005_PHASE1_GAME_ARCHITECTURE_APPROVAL.md` — records approval of the complete Phase-1 architecture package and authorizes this reconciliation.
+- `09_Development/Owner_Directives/2026-09-08_MASTER_OWNER_DIRECTIVE_005_PHASE1_GAME_ARCHITECTURE_APPROVAL.md` — records approval of the complete Phase-1 architecture package and authorizes its reconciliation.
 
 Governance source: `09_Development/Owner_Directives/README.md`.
 
@@ -513,7 +514,8 @@ Evidence does not create new product truth by itself.
 7. **Recency alone does not create authority.**
 8. **Research/reports are evidence only.**
 9. **Implementation is not canon by accident.** Existing runtime remains legacy compatibility where it conflicts with approved future architecture until a dedicated migration PR changes behavior.
-10. **Real DROPi remains separate.** Tycoon canon cannot redefine the real DROPi product.
+10. **Current Roadmap/planning crosswalk controls execution order.** Historical ISSUE/M/E/RBATCH status or numeric order does not outrank newer approved planning.
+11. **Real DROPi remains separate.** Tycoon canon cannot redefine the real DROPi product.
 
 ---
 
