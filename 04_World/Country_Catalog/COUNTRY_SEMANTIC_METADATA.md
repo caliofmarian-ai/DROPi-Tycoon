@@ -2,7 +2,7 @@
 
 Status: Canonical runtime semantics contract for country and territory presentation.
 
-Coordinates: #418 #459 #460 #464 #465 #466 #473 #478 #481 #482
+Coordinates: #418 #459 #460 #461 #464 #465 #466 #473 #478 #481 #482
 
 Runtime data: `game-web/public/data/country-semantic-metadata-v1.json`
 
@@ -90,6 +90,14 @@ Player-facing semantics are authoritative over the structural slot:
 - Johannesburg — `Major city / Constitutional Court`.
 
 Johannesburg must never be described as South Africa's sole national capital simply because Natural Earth marks it with a capital-class feature. Likewise, Cape Town and Bloemfontein must not disappear from the sparse Country Layer merely because only one structural `capital` slot exists.
+
+### Tanzania (`834`) — #461
+
+The Dodoma Capital City (Declaration) Act, 2018 establishes Dodoma as the Capital City of the United Republic of Tanzania. Tanzania's official diplomatic country profile likewise identifies Dodoma as the capital city while describing Dar es Salaam as the commercial capital and major seaport for Tanzania Mainland.
+
+Both localities resolve uniquely in the pinned Natural Earth source. The governed override therefore assigns Dodoma the structural `capital` slot and forces Dar es Salaam to remain in the <=9 sparse representative-node budget without adding or moving coordinates. Player-facing semantic metadata labels Dodoma `National capital` and Dar es Salaam `Commercial capital / major seaport`.
+
+This correction is geographic/semantic only. It must not be interpreted as activating, relocating or otherwise changing DROPi logistics, port, route or economy simulation.
 
 ## Role-override registry contract
 

@@ -50,7 +50,7 @@ describe('South Africa three-capital semantics #460', () => {
   it('governs Pretoria and retains all three other required national cities without coordinates in the override', () => {
     const override = roleOverrideRegistry.entries['710']
 
-    expect(roleOverrideRegistry.version).toBe('1.2.0')
+    expect(roleOverrideRegistry.version).toBe('1.3.0')
     expect(override.issue).toBe(460)
     expect(override.currentCapital).toEqual({
       sourceNames: ['Pretoria'],
@@ -69,7 +69,7 @@ describe('South Africa three-capital semantics #460', () => {
     const nodes = localityCatalog.countries['710'] ?? []
     const byName = Object.fromEntries(nodes.map(node => [node.name, node]))
 
-    expect(localityCatalog.version).toBe('1.5.0')
+    expect(localityCatalog.version).toBe('1.6.0')
     expect(localityCatalog.localityRoleOverrides?.registryVersion).toBe('1.2.0')
     expect(localityCatalog.localityRoleOverrides?.countryIds).toContain('710')
     expect(nodes.length).toBeLessThanOrEqual(9)
@@ -94,7 +94,7 @@ describe('South Africa three-capital semantics #460', () => {
     const entry = semanticCatalog.entries['710']
     const source = semanticCatalog.sources['south-africa-government-capitals']
 
-    expect(semanticCatalog.version).toBe('1.3.0')
+    expect(semanticCatalog.version).toBe('1.4.0')
     expect(entry.issue).toBe(460)
     expect(entry.statusLabel).toBe('Three national capital functions')
     expect(entry.statusSummary).toContain('Pretoria is the administrative capital')
