@@ -2,396 +2,423 @@
 
 Document: GAMEPLAY.md
 Project: DROPi Tycoon
-Version: 1.0.0
-Status: Canonical
+Version: 2.0.0
+Status: Canonical — Gameplay Specialization
 Author: Marian Caliof & OpenAI
 Language: English
-Last Updated: 2026-07-12
+Last Updated: 2026-09-08
 
 ---
 
 # Gameplay Design
 
-## Urban RPG direction — owner decision, 2026-09-05
-
-The active gameplay direction is Urban RPG + Business Tycoon + Local Marketplace
-+ Multimodal Logistics + Future Drone Network Simulation. The player is a person,
-not a map cursor. Free-map straight-line terrestrial traversal is deprecated.
-Phaser 3 + TypeScript + Vite in `game-web/` remains authoritative; the installed
-Expo/React Native Android landscape shell hosts it, rather than reimplementing it.
-
-The first neighborhood supports direct directional movement, collision, a follow
-camera, minimap, physical HQ, merchant onboarding, parcel pickup and delivery.
-Walking and an owned bicycle are embodied transport choices. Progression extends
-to scooter/motorcycle, car, van, then separately operated drones. A transport
-profile includes range, capacity, operating cost and eligible mission modes, not
-merely speed. Larger transport and multi-stop workflows remain foundations.
-
-The HQ is one evolving facility: local office and parcel staging first, then
-administration, marketplace coordination, employees, sorting, terrestrial dispatch,
-maintenance, batteries, charging, lockers and drone launch/recovery. Future
-employees are assigned to physical activity locations. A locked expansion marker
-communicates this future without implying that drone operations are playable.
-
-### Source authority and transformation
-
-REAL DROPi CONCEPT → GENERIC SIMULATION MODEL → TYCOON GAMEPLAY ABSTRACTION.
-The real ecosystem remains authoritative in `caliofmarian-ai/dropi-mobile`.
-Runtime code, backend integration and production schemas are not imported.
-Primary sources outrank derived blueprints; roadmap entries are not deployed facts.
-
-Textual sources inspected for this sprint in `caliofmarian-ai/dropi-mobile`:
-
-- `DROPi_Canonical_Reference/README_FOR_DROPi_TYCOON.md`
-- `DROPi_Canonical_Reference/CANONICAL_KNOWLEDGE_INDEX.md`
-- `DROPi_Canonical_Reference/CANONICAL_MANIFEST.md` (relevant authority entries)
-- `DROPi_Canonical_Reference/03_Logistics/Delivery/DELIVERY_MULTIMODAL.md`
-- `DROPi_Canonical_Reference/02_Architecture/Historical_Archive/SYSTEM_ARCHITECTURE.md`
-- `DROPi_Canonical_Reference/02_Architecture/Blueprint/DROPi_6_LAYERS_EXPLAINED.md`
-- `DROPi_Canonical_Reference/01_Vision/Recovered_04_ZIP/02_VOLUME_I_STRATEGY/Cap_03_Solution_Overview.md`
-- `canonical-structure.md`
-- `app/(tabs)/droneport.tsx`
-- `shared/types.ts`
-- `docs/audits/can-004/canonical_authority_matrix.md` — DronePorts authority section
-- `docs/planning/IMPLEMENTATION_COVERAGE_AUDIT.md`
-- `BLUEPRINT/DROPi_ROADMAP_BY_LAYERS.md` (physical-core planning sections)
-
-**REAL DROPi FACTS USED:** multimodal delivery includes terrestrial modes and
-merchant → DronePort → client transfers. The multimodal reference defines
-DronePorts as consolidation points, logistics buffers and transfer hubs;
-failed drone reception triggers fallback. Marketplace listings do not guarantee
-drone delivery. App orchestration is distinct from marketplace requests.
-The textual CAN-004 authority matrix's DronePorts section explicitly states:
-"Defines fixed and mobile DronePort roles, custody, storage, landing, collection,
-and handover." These roles are grounded in DROPi reference material, not invented
-Tycoon classifications. This cites the inspected textual authority summary, not
-the contents of the binary sources in its authority chain.
-
-**Authority limits:** historical architecture describes reception, transfer,
-batteries, physical audit and non-drone fallback, not proof of live operation.
-The current DronePort screen contains demo station values; these are not canonical
-capacity limits. Shared types alone do not establish fixed/mobile roles; the
-CAN-004 textual matrix does. Its unresolved ownership/approval/conflict entries
-are not silently resolved here, nor does it prove deployed capabilities or exact
-sizes, tiers, capacities, radii or placement rules. The derived roadmap marks live capacity, waiting-parcel
-buffers and terrestrial fallback automation as planned work.
-
-**NOT DIRECTLY INSPECTED:** all binary source documents and approved images.
-The manifest/index identify primary DronePort material under
-`DROPi_Canonical_Reference/04_DronePorts/MasterPlan/02_PRODUS & TEHNOLOGIE/`,
-including `09_INFRASTRUCTURA DRONEPORT -STANDARD^LJ HARDWARE-J SOFTWARE-J PROCEDURI.docx`
-and the chapter-9 audit/annex documents. Their contents are not inferred from their
-names. No official real-world fixed/mobile classifications or service radii are
-claimed from uninspected material.
-
-The owner-approved target art paths remain:
-`08_Assets/Approved_References/dropi-tycoon-brand-concept-e.jpg`,
-`08_Assets/Approved_References/delivery-progression-reference.jpg`, and
-`08_Assets/Approved_References/dropi-port-employee-activity-reference.jpg`.
-Their approval is accepted by owner declaration; no binary inspection, new AI art
-or literal reference-image gameplay backgrounds are required.
-
-### TYCOON GAMEPLAY ABSTRACTIONS
-
-- One local merchant demonstrates physical shop/NPC → onboarding → digital listing
-  eligibility → delivery demand. This is not the real marketplace onboarding process.
-- Central transport profiles use game-space distances, capacities and costs, not
-  asserted real DROPi operating values. Existing vehicle IDs remain stable; car is
-  a future domain mode rather than a new purchased fleet item in this sprint.
-  Per-trip operating-cost profile values are future tuning metadata; the existing
-  daily vehicle-maintenance system remains the actual expense path, avoiding a
-  second hidden charge on the same first-sprint delivery.
-- Delivery missions comprise legs, parcels and custody locations. Future transfer,
-  customer collection and fallback legs may use HQ, fixed or mobile infrastructure.
-- Fixed/mobile roles follow the textual DROPi authority summary. Exact sizes,
-  tiers, capacities, radii, placement rules, coverage and deterministic fallback
-  selection remain Tycoon balancing and implementation abstractions.
-  DronePort factory defaults describe future commissioned facilities; they are
-  not automatically installed as working drone infrastructure at the starter HQ.
-- Smart Parcel Lockers are future/simulated capabilities, not claimed live real-app
-  functionality. No real locker security or autonomous drone routing is implemented.
-
-### DELIBERATE DEVIATIONS
-
-The local district is compact and hand-authored. Roads allow simplified pedestrian
-crossing without traffic simulation. Merchant onboarding uses one proximity action
-instead of real commercial authorization. Player-employees are a Tycoon company
-mechanic; the real reference describes independent pilots, not DROPi employees.
-The integrated HQ/Main DronePort facility is an owner-directed game abstraction.
-Fixed/mobile roles themselves come from the textual CAN-004 authority matrix;
-their game progression and placement do not assert unread binary specifications.
-
-DronePort statuses use `active | maintenance | offline`, matching DROPi
-`shared/types.ts`. Only `active` ports are eligible for service/fallback. The
-separate Tycoon launch-control authorization point retains `operational | offline`:
-`operational` means the control point is usable, not an alternate DronePort status.
-DronePorts are not persisted yet, so this terminology correction needs no migration.
-
-The human/operator actor is ground-bound. Drones are separate aerial actors with
-available, in-flight, charging and maintenance states. Only contracts are introduced
-now: launch control, autonomous flights, multi-city networks and locker workflows
-remain future implementation. Final art quality and Android usability require
-physical owner review; automated tests cannot certify those subjective outcomes.
-
-## FUTURE DROPi ECOSYSTEM TOKEN — ARCHITECTURE BOUNDARY ONLY
-
-**FUTURE / NOT YET IMPLEMENTED.** Normal Company/Game Money (`CompanyState.money`)
-is the independent, non-redeemable simulation currency for deliveries, purchases,
-salaries and maintenance. A future optional ecosystem asset is a separate domain,
-never another name, balance field or conversion path for Company Money.
-
-Core gameplay, progression, mission access, transport, capacity, rewards and
-competitive power must work identically without any ecosystem asset. Participation
-must remain optional and non-pay-to-win: no asset ownership gates, paid speed/cargo
-advantages, reward multipliers or exchange into Company Money. Any future use must
-be non-power-affecting and separately reviewed; no such use is implemented now.
-
-`game-web/src/types/ecosystemAsset.ts` declares only an optional asset descriptor,
-with literal invariants prohibiting core-gameplay requirements, power effects and
-Company Money conversion. It is not imported by runtime gameplay or persistence.
-Regression tests enforce that dependency boundary and exercise ordinary delivery,
-purchase and Save v2 without a wallet or asset service.
-
-There is no wallet implementation, balance, token issuance, blockchain, smart
-contract, tokenomics, exchange, crypto payment, real-money value, KYC or deployment.
-There are no speculative wallet/token Save v2 fields, backend calls or runtime
-integration hooks. Future wallet/reward contracts require a concrete approved use
-case; adding them now would imply functionality this sprint does not implement.
-
 ## Purpose
 
-This document defines how the player interacts with DROPi Tycoon.
+This document defines how the player experiences DROPi Tycoon moment to moment and across sessions.
 
-It describes the gameplay loop, player actions, progression of interaction, and the principles that govern moment-to-moment gameplay.
+It specializes `01_GameDesign/GDD.md`, `01_GameDesign/PROGRESSION.md`, and `00_Project/PHASE1_GAME_ARCHITECTURE_DECISION_BASELINE.md`.
 
----
+The active product identity remains:
 
-# Core Gameplay Philosophy
+**Urban RPG + Business Tycoon + Local Marketplace + Multimodal Logistics + Infrastructure Builder + future Drone Network Simulation.**
 
-DROPi Tycoon is designed around one simple idea:
+The player is a person in the world, not a map cursor or permanent management screen.
 
-Small actions create large consequences.
-
-The player should never feel overwhelmed by mechanics.
-
-Instead, new gameplay systems are introduced naturally as the company grows.
-
-Complexity emerges through interaction between systems rather than difficult controls.
+Phaser 3 + TypeScript + Vite in `game-web/` remains the authoritative gameplay runtime; the installed Expo/React Native Android landscape shell hosts it rather than reimplementing gameplay.
 
 ---
 
-# Core Gameplay Loop
+# 1. Core Gameplay Promise
 
-**Scope Clarification:** This document describes the general and long-term gameplay loop for DROPi Tycoon. Prototype v0.1 uses the reduced canonical loop defined in `09_Development/PROTOTYPE_V0.1.md`; that document is the authoritative owner of the Prototype v0.1 loop.
+> **Your work leaves a mark.**
 
-Every gameplay session follows the same high-level cycle.
+A meaningful play session should usually change at least one of:
 
-Receive Customer Demand
+- the player/person;
+- an organization or asset the player belongs to/owns;
+- the surrounding world/economy.
 
-↓
-
-Accept Delivery Orders
-
-↓
-
-Plan Logistics
-
-↓
-
-Assign Resources
-
-↓
-
-Deliver Packages
-
-↓
-
-Generate Revenue
-
-↓
-
-Pay Expenses
-
-↓
-
-Analyze Performance
-
-↓
-
-Invest in Growth
-
-↓
-
-Expand Operations
-
-↓
-
-Repeat
-
-Each cycle should make the company larger, smarter, and more efficient.
+The player should understand what changed and why.
 
 ---
 
-# Early Game
+# 2. Canonical Starting Experience
 
-The player begins as an independent courier on foot.
+The player begins:
 
-Starting resources include:
+- poor/financially constrained;
+- on foot;
+- with a smartphone and basic carrying equipment;
+- as an employee of a large fictional incumbent delivery/logistics company;
+- doing accessible light work such as flyers, letters and small parcels;
+- without a privately owned mature company, HQ or vehicle.
 
-- Small amount of cash
-- One smartphone
-- One backpack
+The first goals are practical and self-authored: complete a legitimate shift, earn a wage, meet basic living needs, learn the city, improve equipment, save for a Bicycle or begin training.
 
-The player does not start with a vehicle.
-
-The Bicycle is the first purchasable vehicle. It is not starting equipment. For Prototype v0.1 scope, see `09_Development/PROTOTYPE_V0.1.md`.
-
-At this stage, the player performs deliveries personally.
-
-The objective is to understand the fundamentals of logistics.
+The current runtime still initializes company-owned state for prototype compatibility. That does not redefine the canonical start.
 
 ---
 
-# Mid Game
+# 3. Person-Level Session Loop
 
-As revenue increases, management becomes more important than manual work.
+A common early loop is:
 
-New responsibilities include:
+**Check current needs/capability**
 
-- Hiring employees
-- Purchasing vehicles
-- Managing deliveries
-- Expanding delivery zones
-- Building infrastructure
+-> **Choose eligible work / learning / personal action**
 
-The player transitions from worker to manager.
+-> **Travel physically to the relevant context**
 
----
+-> **Perform work / pickup / route / handoff / study / purchase**
 
-# Late Game
+-> **Consume time and Work Capacity / operating resources**
 
-Manual deliveries disappear almost entirely.
+-> **Receive authoritative outcome and wage/payment where eligible**
 
-The player's role becomes strategic.
+-> **Pay/plan living and personal costs**
 
-Responsibilities include:
+-> **Observe what changed**
 
-- Company expansion
-- Technology research
-- AI management
-- Drone operations
-- Financial planning
-- Global logistics optimization
+-> **Choose the next goal**
 
-The player becomes the CEO of an international corporation.
+The player is not required to spend every session working. Planning, training, shopping, maintenance, exploration, company decisions and community contribution can all be legitimate play depending on progression.
 
 ---
 
-# Player Actions
+# 4. Economic / Logistics Loop
 
-The player can:
+A mature economic opportunity follows causal world state:
 
-- Accept orders
-- Reject orders
-- Purchase vehicles
-- Hire employees
-- Build infrastructure
-- Upgrade technology
-- Expand territories
-- Monitor company performance
-- Respond to unexpected events
+**Need / Production Requirement**
 
-Every action affects multiple gameplay systems.
+-> **Demand / Procurement**
+
+-> **Order / Contract**
+
+-> **Inventory / Cargo / Custody**
+
+-> **Qualified Work / Vehicle / Route / Infrastructure**
+
+-> **Delivery / Production / Service**
+
+-> **Settlement**
+
+-> **Consumption / Use / Output**
+
+-> **Visible Consequence / New Requirement**
+
+The player may participate in only one part of that chain depending on their role.
 
 ---
 
-# Decision Making
+# 5. Making Delivery Fun
 
-The game rewards planning.
+Delivery cannot become repeated identical waypoint touching.
 
-Every investment competes with another opportunity.
+## Route Choice
+
+Meaningful differences may include:
+
+- stop order;
+- shortcuts/pedestrian paths;
+- traffic/congestion;
+- parking/loading access;
+- weather exposure;
+- stairs/entrances where appropriate;
+- time windows;
+- fuel/charge/range;
+- Work Capacity.
+
+## Cargo Difference
+
+Cargo can alter gameplay through:
+
+- weight/volume;
+- food/time sensitivity;
+- fragile handling;
+- medical priority;
+- cold-chain;
+- security/high value;
+- pallet/industrial handling;
+- special/hazardous requirements when governed;
+- waste/reverse logistics.
+
+## Destination Difference
+
+Destinations can include homes, apartments, offices, shops, restaurants, pharmacies, hospitals, warehouses, construction sites, farms, factories, rail/air/port terminals and other valid facilities.
+
+## Handoff Feedback
+
+Successful handoff should clearly communicate custody change, route progress and meaningful recipient/economic effect through animation, sound/haptic feedback where appropriate, NPC/world reaction and concise information.
+
+Avoid casino-like reward explosions for ordinary work.
+
+---
+
+# 6. Work Capacity and Living Economy
+
+The player has finite Work Capacity.
+
+Work, travel and some activities consume capacity/time; food, water and rest support recovery according to balancing rules.
+
+The player also has personal living costs including housing and other governed expenses.
+
+These mechanics exist to create planning and economic meaning, not repetitive survival micromanagement.
+
+No real-money Work Capacity refill is permitted.
+
+---
+
+# 7. Career Freedom
+
+DROPi Tycoon does **not** force one linear transformation from courier to CEO.
+
+The player may remain or become:
+
+- courier/transport worker;
+- specialist;
+- dispatcher/warehouse/maintenance/industrial worker;
+- multi-job worker where compatible;
+- independent contractor where enabled;
+- company member;
+- founder;
+- executive;
+- producer/merchant;
+- infrastructure operator;
+- investor;
+- combinations allowed by role/membership rules.
+
+Management becomes available as a path when the player legitimately acquires responsibility; it does not erase embodied work or make earlier professions worthless.
+
+Late-game play may alternate between strategic management and direct world activity according to player choice and operational need.
+
+---
+
+# 8. Company Gameplay
+
+Company gameplay begins only when the player legitimately has the relevant employment, membership, executive or ownership relationship.
+
+Possible responsibilities include:
+
+- hiring and staffing;
+- fleet/equipment;
+- dispatch/capacity;
+- procurement/inventory;
+- facilities/HQ;
+- maintenance;
+- production;
+- contracts/customers;
+- finance/cash flow;
+- research/technology;
+- infrastructure;
+- investments/acquisitions;
+- governance where enabled.
+
+Physical operations remain embodied where their location matters.
+
+---
+
+# 9. Personal and Company Ownership
+
+Personal Money and Company Money are separate.
+
+The player does not automatically own company vehicles, funds, HQ or inventory merely because they can use/manage them through employment or executive authority.
+
+A person has one primary Internal/Member company relationship at a time, may have compatible multiple jobs/contracts, and may hold external investments separately.
+
+---
+
+# 10. Travel and World Expansion
+
+The player expands through real access:
+
+**Neighborhood -> Locality -> City -> Region -> Country -> International Network -> later Frontier/Off-World**.
+
+Strategic map selection is not economic teleportation.
+
+Walking, road transport, public/contract transport, rail, air and river/sea infrastructure move the person/cargo with appropriate access, cost and time. Long journeys may use time compression.
+
+---
+
+# 11. Dynamic World
+
+Variation comes from interacting systems rather than infinite random mission text.
 
 Examples:
 
-Buying another bicycle may delay purchasing a delivery van.
+- changing demand/inventory;
+- businesses opening/closing;
+- construction;
+- traffic;
+- weather/day/night/seasons;
+- shortages/surpluses;
+- jobs and migration;
+- production changes;
+- infrastructure projects/failures;
+- company competition;
+- community projects;
+- regional architecture/products;
+- World Instance history.
 
-Expanding into a new district may reduce available cash for research.
-
-Players continuously balance short-term profit against long-term growth.
-
----
-
-# Dynamic Gameplay
-
-The world changes constantly.
-
-Examples include:
-
-- Rush hours
-- Rain
-- Snow
-- Traffic
-- Holidays
-- Special events
-- Customer behavior
-- Market demand
-
-Players must adapt rather than follow fixed strategies.
+The city should become familiar enough to feel like home but dynamic enough not to feel solved.
 
 ---
 
-# Failure
+# 12. Failure and Comeback
 
-Failure is part of progression.
+Failure can be meaningful and severe.
 
-Companies may experience:
+The person may experience:
 
-- Financial losses
-- Delivery delays
-- Poor customer reviews
-- Equipment failures
-- Employee shortages
+- low/zero Personal Money;
+- housing loss;
+- unemployment;
+- failed contracts/work;
+- vehicle/asset loss through governed rules;
+- company failure/control loss;
+- bankruptcy.
 
-Failure creates learning opportunities instead of permanent punishment.
+The world should explain the cause and show a legitimate next recovery step.
 
----
-
-# Success
-
-Success is measured by more than money.
-
-Players are encouraged to optimize:
-
-- Delivery speed
-- Customer satisfaction
-- Company reputation
-- Operational efficiency
-- Sustainability
-- Innovation
-
-The strongest company is not necessarily the richest.
+Human identity/history and valid earned capability survive normal bankruptcy. A former tycoon may return to basic employment and rebuild.
 
 ---
 
-# Gameplay Rules
+# 13. Session Lengths
 
-Every mechanic added to the game must satisfy the following requirements:
+The game should support different available time without making one duration uniquely efficient.
 
-- Easy to understand
-- Interesting to master
-- Connected to existing systems
-- Capable of future expansion
-- Fun before realistic
+## Very short session
 
-If realism reduces enjoyment, gameplay always has priority.
+- inspect state/alerts;
+- make a planning/purchase decision;
+- review offline history;
+- accept/schedule eligible future work.
+
+## Short session
+
+- complete a compact route;
+- train/maintain equipment;
+- contribute to a small company/community need.
+
+## Medium session
+
+- complete a meaningful shift/multi-stop route;
+- settle costs/wages;
+- make a meaningful purchase/training/company decision.
+
+## Long session
+
+- explore/travel;
+- restructure operations;
+- manage production/logistics chains;
+- participate in major company/infrastructure/community work.
+
+---
+
+# 14. Offline / Return Experience
+
+The world may continue while the player is away.
+
+On return, the player should receive a concise causal summary:
+
+- what changed;
+- what obligations settled;
+- what the company/world did legitimately;
+- what did **not** happen because no active work occurred;
+- what requires attention/recovery.
+
+No generic magical offline income or punitive daily-login streak is required.
+
+---
+
+# 15. World Contribution and Attachment
+
+Persistent physical evidence should create ownership/attachment.
+
+Examples:
+
+- personal room/home/equipment/vehicle;
+- company HQ/fleet/warehouse/factory/farm;
+- recurring NPC relationships;
+- restored shop/business;
+- construction/infrastructure progress;
+- city/community projects;
+- contribution history.
+
+Community contribution can be asynchronous. Appreciation/recognition should not automatically convert into economic power.
+
+---
+
+# 16. Interface Boundary
+
+The smartphone is the canonical portable interface for work, GPS, messages, study, marketplace information, news/weather and later authorized remote controls.
+
+The interface supports the world rather than replacing physical systems with omniscient menus.
+
+See `07_UI/PLAYER_SMARTPHONE.md`.
+
+---
+
+# 17. Real DROPi Transformation Boundary
+
+Tycoon follows:
+
+**REAL DROPi CONCEPT -> GENERIC SIMULATION MODEL -> TYCOON GAMEPLAY ABSTRACTION.**
+
+The real DROPi repository remains authoritative for the real product.
+
+Tycoon may use grounded concepts such as multimodal delivery, merchant/customer handoff, DronePorts, custody, storage and fallback, but Tycoon-specific game progression, values, infrastructure control, company society and fictional world outcomes must not be presented as deployed real DROPi facts.
+
+The human/operator remains ground-bound; drones are separate logistics actors.
+
+---
+
+# 18. Future Ecosystem Asset Boundary
+
+A future DROPi ecosystem asset remains optional and separate from Personal Money/Company Money.
+
+It cannot gate core gameplay, buy Work Capacity, create speed/cargo advantages, bypass qualifications/infrastructure, convert into ordinary economic power, or become pay-to-win.
+
+No wallet, blockchain, tokenomics or real-money settlement is activated by this gameplay canon.
+
+---
+
+# 19. Playability Gate
+
+Every player-facing gameplay implementation should be evaluated against:
+
+`09_Development/Research/GAME_LOGIC/R9_PLAYABILITY_INTEGRATION_GATE.md`
+
+Key dimensions:
+
+- FUN;
+- CHOICE;
+- CLARITY;
+- VISIBLE_CONSEQUENCE;
+- ECONOMIC_CAUSALITY;
+- VARIETY;
+- RECOVERY;
+- ASYNC;
+- ANDROID.
+
+A feature can be technically correct and still fail if the work is dull, choices are fake, consequences are invisible, or mobile interaction is poor.
+
+---
+
+# 20. Runtime Boundary
+
+The current runtime contains legacy/prototype assumptions including starter company state, direct order rewards and incomplete personal economy.
+
+Those remain functional until dedicated migration PRs replace them.
+
+Canonical documentation changes do not silently mutate runtime state/save schemas.
 
 ---
 
 # Canonical Rule
 
-This document defines the official gameplay structure for DROPi Tycoon.
-
-All future gameplay systems must remain consistent with these principles unless superseded by a newer canonical version.
+**DROPi Tycoon gameplay begins with a real person doing understandable work in a living city, then expands through self-authored career, company, investment, production and world choices. Work must come from real economic causes, capability must be earned, travel must be embodied, failure must allow comeback, and meaningful play should leave a visible mark on the person, organization or world.**
 
 ---
 
