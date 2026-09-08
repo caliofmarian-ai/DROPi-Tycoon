@@ -1,5 +1,5 @@
 {
-  "version": "1.1.1",
+  "version": "1.2.0",
   "purpose": "Manual semantic review flags discovered during continent-by-continent audit. These do not silently rewrite pinned Natural Earth source data.",
   "reviews": {
     "204": {
@@ -53,6 +53,18 @@
     "826": {
       "issue": 469,
       "reason": "country-identity bleed: Hamilton from a British overseas territory must not be grouped as the United Kingdom national capital"
+    },
+    "068": {
+      "issue": 472,
+      "reason": "capital-role semantics: Sucre is Bolivia's constitutional/national capital while La Paz is the principal executive and legislative government seat"
+    },
+    "152": {
+      "issue": 473,
+      "reason": "current-capital mismatch: Santiago is Chile's national capital while Valparaiso is the seat of the National Congress and a major port"
+    },
+    "238": {
+      "issue": 474,
+      "reason": "territory-status semantics required: the Falkland Islands/Malvinas remain subject to an unresolved sovereignty dispute and must be presented neutrally"
     }
   }
 }
