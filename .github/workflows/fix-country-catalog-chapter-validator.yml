@@ -1,0 +1,48 @@
+name: Fix Country Catalog Chapter Validator
+
+on:
+  push:
+    branches:
+      - openai/country-catalog-chapters-v1
+    paths:
+      - .github/workflows/fix-country-catalog-chapter-validator.yml
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: openai/country-catalog-chapters-v1
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m pip install --disable-pip-version-check pycountry
+      - name: Reject unstable geography keys and regenerate Europe
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          from pathlib import Path
+          path = Path('scripts/build_country_catalog_chapters.py')
+          text = path.read_text()
+          anchor = "def audit_country(cid, name, nodes, coverage_gap=False):\n    reasons = []\n"
+          replacement = anchor + "    if not str(cid).isdigit():\n        reasons.append('unstable/non-numeric geometry ID')\n"
+          if "unstable/non-numeric geometry ID" not in text:
+              if anchor not in text:
+                  raise SystemExit('audit_country anchor missing')
+              path.write_text(text.replace(anchor, replacement, 1))
+          PY
+          python scripts/build_country_catalog_chapters.py --continent Europe
+          git diff --check
+      - name: Commit validator and Europe manifest
+        run: |
+          set -euo pipefail
+          git config user.name 'DROPi Tycoon automation'
+          git config user.email 'actions@users.noreply.github.com'
+          git add scripts/build_country_catalog_chapters.py 04_World/Country_Catalog/Continents/europe.md
+          git commit -m 'world-data: flag unstable country keys for focused review'
+          git push origin HEAD:openai/country-catalog-chapters-v1
