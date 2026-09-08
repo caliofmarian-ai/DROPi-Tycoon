@@ -34,24 +34,24 @@ jobs:
           root = Path('.tmp/france-source')
           country_codes = ['FR', 'GF', 'GP', 'MQ', 'RE', 'YT']
           mappings = [
-              ('84','FR','84','Auvergne-Rhône-Alpes'),
-              ('27','FR','27','Bourgogne-Franche-Comté'),
-              ('53','FR','53','Bretagne'),
-              ('24','FR','24','Centre-Val de Loire'),
-              ('94','FR','94','Corse'),
-              ('44','FR','44','Grand Est'),
-              ('32','FR','32','Hauts-de-France'),
-              ('11','FR','11','Île-de-France'),
-              ('28','FR','28','Normandie'),
-              ('75','FR','75','Nouvelle-Aquitaine'),
-              ('76','FR','76','Occitanie'),
-              ('52','FR','52','Pays de la Loire'),
-              ('93','FR','93','Provence-Alpes-Côte d’Azur'),
-              ('01','GP','GP','Guadeloupe'),
-              ('02','MQ','MQ','Martinique'),
-              ('03','GF','00','Guyane'),
-              ('04','RE','RE','La Réunion'),
-              ('06','YT','976','Mayotte'),
+              ('84','FR','84','Auvergne-Rhône-Alpes','admin1'),
+              ('27','FR','27','Bourgogne-Franche-Comté','admin1'),
+              ('53','FR','53','Bretagne','admin1'),
+              ('24','FR','24','Centre-Val de Loire','admin1'),
+              ('94','FR','94','Corse','admin1'),
+              ('44','FR','44','Grand Est','admin1'),
+              ('32','FR','32','Hauts-de-France','admin1'),
+              ('11','FR','11','Île-de-France','admin1'),
+              ('28','FR','28','Normandie','admin1'),
+              ('75','FR','75','Nouvelle-Aquitaine','admin1'),
+              ('76','FR','76','Occitanie','admin1'),
+              ('52','FR','52','Pays de la Loire','admin1'),
+              ('93','FR','93','Provence-Alpes-Côte d’Azur','admin1'),
+              ('01','GP','GP','Guadeloupe','country'),
+              ('02','MQ','MQ','Martinique','country'),
+              ('03','GF','00','Guyane','country'),
+              ('04','RE','RE','La Réunion','country'),
+              ('06','YT','976','Mayotte','country'),
           ]
 
           admin = {}
@@ -88,13 +88,17 @@ jobs:
               return fallback[0] if fallback else None
 
           regions = []
-          for canonical, cc, source_admin1, name in mappings:
+          for canonical, cc, source_admin1, name, scope in mappings:
               key = f'{cc}.{source_admin1}'
-              group = [r for r in rows if r['countryCode'] == cc and r['admin1Code'] == source_admin1]
+              if scope == 'country':
+                  group = [r for r in rows if r['countryCode'] == cc]
+              else:
+                  group = [r for r in rows if r['countryCode'] == cc and r['admin1Code'] == source_admin1]
               selected = choose(group)
               regions.append({
                   'canonicalCode': canonical, 'canonicalName': name,
                   'sourceCountryCode': cc, 'sourceAdmin1Code': source_admin1,
+                  'localitySourceScope': scope,
                   'admin1': admin.get(key), 'candidateCount': len(group),
                   'selected': selected,
               })
@@ -102,7 +106,6 @@ jobs:
           topo = json.loads(Path('game-web/public/data/world-atlas-countries-110m.json').read_text(encoding='utf-8'))
           geometry = next(g for g in topo['objects']['countries']['geometries'] if str(g.get('id')).zfill(3) == '250')
           transform = topo.get('transform')
-
           decoded = []
           for arc in topo['arcs']:
               x = y = 0
@@ -118,24 +121,16 @@ jobs:
               decoded.append(pts)
 
           def arc_points(ref):
-              if ref >= 0:
-                  return decoded[ref]
-              return list(reversed(decoded[-ref - 1]))
+              return decoded[ref] if ref >= 0 else list(reversed(decoded[-ref - 1]))
 
           components = []
           polygons = geometry['arcs'] if geometry['type'] == 'MultiPolygon' else [geometry['arcs']]
           for idx, polygon in enumerate(polygons, 1):
-              pts = []
-              for ring in polygon:
-                  for ref in ring:
-                      pts.extend(arc_points(ref))
+              pts = [point for ring in polygon for ref in ring for point in arc_points(ref)]
               xs = [p[0] for p in pts]; ys = [p[1] for p in pts]
               components.append({
                   'component': idx,
-                  'bbox': {
-                      'west': min(xs), 'south': min(ys),
-                      'east': max(xs), 'north': max(ys),
-                  },
+                  'bbox': {'west': min(xs), 'south': min(ys), 'east': max(xs), 'north': max(ys)},
                   'pointCount': len(pts),
               })
 
@@ -143,11 +138,7 @@ jobs:
               'candidateCountsByCountry': dict(counts),
               'expectedCountryCandidateCount': sum(counts.values()),
               'regions': regions,
-              'geometry250': {
-                  'type': geometry['type'],
-                  'componentCount': len(components),
-                  'components': components,
-              },
+              'geometry250': {'type': geometry['type'], 'componentCount': len(components), 'components': components},
           }
           print('FRANCE_AUDIT_JSON_START')
           print(json.dumps(result, ensure_ascii=False, indent=2))
