@@ -1,0 +1,300 @@
+{
+  "version": "1.0.0",
+  "issue": 543,
+  "continent": "Europe",
+  "country": {
+    "geometryId": "250",
+    "sourceCountryCode": "FR",
+    "renderedName": "France"
+  },
+  "administrativeModel": {
+    "level": "regional-level-surfaces-with-overseas-and-special-status-cases",
+    "nativeTermSingular": "région / surface régionale équivalente",
+    "nativeTermPlural": "régions / surfaces régionales équivalentes",
+    "englishTerm": "region / regional-equivalent surface",
+    "unitCount": 18,
+    "officialReferences": [
+      "https://www.insee.fr/fr/metadonnees/definition/c1502",
+      "https://www.insee.fr/fr/metadonnees/definition/c1696",
+      "https://www.insee.fr/fr/information/8740222",
+      "https://www.legifrance.gouv.fr/codes/article_lc/LEGIARTI000052092591/2026-05-13"
+    ],
+    "specialCases": [
+      {
+        "type": "institutional-versus-statistical-regional-surface-model",
+        "note": "INSEE records 17 institutional regions, including five overseas regions, while the France regional/statistical field used by the COG exposes 18 regional-level surfaces. DROPi governs the 18 current COG regional codes as navigation/economic attachment surfaces without claiming that all 18 have identical institutions."
+      },
+      {
+        "type": "corsica-special-status-collectivity",
+        "canonicalRegionCode": "94",
+        "note": "Corse remains a COG regional-level surface but is governed as the Collectivité de Corse, a special-status collectivity generally assimilated to a region for statistical/territorial purposes rather than an ordinary regional council model."
+      },
+      {
+        "type": "overseas-department-region-surfaces",
+        "canonicalRegionCodes": ["01", "04"],
+        "note": "Guadeloupe and La Réunion are retained as overseas regional-level surfaces while preserving their département-et-région d’outre-mer semantics rather than flattening them into ordinary metropolitan regions."
+      },
+      {
+        "type": "martinique-guyane-single-territorial-collectivities",
+        "canonicalRegionCodes": ["02", "03"],
+        "note": "Martinique and Guyane remain COG regional-level surfaces while their current single territorial collectivities exercise competences formerly split between department and region."
+      },
+      {
+        "type": "mayotte-departement-region-2026",
+        "canonicalRegionCode": "06",
+        "legalCollectivityCode": "976R",
+        "effectiveDate": "2026-01-01",
+        "note": "From 1 January 2026 the collectivity is named Département-Région de Mayotte. DROPi keeps current COG regional surface code 06 for the regional navigation layer and records 976R as the current legal collectivity code; the change is not activated retroactively or early."
+      },
+      {
+        "type": "overseas-cross-source-locality-ownership",
+        "canonicalRegionCodes": ["01", "02", "03", "04", "06"],
+        "note": "GeoNames publishes the retained locality corpora under GP, MQ, GF, RE and YT rather than FR. DROPi crosswalks those source identities to current INSEE/COG France regional surfaces, uses each territory corpus as the locality scope, and does not fabricate FR source ownership or duplicate the same geographic locality."
+      },
+      {
+        "type": "runtime-geometry-lod-reconciliation",
+        "geometryId": "250",
+        "geometryType": "MultiPolygon",
+        "componentCount": 3,
+        "representedComponents": [
+          {
+            "surface": "Guyane",
+            "bounds": {"west": -54.524345, "south": 2.05365, "east": -51.658717, "north": 5.756968}
+          },
+          {
+            "surface": "Metropolitan France",
+            "bounds": {"west": -4.591846, "south": 42.343315, "east": 8.098281, "north": 51.148005}
+          },
+          {
+            "surface": "Corse",
+            "bounds": {"west": 8.544685, "south": 41.380249, "east": 9.559896, "north": 43.010183}
+          }
+        ],
+        "notSeparatelyRenderedAtThisLod": ["Guadeloupe", "Martinique", "La Réunion", "Mayotte"],
+        "note": "The current DROPi 110m runtime geometry for Natural Earth/ISO numeric 250 contains metropolitan France, Corse and Guyane only. The other four overseas regional surfaces remain canonical geographic/catalog identities even though this coarse runtime LOD does not contain separate polygons for them; no polygon is invented."
+      }
+    ]
+  },
+  "source": {
+    "provider": "GeoNames",
+    "license": "Creative Commons Attribution 4.0",
+    "releaseTag": "source-geonames-cities500-2026-09-08-f3cda4f9",
+    "cities500Sha256": "f3cda4f9d256d90045121fb8eebad3ed91695c32370ed93b50fbe0cb616e2bbd",
+    "admin1Sha256": "590651498043f674accda2b7f46d21286cda0e290b02f8561c5005eee9a5448c",
+    "candidateCountryCodes": ["FR", "GF", "GP", "MQ", "RE", "YT"],
+    "expectedCountryCandidateCount": 15525,
+    "regionalCrosswalkProvider": "INSEE Code officiel géographique (COG) 2026",
+    "regionalCrosswalkReference": "https://www.insee.fr/fr/information/8740222"
+  },
+  "selectionPolicy": {
+    "primaryFeatureCodes": ["PPLC", "PPLA"],
+    "fallbackFeatureCodes": ["PPLA2", "PPLA3", "PPL"],
+    "expectedPrimarySelections": 18,
+    "expectedFallbackSelections": 0,
+    "highDensityGameplayImport": false,
+    "hardcodedCoordinates": false
+  },
+  "economicEmergence": {
+    "authority": "shared-regional-national-multiplayer-economy",
+    "personalPlayerProgressionUnlock": false,
+    "numericThresholdsDefined": false
+  },
+  "expectedRegions": [
+    {
+      "admin1Code": "84",
+      "canonicalName": "Auvergne-Rhône-Alpes",
+      "sourceName": "Auvergne-Rhône-Alpes",
+      "regionSourceOverride": {
+        "sourceName": "Auvergne-Rhône-Alpes",
+        "asciiName": "Auvergne-Rhone-Alpes",
+        "sourceRef": "https://www.insee.fr/fr/metadonnees/geographie/region/84-auvergne-rhone-alpes"
+      }
+    },
+    {
+      "admin1Code": "27",
+      "canonicalName": "Bourgogne-Franche-Comté",
+      "sourceName": "Bourgogne-Franche-Comté",
+      "regionSourceOverride": {
+        "sourceName": "Bourgogne-Franche-Comté",
+        "asciiName": "Bourgogne-Franche-Comte",
+        "sourceRef": "https://www.insee.fr/fr/metadonnees/geographie/region/27-bourgogne-franche-comte"
+      }
+    },
+    {
+      "admin1Code": "53",
+      "canonicalName": "Bretagne",
+      "sourceName": "Bretagne",
+      "regionSourceOverride": {
+        "sourceName": "Bretagne",
+        "asciiName": "Bretagne",
+        "sourceRef": "https://www.insee.fr/fr/metadonnees/geographie/region/53-bretagne"
+      }
+    },
+    {
+      "admin1Code": "24",
+      "canonicalName": "Centre-Val de Loire",
+      "sourceName": "Centre-Val de Loire",
+      "regionSourceOverride": {
+        "sourceName": "Centre-Val de Loire",
+        "asciiName": "Centre-Val de Loire",
+        "sourceRef": "https://www.insee.fr/fr/metadonnees/geographie/region/24-centre-val-de-loire"
+      }
+    },
+    {
+      "admin1Code": "94",
+      "canonicalName": "Corse",
+      "sourceName": "Corse",
+      "regionSourceOverride": {
+        "sourceName": "Corse",
+        "asciiName": "Corse",
+        "sourceRef": "https://www.insee.fr/fr/metadonnees/geographie/region/94-corse"
+      },
+      "presentationRole": "special-status-collectivity-capital-and-regional-node"
+    },
+    {
+      "admin1Code": "44",
+      "canonicalName": "Grand Est",
+      "sourceName": "Grand Est",
+      "regionSourceOverride": {
+        "sourceName": "Grand Est",
+        "asciiName": "Grand Est",
+        "sourceRef": "https://www.insee.fr/fr/metadonnees/geographie/region/44-grand-est"
+      }
+    },
+    {
+      "admin1Code": "32",
+      "canonicalName": "Hauts-de-France",
+      "sourceName": "Hauts-de-France",
+      "regionSourceOverride": {
+        "sourceName": "Hauts-de-France",
+        "asciiName": "Hauts-de-France",
+        "sourceRef": "https://www.insee.fr/fr/metadonnees/geographie/region/32-hauts-de-france"
+      }
+    },
+    {
+      "admin1Code": "11",
+      "canonicalName": "Île-de-France",
+      "sourceName": "Île-de-France",
+      "regionSourceOverride": {
+        "sourceName": "Île-de-France",
+        "asciiName": "Ile-de-France",
+        "sourceRef": "https://www.insee.fr/fr/metadonnees/geographie/region/11-ile-de-france"
+      }
+    },
+    {
+      "admin1Code": "28",
+      "canonicalName": "Normandie",
+      "sourceName": "Normandie",
+      "regionSourceOverride": {
+        "sourceName": "Normandie",
+        "asciiName": "Normandie",
+        "sourceRef": "https://www.insee.fr/fr/metadonnees/geographie/region/28-normandie"
+      }
+    },
+    {
+      "admin1Code": "75",
+      "canonicalName": "Nouvelle-Aquitaine",
+      "sourceName": "Nouvelle-Aquitaine",
+      "regionSourceOverride": {
+        "sourceName": "Nouvelle-Aquitaine",
+        "asciiName": "Nouvelle-Aquitaine",
+        "sourceRef": "https://www.insee.fr/fr/metadonnees/geographie/region/75-nouvelle-aquitaine"
+      }
+    },
+    {
+      "admin1Code": "76",
+      "canonicalName": "Occitanie",
+      "sourceName": "Occitanie",
+      "regionSourceOverride": {
+        "sourceName": "Occitanie",
+        "asciiName": "Occitanie",
+        "sourceRef": "https://www.insee.fr/fr/metadonnees/geographie/region/76-occitanie"
+      }
+    },
+    {
+      "admin1Code": "52",
+      "canonicalName": "Pays de la Loire",
+      "sourceName": "Pays de la Loire",
+      "regionSourceOverride": {
+        "sourceName": "Pays de la Loire",
+        "asciiName": "Pays de la Loire",
+        "sourceRef": "https://www.insee.fr/fr/metadonnees/geographie/region/52-pays-de-la-loire"
+      }
+    },
+    {
+      "admin1Code": "93",
+      "canonicalName": "Provence-Alpes-Côte d'Azur",
+      "sourceName": "Provence-Alpes-Côte d'Azur",
+      "regionSourceOverride": {
+        "sourceName": "Provence-Alpes-Côte d'Azur",
+        "asciiName": "Provence-Alpes-Cote d'Azur",
+        "sourceRef": "https://www.insee.fr/fr/metadonnees/geographie/region/93-provence-alpes-cote-d-azur"
+      }
+    },
+    {
+      "admin1Code": "01",
+      "canonicalName": "Guadeloupe",
+      "sourceName": "Guadeloupe",
+      "regionSourceOverride": {
+        "sourceName": "Guadeloupe",
+        "asciiName": "Guadeloupe",
+        "sourceRef": "https://www.insee.fr/fr/metadonnees/geographie/region/01-guadeloupe"
+      },
+      "localitySourceCountryCode": "GP",
+      "localitySourceScope": "country",
+      "presentationRole": "overseas-region-capital-and-regional-node"
+    },
+    {
+      "admin1Code": "02",
+      "canonicalName": "Martinique",
+      "sourceName": "Martinique",
+      "regionSourceOverride": {
+        "sourceName": "Martinique",
+        "asciiName": "Martinique",
+        "sourceRef": "https://www.insee.fr/fr/metadonnees/geographie/region/02-martinique"
+      },
+      "localitySourceCountryCode": "MQ",
+      "localitySourceScope": "country",
+      "presentationRole": "single-territorial-collectivity-capital-and-regional-node"
+    },
+    {
+      "admin1Code": "03",
+      "canonicalName": "Guyane",
+      "sourceName": "Guyane",
+      "regionSourceOverride": {
+        "sourceName": "Guyane",
+        "asciiName": "Guyane",
+        "sourceRef": "https://www.insee.fr/fr/metadonnees/geographie/region/03-guyane"
+      },
+      "localitySourceCountryCode": "GF",
+      "localitySourceScope": "country",
+      "presentationRole": "single-territorial-collectivity-capital-and-regional-node"
+    },
+    {
+      "admin1Code": "04",
+      "canonicalName": "La Réunion",
+      "sourceName": "La Réunion",
+      "regionSourceOverride": {
+        "sourceName": "La Réunion",
+        "asciiName": "La Reunion",
+        "sourceRef": "https://www.insee.fr/fr/metadonnees/geographie/region/04-la-reunion"
+      },
+      "localitySourceCountryCode": "RE",
+      "localitySourceScope": "country",
+      "presentationRole": "overseas-region-capital-and-regional-node"
+    },
+    {
+      "admin1Code": "06",
+      "canonicalName": "Mayotte",
+      "sourceName": "Mayotte",
+      "regionSourceOverride": {
+        "sourceName": "Mayotte",
+        "asciiName": "Mayotte",
+        "sourceRef": "https://www.insee.fr/fr/metadonnees/geographie/region/06-mayotte"
+      },
+      "localitySourceCountryCode": "YT",
+      "localitySourceScope": "country",
+      "presentationRole": "departement-region-capital-and-regional-node"
+    }
+  ]
+}
