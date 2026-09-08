@@ -185,7 +185,7 @@ export const renderCityStreetAndAddressLabels = (scene: Phaser.Scene): void => {
   for (const sign of CITY_STREET_SIGNS) {
     const label = cityLabel(scene, sign.x, sign.y, sign.name.toUpperCase(), 9, '#fff4ce', '#175574')
       .setDepth(7).setAlpha(0.9).setName(`street-sign:${sign.roadId}`)
-    if (!sign.horizontal) label.setAngle(-90)
+    if (!sign.horizontal && typeof label.setAngle === 'function') label.setAngle(-90)
   }
   for (const plaque of CITY_ADDRESS_PLAQUES) {
     cityLabel(scene, plaque.x, plaque.y, `${plaque.number}`, 8, '#175574', '#fff4ce')
