@@ -12,6 +12,8 @@ export interface BrailaFirstHourBindings {
 /**
  * Replaceable first-hour architecture fixture only. Agent 8 owns permanent character,
  * dialogue and story canon; callers bind real actor/location/logistics identities later.
+ * Chained missions use explicit unlocks rather than duplicating the same causal edge as
+ * both an unlock and a missionCompleted prerequisite.
  */
 export const buildNeutralBrailaFirstHourBlueprint = (
   bindings: BrailaFirstHourBindings,
@@ -49,7 +51,7 @@ export const buildNeutralBrailaFirstHourBlueprint = (
     category: 'Employer',
     source: { kind: 'Authored', authoredRef: 'agent8-canon-pending' },
     label: 'Complete a basic light job',
-    prerequisites: [{ kind: 'missionCompleted', missionId: 'first-hour:meet-dispatcher' }],
+    prerequisites: [],
     availability: 'ExplicitUnlock',
     startStageId: 'pickup',
     stages: [
@@ -91,7 +93,6 @@ export const buildNeutralBrailaFirstHourBlueprint = (
     source: { kind: 'Authored', authoredRef: 'agent8-canon-pending' },
     label: 'Meet a recurring local contact',
     prerequisites: [
-      { kind: 'missionCompleted', missionId: 'first-hour:light-job' },
       { kind: 'actorAvailable', actorId: bindings.localContactActorId },
       { kind: 'locationAvailable', locationId: bindings.localContactLocationId },
     ],
@@ -122,7 +123,7 @@ export const buildNeutralBrailaFirstHourBlueprint = (
     category: 'Character',
     source: { kind: 'Authored', authoredRef: 'agent8-canon-pending' },
     label: 'Handle a small complication',
-    prerequisites: [{ kind: 'missionCompleted', missionId: 'first-hour:meet-local-contact' }],
+    prerequisites: [],
     availability: 'ExplicitUnlock',
     startStageId: 'choose',
     stages: [{
