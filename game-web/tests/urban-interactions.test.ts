@@ -91,7 +91,7 @@ describe('pure urban merchant listings and physical logistics', () => {
       orderId: original.orderId, reward: original.reward, destination: original.destination,
       pickupLocation: original.pickupLocation,
     })
-    expect(getUrbanRouteDistance(world)).toBe([1040, 260, 60][sequence - 1])
+    expect(getUrbanRouteDistance(world)).toBe(getCityRouteDistance(original.pickupLocation, original.destination))
     expect(isUrbanRouteWithinTransportRange(world)).toBe(true)
   })
 
@@ -126,14 +126,14 @@ describe('pure urban merchant listings and physical logistics', () => {
   it('walks the connected streets through introduction, HQ acceptance, pickup and paid delivery', () => {
     const company = createInitialCompanyState()
     let world = createInitialWorldState()
-    world = walkTo(world, { x: 800, y: 270 }, { x: 800, y: 910 }, URBAN_MERCHANT)
+    world = walkTo(world, ...findRoadRoute(CITY_ROAD_NETWORK, URBAN_HQ, URBAN_MERCHANT)!.points)
     world = performUrbanInteraction(world, company).world
     expect(world.urban?.merchantOnboarded).toBe(true)
-    world = walkTo(world, { x: 800, y: 910 }, { x: 800, y: 270 }, URBAN_HQ)
+    world = walkTo(world, ...findRoadRoute(CITY_ROAD_NETWORK, URBAN_MERCHANT, URBAN_HQ)!.points)
     world = performUrbanInteraction(world, company).world
     expect(world.activeOrder.status).toBe('Accepted')
     expect(getUrbanCargo(world).parcels).toHaveLength(0)
-    world = walkTo(world, { x: 800, y: 270 }, { x: 800, y: 910 }, URBAN_MERCHANT)
+    world = walkTo(world, ...findRoadRoute(CITY_ROAD_NETWORK, URBAN_HQ, URBAN_MERCHANT)!.points)
     expect(world.activeOrder.status).toBe('Accepted')
     world = performUrbanInteraction(world, company).world
     expect(world.activeOrder.status).toBe('PickedUp')
@@ -143,7 +143,7 @@ describe('pure urban merchant listings and physical logistics', () => {
     expect(isDeliveryMission(mission)).toBe(true)
     expect(mission.legs[0].mode).toBe('terrestrial')
     expect(mission.parcels[0].parcelId).toBe(getUrbanCargo(world).parcels[0].parcelId)
-    world = walkTo(world, { x: 800, y: 910 }, { x: 800, y: 290 }, findWorldRoutePoint(world.activeOrder.destination)!)
+    world = walkTo(world, ...findCityRoute(world.activeOrder.pickupLocation, world.activeOrder.destination)!.points)
     expect(world.activeOrder.status).toBe('PickedUp')
     const delivered = performUrbanInteraction(world, company)
     expect(delivered.settled).toBe(true)

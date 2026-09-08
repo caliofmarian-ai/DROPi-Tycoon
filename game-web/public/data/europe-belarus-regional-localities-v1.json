@@ -1,0 +1,248 @@
+{
+  "version": "1.0.0",
+  "issue": 517,
+  "continent": "Europe",
+  "country": {
+    "geometryId": "112",
+    "sourceCountryCode": "BY",
+    "renderedName": "Belarus"
+  },
+  "administrativeModel": {
+    "level": "first-order",
+    "nativeTermSingular": "voblast / Minsk capital city",
+    "nativeTermPlural": "six voblasts plus Minsk City",
+    "englishTerm": "region / capital-city equivalent",
+    "unitCount": 7,
+    "officialReferences": [
+      "https://iarpa.org/international/factbook/belarus/",
+      "https://cis-legislation.com/document.fwx?rgn=30374"
+    ],
+    "specialCases": [
+      {
+        "admin1Code": "05",
+        "type": "administrative-centre-outside-unit",
+        "administrativeCenter": "Minsk",
+        "administrativeCenterUnitAdmin1Code": "04",
+        "gameplayRepresentativePolicy": "inside-region-source-fallback",
+        "note": "Minsk City is a separate first-order unit while Minsk also serves as the administrative centre of Minsk Region. DROPi keeps Minsk City as the national-capital node and uses Barysaw as the source-backed inside-region representative for Minsk Region, avoiding duplicate locality ownership."
+      }
+    ]
+  },
+  "source": {
+    "provider": "GeoNames",
+    "license": "Creative Commons Attribution 4.0",
+    "releaseTag": "source-geonames-cities500-2026-09-08-f3cda4f9",
+    "cities500Sha256": "f3cda4f9d256d90045121fb8eebad3ed91695c32370ed93b50fbe0cb616e2bbd",
+    "admin1Sha256": "590651498043f674accda2b7f46d21286cda0e290b02f8561c5005eee9a5448c",
+    "expectedCountryCandidateCount": 314,
+    "publishedGameplayRepresentativeCount": 7
+  },
+  "selectionModel": {
+    "primaryFeatureCodes": [
+      "PPLC",
+      "PPLA"
+    ],
+    "fallbackFeatureCodes": [
+      "PPLA2"
+    ],
+    "expectedPrimarySelections": 6,
+    "expectedFallbackSelections": 1,
+    "highDensityGameplayImport": false,
+    "hardcodedCoordinates": false,
+    "rule": "One source-backed representative locality per governed first-order region; retained high-density source remains reference-only."
+  },
+  "developmentModel": {
+    "authority": "shared-regional-national-multiplayer-economy",
+    "personalPlayerProgressionUnlock": false,
+    "numericThresholdsDefined": false,
+    "signalsPlanned": [
+      "company-activity",
+      "employment-demand",
+      "production",
+      "logistics-throughput",
+      "construction-investment",
+      "transport-connectivity",
+      "trade-volume",
+      "population-economic-simulation",
+      "regional-national-policy"
+    ],
+    "rule": "Representative locality prominence and development are shared-world economic outcomes, not personal progression rewards."
+  },
+  "units": [
+    {
+      "admin1Code": "01",
+      "regionName": "Brest Voblast",
+      "regionSourceName": "Brest",
+      "regionAsciiName": "Brest",
+      "regionSourceRef": "geonames:629631",
+      "representativeLocality": {
+        "localityId": "dropi:locality:geonames:629634",
+        "sourceRef": "geonames:629634",
+        "name": "Brest",
+        "asciiName": "Brest",
+        "latitude": 52.10894,
+        "longitude": 23.71749,
+        "featureCode": "PPLA",
+        "populationSourceValue": 347138,
+        "selectionBasis": "source-first-order-seat-role",
+        "presentationRole": "regional-representative-locality"
+      },
+      "economicEmergence": {
+        "authority": "shared-regional-national-multiplayer-economy",
+        "personalPlayerProgressionUnlock": false,
+        "numericThresholdsDefined": false,
+        "presentationState": "economy-system-governed"
+      }
+    },
+    {
+      "admin1Code": "02",
+      "regionName": "Homyel Voblast",
+      "regionSourceName": "Homyel’ Voblasc’",
+      "regionAsciiName": "Homyel' Voblasc'",
+      "regionSourceRef": "geonames:628281",
+      "representativeLocality": {
+        "localityId": "dropi:locality:geonames:627907",
+        "sourceRef": "geonames:627907",
+        "name": "Homyel'",
+        "asciiName": "Homyel'",
+        "latitude": 52.4345,
+        "longitude": 30.9754,
+        "featureCode": "PPLA",
+        "populationSourceValue": 501193,
+        "selectionBasis": "source-first-order-seat-role",
+        "presentationRole": "regional-representative-locality"
+      },
+      "economicEmergence": {
+        "authority": "shared-regional-national-multiplayer-economy",
+        "personalPlayerProgressionUnlock": false,
+        "numericThresholdsDefined": false,
+        "presentationState": "economy-system-governed"
+      }
+    },
+    {
+      "admin1Code": "03",
+      "regionName": "Hrodna Voblast",
+      "regionSourceName": "Grodnenskaya",
+      "regionAsciiName": "Grodnenskaya",
+      "regionSourceRef": "geonames:628035",
+      "representativeLocality": {
+        "localityId": "dropi:locality:geonames:627904",
+        "sourceRef": "geonames:627904",
+        "name": "Hrodna",
+        "asciiName": "Hrodna",
+        "latitude": 53.6758,
+        "longitude": 23.82887,
+        "featureCode": "PPLA",
+        "populationSourceValue": 363718,
+        "selectionBasis": "source-first-order-seat-role",
+        "presentationRole": "regional-representative-locality"
+      },
+      "economicEmergence": {
+        "authority": "shared-regional-national-multiplayer-economy",
+        "personalPlayerProgressionUnlock": false,
+        "numericThresholdsDefined": false,
+        "presentationState": "economy-system-governed"
+      }
+    },
+    {
+      "admin1Code": "04",
+      "regionName": "Minsk City",
+      "regionSourceName": "Minsk City",
+      "regionAsciiName": "Minsk City",
+      "regionSourceRef": "geonames:625143",
+      "representativeLocality": {
+        "localityId": "dropi:locality:geonames:625144",
+        "sourceRef": "geonames:625144",
+        "name": "Minsk",
+        "asciiName": "Minsk",
+        "latitude": 53.90019,
+        "longitude": 27.56653,
+        "featureCode": "PPLC",
+        "populationSourceValue": 1742124,
+        "selectionBasis": "source-first-order-seat-role",
+        "presentationRole": "national-capital-and-regional-node"
+      },
+      "economicEmergence": {
+        "authority": "shared-regional-national-multiplayer-economy",
+        "personalPlayerProgressionUnlock": false,
+        "numericThresholdsDefined": false,
+        "presentationState": "economy-system-governed"
+      }
+    },
+    {
+      "admin1Code": "05",
+      "regionName": "Minsk Voblast",
+      "regionSourceName": "Minsk",
+      "regionAsciiName": "Minsk",
+      "regionSourceRef": "geonames:625142",
+      "representativeLocality": {
+        "localityId": "dropi:locality:geonames:630376",
+        "sourceRef": "geonames:630376",
+        "name": "Barysaw",
+        "asciiName": "Barysaw",
+        "latitude": 54.2279,
+        "longitude": 28.505,
+        "featureCode": "PPLA2",
+        "populationSourceValue": 133700,
+        "selectionBasis": "source-admin-fallback",
+        "presentationRole": "regional-representative-locality"
+      },
+      "economicEmergence": {
+        "authority": "shared-regional-national-multiplayer-economy",
+        "personalPlayerProgressionUnlock": false,
+        "numericThresholdsDefined": false,
+        "presentationState": "economy-system-governed"
+      }
+    },
+    {
+      "admin1Code": "06",
+      "regionName": "Mahilyow Voblast",
+      "regionSourceName": "Mogilev",
+      "regionAsciiName": "Mogilev",
+      "regionSourceRef": "geonames:625073",
+      "representativeLocality": {
+        "localityId": "dropi:locality:geonames:625665",
+        "sourceRef": "geonames:625665",
+        "name": "Mahilyow",
+        "asciiName": "Mahilyow",
+        "latitude": 53.90876,
+        "longitude": 30.34044,
+        "featureCode": "PPLA",
+        "populationSourceValue": 352896,
+        "selectionBasis": "source-first-order-seat-role",
+        "presentationRole": "regional-representative-locality"
+      },
+      "economicEmergence": {
+        "authority": "shared-regional-national-multiplayer-economy",
+        "personalPlayerProgressionUnlock": false,
+        "numericThresholdsDefined": false,
+        "presentationState": "economy-system-governed"
+      }
+    },
+    {
+      "admin1Code": "07",
+      "regionName": "Vitebsk Voblast",
+      "regionSourceName": "Vitebsk",
+      "regionAsciiName": "Vitebsk",
+      "regionSourceRef": "geonames:620134",
+      "representativeLocality": {
+        "localityId": "dropi:locality:geonames:620127",
+        "sourceRef": "geonames:620127",
+        "name": "Vitebsk",
+        "asciiName": "Vitebsk",
+        "latitude": 55.1904,
+        "longitude": 30.2049,
+        "featureCode": "PPLA",
+        "populationSourceValue": 358927,
+        "selectionBasis": "source-first-order-seat-role",
+        "presentationRole": "regional-representative-locality"
+      },
+      "economicEmergence": {
+        "authority": "shared-regional-national-multiplayer-economy",
+        "personalPlayerProgressionUnlock": false,
+        "numericThresholdsDefined": false,
+        "presentationState": "economy-system-governed"
+      }
+    }
+  ]
+}

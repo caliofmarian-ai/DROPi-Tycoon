@@ -1,3 +1,4 @@
+import { WORLD_CITY_NAME } from './worldLayout'
 import type { ActiveTransport } from '../types/game'
 
 export type InteriorLocationId = 'hq' | 'marketplace'
@@ -49,7 +50,7 @@ export const HQ_INTERIOR: InteriorLocationDefinition = {
   height: INTERIOR_HEIGHT,
   spawn: { x: 600, y: 620 },
   interactions: [
-    interaction('exit', 'Exit to Cedar City', 600, 662, 54),
+    interaction('exit', `Exit to ${WORLD_CITY_NAME}`, 600, 662, 54),
     interaction('employees', 'Hiring & Staff Terminal', 235, 225, 58),
     interaction('fleet', 'Fleet Purchase Terminal', 155, 390, 62),
     interaction('fleet-handoff', 'Vehicle Handoff', 315, 540, 62),
@@ -73,7 +74,7 @@ export const MARKETPLACE_INTERIOR: InteriorLocationDefinition = {
   height: INTERIOR_HEIGHT,
   spawn: { x: 600, y: 620 },
   interactions: [
-    interaction('exit', 'Exit to Cedar City', 600, 662, 54),
+    interaction('exit', `Exit to ${WORLD_CITY_NAME}`, 600, 662, 54),
     interaction('market-stalls', 'Local Marketplace Stalls', 320, 245, 82),
     interaction('player-listings', 'Player Listings Counter', 880, 245, 82),
   ],

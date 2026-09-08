@@ -1,0 +1,70 @@
+{
+  "version": "1.0.0",
+  "issue": 530,
+  "continent": "Europe",
+  "country": {
+    "geometryId": "208",
+    "sourceCountryCode": "DK",
+    "renderedName": "Denmark"
+  },
+  "administrativeModel": {
+    "level": "first-order-regional-governance",
+    "nativeTermSingular": "region",
+    "nativeTermPlural": "regioner",
+    "englishTerm": "region",
+    "unitCount": 5,
+    "effectiveFrom": "2007-01-01",
+    "effectiveUntil": "2026-12-31",
+    "currentAsOf": "2026-09-08",
+    "officialReferences": [
+      "https://www.dst.dk/en/Statistik/dokumentation/nomenklaturer/nuts",
+      "https://www.dst.dk/en/Statistik/emner/oekonomi/offentlig-oekonomi/regionernes-regnskaber-og-budgetter",
+      "https://www.elections.im.dk/Media/638061785153051178/Act%20on%20Regions.pdf"
+    ],
+    "futureTransitions": [
+      {
+        "type": "legislated-region-merger",
+        "effectiveFrom": "2027-01-01",
+        "sourceAdmin1Codes": ["17", "20"],
+        "sourceRegionNames": ["Capital Region of Denmark", "Region Zealand"],
+        "futureCanonicalName": "Region Østdanmark",
+        "futureEnglishName": "East Denmark Region",
+        "status": "future-not-yet-active",
+        "officialReferences": [
+          "https://www.regionoest.dk/",
+          "https://www.regionh.dk/region-oestdanmark/sider/region-oestdanmark-sammenlaegning.aspx",
+          "https://www.regionoest.dk/om-region-oestdanmark/en-ny-region-i-danmark"
+        ],
+        "note": "The 2026 game-world structure remains the five existing regions. Region Hovedstaden and Region Sjælland continue their existing operations through 31 December 2026. Region Østdanmark becomes operational on 1 January 2027; the future transition must preserve world/company/economy continuity rather than create simultaneous duplicate live ownership."
+      }
+    ]
+  },
+  "source": {
+    "provider": "GeoNames",
+    "license": "Creative Commons Attribution 4.0",
+    "releaseTag": "source-geonames-cities500-2026-09-08-f3cda4f9",
+    "cities500Sha256": "f3cda4f9d256d90045121fb8eebad3ed91695c32370ed93b50fbe0cb616e2bbd",
+    "admin1Sha256": "590651498043f674accda2b7f46d21286cda0e290b02f8561c5005eee9a5448c",
+    "expectedCountryCandidateCount": 507
+  },
+  "selectionPolicy": {
+    "primaryFeatureCodes": ["PPLC", "PPLA"],
+    "fallbackFeatureCodes": ["PPLA2", "PPL"],
+    "expectedPrimarySelections": 5,
+    "expectedFallbackSelections": 0,
+    "highDensityGameplayImport": false,
+    "hardcodedCoordinates": false
+  },
+  "economicEmergence": {
+    "authority": "shared-regional-national-multiplayer-economy",
+    "personalPlayerProgressionUnlock": false,
+    "numericThresholdsDefined": false
+  },
+  "expectedRegions": [
+    {"admin1Code": "17", "canonicalName": "Capital Region of Denmark", "sourceName": "Capital Region"},
+    {"admin1Code": "18", "canonicalName": "Central Denmark Region", "sourceName": "Central Jutland"},
+    {"admin1Code": "19", "canonicalName": "North Denmark Region", "sourceName": "North Denmark"},
+    {"admin1Code": "20", "canonicalName": "Region Zealand", "sourceName": "Zealand"},
+    {"admin1Code": "21", "canonicalName": "Region of Southern Denmark", "sourceName": "South Denmark"}
+  ]
+}

@@ -68,6 +68,7 @@ The date prefix ensures chronological ordering and historical traceability.
 |------|------|--------|---------|
 | [2026-07-16_MASTER_OWNER_DIRECTIVE_001.md](./2026-07-16_MASTER_OWNER_DIRECTIVE_001.md) | 2026-07-16 | Draft – Project Owner Decisions | Master directive for canonical architecture, universe design, documentation structure, web-first continuity, and cross-project alignment. |
 | [2026-09-05_MASTER_OWNER_DIRECTIVE_002_Product_Identity_and_Visible_Operations.md](./2026-09-05_MASTER_OWNER_DIRECTIVE_002_Product_Identity_and_Visible_Operations.md) | 2026-09-05 | Owner Approved — Canonical Integration Required by Domain | Approved DROPi Tycoon identity, use of existing brand assets, visible multimodal progression, drone/operator separation, visible employee activity, DronePort interior direction, audio requirement, and future shared-token direction. |
+| [2026-09-08_MASTER_OWNER_DIRECTIVE_006_REAL_MAP_CITY_PLANS.md](./2026-09-08_MASTER_OWNER_DIRECTIVE_006_REAL_MAP_CITY_PLANS.md) | 2026-09-08 | Owner direction captured; implementation #535 | Real-map city plans, Brăila pilot, capital + 4 major + 4 smaller starting nodes and hero-to-world visual scale. |
 
 ---
 

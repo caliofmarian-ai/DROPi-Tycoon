@@ -1,0 +1,772 @@
+{
+  "version": "1.0.0",
+  "issue": 524,
+  "continent": "Europe",
+  "country": {
+    "geometryId": "100",
+    "sourceCountryCode": "BG",
+    "renderedName": "Bulgaria"
+  },
+  "administrativeModel": {
+    "level": "first-order",
+    "nativeTermSingular": "област",
+    "nativeTermPlural": "области",
+    "englishTerm": "administrative district",
+    "unitCount": 28,
+    "officialReferences": [
+      "https://www.nsi.bg/en/press-release/administrative-territorial-and-territorial-division-of-the-republic-of-bulgaria-9010",
+      "https://www.nsi.bg/en/statistical-data/46/1333"
+    ],
+    "specialCases": [
+      {
+        "admin1Code": "58",
+        "type": "administrative-centre-outside-source-ownership",
+        "label": "Sofia district administrative-centre exception",
+        "note": "The city of Sofia is the official administrative centre of both Sofia-Capital district and Sofia district. GeoNames source-owns Sofia under BG.42 Sofia-Capital, so DROPi keeps Sofia there as the unique national-capital locality and uses a separate source-backed inside-district representative for BG.58 without relabeling that representative as the district capital."
+      }
+    ]
+  },
+  "source": {
+    "provider": "GeoNames",
+    "license": "Creative Commons Attribution 4.0",
+    "releaseTag": "source-geonames-cities500-2026-09-08-f3cda4f9",
+    "cities500Sha256": "f3cda4f9d256d90045121fb8eebad3ed91695c32370ed93b50fbe0cb616e2bbd",
+    "admin1Sha256": "590651498043f674accda2b7f46d21286cda0e290b02f8561c5005eee9a5448c",
+    "expectedCountryCandidateCount": 333,
+    "publishedGameplayRepresentativeCount": 28
+  },
+  "selectionModel": {
+    "primaryFeatureCodes": [
+      "PPLC",
+      "PPLA"
+    ],
+    "fallbackFeatureCodes": [
+      "PPL",
+      "PPLA2"
+    ],
+    "expectedPrimarySelections": 27,
+    "expectedFallbackSelections": 1,
+    "highDensityGameplayImport": false,
+    "hardcodedCoordinates": false,
+    "rule": "One source-backed representative locality per governed first-order region; retained high-density source remains reference-only."
+  },
+  "developmentModel": {
+    "authority": "shared-regional-national-multiplayer-economy",
+    "personalPlayerProgressionUnlock": false,
+    "numericThresholdsDefined": false,
+    "signalsPlanned": [
+      "company-activity",
+      "employment-demand",
+      "production",
+      "logistics-throughput",
+      "construction-investment",
+      "transport-connectivity",
+      "trade-volume",
+      "population-economic-simulation",
+      "regional-national-policy"
+    ],
+    "rule": "Representative locality prominence and development are shared-world economic outcomes, not personal progression rewards."
+  },
+  "units": [
+    {
+      "admin1Code": "38",
+      "regionName": "Blagoevgrad",
+      "regionSourceName": "Blagoevgrad",
+      "regionAsciiName": "Blagoevgrad",
+      "regionSourceRef": "geonames:733192",
+      "representativeLocality": {
+        "localityId": "dropi:locality:geonames:733191",
+        "sourceRef": "geonames:733191",
+        "name": "Blagoevgrad",
+        "asciiName": "Blagoevgrad",
+        "latitude": 42.01457,
+        "longitude": 23.09804,
+        "featureCode": "PPLA",
+        "populationSourceValue": 67810,
+        "selectionBasis": "source-first-order-seat-role",
+        "presentationRole": "regional-representative-locality"
+      },
+      "economicEmergence": {
+        "authority": "shared-regional-national-multiplayer-economy",
+        "personalPlayerProgressionUnlock": false,
+        "numericThresholdsDefined": false,
+        "presentationState": "economy-system-governed"
+      }
+    },
+    {
+      "admin1Code": "39",
+      "regionName": "Burgas",
+      "regionSourceName": "Burgas",
+      "regionAsciiName": "Burgas",
+      "regionSourceRef": "geonames:732771",
+      "representativeLocality": {
+        "localityId": "dropi:locality:geonames:732770",
+        "sourceRef": "geonames:732770",
+        "name": "Burgas",
+        "asciiName": "Burgas",
+        "latitude": 42.50651,
+        "longitude": 27.46886,
+        "featureCode": "PPLA",
+        "populationSourceValue": 210646,
+        "selectionBasis": "source-first-order-seat-role",
+        "presentationRole": "regional-representative-locality"
+      },
+      "economicEmergence": {
+        "authority": "shared-regional-national-multiplayer-economy",
+        "personalPlayerProgressionUnlock": false,
+        "numericThresholdsDefined": false,
+        "presentationState": "economy-system-governed"
+      }
+    },
+    {
+      "admin1Code": "40",
+      "regionName": "Dobrich",
+      "regionSourceName": "Dobrich",
+      "regionAsciiName": "Dobrich",
+      "regionSourceRef": "geonames:726419",
+      "representativeLocality": {
+        "localityId": "dropi:locality:geonames:726418",
+        "sourceRef": "geonames:726418",
+        "name": "Dobrich",
+        "asciiName": "Dobrich",
+        "latitude": 43.56491,
+        "longitude": 27.83138,
+        "featureCode": "PPLA",
+        "populationSourceValue": 69434,
+        "selectionBasis": "source-first-order-seat-role",
+        "presentationRole": "regional-representative-locality"
+      },
+      "economicEmergence": {
+        "authority": "shared-regional-national-multiplayer-economy",
+        "personalPlayerProgressionUnlock": false,
+        "numericThresholdsDefined": false,
+        "presentationState": "economy-system-governed"
+      }
+    },
+    {
+      "admin1Code": "41",
+      "regionName": "Gabrovo",
+      "regionSourceName": "Gabrovo",
+      "regionAsciiName": "Gabrovo",
+      "regionSourceRef": "geonames:864552",
+      "representativeLocality": {
+        "localityId": "dropi:locality:geonames:731549",
+        "sourceRef": "geonames:731549",
+        "name": "Gabrovo",
+        "asciiName": "Gabrovo",
+        "latitude": 42.87419,
+        "longitude": 25.31823,
+        "featureCode": "PPLA",
+        "populationSourceValue": 48133,
+        "selectionBasis": "source-first-order-seat-role",
+        "presentationRole": "regional-representative-locality"
+      },
+      "economicEmergence": {
+        "authority": "shared-regional-national-multiplayer-economy",
+        "personalPlayerProgressionUnlock": false,
+        "numericThresholdsDefined": false,
+        "presentationState": "economy-system-governed"
+      }
+    },
+    {
+      "admin1Code": "42",
+      "regionName": "Sofia-Capital",
+      "regionSourceName": "Sofia-Capital",
+      "regionAsciiName": "Sofia-Capital",
+      "regionSourceRef": "geonames:731061",
+      "representativeLocality": {
+        "localityId": "dropi:locality:geonames:727011",
+        "sourceRef": "geonames:727011",
+        "name": "Sofia",
+        "asciiName": "Sofia",
+        "latitude": 42.69751,
+        "longitude": 23.32415,
+        "featureCode": "PPLC",
+        "populationSourceValue": 1152556,
+        "selectionBasis": "source-first-order-seat-role",
+        "presentationRole": "national-capital-and-regional-node"
+      },
+      "economicEmergence": {
+        "authority": "shared-regional-national-multiplayer-economy",
+        "personalPlayerProgressionUnlock": false,
+        "numericThresholdsDefined": false,
+        "presentationState": "economy-system-governed"
+      }
+    },
+    {
+      "admin1Code": "43",
+      "regionName": "Haskovo",
+      "regionSourceName": "Haskovo",
+      "regionAsciiName": "Haskovo",
+      "regionSourceRef": "geonames:730436",
+      "representativeLocality": {
+        "localityId": "dropi:locality:geonames:730435",
+        "sourceRef": "geonames:730435",
+        "name": "Haskovo",
+        "asciiName": "Haskovo",
+        "latitude": 41.93415,
+        "longitude": 25.55557,
+        "featureCode": "PPLA",
+        "populationSourceValue": 64564,
+        "selectionBasis": "source-first-order-seat-role",
+        "presentationRole": "regional-representative-locality"
+      },
+      "economicEmergence": {
+        "authority": "shared-regional-national-multiplayer-economy",
+        "personalPlayerProgressionUnlock": false,
+        "numericThresholdsDefined": false,
+        "presentationState": "economy-system-governed"
+      }
+    },
+    {
+      "admin1Code": "44",
+      "regionName": "Kardzhali",
+      "regionSourceName": "Kardzhali",
+      "regionAsciiName": "Kardzhali",
+      "regionSourceRef": "geonames:864553",
+      "representativeLocality": {
+        "localityId": "dropi:locality:geonames:729794",
+        "sourceRef": "geonames:729794",
+        "name": "Kardzhali",
+        "asciiName": "Kardzhali",
+        "latitude": 41.64502,
+        "longitude": 25.36578,
+        "featureCode": "PPLA",
+        "populationSourceValue": 44071,
+        "selectionBasis": "source-first-order-seat-role",
+        "presentationRole": "regional-representative-locality"
+      },
+      "economicEmergence": {
+        "authority": "shared-regional-national-multiplayer-economy",
+        "personalPlayerProgressionUnlock": false,
+        "numericThresholdsDefined": false,
+        "presentationState": "economy-system-governed"
+      }
+    },
+    {
+      "admin1Code": "45",
+      "regionName": "Kyustendil",
+      "regionSourceName": "Kyustendil",
+      "regionAsciiName": "Kyustendil",
+      "regionSourceRef": "geonames:864554",
+      "representativeLocality": {
+        "localityId": "dropi:locality:geonames:729730",
+        "sourceRef": "geonames:729730",
+        "name": "Kyustendil",
+        "asciiName": "Kyustendil",
+        "latitude": 42.28314,
+        "longitude": 22.69224,
+        "featureCode": "PPLA",
+        "populationSourceValue": 46856,
+        "selectionBasis": "source-first-order-seat-role",
+        "presentationRole": "regional-representative-locality"
+      },
+      "economicEmergence": {
+        "authority": "shared-regional-national-multiplayer-economy",
+        "personalPlayerProgressionUnlock": false,
+        "numericThresholdsDefined": false,
+        "presentationState": "economy-system-governed"
+      }
+    },
+    {
+      "admin1Code": "46",
+      "regionName": "Lovech",
+      "regionSourceName": "Lovech",
+      "regionAsciiName": "Lovech",
+      "regionSourceRef": "geonames:729560",
+      "representativeLocality": {
+        "localityId": "dropi:locality:geonames:729559",
+        "sourceRef": "geonames:729559",
+        "name": "Lovech",
+        "asciiName": "Lovech",
+        "latitude": 43.13227,
+        "longitude": 24.71763,
+        "featureCode": "PPLA",
+        "populationSourceValue": 27910,
+        "selectionBasis": "source-first-order-seat-role",
+        "presentationRole": "regional-representative-locality"
+      },
+      "economicEmergence": {
+        "authority": "shared-regional-national-multiplayer-economy",
+        "personalPlayerProgressionUnlock": false,
+        "numericThresholdsDefined": false,
+        "presentationState": "economy-system-governed"
+      }
+    },
+    {
+      "admin1Code": "47",
+      "regionName": "Montana",
+      "regionSourceName": "Montana",
+      "regionAsciiName": "Montana",
+      "regionSourceRef": "geonames:453753",
+      "representativeLocality": {
+        "localityId": "dropi:locality:geonames:729114",
+        "sourceRef": "geonames:729114",
+        "name": "Montana",
+        "asciiName": "Montana",
+        "latitude": 43.41285,
+        "longitude": 23.22174,
+        "featureCode": "PPLA",
+        "populationSourceValue": 47445,
+        "selectionBasis": "source-first-order-seat-role",
+        "presentationRole": "regional-representative-locality"
+      },
+      "economicEmergence": {
+        "authority": "shared-regional-national-multiplayer-economy",
+        "personalPlayerProgressionUnlock": false,
+        "numericThresholdsDefined": false,
+        "presentationState": "economy-system-governed"
+      }
+    },
+    {
+      "admin1Code": "48",
+      "regionName": "Pazardzhik",
+      "regionSourceName": "Pazardzhik",
+      "regionAsciiName": "Pazardzhik",
+      "regionSourceRef": "geonames:728379",
+      "representativeLocality": {
+        "localityId": "dropi:locality:geonames:728378",
+        "sourceRef": "geonames:728378",
+        "name": "Pazardzhik",
+        "asciiName": "Pazardzhik",
+        "latitude": 42.19934,
+        "longitude": 24.33318,
+        "featureCode": "PPLA",
+        "populationSourceValue": 55220,
+        "selectionBasis": "source-first-order-seat-role",
+        "presentationRole": "regional-representative-locality"
+      },
+      "economicEmergence": {
+        "authority": "shared-regional-national-multiplayer-economy",
+        "personalPlayerProgressionUnlock": false,
+        "numericThresholdsDefined": false,
+        "presentationState": "economy-system-governed"
+      }
+    },
+    {
+      "admin1Code": "49",
+      "regionName": "Pernik",
+      "regionSourceName": "Pernik",
+      "regionAsciiName": "Pernik",
+      "regionSourceRef": "geonames:728331",
+      "representativeLocality": {
+        "localityId": "dropi:locality:geonames:728330",
+        "sourceRef": "geonames:728330",
+        "name": "Pernik",
+        "asciiName": "Pernik",
+        "latitude": 42.59671,
+        "longitude": 23.03318,
+        "featureCode": "PPLA",
+        "populationSourceValue": 82467,
+        "selectionBasis": "source-first-order-seat-role",
+        "presentationRole": "regional-representative-locality"
+      },
+      "economicEmergence": {
+        "authority": "shared-regional-national-multiplayer-economy",
+        "personalPlayerProgressionUnlock": false,
+        "numericThresholdsDefined": false,
+        "presentationState": "economy-system-governed"
+      }
+    },
+    {
+      "admin1Code": "50",
+      "regionName": "Pleven",
+      "regionSourceName": "Pleven",
+      "regionAsciiName": "Pleven",
+      "regionSourceRef": "geonames:728204",
+      "representativeLocality": {
+        "localityId": "dropi:locality:geonames:728203",
+        "sourceRef": "geonames:728203",
+        "name": "Pleven",
+        "asciiName": "Pleven",
+        "latitude": 43.41791,
+        "longitude": 24.61666,
+        "featureCode": "PPLA",
+        "populationSourceValue": 90209,
+        "selectionBasis": "source-first-order-seat-role",
+        "presentationRole": "regional-representative-locality"
+      },
+      "economicEmergence": {
+        "authority": "shared-regional-national-multiplayer-economy",
+        "personalPlayerProgressionUnlock": false,
+        "numericThresholdsDefined": false,
+        "presentationState": "economy-system-governed"
+      }
+    },
+    {
+      "admin1Code": "51",
+      "regionName": "Plovdiv",
+      "regionSourceName": "Plovdiv",
+      "regionAsciiName": "Plovdiv",
+      "regionSourceRef": "geonames:728194",
+      "representativeLocality": {
+        "localityId": "dropi:locality:geonames:728193",
+        "sourceRef": "geonames:728193",
+        "name": "Plovdiv",
+        "asciiName": "Plovdiv",
+        "latitude": 42.15387,
+        "longitude": 24.75001,
+        "featureCode": "PPLA",
+        "populationSourceValue": 329489,
+        "selectionBasis": "source-first-order-seat-role",
+        "presentationRole": "regional-representative-locality"
+      },
+      "economicEmergence": {
+        "authority": "shared-regional-national-multiplayer-economy",
+        "personalPlayerProgressionUnlock": false,
+        "numericThresholdsDefined": false,
+        "presentationState": "economy-system-governed"
+      }
+    },
+    {
+      "admin1Code": "52",
+      "regionName": "Razgrad",
+      "regionSourceName": "Razgrad",
+      "regionAsciiName": "Razgrad",
+      "regionSourceRef": "geonames:453751",
+      "representativeLocality": {
+        "localityId": "dropi:locality:geonames:727696",
+        "sourceRef": "geonames:727696",
+        "name": "Razgrad",
+        "asciiName": "Razgrad",
+        "latitude": 43.53331,
+        "longitude": 26.51849,
+        "featureCode": "PPLA",
+        "populationSourceValue": 28931,
+        "selectionBasis": "source-first-order-seat-role",
+        "presentationRole": "regional-representative-locality"
+      },
+      "economicEmergence": {
+        "authority": "shared-regional-national-multiplayer-economy",
+        "personalPlayerProgressionUnlock": false,
+        "numericThresholdsDefined": false,
+        "presentationState": "economy-system-governed"
+      }
+    },
+    {
+      "admin1Code": "53",
+      "regionName": "Ruse",
+      "regionSourceName": "Ruse",
+      "regionAsciiName": "Ruse",
+      "regionSourceRef": "geonames:727524",
+      "representativeLocality": {
+        "localityId": "dropi:locality:geonames:727523",
+        "sourceRef": "geonames:727523",
+        "name": "Ruse",
+        "asciiName": "Ruse",
+        "latitude": 43.84872,
+        "longitude": 25.9534,
+        "featureCode": "PPLA",
+        "populationSourceValue": 121168,
+        "selectionBasis": "source-first-order-seat-role",
+        "presentationRole": "regional-representative-locality"
+      },
+      "economicEmergence": {
+        "authority": "shared-regional-national-multiplayer-economy",
+        "personalPlayerProgressionUnlock": false,
+        "numericThresholdsDefined": false,
+        "presentationState": "economy-system-governed"
+      }
+    },
+    {
+      "admin1Code": "54",
+      "regionName": "Shumen",
+      "regionSourceName": "Shumen",
+      "regionAsciiName": "Shumen",
+      "regionSourceRef": "geonames:864555",
+      "representativeLocality": {
+        "localityId": "dropi:locality:geonames:727233",
+        "sourceRef": "geonames:727233",
+        "name": "Shumen",
+        "asciiName": "Shumen",
+        "latitude": 43.27064,
+        "longitude": 26.92286,
+        "featureCode": "PPLA",
+        "populationSourceValue": 72342,
+        "selectionBasis": "source-first-order-seat-role",
+        "presentationRole": "regional-representative-locality"
+      },
+      "economicEmergence": {
+        "authority": "shared-regional-national-multiplayer-economy",
+        "personalPlayerProgressionUnlock": false,
+        "numericThresholdsDefined": false,
+        "presentationState": "economy-system-governed"
+      }
+    },
+    {
+      "admin1Code": "55",
+      "regionName": "Silistra",
+      "regionSourceName": "Silistra",
+      "regionAsciiName": "Silistra",
+      "regionSourceRef": "geonames:864556",
+      "representativeLocality": {
+        "localityId": "dropi:locality:geonames:727221",
+        "sourceRef": "geonames:727221",
+        "name": "Silistra",
+        "asciiName": "Silistra",
+        "latitude": 44.1171,
+        "longitude": 27.26056,
+        "featureCode": "PPLA",
+        "populationSourceValue": 29498,
+        "selectionBasis": "source-first-order-seat-role",
+        "presentationRole": "regional-representative-locality"
+      },
+      "economicEmergence": {
+        "authority": "shared-regional-national-multiplayer-economy",
+        "personalPlayerProgressionUnlock": false,
+        "numericThresholdsDefined": false,
+        "presentationState": "economy-system-governed"
+      }
+    },
+    {
+      "admin1Code": "56",
+      "regionName": "Sliven",
+      "regionSourceName": "Sliven",
+      "regionAsciiName": "Sliven",
+      "regionSourceRef": "geonames:864557",
+      "representativeLocality": {
+        "localityId": "dropi:locality:geonames:727079",
+        "sourceRef": "geonames:727079",
+        "name": "Sliven",
+        "asciiName": "Sliven",
+        "latitude": 42.68607,
+        "longitude": 26.32558,
+        "featureCode": "PPLA",
+        "populationSourceValue": 83740,
+        "selectionBasis": "source-first-order-seat-role",
+        "presentationRole": "regional-representative-locality"
+      },
+      "economicEmergence": {
+        "authority": "shared-regional-national-multiplayer-economy",
+        "personalPlayerProgressionUnlock": false,
+        "numericThresholdsDefined": false,
+        "presentationState": "economy-system-governed"
+      }
+    },
+    {
+      "admin1Code": "57",
+      "regionName": "Smolyan",
+      "regionSourceName": "Smolyan",
+      "regionAsciiName": "Smolyan",
+      "regionSourceRef": "geonames:864558",
+      "representativeLocality": {
+        "localityId": "dropi:locality:geonames:727030",
+        "sourceRef": "geonames:727030",
+        "name": "Smolyan",
+        "asciiName": "Smolyan",
+        "latitude": 41.57439,
+        "longitude": 24.71204,
+        "featureCode": "PPLA",
+        "populationSourceValue": 30689,
+        "selectionBasis": "source-first-order-seat-role",
+        "presentationRole": "regional-representative-locality"
+      },
+      "economicEmergence": {
+        "authority": "shared-regional-national-multiplayer-economy",
+        "personalPlayerProgressionUnlock": false,
+        "numericThresholdsDefined": false,
+        "presentationState": "economy-system-governed"
+      }
+    },
+    {
+      "admin1Code": "58",
+      "regionName": "Sofia",
+      "regionSourceName": "Sofia",
+      "regionAsciiName": "Sofia",
+      "regionSourceRef": "geonames:727012",
+      "representativeLocality": {
+        "localityId": "dropi:locality:geonames:727462",
+        "sourceRef": "geonames:727462",
+        "name": "Samokov",
+        "asciiName": "Samokov",
+        "latitude": 42.33855,
+        "longitude": 23.55805,
+        "featureCode": "PPL",
+        "populationSourceValue": 26765,
+        "selectionBasis": "source-admin-fallback",
+        "presentationRole": "regional-representative-locality"
+      },
+      "economicEmergence": {
+        "authority": "shared-regional-national-multiplayer-economy",
+        "personalPlayerProgressionUnlock": false,
+        "numericThresholdsDefined": false,
+        "presentationState": "economy-system-governed"
+      }
+    },
+    {
+      "admin1Code": "59",
+      "regionName": "Stara Zagora",
+      "regionSourceName": "Stara Zagora",
+      "regionAsciiName": "Stara Zagora",
+      "regionSourceRef": "geonames:864559",
+      "representativeLocality": {
+        "localityId": "dropi:locality:geonames:726848",
+        "sourceRef": "geonames:726848",
+        "name": "Stara Zagora",
+        "asciiName": "Stara Zagora",
+        "latitude": 42.43205,
+        "longitude": 25.64262,
+        "featureCode": "PPLA",
+        "populationSourceValue": 121582,
+        "selectionBasis": "source-first-order-seat-role",
+        "presentationRole": "regional-representative-locality"
+      },
+      "economicEmergence": {
+        "authority": "shared-regional-national-multiplayer-economy",
+        "personalPlayerProgressionUnlock": false,
+        "numericThresholdsDefined": false,
+        "presentationState": "economy-system-governed"
+      }
+    },
+    {
+      "admin1Code": "60",
+      "regionName": "Targovishte",
+      "regionSourceName": "Targovishte",
+      "regionAsciiName": "Targovishte",
+      "regionSourceRef": "geonames:864560",
+      "representativeLocality": {
+        "localityId": "dropi:locality:geonames:726174",
+        "sourceRef": "geonames:726174",
+        "name": "Targovishte",
+        "asciiName": "Targovishte",
+        "latitude": 43.2512,
+        "longitude": 26.57215,
+        "featureCode": "PPLA",
+        "populationSourceValue": 34793,
+        "selectionBasis": "source-first-order-seat-role",
+        "presentationRole": "regional-representative-locality"
+      },
+      "economicEmergence": {
+        "authority": "shared-regional-national-multiplayer-economy",
+        "personalPlayerProgressionUnlock": false,
+        "numericThresholdsDefined": false,
+        "presentationState": "economy-system-governed"
+      }
+    },
+    {
+      "admin1Code": "61",
+      "regionName": "Varna",
+      "regionSourceName": "Varna",
+      "regionAsciiName": "Varna",
+      "regionSourceRef": "geonames:726051",
+      "representativeLocality": {
+        "localityId": "dropi:locality:geonames:726050",
+        "sourceRef": "geonames:726050",
+        "name": "Varna",
+        "asciiName": "Varna",
+        "latitude": 43.21912,
+        "longitude": 27.91024,
+        "featureCode": "PPLA",
+        "populationSourceValue": 318737,
+        "selectionBasis": "source-first-order-seat-role",
+        "presentationRole": "regional-representative-locality"
+      },
+      "economicEmergence": {
+        "authority": "shared-regional-national-multiplayer-economy",
+        "personalPlayerProgressionUnlock": false,
+        "numericThresholdsDefined": false,
+        "presentationState": "economy-system-governed"
+      }
+    },
+    {
+      "admin1Code": "62",
+      "regionName": "Veliko Tarnovo",
+      "regionSourceName": "Veliko Tarnovo",
+      "regionAsciiName": "Veliko Tarnovo",
+      "regionSourceRef": "geonames:864561",
+      "representativeLocality": {
+        "localityId": "dropi:locality:geonames:725993",
+        "sourceRef": "geonames:725993",
+        "name": "Veliko Tŭrnovo",
+        "asciiName": "Veliko Turnovo",
+        "latitude": 43.08124,
+        "longitude": 25.62904,
+        "featureCode": "PPLA",
+        "populationSourceValue": 59166,
+        "selectionBasis": "source-first-order-seat-role",
+        "presentationRole": "regional-representative-locality"
+      },
+      "economicEmergence": {
+        "authority": "shared-regional-national-multiplayer-economy",
+        "personalPlayerProgressionUnlock": false,
+        "numericThresholdsDefined": false,
+        "presentationState": "economy-system-governed"
+      }
+    },
+    {
+      "admin1Code": "63",
+      "regionName": "Vidin",
+      "regionSourceName": "Vidin",
+      "regionAsciiName": "Vidin",
+      "regionSourceRef": "geonames:864562",
+      "representativeLocality": {
+        "localityId": "dropi:locality:geonames:725905",
+        "sourceRef": "geonames:725905",
+        "name": "Vidin",
+        "asciiName": "Vidin",
+        "latitude": 43.99159,
+        "longitude": 22.88236,
+        "featureCode": "PPLA",
+        "populationSourceValue": 34797,
+        "selectionBasis": "source-first-order-seat-role",
+        "presentationRole": "regional-representative-locality"
+      },
+      "economicEmergence": {
+        "authority": "shared-regional-national-multiplayer-economy",
+        "personalPlayerProgressionUnlock": false,
+        "numericThresholdsDefined": false,
+        "presentationState": "economy-system-governed"
+      }
+    },
+    {
+      "admin1Code": "64",
+      "regionName": "Vratsa",
+      "regionSourceName": "Vratsa",
+      "regionAsciiName": "Vratsa",
+      "regionSourceRef": "geonames:725713",
+      "representativeLocality": {
+        "localityId": "dropi:locality:geonames:725712",
+        "sourceRef": "geonames:725712",
+        "name": "Vratsa",
+        "asciiName": "Vratsa",
+        "latitude": 43.21052,
+        "longitude": 23.56312,
+        "featureCode": "PPLA",
+        "populationSourceValue": 49569,
+        "selectionBasis": "source-first-order-seat-role",
+        "presentationRole": "regional-representative-locality"
+      },
+      "economicEmergence": {
+        "authority": "shared-regional-national-multiplayer-economy",
+        "personalPlayerProgressionUnlock": false,
+        "numericThresholdsDefined": false,
+        "presentationState": "economy-system-governed"
+      }
+    },
+    {
+      "admin1Code": "65",
+      "regionName": "Yambol",
+      "regionSourceName": "Yambol",
+      "regionAsciiName": "Yambol",
+      "regionSourceRef": "geonames:864563",
+      "representativeLocality": {
+        "localityId": "dropi:locality:geonames:725578",
+        "sourceRef": "geonames:725578",
+        "name": "Yambol",
+        "asciiName": "Yambol",
+        "latitude": 42.48243,
+        "longitude": 26.50006,
+        "featureCode": "PPLA",
+        "populationSourceValue": 63656,
+        "selectionBasis": "source-first-order-seat-role",
+        "presentationRole": "regional-representative-locality"
+      },
+      "economicEmergence": {
+        "authority": "shared-regional-national-multiplayer-economy",
+        "personalPlayerProgressionUnlock": false,
+        "numericThresholdsDefined": false,
+        "presentationState": "economy-system-governed"
+      }
+    }
+  ]
+}

@@ -4,6 +4,8 @@ import {
   inInteractionRange, isUrbanWalkable, minimapPoint, movementFacing,
   moveUrbanPlayer, repairUrbanPosition,
 } from '../src/world/urbanWorld'
+import { CITY_LOCATIONS, isCityLocationReachable } from '../src/world/city'
+import { CENTRAL_CONTROLLED_CROSSING, crossingPoint } from '../src/world/cityTrafficRules'
 import { WORLD_HEIGHT, WORLD_ROUTE_POINTS, WORLD_WIDTH } from '../src/world/worldLayout'
 
 describe('urban district navigation', () => {
@@ -24,31 +26,16 @@ describe('urban district navigation', () => {
     }
   })
 
-  it('permits roads and pavement, but keeps motor vehicles off pavement', () => {
-    for (const road of URBAN_ROADS) expect(isUrbanWalkable(road.x, road.y, true)).toBe(true)
-    expect(isUrbanWalkable(700, 340)).toBe(false) // radius must fit entirely
-    expect(isUrbanWalkable(700, 334)).toBe(true)
-    expect(isUrbanWalkable(700, 334, true)).toBe(false)
-    expect(isUrbanWalkable(700, 334, false, -1)).toBe(false)
+  it('permits source street centerlines and keeps motor vehicles off pavement', () => {
+    for (const road of URBAN_ROADS) for (const point of road.centerline ?? []) expect(isUrbanWalkable(point.x, point.y, true)).toBe(true)
+    const curb = crossingPoint(CENTRAL_CONTROLLED_CROSSING, 0, CENTRAL_CONTROLLED_CROSSING.halfLength)
+    expect(isUrbanWalkable(curb.x, curb.y, false, 6)).toBe(true)
+    expect(isUrbanWalkable(curb.x, curb.y, true, 6)).toBe(false)
+    expect(isUrbanWalkable(curb.x, curb.y, false, -1)).toBe(false)
   })
 
-  it('keeps every mission endpoint connected to HQ by roads', () => {
-    const visited = new Set<string>()
-    const queue = [{ x: 380, y: 290 }]
-    for (let i = 0; i < queue.length; i += 1) {
-      const point = queue[i]
-      for (const [dx, dy] of [[10, 0], [-10, 0], [0, 10], [0, -10]]) {
-        const next = { x: point.x + dx, y: point.y + dy }
-        const key = `${next.x},${next.y}`
-        if (!visited.has(key) && isUrbanWalkable(next.x, next.y, true)) {
-          visited.add(key)
-          queue.push(next)
-        }
-      }
-    }
-    for (const point of [...WORLD_ROUTE_POINTS, URBAN_MERCHANT, URBAN_CUSTOMER]) {
-      expect(visited.has(`${point.x},${point.y}`), JSON.stringify(point)).toBe(true)
-    }
+  it('keeps every mission endpoint connected to HQ by source streets', () => {
+    for (const point of CITY_LOCATIONS) expect(isCityLocationReachable(point), point.label).toBe(true)
   })
 
   it('cannot cross a building even after prolonged input or a stalled frame', () => {
@@ -63,7 +50,7 @@ describe('urban district navigation', () => {
   })
 
   it('normalizes diagonals, supports all directions and rejects invalid movement', () => {
-    const origin = { x: 800, y: 600 }
+    const origin = { ...URBAN_HQ }
     const straight = moveUrbanPlayer(origin, { x: 1, y: 0 }, 0.05, 150)
     const diagonal = moveUrbanPlayer(origin, { x: 1, y: 1 }, 0.05, 150)
     expect(Math.hypot(diagonal.x - origin.x, diagonal.y - origin.y))
@@ -83,13 +70,13 @@ describe('navigation support', () => {
     expect(minimapPoint({ x: 0, y: 0 }, 160, 120)).toEqual({ x: 0, y: 0 })
     expect(minimapPoint({ x: WORLD_WIDTH, y: WORLD_HEIGHT }, 160, 120)).toEqual({ x: 160, y: 120 })
     expect(minimapPoint({ x: WORLD_WIDTH / 2, y: WORLD_HEIGHT / 2 }, 160, 120)).toEqual({ x: 80, y: 60 })
-    expect(minimapPoint({ x: -100, y: 3000 }, 160, 120)).toEqual({ x: 0, y: 120 })
+    expect(minimapPoint({ x: -100, y: WORLD_HEIGHT + 100 }, 160, 120)).toEqual({ x: 0, y: 120 })
     expect(minimapPoint({ x: NaN, y: Infinity }, 160, 120)).toEqual({ x: 0, y: 0 })
   })
 
   it('gates NPC interactions by finite inclusive proximity', () => {
-    expect(inInteractionRange(URBAN_MERCHANT, { x: 668, y: 910 })).toBe(true)
-    expect(inInteractionRange(URBAN_MERCHANT, { x: 669, y: 910 })).toBe(false)
+    expect(inInteractionRange(URBAN_MERCHANT, { x: URBAN_MERCHANT.x + 48, y: URBAN_MERCHANT.y })).toBe(true)
+    expect(inInteractionRange(URBAN_MERCHANT, { x: URBAN_MERCHANT.x + 49, y: URBAN_MERCHANT.y })).toBe(false)
     expect(inInteractionRange(URBAN_HQ, URBAN_MERCHANT)).toBe(false)
     expect(inInteractionRange(URBAN_HQ, { x: NaN, y: 270 })).toBe(false)
   })

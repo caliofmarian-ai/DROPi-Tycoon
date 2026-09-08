@@ -1,0 +1,216 @@
+{
+  "version": "1.0.0",
+  "issue": 530,
+  "continent": "Europe",
+  "country": {
+    "geometryId": "208",
+    "sourceCountryCode": "DK",
+    "renderedName": "Denmark"
+  },
+  "administrativeModel": {
+    "level": "first-order-regional-governance",
+    "nativeTermSingular": "region",
+    "nativeTermPlural": "regioner",
+    "englishTerm": "region",
+    "unitCount": 5,
+    "effectiveFrom": "2007-01-01",
+    "effectiveUntil": "2026-12-31",
+    "currentAsOf": "2026-09-08",
+    "officialReferences": [
+      "https://www.dst.dk/en/Statistik/dokumentation/nomenklaturer/nuts",
+      "https://www.dst.dk/en/Statistik/emner/oekonomi/offentlig-oekonomi/regionernes-regnskaber-og-budgetter",
+      "https://www.elections.im.dk/Media/638061785153051178/Act%20on%20Regions.pdf"
+    ],
+    "futureTransitions": [
+      {
+        "type": "legislated-region-merger",
+        "effectiveFrom": "2027-01-01",
+        "sourceAdmin1Codes": [
+          "17",
+          "20"
+        ],
+        "sourceRegionNames": [
+          "Capital Region of Denmark",
+          "Region Zealand"
+        ],
+        "futureCanonicalName": "Region Østdanmark",
+        "futureEnglishName": "East Denmark Region",
+        "status": "future-not-yet-active",
+        "officialReferences": [
+          "https://www.regionoest.dk/",
+          "https://www.regionh.dk/region-oestdanmark/sider/region-oestdanmark-sammenlaegning.aspx",
+          "https://www.regionoest.dk/om-region-oestdanmark/en-ny-region-i-danmark"
+        ],
+        "note": "The 2026 game-world structure remains the five existing regions. Region Hovedstaden and Region Sjælland continue their existing operations through 31 December 2026. Region Østdanmark becomes operational on 1 January 2027; the future transition must preserve world/company/economy continuity rather than create simultaneous duplicate live ownership."
+      }
+    ]
+  },
+  "source": {
+    "provider": "GeoNames",
+    "license": "Creative Commons Attribution 4.0",
+    "releaseTag": "source-geonames-cities500-2026-09-08-f3cda4f9",
+    "cities500Sha256": "f3cda4f9d256d90045121fb8eebad3ed91695c32370ed93b50fbe0cb616e2bbd",
+    "admin1Sha256": "590651498043f674accda2b7f46d21286cda0e290b02f8561c5005eee9a5448c",
+    "expectedCountryCandidateCount": 507,
+    "publishedGameplayRepresentativeCount": 5
+  },
+  "selectionModel": {
+    "primaryFeatureCodes": [
+      "PPLC",
+      "PPLA"
+    ],
+    "fallbackFeatureCodes": [
+      "PPLA2",
+      "PPL"
+    ],
+    "expectedPrimarySelections": 5,
+    "expectedFallbackSelections": 0,
+    "highDensityGameplayImport": false,
+    "hardcodedCoordinates": false,
+    "rule": "One source-backed representative locality per governed first-order region; retained high-density source remains reference-only."
+  },
+  "developmentModel": {
+    "authority": "shared-regional-national-multiplayer-economy",
+    "personalPlayerProgressionUnlock": false,
+    "numericThresholdsDefined": false,
+    "signalsPlanned": [
+      "company-activity",
+      "employment-demand",
+      "production",
+      "logistics-throughput",
+      "construction-investment",
+      "transport-connectivity",
+      "trade-volume",
+      "population-economic-simulation",
+      "regional-national-policy"
+    ],
+    "rule": "Representative locality prominence and development are shared-world economic outcomes, not personal progression rewards."
+  },
+  "units": [
+    {
+      "admin1Code": "17",
+      "regionName": "Capital Region of Denmark",
+      "regionSourceName": "Capital Region",
+      "regionAsciiName": "Capital Region",
+      "regionSourceRef": "geonames:6418538",
+      "representativeLocality": {
+        "localityId": "dropi:locality:geonames:2618425",
+        "sourceRef": "geonames:2618425",
+        "name": "Copenhagen",
+        "asciiName": "Copenhagen",
+        "latitude": 55.67594,
+        "longitude": 12.56553,
+        "featureCode": "PPLC",
+        "populationSourceValue": 1153615,
+        "selectionBasis": "source-first-order-seat-role",
+        "presentationRole": "national-capital-and-regional-node"
+      },
+      "economicEmergence": {
+        "authority": "shared-regional-national-multiplayer-economy",
+        "personalPlayerProgressionUnlock": false,
+        "numericThresholdsDefined": false,
+        "presentationState": "economy-system-governed"
+      }
+    },
+    {
+      "admin1Code": "18",
+      "regionName": "Central Denmark Region",
+      "regionSourceName": "Central Jutland",
+      "regionAsciiName": "Central Jutland",
+      "regionSourceRef": "geonames:6418539",
+      "representativeLocality": {
+        "localityId": "dropi:locality:geonames:2610319",
+        "sourceRef": "geonames:2610319",
+        "name": "Viborg",
+        "asciiName": "Viborg",
+        "latitude": 56.45319,
+        "longitude": 9.40201,
+        "featureCode": "PPLA",
+        "populationSourceValue": 41239,
+        "selectionBasis": "source-first-order-seat-role",
+        "presentationRole": "regional-representative-locality"
+      },
+      "economicEmergence": {
+        "authority": "shared-regional-national-multiplayer-economy",
+        "personalPlayerProgressionUnlock": false,
+        "numericThresholdsDefined": false,
+        "presentationState": "economy-system-governed"
+      }
+    },
+    {
+      "admin1Code": "19",
+      "regionName": "North Denmark Region",
+      "regionSourceName": "North Denmark",
+      "regionAsciiName": "North Denmark",
+      "regionSourceRef": "geonames:6418540",
+      "representativeLocality": {
+        "localityId": "dropi:locality:geonames:2624886",
+        "sourceRef": "geonames:2624886",
+        "name": "Aalborg",
+        "asciiName": "Aalborg",
+        "latitude": 57.048,
+        "longitude": 9.9187,
+        "featureCode": "PPLA",
+        "populationSourceValue": 142937,
+        "selectionBasis": "source-first-order-seat-role",
+        "presentationRole": "regional-representative-locality"
+      },
+      "economicEmergence": {
+        "authority": "shared-regional-national-multiplayer-economy",
+        "personalPlayerProgressionUnlock": false,
+        "numericThresholdsDefined": false,
+        "presentationState": "economy-system-governed"
+      }
+    },
+    {
+      "admin1Code": "20",
+      "regionName": "Region Zealand",
+      "regionSourceName": "Zealand",
+      "regionAsciiName": "Zealand",
+      "regionSourceRef": "geonames:6418541",
+      "representativeLocality": {
+        "localityId": "dropi:locality:geonames:2612862",
+        "sourceRef": "geonames:2612862",
+        "name": "Sorø",
+        "asciiName": "Soro",
+        "latitude": 55.43184,
+        "longitude": 11.55547,
+        "featureCode": "PPLA",
+        "populationSourceValue": 7999,
+        "selectionBasis": "source-first-order-seat-role",
+        "presentationRole": "regional-representative-locality"
+      },
+      "economicEmergence": {
+        "authority": "shared-regional-national-multiplayer-economy",
+        "personalPlayerProgressionUnlock": false,
+        "numericThresholdsDefined": false,
+        "presentationState": "economy-system-governed"
+      }
+    },
+    {
+      "admin1Code": "21",
+      "regionName": "Region of Southern Denmark",
+      "regionSourceName": "South Denmark",
+      "regionAsciiName": "South Denmark",
+      "regionSourceRef": "geonames:6418542",
+      "representativeLocality": {
+        "localityId": "dropi:locality:geonames:2610613",
+        "sourceRef": "geonames:2610613",
+        "name": "Vejle",
+        "asciiName": "Vejle",
+        "latitude": 55.70927,
+        "longitude": 9.5357,
+        "featureCode": "PPLA",
+        "populationSourceValue": 60231,
+        "selectionBasis": "source-first-order-seat-role",
+        "presentationRole": "regional-representative-locality"
+      },
+      "economicEmergence": {
+        "authority": "shared-regional-national-multiplayer-economy",
+        "personalPlayerProgressionUnlock": false,
+        "numericThresholdsDefined": false,
+        "presentationState": "economy-system-governed"
+      }
+    }
+  ]
+}

@@ -9,8 +9,7 @@ on:
       - 'game-web/public/data/world-atlas-countries-110m.json'
       - 'game-web/public/data/expanded-localities-v1/**'
       - 'game-web/public/data/europe-romania-regional-localities-v1.json'
-      - 'game-web/public/data/europe-albania-regional-localities-v1.json'
-      - 'game-web/public/data/europe-austria-regional-localities-v1.json'
+      - 'game-web/public/data/europe-*-regional-localities-v1.json'
       - 'scripts/verify_country_catalog_chapters.py'
       - 'scripts/verify_expanded_locality_catalog.py'
       - 'scripts/verify_romania_regional_localities.py'
@@ -24,8 +23,7 @@ on:
       - 'game-web/public/data/world-atlas-countries-110m.json'
       - 'game-web/public/data/expanded-localities-v1/**'
       - 'game-web/public/data/europe-romania-regional-localities-v1.json'
-      - 'game-web/public/data/europe-albania-regional-localities-v1.json'
-      - 'game-web/public/data/europe-austria-regional-localities-v1.json'
+      - 'game-web/public/data/europe-*-regional-localities-v1.json'
       - 'scripts/verify_country_catalog_chapters.py'
       - 'scripts/verify_expanded_locality_catalog.py'
       - 'scripts/verify_romania_regional_localities.py'
@@ -46,10 +44,26 @@ jobs:
           python scripts/verify_country_catalog_chapters.py
           python scripts/verify_expanded_locality_catalog.py
           python scripts/verify_romania_regional_localities.py
-          python scripts/verify_representative_regional_localities.py \
-            --config 04_World/Country_Catalog/Continents/Europe/ALBANIA_REGIONAL_CONFIG.json \
-            --data game-web/public/data/europe-albania-regional-localities-v1.json
-          python scripts/verify_representative_regional_localities.py \
-            --config 04_World/Country_Catalog/Continents/Europe/AUSTRIA_REGIONAL_CONFIG.json \
-            --data game-web/public/data/europe-austria-regional-localities-v1.json
+
+          shopt -s nullglob
+          configs=(04_World/Country_Catalog/Continents/Europe/*_REGIONAL_CONFIG.json)
+          if [ "${#configs[@]}" -eq 0 ]; then
+            echo 'No generic Europe regional configs found' >&2
+            exit 1
+          fi
+
+          for config in "${configs[@]}"; do
+            base_name="$(basename "$config" _REGIONAL_CONFIG.json)"
+            slug="$(printf '%s' "$base_name" | tr '[:upper:]' '[:lower:]' | tr '_' '-')"
+            data="game-web/public/data/europe-${slug}-regional-localities-v1.json"
+            if [ ! -f "$data" ]; then
+              echo "Missing generated regional data for $config: $data" >&2
+              exit 1
+            fi
+            echo "Verifying $config -> $data"
+            python scripts/verify_representative_regional_localities.py \
+              --config "$config" \
+              --data "$data"
+          done
+
           git diff --check

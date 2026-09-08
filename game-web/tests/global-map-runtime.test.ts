@@ -204,14 +204,14 @@ describe('Global Map runtime #418', () => {
   it('integrates map navigation without using the ordinary save/menu transition', () => {
     expect(configSource).toContain('GlobalMapScene')
     expect(hudSource).toContain("'World map', callbacks.worldMap")
-    expect(worldSource).toContain("this.scene.start('GlobalMap')")
+    expect(worldSource).toContain("this.scene.launch('GlobalMap', { focus })")
     expect(worldSource).toContain('this.syncRuntimeSession()')
     expect(resolveNativeBackTarget('GlobalMap')).toBe('GameWorld')
   })
 
   it('keeps strategic inspection non-teleporting and honest about simulation boundaries', () => {
-    expect(mapSource).toContain('Country layers use real geography.')
-    expect(mapSource).toContain('Economy and transport overlays will appear only when authoritative simulation is connected.')
+    expect(mapSource).toContain('Real terrain, rivers and lakes.')
+    expect(mapSource).toContain('City plan pending')
     expect(mapSource).toContain('Opening the map never moves the player, cargo or company.')
     expect(mapSource).not.toContain('player.x =')
     expect(mapSource).not.toContain('player.y =')

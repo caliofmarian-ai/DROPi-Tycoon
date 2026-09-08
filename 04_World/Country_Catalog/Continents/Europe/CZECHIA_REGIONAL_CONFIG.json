@@ -1,0 +1,67 @@
+{
+  "version": "1.0.0",
+  "issue": 528,
+  "continent": "Europe",
+  "country": {
+    "geometryId": "203",
+    "sourceCountryCode": "CZ",
+    "renderedName": "Czechia"
+  },
+  "administrativeModel": {
+    "level": "first-order",
+    "nativeTermSingular": "kraj",
+    "nativeTermPlural": "kraje",
+    "englishTerm": "region",
+    "unitCount": 14,
+    "officialReferences": [
+      "https://csu.gov.cz/territorial-units",
+      "https://csu.gov.cz/produkty/regions-of-the-czech-republic-2024",
+      "https://idzsck.stredoceskykraj.cz/en/web/idz/kontakty"
+    ],
+    "specialCases": [
+      {
+        "admin1Code": "88",
+        "type": "administrative-seat-outside-source-ownership",
+        "label": "Central Bohemian Region seat exception",
+        "note": "The Central Bohemian Regional Authority is seated in Prague, while Prague is a separate region-level unit. GeoNames source-owns Prague under CZ.52, so DROPi keeps Prague there as the unique national-capital locality and uses a source-backed representative inside CZ.88 without relabeling that representative as the regional capital."
+      }
+    ]
+  },
+  "source": {
+    "provider": "GeoNames",
+    "license": "Creative Commons Attribution 4.0",
+    "releaseTag": "source-geonames-cities500-2026-09-08-f3cda4f9",
+    "cities500Sha256": "f3cda4f9d256d90045121fb8eebad3ed91695c32370ed93b50fbe0cb616e2bbd",
+    "admin1Sha256": "590651498043f674accda2b7f46d21286cda0e290b02f8561c5005eee9a5448c",
+    "expectedCountryCandidateCount": 2772
+  },
+  "selectionPolicy": {
+    "primaryFeatureCodes": ["PPLC", "PPLA"],
+    "fallbackFeatureCodes": ["PPL"],
+    "expectedPrimarySelections": 13,
+    "expectedFallbackSelections": 1,
+    "highDensityGameplayImport": false,
+    "hardcodedCoordinates": false
+  },
+  "economicEmergence": {
+    "authority": "shared-regional-national-multiplayer-economy",
+    "personalPlayerProgressionUnlock": false,
+    "numericThresholdsDefined": false
+  },
+  "expectedRegions": [
+    {"admin1Code": "52", "canonicalName": "Prague, the Capital City", "sourceName": "Prague"},
+    {"admin1Code": "78", "canonicalName": "South Moravian Region", "sourceName": "South Moravian"},
+    {"admin1Code": "79", "canonicalName": "South Bohemian Region", "sourceName": "South Bohemian Region"},
+    {"admin1Code": "80", "canonicalName": "Vysočina Region", "sourceName": "Vysocina"},
+    {"admin1Code": "81", "canonicalName": "Karlovy Vary Region", "sourceName": "Carlsbad Region"},
+    {"admin1Code": "82", "canonicalName": "Hradec Králové Region", "sourceName": "Hradec Králové Region"},
+    {"admin1Code": "83", "canonicalName": "Liberec Region", "sourceName": "Liberec Region"},
+    {"admin1Code": "84", "canonicalName": "Olomouc Region", "sourceName": "Olomouc Region"},
+    {"admin1Code": "85", "canonicalName": "Moravian-Silesian Region", "sourceName": "Moravian-Silesian Region"},
+    {"admin1Code": "86", "canonicalName": "Pardubice Region", "sourceName": "Pardubice Region"},
+    {"admin1Code": "87", "canonicalName": "Plzeň Region", "sourceName": "Plzeň Region"},
+    {"admin1Code": "88", "canonicalName": "Central Bohemian Region", "sourceName": "Central Bohemia"},
+    {"admin1Code": "89", "canonicalName": "Ústí nad Labem Region", "sourceName": "Ústí nad Labem Region"},
+    {"admin1Code": "90", "canonicalName": "Zlín Region", "sourceName": "Zlín"}
+  ]
+}

@@ -68,7 +68,7 @@ within a live session preserves the current delivery. No Start New Game is requi
 
 - **City scale:** 3200 × 2400 world units, four times the previous 1600 × 1200
   area, populated by 95 buildings and 19 connected roads with pavements.
-- **Districts:** Old Town, Cedar Commerce, Foundry Quarter, Station Commons,
+- **Districts:** Old Town, Brăila Commerce, Foundry Quarter, Station Commons,
   Canal & Quays and Garden Borough. The catalog exposes `City → District[] →
   Location[]`, with building entrances and connected road routes rather than
   arbitrary destination coordinates. This is one city, not a multi-city release.

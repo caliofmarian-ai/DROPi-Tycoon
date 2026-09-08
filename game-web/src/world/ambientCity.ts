@@ -3,9 +3,10 @@ import { createPlayerVisual, type PlayerVisual } from './playerVisual'
 import { ensureNeighborAtlas, NEIGHBOR_ANCHOR, NEIGHBOR_CELL } from './cityArt'
 import { courierAnimationFrame, getCourierPose } from './courierPose'
 import { isUrbanWalkable, type UrbanFacing, type UrbanPoint } from './urbanWorld'
-import { WORLD_ROADS } from './worldLayout'
+import { PLAYER_START, WORLD_ROADS } from './worldLayout'
 import {
   CENTRAL_CONTROLLED_CROSSING,
+  crossingPoint,
   CONTROLLED_CROSSINGS,
   pedestrianHasCrossingPriority,
   sampleControlledCrossingPedestrian,
@@ -38,76 +39,48 @@ const clearRoute = (start: UrbanPoint, end: UrbanPoint, roadOnly: boolean): bool
   return true
 }
 
-/** Small authored loops, validated once against the real collision surfaces. */
+/** Bounded loops follow safe segments of the active city plan. */
+let cachedRoutes: readonly AmbientRoute[] | undefined
 export const buildAmbientRoutes = (): readonly AmbientRoute[] => {
-  const sidewalkRoutes: AmbientRoute[] = []
-  for (const [index, id] of ['central-vertical', 'garden-avenue'].entries()) {
-    const road = WORLD_ROADS.find(candidate => candidate.id === id)
-    if (!road) continue
-    for (let side = 0; side < 2; side++) {
-      const x = road.x + (side ? 1 : -1) * (road.width / 2 + 12)
-      const start = { x, y: road.y - road.height / 2 + 100 }
-      const end = { x, y: start.y + 240 }
-      if (clearRoute(start, end, false)) sidewalkRoutes.push({
-        id: `neighbor-${id}-${side}`, kind: 'pedestrian', start, end,
-        speed: 25 + index * 3, phase: index * 5 + side * 3,
-      })
-    }
-  }
-  const laneIds = [
-    'residential-lane', 'business-lane', 'storage-lane', 'company-lane',
-    'canal-lane', 'quay-lane', 'foundry-lane', 'garden-lane', 'orchard-lane',
-  ]
-  laneIds.forEach((id, index) => {
-    const road = WORLD_ROADS.find(candidate => candidate.id === id)
-    if (!road) return
-    for (let side = 0; side < 2; side++) {
-      if (index < 4 && side === 1) continue
-      const x = road.x - road.width / 2 + 120 + side * Math.min(320, road.width / 3)
-      const y = road.y + (side ? 1 : -1) * (road.height / 2 + 3)
-      const start = { x, y }
-      const end = { x: x + 180, y }
-      if (clearRoute(start, end, false)) sidewalkRoutes.push({
-        id: `neighbor-${id}-${side}`, kind: 'pedestrian', start, end,
-        speed: 24 + index % 4 * 3, phase: index * 2.3 + side * 4.7,
-      })
-    }
-  })
-
-  // One authored legal road crossing demonstrates real pedestrian/traffic priority without
-  // turning every ambient actor into a pathfinding agent. Its slot is reserved so decorative
-  // sidewalk density can never push the actual crossing behavior out of the mobile actor budget.
+  if (cachedRoutes) return cachedRoutes
   const crossing = CENTRAL_CONTROLLED_CROSSING
+  const sidewalkRoutes: AmbientRoute[] = []
+  const trafficRoutes: AmbientRoute[] = [{
+    id: `traffic-${crossing.id}`, kind: 'car',
+    start: crossingPoint(crossing, -80, 0), end: crossingPoint(crossing, 80, 0),
+    speed: 74, phase: 0, controlledCrossingId: crossing.id,
+  }]
+  const segments = WORLD_ROADS.flatMap(road => (road.centerline ?? []).slice(1).map((b, i) => ({ road, a: road.centerline![i], b })))
+    .filter(({ a, b }) => Math.hypot(b.x - a.x, b.y - a.y) > 90)
+    .sort((a, b) => Math.hypot(a.a.x - PLAYER_START.x, a.a.y - PLAYER_START.y) - Math.hypot(b.a.x - PLAYER_START.x, b.a.y - PLAYER_START.y))
+  for (const [index, { road, a, b }] of segments.entries()) {
+    const length = Math.hypot(b.x - a.x, b.y - a.y), dx = (b.x - a.x) / length, dy = (b.y - a.y) / length
+    const routeLength = Math.min(260, length - 24)
+    for (const side of [-1, 1]) {
+      const offset = side * ((road.roadWidth ?? 32) / 2 + 6)
+      const start = { x: a.x + dx * 12 - dy * offset, y: a.y + dy * 12 + dx * offset }
+      const end = { x: start.x + dx * routeLength, y: start.y + dy * routeLength }
+      if (sidewalkRoutes.length < AMBIENT_ACTOR_LIMIT - 5 && clearRoute(start, end, false)) sidewalkRoutes.push({
+        id: `neighbor-${index}-${side}`, kind: 'pedestrian', start, end, speed: 24 + index % 4 * 3, phase: index * 2.3,
+      })
+    }
+    if (trafficRoutes.length < 4 && Math.hypot(a.x - crossing.x, a.y - crossing.y) > 300) {
+      const start = { x: a.x + dx * 12 - dy * 4, y: a.y + dy * 12 + dx * 4 }
+      const end = { x: start.x + dx * routeLength, y: start.y + dy * routeLength }
+      if (clearRoute(start, end, true)) trafficRoutes.push({
+        id: `traffic-${index}`, kind: trafficRoutes.length % 2 ? 'van' : 'car', start, end, speed: 74 + index % 4 * 7, phase: index * 3,
+      })
+    }
+    if (trafficRoutes.length === 4 && sidewalkRoutes.length === AMBIENT_ACTOR_LIMIT - 5) break
+  }
   const crossingRoute: AmbientRoute = {
-    id: `neighbor-${crossing.id}`,
-    kind: 'pedestrian',
-    start: { x: crossing.x, y: crossing.y - crossing.halfLength },
-    end: { x: crossing.x, y: crossing.y + crossing.halfLength },
-    speed: (crossing.halfLength * 2) / 3,
-    phase: 0,
-    controlledCrossingId: crossing.id,
+    id: `neighbor-${crossing.id}`, kind: 'pedestrian',
+    start: crossingPoint(crossing, 0, -crossing.halfLength),
+    end: crossingPoint(crossing, 0, crossing.halfLength),
+    speed: crossing.halfLength * 2 / 3, phase: 0, controlledCrossingId: crossing.id,
   }
-
-  // Preserve every authored traffic route. New pedestrian life may use the remaining mobile budget,
-  // but it must never silently remove traffic variety from the city.
-  const trafficRoutes: AmbientRoute[] = []
-  for (const [index, id] of ['central-horizontal', 'business-lane', 'market-boulevard', 'garden-boulevard'].entries()) {
-    const road = WORLD_ROADS.find(candidate => candidate.id === id)
-    if (!road) continue
-    const start = { x: road.x - road.width / 2 + 90, y: road.y + road.height * 0.22 }
-    const end = { x: road.x + road.width / 2 - 90, y: start.y }
-    if (clearRoute(start, end, true)) trafficRoutes.push({
-      id: `traffic-${id}`, kind: index % 2 ? 'van' : 'car', start, end,
-      speed: 74 + index * 7, phase: index * 13,
-      controlledCrossingId: id === 'central-horizontal' ? crossing.id : undefined,
-    })
-  }
-  const pedestrianBudget = Math.max(0, AMBIENT_ACTOR_LIMIT - trafficRoutes.length)
-  const sidewalkBudget = Math.max(0, pedestrianBudget - 1)
-  const boundedPedestrians = pedestrianBudget > 0
-    ? [...sidewalkRoutes.slice(0, sidewalkBudget), crossingRoute]
-    : []
-  return [...boundedPedestrians, ...trafficRoutes]
+  cachedRoutes = [...sidewalkRoutes, crossingRoute, ...trafficRoutes]
+  return cachedRoutes
 }
 
 /** Writes into a reused pose, with bounded waits at route ends and controlled crossings. */
@@ -160,22 +133,23 @@ const renderControlledCrossing = (scene: Phaser.Scene, crossing: ControlledCross
   // Zebra markings and stop lines are intentionally tiny bounded Rectangle objects rather than
   // world-sized Graphics, preserving the Android culling/performance baseline.
   for (let stripe = -5; stripe <= 5; stripe += 1) {
-    scene.add.rectangle(crossing.x, crossing.y + stripe * 14, crossing.halfWidth * 2, 6, 0xf5f3e8, 0.86)
+    const p = crossingPoint(crossing, 0, stripe * (crossing.halfLength - 6) / 5)
+    scene.add.rectangle(p.x, p.y, crossing.halfWidth * 2, 3, 0xf5f3e8, 0.86).setRotation(crossing.roadAngle ?? 0)
       .setDepth(2).setName(`${crossing.id}-zebra-${stripe + 5}`)
   }
   for (const direction of [-1, 1]) {
+    const p = crossingPoint(crossing, direction * crossing.approachStopOffset, 0)
     scene.add.rectangle(
-      crossing.x + direction * crossing.approachStopOffset,
-      crossing.y,
+      p.x, p.y,
       5,
-      92,
+      crossing.halfLength * 2 - 12,
       0xf5f3e8,
       0.78,
-    ).setDepth(2).setName(`${crossing.id}-stop-line-${direction < 0 ? 'west' : 'east'}`)
+    ).setRotation(crossing.roadAngle ?? 0).setDepth(2).setName(`${crossing.id}-stop-line-${direction < 0 ? 'west' : 'east'}`)
   }
 
   const signalX = crossing.x - crossing.approachStopOffset - 22
-  const signalY = crossing.y - 72
+  const signalY = crossing.y - crossing.halfLength - 16
   scene.add.rectangle(signalX, signalY + 10, 4, 26, 0x324552, 1)
     .setDepth(4).setName(`${crossing.id}-signal-pole`)
   const stopLamp = scene.add.circle(signalX, signalY - 5, 6, 0xd74d4d, 1)

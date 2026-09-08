@@ -1,0 +1,59 @@
+{
+  "version": "1.0.0",
+  "issue": 520,
+  "continent": "Europe",
+  "country": {
+    "geometryId": "056",
+    "sourceCountryCode": "BE",
+    "renderedName": "Belgium"
+  },
+  "administrativeModel": {
+    "level": "first-order-territorial",
+    "nativeTermSingular": "Region / Gewest / Région",
+    "nativeTermPlural": "Regions / Gewesten / Régions",
+    "englishTerm": "territorial region",
+    "unitCount": 3,
+    "officialReferences": [
+      "https://www.belgium.be/sites/default/files/Brochure_2022_Anglais_web.pdf",
+      "https://verkiezingen.belgium.be/algemeen/belgische-parlementaire-verkiezingsstructuur",
+      "https://www.vlaanderen.be/gemeenten-en-provincies/brussel/vlaamse-overheid-in-brussel"
+    ],
+    "governanceNote": "Belgian Communities are person/language-oriented federated entities and are not a separate territorial world-map node layer. DROPi uses the three constitutionally territorial Regions.",
+    "specialCases": [
+      {
+        "admin1Code": "VLG",
+        "type": "regional-capital-outside-unit",
+        "administrativeCenter": "Brussels",
+        "administrativeCenterUnitAdmin1Code": "BRU",
+        "gameplayRepresentativePolicy": "inside-region-source-fallback",
+        "note": "Brussels is the capital of Flanders and hosts the Flemish Government and Parliament, but Brussels-Capital is a separate territorial Region. DROPi keeps Brussels owned by BRU and uses Antwerp as the source-backed inside-Flanders gameplay representative. Antwerp is not labeled as the capital of Flanders."
+      }
+    ]
+  },
+  "source": {
+    "provider": "GeoNames",
+    "license": "Creative Commons Attribution 4.0",
+    "releaseTag": "source-geonames-cities500-2026-09-08-f3cda4f9",
+    "cities500Sha256": "f3cda4f9d256d90045121fb8eebad3ed91695c32370ed93b50fbe0cb616e2bbd",
+    "admin1Sha256": "590651498043f674accda2b7f46d21286cda0e290b02f8561c5005eee9a5448c",
+    "expectedCountryCandidateCount": 2256
+  },
+  "selectionPolicy": {
+    "primaryFeatureCodes": ["PPLC", "PPLA"],
+    "fallbackFeatureCodes": ["PPL"],
+    "expectedPrimarySelections": 2,
+    "expectedFallbackSelections": 1,
+    "highDensityGameplayImport": false,
+    "hardcodedCoordinates": false
+  },
+  "economicEmergence": {
+    "authority": "shared-regional-national-multiplayer-economy",
+    "personalPlayerProgressionUnlock": false,
+    "numericThresholdsDefined": false
+  },
+  "expectedRegions": [
+    {"admin1Code": "BRU", "canonicalName": "Brussels-Capital Region", "sourceName": "Brussels Capital"},
+    {"admin1Code": "VLG", "canonicalName": "Flemish Region", "sourceName": "Flanders"},
+    {"admin1Code": "WAL", "canonicalName": "Walloon Region", "sourceName": "Wallonia"}
+  ]
+}

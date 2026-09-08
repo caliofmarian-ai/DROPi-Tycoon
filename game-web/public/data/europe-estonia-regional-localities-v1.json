@@ -1,0 +1,446 @@
+{
+  "version": "1.0.0",
+  "issue": 536,
+  "continent": "Europe",
+  "country": {
+    "geometryId": "233",
+    "sourceCountryCode": "EE",
+    "renderedName": "Estonia"
+  },
+  "administrativeModel": {
+    "level": "first-order-territorial-statistical-region",
+    "nativeTermSingular": "maakond",
+    "nativeTermPlural": "maakonnad",
+    "englishTerm": "county",
+    "unitCount": 15,
+    "officialReferences": [
+      "https://www.stat.ee/en/find-statistics/statistics-by-region",
+      "https://stat.ee/en/node/277893",
+      "https://www.siseministeerium.ee/linna-ja-vallavalitsused"
+    ],
+    "specialCases": [
+      {
+        "type": "county-territorial-layer-not-duplicate-local-government-tier",
+        "note": "DROPi uses the 15 counties as the first-order territorial/statistical regional layer. Current operative local government is exercised by city and rural-municipality governments inside those county territories; the county gameplay layer must not imply a duplicate elected local-government authority."
+      }
+    ]
+  },
+  "source": {
+    "provider": "GeoNames",
+    "license": "Creative Commons Attribution 4.0",
+    "releaseTag": "source-geonames-cities500-2026-09-08-f3cda4f9",
+    "cities500Sha256": "f3cda4f9d256d90045121fb8eebad3ed91695c32370ed93b50fbe0cb616e2bbd",
+    "admin1Sha256": "590651498043f674accda2b7f46d21286cda0e290b02f8561c5005eee9a5448c",
+    "expectedCountryCandidateCount": 218,
+    "publishedGameplayRepresentativeCount": 15
+  },
+  "selectionModel": {
+    "primaryFeatureCodes": [
+      "PPLC",
+      "PPLA"
+    ],
+    "fallbackFeatureCodes": [
+      "PPLA2",
+      "PPL"
+    ],
+    "expectedPrimarySelections": 15,
+    "expectedFallbackSelections": 0,
+    "highDensityGameplayImport": false,
+    "hardcodedCoordinates": false,
+    "rule": "One source-backed representative locality per governed first-order region; retained high-density source remains reference-only."
+  },
+  "developmentModel": {
+    "authority": "shared-regional-national-multiplayer-economy",
+    "personalPlayerProgressionUnlock": false,
+    "numericThresholdsDefined": false,
+    "signalsPlanned": [
+      "company-activity",
+      "employment-demand",
+      "production",
+      "logistics-throughput",
+      "construction-investment",
+      "transport-connectivity",
+      "trade-volume",
+      "population-economic-simulation",
+      "regional-national-policy"
+    ],
+    "rule": "Representative locality prominence and development are shared-world economic outcomes, not personal progression rewards."
+  },
+  "units": [
+    {
+      "admin1Code": "01",
+      "regionName": "Harju County",
+      "regionSourceName": "Harjumaa",
+      "regionAsciiName": "Harjumaa",
+      "regionSourceRef": "geonames:592170",
+      "representativeLocality": {
+        "localityId": "dropi:locality:geonames:588409",
+        "sourceRef": "geonames:588409",
+        "name": "Tallinn",
+        "asciiName": "Tallinn",
+        "latitude": 59.43696,
+        "longitude": 24.75353,
+        "featureCode": "PPLC",
+        "populationSourceValue": 394024,
+        "selectionBasis": "source-first-order-seat-role",
+        "presentationRole": "national-capital-and-regional-node"
+      },
+      "economicEmergence": {
+        "authority": "shared-regional-national-multiplayer-economy",
+        "personalPlayerProgressionUnlock": false,
+        "numericThresholdsDefined": false,
+        "presentationState": "economy-system-governed"
+      }
+    },
+    {
+      "admin1Code": "02",
+      "regionName": "Hiiu County",
+      "regionSourceName": "Hiiumaa",
+      "regionAsciiName": "Hiiumaa",
+      "regionSourceRef": "geonames:592133",
+      "representativeLocality": {
+        "localityId": "dropi:locality:geonames:591632",
+        "sourceRef": "geonames:591632",
+        "name": "Kärdla",
+        "asciiName": "Kaerdla",
+        "latitude": 58.99778,
+        "longitude": 22.74917,
+        "featureCode": "PPLA",
+        "populationSourceValue": 3160,
+        "selectionBasis": "source-first-order-seat-role",
+        "presentationRole": "regional-representative-locality"
+      },
+      "economicEmergence": {
+        "authority": "shared-regional-national-multiplayer-economy",
+        "personalPlayerProgressionUnlock": false,
+        "numericThresholdsDefined": false,
+        "presentationState": "economy-system-governed"
+      }
+    },
+    {
+      "admin1Code": "03",
+      "regionName": "Ida-Viru County",
+      "regionSourceName": "Ida-Virumaa",
+      "regionAsciiName": "Ida-Virumaa",
+      "regionSourceRef": "geonames:592075",
+      "representativeLocality": {
+        "localityId": "dropi:locality:geonames:591893",
+        "sourceRef": "geonames:591893",
+        "name": "Jõhvi",
+        "asciiName": "Johvi",
+        "latitude": 59.35917,
+        "longitude": 27.42111,
+        "featureCode": "PPLA",
+        "populationSourceValue": 10130,
+        "selectionBasis": "source-first-order-seat-role",
+        "presentationRole": "regional-representative-locality"
+      },
+      "economicEmergence": {
+        "authority": "shared-regional-national-multiplayer-economy",
+        "personalPlayerProgressionUnlock": false,
+        "numericThresholdsDefined": false,
+        "presentationState": "economy-system-governed"
+      }
+    },
+    {
+      "admin1Code": "04",
+      "regionName": "Järva County",
+      "regionSourceName": "Järvamaa",
+      "regionAsciiName": "Jaervamaa",
+      "regionSourceRef": "geonames:591961",
+      "representativeLocality": {
+        "localityId": "dropi:locality:geonames:589709",
+        "sourceRef": "geonames:589709",
+        "name": "Paide",
+        "asciiName": "Paide",
+        "latitude": 58.88768,
+        "longitude": 25.54042,
+        "featureCode": "PPLA",
+        "populationSourceValue": 7793,
+        "selectionBasis": "source-first-order-seat-role",
+        "presentationRole": "regional-representative-locality"
+      },
+      "economicEmergence": {
+        "authority": "shared-regional-national-multiplayer-economy",
+        "personalPlayerProgressionUnlock": false,
+        "numericThresholdsDefined": false,
+        "presentationState": "economy-system-governed"
+      }
+    },
+    {
+      "admin1Code": "05",
+      "regionName": "Jõgeva County",
+      "regionSourceName": "Jõgevamaa",
+      "regionAsciiName": "Jogevamaa",
+      "regionSourceRef": "geonames:591901",
+      "representativeLocality": {
+        "localityId": "dropi:locality:geonames:591902",
+        "sourceRef": "geonames:591902",
+        "name": "Jõgeva",
+        "asciiName": "Jogeva",
+        "latitude": 58.74667,
+        "longitude": 26.39389,
+        "featureCode": "PPLA",
+        "populationSourceValue": 6396,
+        "selectionBasis": "source-first-order-seat-role",
+        "presentationRole": "regional-representative-locality"
+      },
+      "economicEmergence": {
+        "authority": "shared-regional-national-multiplayer-economy",
+        "personalPlayerProgressionUnlock": false,
+        "numericThresholdsDefined": false,
+        "presentationState": "economy-system-governed"
+      }
+    },
+    {
+      "admin1Code": "07",
+      "regionName": "Lääne County",
+      "regionSourceName": "Lääne",
+      "regionAsciiName": "Laeaene",
+      "regionSourceRef": "geonames:590856",
+      "representativeLocality": {
+        "localityId": "dropi:locality:geonames:592225",
+        "sourceRef": "geonames:592225",
+        "name": "Haapsalu",
+        "asciiName": "Haapsalu",
+        "latitude": 58.93937,
+        "longitude": 23.54127,
+        "featureCode": "PPLA",
+        "populationSourceValue": 9595,
+        "selectionBasis": "source-first-order-seat-role",
+        "presentationRole": "regional-representative-locality"
+      },
+      "economicEmergence": {
+        "authority": "shared-regional-national-multiplayer-economy",
+        "personalPlayerProgressionUnlock": false,
+        "numericThresholdsDefined": false,
+        "presentationState": "economy-system-governed"
+      }
+    },
+    {
+      "admin1Code": "08",
+      "regionName": "Lääne-Viru County",
+      "regionSourceName": "Lääne-Virumaa",
+      "regionAsciiName": "Laeaene-Virumaa",
+      "regionSourceRef": "geonames:590854",
+      "representativeLocality": {
+        "localityId": "dropi:locality:geonames:589165",
+        "sourceRef": "geonames:589165",
+        "name": "Rakvere",
+        "asciiName": "Rakvere",
+        "latitude": 59.34808,
+        "longitude": 26.35784,
+        "featureCode": "PPLA",
+        "populationSourceValue": 14984,
+        "selectionBasis": "source-first-order-seat-role",
+        "presentationRole": "regional-representative-locality"
+      },
+      "economicEmergence": {
+        "authority": "shared-regional-national-multiplayer-economy",
+        "personalPlayerProgressionUnlock": false,
+        "numericThresholdsDefined": false,
+        "presentationState": "economy-system-governed"
+      }
+    },
+    {
+      "admin1Code": "11",
+      "regionName": "Pärnu County",
+      "regionSourceName": "Pärnumaa",
+      "regionAsciiName": "Paernumaa",
+      "regionSourceRef": "geonames:589576",
+      "representativeLocality": {
+        "localityId": "dropi:locality:geonames:589580",
+        "sourceRef": "geonames:589580",
+        "name": "Pärnu",
+        "asciiName": "Paernu",
+        "latitude": 58.38588,
+        "longitude": 24.49711,
+        "featureCode": "PPLA",
+        "populationSourceValue": 40228,
+        "selectionBasis": "source-first-order-seat-role",
+        "presentationRole": "regional-representative-locality"
+      },
+      "economicEmergence": {
+        "authority": "shared-regional-national-multiplayer-economy",
+        "personalPlayerProgressionUnlock": false,
+        "numericThresholdsDefined": false,
+        "presentationState": "economy-system-governed"
+      }
+    },
+    {
+      "admin1Code": "12",
+      "regionName": "Põlva County",
+      "regionSourceName": "Põlvamaa",
+      "regionAsciiName": "Polvamaa",
+      "regionSourceRef": "geonames:589373",
+      "representativeLocality": {
+        "localityId": "dropi:locality:geonames:589375",
+        "sourceRef": "geonames:589375",
+        "name": "Põlva",
+        "asciiName": "Polva",
+        "latitude": 58.06028,
+        "longitude": 27.06944,
+        "featureCode": "PPLA",
+        "populationSourceValue": 5115,
+        "selectionBasis": "source-first-order-seat-role",
+        "presentationRole": "regional-representative-locality"
+      },
+      "economicEmergence": {
+        "authority": "shared-regional-national-multiplayer-economy",
+        "personalPlayerProgressionUnlock": false,
+        "numericThresholdsDefined": false,
+        "presentationState": "economy-system-governed"
+      }
+    },
+    {
+      "admin1Code": "13",
+      "regionName": "Rapla County",
+      "regionSourceName": "Raplamaa",
+      "regionAsciiName": "Raplamaa",
+      "regionSourceRef": "geonames:589115",
+      "representativeLocality": {
+        "localityId": "dropi:locality:geonames:589116",
+        "sourceRef": "geonames:589116",
+        "name": "Rapla",
+        "asciiName": "Rapla",
+        "latitude": 59.00759,
+        "longitude": 24.79386,
+        "featureCode": "PPLA",
+        "populationSourceValue": 5132,
+        "selectionBasis": "source-first-order-seat-role",
+        "presentationRole": "regional-representative-locality"
+      },
+      "economicEmergence": {
+        "authority": "shared-regional-national-multiplayer-economy",
+        "personalPlayerProgressionUnlock": false,
+        "numericThresholdsDefined": false,
+        "presentationState": "economy-system-governed"
+      }
+    },
+    {
+      "admin1Code": "14",
+      "regionName": "Saare County",
+      "regionSourceName": "Saare",
+      "regionAsciiName": "Saare",
+      "regionSourceRef": "geonames:588879",
+      "representativeLocality": {
+        "localityId": "dropi:locality:geonames:590939",
+        "sourceRef": "geonames:590939",
+        "name": "Kuressaare",
+        "asciiName": "Kuressaare",
+        "latitude": 58.25382,
+        "longitude": 22.49217,
+        "featureCode": "PPLA",
+        "populationSourceValue": 12698,
+        "selectionBasis": "source-first-order-seat-role",
+        "presentationRole": "regional-representative-locality"
+      },
+      "economicEmergence": {
+        "authority": "shared-regional-national-multiplayer-economy",
+        "personalPlayerProgressionUnlock": false,
+        "numericThresholdsDefined": false,
+        "presentationState": "economy-system-governed"
+      }
+    },
+    {
+      "admin1Code": "18",
+      "regionName": "Tartu County",
+      "regionSourceName": "Tartu",
+      "regionAsciiName": "Tartu",
+      "regionSourceRef": "geonames:588334",
+      "representativeLocality": {
+        "localityId": "dropi:locality:geonames:588335",
+        "sourceRef": "geonames:588335",
+        "name": "Tartu",
+        "asciiName": "Tartu",
+        "latitude": 58.38062,
+        "longitude": 26.72509,
+        "featureCode": "PPLA",
+        "populationSourceValue": 91407,
+        "selectionBasis": "source-first-order-seat-role",
+        "presentationRole": "regional-representative-locality"
+      },
+      "economicEmergence": {
+        "authority": "shared-regional-national-multiplayer-economy",
+        "personalPlayerProgressionUnlock": false,
+        "numericThresholdsDefined": false,
+        "presentationState": "economy-system-governed"
+      }
+    },
+    {
+      "admin1Code": "19",
+      "regionName": "Valga County",
+      "regionSourceName": "Valgamaa",
+      "regionAsciiName": "Valgamaa",
+      "regionSourceRef": "geonames:587875",
+      "representativeLocality": {
+        "localityId": "dropi:locality:geonames:587876",
+        "sourceRef": "geonames:587876",
+        "name": "Valga",
+        "asciiName": "Valga",
+        "latitude": 57.77781,
+        "longitude": 26.0473,
+        "featureCode": "PPLA",
+        "populationSourceValue": 11792,
+        "selectionBasis": "source-first-order-seat-role",
+        "presentationRole": "regional-representative-locality"
+      },
+      "economicEmergence": {
+        "authority": "shared-regional-national-multiplayer-economy",
+        "personalPlayerProgressionUnlock": false,
+        "numericThresholdsDefined": false,
+        "presentationState": "economy-system-governed"
+      }
+    },
+    {
+      "admin1Code": "20",
+      "regionName": "Viljandi County",
+      "regionSourceName": "Viljandimaa",
+      "regionAsciiName": "Viljandimaa",
+      "regionSourceRef": "geonames:587590",
+      "representativeLocality": {
+        "localityId": "dropi:locality:geonames:587577",
+        "sourceRef": "geonames:587577",
+        "name": "Viljandi",
+        "asciiName": "Viljandi",
+        "latitude": 58.36319,
+        "longitude": 25.59159,
+        "featureCode": "PPLA",
+        "populationSourceValue": 17407,
+        "selectionBasis": "source-first-order-seat-role",
+        "presentationRole": "regional-representative-locality"
+      },
+      "economicEmergence": {
+        "authority": "shared-regional-national-multiplayer-economy",
+        "personalPlayerProgressionUnlock": false,
+        "numericThresholdsDefined": false,
+        "presentationState": "economy-system-governed"
+      }
+    },
+    {
+      "admin1Code": "21",
+      "regionName": "Võru County",
+      "regionSourceName": "Võrumaa",
+      "regionAsciiName": "Vorumaa",
+      "regionSourceRef": "geonames:587448",
+      "representativeLocality": {
+        "localityId": "dropi:locality:geonames:587450",
+        "sourceRef": "geonames:587450",
+        "name": "Võru",
+        "asciiName": "Voru",
+        "latitude": 57.83389,
+        "longitude": 27.01944,
+        "featureCode": "PPLA",
+        "populationSourceValue": 12367,
+        "selectionBasis": "source-first-order-seat-role",
+        "presentationRole": "regional-representative-locality"
+      },
+      "economicEmergence": {
+        "authority": "shared-regional-national-multiplayer-economy",
+        "personalPlayerProgressionUnlock": false,
+        "numericThresholdsDefined": false,
+        "presentationState": "economy-system-governed"
+      }
+    }
+  ]
+}

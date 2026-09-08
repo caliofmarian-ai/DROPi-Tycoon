@@ -1,0 +1,66 @@
+{
+  "version": "1.0.0",
+  "issue": 536,
+  "continent": "Europe",
+  "country": {
+    "geometryId": "233",
+    "sourceCountryCode": "EE",
+    "renderedName": "Estonia"
+  },
+  "administrativeModel": {
+    "level": "first-order-territorial-statistical-region",
+    "nativeTermSingular": "maakond",
+    "nativeTermPlural": "maakonnad",
+    "englishTerm": "county",
+    "unitCount": 15,
+    "officialReferences": [
+      "https://www.stat.ee/en/find-statistics/statistics-by-region",
+      "https://stat.ee/en/node/277893",
+      "https://www.siseministeerium.ee/linna-ja-vallavalitsused"
+    ],
+    "specialCases": [
+      {
+        "type": "county-territorial-layer-not-duplicate-local-government-tier",
+        "note": "DROPi uses the 15 counties as the first-order territorial/statistical regional layer. Current operative local government is exercised by city and rural-municipality governments inside those county territories; the county gameplay layer must not imply a duplicate elected local-government authority."
+      }
+    ]
+  },
+  "source": {
+    "provider": "GeoNames",
+    "license": "Creative Commons Attribution 4.0",
+    "releaseTag": "source-geonames-cities500-2026-09-08-f3cda4f9",
+    "cities500Sha256": "f3cda4f9d256d90045121fb8eebad3ed91695c32370ed93b50fbe0cb616e2bbd",
+    "admin1Sha256": "590651498043f674accda2b7f46d21286cda0e290b02f8561c5005eee9a5448c",
+    "expectedCountryCandidateCount": 218
+  },
+  "selectionPolicy": {
+    "primaryFeatureCodes": ["PPLC", "PPLA"],
+    "fallbackFeatureCodes": ["PPLA2", "PPL"],
+    "expectedPrimarySelections": 15,
+    "expectedFallbackSelections": 0,
+    "highDensityGameplayImport": false,
+    "hardcodedCoordinates": false
+  },
+  "economicEmergence": {
+    "authority": "shared-regional-national-multiplayer-economy",
+    "personalPlayerProgressionUnlock": false,
+    "numericThresholdsDefined": false
+  },
+  "expectedRegions": [
+    {"admin1Code": "01", "canonicalName": "Harju County", "sourceName": "Harjumaa"},
+    {"admin1Code": "02", "canonicalName": "Hiiu County", "sourceName": "Hiiumaa"},
+    {"admin1Code": "03", "canonicalName": "Ida-Viru County", "sourceName": "Ida-Virumaa"},
+    {"admin1Code": "04", "canonicalName": "Järva County", "sourceName": "Järvamaa"},
+    {"admin1Code": "05", "canonicalName": "Jõgeva County", "sourceName": "Jõgevamaa"},
+    {"admin1Code": "07", "canonicalName": "Lääne County", "sourceName": "Lääne"},
+    {"admin1Code": "08", "canonicalName": "Lääne-Viru County", "sourceName": "Lääne-Virumaa"},
+    {"admin1Code": "11", "canonicalName": "Pärnu County", "sourceName": "Pärnumaa"},
+    {"admin1Code": "12", "canonicalName": "Põlva County", "sourceName": "Põlvamaa"},
+    {"admin1Code": "13", "canonicalName": "Rapla County", "sourceName": "Raplamaa"},
+    {"admin1Code": "14", "canonicalName": "Saare County", "sourceName": "Saare"},
+    {"admin1Code": "18", "canonicalName": "Tartu County", "sourceName": "Tartu"},
+    {"admin1Code": "19", "canonicalName": "Valga County", "sourceName": "Valgamaa"},
+    {"admin1Code": "20", "canonicalName": "Viljandi County", "sourceName": "Viljandimaa"},
+    {"admin1Code": "21", "canonicalName": "Võru County", "sourceName": "Võrumaa"}
+  ]
+}

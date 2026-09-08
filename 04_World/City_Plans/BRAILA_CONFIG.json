@@ -1,0 +1,91 @@
+{
+  "version": "1.0.0",
+  "cityId": "braila",
+  "name": "Brăila",
+  "countryId": "642",
+  "countryName": "Romania",
+  "continent": "Europe",
+  "localityId": "dropi:locality:geonames:683902",
+  "countySourceRef": "geonames:683901",
+  "regionName": "Sud-Est",
+  "regionReference": "https://gisco-services.ec.europa.eu/distribution/v2/nuts/nuts-2024-units.json",
+  "regionCountyNames": [
+    "Brăila",
+    "Buzău",
+    "Constanța",
+    "Galați",
+    "Tulcea",
+    "Vrancea"
+  ],
+  "localityCatalog": "game-web/public/data/europe-romania-regional-localities-v1.json",
+  "retainedStreetSource": "04_World/City_Plans/Sources/braila-osm-2026-09-08.json",
+  "streetSourceSha256": "60fafaa53a2d0abca9d7136d6f874c6de24e3efba54972e0ca320fc5a7b38e75",
+  "referenceMap": "https://www.openstreetmap.org/#map=14/45.272/27.960",
+  "artArchetype": "danube-historic-port",
+  "zoneStreetAnchors": {
+    "residential": {
+      "label": "Centrul Vechi",
+      "street": "Piața Traian"
+    },
+    "business": {
+      "label": "Independenței",
+      "street": "Bulevardul Independenței"
+    },
+    "storage": {
+      "label": "Magaziilor & Port",
+      "street": "Strada Magaziilor"
+    },
+    "company": {
+      "label": "Gara & Apollo",
+      "street": "Strada Apollo"
+    },
+    "waterfront": {
+      "label": "Faleza Dunării",
+      "street": "Calea Călărașilor"
+    },
+    "garden": {
+      "label": "Grădina Publică",
+      "street": "Strada Ana Aslan"
+    }
+  },
+  "adaptations": [
+    "Real retained street centerlines inspire the plan; game road widths are exaggerated for readable mobile movement.",
+    "Only the retained central-city extent is materialized in this first playable district set.",
+    "Existing business identities, progression and delivery labels are retained; building footprints and businesses are fictional game placements.",
+    "The river centerline is source-backed; its rendered ribbon width is an illustration, not surveyed river-bank geometry.",
+    "CityId braila is retained as a legacy save identity; the owner has placed the playable city in Brăila, Romania."
+  ],
+  "retainedBuildingSource": "04_World/City_Plans/Sources/braila-buildings-osm-2026-09-08.json",
+  "buildingSourceSha256": "86b02aa1281ad8ab2d01de8675de0f8aa5c0e28cc952e4aba50b5a6cf3a92871",
+  "frontageNearBuilding": {
+    "storage-3": "main-hq",
+    "residential-4": "storage-3",
+    "business-2": "main-hq",
+    "business-4": "business-2",
+    "residential-8": "main-hq",
+    "waterfront-block-1-4": "waterfront-block-1-1",
+    "waterfront-block-1-1": "waterfront-block-3-5",
+    "storage-1": "storage-block-1-2",
+    "company-block-3-1": "company-block-3-2",
+    "waterfront-block-3-6": "waterfront-block-3-5",
+    "waterfront-block-3-3": "waterfront-block-3-5"
+  },
+  "frontagePlacementPriority": [
+    "main-hq",
+    "storage-3",
+    "residential-4",
+    "business-2",
+    "business-4",
+    "residential-8",
+    "waterfront-block-3-5",
+    "waterfront-block-1-1",
+    "waterfront-block-1-4",
+    "storage-block-1-2",
+    "storage-1",
+    "company-block-3-2",
+    "company-block-3-1",
+    "waterfront-block-3-6",
+    "waterfront-block-3-3"
+  ],
+  "buildingFootprintScale": {}
+}

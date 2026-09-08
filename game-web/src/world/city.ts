@@ -1,7 +1,8 @@
 import {
   PLAYER_START, WORLD_BUILDINGS, WORLD_HEIGHT, WORLD_ROADS, WORLD_ROUTE_POINTS, WORLD_WIDTH,
-  WORLD_ZONES, type WorldBuildingLayout, type WorldRectLayout, type WorldRoutePoint, type WorldZoneId, type WorldZoneLayout,
+  WORLD_ZONES, WORLD_CITY_NAME, type WorldBuildingLayout, type WorldRectLayout, type WorldRoutePoint, type WorldZoneId, type WorldZoneLayout,
 } from './worldLayout'
+import { surfaceContains } from './worldSurfaces'
 import { isUrbanWalkable } from './urbanWorld'
 import { buildRoadNetwork, findRoadRoute, type RoadNetwork, type RoadPoint, type RoadRoute } from './cityNavigation'
 
@@ -45,11 +46,11 @@ export const CITY_DISTRICTS: readonly CityDistrict[] = WORLD_ZONES.map(zone => (
 }))
 
 export const CITY: City = {
-  cityId: 'cedar-city', name: 'Cedar City', width: WORLD_WIDTH, height: WORLD_HEIGHT, districts: CITY_DISTRICTS,
+  cityId: 'braila', name: WORLD_CITY_NAME, width: WORLD_WIDTH, height: WORLD_HEIGHT, districts: CITY_DISTRICTS,
 }
 
 const merchantIds: Readonly<Record<string, string>> = {
-  PickupZone: 'mara-market', CommercialPickup: 'cedar-bakery', ResidentialPickup: 'neighborhood-coop',
+  PickupZone: 'mara-market', CommercialPickup: 'braila-bakery', ResidentialPickup: 'neighborhood-coop',
   CanalPickup: 'canal-grocers', HarborPickup: 'quayside-kitchen', DepotPickup: 'foundry-supplies',
   GardenPickup: 'garden-florist', StationPickup: 'station-books',
 }
@@ -75,8 +76,8 @@ export const isCityLocationReachable = (
   const road = WORLD_ROADS.find(entry => entry.id === location.roadId)
   if (!building || !road || building.zoneId !== location.districtId || location.zoneId !== location.districtId ||
       location.door.x !== building.door.x || location.door.y !== building.door.y ||
-      Math.abs(location.x - location.door.x) > 0 || Math.abs(location.y - location.door.y) > 48 ||
-      Math.abs(location.x - road.x) > road.width / 2 || Math.abs(location.y - road.y) > road.height / 2 ||
+      Math.abs(location.x - location.door.x) > 0 || Math.abs(location.y - location.door.y) > 96 ||
+      !surfaceContains(road, location.x, location.y) ||
       !isUrbanWalkable(location.x, location.y, true)) return false
   return findRoadRoute(network, PLAYER_START, location) !== null
 }

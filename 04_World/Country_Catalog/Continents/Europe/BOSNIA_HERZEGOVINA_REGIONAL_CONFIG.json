@@ -1,0 +1,56 @@
+{
+  "version": "1.0.0",
+  "issue": 522,
+  "continent": "Europe",
+  "country": {
+    "geometryId": "070",
+    "sourceCountryCode": "BA",
+    "renderedName": "Bosnia and Herzegovina"
+  },
+  "administrativeModel": {
+    "level": "top-level-territorial-governance",
+    "nativeTermSingular": "Entity / Brčko District",
+    "nativeTermPlural": "two Entities plus Brčko District",
+    "englishTerm": "top-level territorial governance unit",
+    "unitCount": 3,
+    "officialReferences": [
+      "https://bhas.gov.ba/data/Publikacije/Metodologije/IndeksRodneRavnopravnosti_E.pdf",
+      "https://www.ohr.int/ohr_archive/statute-of-the-brcko-district-of-bosnia-and-herzegovina/?print=print",
+      "https://www.ohr.int/is-brcko-district-a-condominium-an-entity-or-a-municipality/"
+    ],
+    "specialCases": [
+      {
+        "admin1Code": "BRC",
+        "type": "self-governing-district-not-entity",
+        "label": "Brčko District of Bosnia and Herzegovina",
+        "note": "Brčko District is a single self-governing administrative unit under the sovereignty of Bosnia and Herzegovina. It is not a third Entity. DROPi preserves this status while treating the District as a separate territorial gameplay region."
+      }
+    ]
+  },
+  "source": {
+    "provider": "GeoNames",
+    "license": "Creative Commons Attribution 4.0",
+    "releaseTag": "source-geonames-cities500-2026-09-08-f3cda4f9",
+    "cities500Sha256": "f3cda4f9d256d90045121fb8eebad3ed91695c32370ed93b50fbe0cb616e2bbd",
+    "admin1Sha256": "590651498043f674accda2b7f46d21286cda0e290b02f8561c5005eee9a5448c",
+    "expectedCountryCandidateCount": 313
+  },
+  "selectionPolicy": {
+    "primaryFeatureCodes": ["PPLC", "PPLA"],
+    "fallbackFeatureCodes": ["PPLA2"],
+    "expectedPrimarySelections": 3,
+    "expectedFallbackSelections": 0,
+    "highDensityGameplayImport": false,
+    "hardcodedCoordinates": false
+  },
+  "economicEmergence": {
+    "authority": "shared-regional-national-multiplayer-economy",
+    "personalPlayerProgressionUnlock": false,
+    "numericThresholdsDefined": false
+  },
+  "expectedRegions": [
+    {"admin1Code": "01", "canonicalName": "Federation of Bosnia and Herzegovina", "sourceName": "Federation of B&H"},
+    {"admin1Code": "02", "canonicalName": "Republika Srpska", "sourceName": "Srpska"},
+    {"admin1Code": "BRC", "canonicalName": "Brčko District of Bosnia and Herzegovina", "sourceName": "Brčko"}
+  ]
+}
