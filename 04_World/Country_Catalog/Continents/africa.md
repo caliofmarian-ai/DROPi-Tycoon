@@ -12,8 +12,8 @@ Parent: #446
 ## Chapter summary
 - countries/territories: **50**
 - representative nodes: **416**
-- structural PASS: **50**
-- REVIEW: **0**
+- structural PASS: **43**
+- REVIEW: **7**
 - documented GAP: **0**
 
 ## Country-by-country manifest
@@ -22,19 +22,19 @@ Parent: #446
 |---:|---|---|---:|---|---|---|
 | 012 | Algeria | Algiers | 9 | CAPITAL, N, E, S, W, NE, SE, SW, NW | **PASS** | structural/source checks passed |
 | 024 | Angola | Luanda | 9 | CAPITAL, N, E, S, W, NE, SE, SW, NW | **PASS** | structural/source checks passed |
-| 204 | Benin | Cotonou | 8 | CAPITAL, N, E, S, W, SE, SW, NW | **PASS** | structural/source checks passed |
+| 204 | Benin | Cotonou | 8 | CAPITAL, N, E, S, W, SE, SW, NW | **REVIEW** | #456: capital-role semantics: Porto-Novo is the political/national capital while Cotonou hosts major government and economic functions |
 | 072 | Botswana | Gaborone | 9 | CAPITAL, N, E, S, W, NE, SE, SW, NW | **PASS** | structural/source checks passed |
 | 854 | Burkina Faso | Ouagadougou | 9 | CAPITAL, N, E, S, W, NE, SE, SW, NW | **PASS** | structural/source checks passed |
-| 108 | Burundi | Bujumbura | 9 | CAPITAL, N, E, S, W, NE, SE, SW, NW | **PASS** | structural/source checks passed |
+| 108 | Burundi | Bujumbura | 9 | CAPITAL, N, E, S, W, NE, SE, SW, NW | **REVIEW** | #457: capital-role semantics: Gitega is the political capital and Bujumbura is the economic capital |
 | 120 | Cameroon | Yaounde | 9 | CAPITAL, N, E, S, W, NE, SE, SW, NW | **PASS** | structural/source checks passed |
 | 140 | Central African Rep. | Bangui | 9 | CAPITAL, N, E, S, W, NE, SE, SW, NW | **PASS** | structural/source checks passed |
 | 148 | Chad | Ndjamena | 9 | CAPITAL, N, E, S, W, NE, SE, SW, NW | **PASS** | structural/source checks passed |
 | 178 | Congo | Brazzaville | 9 | CAPITAL, N, E, S, W, NE, SE, SW, NW | **PASS** | structural/source checks passed |
-| 384 | Côte d'Ivoire | Abidjan | 9 | CAPITAL, N, E, S, W, NE, SE, SW, NW | **PASS** | structural/source checks passed |
+| 384 | Côte d'Ivoire | Abidjan | 9 | CAPITAL, N, E, S, W, NE, SE, SW, NW | **REVIEW** | #458: capital-role semantics: Yamoussoukro is the political/administrative capital while Abidjan is the dominant economic/metropolitan centre |
 | 180 | Dem. Rep. Congo | Kinshasa | 9 | CAPITAL, N, E, S, W, NE, SE, SW, NW | **PASS** | structural/source checks passed |
 | 262 | Djibouti | Djibouti | 5 | CAPITAL, N, E, S, W | **PASS** | structural/source checks passed |
 | 818 | Egypt | Cairo | 9 | CAPITAL, N, E, S, W, NE, SE, SW, NW | **PASS** | structural/source checks passed |
-| 226 | Eq. Guinea | Malabo | 6 | CAPITAL, N, E, S, SE, SW | **PASS** | structural/source checks passed |
+| 226 | Eq. Guinea | Malabo | 6 | CAPITAL, N, E, S, SE, SW | **REVIEW** | #459: current-reality override required: Ciudad de la Paz was declared capital on 2026-01-02 after the pinned source snapshot |
 | 232 | Eritrea | Asmara | 6 | CAPITAL, N, E, W, SW, NW | **PASS** | structural/source checks passed |
 | 748 | eSwatini | Mbabane | 7 | CAPITAL, N, E, S, W, SE, SW | **PASS** | structural/source checks passed |
 | 231 | Ethiopia | Addis Ababa | 9 | CAPITAL, N, E, S, W, NE, SE, SW, NW | **PASS** | structural/source checks passed |
@@ -61,13 +61,13 @@ Parent: #446
 | 686 | Senegal | Dakar | 8 | CAPITAL, N, E, S, W, SE, SW, NW | **PASS** | structural/source checks passed |
 | 694 | Sierra Leone | Freetown | 5 | CAPITAL, N, E, S, NE | **PASS** | structural/source checks passed |
 | 706 | Somalia | Mogadishu | 9 | CAPITAL, N, E, S, W, NE, SE, SW, NW | **PASS** | structural/source checks passed |
-| 710 | South Africa | Johannesburg | 9 | CAPITAL, N, E, S, W, NE, SE, SW, NW | **PASS** | structural/source checks passed |
+| 710 | South Africa | Johannesburg | 9 | CAPITAL, N, E, S, W, NE, SE, SW, NW | **REVIEW** | #460: multi-capital semantics required: Pretoria administrative, Cape Town legislative, Bloemfontein judicial; Johannesburg is not the sole national capital |
 | 729 | Sudan | Khartoum | 9 | CAPITAL, N, E, S, W, NE, SE, SW, NW | **PASS** | structural/source checks passed |
-| 834 | Tanzania | Dar es Salaam | 9 | CAPITAL, N, E, S, W, NE, SE, SW, NW | **PASS** | structural/source checks passed |
+| 834 | Tanzania | Dar es Salaam | 9 | CAPITAL, N, E, S, W, NE, SE, SW, NW | **REVIEW** | #461: capital-role semantics: Dodoma is the national capital while Dar es Salaam remains a major economic/port metropolis |
 | 768 | Togo | Lome | 7 | CAPITAL, N, E, S, W, NE, NW | **PASS** | structural/source checks passed |
 | 788 | Tunisia | Tunis | 9 | CAPITAL, N, E, S, W, NE, SE, SW, NW | **PASS** | structural/source checks passed |
 | 800 | Uganda | Kampala | 9 | CAPITAL, N, E, S, W, NE, SE, SW, NW | **PASS** | structural/source checks passed |
-| 732 | W. Sahara | Bir Lehlou | 1 | CAPITAL | **PASS** | structural/source checks passed |
+| 732 | W. Sahara | Bir Lehlou | 1 | CAPITAL | **REVIEW** | #462: territory-status semantics required: Western Sahara remains a disputed Non-Self-Governing Territory and must not be reduced to an uncontested single-capital claim |
 | 894 | Zambia | Lusaka | 9 | CAPITAL, N, E, S, W, NE, SE, SW, NW | **PASS** | structural/source checks passed |
 | 716 | Zimbabwe | Harare | 9 | CAPITAL, N, E, S, W, NE, SE, SW, NW | **PASS** | structural/source checks passed |
 

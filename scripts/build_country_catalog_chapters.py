@@ -12,6 +12,7 @@ ROOT = pathlib.Path(__file__).resolve().parents[1]
 CATALOG = ROOT / 'game-web/public/data/country-representative-localities-v1.json'
 TOPOLOGY = ROOT / 'game-web/public/data/world-atlas-countries-110m.json'
 OUT_ROOT = ROOT / '04_World/Country_Catalog'
+REVIEW_REGISTRY = OUT_ROOT / 'COUNTRY_REVIEW_REGISTRY.json'
 SRC_COMMIT = 'ca96624a56bd078437bca8184e78163e5039ad19'
 ADMIN0_URL = f'https://raw.githubusercontent.com/nvkelso/natural-earth-vector/{SRC_COMMIT}/geojson/ne_10m_admin_0_countries.geojson'
 CONTINENTS = ('Europe', 'Africa', 'Asia', 'North America', 'South America', 'Oceania', 'Special')
@@ -112,8 +113,12 @@ def node_key(node):
     )
 
 
-def audit_country(cid, name, nodes, coverage_gap=False):
+def audit_country(cid, name, nodes, coverage_gap=False, manual_review=None):
     reasons = []
+    if manual_review:
+        issue = manual_review.get('issue')
+        reason = str(manual_review.get('reason') or 'manual semantic review required')
+        reasons.append(f"#{issue}: {reason}" if issue else reason)
     if not str(cid).isdigit():
         reasons.append('unstable/non-numeric geometry ID')
     if len(nodes) > 9:
@@ -263,12 +268,13 @@ def main():
     continents = build_continent_map(admin0, rendered)
     coverage_gap_ids = {str(item.get('id')) for item in catalog.get('coverageGaps', [])}
     countries = catalog.get('countries', {})
+    review_registry = load_json(REVIEW_REGISTRY).get('reviews', {}) if REVIEW_REGISTRY.exists() else {}
 
     rows_by_continent = {name: [] for name in CONTINENTS}
     rows_by_id = {}
     for cid, name in rendered.items():
         nodes = countries.get(cid, [])
-        row = audit_country(cid, name, nodes, cid in coverage_gap_ids)
+        row = audit_country(cid, name, nodes, cid in coverage_gap_ids, review_registry.get(cid))
         continent = continents.get(cid, 'Special')
         rows_by_continent.setdefault(continent, []).append(row)
         rows_by_id[cid] = (continent, row, nodes)
