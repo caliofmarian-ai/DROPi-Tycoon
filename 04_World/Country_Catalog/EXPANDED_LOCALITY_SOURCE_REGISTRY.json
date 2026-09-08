@@ -1,5 +1,5 @@
 {
-  "version": "1.0.0",
+  "version": "1.1.0",
   "issue": 502,
   "reviewedOn": "2026-09-08",
   "purpose": "Govern the source and licensing contract for the expanded Country/Region locality LOD without replacing the existing Natural Earth sparse Global LOD anchors.",
@@ -114,6 +114,34 @@
     "specialStatusSemanticsRemainAuthoritative": true,
     "currentSparseCatalogRemainsGlobalLod": true,
     "noInventedLocalities": true,
-    "boundedAndroidRenderObjects": true
+    "boundedAndroidRenderObjects": true,
+    "rawSnapshotRetentionSatisfied": true,
+    "productionImporterMustUseRetainedSnapshot": true
+  },
+  "retainedSnapshot": {
+    "status": "RETAINED",
+    "retainedOn": "2026-09-08",
+    "releaseTag": "source-geonames-cities500-2026-09-08-f3cda4f9",
+    "releaseUrl": "https://github.com/caliofmarian-ai/DROPi-Tycoon/releases/tag/source-geonames-cities500-2026-09-08-f3cda4f9",
+    "targetCommit": "5e7a3339ae70eb07529135bb13bb44477aaad038",
+    "license": "Creative Commons Attribution 4.0",
+    "attributionText": "GeoNames",
+    "assets": {
+      "cities500.zip": {
+        "url": "https://github.com/caliofmarian-ai/DROPi-Tycoon/releases/download/source-geonames-cities500-2026-09-08-f3cda4f9/cities500.zip",
+        "sha256": "f3cda4f9d256d90045121fb8eebad3ed91695c32370ed93b50fbe0cb616e2bbd",
+        "bytes": 13602522
+      },
+      "admin1CodesASCII.txt": {
+        "url": "https://github.com/caliofmarian-ai/DROPi-Tycoon/releases/download/source-geonames-cities500-2026-09-08-f3cda4f9/admin1CodesASCII.txt",
+        "sha256": "590651498043f674accda2b7f46d21286cda0e290b02f8561c5005eee9a5448c",
+        "bytes": 151536
+      },
+      "geonames-readme.txt": {
+        "url": "https://github.com/caliofmarian-ai/DROPi-Tycoon/releases/download/source-geonames-cities500-2026-09-08-f3cda4f9/geonames-readme.txt",
+        "sha256": "b1957379b6c1242c700c98ac9a8aa0a09f56c3c0a50ee72175527005f48ef2c5",
+        "bytes": 8843
+      }
+    }
   }
 }

@@ -100,3 +100,14 @@ Build a deterministic importer that converts the selected source into partitione
 - no duplicate marker for a Natural Earth anchor that resolves to the same real locality;
 - review queues for ambiguous/border/status-sensitive cases;
 - no requirement to render the whole catalog at once.
+
+## Durable snapshot retention
+
+The exact 2026-09-08 audited inputs are retained outside the Git source tree as GitHub Release assets under tag `source-geonames-cities500-2026-09-08-f3cda4f9`.
+
+Retained assets:
+- `cities500.zip` — SHA-256 `f3cda4f9d256d90045121fb8eebad3ed91695c32370ed93b50fbe0cb616e2bbd`;
+- `admin1CodesASCII.txt` — SHA-256 `590651498043f674accda2b7f46d21286cda0e290b02f8561c5005eee9a5448c`;
+- `geonames-readme.txt` — SHA-256 `b1957379b6c1242c700c98ac9a8aa0a09f56c3c0a50ee72175527005f48ef2c5`.
+
+Production catalog generation must consume this retained snapshot, verify checksums before parsing, and must not silently fall back to the moving upstream daily dump. A future GeoNames refresh requires a new explicit snapshot/version rather than mutation of this retained source contract.
