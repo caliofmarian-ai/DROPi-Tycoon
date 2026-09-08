@@ -32,6 +32,6 @@ jobs:
           set -euo pipefail
           git config user.name 'DROPi Tycoon automation'
           git config user.email 'actions@users.noreply.github.com'
-          git add 04_World/Country_Catalog/Continents/north-america.md
+          git add 04_World/Country_Catalog/Continents/northamerica.md
           git commit -m 'world-data: materialize North America country catalog chapter'
           git push origin HEAD:openai/country-catalog-north-america-v1
