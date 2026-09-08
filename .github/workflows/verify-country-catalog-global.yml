@@ -1,0 +1,33 @@
+name: Verify Global Country Catalog Audit
+
+on:
+  push:
+    branches:
+      - openai/country-catalog-global-reconciliation-v1
+    paths:
+      - .github/workflows/verify-country-catalog-global.yml
+
+permissions:
+  contents: write
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: openai/country-catalog-global-reconciliation-v1
+          fetch-depth: 0
+      - name: Verify chapters and write global report
+        run: |
+          set -euo pipefail
+          python scripts/verify_country_catalog_chapters.py --write-report
+          git diff --check
+      - name: Commit generated global audit report
+        run: |
+          set -euo pipefail
+          git config user.name 'DROPi Tycoon automation'
+          git config user.email 'actions@users.noreply.github.com'
+          git add 04_World/Country_Catalog/GLOBAL_COUNTRY_CATALOG_AUDIT.md
+          git commit -m 'world-data: materialize global Country Catalog audit report'
+          git push origin HEAD:openai/country-catalog-global-reconciliation-v1
