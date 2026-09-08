@@ -38,7 +38,7 @@ Parent: #446
 | 352 | Iceland | Reykjavik | 8 | CAPITAL, N, E, S, W, NE, SW, NW | **PASS** | structural/source checks passed |
 | 372 | Ireland | Dublin | 9 | CAPITAL, N, E, S, W, NE, SE, SW, NW | **PASS** | structural/source checks passed |
 | 380 | Italy | Rome | 9 | CAPITAL, N, E, S, W, NE, SE, SW, NW | **PASS** | structural/source checks passed |
-| None | Kosovo | Pristina | 3 | CAPITAL, N, S | **REVIEW** | unstable/non-numeric geometry ID |
+| None | Kosovo | Pristina | 3 | CAPITAL, N, S | **REVIEW** | #478: nonstandard geometry identity and neutral status semantics required: Kosovo must not depend on a None catalog key or an implied universally settled sovereignty position; unstable/non-numeric geometry ID |
 | 428 | Latvia | Riga | 6 | CAPITAL, N, E, W, NE, SW | **PASS** | structural/source checks passed |
 | 440 | Lithuania | Vilnius | 5 | CAPITAL, N, E, W, NE | **PASS** | structural/source checks passed |
 | 442 | Luxembourg | Luxembourg | 3 | CAPITAL, N, E | **PASS** | structural/source checks passed |
