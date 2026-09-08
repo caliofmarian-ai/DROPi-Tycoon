@@ -12,8 +12,8 @@ Parent: #446
 ## Chapter summary
 - countries/territories: **46**
 - representative nodes: **356**
-- structural PASS: **46**
-- REVIEW: **0**
+- structural PASS: **41**
+- REVIEW: **5**
 - documented GAP: **0**
 
 ## Country-by-country manifest
@@ -34,8 +34,8 @@ Parent: #446
 | 360 | Indonesia | Jakarta | 9 | CAPITAL, N, E, S, W, NE, SE, SW, NW | **PASS** | structural/source checks passed |
 | 364 | Iran | Tehran | 9 | CAPITAL, N, E, S, W, NE, SE, SW, NW | **PASS** | structural/source checks passed |
 | 368 | Iraq | Baghdad | 9 | CAPITAL, N, E, S, W, NE, SE, SW, NW | **PASS** | structural/source checks passed |
-| 376 | Israel | Tel Aviv-Yafo | 6 | CAPITAL, N, E, S, W, NE | **PASS** | structural/source checks passed |
-| 392 | Japan | Kyoto | 9 | CAPITAL, N, E, S, W, NE, SE, SW, NW | **PASS** | structural/source checks passed |
+| 376 | Israel | Tel Aviv-Yafo | 6 | CAPITAL, N, E, S, W, NE | **REVIEW** | #467: capital/status semantics: Tel Aviv-Yafo must not be labeled Israel's national capital; Jerusalem requires explicit neutral status handling |
+| 392 | Japan | Kyoto | 9 | CAPITAL, N, E, S, W, NE, SE, SW, NW | **REVIEW** | #464: current-capital mismatch: Tokyo is Japan's current capital; Kyoto must not retain the capital role |
 | 400 | Jordan | Amman | 8 | CAPITAL, N, E, S, W, NE, SE, NW | **PASS** | structural/source checks passed |
 | 398 | Kazakhstan | Astana | 9 | CAPITAL, N, E, S, W, NE, SE, SW, NW | **PASS** | structural/source checks passed |
 | 414 | Kuwait | Kuwait City | 4 | CAPITAL, N, E, W | **PASS** | structural/source checks passed |
@@ -44,17 +44,17 @@ Parent: #446
 | 422 | Lebanon | Beirut | 6 | CAPITAL, N, E, S, W, SW | **PASS** | structural/source checks passed |
 | 458 | Malaysia | Kuala Lumpur | 9 | CAPITAL, N, E, S, W, NE, SE, SW, NW | **PASS** | structural/source checks passed |
 | 496 | Mongolia | Ulaanbaatar | 9 | CAPITAL, N, E, S, W, NE, SE, SW, NW | **PASS** | structural/source checks passed |
-| 104 | Myanmar | Rangoon | 9 | CAPITAL, N, E, S, W, NE, SE, SW, NW | **PASS** | structural/source checks passed |
+| 104 | Myanmar | Rangoon | 9 | CAPITAL, N, E, S, W, NE, SE, SW, NW | **REVIEW** | #465: current-capital mismatch: Nay Pyi Taw is Myanmar's capital while Yangon/Rangoon is a major commercial city |
 | 524 | Nepal | Kathmandu | 9 | CAPITAL, N, E, S, W, NE, SE, SW, NW | **PASS** | structural/source checks passed |
 | 408 | North Korea | Pyongyang | 9 | CAPITAL, N, E, S, W, NE, SE, SW, NW | **PASS** | structural/source checks passed |
 | 512 | Oman | Muscat | 9 | CAPITAL, N, E, S, W, NE, SE, SW, NW | **PASS** | structural/source checks passed |
 | 586 | Pakistan | Islamabad | 9 | CAPITAL, N, E, S, W, NE, SE, SW, NW | **PASS** | structural/source checks passed |
-| 275 | Palestine | Gaza | 4 | CAPITAL, N, E, S | **PASS** | structural/source checks passed |
+| 275 | Palestine | Gaza | 4 | CAPITAL, N, E, S | **REVIEW** | #468: capital/status semantics: Gaza must not be labeled the State of Palestine's national capital; East Jerusalem claim and Ramallah administrative role require neutral handling |
 | 608 | Philippines | Manila | 9 | CAPITAL, N, E, S, W, NE, SE, SW, NW | **PASS** | structural/source checks passed |
 | 634 | Qatar | Doha | 1 | CAPITAL | **PASS** | structural/source checks passed |
 | 682 | Saudi Arabia | Riyadh | 9 | CAPITAL, N, E, S, W, NE, SE, SW, NW | **PASS** | structural/source checks passed |
 | 410 | South Korea | Seoul | 9 | CAPITAL, N, E, S, W, NE, SE, SW, NW | **PASS** | structural/source checks passed |
-| 144 | Sri Lanka | Colombo | 9 | CAPITAL, N, E, S, W, NE, SE, SW, NW | **PASS** | structural/source checks passed |
+| 144 | Sri Lanka | Colombo | 9 | CAPITAL, N, E, S, W, NE, SE, SW, NW | **REVIEW** | #466: capital-role semantics: Sri Jayewardenepura Kotte is the national/administrative capital while Colombo is the commercial capital and major government-services city |
 | 760 | Syria | Damascus | 9 | CAPITAL, N, E, S, W, NE, SE, SW, NW | **PASS** | structural/source checks passed |
 | 158 | Taiwan | Taipei | 9 | CAPITAL, N, E, S, W, NE, SE, SW, NW | **PASS** | structural/source checks passed |
 | 762 | Tajikistan | Dushanbe | 8 | CAPITAL, N, E, S, W, NE, SW, NW | **PASS** | structural/source checks passed |
