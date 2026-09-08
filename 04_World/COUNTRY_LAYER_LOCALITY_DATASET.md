@@ -106,3 +106,6 @@ The generated runtime catalog records the geometry-identity registry version, lo
 - Current country locality catalog version `1.8.0` adds the source-backed Bolivia Sucre/La Paz capital-role correction without manual coordinates.
 
 - Current country locality catalog version `1.9.0` replaces the misleading Tel Aviv-Yafo and Gaza structural capital flags with source-backed Jerusalem and Ramallah slots while preserving neutral player-facing Jerusalem status semantics.
+
+- #474 Falkland Islands (Malvinas): Stanley remains source-backed but player-facing semantics describe it only as the current administrative centre under an unresolved UN-tracked sovereignty dispute.
+- #477 Antarctica: the sparse structural slot must never surface as a national-capital claim; McMurdo and other Antarctic nodes use research/logistics/locality semantics under the Antarctic Treaty status contract.

@@ -1,5 +1,5 @@
 {
-  "version": "1.8.0",
+  "version": "1.9.0",
   "reviewedOn": "2026-09-08",
   "purpose": "Player-facing semantic metadata for country and territory cases where a single generic capital label or geographic rendering could misstate political, constitutional, administrative or recognition reality.",
   "governance": {
@@ -240,6 +240,35 @@
       "publishedOn": "2020-10-26",
       "accessedOn": "2026-09-08",
       "note": "Article 2 establishes the principal Council of Ministers headquarters in Jerusalem and temporary headquarters in Ramallah and Gaza; the decision was issued in Ramallah."
+    },
+    "un-falkland-malvinas-status": {
+      "publisher": "United Nations and Decolonization",
+      "title": "Falkland Islands (Malvinas)",
+      "url": "https://www.un.org/dppa/decolonization/en/content/falkland-islands-malvinas",
+      "accessedOn": "2026-09-08",
+      "note": "The United Nations lists the Falkland Islands (Malvinas) as a Non-Self-Governing Territory, identifies the United Kingdom as administering Power, and explicitly notes a sovereignty dispute between Argentina and the United Kingdom."
+    },
+    "un-c24-falkland-malvinas-2026": {
+      "publisher": "United Nations Special Committee on Decolonization",
+      "title": "C-24 2026 session — Question of the Falkland Islands (Malvinas)",
+      "url": "https://webtv.un.org/en/asset/k1s/k1sjz1in6d",
+      "publishedOn": "2026-06-25",
+      "accessedOn": "2026-09-08",
+      "note": "The 2026 C-24 session continued formal consideration of the Question of the Falkland Islands (Malvinas), including the sovereignty dispute between Argentina and the United Kingdom."
+    },
+    "antarctic-treaty-article-iv": {
+      "publisher": "Antarctic Treaty Secretariat",
+      "title": "The Antarctic Treaty — Article IV territorial-claim safeguards",
+      "url": "https://www.ats.aq/e/antarctictreaty.html?lang=en",
+      "accessedOn": "2026-09-08",
+      "note": "Article IV safeguards existing positions on territorial claims, prevents Treaty-era activities from creating sovereignty rights, and bars new claims or enlargement of existing claims while the Treaty is in force."
+    },
+    "nsf-mcmurdo-station": {
+      "publisher": "U.S. National Science Foundation, Office of Polar Programs",
+      "title": "NSF McMurdo Station",
+      "url": "https://www.nsf.gov/geo/opp/ail/mcmurdo-station",
+      "accessedOn": "2026-09-08",
+      "note": "NSF identifies McMurdo Station as the largest station on Antarctica and the central logistics hub for the U.S. Antarctic Program, supporting scientific research across the continent."
     }
   },
   "entries": {
@@ -627,6 +656,77 @@
         "palestine-basic-law-jerusalem",
         "palestine-cabinet-headquarters",
         "un-sg-jerusalem-two-state-2026"
+      ]
+    },
+    "238": {
+      "issue": 474,
+      "renderedName": "Falkland Is.",
+      "statusLabel": "Falkland Islands (Malvinas) — unresolved sovereignty dispute",
+      "statusSummary": "The United Nations lists the Falkland Islands (Malvinas) as a Non-Self-Governing Territory administered by the United Kingdom and explicitly records an unresolved sovereignty dispute between Argentina and the United Kingdom. DROPi preserves the current geographic/locality layer without deciding final sovereignty.",
+      "territoryStatus": {
+        "classification": "un-non-self-governing-territory-sovereignty-dispute",
+        "label": "UN Non-Self-Governing Territory / sovereignty dispute unresolved",
+        "finalStatusResolved": false,
+        "note": "Geographic rendering, local administration and company activity do not constitute a DROPi sovereignty determination."
+      },
+      "coverageNote": "Stanley remains a source-backed locality and current administrative centre in the sparse map; that administrative role is not a final sovereignty judgment.",
+      "placeRoles": [
+        {
+          "locality": "Stanley",
+          "role": "current-administrative-centre",
+          "label": "Current administrative centre",
+          "note": "Administrative-centre labeling describes present local administration only and does not resolve the sovereignty dispute."
+        }
+      ],
+      "sourceRefs": [
+        "un-falkland-malvinas-status",
+        "un-c24-falkland-malvinas-2026"
+      ]
+    },
+    "010": {
+      "issue": 477,
+      "renderedName": "Antarctica",
+      "statusLabel": "Antarctic Treaty geography / no national capital",
+      "statusSummary": "Antarctica has no sovereign national capital in DROPi. The Antarctic Treaty preserves Parties’ differing positions on territorial claims and prevents Treaty-era activities from creating new sovereignty rights. Research stations are scientific and logistics facilities, not national capitals.",
+      "territoryStatus": {
+        "classification": "antarctic-treaty-status",
+        "label": "Antarctic Treaty System / sovereignty positions safeguarded",
+        "finalStatusResolved": false,
+        "note": "DROPi does not adjudicate Antarctic territorial claims; station presence and operations do not alter sovereignty."
+      },
+      "coverageNote": "The sparse map keeps the pinned Natural Earth Antarctic facility/locality nodes and overrides their player-facing meaning without changing source coordinates.",
+      "placeRoles": [
+        {
+          "locality": "McMurdo Station",
+          "role": "research-logistics-station",
+          "label": "Research / logistics station",
+          "note": "NSF describes McMurdo as Antarctica’s largest station and the central logistics hub for the U.S. Antarctic Program."
+        },
+        {
+          "locality": "Dumont d'Urville Station",
+          "role": "research-station",
+          "label": "Research station"
+        },
+        {
+          "locality": "AmundseniScott South Pole Station",
+          "role": "research-station",
+          "label": "Research station",
+          "note": "The locality name is preserved exactly from the pinned Natural Earth source."
+        },
+        {
+          "locality": "Sobral Base",
+          "role": "research-base",
+          "label": "Research base"
+        },
+        {
+          "locality": "Elephant Island",
+          "role": "source-backed-antarctic-locality",
+          "label": "Source-backed Antarctic locality"
+        }
+      ],
+      "sourceRefs": [
+        "antarctic-treaty-article-iv",
+        "nsf-mcmurdo-station"
       ]
     }
   }

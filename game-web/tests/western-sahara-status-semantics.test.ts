@@ -50,7 +50,7 @@ describe('Western Sahara neutral territory-status semantics #462', () => {
 
   it('classifies the geometry as a UN Non-Self-Governing Territory with unresolved final status', () => {
     const entry = semanticEntryForCountry(semanticCatalog, '732')
-    expect(semanticCatalog.version).toBe('1.8.0')
+    expect(semanticCatalog.version).toBe('1.9.0')
     expect(entry?.issue).toBe(462)
     expect(entry?.statusLabel).toBe('UN Non-Self-Governing Territory')
     expect(entry?.territoryStatus).toEqual({

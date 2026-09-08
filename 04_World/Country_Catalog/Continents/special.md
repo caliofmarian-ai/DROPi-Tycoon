@@ -21,7 +21,7 @@ Parent: #446
 
 | ID | Country / territory | Structural capital slot | Nodes | Slots | State | Notes |
 |---:|---|---|---:|---|---|---|
-| 010 | Antarctica | McMurdo Station | 5 | CAPITAL, NE, SE, SW, NW | **REVIEW** | #477: Antarctic Treaty semantics required: McMurdo Station is a research/logistics station, not a sovereign national capital; Antarctic territorial positions must remain neutral |
+| 010 | Antarctica | McMurdo Station | 5 | CAPITAL, NE, SE, SW, NW | **REVIEW** | #477: Antarctic Treaty semantics implemented; McMurdo and other source-backed Antarctic facilities/localities are not exposed as a sovereign national capital; owner Android acceptance pending |
 | 260 | Fr. S. Antarctic Lands | — | 0 | — | **GAP** | documented source coverage gap |
 
 ## Interpretation

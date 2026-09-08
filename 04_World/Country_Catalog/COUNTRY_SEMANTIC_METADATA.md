@@ -183,3 +183,12 @@ Bolivia is governed as a multi-role capital case: Sucre is the constitutional/na
 ## Jerusalem final-status model — #467 #468
 
 Israel and Palestine share one neutral Jerusalem semantic model. Israel’s source-backed Jerusalem marker records the capital/institutional role established by Israeli law while the status layer preserves the current United Nations final-status context. Palestine uses Ramallah as the source-backed sparse structural slot and Gaza as a retained urban node; East Jerusalem is represented in semantic metadata as the State of Palestine capital designation without fabricating or duplicating a locality marker where the pinned source does not safely assign it to geometry `275`. Structural map roles never settle sovereignty.
+
+
+## Falkland Islands (Malvinas) — #474
+
+Geometry `238` remains geographically rendered in South America with pinned Natural Earth locality coordinates. Player-facing semantics follow the United Nations naming/status convention: the territory is listed as a Non-Self-Governing Territory, the United Kingdom is identified as administering Power, and the sovereignty dispute between Argentina and the United Kingdom remains unresolved. Stanley is presented only as the **current administrative centre**; this does not encode final sovereignty.
+
+## Antarctica — #477
+
+Geometry `010` must never expose a sovereign national-capital concept. The internal sparse-map structural slot is not a political claim. Player-facing semantic metadata labels McMurdo Station as a **Research / logistics station**, other source-backed stations/bases as research facilities, and Elephant Island as a source-backed Antarctic locality. Antarctic Treaty Article IV governs the neutral status contract: DROPi preserves differing positions on territorial claims and does not treat station presence or activity as creating sovereignty.
