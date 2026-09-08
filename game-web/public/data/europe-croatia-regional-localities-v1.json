@@ -1,0 +1,597 @@
+{
+  "version": "1.0.0",
+  "issue": 526,
+  "continent": "Europe",
+  "country": {
+    "geometryId": "191",
+    "sourceCountryCode": "HR",
+    "renderedName": "Croatia"
+  },
+  "administrativeModel": {
+    "level": "first-order",
+    "nativeTermSingular": "županija / Grad Zagreb",
+    "nativeTermPlural": "županije plus Grad Zagreb",
+    "englishTerm": "county-level unit",
+    "unitCount": 21,
+    "officialReferences": [
+      "https://podaci.dzs.hr/2026/en/121448",
+      "https://podaci.dzs.hr/2026/en/121350",
+      "https://www.zagrebacka-zupanija.hr/zupanija/"
+    ],
+    "specialCases": [
+      {
+        "admin1Code": "20",
+        "type": "administrative-seat-outside-source-ownership",
+        "label": "Zagreb County seat exception",
+        "note": "Zagreb County officially has its seat in Zagreb, while the City of Zagreb is a separate county-level unit. GeoNames source-owns Zagreb under HR.21, so DROPi keeps Zagreb there as the unique national-capital locality and uses a separate source-backed representative inside HR.20 without relabeling that representative as the county seat."
+      }
+    ]
+  },
+  "source": {
+    "provider": "GeoNames",
+    "license": "Creative Commons Attribution 4.0",
+    "releaseTag": "source-geonames-cities500-2026-09-08-f3cda4f9",
+    "cities500Sha256": "f3cda4f9d256d90045121fb8eebad3ed91695c32370ed93b50fbe0cb616e2bbd",
+    "admin1Sha256": "590651498043f674accda2b7f46d21286cda0e290b02f8561c5005eee9a5448c",
+    "expectedCountryCandidateCount": 1215,
+    "publishedGameplayRepresentativeCount": 21
+  },
+  "selectionModel": {
+    "primaryFeatureCodes": [
+      "PPLC",
+      "PPLA"
+    ],
+    "fallbackFeatureCodes": [
+      "PPLA2"
+    ],
+    "expectedPrimarySelections": 20,
+    "expectedFallbackSelections": 1,
+    "highDensityGameplayImport": false,
+    "hardcodedCoordinates": false,
+    "rule": "One source-backed representative locality per governed first-order region; retained high-density source remains reference-only."
+  },
+  "developmentModel": {
+    "authority": "shared-regional-national-multiplayer-economy",
+    "personalPlayerProgressionUnlock": false,
+    "numericThresholdsDefined": false,
+    "signalsPlanned": [
+      "company-activity",
+      "employment-demand",
+      "production",
+      "logistics-throughput",
+      "construction-investment",
+      "transport-connectivity",
+      "trade-volume",
+      "population-economic-simulation",
+      "regional-national-policy"
+    ],
+    "rule": "Representative locality prominence and development are shared-world economic outcomes, not personal progression rewards."
+  },
+  "units": [
+    {
+      "admin1Code": "01",
+      "regionName": "County of Bjelovar-Bilogora",
+      "regionSourceName": "Bjelovar-Bilogora",
+      "regionAsciiName": "Bjelovar-Bilogora",
+      "regionSourceRef": "geonames:3337511",
+      "representativeLocality": {
+        "localityId": "dropi:locality:geonames:3203982",
+        "sourceRef": "geonames:3203982",
+        "name": "Bjelovar",
+        "asciiName": "Bjelovar",
+        "latitude": 45.89789,
+        "longitude": 16.85071,
+        "featureCode": "PPLA",
+        "populationSourceValue": 24392,
+        "selectionBasis": "source-first-order-seat-role",
+        "presentationRole": "regional-representative-locality"
+      },
+      "economicEmergence": {
+        "authority": "shared-regional-national-multiplayer-economy",
+        "personalPlayerProgressionUnlock": false,
+        "numericThresholdsDefined": false,
+        "presentationState": "economy-system-governed"
+      }
+    },
+    {
+      "admin1Code": "02",
+      "regionName": "County of Slavonski Brod-Posavina",
+      "regionSourceName": "Brod-Posavina",
+      "regionAsciiName": "Brod-Posavina",
+      "regionSourceRef": "geonames:3337512",
+      "representativeLocality": {
+        "localityId": "dropi:locality:geonames:3190586",
+        "sourceRef": "geonames:3190586",
+        "name": "Slavonski Brod",
+        "asciiName": "Slavonski Brod",
+        "latitude": 45.16158,
+        "longitude": 18.0163,
+        "featureCode": "PPLA",
+        "populationSourceValue": 45005,
+        "selectionBasis": "source-first-order-seat-role",
+        "presentationRole": "regional-representative-locality"
+      },
+      "economicEmergence": {
+        "authority": "shared-regional-national-multiplayer-economy",
+        "personalPlayerProgressionUnlock": false,
+        "numericThresholdsDefined": false,
+        "presentationState": "economy-system-governed"
+      }
+    },
+    {
+      "admin1Code": "03",
+      "regionName": "County of Dubrovnik-Neretva",
+      "regionSourceName": "Dubrovnik-Neretva",
+      "regionAsciiName": "Dubrovnik-Neretva",
+      "regionSourceRef": "geonames:3337513",
+      "representativeLocality": {
+        "localityId": "dropi:locality:geonames:3201047",
+        "sourceRef": "geonames:3201047",
+        "name": "Dubrovnik",
+        "asciiName": "Dubrovnik",
+        "latitude": 42.64125,
+        "longitude": 18.10909,
+        "featureCode": "PPLA",
+        "populationSourceValue": 26922,
+        "selectionBasis": "source-first-order-seat-role",
+        "presentationRole": "regional-representative-locality"
+      },
+      "economicEmergence": {
+        "authority": "shared-regional-national-multiplayer-economy",
+        "personalPlayerProgressionUnlock": false,
+        "numericThresholdsDefined": false,
+        "presentationState": "economy-system-governed"
+      }
+    },
+    {
+      "admin1Code": "04",
+      "regionName": "County of Istria",
+      "regionSourceName": "Istria",
+      "regionAsciiName": "Istria",
+      "regionSourceRef": "geonames:3337514",
+      "representativeLocality": {
+        "localityId": "dropi:locality:geonames:3193561",
+        "sourceRef": "geonames:3193561",
+        "name": "Pazin",
+        "asciiName": "Pazin",
+        "latitude": 45.23917,
+        "longitude": 13.93945,
+        "featureCode": "PPLA",
+        "populationSourceValue": 3981,
+        "selectionBasis": "source-first-order-seat-role",
+        "presentationRole": "regional-representative-locality"
+      },
+      "economicEmergence": {
+        "authority": "shared-regional-national-multiplayer-economy",
+        "personalPlayerProgressionUnlock": false,
+        "numericThresholdsDefined": false,
+        "presentationState": "economy-system-governed"
+      }
+    },
+    {
+      "admin1Code": "05",
+      "regionName": "County of Karlovac",
+      "regionSourceName": "Karlovac",
+      "regionAsciiName": "Karlovac",
+      "regionSourceRef": "geonames:3337515",
+      "representativeLocality": {
+        "localityId": "dropi:locality:geonames:3345300",
+        "sourceRef": "geonames:3345300",
+        "name": "Karlovac",
+        "asciiName": "Karlovac",
+        "latitude": 45.49167,
+        "longitude": 15.55,
+        "featureCode": "PPLA",
+        "populationSourceValue": 41869,
+        "selectionBasis": "source-first-order-seat-role",
+        "presentationRole": "regional-representative-locality"
+      },
+      "economicEmergence": {
+        "authority": "shared-regional-national-multiplayer-economy",
+        "personalPlayerProgressionUnlock": false,
+        "numericThresholdsDefined": false,
+        "presentationState": "economy-system-governed"
+      }
+    },
+    {
+      "admin1Code": "06",
+      "regionName": "County of Koprivnica-Križevci",
+      "regionSourceName": "Koprivnica-Križevci",
+      "regionAsciiName": "Koprivnica-Krizevci",
+      "regionSourceRef": "geonames:3337518",
+      "representativeLocality": {
+        "localityId": "dropi:locality:geonames:3197728",
+        "sourceRef": "geonames:3197728",
+        "name": "Koprivnica",
+        "asciiName": "Koprivnica",
+        "latitude": 46.16364,
+        "longitude": 16.8297,
+        "featureCode": "PPLA",
+        "populationSourceValue": 22262,
+        "selectionBasis": "source-first-order-seat-role",
+        "presentationRole": "regional-representative-locality"
+      },
+      "economicEmergence": {
+        "authority": "shared-regional-national-multiplayer-economy",
+        "personalPlayerProgressionUnlock": false,
+        "numericThresholdsDefined": false,
+        "presentationState": "economy-system-governed"
+      }
+    },
+    {
+      "admin1Code": "07",
+      "regionName": "County of Krapina-Zagorje",
+      "regionSourceName": "Krapina-Zagorje",
+      "regionAsciiName": "Krapina-Zagorje",
+      "regionSourceRef": "geonames:3337519",
+      "representativeLocality": {
+        "localityId": "dropi:locality:geonames:3197369",
+        "sourceRef": "geonames:3197369",
+        "name": "Krapina",
+        "asciiName": "Krapina",
+        "latitude": 46.16076,
+        "longitude": 15.8737,
+        "featureCode": "PPLA",
+        "populationSourceValue": 4201,
+        "selectionBasis": "source-first-order-seat-role",
+        "presentationRole": "regional-representative-locality"
+      },
+      "economicEmergence": {
+        "authority": "shared-regional-national-multiplayer-economy",
+        "personalPlayerProgressionUnlock": false,
+        "numericThresholdsDefined": false,
+        "presentationState": "economy-system-governed"
+      }
+    },
+    {
+      "admin1Code": "08",
+      "regionName": "County of Lika-Senj",
+      "regionSourceName": "Lika-Senj",
+      "regionAsciiName": "Lika-Senj",
+      "regionSourceRef": "geonames:3337520",
+      "representativeLocality": {
+        "localityId": "dropi:locality:geonames:3199873",
+        "sourceRef": "geonames:3199873",
+        "name": "Gospić",
+        "asciiName": "Gospic",
+        "latitude": 44.54611,
+        "longitude": 15.37472,
+        "featureCode": "PPLA",
+        "populationSourceValue": 6362,
+        "selectionBasis": "source-first-order-seat-role",
+        "presentationRole": "regional-representative-locality"
+      },
+      "economicEmergence": {
+        "authority": "shared-regional-national-multiplayer-economy",
+        "personalPlayerProgressionUnlock": false,
+        "numericThresholdsDefined": false,
+        "presentationState": "economy-system-governed"
+      }
+    },
+    {
+      "admin1Code": "09",
+      "regionName": "County of Međimurje",
+      "regionSourceName": "Međimurje",
+      "regionAsciiName": "Megimurje",
+      "regionSourceRef": "geonames:3337521",
+      "representativeLocality": {
+        "localityId": "dropi:locality:geonames:3202888",
+        "sourceRef": "geonames:3202888",
+        "name": "Čakovec",
+        "asciiName": "Cakovec",
+        "latitude": 46.38444,
+        "longitude": 16.43389,
+        "featureCode": "PPLA",
+        "populationSourceValue": 15078,
+        "selectionBasis": "source-first-order-seat-role",
+        "presentationRole": "regional-representative-locality"
+      },
+      "economicEmergence": {
+        "authority": "shared-regional-national-multiplayer-economy",
+        "personalPlayerProgressionUnlock": false,
+        "numericThresholdsDefined": false,
+        "presentationState": "economy-system-governed"
+      }
+    },
+    {
+      "admin1Code": "10",
+      "regionName": "County of Osijek-Baranja",
+      "regionSourceName": "County of Osijek-Baranja",
+      "regionAsciiName": "County of Osijek-Baranja",
+      "regionSourceRef": "geonames:3337522",
+      "representativeLocality": {
+        "localityId": "dropi:locality:geonames:3193935",
+        "sourceRef": "geonames:3193935",
+        "name": "Osijek",
+        "asciiName": "Osijek",
+        "latitude": 45.55066,
+        "longitude": 18.6942,
+        "featureCode": "PPLA",
+        "populationSourceValue": 75535,
+        "selectionBasis": "source-first-order-seat-role",
+        "presentationRole": "regional-representative-locality"
+      },
+      "economicEmergence": {
+        "authority": "shared-regional-national-multiplayer-economy",
+        "personalPlayerProgressionUnlock": false,
+        "numericThresholdsDefined": false,
+        "presentationState": "economy-system-governed"
+      }
+    },
+    {
+      "admin1Code": "11",
+      "regionName": "County of Požega-Slavonija",
+      "regionSourceName": "Požega-Slavonia",
+      "regionAsciiName": "Pozega-Slavonia",
+      "regionSourceRef": "geonames:3337523",
+      "representativeLocality": {
+        "localityId": "dropi:locality:geonames:3190589",
+        "sourceRef": "geonames:3190589",
+        "name": "Požega",
+        "asciiName": "Pozega",
+        "latitude": 45.34028,
+        "longitude": 17.68528,
+        "featureCode": "PPLA",
+        "populationSourceValue": 16867,
+        "selectionBasis": "source-first-order-seat-role",
+        "presentationRole": "regional-representative-locality"
+      },
+      "economicEmergence": {
+        "authority": "shared-regional-national-multiplayer-economy",
+        "personalPlayerProgressionUnlock": false,
+        "numericThresholdsDefined": false,
+        "presentationState": "economy-system-governed"
+      }
+    },
+    {
+      "admin1Code": "12",
+      "regionName": "County of Primorje-Gorski Kotar",
+      "regionSourceName": "Primorje-Gorski Kotar",
+      "regionAsciiName": "Primorje-Gorski Kotar",
+      "regionSourceRef": "geonames:3337524",
+      "representativeLocality": {
+        "localityId": "dropi:locality:geonames:3191648",
+        "sourceRef": "geonames:3191648",
+        "name": "Rijeka",
+        "asciiName": "Rijeka",
+        "latitude": 45.32673,
+        "longitude": 14.44241,
+        "featureCode": "PPLA",
+        "populationSourceValue": 107964,
+        "selectionBasis": "source-first-order-seat-role",
+        "presentationRole": "regional-representative-locality"
+      },
+      "economicEmergence": {
+        "authority": "shared-regional-national-multiplayer-economy",
+        "personalPlayerProgressionUnlock": false,
+        "numericThresholdsDefined": false,
+        "presentationState": "economy-system-governed"
+      }
+    },
+    {
+      "admin1Code": "13",
+      "regionName": "County of Šibenik-Knin",
+      "regionSourceName": "Šibenik-Knin",
+      "regionAsciiName": "Sibenik-Knin",
+      "regionSourceRef": "geonames:3337525",
+      "representativeLocality": {
+        "localityId": "dropi:locality:geonames:3190941",
+        "sourceRef": "geonames:3190941",
+        "name": "Šibenik",
+        "asciiName": "Sibenik",
+        "latitude": 43.73429,
+        "longitude": 15.8942,
+        "featureCode": "PPLA",
+        "populationSourceValue": 31115,
+        "selectionBasis": "source-first-order-seat-role",
+        "presentationRole": "regional-representative-locality"
+      },
+      "economicEmergence": {
+        "authority": "shared-regional-national-multiplayer-economy",
+        "personalPlayerProgressionUnlock": false,
+        "numericThresholdsDefined": false,
+        "presentationState": "economy-system-governed"
+      }
+    },
+    {
+      "admin1Code": "14",
+      "regionName": "County of Sisak-Moslavina",
+      "regionSourceName": "Sisak-Moslavina",
+      "regionAsciiName": "Sisak-Moslavina",
+      "regionSourceRef": "geonames:3337526",
+      "representativeLocality": {
+        "localityId": "dropi:locality:geonames:3190813",
+        "sourceRef": "geonames:3190813",
+        "name": "Sisak",
+        "asciiName": "Sisak",
+        "latitude": 45.46608,
+        "longitude": 16.37748,
+        "featureCode": "PPLA",
+        "populationSourceValue": 27859,
+        "selectionBasis": "source-first-order-seat-role",
+        "presentationRole": "regional-representative-locality"
+      },
+      "economicEmergence": {
+        "authority": "shared-regional-national-multiplayer-economy",
+        "personalPlayerProgressionUnlock": false,
+        "numericThresholdsDefined": false,
+        "presentationState": "economy-system-governed"
+      }
+    },
+    {
+      "admin1Code": "15",
+      "regionName": "County of Split-Dalmatia",
+      "regionSourceName": "Split-Dalmatia",
+      "regionAsciiName": "Split-Dalmatia",
+      "regionSourceRef": "geonames:3337527",
+      "representativeLocality": {
+        "localityId": "dropi:locality:geonames:3190261",
+        "sourceRef": "geonames:3190261",
+        "name": "Split",
+        "asciiName": "Split",
+        "latitude": 43.50891,
+        "longitude": 16.43915,
+        "featureCode": "PPLA",
+        "populationSourceValue": 149830,
+        "selectionBasis": "source-first-order-seat-role",
+        "presentationRole": "regional-representative-locality"
+      },
+      "economicEmergence": {
+        "authority": "shared-regional-national-multiplayer-economy",
+        "personalPlayerProgressionUnlock": false,
+        "numericThresholdsDefined": false,
+        "presentationState": "economy-system-governed"
+      }
+    },
+    {
+      "admin1Code": "16",
+      "regionName": "County of Varaždin",
+      "regionSourceName": "Varaždin",
+      "regionAsciiName": "Varazdin",
+      "regionSourceRef": "geonames:3337528",
+      "representativeLocality": {
+        "localityId": "dropi:locality:geonames:3188383",
+        "sourceRef": "geonames:3188383",
+        "name": "Varaždin",
+        "asciiName": "Varazdin",
+        "latitude": 46.30444,
+        "longitude": 16.33778,
+        "featureCode": "PPLA",
+        "populationSourceValue": 36187,
+        "selectionBasis": "source-first-order-seat-role",
+        "presentationRole": "regional-representative-locality"
+      },
+      "economicEmergence": {
+        "authority": "shared-regional-national-multiplayer-economy",
+        "personalPlayerProgressionUnlock": false,
+        "numericThresholdsDefined": false,
+        "presentationState": "economy-system-governed"
+      }
+    },
+    {
+      "admin1Code": "17",
+      "regionName": "County of Virovitica-Podravina",
+      "regionSourceName": "Virovitica-Podravina",
+      "regionAsciiName": "Virovitica-Podravina",
+      "regionSourceRef": "geonames:3337533",
+      "representativeLocality": {
+        "localityId": "dropi:locality:geonames:3187694",
+        "sourceRef": "geonames:3187694",
+        "name": "Virovitica",
+        "asciiName": "Virovitica",
+        "latitude": 45.83448,
+        "longitude": 17.38555,
+        "featureCode": "PPLA",
+        "populationSourceValue": 13486,
+        "selectionBasis": "source-first-order-seat-role",
+        "presentationRole": "regional-representative-locality"
+      },
+      "economicEmergence": {
+        "authority": "shared-regional-national-multiplayer-economy",
+        "personalPlayerProgressionUnlock": false,
+        "numericThresholdsDefined": false,
+        "presentationState": "economy-system-governed"
+      }
+    },
+    {
+      "admin1Code": "18",
+      "regionName": "County of Vukovar-Srijem",
+      "regionSourceName": "Vukovar-Srijem",
+      "regionAsciiName": "Vukovar-Srijem",
+      "regionSourceRef": "geonames:3337529",
+      "representativeLocality": {
+        "localityId": "dropi:locality:geonames:3187047",
+        "sourceRef": "geonames:3187047",
+        "name": "Vukovar",
+        "asciiName": "Vukovar",
+        "latitude": 45.35161,
+        "longitude": 19.00225,
+        "featureCode": "PPLA",
+        "populationSourceValue": 22255,
+        "selectionBasis": "source-first-order-seat-role",
+        "presentationRole": "regional-representative-locality"
+      },
+      "economicEmergence": {
+        "authority": "shared-regional-national-multiplayer-economy",
+        "personalPlayerProgressionUnlock": false,
+        "numericThresholdsDefined": false,
+        "presentationState": "economy-system-governed"
+      }
+    },
+    {
+      "admin1Code": "19",
+      "regionName": "County of Zadar",
+      "regionSourceName": "Zadar",
+      "regionAsciiName": "Zadar",
+      "regionSourceRef": "geonames:3337530",
+      "representativeLocality": {
+        "localityId": "dropi:locality:geonames:3186952",
+        "sourceRef": "geonames:3186952",
+        "name": "Zadar",
+        "asciiName": "Zadar",
+        "latitude": 44.11578,
+        "longitude": 15.22514,
+        "featureCode": "PPLA",
+        "populationSourceValue": 67309,
+        "selectionBasis": "source-first-order-seat-role",
+        "presentationRole": "regional-representative-locality"
+      },
+      "economicEmergence": {
+        "authority": "shared-regional-national-multiplayer-economy",
+        "personalPlayerProgressionUnlock": false,
+        "numericThresholdsDefined": false,
+        "presentationState": "economy-system-governed"
+      }
+    },
+    {
+      "admin1Code": "20",
+      "regionName": "County of Zagreb",
+      "regionSourceName": "Zagreb County",
+      "regionAsciiName": "Zagreb County",
+      "regionSourceRef": "geonames:3337531",
+      "representativeLocality": {
+        "localityId": "dropi:locality:geonames:3188244",
+        "sourceRef": "geonames:3188244",
+        "name": "Velika Gorica",
+        "asciiName": "Velika Gorica",
+        "latitude": 45.7125,
+        "longitude": 16.07556,
+        "featureCode": "PPLA2",
+        "populationSourceValue": 30036,
+        "selectionBasis": "source-admin-fallback",
+        "presentationRole": "regional-representative-locality"
+      },
+      "economicEmergence": {
+        "authority": "shared-regional-national-multiplayer-economy",
+        "personalPlayerProgressionUnlock": false,
+        "numericThresholdsDefined": false,
+        "presentationState": "economy-system-governed"
+      }
+    },
+    {
+      "admin1Code": "21",
+      "regionName": "City of Zagreb",
+      "regionSourceName": "Zagreb",
+      "regionAsciiName": "Zagreb",
+      "regionSourceRef": "geonames:3337532",
+      "representativeLocality": {
+        "localityId": "dropi:locality:geonames:3186886",
+        "sourceRef": "geonames:3186886",
+        "name": "Zagreb",
+        "asciiName": "Zagreb",
+        "latitude": 45.81444,
+        "longitude": 15.97798,
+        "featureCode": "PPLC",
+        "populationSourceValue": 663592,
+        "selectionBasis": "source-first-order-seat-role",
+        "presentationRole": "national-capital-and-regional-node"
+      },
+      "economicEmergence": {
+        "authority": "shared-regional-national-multiplayer-economy",
+        "personalPlayerProgressionUnlock": false,
+        "numericThresholdsDefined": false,
+        "presentationState": "economy-system-governed"
+      }
+    }
+  ]
+}
