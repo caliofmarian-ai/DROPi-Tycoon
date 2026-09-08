@@ -1,0 +1,61 @@
+{
+  "version": "1.0.0",
+  "issue": 517,
+  "continent": "Europe",
+  "country": {
+    "geometryId": "112",
+    "sourceCountryCode": "BY",
+    "renderedName": "Belarus"
+  },
+  "administrativeModel": {
+    "level": "first-order",
+    "nativeTermSingular": "voblast / Minsk capital city",
+    "nativeTermPlural": "six voblasts plus Minsk City",
+    "englishTerm": "region / capital-city equivalent",
+    "unitCount": 7,
+    "officialReferences": [
+      "https://iarpa.org/international/factbook/belarus/",
+      "https://cis-legislation.com/document.fwx?rgn=30374"
+    ],
+    "specialCases": [
+      {
+        "admin1Code": "05",
+        "type": "administrative-centre-outside-unit",
+        "administrativeCenter": "Minsk",
+        "administrativeCenterUnitAdmin1Code": "04",
+        "gameplayRepresentativePolicy": "inside-region-source-fallback",
+        "note": "Minsk City is a separate first-order unit while Minsk also serves as the administrative centre of Minsk Region. DROPi keeps Minsk City as the national-capital node and uses Barysaw as the source-backed inside-region representative for Minsk Region, avoiding duplicate locality ownership."
+      }
+    ]
+  },
+  "source": {
+    "provider": "GeoNames",
+    "license": "Creative Commons Attribution 4.0",
+    "releaseTag": "source-geonames-cities500-2026-09-08-f3cda4f9",
+    "cities500Sha256": "f3cda4f9d256d90045121fb8eebad3ed91695c32370ed93b50fbe0cb616e2bbd",
+    "admin1Sha256": "590651498043f674accda2b7f46d21286cda0e290b02f8561c5005eee9a5448c",
+    "expectedCountryCandidateCount": 314
+  },
+  "selectionPolicy": {
+    "primaryFeatureCodes": ["PPLC", "PPLA"],
+    "fallbackFeatureCodes": ["PPLA2"],
+    "expectedPrimarySelections": 6,
+    "expectedFallbackSelections": 1,
+    "highDensityGameplayImport": false,
+    "hardcodedCoordinates": false
+  },
+  "economicEmergence": {
+    "authority": "shared-regional-national-multiplayer-economy",
+    "personalPlayerProgressionUnlock": false,
+    "numericThresholdsDefined": false
+  },
+  "expectedRegions": [
+    {"admin1Code": "01", "canonicalName": "Brest Voblast", "sourceName": "Brest"},
+    {"admin1Code": "02", "canonicalName": "Homyel Voblast", "sourceName": "Homyel’ Voblasc’"},
+    {"admin1Code": "03", "canonicalName": "Hrodna Voblast", "sourceName": "Grodnenskaya"},
+    {"admin1Code": "04", "canonicalName": "Minsk City", "sourceName": "Minsk City"},
+    {"admin1Code": "05", "canonicalName": "Minsk Voblast", "sourceName": "Minsk"},
+    {"admin1Code": "06", "canonicalName": "Mahilyow Voblast", "sourceName": "Mogilev"},
+    {"admin1Code": "07", "canonicalName": "Vitebsk Voblast", "sourceName": "Vitebsk"}
+  ]
+}
