@@ -192,7 +192,15 @@ export class GlobalMapScene extends Phaser.Scene {
       .strokeRoundedRect(-width / 2, -height / 2, width, height, RADII.button)
     const hit = this.add.rectangle(x, y, safeWidth, safeHeight, 0xffffff, 0.001)
       .setInteractive({ useHandCursor: true })
-    hit.on('pointerdown', callback)
+    hit.on('pointerdown', (
+      _pointer: Phaser.Input.Pointer,
+      _localX: number,
+      _localY: number,
+      event: Phaser.Types.Input.EventData,
+    ) => {
+      event.stopPropagation()
+      callback()
+    })
     const text = this.add.text(x, y, label, {
       fontFamily: TYPOGRAPHY.family,
       fontSize: '12px',

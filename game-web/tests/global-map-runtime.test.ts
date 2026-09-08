@@ -65,6 +65,7 @@ describe('Global Map runtime #418', () => {
     expect(scale).toBeGreaterThan(0)
     expect(mapSource).toContain('TOUCH_TARGET_MIN_PX')
     expect(mapSource).toContain("'Open country view'")
+    expect(mapSource).toContain('event.stopPropagation()')
   })
 
   it('integrates map navigation without using the ordinary save/menu transition', () => {
