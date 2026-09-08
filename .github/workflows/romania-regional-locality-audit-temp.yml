@@ -1,0 +1,100 @@
+name: TEMP Romania Regional Locality Audit
+
+on:
+  push:
+    branches:
+      - openai/europe-romania-regional-localities-509
+    paths:
+      - .github/workflows/romania-regional-locality-audit-temp.yml
+
+permissions:
+  contents: read
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Download retained GeoNames snapshot assets
+        shell: bash
+        run: |
+          set -euo pipefail
+          base='https://github.com/caliofmarian-ai/DROPi-Tycoon/releases/download/source-geonames-cities500-2026-09-08-f3cda4f9'
+          curl -fsSL "$base/cities500.zip" -o /tmp/cities500.zip
+          curl -fsSL "$base/admin1CodesASCII.txt" -o /tmp/admin1CodesASCII.txt
+          printf '%s  %s\n' 'f3cda4f9d256d90045121fb8eebad3ed91695c32370ed93b50fbe0cb616e2bbd' /tmp/cities500.zip | sha256sum -c -
+          printf '%s  %s\n' '590651498043f674accda2b7f46d21286cda0e290b02f8561c5005eee9a5448c' /tmp/admin1CodesASCII.txt | sha256sum -c -
+      - name: Audit Romania admin1 and representative-seat candidates
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import collections, csv, io, json, zipfile
+          from pathlib import Path
+
+          admin = {}
+          for line in Path('/tmp/admin1CodesASCII.txt').read_text(encoding='utf-8').splitlines():
+              if not line.startswith('RO.'):
+                  continue
+              fields = line.split('\t')
+              code = fields[0].split('.', 1)[1]
+              admin[code] = {'name': fields[1], 'asciiName': fields[2], 'geonameid': fields[3]}
+
+          fields = [
+              'geonameid','name','asciiname','alternatenames','latitude','longitude',
+              'feature_class','feature_code','country_code','cc2','admin1_code',
+              'admin2_code','admin3_code','admin4_code','population','elevation',
+              'dem','timezone','modification_date'
+          ]
+          groups = collections.defaultdict(list)
+          with zipfile.ZipFile('/tmp/cities500.zip') as zf:
+              with zf.open('cities500.txt') as raw:
+                  for line in io.TextIOWrapper(raw, encoding='utf-8'):
+                      row = dict(zip(fields, line.rstrip('\n').split('\t')))
+                      if row['country_code'] != 'RO':
+                          continue
+                      groups[row['admin1_code']].append(row)
+
+          print('ROMANIA_ADMIN1_COUNT', len(admin))
+          print('ROMANIA_SOURCE_LOCALITIES', sum(len(v) for v in groups.values()))
+          print('ROMANIA_ADMIN1_WITH_LOCALITIES', len([c for c in admin if groups.get(c)]))
+          print('--- CANDIDATES ---')
+          priority = {'PPLC': 0, 'PPLA': 1, 'PPLA2': 2, 'PPLA3': 3, 'PPLA4': 4}
+          summary = []
+          for code in sorted(admin, key=lambda c: (admin[c]['name'].casefold(), c)):
+              rows = groups.get(code, [])
+              candidates = [r for r in rows if r['feature_code'] in priority]
+              candidates.sort(key=lambda r: (priority[r['feature_code']], -int(r['population'] or 0), r['name'].casefold(), int(r['geonameid'])))
+              best = candidates[0] if candidates else (max(rows, key=lambda r: int(r['population'] or 0)) if rows else None)
+              entry = {
+                  'admin1Code': code,
+                  'admin1Name': admin[code]['name'],
+                  'admin1SourceRef': f"geonames:{admin[code]['geonameid']}",
+                  'candidateCount': len(candidates),
+                  'best': None if best is None else {
+                      'name': best['name'],
+                      'asciiName': best['asciiname'],
+                      'featureCode': best['feature_code'],
+                      'population': int(best['population'] or 0),
+                      'sourceRef': f"geonames:{best['geonameid']}",
+                      'latitude': float(best['latitude']),
+                      'longitude': float(best['longitude']),
+                  },
+                  'topCandidates': [
+                      {
+                          'name': r['name'],
+                          'featureCode': r['feature_code'],
+                          'population': int(r['population'] or 0),
+                          'sourceRef': f"geonames:{r['geonameid']}"
+                      }
+                      for r in candidates[:4]
+                  ]
+              }
+              summary.append(entry)
+              print(json.dumps(entry, ensure_ascii=False))
+
+          missing = [e['admin1Name'] for e in summary if e['best'] is None]
+          print('MISSING_BEST', json.dumps(missing, ensure_ascii=False))
+          print('BEST_COUNT', sum(e['best'] is not None for e in summary))
+          print('PPLA_OR_PPLC_COUNT', sum(e['best'] and e['best']['featureCode'] in {'PPLA','PPLC'} for e in summary))
+          PY
