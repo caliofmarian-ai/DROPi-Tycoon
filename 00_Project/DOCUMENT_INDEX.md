@@ -2,7 +2,7 @@
 
 Document: DOCUMENT_INDEX.md
 Project: DROPi Tycoon
-Version: 2.2.0
+Version: 2.2.1
 Status: Documentation Control
 Author: Marian Caliof & OpenAI
 Language: English
@@ -21,7 +21,7 @@ It defines:
 - stable live Markdown documents that must be discoverable;
 - managed root-level directories;
 - documentation ownership and authority;
-- directory-policy treatment for dynamic, research, historical or generated areas.
+- directory-policy treatment for dynamic, research, historical, or generated areas.
 
 ---
 
@@ -29,7 +29,7 @@ It defines:
 
 1. Stable live Markdown documents are listed individually where practical.
 2. Managed root-level directories are represented explicitly.
-3. Dynamic/high-churn research, historical and report streams may be represented at directory-policy level.
+3. Dynamic/high-churn research, historical, and report streams may be represented at directory-policy level.
 4. Generated internals and build artifacts are not individually enumerated.
 5. Discoverability does not change content ownership.
 6. Higher-level strategic owners constrain lower-level specializations.
@@ -76,15 +76,15 @@ game-web/
 
 ## Purpose
 
-Strategic design authority, project identity, governance, architecture decisions, roadmap, status and documentation control.
+Strategic design authority, project identity, governance, architecture decisions, roadmap, status, and documentation control.
 
 ## Canonical Strategic Owners
 
 - `00_Project/VISION.md` — Level 1 Project Vision Authority.
-- `00_Project/UNIVERSE_DESIGN.md` — Level 2 Universe Design Authority: persistent society/world, citizens, organizations, institutions, infrastructure, scale and fair-access principles.
-- `00_Project/BUSINESS_DESIGN.md` — Level 3 Business Design Authority: organizations, workforce, competition, ownership/governance, productive assets and business/infrastructure relationships.
-- `00_Project/LOGISTICS_DESIGN.md` — Level 4 Logistics Design Authority: demand/cargo/custody, multimodal transport, hubs, qualifications, capacity and local-to-global logistics.
-- `00_Project/PHASE1_GAME_ARCHITECTURE_DECISION_BASELINE.md` — owner-approved Phase-1 architecture baseline produced from Game Logic Research #423 and approval gate #434. It binds player/world identity, employment/membership, travel, insolvency/offline life, staged currency/banking/public-economy direction, productive/infrastructure ownership and persistent multiplayer continuity.
+- `00_Project/UNIVERSE_DESIGN.md` — Level 2 Universe Design Authority: persistent society/world, citizens, organizations, institutions, infrastructure, scale, and fair-access principles.
+- `00_Project/BUSINESS_DESIGN.md` — Level 3 Business Design Authority: organizations, workforce, competition, ownership/governance, productive assets, and business/infrastructure relationships.
+- `00_Project/LOGISTICS_DESIGN.md` — Level 4 Logistics Design Authority: demand/cargo/custody, multimodal transport, hubs, qualifications, capacity, and local-to-global logistics.
+- `00_Project/PHASE1_GAME_ARCHITECTURE_DECISION_BASELINE.md` — owner-approved Phase-1 architecture baseline produced from Game Logic Research #423 and approval gate #434. It binds player/world identity, employment/membership, travel, insolvency/offline life, staged currency/banking/public-economy direction, productive/infrastructure ownership, persistent multiplayer continuity, and the Phase-1 playability direction.
 - `00_Project/ROADMAP.md` — canonical strategic development order.
 
 ## Other Stable Project Documents
@@ -107,12 +107,12 @@ Key reconciled truths include:
 - poor pedestrian employee start rather than automatic company ownership;
 - one economic hero per account per World Instance;
 - Personal Money and Company Money remain distinct ownership domains;
-- human consumption, finite Work Capacity and living costs are real economic drivers;
+- human consumption, finite Work Capacity, and living costs are real economic drivers;
 - deliveries emerge from demand/inventory/contracts instead of arbitrary money rewards;
-- people, companies, cities and industries participate in one stock-flow economy;
+- people, companies, cities, industries, and infrastructure participate in one stock-flow economy;
 - bankruptcy can be severe but is recoverable;
 - economic power is isolated between fresh World Instances;
-- strategic-map navigation does not teleport people/cargo;
+- strategic-map navigation does not teleport people or cargo;
 - the game must remain playable and attractive under the principle **Your work leaves a mark**.
 
 ---
@@ -121,20 +121,20 @@ Key reconciled truths include:
 
 ## Purpose
 
-Playable design: hero experience, gameplay structure, progression, objectives, physical HQ progression and multiplayer society.
+Playable design: hero experience, gameplay structure, progression, objectives, physical HQ progression, and multiplayer society.
 
 Documents:
 
 - `01_GameDesign/GDD.md` — Level 5 global Game Design Authority.
-- `01_GameDesign/GAMEPLAY.md` — moment-to-moment and session gameplay; reconciled to employee-first start and multiple valid long-term careers.
+- `01_GameDesign/GAMEPLAY.md` — moment-to-moment and session gameplay; reconciled to the employee-first start and multiple valid long-term careers.
 - `01_GameDesign/MISSIONS.md` — player guidance/objectives; mission completion cannot invent unbacked economic value.
 - `01_GameDesign/PROGRESSION.md` — three-axis progression: Personal Capability + Company Capability + World Access, with earned qualification/equipment/authorization/infrastructure gates.
 - `01_GameDesign/HQ_PROGRESSION.md` — physical HQ growth and department capability.
-- `01_GameDesign/COMPANY_SOCIETY_AND_MULTIPLAYER.md` — company membership, mixed human/NPC organizations, society, ownership, governance and multiplayer specialization.
+- `01_GameDesign/COMPANY_SOCIETY_AND_MULTIPLAYER.md` — company membership, mixed human/NPC organizations, society, ownership, governance, and multiplayer specialization.
 
 Authority note:
 
-- `GDD.md` cannot contradict `VISION`, `UNIVERSE_DESIGN`, `BUSINESS_DESIGN`, `LOGISTICS_DESIGN` or approved architecture decisions.
+- `GDD.md` cannot contradict `VISION`, `UNIVERSE_DESIGN`, `BUSINESS_DESIGN`, `LOGISTICS_DESIGN`, or approved architecture decisions.
 - Other Game Design documents specialize `GDD.md` and their relevant higher strategic owners.
 
 ---
@@ -143,15 +143,15 @@ Authority note:
 
 ## Purpose
 
-Detailed in-game economic, financial, market, workforce and ownership systems.
+Detailed in-game economic, financial, market, workforce, and ownership systems.
 
 Documents:
 
-- `02_Economy/ECONOMY.md` — universal stock-flow economic framework across persons, companies, cities, productive assets and countries.
-- `02_Economy/PERSONAL_FINANCE.md` — Personal Money, wages, living costs, personal insolvency and player investment ownership.
+- `02_Economy/ECONOMY.md` — universal stock-flow economic framework across persons, companies, cities, productive assets, and countries.
+- `02_Economy/PERSONAL_FINANCE.md` — Personal Money, wages, living costs, personal insolvency, and player investment ownership.
 - `02_Economy/MARKET.md` — inventory/consumption/procurement-driven markets and demand.
 - `02_Economy/PRICING.md` — pricing specialization.
-- `02_Economy/EMPLOYEES.md` — workforce, employment/payroll and human/NPC compatibility.
+- `02_Economy/EMPLOYEES.md` — workforce, employment/payroll, and human/NPC compatibility.
 - `02_Economy/PRODUCTION_AND_TRADE.md` — productive chains and trade.
 - `02_Economy/VALUATION.md` — company valuation.
 - `02_Economy/DIVIDENDS.md` — distributable company-to-person settlement.
@@ -160,9 +160,9 @@ Documents:
 
 Authority note:
 
-`02_Economy/*` specializes `BUSINESS_DESIGN`, Game Design and World rules. It owns economic calculations and conservation but does not redefine strategic company/world identity.
+`02_Economy/*` specializes `BUSINESS_DESIGN`, Game Design, and World rules. It owns economic calculations and conservation but does not redefine strategic company/world identity.
 
-No economy feature may create unexplained money, goods, labor, capacity or settlement outside the canonical stock-flow model.
+No economy feature may create unexplained money, goods, labor, capacity, or settlement outside the canonical stock-flow model.
 
 ---
 
@@ -183,7 +183,7 @@ Documents:
 
 Authority note:
 
-`03_Logistics/*` specializes `LOGISTICS_DESIGN.md`. Cargo, people and inventory must not teleport between economic locations because a UI action occurred.
+`03_Logistics/*` specializes `00_Project/LOGISTICS_DESIGN.md`. Cargo, people, and inventory must not teleport between economic locations because a UI action occurred.
 
 ---
 
@@ -191,11 +191,11 @@ Authority note:
 
 ## Purpose
 
-Detailed world simulation, global map, buildings, population/NPCs, environment and weather.
+Detailed world simulation, global map, buildings, population/NPCs, environment, and weather.
 
 Documents:
 
-- `04_World/WORLD.md` — living global world, authoritative time, consumption, production, migration, development/decline, events and multi-resolution simulation.
+- `04_World/WORLD.md` — living global world, authoritative time, consumption, production, migration, development/decline, events, and multi-resolution simulation.
 - `04_World/MAP.md` — Global -> Country -> Administrative Region -> Representative Locality / External Economic Node -> Detailed Local Scene; strategic map is observation/planning/travel, not teleportation.
 - `04_World/BUILDINGS.md`
 - `04_World/NPC.md`
@@ -203,7 +203,7 @@ Documents:
 
 Authority note:
 
-`04_World/*` specializes `UNIVERSE_DESIGN.md`. All countries may participate strategically, while detailed simulation remains sparse and bounded for scalability.
+`04_World/*` specializes `00_Project/UNIVERSE_DESIGN.md`. All countries may participate strategically, while detailed simulation remains sparse and bounded for scalability.
 
 ---
 
@@ -220,7 +220,7 @@ Documents:
 
 Important: this folder defines **in-game AI**, not AI-assisted development workflow.
 
-AI/automation must obey the same authoritative economy, labor, cargo, capacity and infrastructure rules as human-controlled actors. NPC fallback cannot create infinite free resources.
+AI/automation must obey the same authoritative economy, labor, cargo, capacity, and infrastructure rules as human-controlled actors. NPC fallback cannot create infinite free resources.
 
 ---
 
@@ -228,15 +228,15 @@ AI/automation must obey the same authoritative economy, labor, cargo, capacity a
 
 ## Purpose
 
-Level 7 Technical Design, persistence and shared-authority specifications.
+Level 7 Technical Design, persistence, and shared-authority specifications.
 
 Documents:
 
 - `06_Technical/ARCHITECTURE.md` — global technical architecture.
-- `06_Technical/MOBILE_APPLICATION_PLATFORM.md` — installed-mobile runtime, Android application shell and Railway role.
+- `06_Technical/MOBILE_APPLICATION_PLATFORM.md` — installed-mobile runtime, Android application shell, and Railway role.
 - `06_Technical/SAVE_SYSTEM.md` — local Save/Load plus explicit legacy boundary for migration into future multiplayer worlds.
-- `06_Technical/SHARED_AUTHORITY_CONTRACT.md` — server/trusted authority for shared identity, money, inventory, cargo, contracts, ownership, world time and settlement.
-- `06_Technical/WORLD_INSTANCES.md` — persistent independent global economies, economic isolation, one hero/world and multi-resolution/catch-up requirements.
+- `06_Technical/SHARED_AUTHORITY_CONTRACT.md` — trusted/server authority for shared identity, money, inventory, cargo, contracts, ownership, world time, and settlement.
+- `06_Technical/WORLD_INSTANCES.md` — persistent independent global economies, economic isolation, one hero/world, and multi-resolution/catch-up requirements.
 - `06_Technical/DURABLE_AUTHORITY_AND_AUTHENTICATION.md`
 - `06_Technical/DURABLE_AUTHORITY_STACK_DECISION.md`
 - `06_Technical/SERVER_AUTHORITY_PROTOTYPE.md`
@@ -262,7 +262,7 @@ Documents:
 
 UX/UI must support world-embodied gameplay rather than replace physical systems with omniscient management screens.
 
-Player-facing features should satisfy the Phase-1 R9 playability principles: meaningful choice, clarity, visible consequence, economic causality, variety, recovery, asynchronous compatibility where appropriate and Android usability.
+Player-facing features should satisfy the Phase-1 R9 playability principles: meaningful choice, clarity, visible consequence, economic causality, variety, recovery, asynchronous compatibility where appropriate, and Android usability.
 
 ---
 
@@ -270,9 +270,9 @@ Player-facing features should satisfy the Phase-1 R9 playability principles: mea
 
 ## Purpose
 
-Asset standards, approved references, world-art canon, production planning and resource governance.
+Asset standards, approved references, world-art canon, production planning, and resource governance.
 
-Documents:
+Documents/managed areas:
 
 - `08_Assets/ASSETS.md`
 - `08_Assets/WORLD_ASSET_BIBLE.md`
@@ -283,7 +283,7 @@ Documents:
 
 Authority note:
 
-`WORLD_ASSET_BIBLE.md` is an explicitly owner-authorized lower-level specialization. Asset generation remains demand-driven: search/reuse/deduplicate existing approved material before generating new source art.
+`WORLD_ASSET_BIBLE.md` is an explicitly owner-authorized lower-level specialization. Asset generation remains demand-driven: search, reuse, and deduplicate existing approved material before generating new source art.
 
 ---
 
@@ -291,7 +291,7 @@ Authority note:
 
 ## Purpose
 
-Implementation process, research, planning support, verification, reporting and historical evidence.
+Implementation process, research, planning support, verification, reporting, and historical evidence.
 
 ## Stable Top-Level Documents
 
@@ -308,29 +308,36 @@ Implementation process, research, planning support, verification, reporting and 
 - `09_Development/GAMEPLAY_EVENTS_FLOW.md`
 - `09_Development/GAME_BALANCING_RULES.md`
 - `09_Development/GAME_DATA_STRUCTURE.md`
+- `09_Development/GDEVELOP_PROJECT_STRUCTURE.md`
 - `09_Development/GITHUB_WORKFLOW.md`
+- `09_Development/IDEAS.md`
 - `09_Development/MOBILE_UI_CONTROLS.md`
 - `09_Development/PROTOTYPE_BUILD_PIPELINE.md`
+- `09_Development/PROTOTYPE_GENERATION_PACKAGE.md`
 - `09_Development/PROTOTYPE_MILESTONES.md`
 - `09_Development/PROTOTYPE_RELEASE_CHECKLIST.md`
+- `09_Development/PROTOTYPE_TECH_STACK.md`
 - `09_Development/PROTOTYPE_TESTING_PLAN.md`
 - `09_Development/PROTOTYPE_V0.1.md`
 - `09_Development/TASKS.md`
 
 ## Managed Game Logic Research Directory
 
-- `09_Development/Research/GAME_LOGIC/` — Phase-1 R1-R9 research archive from #423 and PR #425.
+- `09_Development/Research/GAME_LOGIC/` — Phase-1 R1-R9 research archive from #423 and merged PR #425.
 
 Rules:
 
 - research files remain **NON-CANONICAL evidence** even after merge;
-- approved conclusions are represented by `00_Project/PHASE1_GAME_ARCHITECTURE_DECISION_BASELINE.md`, Owner Directive 005 and reconciled domain documents;
-- research wording cannot override the reconciled canon;
+- approved conclusions are represented by `00_Project/PHASE1_GAME_ARCHITECTURE_DECISION_BASELINE.md`, Owner Directive 005, and reconciled domain documents;
+- research wording cannot override reconciled canon;
 - future research may identify new decisions but must pass owner approval before changing canonical architecture.
 
 ## Managed Historical Report Directory
 
-- `09_Development/AI_Reports/` — historical audit/report stream; evidence only.
+- `09_Development/AI_Reports/` — historical audit/report stream.
+- Governance source: `09_Development/AI_REPORTING_PROTOCOL.md`.
+- Individual reports are not enumerated here.
+- Reports are evidence, not live canonical authority.
 
 ## Managed Implementation-Preparation Directory
 
@@ -340,35 +347,35 @@ Rules:
 
 - `09_Development/Planning/` — planning-canonical milestone/epic/batch/issue architecture.
 
-Stable planning documents include:
+Stable planning documents:
 
-- `MILESTONE_ARCHITECTURE.md`
-- `EPIC_CATALOG.md`
-- `BATCH_ARCHITECTURE.md`
-- `ISSUE_CATALOG.md`
-- `DEPENDENCY_GRAPH.md`
-- `LABEL_TAXONOMY.md`
-- `GITHUB_CREATION_PLAN.md`
-- `github_creation_plan.yaml`
+- `09_Development/Planning/MILESTONE_ARCHITECTURE.md`
+- `09_Development/Planning/EPIC_CATALOG.md`
+- `09_Development/Planning/BATCH_ARCHITECTURE.md`
+- `09_Development/Planning/ISSUE_CATALOG.md`
+- `09_Development/Planning/DEPENDENCY_GRAPH.md`
+- `09_Development/Planning/LABEL_TAXONOMY.md`
+- `09_Development/Planning/GITHUB_CREATION_PLAN.md`
+- `09_Development/Planning/github_creation_plan.yaml`
 
-Historical M/E/RBATCH identities must be preserved, but execution order must be reconciled downward from current strategic canon rather than inferred from old numeric ordering.
+Historical M/E/RBATCH identities must be preserved. Execution order must be reconciled downward from current strategic canon rather than inferred from old numeric ordering.
 
 ## Managed Engine-Migration Directory
 
 - `09_Development/Engine_Migration/`
 
-Includes:
+Stable documents:
 
-- `ENVIRONMENT_VARIABLES.md`
-- `FUTURE_SERVER_AUTHORITATIVE_ARCHITECTURE_PREPARATION.md`
-- `WEB_RUNTIME_MIGRATION_MILESTONE_001.md`
+- `09_Development/Engine_Migration/ENVIRONMENT_VARIABLES.md`
+- `09_Development/Engine_Migration/FUTURE_SERVER_AUTHORITATIVE_ARCHITECTURE_PREPARATION.md`
+- `09_Development/Engine_Migration/WEB_RUNTIME_MIGRATION_MILESTONE_001.md`
 
 These documents cannot override current mobile-first or shared-authority canon.
 
 ## Managed Owner Directives Directory
 
 - `09_Development/Owner_Directives/` — binding owner input requiring deliberate canonical integration.
-- `09_Development/Owner_Directives/2026-09-08_MASTER_OWNER_DIRECTIVE_005_PHASE1_GAME_ARCHITECTURE_APPROVAL.md` — records approval of the complete Phase-1 architecture package and triggers this reconciliation.
+- `09_Development/Owner_Directives/2026-09-08_MASTER_OWNER_DIRECTIVE_005_PHASE1_GAME_ARCHITECTURE_APPROVAL.md` — records approval of the complete Phase-1 architecture package and authorizes this reconciliation.
 
 Governance source: `09_Development/Owner_Directives/README.md`.
 
@@ -380,7 +387,40 @@ Governance source: `09_Development/Owner_Directives/README.md`.
 
 The Project Owner explicitly authorized `08_Assets/WORLD_ASSET_BIBLE.md` on 2026-09-07 after the required domain audit/reconciliation.
 
-This authorization is specific to the world-art/asset domain. No other future BIBLE document is automatically authorized.
+This authorization is specific to the world-art/asset domain.
+
+`WORLD_ASSET_BIBLE.md` must remain subordinate to higher Universe, Business, Logistics, Game, World, UI, and Technical authority and must not redefine gameplay/economic behavior outside its asset domain.
+
+## Other Future BIBLE Documents
+
+No other BIBLE document is automatically authorized by the world-art decision.
+
+Any additional BIBLE document requires:
+
+1. complete domain audit;
+2. ownership mapping;
+3. overlap detection;
+4. contradiction analysis;
+5. migration proposal;
+6. explicit Project Owner approval.
+
+---
+
+# External DROPi Canonical Reference Package
+
+**Status:** Planned — package not uploaded in this repository.
+
+A future `DROPi_Canonical_Reference.zip` may provide a read-only snapshot of real DROPi canon.
+
+Until such a package exists:
+
+- do not invent it;
+- do not create a placeholder pretending it exists;
+- do not claim Tycoon gameplay inventions are real DROPi features.
+
+When uploaded, integration requires a dedicated cross-project alignment audit covering manifest/source verification, terminology, architecture, overlap, contradictions, gameplay adaptation, and explicit Owner approval.
+
+The real DROPi repository remains authoritative for the real product.
 
 ---
 
@@ -398,7 +438,7 @@ Managed generated/exported build-output area. Generated build artifacts are not 
 
 # game-mobile/
 
-Installed Expo/React Native application shell. It owns native lifecycle, orientation, system UI, Android bridge behavior, packaging and EAS integration while hosting the authoritative Phaser runtime.
+Installed Expo/React Native application shell. It owns native lifecycle, orientation, system UI, Android bridge behavior, packaging, and EAS integration while hosting the authoritative Phaser runtime.
 
 Canonical authority: `06_Technical/MOBILE_APPLICATION_PLATFORM.md` and `06_Technical/ARCHITECTURE.md`.
 
@@ -415,37 +455,48 @@ The project must not create a second independent React Native gameplay implement
 # Global Document Authority Hierarchy
 
 ## Level 1 — Project Vision
+
 `00_Project/VISION.md`
 
 ## Level 2 — Universe Design
+
 `00_Project/UNIVERSE_DESIGN.md`
 
 ## Level 3 — Business Design
+
 `00_Project/BUSINESS_DESIGN.md`
 
 ## Level 4 — Logistics Design
+
 `00_Project/LOGISTICS_DESIGN.md`
 
 ## Cross-Domain Approved Architecture Baselines
+
 Owner-approved decision baselines such as `00_Project/PHASE1_GAME_ARCHITECTURE_DECISION_BASELINE.md` constrain all affected domains until deliberately superseded by a later owner decision. They do not erase domain ownership.
 
 ## Level 5 — Game Design
+
 `01_GameDesign/GDD.md` and legitimate specializations.
 
 ## Level 6 — UX Design
+
 `07_UI/` canonical UI/UX documents.
 
 ## Level 7 — Technical Design
+
 `06_Technical/` canonical documents.
 
 ## Level 8 — Implementation / Prototype Scope
-Implementation specs, code, balancing/configuration and prototype-scope documents.
+
+Implementation specs, code, balancing/configuration, and prototype-scope documents.
 
 ## Level 9 — Verification
-Tests, CI, owner acceptance, deployment evidence and audits.
+
+Tests, CI, owner acceptance, deployment evidence, and audits.
 
 ## Level 10 — Historical / Research Evidence
-Research archives, AI reports, migration reports, old planning evidence and historical implementation records.
+
+Research archives, AI reports, migration reports, old planning evidence, and historical implementation records.
 
 Evidence does not create new product truth by itself.
 
@@ -468,7 +519,7 @@ Evidence does not create new product truth by itself.
 
 # Maintenance Rule
 
-When files are added, removed, moved or materially change authority:
+When files are added, removed, moved, or materially change authority:
 
 1. keep this index aligned with the real repository filesystem;
 2. register stable live canonical documents;
@@ -483,7 +534,7 @@ When files are added, removed, moved or materially change authority:
 
 # Canonical Rule
 
-**Every important project truth must have one clear owner, approved cross-domain decisions must be reconciled into every affected owner, and planning/implementation must flow downward from current canon rather than upward from prototype behavior, old issue numbering or research evidence.**
+**Every important project truth must have one clear owner, approved cross-domain decisions must be reconciled into every affected owner, and planning/implementation must flow downward from current canon rather than upward from prototype behavior, old issue numbering, or research evidence.**
 
 ---
 
