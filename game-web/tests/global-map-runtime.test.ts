@@ -1,4 +1,5 @@
 import { readFileSync } from 'node:fs'
+import type { CountryLocalityCatalog } from '../src/world/countryLayerNodes'
 import { describe, expect, it } from 'vitest'
 import {
   countryAtMapPoint,
@@ -14,13 +15,33 @@ const topology = JSON.parse(readFileSync(
   new URL('../public/data/world-atlas-countries-110m.json', import.meta.url),
   'utf8',
 )) as WorldTopology
+const localityCatalog = JSON.parse(readFileSync(
+  new URL('../public/data/country-representative-localities-v1.json', import.meta.url),
+  'utf8',
+)) as CountryLocalityCatalog
 
 const configSource = readFileSync(new URL('../src/config/gameConfig.ts', import.meta.url), 'utf8')
 const worldSource = readFileSync(new URL('../src/scenes/GameWorldScene.ts', import.meta.url), 'utf8')
 const hudSource = readFileSync(new URL('../src/ui/UrbanHUD.ts', import.meta.url), 'utf8')
 const mapSource = readFileSync(new URL('../src/scenes/GlobalMapScene.ts', import.meta.url), 'utf8')
 
+const PINNED_POPULATED_PLACES_COMMIT = 'ca96624a56bd078437bca8184e78163e5039ad19'
+
 describe('Global Map runtime #418', () => {
+  it('materializes sparse real-world locality nodes for country drill-down', () => {
+    const romania = localityCatalog.countries['642'] ?? []
+    const ireland = localityCatalog.countries['372'] ?? []
+    expect(romania.find(node => node.role === 'capital')?.name).toMatch(/Bucharest|Bucuresti/)
+    expect(ireland.find(node => node.role === 'capital')?.name).toBe('Dublin')
+    expect(romania.length).toBeLessThanOrEqual(9)
+    expect(ireland.length).toBeLessThanOrEqual(9)
+    expect(Object.values(localityCatalog.countries).every(nodes => nodes.length <= 9)).toBe(true)
+    expect(localityCatalog.stats.countriesWithRepresentativeNodes).toBeGreaterThan(150)
+    expect(localityCatalog.source.upstreamCommit === PINNED_POPULATED_PLACES_COMMIT).toBe(true)
+    const northIreland = ireland.find(node => node.role === 'urban' && node.sector === 'N')
+    expect(!northIreland || northIreland.populationReference >= 15000 || northIreland.sourceFeatureClass.includes('Admin-1 capital')).toBe(true)
+  })
+
   it('loads the pinned local country topology as real selectable geography', () => {
     const countries = decodeWorldTopology(topology, 1440, 720)
     const names = new Set(countries.map(country => country.name))
@@ -76,12 +97,17 @@ describe('Global Map runtime #418', () => {
     expect(resolveNativeBackTarget('GlobalMap')).toBe('GameWorld')
   })
 
-  it('keeps strategic map inspection non-teleporting and honest about inactive economy overlays', () => {
-    expect(mapSource).toContain("simulation: 'GeometryOnly'")
-    expect(mapSource).toContain("economy: 'NotActivated'")
-    expect(mapSource).toContain("logistics: 'NotActivated'")
-    expect(mapSource).toContain('No player, cargo or company state is moved by map inspection.')
+  it('keeps strategic inspection non-teleporting and honest about simulation boundaries', () => {
+    expect(mapSource).toContain('Country layers use real geography.')
+    expect(mapSource).toContain('Economy and transport overlays will appear only when authoritative simulation is connected.')
+    expect(mapSource).toContain('Opening the map never moves the player, cargo or company.')
     expect(mapSource).not.toContain('player.x =')
     expect(mapSource).not.toContain('player.y =')
+    expect(mapSource).toContain('repaintCountryLocalities')
+    expect(mapSource).toContain('selectedLocality')
+    const applyTransform = mapSource.slice(mapSource.indexOf('private applyMapTransform'), mapSource.indexOf('private screenToMap'))
+    expect(applyTransform).not.toContain('repaintCountryLocalities()')
+    expect(mapSource).not.toContain('GeometryOnly')
+    expect(mapSource).not.toContain('NotActivated')
   })
 })

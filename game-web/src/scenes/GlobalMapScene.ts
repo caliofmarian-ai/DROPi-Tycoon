@@ -11,6 +11,13 @@ import {
 } from '../world/globalMapTopology'
 import { COLORS, RADII, TOUCH_TARGET_MIN_PX, TYPOGRAPHY } from '../ui/theme'
 import {
+  localityNodesForCountry,
+  nearestLocalityNode,
+  projectLocalityToGlobalMap,
+  type CountryLocalityCatalog,
+  type CountryLocalityNode,
+} from '../world/countryLayerNodes'
+import {
   fitGlobalMapScale,
   GLOBAL_MAP_HEIGHT as MAP_HEIGHT,
   GLOBAL_MAP_WIDTH as MAP_WIDTH,
@@ -21,6 +28,8 @@ import {
 const MAX_ZOOM_MULTIPLIER = 8
 const COUNTRY_DATA_KEY = 'global-country-topology'
 const COUNTRY_DATA_URL = 'data/world-atlas-countries-110m.json'
+const LOCALITY_DATA_KEY = 'country-representative-localities'
+const LOCALITY_DATA_URL = 'data/country-representative-localities-v1.json'
 
 type MapLevel = 'Global' | 'Country'
 
@@ -33,29 +42,19 @@ interface PointerDrag {
   moved: boolean
 }
 
-interface StrategicCountryRuntimeState {
-  simulation: 'GeometryOnly'
-  economy: 'NotActivated'
-  logistics: 'NotActivated'
-  localityNodes: number
-}
-
-const countryRuntimeState = (): StrategicCountryRuntimeState => ({
-  simulation: 'GeometryOnly',
-  economy: 'NotActivated',
-  logistics: 'NotActivated',
-  localityNodes: 0,
-})
-
 const clamp = (value: number, min: number, max: number): number => Math.max(min, Math.min(max, value))
 
 export class GlobalMapScene extends Phaser.Scene {
   private countries: GlobalCountryGeometry[] = []
+  private localityCatalog: CountryLocalityCatalog | null = null
   private selected: GlobalCountryGeometry | null = null
+  private selectedLocality: CountryLocalityNode | null = null
   private level: MapLevel = 'Global'
   private viewport!: ViewportRect
   private mapLayer!: Phaser.GameObjects.Container
   private countryGraphics!: Phaser.GameObjects.Graphics
+  private localityGraphics!: Phaser.GameObjects.Graphics
+  private localityLabels: Phaser.GameObjects.Text[] = []
   private selectionTitle!: Phaser.GameObjects.Text
   private selectionBody!: Phaser.GameObjects.Text
   private breadcrumb!: Phaser.GameObjects.Text
@@ -74,11 +73,13 @@ export class GlobalMapScene extends Phaser.Scene {
 
   preload(): void {
     if (!this.cache.json.exists(COUNTRY_DATA_KEY)) this.load.json(COUNTRY_DATA_KEY, COUNTRY_DATA_URL)
+    if (!this.cache.json.exists(LOCALITY_DATA_KEY)) this.load.json(LOCALITY_DATA_KEY, LOCALITY_DATA_URL)
   }
 
   create(): void {
     const topology = this.cache.json.get(COUNTRY_DATA_KEY) as WorldTopology | undefined
     this.countries = topology ? decodeWorldTopology(topology, MAP_WIDTH, MAP_HEIGHT) : []
+    this.localityCatalog = (this.cache.json.get(LOCALITY_DATA_KEY) as CountryLocalityCatalog | undefined) ?? null
     this.viewport = globalMapViewport(this.scale.width, this.scale.height)
     this.fitScale = fitGlobalMapScale(this.viewport)
     this.mapScale = this.fitScale
@@ -126,7 +127,8 @@ export class GlobalMapScene extends Phaser.Scene {
       ocean.lineBetween(0, latitude, MAP_WIDTH, latitude)
     }
     this.countryGraphics = this.add.graphics()
-    this.mapLayer.add([ocean, this.countryGraphics])
+    this.localityGraphics = this.add.graphics()
+    this.mapLayer.add([ocean, this.countryGraphics, this.localityGraphics])
   }
 
   private createInterface(): void {
@@ -228,33 +230,82 @@ export class GlobalMapScene extends Phaser.Scene {
     }
   }
 
+  private repaintCountryLocalities(): void {
+    if (!this.localityGraphics) return
+    this.localityGraphics.clear()
+    for (const label of this.localityLabels) label.destroy()
+    this.localityLabels = []
+    if (this.level !== 'Country' || !this.selected) return
+
+    const nodes = localityNodesForCountry(this.localityCatalog, this.selected.id)
+    const inverseScale = 1 / Math.max(0.001, this.mapScale)
+    for (const node of nodes) {
+      const point = projectLocalityToGlobalMap(node, MAP_WIDTH, MAP_HEIGHT)
+      const selected = node === this.selectedLocality
+      const screenRadius = node.role === 'capital' ? 7 : node.role === 'urban' ? 5.5 : 4.5
+      const radius = screenRadius * inverseScale
+      const fill = selected ? COLORS.review : node.role === 'capital' ? COLORS.gold : node.role === 'urban' ? COLORS.accent : COLORS.success
+      this.localityGraphics.fillStyle(fill, 1).fillCircle(point.x, point.y, radius)
+      this.localityGraphics.lineStyle((selected ? 2.4 : 1.5) * inverseScale, 0xffffff, 0.9).strokeCircle(point.x, point.y, radius)
+      const label = this.add.text(point.x + 8 * inverseScale, point.y - 9 * inverseScale, node.name, {
+        fontFamily: TYPOGRAPHY.family,
+        fontSize: `${11 * inverseScale}px`,
+        color: node.role === 'capital' ? COLORS.textGold : COLORS.textPrimary,
+        fontStyle: node.role === 'capital' ? 'bold' : 'normal',
+        stroke: '#041c38',
+        strokeThickness: 3 * inverseScale,
+      })
+      this.mapLayer.add(label)
+      this.localityLabels.push(label)
+    }
+  }
+
   private refreshSelectionPanel(): void {
     if (!this.selected) {
       this.selectionTitle.setText('WORLD')
       this.selectionBody.setText([
-        `${this.countries.length} country geometries loaded`,
+        `${this.countries.length} countries on the global map`,
         'Tap a country to inspect it.',
         'Drag the map to pan.',
         'Use + / − to zoom.',
         '',
-        'Strategic economy/logistics overlays remain inactive until their authoritative domain slices exist.',
+        'Country layers use real geography. Economic and transport activity appears only when its authoritative simulation is connected.',
       ].join('\n'))
       this.setDrillEnabled(false, 'Select a country')
       this.breadcrumb.setText('GLOBAL')
       return
     }
 
-    const state = countryRuntimeState()
-    this.selectionTitle.setText(this.selected.name.toUpperCase())
-    this.selectionBody.setText([
-      `Country ID: ${this.selected.id}`,
-      `Map entity: ${state.simulation}`,
-      `Economy: ${state.economy}`,
-      `Logistics: ${state.logistics}`,
-      `Representative locality nodes: ${state.localityNodes}`,
-      '',
-      'No player, cargo or company state is moved by map inspection.',
-    ].join('\n'))
+    const nodes = localityNodesForCountry(this.localityCatalog, this.selected.id)
+    const capital = nodes.find(node => node.role === 'capital')
+    const urbanCount = nodes.filter(node => node.role === 'urban').length
+    const secondaryCount = nodes.filter(node => node.role === 'secondary').length
+    if (this.selectedLocality) {
+      const locality = this.selectedLocality
+      const kind = locality.role === 'capital' ? 'National capital' : locality.role === 'urban' ? 'Representative city' : 'Smaller locality'
+      this.selectionTitle.setText(locality.name.toUpperCase())
+      this.selectionBody.setText([
+        kind,
+        locality.admin1 ? `Region: ${locality.admin1}` : this.selected.name,
+        locality.populationReference > 0 ? `Population reference: ${locality.populationReference.toLocaleString('en-US')}` : 'Population reference: unavailable',
+        `Geographic sector: ${locality.sector}`,
+        '',
+        `Part of ${this.selected.name}'s sparse strategic map.`,
+        'Opening the map never moves the player, cargo or company.',
+      ].join('\n'))
+    } else {
+      this.selectionTitle.setText(this.selected.name.toUpperCase())
+      this.selectionBody.setText([
+        capital ? `Capital: ${capital.name}` : 'Capital: source coverage unavailable',
+        `Representative places: ${nodes.length}`,
+        `Representative city nodes: ${urbanCount}`,
+        `Smaller locality nodes: ${secondaryCount}`,
+        '',
+        this.level === 'Country'
+          ? 'Tap a locality marker to inspect it. Economy and transport overlays will appear only when authoritative simulation is connected.'
+          : 'Open country view to inspect its representative settlement network.',
+      ].join('\n'))
+    }
     this.setDrillEnabled(true, this.level === 'Global' ? 'Open country view' : 'Return to world view')
     this.breadcrumb.setText(this.level === 'Global' ? `GLOBAL  ›  ${this.selected.name}` : `GLOBAL  ›  ${this.selected.name}  ›  COUNTRY`)
   }
@@ -295,15 +346,25 @@ export class GlobalMapScene extends Phaser.Scene {
     this.drag = null
     if (!wasTap) return
     const mapPoint = this.screenToMap(pointer.x, pointer.y)
+    if (this.level === 'Country' && this.selected) {
+      const nodes = localityNodesForCountry(this.localityCatalog, this.selected.id)
+      this.selectedLocality = nearestLocalityNode(nodes, mapPoint, MAP_WIDTH, MAP_HEIGHT, 18 / this.mapScale)
+      this.repaintCountryLocalities()
+      this.refreshSelectionPanel()
+      return
+    }
     const country = countryAtMapPoint(this.countries, mapPoint, MAP_WIDTH)
     this.selected = country
+    this.selectedLocality = null
     if (!country) this.level = 'Global'
     this.repaintCountries()
+    this.repaintCountryLocalities()
     this.refreshSelectionPanel()
   }
 
   private toggleCountryView(): void {
     if (!this.selected) return
+    this.selectedLocality = null
     if (this.level === 'Country') {
       this.level = 'Global'
       this.fitWorld()
@@ -311,6 +372,7 @@ export class GlobalMapScene extends Phaser.Scene {
       this.level = 'Country'
       this.focusBounds(this.selected.primaryBounds)
     }
+    this.repaintCountryLocalities()
     this.refreshSelectionPanel()
   }
 
@@ -337,14 +399,17 @@ export class GlobalMapScene extends Phaser.Scene {
     this.mapY = this.viewport.top + this.viewport.height / 2 - center.y * this.mapScale
     this.clampMapPosition()
     this.applyMapTransform()
+    this.repaintCountryLocalities()
   }
 
   private fitWorld(): void {
     this.level = 'Global'
+    this.selectedLocality = null
     this.mapScale = this.fitScale
     this.mapX = this.viewport.left + (this.viewport.width - MAP_WIDTH * this.mapScale) / 2
     this.mapY = this.viewport.top + (this.viewport.height - MAP_HEIGHT * this.mapScale) / 2
     this.applyMapTransform()
+    this.repaintCountryLocalities()
     if (this.selectionTitle) this.refreshSelectionPanel()
   }
 
@@ -365,6 +430,7 @@ export class GlobalMapScene extends Phaser.Scene {
     this.mapY = screenY - localY * nextScale
     this.clampMapPosition()
     this.applyMapTransform()
+    this.repaintCountryLocalities()
   }
 
   private clampMapPosition(): void {
