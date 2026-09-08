@@ -1,0 +1,56 @@
+{
+  "version": "1.0.0",
+  "issue": 512,
+  "continent": "Europe",
+  "country": {
+    "geometryId": "008",
+    "sourceCountryCode": "AL",
+    "renderedName": "Albania"
+  },
+  "administrativeModel": {
+    "level": "first-order",
+    "nativeTermSingular": "qark",
+    "nativeTermPlural": "qarqe",
+    "englishTerm": "county",
+    "unitCount": 12,
+    "officialReferences": [
+      "https://www.instat.gov.al/en/documentation/classifications/version/?verId=3488",
+      "https://www.instat.gov.al/en/documentation/classifications/version/level/?levId=3840"
+    ]
+  },
+  "source": {
+    "provider": "GeoNames",
+    "license": "Creative Commons Attribution 4.0",
+    "releaseTag": "source-geonames-cities500-2026-09-08-f3cda4f9",
+    "cities500Sha256": "f3cda4f9d256d90045121fb8eebad3ed91695c32370ed93b50fbe0cb616e2bbd",
+    "admin1Sha256": "590651498043f674accda2b7f46d21286cda0e290b02f8561c5005eee9a5448c",
+    "expectedCountryCandidateCount": 419
+  },
+  "selectionPolicy": {
+    "primaryFeatureCodes": ["PPLC", "PPLA"],
+    "fallbackFeatureCodes": ["PPLA2"],
+    "expectedPrimarySelections": 12,
+    "expectedFallbackSelections": 0,
+    "highDensityGameplayImport": false,
+    "hardcodedCoordinates": false
+  },
+  "economicEmergence": {
+    "authority": "shared-regional-national-multiplayer-economy",
+    "personalPlayerProgressionUnlock": false,
+    "numericThresholdsDefined": false
+  },
+  "expectedRegions": [
+    {"admin1Code": "40", "canonicalName": "Berat", "sourceName": "Berat County"},
+    {"admin1Code": "41", "canonicalName": "Dibër", "sourceName": "Dibër County"},
+    {"admin1Code": "42", "canonicalName": "Durrës", "sourceName": "Durrës County"},
+    {"admin1Code": "43", "canonicalName": "Elbasan", "sourceName": "Elbasan County"},
+    {"admin1Code": "44", "canonicalName": "Fier", "sourceName": "Fier County"},
+    {"admin1Code": "45", "canonicalName": "Gjirokastër", "sourceName": "Gjirokastër County"},
+    {"admin1Code": "46", "canonicalName": "Korçë", "sourceName": "Korçë County"},
+    {"admin1Code": "47", "canonicalName": "Kukës", "sourceName": "Kukës County"},
+    {"admin1Code": "48", "canonicalName": "Lezhë", "sourceName": "Lezhë County"},
+    {"admin1Code": "49", "canonicalName": "Shkodër", "sourceName": "Shkodër County"},
+    {"admin1Code": "50", "canonicalName": "Tiranë", "sourceName": "Tirana"},
+    {"admin1Code": "51", "canonicalName": "Vlorë", "sourceName": "Vlorë County"}
+  ]
+}
