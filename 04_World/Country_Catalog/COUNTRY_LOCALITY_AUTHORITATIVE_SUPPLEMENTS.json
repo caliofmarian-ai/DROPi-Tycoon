@@ -1,0 +1,37 @@
+{
+  "version": "1.0.0",
+  "purpose": "Authoritative locality features used only when a reviewed current-reality locality is absent from the pinned Natural Earth populated-place snapshot. Every supplement must preserve explicit institutional provenance and must never be synthesized from an approximate map position.",
+  "governance": {
+    "institutionalSourceRequired": true,
+    "geometryIdRequired": true,
+    "sourceCoordinateTextRequired": true,
+    "decimalCoordinatesMustBeExactConversion": true,
+    "reviewIssueRequired": true
+  },
+  "sources": {
+    "uk-pcgn-equatorial-guinea-2026": {
+      "publisher": "UK Permanent Committee on Geographical Names (PCGN)",
+      "title": "Equatorial Guinea: Toponymic Factfile",
+      "url": "https://assets.publishing.service.gov.uk/media/695fb2f757e7407fe07765d8/Equatorial_Guinea_Toponymic_Factfile.pdf",
+      "landingPage": "https://www.gov.uk/government/publications/toponymic-factfiles",
+      "updatedOn": "2026-01-08",
+      "accessedOn": "2026-09-08",
+      "note": "The official factfile lists Ciudad de la Paz as the administrative centre of Djibloho at 01°35′33″N 10°49′25″E, states that the settlement was formerly known as Oyala, and records its January 2026 capital status."
+    }
+  },
+  "entries": {
+    "equatorial-guinea-ciudad-de-la-paz-2026": {
+      "issue": 459,
+      "countryId": "226",
+      "name": "Ciudad de la Paz",
+      "formerNames": ["Oyala"],
+      "admin1": "Djibloho",
+      "featureClass": "Authoritative current-reality capital",
+      "longitude": 10.823611111111111,
+      "latitude": 1.5925,
+      "sourceCoordinateText": "01°35′33″N 10°49′25″E",
+      "sourceRef": "uk-pcgn-equatorial-guinea-2026",
+      "effectiveOn": "2026-01-02"
+    }
+  }
+}
