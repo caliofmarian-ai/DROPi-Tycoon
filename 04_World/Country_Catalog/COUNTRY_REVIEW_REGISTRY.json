@@ -1,5 +1,5 @@
 {
-  "version": "1.0.0",
+  "version": "1.1.0",
   "purpose": "Manual semantic review flags discovered during continent-by-continent audit. These do not silently rewrite pinned Natural Earth source data.",
   "reviews": {
     "204": {
@@ -29,6 +29,26 @@
     "732": {
       "issue": 462,
       "reason": "territory-status semantics required: Western Sahara remains a disputed Non-Self-Governing Territory and must not be reduced to an uncontested single-capital claim"
+    },
+    "392": {
+      "issue": 464,
+      "reason": "current-capital mismatch: Tokyo is Japan's current capital; Kyoto must not retain the capital role"
+    },
+    "104": {
+      "issue": 465,
+      "reason": "current-capital mismatch: Nay Pyi Taw is Myanmar's capital while Yangon/Rangoon is a major commercial city"
+    },
+    "144": {
+      "issue": 466,
+      "reason": "capital-role semantics: Sri Jayewardenepura Kotte is the national/administrative capital while Colombo is the commercial capital and major government-services city"
+    },
+    "376": {
+      "issue": 467,
+      "reason": "capital/status semantics: Tel Aviv-Yafo must not be labeled Israel's national capital; Jerusalem requires explicit neutral status handling"
+    },
+    "275": {
+      "issue": 468,
+      "reason": "capital/status semantics: Gaza must not be labeled the State of Palestine's national capital; East Jerusalem claim and Ramallah administrative role require neutral handling"
     }
   }
 }
