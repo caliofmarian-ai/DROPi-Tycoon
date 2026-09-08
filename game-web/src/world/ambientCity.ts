@@ -40,10 +40,15 @@ const clearRoute = (start: UrbanPoint, end: UrbanPoint, roadOnly: boolean): bool
   return true
 }
 
+/**
+ * Ambient pedestrian routes are materialized once, then cached. Pixel-cadence validation is
+ * deliberately stricter than runtime pose cadence so no interpolation point can cut a corner,
+ * leave pavement, or enter a road surface outside an explicit controlled crossing.
+ */
 const clearPedestrianRoute = (start: UrbanPoint, end: UrbanPoint): boolean => {
-  const steps = Math.ceil(Math.hypot(end.x - start.x, end.y - start.y) / 8)
+  const steps = Math.max(1, Math.ceil(Math.hypot(end.x - start.x, end.y - start.y)))
   for (let step = 0; step <= steps; step++) {
-    const fraction = step / Math.max(1, steps)
+    const fraction = step / steps
     const x = start.x + (end.x - start.x) * fraction
     const y = start.y + (end.y - start.y) * fraction
     if (!isUrbanWalkable(x, y, false, 6)) return false
