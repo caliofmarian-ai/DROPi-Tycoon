@@ -29,6 +29,14 @@ const semanticCatalog = JSON.parse(readFileSync(
   new URL('../public/data/country-semantic-metadata-v1.json', import.meta.url),
   'utf8',
 )) as CountrySemanticCatalog
+const roleOverrideRegistry = JSON.parse(readFileSync(
+  new URL('../../04_World/Country_Catalog/COUNTRY_LOCALITY_ROLE_OVERRIDES.json', import.meta.url),
+  'utf8',
+)) as {
+  version: string
+  source: { upstreamCommit: string }
+  entries: Record<string, unknown>
+}
 
 const configSource = readFileSync(new URL('../src/config/gameConfig.ts', import.meta.url), 'utf8')
 const worldSource = readFileSync(new URL('../src/scenes/GameWorldScene.ts', import.meta.url), 'utf8')
@@ -45,6 +53,11 @@ describe('Global Map runtime #418', () => {
     const kosovo = localityCatalog.countries['XKX'] ?? []
     const northernCyprus = localityCatalog.countries['XNC'] ?? []
     const somaliland = localityCatalog.countries['XSL'] ?? []
+    const japan = localityCatalog.countries['392'] ?? []
+    const myanmar = localityCatalog.countries['104'] ?? []
+    const sriLanka = localityCatalog.countries['144'] ?? []
+    const chile = localityCatalog.countries['152'] ?? []
+
     expect(romania.find(node => node.role === 'capital')?.name).toMatch(/Bucharest|Bucuresti/)
     expect(ireland.find(node => node.role === 'capital')?.name).toBe('Dublin')
     expect(unitedKingdom.find(node => node.role === 'capital')?.name).toBe('London')
@@ -52,6 +65,16 @@ describe('Global Map runtime #418', () => {
     expect(kosovo.find(node => node.role === 'capital')?.name).toBe('Pristina')
     expect(northernCyprus).toEqual([])
     expect(somaliland.find(node => node.role === 'capital')?.name).toBe('Hargeysa')
+
+    expect(japan.find(node => node.role === 'capital')?.name).toBe('Tokyo')
+    expect(japan.find(node => node.name === 'Kyoto')?.role).not.toBe('capital')
+    expect(myanmar.find(node => node.role === 'capital')?.name).toBe('Nay Pyi Taw')
+    expect(myanmar.find(node => node.name === 'Yangon')?.role).not.toBe('capital')
+    expect(sriLanka.find(node => node.role === 'capital')?.name).toBe('Sri Jayewardenepura Kotte')
+    expect(sriLanka.find(node => node.name === 'Colombo')?.role).not.toBe('capital')
+    expect(chile.find(node => node.role === 'capital')?.name).toBe('Santiago')
+    expect(chile.find(node => node.name === 'Valparaíso')?.role).not.toBe('capital')
+
     expect(localityCatalog.geometryIdentity?.byRenderedName['N. Cyprus']).toBe('XNC')
     expect(localityCatalog.geometryIdentity?.byRenderedName.Somaliland).toBe('XSL')
     expect(localityCatalog.geometryIdentity?.byRenderedName.Kosovo).toBe('XKX')
@@ -65,12 +88,29 @@ describe('Global Map runtime #418', () => {
     expect(!northIreland || northIreland.populationReference >= 15000 || northIreland.sourceFeatureClass.includes('Admin-1 capital')).toBe(true)
   })
 
-  it('keeps special-status semantics source-governed and separate from locality coordinates', () => {
+  it('governs source-backed capital corrections without hardcoded coordinates', () => {
+    expect(roleOverrideRegistry.version).toBe('1.0.0')
+    expect(roleOverrideRegistry.source.upstreamCommit).toBe(PINNED_POPULATED_PLACES_COMMIT)
+    expect(Object.keys(roleOverrideRegistry.entries).sort()).toEqual(['104', '144', '152', '392'])
+    expect(JSON.stringify(roleOverrideRegistry)).not.toContain('longitude')
+    expect(JSON.stringify(roleOverrideRegistry)).not.toContain('latitude')
+
+    expect(localityCatalog.version).toBe('1.3.0')
+    expect(localityCatalog.localityRoleOverrides?.registryVersion).toBe(roleOverrideRegistry.version)
+    expect(localityCatalog.localityRoleOverrides?.sourceCommit).toBe(PINNED_POPULATED_PLACES_COMMIT)
+    expect(localityCatalog.localityRoleOverrides?.countryIds).toEqual(['104', '144', '152', '392'])
+  })
+
+  it('keeps special-status and current-capital semantics source-governed', () => {
     const kosovo = semanticEntryForCountry(semanticCatalog, 'XKX')
     const northernCyprus = semanticEntryForCountry(semanticCatalog, 'XNC')
     const somaliland = semanticEntryForCountry(semanticCatalog, 'XSL')
+    const japan = semanticEntryForCountry(semanticCatalog, '392')
+    const myanmar = semanticEntryForCountry(semanticCatalog, '104')
+    const sriLanka = semanticEntryForCountry(semanticCatalog, '144')
+    const chile = semanticEntryForCountry(semanticCatalog, '152')
 
-    expect(semanticCatalog.version).toBe('1.0.0')
+    expect(semanticCatalog.version).toBe('1.1.0')
     expect(semanticCatalog.governance.geographyDoesNotAssertSovereignty).toBe(true)
     expect(semanticCatalog.governance.projectGeometryIdsAreNonISO).toBe(true)
     expect(semanticCatalog.governance.localityCoordinatesRemainSourceBacked).toBe(true)
@@ -88,6 +128,22 @@ describe('Global Map runtime #418', () => {
     expect(somaliland?.issue).toBe(482)
     expect(semanticPlaceRoleForLocality(somaliland, 'Hargeysa')?.label).toBe('Principal administrative centre')
     expect(somaliland?.statusSummary).toContain('26 December 2025')
+
+    expect(japan?.issue).toBe(464)
+    expect(semanticPlaceRoleForLocality(japan, 'Tokyo')?.label).toBe('National capital')
+    expect(semanticPlaceRoleForLocality(japan, 'Kyoto')?.label).toBe('Representative city')
+
+    expect(myanmar?.issue).toBe(465)
+    expect(semanticPlaceRoleForLocality(myanmar, 'Nay Pyi Taw')?.label).toBe('National capital')
+    expect(semanticPlaceRoleForLocality(myanmar, 'Yangon')?.label).toBe('Commercial hub')
+
+    expect(sriLanka?.issue).toBe(466)
+    expect(semanticPlaceRoleForLocality(sriLanka, 'Sri Jayewardenepura Kotte')?.label).toBe('Administrative / national capital')
+    expect(semanticPlaceRoleForLocality(sriLanka, 'Colombo')?.label).toBe('Commercial capital')
+
+    expect(chile?.issue).toBe(473)
+    expect(semanticPlaceRoleForLocality(chile, 'Santiago')?.label).toBe('National capital')
+    expect(semanticPlaceRoleForLocality(chile, 'Valparaíso')?.label).toBe('National Congress seat / representative city')
   })
 
   it('loads the pinned local country topology as real selectable geography', () => {

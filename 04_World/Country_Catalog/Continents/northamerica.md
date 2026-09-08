@@ -5,7 +5,7 @@ Status: Generated audit manifest; country-by-country maintenance surface.
 Parent: #446
 
 ## Source contract
-- runtime catalog version: `1.2.0`
+- runtime catalog version: `1.3.0`
 - Natural Earth upstream commit: `ca96624a56bd078437bca8184e78163e5039ad19`
 - every node coordinate remains a source coordinate; this manifest does not reposition places.
 

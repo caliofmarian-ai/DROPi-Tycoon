@@ -25,6 +25,11 @@ export interface CountryLocalityCatalog {
     registryVersion: string
     byRenderedName: Record<string, string>
   }
+  localityRoleOverrides?: {
+    registryVersion: string
+    sourceCommit: string
+    countryIds: string[]
+  }
   stats: {
     renderedCountries: number
     countriesWithRepresentativeNodes: number

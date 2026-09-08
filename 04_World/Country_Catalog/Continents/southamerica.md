@@ -5,7 +5,7 @@ Status: Generated audit manifest; country-by-country maintenance surface.
 Parent: #446
 
 ## Source contract
-- runtime catalog version: `1.2.0`
+- runtime catalog version: `1.3.0`
 - Natural Earth upstream commit: `ca96624a56bd078437bca8184e78163e5039ad19`
 - every node coordinate remains a source coordinate; this manifest does not reposition places.
 
@@ -23,7 +23,7 @@ Parent: #446
 | 032 | Argentina | Buenos Aires | 9 | CAPITAL, N, E, S, W, NE, SE, SW, NW | **PASS** | structural/source checks passed |
 | 068 | Bolivia | La Paz | 9 | CAPITAL, N, E, S, W, NE, SE, SW, NW | **REVIEW** | #472: capital-role semantics: Sucre is Bolivia's constitutional/national capital while La Paz is the principal executive and legislative government seat |
 | 076 | Brazil | Brasilia | 9 | CAPITAL, N, E, S, W, NE, SE, SW, NW | **PASS** | structural/source checks passed |
-| 152 | Chile | Valparaiso | 9 | CAPITAL, N, E, S, W, NE, SE, SW, NW | **REVIEW** | #473: current-capital mismatch: Santiago is Chile's national capital while Valparaiso is the seat of the National Congress and a major port |
+| 152 | Chile | Santiago | 9 | CAPITAL, NW, N, E, S, W, NE, SE, SW | **REVIEW** | #473: current-capital mismatch: Santiago is Chile's national capital while Valparaiso is the seat of the National Congress and a major port |
 | 170 | Colombia | Bogota | 9 | CAPITAL, N, E, S, W, NE, SE, SW, NW | **PASS** | structural/source checks passed |
 | 218 | Ecuador | Quito | 9 | CAPITAL, N, E, S, W, NE, SE, SW, NW | **PASS** | structural/source checks passed |
 | 238 | Falkland Is. | Stanley | 2 | CAPITAL, SW | **REVIEW** | #474: territory-status semantics required: the Falkland Islands/Malvinas remain subject to an unresolved sovereignty dispute and must be presented neutrally |

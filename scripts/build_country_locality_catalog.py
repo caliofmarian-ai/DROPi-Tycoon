@@ -8,6 +8,7 @@ SRC_COMMIT = 'ca96624a56bd078437bca8184e78163e5039ad19'
 SRC_URL = f'https://raw.githubusercontent.com/nvkelso/natural-earth-vector/{SRC_COMMIT}/geojson/ne_10m_populated_places_simple.geojson'
 OUT = ROOT / 'game-web/public/data/country-representative-localities-v1.json'
 TOPOLOGY = ROOT / 'game-web/public/data/world-atlas-countries-110m.json'
+ROLE_OVERRIDES = ROOT / '04_World/Country_Catalog/COUNTRY_LOCALITY_ROLE_OVERRIDES.json'
 W, H = 1440.0, 720.0
 
 
@@ -20,6 +21,10 @@ with urllib.request.urlopen(SRC_URL, timeout=60) as r:
     source = json.load(r)
 topology = json.loads(TOPOLOGY.read_text())
 identity_registry, identity_by_name = load_geometry_id_registry()
+role_override_registry = json.loads(ROLE_OVERRIDES.read_text())
+if role_override_registry.get('source', {}).get('upstreamCommit') != SRC_COMMIT:
+    raise RuntimeError('COUNTRY_LOCALITY_ROLE_OVERRIDES.json must target the pinned populated-place source commit')
+role_overrides = role_override_registry.get('entries') or {}
 rendered = topology_names(topology, identity_by_name)
 ids = set(rendered)
 name_to_id = {norm(name): cid for cid, name in rendered.items() if name}
@@ -80,9 +85,24 @@ def place_key(p):
     return (round(p['lon'], 6), round(p['lat'], 6), p['name'])
 
 
-def choose(places):
+def unique_source_place(places, source_names, country_id_value, purpose):
+    wanted = {norm(name) for name in source_names if norm(name)}
+    hits = [p for p in places if norm(p['name']) in wanted]
+    if len(hits) != 1:
+        available = sorted({p['name'] for p in places if p['name']})
+        raise RuntimeError(
+            f'{country_id_value} {purpose}: expected exactly one pinned-source locality '
+            f'for {source_names!r}, found {len(hits)}. Available names: {available!r}'
+        )
+    return hits[0]
+
+
+def choose(places, country_id_value, override=None):
     if not places:
+        if override:
+            raise RuntimeError(f'{country_id_value}: governed role override has no pinned-source locality pool')
         return []
+
     xs, ys = zip(*(point(p) for p in places))
     cx, cy = (min(xs) + max(xs)) / 2, (min(ys) + max(ys)) / 2
     hw, hh = max(8, (max(xs) - min(xs)) / 2), max(8, (max(ys) - min(ys)) / 2)
@@ -93,19 +113,33 @@ def choose(places):
         mag = max(1e-9, math.hypot(dx, dy))
         return dx / mag, dy / mag, min(2.5, mag)
 
-    capitals = [p for p in places if p['isCapital']]
-    capitals.sort(key=lambda p: (p['scalerank'], -p['population'], p['name']))
-    capital = capitals[0] if capitals else max(places, key=lambda p: (p['population'], -p['scalerank']))
+    if override:
+        current_capital = override.get('currentCapital') or {}
+        capital = unique_source_place(
+            places,
+            current_capital.get('sourceNames') or [],
+            country_id_value,
+            'currentCapital',
+        )
+        capital_display_name = str(current_capital.get('displayName') or capital['name']).strip()
+    else:
+        capitals = [p for p in places if p['isCapital']]
+        capitals.sort(key=lambda p: (p['scalerank'], -p['population'], p['name']))
+        capital = capitals[0] if capitals else max(places, key=lambda p: (p['population'], -p['scalerank']))
+        capital_display_name = capital['name']
+
     selected = []
     used = set()
+    used_sectors = set()
 
-    def add(p, role, sector):
+    def add(p, role, sector, display_name=None):
         k = place_key(p)
-        if k in used:
-            return
+        if k in used or sector in used_sectors:
+            return False
         used.add(k)
+        used_sectors.add(sector)
         selected.append({
-            'name': p['name'],
+            'name': str(display_name or p['name']).strip(),
             'role': role,
             'sector': sector,
             'longitude': round(p['lon'], 6),
@@ -114,8 +148,34 @@ def choose(places):
             'admin1': p['admin1'],
             'sourceFeatureClass': p['featureClass'],
         })
+        return True
 
-    add(capital, 'capital', 'CAPITAL')
+    add(capital, 'capital', 'CAPITAL', capital_display_name)
+
+    def ranked_sectors(p):
+        dx, dy, _distance = vec(p)
+        return sorted(
+            directions,
+            key=lambda sector: (dx * directions[sector][0] + dy * directions[sector][1], sector),
+            reverse=True,
+        )
+
+    if override:
+        for required in override.get('requiredRepresentatives') or []:
+            representative = unique_source_place(
+                places,
+                required.get('sourceNames') or [],
+                country_id_value,
+                'requiredRepresentative',
+            )
+            sector = next((value for value in ranked_sectors(representative) if value not in used_sectors), None)
+            if not sector:
+                raise RuntimeError(f'{country_id_value}: no sector available for required representative {required!r}')
+            role = str(required.get('role') or 'urban')
+            if role not in {'urban', 'secondary'}:
+                raise RuntimeError(f'{country_id_value}: invalid required representative role {role!r}')
+            if not add(representative, role, sector, required.get('displayName')):
+                raise RuntimeError(f'{country_id_value}: failed to add required representative {required!r}')
 
     def significant(p):
         return p['isAdmin1'] or p['population'] >= 15000
@@ -147,10 +207,14 @@ def choose(places):
         return winner
 
     for sector in ('N', 'E', 'S', 'W'):
+        if sector in used_sectors:
+            continue
         p = best(sector, False)
         if p:
             add(p, 'urban', sector)
     for sector in ('NE', 'SE', 'SW', 'NW'):
+        if sector in used_sectors:
+            continue
         p = best(sector, True)
         if p:
             add(p, 'secondary', sector)
@@ -159,7 +223,7 @@ def choose(places):
 
 countries = {}
 for cid in sorted(ids):
-    nodes = choose(grouped.get(cid, []))
+    nodes = choose(grouped.get(cid, []), cid, role_overrides.get(cid))
     if nodes:
         countries[cid] = nodes
 missing = [{'id': cid, 'name': rendered[cid]} for cid in sorted(ids) if cid not in countries]
@@ -169,17 +233,29 @@ def capital(cid):
     return next((n['name'] for n in countries.get(cid, []) if n['role'] == 'capital'), None)
 
 
+def node(cid, name):
+    return next((n for n in countries.get(cid, []) if n['name'] == name), None)
+
+
 assert capital('642') in {'Bucharest', 'Bucuresti'}
 assert capital('372') == 'Dublin'
 assert capital('826') == 'London'
 assert capital('XKX') == 'Pristina'
+assert capital('392') == 'Tokyo'
+assert capital('104') == 'Nay Pyi Taw'
+assert capital('144') == 'Sri Jayewardenepura Kotte'
+assert capital('152') == 'Santiago'
+assert node('392', 'Kyoto') and node('392', 'Kyoto')['role'] != 'capital'
+assert node('104', 'Yangon') and node('104', 'Yangon')['role'] != 'capital'
+assert node('144', 'Colombo') and node('144', 'Colombo')['role'] != 'capital'
+assert node('152', 'Valparaíso') and node('152', 'Valparaíso')['role'] != 'capital'
 assert all(n['name'] != 'Hamilton' for n in countries.get('826', []))
 assert all(len(v) <= 9 for v in countries.values())
 ireland_n = next((n for n in countries['372'] if n['role'] == 'urban' and n['sector'] == 'N'), None)
 assert ireland_n is None or ireland_n['populationReference'] >= 15000 or 'Admin-1 capital' in ireland_n['sourceFeatureClass']
 
 payload = {
-    'version': '1.2.0',
+    'version': '1.3.0',
     'source': {
         'name': 'Natural Earth 1:10m populated places simple',
         'upstreamCommit': SRC_COMMIT,
@@ -188,6 +264,11 @@ payload = {
     'geometryIdentity': {
         'registryVersion': identity_registry.get('version', 'unknown'),
         'byRenderedName': identity_by_name,
+    },
+    'localityRoleOverrides': {
+        'registryVersion': role_override_registry.get('version', 'unknown'),
+        'sourceCommit': role_override_registry.get('source', {}).get('upstreamCommit'),
+        'countryIds': sorted(role_overrides),
     },
     'stats': {
         'renderedCountries': len(ids),
@@ -206,3 +287,5 @@ print('ROMANIA', json.dumps(countries['642'], ensure_ascii=False))
 print('IRELAND', json.dumps(countries['372'], ensure_ascii=False))
 print('UNITED_KINGDOM', json.dumps(countries['826'], ensure_ascii=False))
 print('KOSOVO', json.dumps(countries['XKX'], ensure_ascii=False))
+for cid in sorted(role_overrides):
+    print('OVERRIDE', cid, json.dumps(countries[cid], ensure_ascii=False))
