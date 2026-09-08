@@ -1,9 +1,9 @@
 # Report 127 — World Instance B1 Local Identity
 
-**Date:** 2026-09-08  
-**Issue:** #515  
-**Parent:** #421  
-**PR:** #518  
+**Date:** 2026-09-08
+**Issue:** #515
+**Parent:** #421
+**PR:** #518
 **Track:** Phase-1 Track B / B1 — World Instance + worldActor identity
 
 ## Objective
