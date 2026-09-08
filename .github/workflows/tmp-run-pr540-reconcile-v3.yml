@@ -1,0 +1,58 @@
+name: Temporary run PR 540 reconciliation v3
+
+on:
+  push:
+    branches:
+      - openai/issue-539-district-identity-streets
+
+permissions:
+  contents: write
+
+jobs:
+  reconcile-v3:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          ref: openai/issue-539-district-identity-streets
+      - name: Reconcile without workflow-file mutation
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          from pathlib import Path
+
+          source = Path('.github/workflows/tmp-reconcile-pr540-braila.yml').read_text()
+          marker = '        run: |\n'
+          body = source.split(marker, 1)[1]
+          lines = []
+          for line in body.splitlines():
+              lines.append(line[10:] if line.startswith('          ') else line)
+          script = '\n'.join(lines) + '\n'
+
+          script = script.replace(
+              'git reset --hard origin/main',
+              """git -c user.name='dropi-reconciliation-bot' -c user.email='actions@users.noreply.github.com' merge -s ours --no-edit origin/main
+          git checkout origin/main -- .
+          rm -f 09_Development/AI_Reports/2026-09-08_127_CEDAR_CITY_DISTRICT_IDENTITY.md
+          rm -f game-web/src/world/cityIdentity.ts
+          rm -f game-web/tests/city-identity.test.ts""",
+          )
+          script = script.replace(
+              "for raw in paths:\n    if not raw:",
+              "for raw in paths:\n    if raw.startswith('.github/workflows/tmp-'):\n        continue\n    if not raw:",
+          )
+          old = '''render_marker = "  WORLD_DECORATIONS.forEach((tree, index) => {\\n"\nif 'renderBrailaAddressLabels(scene)' not in text:\n    text = text.replace(render_marker, "  renderBrailaAddressLabels(scene)\\n\\n" + render_marker, 1)'''
+          new = '''render_marker = "  WORLD_DECORATIONS.forEach((tree, index) => {\\n"\nif 'renderBrailaAddressLabels(scene)' not in text:\n    render_start = text.index('export const renderUrbanNeighborhood')\n    before, after = text[:render_start], text[render_start:]\n    after = after.replace(render_marker, "  renderBrailaAddressLabels(scene)\\n\\n" + render_marker, 1)\n    text = before + after'''
+          if old not in script:
+              raise SystemExit('address injection block not found in source reconciler')
+          script = script.replace(old, new)
+          script = script.replace("if git grep -n -i 'cedar'; then", "if git grep -n -i 'cedar' -- ':!.github/workflows/tmp-*'; then")
+          script = script.replace(
+              'git push --force-with-lease origin HEAD:openai/issue-539-district-identity-streets',
+              'git push origin HEAD:openai/issue-539-district-identity-streets',
+          )
+          Path('/tmp/reconcile-pr540.sh').write_text(script)
+          PY
+          bash /tmp/reconcile-pr540.sh
