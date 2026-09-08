@@ -1,0 +1,305 @@
+name: TEMP Refine Expanded Anchor Matching
+
+on:
+  push:
+    branches:
+      - openai/expanded-locality-importer-pilot-502
+
+permissions:
+  contents: write
+
+jobs:
+  refine:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: openai/expanded-locality-importer-pilot-502
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install importer dependency
+        run: python -m pip install --disable-pip-version-check pycountry
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22.12.0'
+          cache: npm
+          cache-dependency-path: game-web/package-lock.json
+      - name: Patch importer to use source-provided alternate names
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          from pathlib import Path
+
+          path = Path('scripts/build_expanded_locality_catalog.py')
+          text = path.read_text()
+
+          old = '''def reconcile_anchors(anchors, localities):
+              by_name = {}
+              for locality in localities:
+                  for candidate in {norm(locality['name']), norm(locality['asciiName'])}:
+                      if candidate:
+                          by_name.setdefault(candidate, []).append(locality)
+
+              reconciliations = []
+              for anchor in anchors:
+                  key = norm(anchor.get('name'))
+                  candidates = by_name.get(key, [])
+                  ranked = []
+                  for candidate in candidates:
+                      distance = haversine_km(
+                          float(anchor['longitude']), float(anchor['latitude']),
+                          candidate['longitude'], candidate['latitude'],
+                      )
+                      if distance <= 40.0:
+                          ranked.append((distance, candidate))
+                  ranked.sort(key=lambda item: (item[0], -item[1]['population'], item[1]['localityId']))
+                  base = {
+                      'anchorName': anchor.get('name'),
+                      'anchorSector': anchor.get('sector'),
+                      'anchorRole': anchor.get('role'),
+                  }
+                  if ranked:
+                      distance, locality = ranked[0]
+                      base.update({
+                          'status': 'MATCHED',
+                          'localityId': locality['localityId'],
+                          'sourceRef': locality['sourceRef'],
+                          'distanceKm': round(distance, 3),
+                      })
+                  else:
+                      base['status'] = 'UNMATCHED'
+                  reconciliations.append(base)
+              return reconciliations
+          '''
+          new = '''def reconcile_anchors(anchors, localities):
+              by_name = {}
+              for locality in localities:
+                  primary_keys = {norm(locality['name']), norm(locality['asciiName'])}
+                  for candidate in locality.get('_matchNames', primary_keys):
+                      if not candidate:
+                          continue
+                      basis = 'primary-name' if candidate in primary_keys else 'alternate-name'
+                      by_name.setdefault(candidate, []).append((locality, basis))
+
+              reconciliations = []
+              for anchor in anchors:
+                  key = norm(anchor.get('name'))
+                  candidates = by_name.get(key, [])
+                  ranked = []
+                  for candidate, basis in candidates:
+                      distance = haversine_km(
+                          float(anchor['longitude']), float(anchor['latitude']),
+                          candidate['longitude'], candidate['latitude'],
+                      )
+                      if distance <= 40.0:
+                          ranked.append((distance, candidate, basis))
+                  ranked.sort(key=lambda item: (item[0], -item[1]['population'], item[1]['localityId'], item[2]))
+                  base = {
+                      'anchorName': anchor.get('name'),
+                      'anchorSector': anchor.get('sector'),
+                      'anchorRole': anchor.get('role'),
+                  }
+                  if ranked:
+                      distance, locality, basis = ranked[0]
+                      base.update({
+                          'status': 'MATCHED',
+                          'localityId': locality['localityId'],
+                          'sourceRef': locality['sourceRef'],
+                          'distanceKm': round(distance, 3),
+                          'matchBasis': basis,
+                      })
+                  else:
+                      base['status'] = 'UNMATCHED'
+                  reconciliations.append(base)
+              return reconciliations
+          '''
+          if old not in text:
+              raise SystemExit('expected reconcile_anchors block not found')
+          text = text.replace(old, new, 1)
+
+          old = '''                locality = {
+                              'localityId': canonical_locality_id(source_id),
+                              'sourceRef': f'geonames:{source_id}',
+                              'sourceId': source_id,
+                              'name': row['name'],
+                              'asciiName': row['asciiname'] or row['name'],
+                              'latitude': round(latitude, 6),
+          '''
+          new = '''                locality = {
+                              'localityId': canonical_locality_id(source_id),
+                              'sourceRef': f'geonames:{source_id}',
+                              'sourceId': source_id,
+                              'name': row['name'],
+                              'asciiName': row['asciiname'] or row['name'],
+                              '_matchNames': sorted({
+                                  key for key in (
+                                      norm(row['name']),
+                                      norm(row['asciiname']),
+                                      *(norm(alias) for alias in row['alternatenames'].split(',') if alias),
+                                  ) if key
+                              }),
+                              'latitude': round(latitude, 6),
+          '''
+          if old not in text:
+              raise SystemExit('expected locality construction block not found')
+          text = text.replace(old, new, 1)
+
+          old = '''        total_localities += len(localities)
+                  partitions = {}
+                  for locality in localities:
+                      partitions.setdefault(locality['admin1Code'], []).append(locality)
+          '''
+          new = '''        total_localities += len(localities)
+                  reconciliations = reconcile_anchors(
+                      anchors_catalog.get('countries', {}).get(geometry_id, []),
+                      localities,
+                  )
+                  for locality in localities:
+                      locality.pop('_matchNames', None)
+                  partitions = {}
+                  for locality in localities:
+                      partitions.setdefault(locality['admin1Code'], []).append(locality)
+          '''
+          if old not in text:
+              raise SystemExit('expected pre-partition block not found')
+          text = text.replace(old, new, 1)
+
+          old = '''        reconciliations = reconcile_anchors(anchors_catalog.get('countries', {}).get(geometry_id, []), localities)
+                  matched_count = sum(item['status'] == 'MATCHED' for item in reconciliations)
+          '''
+          new = '''        matched_count = sum(item['status'] == 'MATCHED' for item in reconciliations)
+          '''
+          if old not in text:
+              raise SystemExit('expected late reconciliation block not found')
+          text = text.replace(old, new, 1)
+
+          path.write_text(text)
+
+          doc_path = Path('04_World/Country_Catalog/EXPANDED_LOCALITY_IMPORTER.md')
+          doc = doc_path.read_text()
+          doc = doc.replace(
+              '- normalize anchor and GeoNames names without accents/case/punctuation;\n- consider only same-normalized-name candidates in the same country;',
+              '- normalize anchor names and GeoNames `name`, `asciiname`, and source-provided `alternatenames` without accents/case/punctuation;\n- consider only candidates whose normalized primary or alternate source name matches in the same country;\n- record whether a successful link used a `primary-name` or `alternate-name` match basis;'
+          )
+          doc_path.write_text(doc)
+          PY
+          git diff --check
+      - name: Regenerate and verify pilot
+        run: |
+          set -euo pipefail
+          python scripts/build_expanded_locality_catalog.py | tee /tmp/refined-build.json
+          python scripts/verify_expanded_locality_catalog.py
+          git diff --check
+      - name: Run targeted tests and production build
+        working-directory: game-web
+        run: |
+          set -euo pipefail
+          npm ci
+          npx vitest run tests/expanded-locality-query.test.ts tests/expanded-locality-source-contract.test.ts tests/expanded-locality-snapshot-retention.test.ts
+          npm run build
+      - name: Refresh pilot audit from committed output
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import json
+          from pathlib import Path
+
+          root = Path('game-web/public/data/expanded-localities-v1')
+          index = json.loads((root / 'index.json').read_text())
+          rows = []
+          total_bytes = (root / 'index.json').stat().st_size
+          total_partitions = 0
+          total_matched = 0
+          total_anchors = 0
+          alternate_matches = 0
+          for country in sorted(index['countries'], key=lambda item: item['countryCode']):
+              country_index_path = root / country['indexFile']
+              country_index = json.loads(country_index_path.read_text())
+              country_bytes = country_index_path.stat().st_size
+              for partition in country_index['partitions']:
+                  country_bytes += (country_index_path.parent / partition['file']).stat().st_size
+              total_bytes += country_bytes
+              total_partitions += country_index['admin1PartitionCount']
+              entries = country_index['anchorReconciliation']['entries']
+              matched = [entry for entry in entries if entry['status'] == 'MATCHED']
+              alt = [entry for entry in matched if entry.get('matchBasis') == 'alternate-name']
+              total_matched += len(matched)
+              alternate_matches += len(alt)
+              total_anchors += len(entries)
+              rows.append({
+                  'code': country['countryCode'],
+                  'geometryId': country['geometryId'],
+                  'name': country['renderedName'],
+                  'records': country['recordCount'],
+                  'partitions': country['admin1PartitionCount'],
+                  'anchors': len(entries),
+                  'matched': len(matched),
+                  'alternateMatches': len(alt),
+                  'bytes': country_bytes,
+              })
+          output_files = list(root.rglob('*.json'))
+          lines = [
+              '# Expanded Locality Pilot Audit', '',
+              'Status: generated and deterministically verified pilot evidence for issue #502.', '',
+              'Coordinates: #417 #446 #491 #498 #502 #503 #504', '',
+              '## Source', '',
+              f"- retained release: `{index['source']['releaseTag']}`;",
+              f"- `cities500.zip` SHA-256: `{index['source']['cities500Sha256']}`;",
+              f"- source license: {index['source']['license']};",
+              f"- attribution: {index['source']['attributionText']}.", '',
+              '## Pilot totals', '',
+              f"- countries: **{index['countryCount']}**;",
+              f"- imported localities: **{index['localityCount']:,}**;",
+              f"- admin1 partitions: **{total_partitions}**;",
+              f"- generated JSON files: **{len(output_files)}**;",
+              f"- generated catalog bytes: **{total_bytes:,}**;",
+              f"- Global LOD anchors reconciled: **{total_matched}/{total_anchors}**;",
+              f"- anchor links using source-provided alternate names: **{alternate_matches}**;",
+              '- raw GeoNames source archives are not committed into the game source tree.', '',
+              '## Country evidence', '',
+              '| Source code | DROPi geometry | Country | Localities | Admin1 partitions | Global anchors matched | Alternate-name links | Generated bytes |',
+              '|---|---:|---|---:|---:|---:|---:|---:|',
+          ]
+          for row in rows:
+              lines.append(
+                  f"| {row['code']} | {row['geometryId']} | {row['name']} | {row['records']:,} | "
+                  f"{row['partitions']} | {row['matched']}/{row['anchors']} | {row['alternateMatches']} | {row['bytes']:,} |"
+              )
+          lines += [
+              '', '## Reconciliation interpretation', '',
+              'An `UNMATCHED` Global LOD anchor is not automatically a data error. The retained `cities500` source includes populated places above its threshold plus administrative seats; sparse Natural Earth anchors may intentionally include smaller or remote places outside that source contract. DROPi does not fabricate a GeoNames match. Name reconciliation uses only GeoNames primary/ascii/alternate names from the retained record plus a <=40 km coordinate guard.', '',
+              'Every pilot national-capital anchor reconciles exactly once. Source-provided alternate names can improve legitimate cross-source identity links without a DROPi hardcoded alias table.', '',
+              '## Validation result', '',
+              'The pilot passed the offline expanded-locality verifier after generation. The verifier checks retained-source identity, exact country counts, unique locality/source IDs, DROPi geometry ownership, coordinates, importance tiers, admin1 partition accounting, deterministic sort order, antimeridian-aware bounds, Global-anchor reconciliation, and the absence of raw source archives from the game tree.', '',
+              'The TypeScript bounded-query tests and full production build also passed before the refined generated pilot was committed.', '',
+              '## Runtime boundary', '',
+              'This pilot does **not** draw all imported localities. `expandedLocalityCatalog.ts` loads only viewport-intersecting admin1 partitions, filters by semantic-zoom importance tier, and enforces an explicit caller-provided marker budget. Country Layer rendering integration remains a later #502 slice.', '',
+              '## Next gate', '',
+              'Before global expansion, define explicit ownership rules for special-status source codes/geometries. Global generation must preserve the existing neutral status layer and must not infer sovereignty directly from GeoNames country codes.', '',
+          ]
+          Path('04_World/Country_Catalog/EXPANDED_LOCALITY_PILOT_AUDIT.md').write_text('\n'.join(lines), encoding='utf-8')
+          print(json.dumps({
+              'localities': index['localityCount'],
+              'partitions': total_partitions,
+              'anchorMatches': total_matched,
+              'anchors': total_anchors,
+              'alternateNameMatches': alternate_matches,
+              'rows': rows,
+          }, indent=2))
+          PY
+          git diff --check
+      - name: Commit refined importer/output and remove temporary workflow
+        run: |
+          set -euo pipefail
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git rm .github/workflows/refine-expanded-anchor-matching-temp.yml
+          git add scripts/build_expanded_locality_catalog.py \
+                  04_World/Country_Catalog/EXPANDED_LOCALITY_IMPORTER.md \
+                  04_World/Country_Catalog/EXPANDED_LOCALITY_PILOT_AUDIT.md \
+                  game-web/public/data/expanded-localities-v1
+          git diff --cached --check
+          git commit -m 'data: reconcile expanded anchors with source alternate names'
+          git push origin HEAD:openai/expanded-locality-importer-pilot-502
