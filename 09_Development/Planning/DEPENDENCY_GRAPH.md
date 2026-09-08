@@ -2,21 +2,123 @@
 
 Document: DEPENDENCY_GRAPH.md
 Project: DROPi Tycoon
-Version: 1.2.0
+Version: 2.0.0
 Status: Planning — Canonical
-Author: AI Agent (Report 087)
+Author: Marian Caliof & OpenAI
 Language: English
-Last Updated: 2026-08-01
+Last Updated: 2026-09-08
 
 ---
 
 # Dependency Graph
 
-All milestone, epic, and batch graphs are acyclic. Bidirectional parent mappings and phase alignment are expected to match the YAML registry.
+## Purpose
 
-## Milestone Dependencies
+This document owns the current planning dependency interpretation.
 
-| Milestone | Depends On |
+The historical M/E/RBATCH graph is preserved below for traceability, but its old numeric/phase ordering is **not the current execution graph**.
+
+Current execution follows:
+
+- `00_Project/ROADMAP.md` v4+;
+- `09_Development/Planning/PHASE1_IMPLEMENTATION_SEQUENCE.md`;
+- current canonical domain prerequisites.
+
+---
+
+# 1. Current Causal Execution Graph
+
+```text
+CANON-BASELINE
+|
++-- WORLD-GEOGRAPHY ------------------------> GLOBAL-MAP (#418)
+|                                               |
+|                                               +--> COUNTRY/REGION DRILL-DOWN
+|                                               +--> SMARTPHONE-GPS (#349)
+|
++-- WORLD-INSTANCE/ACTOR (#421) ------------+---------------------------+
+|                                                                        |
++-- AUTHORITATIVE-TIME (#420) --------------+--> HUMAN-ECONOMIC-LIFE --+--> CAUSAL-LOCAL-ECONOMY (#419)
+|                                                 | Personal Money        |     | inventory/demand
+|                                                 | wage/living costs     |     | cargo/custody
+|                                                 | Work Capacity         |     | settlement
+|                                                 | recovery              |     | visible consequence
+|                                                                        |     |
++-- EXISTING-CITY/HQ/VEHICLE FOUNDATION --------------------------------+-----+
+                                                                              |
+                                                                              +--> PROFESSIONS/EQUIPMENT
+                                                                              +--> COMPANY-FORMATION
+                                                                                         |
+CAUSAL-LOCAL-ECONOMY + PROFESSIONS + COMPANY-FORMATION -----------------------------> LIVING-CITY/PRODUCTION
+
+WORLD-INSTANCE + TIME + CAUSAL-ECONOMY + COMPANY-FORMATION -----------------------> TRUSTED-MULTIPLAYER-AUTHORITY
+
+GLOBAL-MAP + LIVING-CITY/PRODUCTION + TRUSTED-MULTIPLAYER-AUTHORITY ---------------> REGIONAL/NATIONAL MULTIMODAL
+
+REGIONAL/NATIONAL MULTIMODAL ------------------------------------------------------> GLOBAL DYNAMIC ECONOMY/WORLD HISTORY
+```
+
+The Global Map is the first major visible checkpoint. Invisible foundations may proceed in parallel, but visible overlays cannot fabricate unfinished economy/traffic/world state.
+
+---
+
+# 2. Current Near-Term Dependency Nodes
+
+| Node | Depends On | Existing Anchor | Execution Rule |
+|---|---|---|---|
+| Global geography/data | approved map/world canon | #417 | all countries, versioned dataset, no single-country hardcode |
+| Global Map UI | geography/data | #418 | first major visible checkpoint; no fake economy |
+| World Instance + world actor | Phase-1 baseline | #421 | can run parallel to map |
+| Authoritative clock | Phase-1 baseline | #420 | clock first; slow cycles later |
+| Personal Money/lifecycle | World actor + clock + economy ledger | new executable slice required | employee-first start, living costs, Work Capacity |
+| Causal inventory/order/cargo | economy canon + time interfaces | #419 first slice | replace arbitrary reward causality progressively |
+| Smartphone/GPS hierarchy | stable map hierarchy + existing phone canon | #349 | one map truth |
+| Professions/equipment | personal lifecycle + time/economy | new executable slice required | earned capability |
+| Company formation | Personal Money + professions + economy | new executable slice required | no automatic founder start |
+| Living city/production | causal economy + labor/company foundation | #419/#420 | population/production/waste/competition |
+| Shared multiplayer authority | world actor + settlement domains | #348 + technical canon | migrate state family by family |
+| Regional/global operations | map + local economy + authority/custody | #344 | no teleport; multi-leg logistics |
+
+---
+
+# 3. Parallelism Rules
+
+Parallel implementation is allowed when one track does not invent authoritative state owned by another unfinished track.
+
+Allowed examples:
+
+- render country boundaries while economic overlays are absent;
+- build pure World Instance IDs while current local Save remains untouched;
+- implement deterministic clock domain before connecting every slow-cycle consumer;
+- design Personal Money ledger before real networking, using a local authoritative adapter;
+- extend visual locality nodes before acquisition/ownership UI exists.
+
+Forbidden examples:
+
+- fake trade lines presented as real simulated traffic;
+- granting Personal Money from unexplained mission rewards;
+- moving cargo through map selection;
+- client-authoritative multiplayer money/ownership;
+- purchasing a railway/industry solely because a level threshold was reached;
+- making a new hero the owner of the legacy starter company without an explicit migration rule.
+
+---
+
+# 4. Legacy Planning Graph Status
+
+The v1.x graph below was valid for its historical planning architecture and remains useful for identifying old ordering assumptions.
+
+Classification:
+
+**LEGACY ORDER / TRACEABILITY — DO NOT EXECUTE BLINDLY.**
+
+Any historical milestone/epic/RBATCH used for new work must first be mapped to a current strategic wave/track and classified as KEEP / UPDATE / MERGE-ABSORB / CLOSE-HISTORICAL / NEW-CHILD-NEEDED.
+
+---
+
+# 5. Historical Milestone Dependencies
+
+| Milestone | Historical Depends On |
 |---|---|
 | M-001 | none |
 | M-002 | M-001 |
@@ -40,9 +142,13 @@ All milestone, epic, and batch graphs are acyclic. Bidirectional parent mappings
 | M-020 | M-019 |
 | M-021 | M-020 |
 
-## Epic Dependencies
+This chain is historical sequence evidence, not a current requirement that every later capability wait for every prior milestone number.
 
-| Epic | Depends On |
+---
+
+# 6. Historical Epic Dependencies
+
+| Epic | Historical Depends On |
 |---|---|
 | E-001 | none |
 | E-002 | none |
@@ -91,9 +197,11 @@ All milestone, epic, and batch graphs are acyclic. Bidirectional parent mappings
 | E-045 | E-044 |
 | E-046 | E-044, E-045 |
 
-## Batch Dependencies
+---
 
-| Batch | Depends On |
+# 7. Historical RBATCH Dependencies
+
+| Batch | Historical Depends On |
 |---|---|
 | RBATCH-001 | none |
 | RBATCH-002 | RBATCH-001 |
@@ -150,11 +258,25 @@ All milestone, epic, and batch graphs are acyclic. Bidirectional parent mappings
 | RBATCH-053 | RBATCH-052 |
 | RBATCH-054 | RBATCH-053 |
 
-## Acyclicity Summary
+---
 
-- Milestones: 21 nodes, forward-only dependencies, acyclic.
-- Epics: 46 nodes, forward-only dependencies, acyclic.
-- Batches: 54 nodes, forward-only dependencies, acyclic.
+# 8. Acyclicity and Current Validation
+
+The current causal graph is intentionally acyclic at the architecture level:
+
+- identity/time/economy foundations precede systems that consume their truth;
+- visible map work may proceed in parallel only while remaining read-only/sparse where underlying simulation is absent;
+- trusted multiplayer authority precedes contested shared writes;
+- regional/global operational networks depend on local economic/custody truth;
+- global dynamic history depends on operational regional/global systems.
+
+Historical graph acyclicity remains true but does not imply current execution priority.
+
+---
+
+# Canonical Planning Rule
+
+**Dependency means causal truth, not numeric seniority. Historical identifiers remain traceable, while current execution follows the Phase-1 causal graph and Roadmap v4.**
 
 ---
 
