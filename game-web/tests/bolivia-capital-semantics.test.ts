@@ -10,7 +10,7 @@ const label = (name: string) => semantics.entries['068']?.placeRoles.find((value
 
 describe('Bolivia capital semantics #472', () => {
   it('uses a source-only role override with no hardcoded coordinates', () => {
-    expect(roles.version).toBe('1.5.0')
+    expect(roles.version).toBe('1.6.0')
     expect(roles.entries['068'].issue).toBe(472)
     expect(roles.entries['068'].currentCapital).toEqual({ sourceNames: ['Sucre'], displayName: 'Sucre' })
     expect(JSON.stringify(roles.entries['068'])).not.toContain('longitude')
@@ -19,7 +19,7 @@ describe('Bolivia capital semantics #472', () => {
 
   it('materializes Sucre as the structural capital and preserves La Paz from Natural Earth', () => {
     const nodes = localities.countries['068'] ?? []
-    expect(localities.version).toBe('1.8.0')
+    expect(localities.version).toBe('1.9.0')
     expect(nodes.filter((value: any) => value.role === 'capital')).toHaveLength(1)
     expect(nodes.find((value: any) => value.role === 'capital')?.name).toBe('Sucre')
     expect(node('La Paz')).toBeDefined()
@@ -31,7 +31,7 @@ describe('Bolivia capital semantics #472', () => {
 
   it('exposes constitutional-capital and government-seat roles from Bolivian institutional sources', () => {
     const entry = semantics.entries['068']
-    expect(semantics.version).toBe('1.7.0')
+    expect(semantics.version).toBe('1.8.0')
     expect(entry.issue).toBe(472)
     expect(label('Sucre')).toBe('Constitutional / national capital')
     expect(label('La Paz')).toBe('Government seat / executive & legislative centre')

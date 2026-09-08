@@ -5,7 +5,7 @@ Status: Generated audit manifest; country-by-country maintenance surface.
 Parent: #446
 
 ## Source contract
-- runtime catalog version: `1.8.0`
+- runtime catalog version: `1.9.0`
 - Natural Earth upstream commit: `ca96624a56bd078437bca8184e78163e5039ad19`
 - every node coordinate remains a source coordinate; this manifest does not reposition places.
 - Structural capital slot is a sparse-map data role only; player-facing political/territory semantics are governed by `game-web/public/data/country-semantic-metadata-v1.json`.
@@ -35,7 +35,7 @@ Parent: #446
 | 360 | Indonesia | Jakarta | 9 | CAPITAL, N, E, S, W, NE, SE, SW, NW | **PASS** | structural/source checks passed |
 | 364 | Iran | Tehran | 9 | CAPITAL, N, E, S, W, NE, SE, SW, NW | **PASS** | structural/source checks passed |
 | 368 | Iraq | Baghdad | 9 | CAPITAL, N, E, S, W, NE, SE, SW, NW | **PASS** | structural/source checks passed |
-| 376 | Israel | Tel Aviv-Yafo | 6 | CAPITAL, N, E, S, W, NE | **REVIEW** | #467: capital/status semantics: Tel Aviv-Yafo must not be labeled Israel's national capital; Jerusalem requires explicit neutral status handling |
+| 376 | Israel | Jerusalem | 6 | CAPITAL, W, N, E, S, SW | **REVIEW** | #467: Jerusalem source-backed structural role implemented with Israeli institutional semantics and UN final-status context; Tel Aviv-Yafo retained as major economic/metropolitan centre; owner Android acceptance pending |
 | 392 | Japan | Tokyo | 9 | CAPITAL, W, N, E, S, NE, SE, SW, NW | **REVIEW** | #464: current-capital mismatch: Tokyo is Japan's current capital; Kyoto must not retain the capital role |
 | 400 | Jordan | Amman | 8 | CAPITAL, N, E, S, W, NE, SE, NW | **PASS** | structural/source checks passed |
 | 398 | Kazakhstan | Astana | 9 | CAPITAL, N, E, S, W, NE, SE, SW, NW | **PASS** | structural/source checks passed |
@@ -51,7 +51,7 @@ Parent: #446
 | 408 | North Korea | Pyongyang | 9 | CAPITAL, N, E, S, W, NE, SE, SW, NW | **PASS** | structural/source checks passed |
 | 512 | Oman | Muscat | 9 | CAPITAL, N, E, S, W, NE, SE, SW, NW | **PASS** | structural/source checks passed |
 | 586 | Pakistan | Islamabad | 9 | CAPITAL, N, E, S, W, NE, SE, SW, NW | **PASS** | structural/source checks passed |
-| 275 | Palestine | Gaza | 4 | CAPITAL, N, E, S | **REVIEW** | #468: capital/status semantics: Gaza must not be labeled the State of Palestine's national capital; East Jerusalem claim and Ramallah administrative role require neutral handling |
+| 275 | Palestine | Ramallah | 4 | CAPITAL, SW, N, E | **REVIEW** | #468: Gaza capital flag removed; Ramallah retained as temporary government/administrative seat and East Jerusalem represented as source-governed semantic capital designation without fabricated marker; owner Android acceptance pending |
 | 608 | Philippines | Manila | 9 | CAPITAL, N, E, S, W, NE, SE, SW, NW | **PASS** | structural/source checks passed |
 | 634 | Qatar | Doha | 1 | CAPITAL | **PASS** | structural/source checks passed |
 | 682 | Saudi Arabia | Riyadh | 9 | CAPITAL, N, E, S, W, NE, SE, SW, NW | **PASS** | structural/source checks passed |

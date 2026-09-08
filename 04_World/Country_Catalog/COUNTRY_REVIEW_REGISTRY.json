@@ -1,5 +1,5 @@
 {
-  "version": "1.8.0",
+  "version": "1.9.0",
   "purpose": "Manual semantic review flags discovered during continent-by-continent audit. These do not silently rewrite pinned Natural Earth source data.",
   "reviews": {
     "204": {
@@ -44,11 +44,11 @@
     },
     "376": {
       "issue": 467,
-      "reason": "capital/status semantics: Tel Aviv-Yafo must not be labeled Israel's national capital; Jerusalem requires explicit neutral status handling"
+      "reason": "Jerusalem source-backed structural role implemented with Israeli institutional semantics and UN final-status context; Tel Aviv-Yafo retained as major economic/metropolitan centre; owner Android acceptance pending"
     },
     "275": {
       "issue": 468,
-      "reason": "capital/status semantics: Gaza must not be labeled the State of Palestine's national capital; East Jerusalem claim and Ramallah administrative role require neutral handling"
+      "reason": "Gaza capital flag removed; Ramallah retained as temporary government/administrative seat and East Jerusalem represented as source-governed semantic capital designation without fabricated marker; owner Android acceptance pending"
     },
     "068": {
       "issue": 472,

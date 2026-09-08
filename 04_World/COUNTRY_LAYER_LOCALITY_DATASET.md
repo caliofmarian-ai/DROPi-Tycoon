@@ -104,3 +104,5 @@ The generated runtime catalog records the geometry-identity registry version, lo
 - Current country locality catalog version `1.7.0` adds source-backed capital-role corrections for Benin, Burundi and Côte d’Ivoire without adding manual coordinates.
 
 - Current country locality catalog version `1.8.0` adds the source-backed Bolivia Sucre/La Paz capital-role correction without manual coordinates.
+
+- Current country locality catalog version `1.9.0` replaces the misleading Tel Aviv-Yafo and Gaza structural capital flags with source-backed Jerusalem and Ramallah slots while preserving neutral player-facing Jerusalem status semantics.

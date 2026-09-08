@@ -18,8 +18,8 @@ Project-owned geometry IDs beginning with `X` in this ledger are internal DROPi 
 |---:|---|---|---|---|---|
 | 732 | W. Sahara | Africa | UN Non-Self-Governing Territory / unresolved final status | REVIEW | #462 — UN territory-status semantics implemented; Bir Lehlou player-facing capital claim suppressed; owner Android acceptance pending |
 | XSL | Somaliland | Africa | de facto administration / internationally contested status; stable DROPi project key | REVIEW | #482 — current neutral status semantics and updateable recognition metadata required |
-| 376 | Israel | Asia | special disputed-status semantics in source | REVIEW | #467 — capital/status semantics require neutral handling |
-| 275 | Palestine | Asia | indeterminate/disputed status in source | REVIEW | #468 — capital/status semantics require neutral handling |
+| 376 | Israel | Asia | Jerusalem final-status-sensitive semantics | REVIEW | #467 — neutral Israeli institutional role + UN final-status model implemented; Android acceptance pending |
+| 275 | Palestine | Asia | East Jerusalem final-status-sensitive semantics | REVIEW | #468 — East Jerusalem designation + Ramallah/Gaza role model implemented without fabricated marker; Android acceptance pending |
 | XNC | N. Cyprus | Asia | non-standard/disputed source geometry; stable DROPi project key | REVIEW | #481 — neutral status semantics required; geography must not imply uncontested sovereignty |
 | XKX | Kosovo | Europe | disputed/non-standard source identity; stable DROPi project key | REVIEW | #478 — neutral status semantics still required |
 | 304 | Greenland | North America | territory within the Kingdom of Denmark | PASS | remain geographically in North America; do not infer independent sovereignty from chapter placement |

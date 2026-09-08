@@ -1,5 +1,5 @@
 {
-  "version": "1.5.0",
+  "version": "1.6.0",
   "source": {
     "name": "Natural Earth 1:10m populated places simple",
     "upstreamCommit": "ca96624a56bd078437bca8184e78163e5039ad19"
@@ -239,6 +239,45 @@
             "La Paz"
           ],
           "displayName": "La Paz",
+          "role": "urban"
+        }
+      ]
+    },
+    "376": {
+      "issue": 467,
+      "country": "Israel",
+      "currentCapital": {
+        "sourceNames": [
+          "Jerusalem"
+        ],
+        "displayName": "Jerusalem"
+      },
+      "requiredRepresentatives": [
+        {
+          "sourceNames": [
+            "Tel Aviv-Yafo",
+            "Tel Aviv"
+          ],
+          "displayName": "Tel Aviv-Yafo",
+          "role": "urban"
+        }
+      ]
+    },
+    "275": {
+      "issue": 468,
+      "country": "Palestine",
+      "currentCapital": {
+        "sourceNames": [
+          "Ramallah"
+        ],
+        "displayName": "Ramallah"
+      },
+      "requiredRepresentatives": [
+        {
+          "sourceNames": [
+            "Gaza"
+          ],
+          "displayName": "Gaza",
           "role": "urban"
         }
       ]
