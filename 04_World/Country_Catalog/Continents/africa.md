@@ -34,7 +34,7 @@ Parent: #446
 | 180 | Dem. Rep. Congo | Kinshasa | 9 | CAPITAL, N, E, S, W, NE, SE, SW, NW | **PASS** | structural/source checks passed |
 | 262 | Djibouti | Djibouti | 5 | CAPITAL, N, E, S, W | **PASS** | structural/source checks passed |
 | 818 | Egypt | Cairo | 9 | CAPITAL, N, E, S, W, NE, SE, SW, NW | **PASS** | structural/source checks passed |
-| 226 | Eq. Guinea | Ciudad de la Paz | 7 | CAPITAL, NW, N, E, S, SE, SW | **REVIEW** | #459: current-reality override required: Ciudad de la Paz was declared capital on 2026-01-02 after the pinned source snapshot |
+| 226 | Eq. Guinea | Ciudad de la Paz | 7 | CAPITAL, NW, N, E, S, SE, SW | **REVIEW** | #459: 2026 capital override implemented with authoritative locality supplement; owner Android Country Layer acceptance pending |
 | 232 | Eritrea | Asmara | 6 | CAPITAL, N, E, W, SW, NW | **PASS** | structural/source checks passed |
 | 748 | eSwatini | Mbabane | 7 | CAPITAL, N, E, S, W, SE, SW | **PASS** | structural/source checks passed |
 | 231 | Ethiopia | Addis Ababa | 9 | CAPITAL, N, E, S, W, NE, SE, SW, NW | **PASS** | structural/source checks passed |
