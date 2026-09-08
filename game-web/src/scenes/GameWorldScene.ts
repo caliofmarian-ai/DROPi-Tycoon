@@ -115,6 +115,7 @@ export class GameWorldScene extends Phaser.Scene {
       audio: () => this.toggleAudio(),
       zoom: direction => this.setWorldZoom(urbanZoomStep(this.cameras.main.zoom, direction)),
       recenter: () => this.recenterCamera(),
+      worldMap: () => this.openGlobalMap(),
     })
     this.input.addPointer(Math.max(0, 4 - this.input.manager.pointers.length))
     this.keys = (this.input.keyboard?.addKeys('W,A,S,D,UP,DOWN,LEFT,RIGHT,E,T,ESC') ?? {}) as typeof this.keys
@@ -253,6 +254,12 @@ export class GameWorldScene extends Phaser.Scene {
     getAudioController().setEnabled(session.settings.soundEnabled)
     this.persist('settings-changed')
     this.hud.notify(session.settings.soundEnabled ? 'Sound on' : 'Sound off')
+  }
+
+  private openGlobalMap(): void {
+    this.clearInput()
+    this.syncRuntimeSession()
+    this.scene.start('GlobalMap')
   }
 
   private navigate(scene: string): void {

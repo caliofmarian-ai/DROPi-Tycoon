@@ -31,6 +31,7 @@ interface HUDCallbacks {
   audio: () => void
   zoom: (direction: 'in' | 'out') => void
   recenter: () => void
+  worldMap: () => void
 }
 
 /**
@@ -86,7 +87,7 @@ export const isUrbanHUDPoint = (width: number, height: number, x: number, y: num
   const padExtra = (ANALOG_JOYSTICK_HIT_DIAMETER - ANALOG_JOYSTICK_VISUAL_DIAMETER) / 2
   return y <= l.headerHeight ||
     inside(l.objective.x, l.objective.y, l.objective.width, l.objective.height) ||
-    inside(l.minimap.x - 5, l.minimap.y - 5, l.minimap.width + 10, l.minimap.height + 66) ||
+    inside(l.minimap.x - 5, l.minimap.y - 5, l.minimap.width + 10, l.minimap.height + 118) ||
     inside(l.pad.x - padExtra, l.pad.y - padExtra, ANALOG_JOYSTICK_HIT_DIAMETER, ANALOG_JOYSTICK_HIT_DIAMETER) ||
     inside(l.action.x - l.action.width / 2, l.transport.y - 22, l.action.width, 94) ||
     (menuOpen && inside(l.menu.x - l.menu.width / 2, l.menu.y - 22, l.menu.width, l.menu.rowHeight * MENU_ROW_COUNT))
@@ -220,6 +221,7 @@ export class UrbanHUD {
     this.button(zoom.x - 38, zoom.y, zoom.size, zoom.size, '−', () => callbacks.zoom('out'))
     this.button(zoom.x, zoom.y, zoom.size, zoom.size, '⌖', callbacks.recenter)
     this.button(zoom.x + 38, zoom.y, zoom.size, zoom.size, '+', () => callbacks.zoom('in'))
+    this.button(zoom.x, zoom.y + 48, 112, 40, 'World map', callbacks.worldMap)
 
     this.createDPad()
     const a = this.layout.action

@@ -197,6 +197,7 @@ Documents:
 
 - `04_World/WORLD.md` — living global world, authoritative time, consumption, production, migration, development/decline, events, and multi-resolution simulation.
 - `04_World/MAP.md` — Global -> Country -> Administrative Region -> Representative Locality / External Economic Node -> Detailed Local Scene; strategic map is observation/planning/travel, not teleportation.
+- `04_World/GLOBAL_MAP_DATASET.md` — versioned Natural Earth/world-atlas provenance, license and runtime-truth boundary for the strategic Global Map.
 - `04_World/BUILDINGS.md`
 - `04_World/NPC.md`
 - `04_World/WEATHER.md`
