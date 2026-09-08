@@ -8,6 +8,10 @@ import {
   createInitialOwnershipEconomyState,
   sanitizeOwnershipEconomyState,
 } from '../systems/ownershipEconomySystem'
+import {
+  createInitialWorldIdentityState,
+  sanitizeWorldIdentityState,
+} from '../systems/worldIdentitySystem'
 import type {
   CompanyState,
   GameSessionState,
@@ -24,6 +28,7 @@ export const startNewGameSession = (): GameSessionState => {
     settings: createInitialGameSettingsState(),
     personalProgression: createInitialPersonalProgressionState(),
     ownershipEconomy: createInitialOwnershipEconomyState(),
+    worldIdentity: createInitialWorldIdentityState(),
   }
   return activeSession
 }
@@ -42,6 +47,7 @@ export const replaceGameSession = (
     settings,
     personalProgression: activeSession?.personalProgression ?? createInitialPersonalProgressionState(),
     ownershipEconomy: sanitizeOwnershipEconomyState(activeSession?.ownershipEconomy).state,
+    worldIdentity: sanitizeWorldIdentityState(activeSession?.worldIdentity).state,
   }
   return activeSession
 }
@@ -51,6 +57,7 @@ export const replaceEntireGameSession = (session: GameSessionState): GameSession
     ...session,
     personalProgression: session.personalProgression ?? createInitialPersonalProgressionState(),
     ownershipEconomy: sanitizeOwnershipEconomyState(session.ownershipEconomy).state,
+    worldIdentity: sanitizeWorldIdentityState(session.worldIdentity).state,
   }
   return activeSession
 }
