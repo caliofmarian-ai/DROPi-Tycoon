@@ -25,6 +25,22 @@ jobs:
         with:
           node-version: '22.12.0'
       - run: python -m pip install --disable-pip-version-check pycountry
+      - name: Enumerate all rendered geometries without usable source IDs
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          topology = json.loads(Path('game-web/public/data/world-atlas-countries-110m.json').read_text())
+          missing = []
+          for index, geometry in enumerate(topology['objects']['countries']['geometries']):
+              raw = geometry.get('id')
+              text = '' if raw is None else str(raw).strip()
+              if not text or text.casefold() in {'none', 'null'}:
+                  name = str((geometry.get('properties') or {}).get('name') or '').strip()
+                  missing.append({'index': index, 'name': name, 'sourceId': raw})
+          print('MISSING_SOURCE_IDS=' + json.dumps(missing, ensure_ascii=False, sort_keys=True))
+          print('MISSING_SOURCE_ID_COUNT=' + str(len(missing)))
+          PY
       - name: Patch runtime scene and regression tests
         run: |
           python - <<'PY'
