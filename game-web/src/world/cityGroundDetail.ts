@@ -25,8 +25,9 @@ export const cityGroundTiles = (view: { x: number; y: number; width: number; hei
 
 /**
  * Crisp local pavement over a cheap city overview. The #614 enlarged city therefore increases
- * total world sectors, never the resident Android detail budget: at most 12 local textures and one
- * newly materialized tile per frame.
+ * total world sectors, never the resident Android detail budget: at most five local textures and
+ * one newly materialized tile per frame. DT-04 may later add chunk-level guardrails underneath
+ * this stable presentation contract without changing city geometry.
  */
 export class CityGroundDetail {
   private resident = new Map<string, Phaser.GameObjects.Image>()
