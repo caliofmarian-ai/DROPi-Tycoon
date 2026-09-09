@@ -28,7 +28,7 @@ The existing release artifacts remain authoritative for their narrower scopes:
 Repository evidence now supports these conclusions:
 
 1. the current `game-web/package-lock.json` still matches the exact production web dependency inventory created by the first #565 slice;
-2. the commercial Android product also contains an Expo/React Native shell whose exact resolved dependency/licence closure cannot yet be proven because `game-mobile/package-lock.json` is absent;
+2. the commercial Android product also contains an Expo/React Native shell whose canonical `game-mobile/package-lock.json` is now committed, but whose exact release-path dependency/licence/native closure is not yet proven from a final production AAB audit;
 3. the three current mobile branding files exist and have repository hashes, owner-approval evidence and explicit press/public-use HOLDs, but that evidence is not trademark or chain-of-title clearance;
 4. the generated `icon-orders.webp` has owner/runtime approval and source-family lineage, but the repository still lacks the exact provider/tool/date/terms/input/derivative chain needed to close commercial provenance;
 5. OSM, GeoNames and Natural Earth notice/provenance surfaces remain present;
@@ -59,7 +59,7 @@ Main Menu → Information → Third-party notices links to this surface.
 
 The existing `dependency-license-inventory.json` is an exact inventory of the **game-web production npm closure**, not the entire Android AAB dependency graph.
 
-The Android shell must not be represented as licence-complete until #568 provides a canonical mobile lockfile and release-artifact dependency/native evidence.
+The Android shell must not be represented as licence-complete until #568 uses the committed mobile lockfile together with release-artifact dependency/native evidence.
 
 **ENGINEERING EVIDENCE REQUIRED — #568.**
 
@@ -86,9 +86,9 @@ No evidence gap remains for the current **web-runtime npm closure**.
 
 Current `game-mobile/package.json` declares production dependencies including Expo, React Native, React Native WebView, local-filesystem/static-server modules and Expo shell modules.
 
-However:
+However, repository truth still does not prove the exact commercial release closure merely from source manifests:
 
-`game-mobile/package-lock.json` = **NOT PRESENT** at the audit baseline.
+`game-mobile/package-lock.json` = **PRESENT** in the current repository state.
 
 Therefore DT-13 does not infer:
 
@@ -103,12 +103,11 @@ Machine-readable blocker:
 
 Required closure path:
 
-1. #568 creates/commits the canonical mobile lockfile;
-2. build the actual production AAB from an exact commit;
-3. resolve npm/native dependency inventory from that release path;
-4. identify licence/notice/source obligations;
-5. update shipped notices and machine-readable inventory;
-6. rerun #565 commercial gate.
+1. build the actual production AAB from an exact commit using the committed canonical mobile lockfile;
+2. resolve npm/native dependency inventory from that release path;
+3. identify licence/notice/source obligations;
+4. update shipped notices and machine-readable inventory;
+5. rerun #565 commercial gate.
 
 Until then, **commercial Android dependency licence evidence is incomplete**.
 
@@ -270,7 +269,7 @@ This converts notice placement from an incidental Vite-copy behavior into a dete
 | `generated-orders-icon-chain-of-title` | repo lineage exists; exact generation facts absent | `OWNER INPUT REQUIRED` + `QUALIFIED REVIEW REQUIRED` |
 | `branding-chain-of-title-and-trademark` | files/hashes/approval/HOLD proven; commercial chain/trademark not proven | `OWNER INPUT REQUIRED` + `QUALIFIED REVIEW REQUIRED` |
 | `osm-commercial-distribution-characterization` | attribution/provenance/source evidence present | `QUALIFIED REVIEW REQUIRED` |
-| `mobile-release-dependency-license-closure` | manifest exists; lockfile absent | #568 engineering evidence, then licence review as needed |
+| `mobile-release-dependency-license-closure` | manifest + committed lockfile exist; exact release-path licence/native closure still unproven | #568 engineering evidence, then licence review as needed |
 
 No blocker above may be converted to `CLEARED` by changing a boolean without attaching the required evidence.
 

@@ -18,13 +18,14 @@
     "note": "The existing inventory is the exact production npm closure for game-web only."
   },
   "mobileReleaseDependencyClosure": {
-    "status": "BLOCKED_PENDING_LOCKFILE",
+    "status": "LOCKFILE_PRESENT_REVIEW_PENDING",
     "blocker": "mobile-release-dependency-license-closure",
     "linkedIssue": 568,
     "manifestPath": "game-mobile/package.json",
-    "manifestGitBlobSha": "38f3f5834c4b2cfdc78bb3fb34640e18da4397e8",
+    "manifestGitBlobSha": "8c851a9c3938f7a8752cefb77c72ed798011f86e",
     "requiredLockfilePath": "game-mobile/package-lock.json",
-    "lockfilePresentAtAudit": false,
+    "lockfileGitBlobSha": "b63f21e25f6257f87be3f9542e1a45c6dee42fe8",
+    "lockfilePresentAtAudit": true,
     "declaredDirectProductionDependencies": {
       "@dr.pogodin/react-native-fs": "2.40.1",
       "@dr.pogodin/react-native-static-server": "0.27.1",
@@ -37,8 +38,8 @@
       "react-native": "0.86.3",
       "react-native-webview": "13.16.1"
     },
-    "releaseRequirement": "Generate and commit the canonical mobile lockfile under #568, resolve the exact production/native dependency closure used by the release AAB, record licence/notice obligations, and update the shipped notices before commercial distribution.",
-    "legalStatus": "EVIDENCE INCOMPLETE — DO NOT INFER TRANSITIVE LICENCES FROM THE UNLOCKED MANIFEST"
+    "releaseRequirement": "Use the committed canonical mobile lockfile under #568 to build the exact release AAB, resolve the exact production/native dependency closure used by that release path, record licence/notice obligations, and update the shipped notices before commercial distribution.",
+    "legalStatus": "EVIDENCE INCOMPLETE — A COMMITTED LOCKFILE EXISTS, BUT THE EXACT RELEASE-PATH DEPENDENCY/LICENCE CLOSURE AND NATIVE NOTICE SURFACE ARE NOT YET AUDITED"
   },
   "mobileBrandingAssets": [
     {
