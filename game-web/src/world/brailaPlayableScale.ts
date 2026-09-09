@@ -2,6 +2,7 @@ import type {
   WorldBuildingLayout,
   WorldRectLayout,
   WorldRoutePoint,
+  WorldZoneId,
   WorldZoneLayout,
 } from './legacyCityLayout'
 
@@ -16,9 +17,12 @@ import type {
 export const BRAILA_PLAYABLE_SCALE_VERSION = 2
 export const BRAILA_PLAYABLE_DISTANCE_SCALE = 2.75
 
-/** Existing Android detail renderer: bounded local sectors, never the whole enlarged city at detail. */
+/**
+ * Android detail presentation remains strictly local. DT-04 owns the downstream performance
+ * guardrail and requires no more than five resident streamed/detail sectors at once.
+ */
 export const BRAILA_DETAIL_SECTOR_SIZE = 768
-export const BRAILA_DETAIL_SECTOR_LIMIT = 12
+export const BRAILA_DETAIL_SECTOR_LIMIT = 5
 export const BRAILA_DETAIL_MIN_ZOOM = 0.4
 
 export interface BrailaPoint { x: number; y: number }
@@ -155,15 +159,76 @@ export const brailaSectorForPoint = (
 
 export type BrailaRoadDistanceClass = 'local' | 'adjacent-district' | 'cross-city'
 
+export interface BrailaRouteDistanceContext {
+  originZoneId: WorldZoneId
+  destinationZoneId: WorldZoneId
+  roadDistance: number
+}
+
+export interface BrailaRouteDistanceClassification extends BrailaRouteDistanceContext {
+  spatialClass: BrailaRoadDistanceClass
+  routeDistanceValid: boolean
+}
+
+const zoneCenter = (zone: WorldZoneLayout): BrailaPoint => ({
+  x: zone.x + zone.width / 2,
+  y: zone.y + zone.height / 2,
+})
+
+const zoneDistanceSquared = (a: WorldZoneLayout, b: WorldZoneLayout): number => {
+  const ac = zoneCenter(a)
+  const bc = zoneCenter(b)
+  const dx = ac.x - bc.x
+  const dy = ac.y - bc.y
+  return dx * dx + dy * dy
+}
+
 /**
- * #615 handoff: classify an already-computed authoritative road-network distance. Do not pass
- * straight-line distance here as a substitute for route authority.
+ * District adjacency is derived from the enlarged governed city structure, not mission quotas.
+ * Two districts are adjacent when each is among the other's two closest district identities.
+ * This gives #615 a stable spatial class while authoritative road-network distance remains an
+ * independent metric for reward/time logic.
  */
-export const classifyBrailaRoadDistance = (roadDistance: number): BrailaRoadDistanceClass => {
-  const distance = Number.isFinite(roadDistance) ? Math.max(0, roadDistance) : 0
-  if (distance < 2400) return 'local'
-  if (distance < 7200) return 'adjacent-district'
-  return 'cross-city'
+export const brailaAdjacentDistrictIds = (
+  zoneId: WorldZoneId,
+  zones: readonly WorldZoneLayout[],
+): readonly WorldZoneId[] => {
+  const origin = zones.find(zone => zone.id === zoneId)
+  if (!origin) return []
+  return zones
+    .filter(zone => zone.id !== zoneId)
+    .sort((a, b) => zoneDistanceSquared(origin, a) - zoneDistanceSquared(origin, b) || a.id.localeCompare(b.id))
+    .slice(0, 2)
+    .map(zone => zone.id)
+}
+
+/**
+ * #615 handoff: classify spatial context from stable district topology and carry the already-
+ * computed road-network distance beside it. Straight-line distance is never substituted for road
+ * authority, and invalid road distance fails closed through routeDistanceValid=false.
+ */
+export const classifyBrailaRouteDistance = (
+  context: BrailaRouteDistanceContext,
+  zones: readonly WorldZoneLayout[],
+): BrailaRouteDistanceClassification => {
+  const origin = zones.find(zone => zone.id === context.originZoneId)
+  const destination = zones.find(zone => zone.id === context.destinationZoneId)
+  const routeDistanceValid = Number.isFinite(context.roadDistance) && context.roadDistance >= 0
+
+  let spatialClass: BrailaRoadDistanceClass = 'cross-city'
+  if (origin && destination) {
+    if (origin.id === destination.id) {
+      spatialClass = 'local'
+    } else {
+      const originNeighbors = brailaAdjacentDistrictIds(origin.id, zones)
+      const destinationNeighbors = brailaAdjacentDistrictIds(destination.id, zones)
+      if (originNeighbors.includes(destination.id) && destinationNeighbors.includes(origin.id)) {
+        spatialClass = 'adjacent-district'
+      }
+    }
+  }
+
+  return { ...context, spatialClass, routeDistanceValid }
 }
 
 export const brailaTravelSeconds = (roadDistance: number, movementSpeed: number): number =>
