@@ -17,11 +17,16 @@ import {
 import type { NarrativePresentationCallbacks } from '../src/ui/NarrativePresentation'
 import type { NarrativePresentationSequence } from '../src/narrative/visualStorytelling'
 
+// Source-backed DT-11 locality IDs used only as coherence fixtures; DT-10 does not create locality identity.
+const BRAILA_LOCALITY_ID = 'dropi:locality:geonames:683902'
+const CLUJ_LOCALITY_ID = 'dropi:locality:geonames:681290'
+
 const brailaFirstStandardEvidence = (): FirstHourStoryPresentationEvidence => ({
   triggerId: FIRST_HOUR_STORY_TRIGGER_IDS.firstStandard,
   mission: {
     missionId: BRAILA_FIRST_HOUR_MISSION_IDS.firstStandard,
     authoredRef: BRAILA_FIRST_HOUR_AUTHORED_REFS.firstStandard,
+    localityId: BRAILA_LOCALITY_ID,
     status: 'Active',
     stageId: 'standard',
   },
@@ -31,10 +36,10 @@ const brailaFirstStandardEvidence = (): FirstHourStoryPresentationEvidence => ({
     FIRST_HOUR_AUTHORITY_CODES.localityRoleBinding,
   ],
   roleContext: {
-    currentLocalityId: 'locality:ro:braila-fixture',
+    currentLocalityId: BRAILA_LOCALITY_ID,
     bindings: [{
       roleId: FIRST_HOUR_STORY_ROLE_IDS.dispatcherMentor,
-      localityId: 'locality:ro:braila-fixture',
+      localityId: BRAILA_LOCALITY_ID,
       actorId: 'actor:braila:ana',
       characterRef: 'ana-stoica',
       displayName: 'Ana Stoica',
@@ -108,14 +113,14 @@ describe('DT-10 #554 authoritative first-hour Story presentation adapter', () =>
     })
   })
 
-  it('supports a second-locality role fixture without ever substituting Ana/Radu or a Braila portrait', () => {
+  it('fails closed when Braila-authored mission/story refs are presented in a non-Braila locality context', () => {
     const evidence: FirstHourStoryPresentationEvidence = {
       ...brailaFirstStandardEvidence(),
       roleContext: {
-        currentLocalityId: 'locality:fixture:second-city',
+        currentLocalityId: CLUJ_LOCALITY_ID,
         bindings: [{
           roleId: FIRST_HOUR_STORY_ROLE_IDS.dispatcherMentor,
-          localityId: 'locality:fixture:second-city',
+          localityId: CLUJ_LOCALITY_ID,
           actorId: 'actor:fixture:mentor',
           characterRef: 'character:fixture:mentor',
           displayName: 'Local mentor',
@@ -123,57 +128,35 @@ describe('DT-10 #554 authoritative first-hour Story presentation adapter', () =>
         }],
       },
       authoredLines: {
-        'line:ana:first-standard': 'Check the handoff, keep custody clean, and close the work you accept.',
+        'line:ana:first-standard': 'This supplied line must not make Braila authored evidence portable.',
       },
     }
 
-    const resolved = resolveFirstHourStoryPresentation(evidence)
-    expect(resolved.eligible).toBe(true)
-    if (!resolved.eligible) return
-
-    expect(resolved.sequence.beats).toHaveLength(1)
-    expect(resolved.sequence.beats[0]).toMatchObject({
-      beatId: 'presentation:first-hour:first-standard',
-      contextLabel: 'Local mentor · Local employer',
-      text: 'Check the handoff, keep custody clean, and close the work you accept.',
+    expect(evidence.mission.missionId).toContain('mission:braila:')
+    expect(evidence.mission.authoredRef).toContain('story:braila:')
+    expect(resolveFirstHourStoryPresentation(evidence)).toMatchObject({
+      eligible: false,
+      blocker: 'locality-evidence-mismatch',
     })
-    expect(resolved.sequence.beats[0].characterId).toBeUndefined()
-    const visible = JSON.stringify(resolved.sequence)
-    expect(visible).not.toContain('ana-stoica')
-    expect(visible).not.toContain('radu-marin')
-    expect(visible).not.toContain('Ana Stoica')
-    expect(visible).not.toContain('Radu Marin')
-    expect(visible).not.toContain('Braila')
-    expect(visible).not.toContain('Brăila')
   })
 
-  it('does not fall back to Braila authored copy when a non-Braila role has no governed local line', () => {
-    const evidence: FirstHourStoryPresentationEvidence = {
-      ...brailaFirstStandardEvidence(),
-      roleContext: {
-        currentLocalityId: 'locality:fixture:second-city',
-        bindings: [{
-          roleId: FIRST_HOUR_STORY_ROLE_IDS.dispatcherMentor,
-          localityId: 'locality:fixture:second-city',
-          actorId: 'actor:fixture:mentor',
-          characterRef: 'character:fixture:mentor',
-          displayName: 'Local mentor',
-        }],
-      },
-    }
+  it('fails closed when mission locality evidence is missing instead of inferring locality from authored refs', () => {
+    const evidence = brailaFirstStandardEvidence()
+    evidence.mission.localityId = ''
 
     expect(resolveFirstHourStoryPresentation(evidence)).toMatchObject({
       eligible: false,
-      blocker: 'authored-line-missing',
+      blocker: 'locality-evidence-mismatch',
     })
   })
 
-  it('uses the DT-08 handoff copy for a role-free consequence card without inventing a character', () => {
+  it('uses the DT-08 handoff copy for a role-free Brăila consequence card without inventing a character', () => {
     const evidence: FirstHourStoryPresentationEvidence = {
       triggerId: FIRST_HOUR_STORY_TRIGGER_IDS.workLeavesMark,
       mission: {
         missionId: BRAILA_FIRST_HOUR_MISSION_IDS.firstConsequence,
         authoredRef: BRAILA_FIRST_HOUR_AUTHORED_REFS.firstConsequence,
+        localityId: BRAILA_LOCALITY_ID,
         status: 'Completed',
       },
       factIds: [],
@@ -181,7 +164,7 @@ describe('DT-10 #554 authoritative first-hour Story presentation adapter', () =>
         FIRST_HOUR_AUTHORITY_CODES.missionState,
         FIRST_HOUR_AUTHORITY_CODES.authoritativeOutcome,
       ],
-      roleContext: { currentLocalityId: 'locality:fixture:any', bindings: [] },
+      roleContext: { currentLocalityId: BRAILA_LOCALITY_ID, bindings: [] },
     }
 
     const resolved = resolveFirstHourStoryPresentation(evidence)

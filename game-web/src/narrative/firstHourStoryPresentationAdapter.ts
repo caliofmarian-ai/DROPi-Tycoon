@@ -29,9 +29,9 @@ import type { NarrativePresentationCallbacks } from '../ui/NarrativePresentation
 export const FIRST_HOUR_STORY_PRESENTATION_ADAPTER_VERSION = 1 as const
 
 /**
- * Braila authored copy mirrored from the current Story Director contract by stable line ID.
- * It is used only when the resolved role is the canonical Braila character. A locality-specific
- * role binding must supply its own governed line copy and can never inherit Ana/Radu/Mirela text.
+ * Brăila-authored copy mirrored from the current Story Director contract by stable line ID.
+ * This adapter does not make those authored refs portable. A different locality needs its own
+ * DT-08 narrative semantics and DT-09 materialized mission evidence before DT-10 can present it.
  */
 export const BRAILA_FIRST_HOUR_RUNTIME_LINE_COPY: Readonly<Record<string, string>> = Object.freeze({
   'line:prologue:first-shift-card': 'Braila. First shift. One phone, one backpack, and a day that has to add up.',
@@ -55,6 +55,8 @@ export const BRAILA_FIRST_HOUR_RUNTIME_LINE_COPY: Readonly<Record<string, string
 export interface FirstHourStoryMissionPresentationEvidence {
   missionId: string
   authoredRef: string
+  /** DT-09 materialized locality identity, sourced from DT-11 rather than inferred by DT-10. */
+  localityId: string
   status: MissionStatus
   stageId?: string
 }
@@ -67,7 +69,7 @@ export interface FirstHourStoryPresentationEvidence {
   roleContext: FirstHourStoryRoleContext
   /** Durable acknowledgement receipt IDs already accepted by DT-09. */
   acknowledgedReceiptIds?: readonly string[]
-  /** Governed locality-specific line copy keyed by DT-08 line ref. */
+  /** Optional governed copy for the same authored locality; it cannot override locality mismatch. */
   authoredLines?: Readonly<Record<string, string>>
 }
 
@@ -84,6 +86,7 @@ export interface FirstHourStoryPresentationPort {
 
 export type FirstHourStoryPresentationBlocker =
   | 'unknown-trigger'
+  | 'locality-evidence-mismatch'
   | 'mission-gate-mismatch'
   | 'required-fact-missing'
   | 'forbidden-fact-present'
@@ -111,6 +114,8 @@ const existingSequences: readonly NarrativePresentationSequence[] = [
   FIRST_SHIFT_OPENING_SEQUENCE,
   FIRST_DELIVERY_CONSEQUENCE_SEQUENCE,
 ]
+
+const validLocalityId = (value: string): boolean => value.trim().length > 0 && value.trim().length <= 180
 
 const canonicalCharacterForRole = (
   roleId: FirstHourStoryRoleId,
@@ -206,12 +211,24 @@ const acknowledgementFor = (
  * Resolves one explicit DT-08 trigger from caller-supplied authoritative evidence.
  * It never reads screen state, revenue, raw Save envelopes, active-order heuristics or local
  * merchant onboarding to decide whether story is allowed to appear.
+ *
+ * Locality coherence is mandatory: DT-10 only presents a mission/story handoff when the DT-09
+ * materialized mission locality exactly matches the DT-11-backed current locality in the role
+ * context. Brăila-authored refs therefore cannot be repurposed as multi-locality proof here.
  */
 export const resolveFirstHourStoryPresentation = (
   evidence: FirstHourStoryPresentationEvidence,
 ): FirstHourStoryPresentationResolution => {
   const trigger = getFirstHourStoryTrigger(evidence.triggerId)
   if (!trigger) return { eligible: false, version: FIRST_HOUR_STORY_PRESENTATION_ADAPTER_VERSION, blocker: 'unknown-trigger' }
+
+  if (
+    !validLocalityId(evidence.mission.localityId) ||
+    !validLocalityId(evidence.roleContext.currentLocalityId) ||
+    evidence.mission.localityId !== evidence.roleContext.currentLocalityId
+  ) {
+    return { eligible: false, version: FIRST_HOUR_STORY_PRESENTATION_ADAPTER_VERSION, blocker: 'locality-evidence-mismatch' }
+  }
 
   const gate = trigger.gate
   if (
