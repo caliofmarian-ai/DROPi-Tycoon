@@ -233,6 +233,11 @@ export interface GameSessionState {
   ownershipEconomy?: OwnershipEconomyState
   /** B1 #515 local World Instance/account/hero identity; durable persistence belongs to B2. */
   worldIdentity?: WorldIdentityState
+  /**
+   * Save-owned mission resume envelope. The value remains opaque here and must be
+   * materialized only through the DT-09 mission resume contract after world/cargo restore.
+   */
+  missionResume?: unknown
 }
 
 export interface PickupContext {

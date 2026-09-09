@@ -18,7 +18,7 @@ describe('additive urban Save v2 progress', () => {
     expect(decoded.save.urban).toEqual(defaults)
   })
 
-  it('round-trips urban progress and company state while regenerating transient world state', () => {
+  it('round-trips urban progress, company state and governed world continuity while dropping transient input', () => {
     const game = session()
     game.company.money = 325
     game.company.level = 4
@@ -38,6 +38,12 @@ describe('additive urban Save v2 progress', () => {
     const parsed = JSON.parse(raw)
     expect(parsed.formatVersion).toBe(2)
     expect(parsed.urban).toEqual(game.world.urban)
+    expect(parsed.worldContinuity).toMatchObject({
+      schemaVersion: 1,
+      hero: { x: 999, y: game.world.player.y },
+      activeOrder: { orderId: game.world.activeOrder.orderId, status: 'PickedUp' },
+      cargo: { custody: 'Player', orderId: game.world.activeOrder.orderId },
+    })
     expect(parsed).not.toHaveProperty('world')
     expect(parsed).not.toHaveProperty('player')
     expect(parsed).not.toHaveProperty('activeOrder')
@@ -49,8 +55,13 @@ describe('additive urban Save v2 progress', () => {
     expect(restored.company).toEqual(game.company)
     expect(restored.settings).toEqual(game.settings)
     expect(restored.world.urban).toEqual(game.world.urban)
-    expect(restored.world.player.x).toBe(createInitialWorldState().player.x)
-    expect(restored.world.activeOrder).toEqual(createInitialWorldState().activeOrder)
+    expect(restored.world.player.x).toBe(999)
+    expect(restored.world.activeOrder.status).toBe('PickedUp')
+    expect(restored.world.activeOrder.orderId).toBe(game.world.activeOrder.orderId)
+    expect(restored.world.player.currentOrder).toBe(game.world.activeOrder.orderId)
+    expect(restored.world.player.carryingPackage).toBe(true)
+    expect(restored.world.isMoving).toBe(false)
+    expect(restored.world.pendingDeliveryDestination).toBe('')
     expect(game).toEqual(snapshot)
     expect(restored.world.urban).not.toBe(decoded.save.urban)
   })
