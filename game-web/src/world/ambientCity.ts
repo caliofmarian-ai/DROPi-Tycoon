@@ -1,4 +1,10 @@
 import type Phaser from 'phaser'
+import {
+  DEFAULT_AMBIENT_SECTOR_POLICY,
+  resolveAmbientSectorTransition,
+  type AmbientSectorActivation,
+  type AmbientSectorPoint,
+} from '../simulation/ambient/sectorActivation'
 import { createPlayerVisual, type PlayerVisual } from './playerVisual'
 import { ensureNeighborAtlas, NEIGHBOR_ANCHOR, NEIGHBOR_CELL } from './cityArt'
 import { courierAnimationFrame, getCourierPose } from './courierPose'
@@ -57,7 +63,69 @@ const clearPedestrianRoute = (start: UrbanPoint, end: UrbanPoint): boolean => {
   return true
 }
 
-/** Bounded loops follow safe segments of the active city plan. */
+interface AmbientRoadSegment {
+  sourceIndex: number
+  road: (typeof WORLD_ROADS)[number]
+  a: UrbanPoint
+  b: UrbanPoint
+  midpoint: UrbanPoint
+}
+
+const squaredDistance = (a: UrbanPoint, b: UrbanPoint): number => {
+  const dx = a.x - b.x
+  const dy = a.y - b.y
+  return dx * dx + dy * dy
+}
+
+/**
+ * Keeps the tiny candidate population spatially representative instead of filling every slot
+ * from the HQ/start neighborhood. The first seed preserves opening-area life, then farthest-point
+ * sampling spreads the remaining bounded loops across the governed road surface.
+ */
+const spreadAmbientSegments = (
+  segments: readonly AmbientRoadSegment[],
+  limit: number,
+): readonly AmbientRoadSegment[] => {
+  if (segments.length <= 1 || limit <= 1) return segments.slice(0, Math.max(0, limit))
+  const selected: AmbientRoadSegment[] = []
+  const remaining = new Set(segments.map(segment => segment.sourceIndex))
+  const byIndex = new Map(segments.map(segment => [segment.sourceIndex, segment] as const))
+
+  let seed = segments[0]
+  let seedDistance = squaredDistance(seed.midpoint, PLAYER_START)
+  for (const segment of segments.slice(1)) {
+    const distance = squaredDistance(segment.midpoint, PLAYER_START)
+    if (distance < seedDistance || (distance === seedDistance && segment.sourceIndex < seed.sourceIndex)) {
+      seed = segment
+      seedDistance = distance
+    }
+  }
+  selected.push(seed)
+  remaining.delete(seed.sourceIndex)
+
+  while (remaining.size > 0 && selected.length < limit) {
+    let best: AmbientRoadSegment | undefined
+    let bestSeparation = Number.NEGATIVE_INFINITY
+    for (const sourceIndex of remaining) {
+      const candidate = byIndex.get(sourceIndex)!
+      const separation = selected.reduce(
+        (minimum, existing) => Math.min(minimum, squaredDistance(candidate.midpoint, existing.midpoint)),
+        Number.POSITIVE_INFINITY,
+      )
+      if (separation > bestSeparation
+        || (separation === bestSeparation && (best === undefined || candidate.sourceIndex < best.sourceIndex))) {
+        best = candidate
+        bestSeparation = separation
+      }
+    }
+    if (!best) break
+    selected.push(best)
+    remaining.delete(best.sourceIndex)
+  }
+  return selected
+}
+
+/** Bounded loops follow safe segments across the active city plan without a center-only bias. */
 let cachedRoutes: readonly AmbientRoute[] | undefined
 export const buildAmbientRoutes = (): readonly AmbientRoute[] => {
   if (cachedRoutes) return cachedRoutes
@@ -68,10 +136,22 @@ export const buildAmbientRoutes = (): readonly AmbientRoute[] => {
     start: crossingPoint(crossing, -80, 0), end: crossingPoint(crossing, 80, 0),
     speed: 74, phase: 0, controlledCrossingId: crossing.id,
   }]
-  const segments = WORLD_ROADS.flatMap(road => (road.centerline ?? []).slice(1).map((b, i) => ({ road, a: road.centerline![i], b })))
+  let sourceIndex = 0
+  const segments: AmbientRoadSegment[] = WORLD_ROADS.flatMap(road => (road.centerline ?? []).slice(1).map((b, i) => {
+    const a = road.centerline![i]
+    const segment = {
+      sourceIndex: sourceIndex++,
+      road,
+      a,
+      b,
+      midpoint: { x: (a.x + b.x) / 2, y: (a.y + b.y) / 2 },
+    }
+    return segment
+  }))
     .filter(({ a, b }) => Math.hypot(b.x - a.x, b.y - a.y) > 90)
-    .sort((a, b) => Math.hypot(a.a.x - PLAYER_START.x, a.a.y - PLAYER_START.y) - Math.hypot(b.a.x - PLAYER_START.x, b.a.y - PLAYER_START.y))
-  for (const [index, { road, a, b }] of segments.entries()) {
+  const spreadSegments = spreadAmbientSegments(segments, Math.min(segments.length, 128))
+
+  for (const { sourceIndex: segmentIndex, road, a, b } of spreadSegments) {
     const length = Math.hypot(b.x - a.x, b.y - a.y), dx = (b.x - a.x) / length, dy = (b.y - a.y) / length
     const routeLength = Math.min(260, length - 24)
     for (const side of [-1, 1]) {
@@ -79,14 +159,16 @@ export const buildAmbientRoutes = (): readonly AmbientRoute[] => {
       const start = { x: a.x + dx * 12 - dy * offset, y: a.y + dy * 12 + dx * offset }
       const end = { x: start.x + dx * routeLength, y: start.y + dy * routeLength }
       if (sidewalkRoutes.length < AMBIENT_ACTOR_LIMIT - 5 && clearPedestrianRoute(start, end)) sidewalkRoutes.push({
-        id: `neighbor-${index}-${side}`, kind: 'pedestrian', start, end, speed: 24 + index % 4 * 3, phase: index * 2.3,
+        id: `neighbor-${segmentIndex}-${side}`, kind: 'pedestrian', start, end,
+        speed: 24 + segmentIndex % 4 * 3, phase: segmentIndex * 2.3,
       })
     }
     if (trafficRoutes.length < 4 && Math.hypot(a.x - crossing.x, a.y - crossing.y) > 300) {
       const start = { x: a.x + dx * 12 - dy * 4, y: a.y + dy * 12 + dx * 4 }
       const end = { x: start.x + dx * routeLength, y: start.y + dy * routeLength }
       if (clearRoute(start, end, true)) trafficRoutes.push({
-        id: `traffic-${index}`, kind: trafficRoutes.length % 2 ? 'van' : 'car', start, end, speed: 74 + index % 4 * 7, phase: index * 3,
+        id: `traffic-${segmentIndex}`, kind: trafficRoutes.length % 2 ? 'van' : 'car', start, end,
+        speed: 74 + segmentIndex % 4 * 7, phase: segmentIndex * 3,
       })
     }
     if (trafficRoutes.length === 4 && sidewalkRoutes.length === AMBIENT_ACTOR_LIMIT - 5) break
@@ -180,12 +262,16 @@ const renderControlledCrossing = (scene: Phaser.Scene, crossing: ControlledCross
 /** Ambient actors never own gameplay jobs or serialized state; city-rule behavior stays deterministic. */
 export class AmbientCity {
   private elapsed = 0
+  private readonly routes: readonly AmbientRoute[]
   private readonly actors: AmbientActor[]
   private readonly crossingSignals: AmbientCrossingSignal[]
+  private activation?: AmbientSectorActivation
+  private activationFocuses: readonly AmbientSectorPoint[] = []
 
   constructor(scene: Phaser.Scene) {
     this.crossingSignals = CONTROLLED_CROSSINGS.map(crossing => renderControlledCrossing(scene, crossing))
-    this.actors = buildAmbientRoutes().map((route, index) => {
+    this.routes = buildAmbientRoutes()
+    this.actors = this.routes.map((route, index) => {
       const pose = sampleAmbientRoute(route, 0, { x: 0, y: 0, facing: 'right', moving: false })
       const vehicle = route.kind === 'pedestrian' ? undefined : createPlayerVisual(scene, pose.x, pose.y)
       vehicle?.setState(route.kind === 'van' ? 'DeliveryVan' : 'Car')
@@ -200,6 +286,19 @@ export class AmbientCity {
     })
   }
 
+  /**
+   * Optional read-only corridor look-ahead supplied by an owning traversal/mission layer. These
+   * points create no mission, demand or geography; they only let nearby governed sectors share the
+   * same bounded ambient budget while the player travels a long route.
+   */
+  setActivationFocuses(focuses: readonly AmbientSectorPoint[]): void {
+    const focusLimit = Math.max(0, (DEFAULT_AMBIENT_SECTOR_POLICY.maxActivationFocuses ?? 3) - 1)
+    this.activationFocuses = focuses
+      .filter(focus => Number.isFinite(focus.x) && Number.isFinite(focus.y))
+      .slice(0, focusLimit)
+      .map(focus => ({ x: focus.x, y: focus.y }))
+  }
+
   update(delta: number, view: Phaser.Geom.Rectangle): void {
     this.elapsed += Math.max(0, Math.min(Number.isFinite(delta) ? delta : 0, 100)) / 1000
     for (const signal of this.crossingSignals) {
@@ -207,7 +306,28 @@ export class AmbientCity {
       signal.stopLamp.setAlpha(stop ? 1 : 0.2)
       signal.goLamp.setAlpha(stop ? 0.2 : 1)
     }
+
+    const width = Number.isFinite(view.width) ? view.width : view.right - view.x
+    const height = Number.isFinite(view.height) ? view.height : view.bottom - view.y
+    const center = { x: view.x + width / 2, y: view.y + height / 2 }
+    const transition = resolveAmbientSectorTransition(
+      this.routes,
+      this.activation,
+      [center, ...this.activationFocuses],
+      { ...DEFAULT_AMBIENT_SECTOR_POLICY, maxActiveActors: AMBIENT_ACTOR_LIMIT },
+    )
+    this.activation = transition.activation
+    const activeIds = new Set(transition.activation.activeActorIds)
+
     for (const actor of this.actors) {
+      if (!activeIds.has(actor.route.id)) {
+        if (actor.visible) {
+          actor.object.setVisible(false)
+          actor.visible = false
+        }
+        continue
+      }
+      // Reactivation samples the same global elapsed clock and stable route phase; actor motion never restarts at zero.
       const p = sampleAmbientRoute(actor.route, this.elapsed, actor.pose)
       const visible = p.x >= view.x - 100 && p.x <= view.right + 100 && p.y >= view.y - 100 && p.y <= view.bottom + 100
       if (visible !== actor.visible) {

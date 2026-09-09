@@ -2,7 +2,10 @@ import { describe, expect, it } from 'vitest'
 import {
   ambientSectorId,
   resolveActiveAmbientSectorIds,
+  resolveActiveAmbientSectorIdsForFocuses,
   resolveAmbientSectorActivation,
+  resolveAmbientSectorActivationForFocuses,
+  resolveAmbientSectorTransition,
   type AmbientSectorRoute,
 } from '../src/simulation/ambient/sectorActivation'
 
@@ -97,5 +100,58 @@ describe('Living City sector activation', () => {
     expect(after.centerSectorId).toBe('1:0')
     expect(after.activeActorIds).toEqual(['east-sector'])
     expect(resolveAmbientSectorActivation(routes, { x: 512, y: 100 }, policy)).toEqual(after)
+  })
+
+  it('keeps overlapping nearby actors retained instead of resetting them at a boundary', () => {
+    const routes = [
+      route('west-only', -400, 100),
+      route('shared-near-boundary', 700, 100),
+      route('east-only', 1300, 100),
+    ]
+    const policy = { sectorSize: 512, activeRadius: 1, maxActiveActors: 8 }
+    const before = resolveAmbientSectorActivation(routes, { x: 511.99, y: 100 }, policy)
+    const transition = resolveAmbientSectorTransition(routes, before, [{ x: 512, y: 100 }], policy)
+
+    expect(transition.retainedActorIds).toContain('shared-near-boundary')
+    expect(transition.activatedActorIds).toContain('east-only')
+    expect(transition.deactivatedActorIds).toContain('west-only')
+    expect(transition.transitionActorCount).toBe(
+      transition.activatedActorIds.length + transition.deactivatedActorIds.length,
+    )
+    expect(transition.activation.simulatedActorCount).toBeLessThanOrEqual(policy.maxActiveActors)
+  })
+
+  it('activates bounded life around a player and governed route look-ahead without center-only bias', () => {
+    const routes = [
+      route('player-nearby', 100, 100),
+      route('corridor-nearby', 5100, 100),
+      route('unreferenced-distant', 15000, 100),
+    ]
+    const policy = { sectorSize: 512, activeRadius: 1, maxActiveActors: 22, maxActivationFocuses: 3 }
+    const focuses = [{ x: 150, y: 100 }, { x: 5150, y: 100 }]
+    const activation = resolveAmbientSectorActivationForFocuses(routes, focuses, policy)
+
+    expect(activation.activeActorIds).toEqual(['player-nearby', 'corridor-nearby'])
+    expect(activation.inactiveActorIds).toEqual(['unreferenced-distant'])
+    expect(resolveActiveAmbientSectorIdsForFocuses(focuses, policy).length).toBeLessThanOrEqual(18)
+  })
+
+  it('keeps actor and transition work bounded across a city hundreds of sectors wide', () => {
+    const routes = Array.from({ length: 12000 }, (_, index) => {
+      const band = Math.floor(index / 120)
+      return route(`wide-${String(index).padStart(5, '0')}`, (index % 120) * 512, band * 512)
+    })
+    const policy = { sectorSize: 512, activeRadius: 1, maxActiveActors: 22, maxActivationFocuses: 3 }
+    const firstFocuses = [{ x: 256, y: 256 }, { x: 512 * 40 + 256, y: 256 }, { x: 512 * 80 + 256, y: 256 }]
+    const nextFocuses = firstFocuses.map(focus => ({ x: focus.x + 512, y: focus.y }))
+    const first = resolveAmbientSectorActivationForFocuses(routes, firstFocuses, policy)
+    const transition = resolveAmbientSectorTransition(routes, first, nextFocuses, policy)
+
+    expect(first.candidateCount).toBe(12000)
+    expect(first.simulatedActorCount).toBeLessThanOrEqual(22)
+    expect(first.activeSectorIds.length).toBeLessThanOrEqual(27)
+    expect(transition.activation.simulatedActorCount).toBeLessThanOrEqual(22)
+    expect(transition.transitionActorCount).toBeLessThanOrEqual(44)
+    expect(resolveAmbientSectorTransition(routes, first, nextFocuses, policy)).toEqual(transition)
   })
 })
