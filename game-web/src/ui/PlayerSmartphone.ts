@@ -6,12 +6,14 @@ import type { UrbanObjective } from '../systems/urbanInteractions'
 import type { CompanyState, WorldState } from '../types/game'
 import type { OwnershipEconomyState } from '../types/ownershipEconomy'
 import { WORLD_ZONES, WORLD_CITY_NAME } from '../world/worldLayout'
+import { buildPlayerProfilePresentation } from './PlayerProfilePresentation'
 import { COLORS, formatMoney, RADII, TOUCH_TARGET_MIN_PX, TYPOGRAPHY } from './theme'
 
 export const SMARTPHONE_LIVE_APPS = [
   { id: 'delivery', label: 'Delivery' },
   { id: 'map', label: 'Map' },
   { id: 'assets', label: 'Money & Assets' },
+  { id: 'profile', label: 'Profile' },
 ] as const
 
 export type SmartphoneAppId = (typeof SMARTPHONE_LIVE_APPS)[number]['id']
@@ -34,6 +36,7 @@ export interface SmartphoneSnapshot {
   delivery: SmartphoneAppSnapshot
   map: SmartphoneAppSnapshot
   assets: SmartphoneAppSnapshot
+  profile: SmartphoneAppSnapshot
 }
 
 const districtForPoint = (point: { x: number; y: number }): string =>
@@ -75,6 +78,10 @@ export const buildSmartphoneSnapshot = (
   company: CompanyState,
   ownership: OwnershipEconomyState,
   objective: UrbanObjective,
+  profile: SmartphoneAppSnapshot = {
+    heading: 'PLAYER PROFILE',
+    lines: ['Profile authority is unavailable in this snapshot.'],
+  },
 ): SmartphoneSnapshot => {
   const transport = ACTIVE_TRANSPORT_LABELS[world.urban?.activeTransport ?? 'walking']
   const distance = Math.round(Math.hypot(objective.point.x - world.player.x, objective.point.y - world.player.y))
@@ -123,6 +130,10 @@ export const buildSmartphoneSnapshot = (
         `Rep ${company.reputation} · Team ${activeEmployees}/${company.employees.length} active`,
         `Fleet ${company.vehicles.length} owned/${assignedVehicles} assigned · HQ ${departmentCount} dept${departmentCount === 1 ? '' : 's'}`,
       ],
+    },
+    profile: {
+      heading: profile.heading,
+      lines: [...profile.lines],
     },
   }
 }
@@ -405,8 +416,10 @@ export class PlayerSmartphoneOverlay {
   }
 
   update(world: WorldState, company: CompanyState, objective: UrbanObjective): void {
-    const ownership = sanitizeOwnershipEconomyState(getOrCreateGameSession().ownershipEconomy).state
-    this.snapshot = buildSmartphoneSnapshot(world, company, ownership, objective)
+    const session = getOrCreateGameSession()
+    const ownership = sanitizeOwnershipEconomyState(session.ownershipEconomy).state
+    const profile = buildPlayerProfilePresentation(session)
+    this.snapshot = buildSmartphoneSnapshot(world, company, ownership, objective, profile)
     if (this.isOpen()) this.renderSnapshot()
   }
 
