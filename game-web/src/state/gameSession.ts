@@ -48,6 +48,9 @@ export const replaceGameSession = (
     personalProgression: activeSession?.personalProgression ?? createInitialPersonalProgressionState(),
     ownershipEconomy: sanitizeOwnershipEconomyState(activeSession?.ownershipEconomy).state,
     worldIdentity: sanitizeWorldIdentityState(activeSession?.worldIdentity).state,
+    ...(activeSession?.missionResume !== undefined
+      ? { missionResume: activeSession.missionResume }
+      : {}),
   }
   return activeSession
 }
