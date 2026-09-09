@@ -3,7 +3,8 @@ import path from 'node:path'
 
 const MAX_STREAMED_SECTORS = 5
 const MAX_CHUNKS_PER_SECTOR = 10
-const BRAILA_SCALE_CONTRACT = 'src/world/brailaPlayableScale.ts'
+const GLOBAL_SCALE_CONTRACT = 'src/world/worldScale.ts'
+const BRAILA_SCALE_ADAPTER = 'src/world/brailaPlayableScale.ts'
 const CITY_RUNTIME_ROOT = 'src/city'
 
 const numericExportPattern = /export\s+const\s+([A-Z0-9_]+)\s*=\s*(\d+(?:\.\d+)?)/g
@@ -85,9 +86,9 @@ const walkTypeScriptFiles = async root => {
 
 const assertSelfTest = () => {
   const passing = readNumericExports(`
-    export const BRAILA_DETAIL_SECTOR_LIMIT = 5
+    export const CITY_DETAIL_SECTOR_LIMIT = 5
     export const MAX_CHUNKS_PER_SECTOR = 10
-    export const BRAILA_DETAIL_SECTOR_SIZE = 768
+    export const CITY_DETAIL_SECTOR_SIZE = 768
   `)
   const passingResult = evaluateExports('self-test-pass.ts', passing)
   if (passingResult.violations.length !== 0) {
@@ -95,7 +96,7 @@ const assertSelfTest = () => {
   }
 
   const failing = readNumericExports(`
-    export const BRAILA_DETAIL_SECTOR_LIMIT = 12
+    export const CITY_DETAIL_SECTOR_LIMIT = 12
     export const MAX_CHUNKS_PER_SECTOR = 11
   `)
   const failingResult = evaluateExports('self-test-fail.ts', failing)
@@ -107,9 +108,8 @@ const assertSelfTest = () => {
 assertSelfTest()
 
 const filesToInspect = []
-if (await fileExists(BRAILA_SCALE_CONTRACT)) {
-  filesToInspect.push(BRAILA_SCALE_CONTRACT)
-}
+if (await fileExists(GLOBAL_SCALE_CONTRACT)) filesToInspect.push(GLOBAL_SCALE_CONTRACT)
+if (await fileExists(BRAILA_SCALE_ADAPTER)) filesToInspect.push(BRAILA_SCALE_ADAPTER)
 filesToInspect.push(...await walkTypeScriptFiles(CITY_RUNTIME_ROOT))
 
 const observations = []
@@ -126,8 +126,9 @@ console.log('Large-city presentation performance guard')
 console.log(`- streamed-sector hard ceiling: ${MAX_STREAMED_SECTORS}`)
 console.log(`- chunks-per-sector hard ceiling: ${MAX_CHUNKS_PER_SECTOR}`)
 
-if (!(await fileExists(BRAILA_SCALE_CONTRACT))) {
-  console.log(`- ${BRAILA_SCALE_CONTRACT}: pending on this ref`)
+if (!(await fileExists(GLOBAL_SCALE_CONTRACT))) {
+  console.error(`- missing global scale authority: ${GLOBAL_SCALE_CONTRACT}`)
+  violations.push(`${GLOBAL_SCALE_CONTRACT}: global city-scale authority is required`)
 }
 if (!(await fileExists(CITY_RUNTIME_ROOT))) {
   console.log(`- ${CITY_RUNTIME_ROOT}/: pending on this ref`)
