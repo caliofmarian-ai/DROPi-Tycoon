@@ -104,12 +104,11 @@ const repairTerminalReservation = (
   sourceInventory: InventoryState,
   reservation: InventoryReservation | undefined,
 ): ProducerReservationRepairResult => {
-  if (!reservation || reservation.status === 'released') {
-    return { status: 'clean', contract, sourceInventory }
-  }
+  if (!reservation) return { status: 'clean', contract, sourceInventory }
   if (!reservationMatchesContract(reservation, contract)) {
     return { status: 'rejected', contract, sourceInventory, reason: 'reservation-contract-mismatch' }
   }
+  if (reservation.status === 'released') return { status: 'clean', contract, sourceInventory }
   if (reservation.status === 'consumed') {
     return {
       status: 'rejected',
@@ -356,6 +355,10 @@ export const completeProducerMissionDelivery = (
 ): ProducerMissionLifecycleResult => {
   if (!missionMatchesContract(input.definitions, input.missionId, input.contract)) {
     return rejectedLifecycle(input, input.contract, input.sourceInventory, 'producer-mission-binding-mismatch')
+  }
+  const missionStatus = input.state.missions[input.missionId]?.status
+  if (missionStatus !== 'Active' && missionStatus !== 'Completed') {
+    return rejectedLifecycle(input, input.contract, input.sourceInventory, 'producer-mission-not-active')
   }
 
   const repaired = repairProducerReservationReference(input.contract, input.sourceInventory)
