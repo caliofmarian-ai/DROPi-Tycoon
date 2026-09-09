@@ -1,12 +1,18 @@
 import type Phaser from 'phaser'
+import {
+  BRAILA_DETAIL_MIN_ZOOM,
+  BRAILA_DETAIL_SECTOR_LIMIT,
+  BRAILA_DETAIL_SECTOR_SIZE,
+} from './brailaPlayableScale'
 import { drawCityGround } from './urbanPresentation'
 import { WORLD_WIDTH, WORLD_HEIGHT } from './worldLayout'
 
-export const CITY_DETAIL_TILE_SIZE = 768
-export const CITY_DETAIL_TILE_LIMIT = 12
+export const CITY_DETAIL_TILE_SIZE = BRAILA_DETAIL_SECTOR_SIZE
+export const CITY_DETAIL_TILE_LIMIT = BRAILA_DETAIL_SECTOR_LIMIT
+export const CITY_DETAIL_MIN_ZOOM = BRAILA_DETAIL_MIN_ZOOM
 interface Tile { id: string; x: number; y: number }
 export const cityGroundTiles = (view: { x: number; y: number; width: number; height: number }, zoom: number): Tile[] => {
-  if (zoom < .4 || view.width <= 0 || view.height <= 0) return []
+  if (zoom < CITY_DETAIL_MIN_ZOOM || view.width <= 0 || view.height <= 0) return []
   const tiles: Tile[] = [], size = CITY_DETAIL_TILE_SIZE
   for (let row = Math.max(0, Math.floor(view.y / size)); row <= Math.min(Math.ceil(WORLD_HEIGHT / size) - 1, Math.floor((view.y + view.height) / size)); row++) {
     for (let col = Math.max(0, Math.floor(view.x / size)); col <= Math.min(Math.ceil(WORLD_WIDTH / size) - 1, Math.floor((view.x + view.width) / size)); col++) {
@@ -17,7 +23,11 @@ export const cityGroundTiles = (view: { x: number; y: number; width: number; hei
     Math.hypot(b.x + size / 2 - view.x - view.width / 2, b.y + size / 2 - view.y - view.height / 2)).slice(0, CITY_DETAIL_TILE_LIMIT)
 }
 
-/** Crisp local pavement over a cheap city overview. At most 27 MiB of detail textures, one new tile per frame. */
+/**
+ * Crisp local pavement over a cheap city overview. The #614 enlarged city therefore increases
+ * total world sectors, never the resident Android detail budget: at most 12 local textures and one
+ * newly materialized tile per frame.
+ */
 export class CityGroundDetail {
   private resident = new Map<string, Phaser.GameObjects.Image>()
   private readonly scene: Phaser.Scene
