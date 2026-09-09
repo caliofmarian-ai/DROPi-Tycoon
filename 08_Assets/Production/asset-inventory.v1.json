@@ -173,9 +173,11 @@
       "lifecycleState": "RUNTIME_INTEGRATED",
       "reuseGroup": "orders-icon-v1",
       "lifecycleEvidence": {
+        "INVENTORIED": "08_Assets/Production/Candidates/Legacy_Board_Crops_v1/README.md",
+        "SPECIFIED": "08_Assets/ASSETS.md",
         "CANDIDATE": "08_Assets/Production/Candidates/Legacy_Board_Crops_v1/ui/icons/icon_orders.webp",
         "APPROVED_SOURCE": "08_Assets/Production/Approved_Sources/APPROVED_SOURCE_REGISTER.md",
-        "PRODUCTION_READY": "game-web/tests/runtime-art-adoption.test.ts",
+        "PRODUCTION_READY": "game-web/public/assets/production/icon-orders.webp",
         "RUNTIME_INTEGRATED": "game-web/src/scenes/ApprovedAssetMainMenuScene.ts"
       },
       "legalEvidenceRef": "game-web/public/legal/runtime-provenance.json"
