@@ -1,6 +1,6 @@
 # Save v2 World Continuity Contract
 
-Issue: #566  
+Issue: #566
 Owner lane: DT-02 World Persistence
 
 ## Purpose
