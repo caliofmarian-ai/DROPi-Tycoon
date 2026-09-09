@@ -20,10 +20,18 @@ Natural Earth data are [public domain](https://www.naturalearthdata.com/about/te
 
 ## Natural-resource inventory boundary (#493)
 
-The requested global/country/region resource inventory remains to be populated. The map layer cannot supply quantities of ore, fuel, timber, agricultural production, renewable generation or usable water. No resource reserve is inferred from a map color or assigned a fictional zero.
+The global/country/region resource inventory is a separate governed data/economy authority. The map layer cannot supply quantities of ore, fuel, timber, agricultural production, renewable generation or usable water. No resource reserve is inferred from a map color or assigned a fictional zero.
 
-The next inventory records need: stable resource/deposit/basin identity; source and license; source year and retrieval date; geometry and resolution; country/region ownership resolution; resource category; measurement type; numeric value and unit when known; explicit missing/estimated status; and separate extraction/production/transport capacity. Country totals must not be uniformly distributed across regions. Shared rivers and deposits need explicit allocation to avoid double counting.
+Canonical resource semantics now live in `02_Economy/GLOBAL_RESOURCE_ECONOMY.md` and `00_Project/GLOBAL_WORLD_ECONOMY_CANON.md`.
 
-Required categories are minerals/construction materials, fossil energy, fresh water, forests/biomass, agricultural land/output, marine resources and renewable-energy potential. Occurrence, reserve, annual production, theoretical potential and installed capacity are different measurements.
+Inventory records require: stable resource/deposit/basin identity; source and license; source year and retrieval date; geometry and resolution; country/region ownership resolution; resource category; measurement type; numeric value and unit when known; explicit missing/estimated status; and separate extraction/production/transport capacity.
 
-A verified source family for the water work is [FAO AQUASTAT](https://www.fao.org/aquastat/en/overview/), which supplies country water-resource/use and irrigation information. This slice imports none of those quantities. Mineral, energy, agriculture and forest sources must likewise be retained, licensed and reconciled before the economy reads them.
+Country totals must not be uniformly distributed across regions. Shared rivers and deposits need explicit allocation to avoid double counting.
+
+Required categories include minerals/construction materials, fossil energy, fresh water, forests/biomass, agricultural land/output, marine resources and renewable-energy potential. Occurrence, reserve, recoverable quantity, annual production, theoretical potential and installed capacity are different measurements.
+
+A verified source family for water work is [FAO AQUASTAT](https://www.fao.org/aquastat/en/overview/), which supplies country water-resource/use and irrigation information. This visual-geography slice imports none of those quantities. Mineral, energy, agriculture, forest and other source families must likewise be retained, licensed and reconciled before economic authority consumes them.
+
+## Baseline vs simulation
+
+Source-backed physical/resource data seed a versioned World Instance baseline. Later extraction, depletion, productive capacity, ownership, infrastructure, settlement growth and trade are simulated World Instance state and must not be represented as current real-world facts.
