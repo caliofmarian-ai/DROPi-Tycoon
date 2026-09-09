@@ -3,11 +3,8 @@ import { stat } from 'node:fs/promises'
 import { createServer } from 'node:http'
 import { extname, join, normalize } from 'node:path'
 import { fileURLToPath } from 'node:url'
-import { createPostgresAuthorityRegistry } from './postgres-authority.mjs'
-import {
-  createSessionAuthorityRegistry,
-  handleSessionAuthorityRequest,
-} from './session-authority.mjs'
+import { createRuntimeAuthorityServices } from './runtime-authority.mjs'
+import { handleSessionAuthorityRequest } from './session-authority.mjs'
 
 const __dirname = fileURLToPath(new URL('.', import.meta.url))
 const distDir = normalize(join(__dirname, '..', 'dist'))
@@ -15,15 +12,11 @@ const port = Number.parseInt(process.env.PORT ?? '3000', 10) || 3000
 const host = '0.0.0.0'
 const authorityStore = String(process.env.DROPI_AUTHORITY_STORE ?? 'session').trim().toLowerCase()
 
-const createAuthorityRegistry = async () => {
-  if (authorityStore === 'session') return createSessionAuthorityRegistry()
-  if (authorityStore === 'postgres') {
-    return createPostgresAuthorityRegistry({ databaseUrl: process.env.DATABASE_URL })
-  }
-  throw new Error(`Unsupported DROPI_AUTHORITY_STORE value: ${authorityStore}`)
-}
-
-const authorityRegistry = await createAuthorityRegistry()
+const runtimeServices = await createRuntimeAuthorityServices({
+  authorityStore,
+  databaseUrl: process.env.DATABASE_URL,
+})
+const { authorityRegistry, worldInstanceRuntime } = runtimeServices
 
 const mimeTypes = {
   '.css': 'text/css; charset=utf-8',
@@ -38,7 +31,7 @@ const mimeTypes = {
 
 if (!existsSync(join(distDir, 'index.html'))) {
   console.error('dist/index.html not found. Run "npm run build" before "npm run start".')
-  await authorityRegistry.close?.().catch(() => {})
+  await runtimeServices.close().catch(() => {})
   process.exit(1)
 }
 
@@ -97,7 +90,7 @@ const shutdown = async signal => {
   shuttingDown = true
   console.log(`Received ${signal}; shutting down DROPi Tycoon runtime.`)
   await new Promise(resolve => server.close(resolve))
-  await authorityRegistry.close?.().catch(error => console.error('Authority repository close failed.', error))
+  await runtimeServices.close().catch(error => console.error('Authority runtime close failed.', error))
 }
 
 process.once('SIGTERM', () => {
@@ -113,5 +106,8 @@ server.listen(port, host, () => {
     console.log('PostgreSQL authority prototype enabled at /api/authority/* (durable public-profile scope; production authentication not configured).')
   } else {
     console.log('Session authority prototype enabled at /api/authority/* (non-durable, unauthenticated public-profile scope only).')
+  }
+  if (worldInstanceRuntime) {
+    console.log('World Instance B2 runtime adapter initialized internally (no public routes; authenticated server identity context required before durable bindings can be created).')
   }
 })
