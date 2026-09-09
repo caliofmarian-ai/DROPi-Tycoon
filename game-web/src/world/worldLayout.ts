@@ -50,11 +50,13 @@ export const WORLD_BUILDINGS: readonly WorldBuildingLayout[] = (layout.buildings
   .map(building => expandBrailaBuilding(building))
 export const WORLD_ROUTE_POINTS: readonly WorldRoutePoint[] = (layout.routes as WorldRoutePoint[])
   .map(point => expandBrailaRoutePoint(point))
-/** #613 compact tuples remain the shipped representation; #614 expands only after reconstruction. */
-export const WORLD_CONTEXT_BUILDINGS = __BRAILA_CONTEXT_BUILDINGS__
+/** #613 compact tuples remain the shipped representation; expose their exact pre-scale reconstruction for its lossless regression gate. */
+export const WORLD_SOURCE_CONTEXT_BUILDINGS = __BRAILA_CONTEXT_BUILDINGS__
   .map(([x, y, width, height, pointCoordinates]) => ({
     x, y, width, height, points: unpackContextPoints(pointCoordinates),
   }))
+/** #614 applies playable spacing only after #613's compact representation has been reconstructed exactly. */
+export const WORLD_CONTEXT_BUILDINGS = WORLD_SOURCE_CONTEXT_BUILDINGS
   .map(building => expandBrailaContextBuilding(building))
 export const WORLD_LANDSCAPE = layout.landscape.map(feature => expandBrailaLandscapeFeature(feature))
 export const WORLD_MARKETPLACE = expandBrailaPoint({ x: layout.marketplace.x, y: layout.marketplace.y })
