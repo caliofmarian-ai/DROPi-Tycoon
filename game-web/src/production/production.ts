@@ -15,11 +15,24 @@ import {
 } from '../inventory/inventory'
 import { PRODUCT_CATALOG, type ProductId } from './productCatalog'
 
+/**
+ * Stable semantic city endpoint identity owned by the world/economy binding, never by mission selection.
+ * Coordinates are intentionally absent so playable-city rescaling can preserve economic identity.
+ */
+export interface EconomicNodeCityEndpointRef {
+  routeLabel: string
+  districtId: string
+  areaId?: string
+  locationRef: string
+  roadRef: string
+}
+
 export interface EconomicNodeLocation {
   worldInstanceId: string
   countryId: string
   administrativeRegionId?: string
   localityId?: string
+  cityEndpoint?: EconomicNodeCityEndpointRef
 }
 
 export interface ProductAmount {
@@ -113,7 +126,10 @@ export const createProductiveNode = (input: {
   return {
     nodeId: input.nodeId,
     kind: input.kind,
-    location: { ...input.location },
+    location: {
+      ...input.location,
+      ...(input.location.cityEndpoint ? { cityEndpoint: { ...input.location.cityEndpoint } } : {}),
+    },
     inventory: createInventory({
       inventoryId: `inventory:${input.nodeId}`,
       nodeId: input.nodeId,
