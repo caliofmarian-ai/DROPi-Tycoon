@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest'
 import rawLayout from '../src/world/brailaLayout.generated.json'
 import rawContext from '../src/world/brailaContext.generated.json'
 import { CAMERA_MIN_ZOOM, zoomByStep } from '../src/ui/cameraControls'
+import { BRAILA_LABEL_MAX_SCREEN_COMPENSATION } from '../src/world/brailaLabelPresentation'
 import {
   BRAILA_DETAIL_MIN_ZOOM,
   BRAILA_DETAIL_SECTOR_LIMIT,
@@ -101,6 +102,7 @@ describe('Brăila canonical playable city scale', () => {
     const fit = cityFitZoom(800, 360, WORLD_WIDTH, WORLD_HEIGHT)
     expect(CAMERA_MIN_ZOOM).toBeLessThanOrEqual(fit * 1.3)
     expect(cityScaleLevel(CAMERA_MIN_ZOOM, fit)).toBe('City')
+    expect(BRAILA_LABEL_MAX_SCREEN_COMPENSATION * CAMERA_MIN_ZOOM).toBeGreaterThanOrEqual(1)
     expect(cityScaleLevel(0.3, fit)).toBe('District')
     expect(cityScaleLevel(0.5, fit)).toBe('Area')
     expect(cityScaleLevel(1, fit)).toBe('Hero')
