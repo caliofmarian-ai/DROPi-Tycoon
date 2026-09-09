@@ -2,11 +2,11 @@
 
 Document: WORLD.md
 Project: DROPi Tycoon
-Version: 2.1.0
+Version: 2.2.0
 Status: Canonical
 Author: Marian Caliof & OpenAI
 Language: English
-Last Updated: 2026-09-08
+Last Updated: 2026-09-09
 
 ---
 
@@ -14,353 +14,461 @@ Last Updated: 2026-09-08
 
 ## Purpose
 
-DROPi Tycoon is a persistent global economic/logistics society. Geography, people, companies, productive assets, trade, infrastructure, time, migration, tourism, specialists, consumption, production, waste, and events evolve inside one coherent world model.
+DROPi Tycoon is a persistent global economic/logistics society. Geography, resources, people, companies, productive assets, education, research, trade, infrastructure, time, migration, consumption, production, waste and settlement development evolve inside one coherent World Instance.
 
-The current detailed city is one local scene inside this hierarchy; it is not the whole world.
+This document is reconciled with `00_Project/GLOBAL_WORLD_ECONOMY_CANON.md`, `04_World/SETTLEMENT_EVOLUTION.md`, `02_Economy/GLOBAL_RESOURCE_ECONOMY.md` and the approved Phase-1 architecture baseline.
 
-This document is reconciled with `00_Project/PHASE1_GAME_ARCHITECTURE_DECISION_BASELINE.md`.
+Brăila is a calibration/reference locality, not the whole world, not the universal spawn and not the universal architectural template.
 
 ---
 
 # 1. World Hierarchy
 
-**Global -> Country -> First-order Administrative Region -> Representative Locality / External Economic Node -> Detailed Local Scene.**
+Canonical hierarchy:
 
-Only the active detailed area and current operational context run at high frequency. Countries, inactive regions, inactive localities, external producers and global trade persist as lower-frequency strategic state.
+**Global -> Country -> Administrative Region -> Locality / External Economic Node -> District/Area where present -> Detailed Local Scene.**
 
-All countries can be strategically represented without requiring every real settlement to exist as a high-detail scene.
+All supported countries and governed localities may exist as stable world identities while detailed rendering/simulation remains bounded to active context.
+
+The world must not confuse:
+
+- existence in the catalog/world identity graph;
+- data/source readiness;
+- settlement development;
+- current runtime activation;
+- release verification.
 
 ---
 
 # 2. Multi-Resolution Simulation
 
-World scale is achieved by simulation resolution, not by attempting to simulate every person at frame rate.
+World scale is achieved through hierarchical simulation frequency.
 
-Typical bands are:
+Typical bands:
 
-- **active player scene** — detailed movement/interaction/high frequency;
-- **important nearby NPCs/operations** — individual or operational simulation;
-- **local production/inventory/markets** — economic ticks;
-- **city/regional population** — cohorts, stocks and flows;
-- **country/global trade** — strategic ticks;
-- **demographics/urbanization/state evolution** — slow structural cycles;
-- **inactive scopes** — deterministic summarized catch-up.
+- active hero/local scene — frame/local frequency;
+- nearby important actors/operations — local operational simulation;
+- local production/inventory/market — economic ticks;
+- settlement/regional population/workforce — cohort/stock-flow ticks;
+- country/global trade/resources — strategic ticks;
+- demographics/urbanization/research/infrastructure — slow cycles;
+- inactive scopes — deterministic summarized catch-up.
 
-Aggregation must conserve equivalent economic truth: population cohorts still consume, work, migrate, and affect supply/demand even when individuals are not rendered.
+Aggregation must conserve equivalent economic truth.
 
 ---
 
 # 3. World Time
 
-The world has authoritative game time with several responsibilities:
+The world has authoritative game time for:
 
-- **local clock** — day/night and time-of-day behavior;
-- **operating day / shifts** — routine work, deliveries, business operation, inventories and production;
-- **week/market cycle** — recurring contracts and short economic trends;
-- **season** — agriculture, tourism, weather and broader demand shifts;
-- **year/slow cycle** — demographics, construction, industrial and national development.
+- local clock/day-night;
+- shifts/operating day;
+- week/market cycles;
+- seasons;
+- years/slow structural development.
 
-The real-time-to-game-time ratio is balancing/configuration and is not fixed here.
+World time may continue while players are offline where causal rules permit.
 
-Day/night may influence traffic, customer demand, opening patterns, industrial shifts, employee availability and visible ambience.
-
-World time may continue while individual players are offline. Catch-up must be causal and idempotent: legitimate fixed obligations/basic consumption can continue, but active-use costs and starter wages do not occur without the underlying activity.
+Catch-up must be deterministic/idempotent. Active-use costs and wages do not occur without the underlying activity.
 
 ---
 
-# 4. Population, Households and Workforce
+# 4. Stable Locality Identity and Dynamic Development
 
-Localities, regions and countries may track summarized:
+A locality can exist globally without being a mature city.
+
+Conceptual settlement states:
+
+`LATENT / UNDEVELOPED -> RURAL_POINT -> HAMLET -> VILLAGE -> SMALL_TOWN -> TOWN -> CITY -> LARGE_CITY / METROPOLITAN`
+
+Exact enum names/thresholds are implementation/balance details.
+
+Locality ID is persistent. Settlement class is dynamic World Instance state.
+
+A low-tier locality may contain only undeveloped land, a farm/resource site, a road junction or 1–2 isolated buildings. It should not be rendered as a fake city.
+
+Development may grow or decline over time.
+
+---
+
+# 5. Economy-Driven Urbanization
+
+Settlement development is caused by legitimate world state.
+
+Canonical feedback loop:
+
+`resource / demand / route opportunity`
+`-> company/institution investment`
+`-> extraction / farming / production / infrastructure / services`
+`-> jobs`
+`-> population + specialists`
+`-> housing + utilities`
+`-> commerce + services + education`
+`-> larger settlement footprint`
+`-> new demand + firms + professions + trade`
+`-> further opportunity`
+
+Money alone cannot instantiate a city.
+
+Projects can require materials, specialists, equipment, infrastructure, utilities, land/site access, logistics and time.
+
+---
+
+# 6. Global 10x Playable-Distance Scale
+
+All governed playable settlements use one reusable scale baseline:
+
+**`CITY_PLAYABLE_DISTANCE_SCALE_BASELINE = 10`**
+
+Brăila is the first calibration city.
+
+The rule scales governed intra-settlement positional separation/traversal, not every object dimension.
+
+A hamlet remains small because its developed network is small; a metropolis is larger because its governed urbanized footprint/network is larger.
+
+New streets/districts/facilities created by development inherit the same global scale automatically.
+
+Android performance is preserved through streaming, chunking, sectors, LOD, culling and bounded simulation rather than shrinking settlements.
+
+---
+
+# 7. Population, Households and Workforce
+
+Localities/regions/countries may track summarized:
 
 - residents/households;
 - workforce;
-- available jobs;
+- jobs;
 - qualified specialists;
-- tourists/temporary visitors;
+- students/trainees;
+- tourists/temporary residents;
 - migration pressure;
 - housing/service capacity;
 - consumption requirements;
-- income/employment conditions.
+- employment/income conditions.
 
-People/households are economic actors. They may consume goods/services, require housing/utilities, supply labor, create waste, and change local demand.
+People are economic actors: they consume, work, migrate, require housing/services, create waste and change demand.
 
-Specialists are productive strategic resources. Advanced industry, transport, research and infrastructure may require appropriate trained people in addition to money and equipment.
-
-Visual/social diversity must not become a discriminatory economic mechanic based on protected personal traits.
+Specialists are productive strategic capacity.
 
 ---
 
-# 5. Migration and Tourism
+# 8. Education, Training and Research
 
-People may move between localities, regions and countries in response to fictional world conditions such as:
+Education and research are world infrastructure and economic systems.
 
-- employment and wages;
-- housing and services;
-- economic opportunity or decline;
-- specialist demand;
-- infrastructure and connectivity;
-- environmental conditions;
-- tourism attractiveness;
-- major events.
+Institutions may include:
 
-Migration changes demand, workforce supply, housing pressure, architecture and business opportunity.
+- schools;
+- vocational/training centers;
+- universities;
+- academies;
+- company training facilities;
+- specialist institutes;
+- laboratories/research centers.
 
-Large migration waves can exist as advanced game events but are not predictions about real populations.
+Programs can be geographically specific.
 
----
+A player/company may need to travel, relocate, recruit or sponsor someone in another region/country to obtain a rare specialization.
 
-# 6. Urban and Rural Metabolism
+Education can require theory, practice, supervision, assessment, facilities/equipment, time and money.
 
-A locality grows only when multiple supporting systems can sustain growth, for example:
+Research may later unlock technology/process/infrastructure improvements through governed specialist/facility/funding requirements.
 
-- food and water;
-- energy/utilities;
-- construction materials;
-- jobs/income;
-- housing;
-- transport/logistics access;
-- public/service capacity;
-- industry/commerce;
-- specialists;
-- trade connectivity;
-- investment;
-- waste collection/treatment where modeled.
-
-Visible consequences may include new housing, denser/diverse architecture, commercial growth, industry, roads, utilities, services, increased population activity, shortages, closures, recovery or construction.
-
-Rural localities develop through agriculture, livestock, forestry, extraction, processing, tourism, specialist industry and connectivity while preserving a distinct rural identity rather than becoming small copies of cities.
-
-Roughly five meaningful last-mile competitors is an urban design target and normally one to two is a rural target. This is shaped by local demand/capacity and entry/exit rather than a simplistic permanent hard counter.
+See `01_GameDesign/EDUCATION_SPECIALIZATION_AND_GROUP_CAPABILITY.md`.
 
 ---
 
-# 7. New Settlements
+# 9. Group and Company Specialist Capacity
 
-Advanced world simulation may create new settlements in eligible undeveloped territory.
+Companies/groups may need teams with complementary qualifications.
 
-A new town/city requires a plausible foundation such as resources or productive activity, employment, transport access, infrastructure/housing investment and population inflow.
+Advanced capability can require:
 
-New settlements emerge from world rules, not arbitrary random placement.
+- qualified people;
+- equipment;
+- facilities;
+- infrastructure;
+- materials;
+- utilities;
+- money;
+- authorization/access;
+- time.
+
+A company can sponsor a member's education through conserved Personal/Company Money transactions.
+
+The qualification remains the person's capability unless a separate corporate research/technology asset is defined.
+
+If a required specialist leaves, affected company capability may pause/degrade until replacement capacity exists.
 
 ---
 
-# 8. Productive Geography
+# 10. Migration and Player Origin
+
+A new player does not silently begin in Brăila.
+
+The world distinguishes:
+
+- origin/nationality context where collected;
+- home country/locality;
+- starting country/locality;
+- current country/locality;
+- relocation history.
+
+A player may begin in an appropriate supported locality in their own country under onboarding rules.
+
+If the starting locality is currently low-tier, gameplay reflects its real current settlement state.
+
+Migration can occur through employment, study, company expansion, personal choice, investment or world events.
+
+---
+
+# 11. Natural Resources
+
+Natural resources are governed world inputs and cannot be inferred from map art.
+
+Families include where supported:
+
+- minerals/construction materials;
+- fossil energy;
+- fresh water;
+- forests/biomass;
+- agricultural land/output potential;
+- fisheries/marine resources;
+- renewable-energy potential.
+
+Occurrence, reserve, production, potential and installed capacity are distinct measurements.
+
+Source-backed real-world data seed the baseline. World Instance extraction, depletion, ownership, capacity and trade are simulated future state.
+
+See `02_Economy/GLOBAL_RESOURCE_ECONOMY.md` and `04_World/Physical_Geography/README.md`.
+
+---
+
+# 12. Productive Geography
 
 Economic activity is not limited to towns.
 
-Large farms, mines, steelworks, paper mills, chemical/fertilizer plants, refineries, energy sites, processing facilities, warehouses and freight terminals may exist as independent external economic nodes.
+External nodes may include:
 
-They consume inputs, use workforce/infrastructure, create outputs/inventory/waste, and generate physical logistics demand.
+- farms;
+- mines/quarries;
+- forestry/fisheries sites;
+- power/energy sites;
+- steelworks;
+- paper/pulp mills;
+- chemical/fertilizer plants;
+- refineries;
+- processors;
+- warehouses;
+- freight terminals;
+- utilities/waste/recycling sites.
 
-Eligible productive assets may later be sold, auctioned, concessioned, invested in or acquired under Business/Economy rules.
+These nodes use workforce/specialists, inputs, infrastructure, time and capacity; they create outputs, jobs, logistics demand and consequences.
 
----
-
-# 9. Infrastructure Ownership and Access
-
-World infrastructure may use public, private, concession or mixed ownership.
-
-Examples include roads/tolls, rail terminals, ports, airports, warehouses, utilities and other shared facilities.
-
-Private operation may produce capacity/cost/revenue advantages, but essential corridors/utilities require fair-access/counterplay safeguards. One actor must not permanently softlock a city/country by denying essential access.
-
-Infrastructure condition and capacity should affect economic opportunity and visible world state.
-
----
-
-# 10. Travel and Presence
-
-Strategic maps are navigation/planning layers, not free economic teleportation.
-
-A player's physical presence changes through unlocked transport/infrastructure such as:
-
-- walking/local streets;
-- private/contracted road transport;
-- public transport;
-- rail;
-- air;
-- river/sea travel;
-- later advanced transport.
-
-Travel may use time compression for usability, but appropriate time/cost/access consequences remain.
+A productive node may later stimulate a settlement around it.
 
 ---
 
-# 11. Country Development
+# 13. Production, Demand and Trade
 
-Countries are dynamic entities whose long-term condition may respond to a basket of:
+One stock-flow economy governs all scales.
 
-- productive output and productivity;
+Canonical economic chain:
+
+**Need -> Demand/Procurement -> Order/Contract -> Inventory/Cargo/Labor -> Work/Production/Transport -> Settlement -> Consumption/Use/Output -> Waste/New Need -> Visible Consequence.**
+
+Production requires real inputs/capacity/specialists/equipment/utilities/time.
+
+Trade arises from real deficit/surplus and transport access.
+
+Products do not teleport between markets.
+
+---
+
+# 14. Country and Regional Development
+
+Countries/regions evolve through combinations of:
+
+- resources;
+- productive output/productivity;
 - trade;
-- transport/infrastructure;
-- food/water/energy availability;
-- workforce and specialists;
-- innovation;
-- population trend;
-- tourism/services;
+- infrastructure;
+- energy/water/food;
+- workforce/specialists;
+- education/research;
+- population/migration;
+- services/tourism;
 - logistics capacity;
-- investment/public-service capacity where modeled;
-- major events and disruptions.
+- investment;
+- events/disruptions.
 
-Countries may become more prosperous, connected and urbanized or may decline through sustained demographic, economic, infrastructure or environmental pressure.
+No single score determines success.
 
-No single score should determine national success.
-
----
-
-# 12. National Currency — Staged Advanced System
-
-The architecture must support a future advanced economy with national game currencies and exchange-rate pressure.
-
-Currency strength may respond to fictionalized fundamentals such as productivity, trade, stability, inflation/liquidity abstractions and confidence. The mechanic does not need to reproduce live real-world exchange rates.
-
-`Personal Money` and `Company Money` are ownership/accounting domains; they may later carry currency denomination.
-
-A common gameplay denomination may remain in use until multi-currency settlement is separately implemented and approved.
+Country/regional summaries cannot invent goods/money independent of lower-level or explicitly aggregated stocks/flows.
 
 ---
 
-# 13. World Events
+# 15. Companies and Business Ecosystems
 
-Events may operate at local, regional, national or global scale.
+Company ecosystems differ by place.
 
-Possible categories include:
+A port city, mining region, agricultural area, university center, industrial settlement and financial/service center should create different combinations of firms/jobs.
 
-- festivals and tourism surges;
+Company opportunity responds to:
+
+- population/need;
+- resources;
+- production;
+- trade;
+- infrastructure;
+- specialist availability;
+- education/research;
+- competition;
+- investment.
+
+NPC/simulated firms provide bounded continuity and obey the same economy.
+
+---
+
+# 16. Infrastructure Ownership and Access
+
+Infrastructure may be public, private, concession-operated or mixed.
+
+Examples include roads, rail, ports, airports, warehouses, utilities and other shared facilities.
+
+Private operation can create revenue/capacity advantages but essential systems require fair-access/counterplay safeguards.
+
+Infrastructure can stimulate settlement development and redirect trade.
+
+---
+
+# 17. Travel and Presence
+
+Strategic map navigation does not teleport people/cargo.
+
+Presence changes through legitimate transport/infrastructure with time/cost/capacity.
+
+Modes may include walking, road/public transport, rail, air, river/sea and later advanced transport.
+
+Time compression is allowed for usability without erasing economic consequence.
+
+---
+
+# 18. Local Visual Identity
+
+All localities share the canonical art style:
+
+**Stylized 3D Pre-Rendered Mobile World / premium mobile tycoon / elevated soft-isometric or 3/4.**
+
+They do not share identical architecture.
+
+Visual identity should reflect governed local/regional reality through architecture, street pattern, density, materials, vegetation, climate, industry/agriculture and infrastructure.
+
+Art pipeline:
+
+`Global DROPi Style -> Regional/Local Archetype -> Locality-Specific Variants -> Runtime Derivatives`
+
+Missing required assets may be generated, cut out, cleaned, optimized and integrated under the governed asset/provenance pipeline.
+
+---
+
+# 19. World Events
+
+Events may operate locally, regionally, nationally or globally.
+
+Categories can include:
+
+- festivals/tourism;
 - harvest variation;
-- severe weather/environmental disruption;
-- industrial openings/closures;
+- severe weather;
+- industry openings/closures;
 - infrastructure projects/failures;
-- commodity shortages/surpluses;
+- shortages/surpluses;
 - workforce shortages;
-- economic/financial cycles;
-- route or border disruption;
+- economic cycles;
+- route/border disruption;
 - migration waves;
-- advanced geopolitical conflict/war as macro simulation;
-- recovery/reconstruction campaigns.
+- recovery/reconstruction;
+- later macro geopolitical conflict as non-tactical simulation.
 
-Events must alter the same logistics/economic state used by normal gameplay and provide understandable consequences and recovery paths.
-
-They may be inspired by recognizable real-world event categories but must not be presented as forecasts or exact reenactments of current real conflicts.
+Events alter the same economy/logistics state as normal gameplay and require understandable recovery/counterplay.
 
 ---
 
-# 14. War and State Change
+# 20. Decline and Recovery
 
-DROPi Tycoon is not a tactical combat game.
+Localities/regions/countries can decline through combinations of unemployment, lost supply, industrial closure, weak connectivity, population outflow, infrastructure degradation or prolonged disruption.
 
-Advanced geopolitical conflict may instead cause macro consequences such as:
+Visible consequences can include closures, underused housing/facilities, lower services, reduced production and shrinking demand.
 
-- route closures;
-- reduced or damaged infrastructure capacity;
-- displaced population;
-- emergency logistics demand;
-- commodity shortages;
-- changing trade access;
-- changes in political control/state status.
-
-Inside a fictional World Instance, a political state may become inactive, merge, split or later re-emerge. Land geography and stable historical identifiers remain preserved so company, cargo and world history are not orphaned.
-
-These are fictional simulation outcomes, not predictions about real countries.
+Recovery remains possible through new industry, trade, education, specialists, infrastructure, migration and investment.
 
 ---
 
-# 15. Decline and Recovery
+# 21. Persistent World Instances
 
-Regions/localities/countries may decline through combinations of unemployment, supply loss, industrial collapse, weak connectivity, population outflow, environmental degradation, inadequate services and prolonged disruption.
+Each World Instance is an independent global economic history.
 
-Visible consequences may include abandoned facilities/housing, reduced services, lower production, shortages and shrinking demand.
+A world begins from a versioned baseline and evolves independently.
 
-Normal decline must preserve meaningful recovery through trade, investment, migration, new industry, specialists, infrastructure, public/community projects and logistics access.
-
----
-
-# 16. Bounded NPC Continuity
-
-A World Instance must remain playable when human population is low.
-
-NPC/simulated actors may provide a bounded baseline of:
-
-- employers;
-- workers;
-- consumers;
-- merchants;
-- suppliers;
-- logistics counterparties;
-- service/infrastructure operation.
-
-They obey real costs, inventories, production/consumption, capacity and authority rules.
-
-NPC fallback cannot create infinite free money, inventory, demand or productive capacity.
-
-Human and NPC economic roles should use compatible semantics so human participation can replace/compete/cooperate with simulation without creating a second economy.
-
----
-
-# 17. Persistent World Instances
-
-DROPi Tycoon may operate multiple independent global economies at the same time.
-
-A new **World Instance** starts from a versioned baseline seed and evolves independently. Opening a new world does not reset or delete older worlds. Mature worlds may remain as persistent legacy economies with their own history.
+Money, assets, companies, inventory, contracts, productive capability, settlement state, infrastructure and trade are world-local by default.
 
 One economic hero exists per account per World Instance.
 
-Fresh worlds isolate economic power by default. Money, productive qualifications/capability, assets, shares, reputation, companies, inventory, contracts and infrastructure control are world-local unless a later owner-approved exception exists.
-
-Non-economic account settings/cosmetics/history may follow the account where authorized.
-
-Launch cadence may eventually be monthly, seasonal, multi-month or annual according to live-operations balance; no cadence is fixed yet.
-
-A logical World Instance is not one physical server and may span many services/shards at scale.
-
-See `06_Technical/WORLD_INSTANCES.md`.
+A logical World Instance is not one physical server.
 
 ---
 
-# 18. Human Identity Across World Time
+# 22. Visible Consequences
 
-The human player identity persists through normal years/seasons of a World Instance.
+Important world changes should become visible at the appropriate zoom:
 
-NPC demographics may age/change, and the player's current economic position may improve or collapse, but normal world time does not permanently kill/delete the human player's economic identity.
-
-Bankruptcy, housing loss or company failure may create severe setbacks without erasing identity/history/valid earned capability.
-
----
-
-# 19. Visible Consequences
-
-Important changes should become visible at the appropriate map layer:
-
-- supplied/empty shops and facilities;
 - construction progress;
-- factory/farm growth or closure;
-- new/expanded/degraded infrastructure;
-- changing trade corridors;
-- city density and architecture growth;
-- rural prosperity or decline;
-- migration and workforce activity;
-- cleanliness/waste/recovery where modeled;
-- new settlements;
-- national development/decline;
-- global freight shifts.
+- new/expanded roads;
+- farms/factories/warehouses;
+- changing inventory/supply state;
+- new housing/services;
+- schools/research facilities;
+- migration/workforce activity;
+- new trade corridors;
+- settlement growth/decline;
+- national/global freight shifts.
 
-The visible consequence should derive from the same authoritative state as the economy whenever practical.
+The visible state should derive from the same authoritative state as the economy whenever practical.
+
+**Your work leaves a mark.**
 
 ---
 
-# 20. Performance Rule
+# 23. Performance Rule
 
-World scale comes from hierarchical simulation frequency and deterministic summarized catch-up.
+The global world must not require every person, locality or facility to be rendered or simulated at local frequency.
 
-Do not hardcode `one world = one machine`, `one country = one server`, or `every person = a continuously simulated entity`.
+Use hierarchical state, summarized catch-up, streaming, chunking, sector activation, LOD and culling.
 
-Android/mobile performance remains a hard client constraint; global simulation authority must not require rendering/simulating the entire world on-device.
+Performance can reduce active detail, not economic causality or city-scale truth.
+
+---
+
+# 24. Release Architecture Proof
+
+Before public release can claim a global functional world, prove the full lifecycle across materially different localities:
+
+- Brăila premium calibration city;
+- another Romanian locality;
+- a non-Romanian European locality;
+- a materially different archetype/scale;
+- a low-tier settlement that evolves through legitimate economic causes.
+
+Proof includes start locality, semantic zoom, local work/economy, movement/cargo, settlement, story/consequence, persistence/reload, investment/evolution and relocation.
 
 ---
 
 # Canonical Rule
 
-**DROPi Tycoon is a persistent evolving global economy. People and organizations consume, work, produce, trade, travel and create waste; infrastructure and specialists shape opportunity; cities/countries can grow or decline; multiple independent World Instances preserve separate economic histories; and detailed simulation remains bounded to the player's active context without losing causal economic truth.**
+**DROPi Tycoon is a persistent global economy in which stable locality identities can begin undeveloped and become villages, towns or cities through real resources, companies, infrastructure, specialists, education, production, trade and migration. All playable settlements inherit one global 10x traversal scale and one art language while preserving locally authentic identity; players and groups can materially reshape the world without bypassing stock-flow, capability or persistence authority.**
 
 ---
 
