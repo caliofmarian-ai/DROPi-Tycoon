@@ -2,11 +2,11 @@
 
 Document: COMPANY_SOCIETY_AND_MULTIPLAYER.md
 Project: DROPi Tycoon
-Version: 1.1.0
+Version: 1.2.0
 Status: Canonical Gameplay Specialization
 Author: Marian Caliof & OpenAI
 Language: English
-Last Updated: 2026-09-08
+Last Updated: 2026-09-09
 
 ---
 
@@ -71,6 +71,8 @@ Specialization families may include delivery/navigation, bicycle, road vehicles,
 
 Advanced capability may require people + qualification + equipment + infrastructure + authorization, not money alone.
 
+Specialist Card Fragments under `01_GameDesign/PROGRESSION.md` and `04_World/NPC.md` may unlock access to recruitable specialist NPCs, but they do not transfer that person's qualification into the player or company as an abstract stat.
+
 ---
 
 # 4. Company Formation
@@ -90,6 +92,8 @@ A new company receives its own Company Money ownership domain through governed f
 
 Exact amounts are balancing data.
 
+A company can be a logistics carrier, producer, farm, factory, warehouse/distributor, service business, infrastructure operator or another explicitly governed business type. Company formation does not imply that every business type is available from the start.
+
 ---
 
 # 5. Mixed Human/NPC Organizations
@@ -99,6 +103,37 @@ Companies may contain human players and NPC/simulated workers.
 The world must remain viable with few humans, so NPC employers/workers/consumers remain legitimate, but they obey real wages, costs, inventory, capacity and production/consumption rules.
 
 Human and NPC roles should use compatible authoritative semantics rather than two separate economies.
+
+## Specialist recruitment and deployment
+
+A specialist NPC unlocked through governed discovery/fragments remains a person with locality, availability, profession, qualifications, wage expectations and employment state.
+
+A player/company may recruit or contract that specialist when the existing labor, locality, migration, housing, company-capability and authorization rules permit it.
+
+Once legitimately engaged, a specialist may be assigned to a compatible productive or service role such as:
+
+- cattle husbandry at an eligible cattle farm;
+- pig husbandry at an eligible pig farm;
+- horticulture/vegetable production at an eligible agricultural site;
+- farm operations or agricultural maintenance/logistics;
+- manufacturing/processing roles;
+- warehouse/dispatch/maintenance roles;
+- other governed professions supported by the economic node.
+
+The specialist does not become permanently owned by the player. Employment can end, the specialist can relocate or leave where the labor system permits, and company capability that depends on that person may be reduced until a replacement is found.
+
+## Economic return from deployed specialists
+
+The player's economic return must come from a real company/employment/service relationship, not from taking a magical percentage of an NPC's wage.
+
+Valid patterns may include:
+
+- the player's own company employs the specialist, pays the specialist's wage/costs, and earns company revenue/profit from the productive activity the specialist helps enable;
+- the player's staffing/service company contracts specialist capacity to another enterprise and receives an explicit placement/service/management fee while the specialist receives the governed wage/compensation defined by the contract;
+- the player/company owns an eligible share of the productive enterprise and receives only legitimate profit/dividend/distribution according to ownership and company cash flow;
+- another explicit governed contract transfers money for real delivered labor/service value.
+
+The same labor output must not be counted twice. The specialist's wage, company service fee and enterprise profit are distinct flows with explicit payer/source accounting.
 
 ---
 
@@ -140,9 +175,42 @@ A relationship with a productive asset may develop as:
 
 Eligible assets may include farms, factories, processing facilities, warehouses, industrial/energy sites and infrastructure.
 
-Control requires legitimate capital, transaction availability, specialists, infrastructure, authorization and ongoing operating inputs/costs.
+Control requires legitimate capital, transaction availability, specialists, workforce, infrastructure, authorization and ongoing operating inputs/costs.
 
 Ownership never creates free production.
+
+## Founding, buying and controlling productive enterprises
+
+A sufficiently capable player/company may legitimately:
+
+- found a new eligible enterprise;
+- buy an available existing enterprise;
+- acquire a governed ownership stake;
+- create or control subsidiaries/business units where the corporate rules permit;
+- invest in or contract with productive sites.
+
+Money alone is insufficient. A cattle farm, dairy plant, vegetable farm, factory or other advanced business may require the appropriate combination of:
+
+- suitable land/site and locality access;
+- qualified specialist workforce;
+- ordinary labor capacity;
+- equipment/machinery;
+- utilities/infrastructure;
+- input inventory/materials;
+- logistics capacity;
+- authorizations/game requirements;
+- working capital;
+- actual market demand.
+
+A player who has accumulated and recruited the right agricultural specialists can therefore become capable of founding/acquiring agricultural businesses when the remaining prerequisites are also satisfied.
+
+## Specialist-to-enterprise progression loop
+
+A canonical long-term loop is:
+
+`legitimate delivery/work -> XP + entity loyalty + eligible specialist fragments -> specialist discovery/unlock -> recruitment/employment -> new company capability -> found/acquire/operate productive enterprise -> real output inventory -> marketplace/contracts -> logistics demand -> more work/economic opportunity`.
+
+This loop is causal rather than level-triggered. A high player Level or enough money does not instantly instantiate a productive company without the people, assets, inputs and infrastructure required to operate it.
 
 ---
 
@@ -175,6 +243,10 @@ Companies may design/source/produce/store/market/transport/sell goods.
 Regional demand, scarcity, production and infrastructure create trade routes and logistics opportunities.
 
 Goods must connect to real input inventory, production capacity, consumers/buyers and logistics rather than passive abstract income.
+
+A productive company does not complete economic value merely when goods are manufactured. Output becomes inventory that must be stored, sold/contracted and physically moved to its next buyer/user through executable logistics under `00_Project/LOGISTICS_DESIGN.md`, `02_Economy/MARKET.md` and `03_Logistics/ORDERS.md`.
+
+If the producing/buying companies lack a feasible delivery capability, they may contract another logistics company. Missing transport capability should create legitimate market demand rather than teleported trade.
 
 Essential shortages require alternate supply/recovery paths and cannot become permanent griefing.
 
@@ -259,6 +331,7 @@ Before real contested multiplayer economy is activated, trusted/server authority
 - contracts/orders/inventory/cargo custody;
 - market settlement;
 - productive/infrastructure ownership;
+- workforce assignment/employment state;
 - world time/offline catch-up.
 
 Required foundations include transaction integrity, revisions/conflict handling, idempotency, anti-duplication, anti-cheat, persistence/recovery and moderation where communication exists.
@@ -274,6 +347,8 @@ A shared world must remain usable when few real players are online.
 NPC actors may maintain bounded employment, consumption, supply, services and market counterparties, but they cannot create infinite free resources or magical liquidity.
 
 Human participation should replace/compete/cooperate with NPC capacity naturally as population grows.
+
+A company may therefore operate with only human players, only NPC workers, or a governed mixture of both, provided the same economic inputs/costs/capability rules apply.
 
 ---
 
@@ -323,13 +398,15 @@ Preferred dependency order:
 4. visible-consequence / first-hour playability slice under the R9 gate;
 5. professions/training and richer labor market;
 6. company formation, local competition and customer/contract depth;
-7. production/waste/city metabolism;
-8. trusted multiplayer authority and migration for selected state families;
-9. real-player employment/membership/market interactions;
-10. valuation/shares/governance/acquisitions when core transactions are stable;
-11. regional/international multimodal expansion;
-12. mature infrastructure/national/global systems;
-13. only after separate review: optional ecosystem-asset integration.
+7. specialist discovery/recruitment and governed NPC/human workforce assignment;
+8. production/waste/city metabolism;
+9. capability-routed marketplace fulfillment and third-party carrier demand;
+10. trusted multiplayer authority and migration for selected state families;
+11. real-player employment/membership/market interactions;
+12. valuation/shares/governance/acquisitions when core transactions are stable;
+13. regional/international multimodal expansion;
+14. mature infrastructure/national/global systems;
+15. only after separate review: optional ecosystem-asset integration.
 
 Each visible implementation receives tests, CI and installed Android owner verification.
 
@@ -337,7 +414,7 @@ Each visible implementation receives tests, CI and installed Android owner verif
 
 # Canonical Rule
 
-**DROPi Tycoon society grows from one economically real person into a persistent network of workers, organizations, markets, productive assets and infrastructure. The player chooses employment, specialization, membership, entrepreneurship, management and investment paths; human and NPC actors share one constrained economy; company power is earned legitimately; and multiplayer extends rather than replaces the same causal world.**
+**DROPi Tycoon society grows from one economically real person into a persistent network of workers, organizations, markets, productive assets and infrastructure. The player chooses employment, specialization, membership, entrepreneurship, management and investment paths; human and NPC actors share one constrained economy; specialist discovery can become real workforce and then real productive capability; company power is earned through people, assets, inputs, infrastructure and demand; and multiplayer extends rather than replaces the same causal world.**
 
 ---
 

@@ -2,11 +2,11 @@
 
 Document: LOGISTICS_DESIGN.md
 Project: DROPi Tycoon
-Version: 1.1.0
+Version: 1.2.0
 Status: Canonical — Logistics Design Authority
 Author: Marian Caliof & OpenAI
 Language: English
-Last Updated: 2026-09-08
+Last Updated: 2026-09-09
 
 ---
 
@@ -66,6 +66,8 @@ Where use/consumption creates waste or depleted inventory, that may generate the
 Every advanced logistics system must extend this flow rather than create an unrelated transportation/reward economy.
 
 A completed delivery must not create unexplained money merely because a waypoint was reached.
+
+A marketplace agreement, purchase or ownership decision is not equivalent to physical movement. If goods must change location, the logistics portion of this flow remains mandatory.
 
 ---
 
@@ -133,6 +135,25 @@ A leg may connect:
 Each leg may have its own transport mode, operator, vehicle, capacity, cost, time, risk and service requirement.
 
 Multi-leg logistics must preserve one coherent cargo/custody chain.
+
+## Per-leg feasibility
+
+Every leg is subject to an executable transport contract before it may be assigned or settled.
+
+Feasibility may require:
+
+- a traversable path/network for the selected mode;
+- vehicle/mode range/endurance;
+- cargo-compatible payload/handling;
+- qualified operator/automation capability;
+- company capacity/authorization;
+- required hubs, terminals, roads, rails, waterways, airports or DronePorts;
+- available time/energy/fuel/maintenance state;
+- weather/restrictions where governed.
+
+Road vehicles cannot bridge an absent/unusable road connection. Drones may bridge some terrestrial discontinuities only under the full drone capability contract. Rail, maritime and air modes require their own compatible networks/gateways.
+
+A long route may therefore be feasible only as a chain of shorter legs with different vehicles, modes or companies.
 
 ---
 
@@ -202,20 +223,23 @@ Canonical families include:
 
 No transport family is automatically available merely because it appears in long-term canon.
 
+Each family has a distinct range/capacity/infrastructure niche. Exact numeric ranges are balancing data owned by the detailed logistics/runtime authorities.
+
 ---
 
 # 7. Qualification + People + Equipment + Infrastructure Gate
 
 Advanced logistics capability is unlocked by the intersection of:
 
-**qualified people + valid equipment/vehicles + required infrastructure + valid economic demand/cargo.**
+**qualified people + valid equipment/vehicles + required infrastructure + executable route/network + valid economic demand/cargo.**
 
 Examples:
 
 - owning a drone does not automatically make drone operations usable without qualified operation and DronePort capability;
 - owning an aircraft does not replace pilot/air-cargo qualifications and airport access;
 - owning rail assets does not create a rail network without compatible infrastructure/operations;
-- a warehouse does not create useful throughput without staff, inventory, routes, handling capacity and demand.
+- a warehouse does not create useful throughput without staff, inventory, routes, handling capacity and demand;
+- owning a road vehicle does not make a delivery feasible if no compatible road path connects the required endpoints.
 
 Money is necessary for many investments but cannot bypass all progression gates.
 
@@ -270,7 +294,7 @@ Warehouses/distribution centers extend capacity beyond the HQ rather than replac
 
 ---
 
-# 11. Capacity
+# 11. Capacity, Outsourcing and Carrier Demand
 
 Every logistics network has finite capacity.
 
@@ -278,6 +302,7 @@ Capacity may depend on:
 
 - people and Work Capacity/shift availability;
 - vehicle payload/count;
+- vehicle/mode range;
 - warehouse space;
 - sorting/hub throughput;
 - route congestion;
@@ -288,6 +313,18 @@ Capacity may depend on:
 - cargo handling requirements.
 
 Demand above capacity must create choices, delays, outsourcing, prioritization, expansion pressure or service-quality consequences rather than invisible infinite throughput.
+
+A buyer/seller/producer does not need to personally own every transport mode required by its trade. When the parties lack a feasible movement capability, they may contract another eligible logistics player/company.
+
+The missing capability may itself become market demand. Examples include:
+
+- local bicycle/scooter/van courier demand;
+- longer road-freight demand;
+- drone delivery demand where a road route is absent but a valid drone route exists;
+- intermodal road/rail/air/maritime transfer demand;
+- intermediate warehouse/hub handling demand.
+
+The third-party service has a real payer, cost, capacity and settlement. It is not free infrastructure supplied by the marketplace.
 
 ---
 
@@ -334,6 +371,8 @@ Example:
 
 Every transfer preserves cargo identity/custody/economic semantics.
 
+Different companies may legitimately operate different legs of the same movement.
+
 ---
 
 # 15. Travel vs Cargo Movement
@@ -358,7 +397,7 @@ One company must not permanently prevent a locality/country from using essential
 
 ---
 
-# 17. Products, Production and Trade
+# 17. Products, Production, Marketplace and Trade
 
 Goods create logistics demand through real production/consumption.
 
@@ -369,6 +408,18 @@ A product lifecycle may create movements such as:
 Regional scarcity/surplus can generate strategic routes and business opportunities.
 
 Products must not become passive abstract income disconnected from inputs, inventory, physical logistics, capacity and buyers.
+
+The same rule applies to player-to-player/company marketplace trades. A listing/match reserves or commits inventory and commercial terms; it does not teleport physical ownership to the recipient.
+
+If the seller and buyer are served by different companies, are far apart, or lack a mutually executable route, the logistics system must determine whether:
+
+- one party can self-fulfill;
+- one party's company can fulfill;
+- another carrier can be contracted;
+- a multimodal/multi-company chain can be formed;
+- or no valid chain currently exists.
+
+A valid third-party carrier converts the unmet movement into ordinary logistics work with custody and settlement. If no valid chain exists, the physical trade remains unfulfilled rather than becoming a magical inventory transfer.
 
 ---
 
@@ -398,6 +449,8 @@ Failure should create consequences and recovery decisions.
 
 No normal logistics failure should permanently delete human identity/core capability or create an unrecoverable world softlock.
 
+Carrier failure may cause rerouting/re-tendering/reassignment rather than false delivery settlement.
+
 ---
 
 # 20. Automation and AI
@@ -408,6 +461,8 @@ AI-assisted/autonomous systems may optimize assignment, routes, demand forecasti
 
 They still consume real capacity, infrastructure, vehicles, inventory, energy/cost and specialist capability where required.
 
+Automation may discover feasible third-party or multimodal carrier chains, but it must not create a route/capability that does not exist.
+
 Automation must not become unexplained unlimited passive income.
 
 ---
@@ -417,6 +472,8 @@ Automation must not become unexplained unlimited passive income.
 Shared-world cargo, vehicles, infrastructure, warehouses, markets or deliveries require trusted/server-authoritative state before multiple real players can contest/transfer ownership/custody.
 
 Online authority must prevent duplicate cargo, double settlement, conflicting custody, fabricated vehicle/infrastructure state and client-authoritative money creation.
+
+Multi-company fulfillment additionally requires authoritative carrier assignment, leg completion, transfer custody and payment settlement.
 
 The local domain should be designed so online authority extends it rather than replacing it.
 
@@ -436,8 +493,8 @@ Detailed owners include:
 
 - `03_Logistics/LOGISTICS.md` — core logistics gameplay;
 - `03_Logistics/ORDERS.md` — orders;
-- `03_Logistics/ROUTING.md` — routing;
-- `03_Logistics/VEHICLES.md` — vehicle rules;
+- `03_Logistics/ROUTING.md` — routing and physical reachability;
+- `03_Logistics/VEHICLES.md` — vehicle/mode range and capability;
 - `03_Logistics/DRONES.md` — drone rules;
 - `03_Logistics/DRONEPORTS.md` — DronePort rules;
 - `02_Economy/*` — stock-flow, money, market/cost effects;
@@ -448,7 +505,7 @@ Detailed owners include:
 
 # Canonical Rule
 
-**Every DROPi Tycoon logistics capability must preserve a coherent causal chain from real need through demand, inventory/cargo, custody, qualified operators, vehicles, infrastructure, capacity, transport legs, settlement and final use/consequence. Scale may grow from one walking employee to global multimodal networks, but logistics can never become an isolated waypoint-reward economy.**
+**Every DROPi Tycoon logistics capability must preserve a coherent causal chain from real need through demand, inventory/cargo, custody, qualified operators, vehicles, infrastructure, executable route legs, capacity, transport, settlement and final use/consequence. Scale may grow from one walking employee to global multimodal networks. If a buyer/seller/company lacks a needed transport capability, that gap may become legitimate paid demand for another carrier or multi-leg chain; if no valid chain exists, cargo does not teleport and physical settlement cannot occur.**
 
 ---
 
