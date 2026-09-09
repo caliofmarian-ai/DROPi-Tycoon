@@ -1,36 +1,57 @@
-const configuredGameUrl = process.env.EXPO_PUBLIC_DROPITYCOON_GAME_URL?.trim()
+export type RuntimeMode = 'remote' | 'bundled'
 
 export interface RuntimeConfiguration {
-  gameUrl: string | null
+  mode: RuntimeMode | null
+  remoteGameUrl: string | null
   configurationError: string | null
 }
 
+const configuredRuntimeMode = process.env.EXPO_PUBLIC_DROPITYCOON_RUNTIME_MODE?.trim()
+const configuredGameUrl = process.env.EXPO_PUBLIC_DROPITYCOON_GAME_URL?.trim()
+
+const configurationError = (message: string): RuntimeConfiguration => ({
+  mode: null,
+  remoteGameUrl: null,
+  configurationError: message,
+})
+
 export const getRuntimeConfiguration = (): RuntimeConfiguration => {
-  if (!configuredGameUrl) {
+  if (configuredRuntimeMode === 'bundled') {
     return {
-      gameUrl: null,
-      configurationError:
-        'Missing EXPO_PUBLIC_DROPITYCOON_GAME_URL. Configure the first-stage Railway bridge before building the development client.',
+      mode: 'bundled',
+      remoteGameUrl: null,
+      configurationError: null,
     }
+  }
+
+  if (configuredRuntimeMode !== 'remote') {
+    return configurationError(
+      'Missing or invalid EXPO_PUBLIC_DROPITYCOON_RUNTIME_MODE. Use remote for development/preview or bundled for production.',
+    )
+  }
+
+  if (!configuredGameUrl) {
+    return configurationError(
+      'Remote runtime mode requires EXPO_PUBLIC_DROPITYCOON_GAME_URL.',
+    )
   }
 
   try {
     const parsed = new URL(configuredGameUrl)
     if (parsed.protocol !== 'https:') {
-      return {
-        gameUrl: null,
-        configurationError: 'EXPO_PUBLIC_DROPITYCOON_GAME_URL must use HTTPS.',
-      }
+      return configurationError(
+        'EXPO_PUBLIC_DROPITYCOON_GAME_URL must use HTTPS in remote runtime mode.',
+      )
     }
 
     return {
-      gameUrl: parsed.toString(),
+      mode: 'remote',
+      remoteGameUrl: parsed.toString(),
       configurationError: null,
     }
   } catch {
-    return {
-      gameUrl: null,
-      configurationError: 'EXPO_PUBLIC_DROPITYCOON_GAME_URL is not a valid URL.',
-    }
+    return configurationError(
+      'EXPO_PUBLIC_DROPITYCOON_GAME_URL is not a valid URL.',
+    )
   }
 }

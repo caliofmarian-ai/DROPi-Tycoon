@@ -1,0 +1,137 @@
+{
+  "schemaVersion": 1,
+  "auditDate": "2026-09-09",
+  "baselineCommit": "65413103c7ae4e1951ac63aacc8e1232643e0bd0",
+  "commercialReleaseReady": false,
+  "blockingReviewIds": [
+    "generated-orders-icon-chain-of-title",
+    "branding-chain-of-title-and-trademark",
+    "osm-commercial-distribution-characterization"
+  ],
+  "assets": [
+    {
+      "path": "assets/branding/dropi-tycoon-logo.png",
+      "gitBlobSha": "82d261d62f301b51cc5adb93789c7a15a7165a81",
+      "family": "DROPi Tycoon branding",
+      "sourceEvidence": "08_Assets/ASSETS.md",
+      "declaredSourceSha256": "3aa62f1c6f38d06d52403477ff796665428a55178f5e3a975f38b527f7654616",
+      "status": "REVIEW_REQUIRED",
+      "blocker": "branding-chain-of-title-and-trademark",
+      "reason": "Owner approval and source hash exist, but commercial creation/provider provenance and trademark clearance are not yet recorded as complete."
+    },
+    {
+      "path": "assets/production/icon-orders.webp",
+      "gitBlobSha": "e2221c8584a6db7836d0c2691439b8ad57fc07d5",
+      "family": "owner-approved generated orders UI icon",
+      "sourceEvidence": "08_Assets/Production/Approved_Sources/2026-09-07_GENERATED_FAMILY_REGISTRY.md",
+      "status": "BLOCKED",
+      "blocker": "generated-orders-icon-chain-of-title",
+      "reason": "Visual/runtime approval exists, but the exact generation provider/tool, generation date, applicable provider terms, input/reference provenance and derivative chain are not linked to this runtime file."
+    },
+    {
+      "path": "assets/sprites/building_commercial.png",
+      "gitBlobSha": "ed0fb91be584365cc527e10dc2333153cf5dc694",
+      "family": "legacy project-generated placeholder sprites",
+      "sourceEvidence": "08_Assets/BATCH_003_PLACEHOLDER_PROVENANCE.md; game-web/README.md",
+      "status": "PROJECT_GENERATED"
+    },
+    {
+      "path": "assets/sprites/building_company_small.png",
+      "gitBlobSha": "ee01391e21f9be335fb4a1d5817de4ee51791d14",
+      "family": "legacy project-generated placeholder sprites",
+      "sourceEvidence": "08_Assets/BATCH_003_PLACEHOLDER_PROVENANCE.md; game-web/README.md",
+      "status": "PROJECT_GENERATED"
+    },
+    {
+      "path": "assets/sprites/building_residential.png",
+      "gitBlobSha": "c969955f5d10f5cc2841280360feb2fef702c47a",
+      "family": "legacy project-generated placeholder sprites",
+      "sourceEvidence": "08_Assets/BATCH_003_PLACEHOLDER_PROVENANCE.md; game-web/README.md",
+      "status": "PROJECT_GENERATED"
+    },
+    {
+      "path": "assets/sprites/delivery_point_marker.png",
+      "gitBlobSha": "906b69771d89175545da31f64222ed4a7943b260",
+      "family": "legacy project-generated placeholder sprites",
+      "sourceEvidence": "game-web/README.md; 09_Development/CHANGELOG.md",
+      "status": "PROJECT_GENERATED",
+      "note": "The changelog records this as an additional locally created placeholder; the BATCH-003 table itself does not list this filename."
+    },
+    {
+      "path": "assets/sprites/environment_road_tile.png",
+      "gitBlobSha": "ea101d2c80891661b004a5ea0bd1a53957a85dcd",
+      "family": "legacy project-generated placeholder sprites",
+      "sourceEvidence": "game-web/README.md; 09_Development/CHANGELOG.md",
+      "status": "PROJECT_GENERATED",
+      "note": "The changelog records this as an additional locally created placeholder; the BATCH-003 table itself does not list this filename."
+    },
+    {
+      "path": "assets/sprites/package_delivery.png",
+      "gitBlobSha": "7431fc5bd045f3dbf54ece4887f518ab51409b33",
+      "family": "legacy project-generated placeholder sprites",
+      "sourceEvidence": "08_Assets/BATCH_003_PLACEHOLDER_PROVENANCE.md; game-web/README.md",
+      "status": "PROJECT_GENERATED"
+    },
+    {
+      "path": "assets/sprites/player_character_idle.png",
+      "gitBlobSha": "4746112f0ef0d8f91a33b6b4ddb3adec1c120c6f",
+      "family": "legacy project-generated placeholder sprites",
+      "sourceEvidence": "08_Assets/BATCH_003_PLACEHOLDER_PROVENANCE.md; game-web/README.md",
+      "status": "PROJECT_GENERATED"
+    },
+    {
+      "path": "assets/sprites/player_character_move.png",
+      "gitBlobSha": "2508b5b279d42bdc213bfdc09a5cd993530a5df9",
+      "family": "legacy project-generated placeholder sprites",
+      "sourceEvidence": "08_Assets/BATCH_003_PLACEHOLDER_PROVENANCE.md; game-web/README.md",
+      "status": "PROJECT_GENERATED"
+    }
+  ],
+  "dataFamilies": [
+    {
+      "id": "natural-earth-global-localities",
+      "runtimePath": "data/country-representative-localities-v1.json",
+      "provider": "Natural Earth",
+      "source": "Natural Earth 1:10m populated places simple",
+      "upstreamCommit": "ca96624a56bd078437bca8184e78163e5039ad19",
+      "license": "Public Domain",
+      "status": "CLEARED_WITH_PROVENANCE"
+    },
+    {
+      "id": "natural-earth-world-atlas-boundaries",
+      "runtimePath": "data/world-atlas-countries-110m.json",
+      "provider": "Natural Earth via world-atlas@2.0.2",
+      "source": "Natural Earth Admin 0 boundaries 1:110m, data version 4.1.0",
+      "license": "Natural Earth Public Domain; world-atlas redistribution/tooling ISC",
+      "sourceEvidence": "04_World/GLOBAL_MAP_DATASET.md",
+      "repositoryGitBlobSha": "055d19ffcf3133435978527737ff8ad37a568c59",
+      "status": "CLEARED_WITH_NOTICE"
+    },
+    {
+      "id": "geonames-regional-localities",
+      "runtimePathPattern": "data/europe-*-regional-localities-v1.json",
+      "provider": "GeoNames",
+      "source": "cities500.zip + admin1CodesASCII.txt retained snapshot",
+      "releaseTag": "source-geonames-cities500-2026-09-08-f3cda4f9",
+      "cities500Sha256": "f3cda4f9d256d90045121fb8eebad3ed91695c32370ed93b50fbe0cb616e2bbd",
+      "admin1Sha256": "590651498043f674accda2b7f46d21286cda0e290b02f8561c5005eee9a5448c",
+      "license": "Creative Commons Attribution 4.0",
+      "modificationNotice": "Source records were selected, normalized and transformed into a sparse representative-locality game catalog.",
+      "attributionSurface": "/legal/third-party-notices.html#geonames",
+      "status": "CLEARED_WITH_ATTRIBUTION"
+    },
+    {
+      "id": "osm-braila-city-plan",
+      "runtimePathDescription": "Brăila generated street/building/context geography used by the runtime",
+      "provider": "OpenStreetMap contributors",
+      "license": "Open Database License 1.0",
+      "sourceEvidence": "04_World/City_Plans/README.md; retained Brăila OSM snapshot and transformation scripts",
+      "attributionSurface": "UrbanHUD footer plus /legal/third-party-notices.html#openstreetmap",
+      "status": "REVIEW_REQUIRED",
+      "blocker": "osm-commercial-distribution-characterization",
+      "reason": "Attribution and source/transformation evidence exist; qualified review must confirm the exact Database/Derivative Database/Produced Work obligations for the commercial distributed artifacts and source-availability mechanism."
+    }
+  ],
+  "softwareNoticeSurface": "/legal/third-party-notices.html",
+  "dependencyInventory": "/legal/dependency-license-inventory.json"
+}
