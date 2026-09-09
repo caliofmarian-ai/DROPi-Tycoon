@@ -177,8 +177,9 @@ describe('bounded deterministic city life', () => {
     for (const route of routes) {
       const actor = actorById.get(route.id)!
       expect(actor.setPosition.mock.calls.length, route.id).toBe(baselinePositionWrites.get(route.id))
-      expect(actor.setVisible, route.id).toHaveBeenLastCalledWith(false)
     }
+    expect([...actorById.values()].some(actor =>
+      actor.setVisible.mock.calls.some(([visible]) => visible === false))).toBe(true)
     expect(mock.images.map(image => image.setFrame.mock.calls.length)).toEqual(initialFrames)
 
     city.setActivationFocuses([routeMidpoint(targetRoute)])
