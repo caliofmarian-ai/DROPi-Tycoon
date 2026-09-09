@@ -3,12 +3,15 @@ import type { WorldBuildingLayout, WorldDecorationLayout, WorldRectLayout, World
 import {
   CITY_PLAYABLE_DISTANCE_SCALE_BASELINE,
   CITY_PLAYABLE_SCALE_VERSION,
+  cityRoadAnchorForPoint,
   scaleCityBuilding,
+  scaleCityBuildingFromAnchor,
   scaleCityContextBuilding,
   scaleCityExtent,
   scaleCityLandscapeFeature,
   scaleCityPoint,
   scaleCityRoad,
+  scaleCityRoadAttachedPoint,
   scaleCityRoutePoint,
   scaleCityZone,
 } from './worldScale'
@@ -39,7 +42,6 @@ export const WORLD_PLAYABLE_SCALE_VERSION = CITY_PLAYABLE_SCALE_VERSION
 export const WORLD_PLAYABLE_DISTANCE_SCALE = CITY_PLAYABLE_DISTANCE_SCALE_BASELINE
 export const WORLD_WIDTH = scaleCityExtent(WORLD_SOURCE_WIDTH)
 export const WORLD_HEIGHT = scaleCityExtent(WORLD_SOURCE_HEIGHT)
-export const PLAYER_START = scaleCityPoint({ x: layout.playerStart.x, y: layout.playerStart.y })
 
 export const WORLD_SOURCE_ZONES: readonly WorldZoneLayout[] = layout.zones as WorldZoneLayout[]
 export const WORLD_ZONES: readonly WorldZoneLayout[] = WORLD_SOURCE_ZONES.map(zone => scaleCityZone(zone))
@@ -51,15 +53,32 @@ export const WORLD_SIDEWALKS: readonly WorldRectLayout[] = WORLD_ROADS.map(road 
   roadWidth: (road.roadWidth ?? 32) + 32,
 }))
 
-export const WORLD_SOURCE_BUILDINGS: readonly WorldBuildingLayout[] = layout.buildings as WorldBuildingLayout[]
-export const WORLD_BUILDINGS: readonly WorldBuildingLayout[] = WORLD_SOURCE_BUILDINGS
-  .map(building => scaleCityBuilding(building))
+const WORLD_SOURCE_PLAYER_START = { x: layout.playerStart.x, y: layout.playerStart.y }
+const playerStartRoad = WORLD_SOURCE_ROADS
+  .map(road => {
+    const anchor = cityRoadAnchorForPoint(WORLD_SOURCE_PLAYER_START, road)
+    const dx = WORLD_SOURCE_PLAYER_START.x - anchor.x
+    const dy = WORLD_SOURCE_PLAYER_START.y - anchor.y
+    return { road, distanceSquared: dx * dx + dy * dy }
+  })
+  .sort((a, b) => a.distanceSquared - b.distanceSquared || a.road.id.localeCompare(b.road.id))[0]?.road
+export const PLAYER_START = playerStartRoad
+  ? scaleCityRoadAttachedPoint(WORLD_SOURCE_PLAYER_START, playerStartRoad)
+  : scaleCityPoint(WORLD_SOURCE_PLAYER_START)
 
 export const WORLD_SOURCE_ROUTE_POINTS: readonly WorldRoutePoint[] = layout.routes as WorldRoutePoint[]
 export const WORLD_ROUTE_POINTS: readonly WorldRoutePoint[] = WORLD_SOURCE_ROUTE_POINTS.map(point => {
-  const sourceBuilding = WORLD_SOURCE_BUILDINGS.find(building => building.id === point.buildingId)
-  const playableBuilding = WORLD_BUILDINGS.find(building => building.id === point.buildingId)
-  return scaleCityRoutePoint(point, sourceBuilding, playableBuilding)
+  const sourceRoad = WORLD_SOURCE_ROADS.find(road => road.id === point.roadId)
+  return scaleCityRoutePoint(point, sourceRoad)
+})
+
+export const WORLD_SOURCE_BUILDINGS: readonly WorldBuildingLayout[] = layout.buildings as WorldBuildingLayout[]
+export const WORLD_BUILDINGS: readonly WorldBuildingLayout[] = WORLD_SOURCE_BUILDINGS.map(building => {
+  const sourceAnchor = WORLD_SOURCE_ROUTE_POINTS.find(point => point.buildingId === building.id)
+  const playableAnchor = sourceAnchor && WORLD_ROUTE_POINTS.find(point => point.label === sourceAnchor.label)
+  return sourceAnchor && playableAnchor
+    ? scaleCityBuildingFromAnchor(building, sourceAnchor, playableAnchor)
+    : scaleCityBuilding(building)
 })
 
 /** #613 compact tuples remain the shipped representation; playable scaling occurs after lossless reconstruction. */
