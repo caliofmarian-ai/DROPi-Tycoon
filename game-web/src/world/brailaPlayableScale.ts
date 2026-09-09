@@ -5,25 +5,27 @@ import type {
   WorldZoneId,
   WorldZoneLayout,
 } from './legacyCityLayout'
+import {
+  CITY_DETAIL_MIN_ZOOM,
+  CITY_DETAIL_SECTOR_LIMIT,
+  CITY_DETAIL_SECTOR_SIZE,
+  CITY_PLAYABLE_DISTANCE_SCALE_BASELINE,
+  CITY_PLAYABLE_SCALE_VERSION,
+} from './worldScale'
 
 /**
- * #614 canonical Brăila gameplay-distance contract.
+ * Brăila compatibility/calibration adapter for #614.
  *
- * The retained OSM geometry remains the geographic source of truth. This multiplier deliberately
- * changes only the *playable separation* between source-backed coordinates so Brăila reads as a
- * real playable city rather than a compact board. It must never be interpreted as surveyed metres
- * or used to fabricate latitude/longitude.
+ * The authoritative scale policy is global and lives in worldScale.ts. Brăila consumes that
+ * World/Locality contract; it must never become a separate city-owned scale authority again.
  */
-export const BRAILA_PLAYABLE_SCALE_VERSION = 3
-export const BRAILA_PLAYABLE_DISTANCE_SCALE = 10
+export const BRAILA_PLAYABLE_SCALE_VERSION = CITY_PLAYABLE_SCALE_VERSION
+export const BRAILA_PLAYABLE_DISTANCE_SCALE = CITY_PLAYABLE_DISTANCE_SCALE_BASELINE
 
-/**
- * Android detail presentation remains strictly local. DT-04 owns the downstream performance
- * guardrail and requires no more than five resident streamed/detail sectors at once.
- */
-export const BRAILA_DETAIL_SECTOR_SIZE = 768
-export const BRAILA_DETAIL_SECTOR_LIMIT = 5
-export const BRAILA_DETAIL_MIN_ZOOM = 0.4
+/** Android detail limits are aliases of the global bounded presentation contract. */
+export const BRAILA_DETAIL_SECTOR_SIZE = CITY_DETAIL_SECTOR_SIZE
+export const BRAILA_DETAIL_SECTOR_LIMIT = CITY_DETAIL_SECTOR_LIMIT
+export const BRAILA_DETAIL_MIN_ZOOM = CITY_DETAIL_MIN_ZOOM
 
 export interface BrailaPoint { x: number; y: number }
 export interface BrailaContextBuilding extends BrailaPoint {
@@ -39,16 +41,16 @@ export interface BrailaLandscapeFeature {
 }
 
 const finiteScale = (value: number): number =>
-  Number.isFinite(value) && value > 0 ? value : BRAILA_PLAYABLE_DISTANCE_SCALE
+  Number.isFinite(value) && value > 0 ? value : CITY_PLAYABLE_DISTANCE_SCALE_BASELINE
 
 export const expandBrailaCoordinate = (
   value: number,
-  scale = BRAILA_PLAYABLE_DISTANCE_SCALE,
+  scale = CITY_PLAYABLE_DISTANCE_SCALE_BASELINE,
 ): number => value * finiteScale(scale)
 
 export const expandBrailaPoint = <T extends BrailaPoint>(
   point: T,
-  scale = BRAILA_PLAYABLE_DISTANCE_SCALE,
+  scale = CITY_PLAYABLE_DISTANCE_SCALE_BASELINE,
 ): T => ({
   ...point,
   x: expandBrailaCoordinate(point.x, scale),
@@ -57,17 +59,15 @@ export const expandBrailaPoint = <T extends BrailaPoint>(
 
 export const expandBrailaExtent = (
   value: number,
-  scale = BRAILA_PLAYABLE_DISTANCE_SCALE,
+  scale = CITY_PLAYABLE_DISTANCE_SCALE_BASELINE,
 ): number => Math.ceil(expandBrailaCoordinate(value, scale))
 
 /**
- * Roads become longer while preserving their mobile-readable carriageway width. Source vertices
- * are scaled identically, so real OSM junction connectivity remains exact and route finding does
- * not gain invented links.
+ * Legacy Brăila helper retained for compatibility. New world materialization should use worldScale.
  */
 export const expandBrailaRoad = <T extends WorldRectLayout>(
   road: T,
-  scale = BRAILA_PLAYABLE_DISTANCE_SCALE,
+  scale = CITY_PLAYABLE_DISTANCE_SCALE_BASELINE,
 ): T => {
   if (!road.centerline?.length) return expandBrailaPoint(road, scale)
   const centerline = road.centerline.map(point => expandBrailaPoint(point, scale))
@@ -84,22 +84,17 @@ export const expandBrailaRoad = <T extends WorldRectLayout>(
   }
 }
 
-/** District footprint size stays readable while its source-backed anchor gains real separation. */
 export const expandBrailaZone = <T extends WorldZoneLayout>(
   zone: T,
-  scale = BRAILA_PLAYABLE_DISTANCE_SCALE,
+  scale = CITY_PLAYABLE_DISTANCE_SCALE_BASELINE,
 ): T => {
   const center = expandBrailaPoint({ x: zone.x + zone.width / 2, y: zone.y + zone.height / 2 }, scale)
   return { ...zone, x: center.x - zone.width / 2, y: center.y - zone.height / 2 }
 }
 
-/**
- * Gameplay building footprints stay usable at Hero scale. Their centers move with the city and
- * their door keeps its local offset, so interactions remain attached to the same building.
- */
 export const expandBrailaBuilding = <T extends WorldBuildingLayout>(
   building: T,
-  scale = BRAILA_PLAYABLE_DISTANCE_SCALE,
+  scale = CITY_PLAYABLE_DISTANCE_SCALE_BASELINE,
 ): T => {
   const center = expandBrailaPoint(building, scale)
   const dx = center.x - building.x
@@ -114,17 +109,12 @@ export const expandBrailaBuilding = <T extends WorldBuildingLayout>(
 
 export const expandBrailaRoutePoint = <T extends WorldRoutePoint>(
   point: T,
-  scale = BRAILA_PLAYABLE_DISTANCE_SCALE,
+  scale = CITY_PLAYABLE_DISTANCE_SCALE_BASELINE,
 ): T => expandBrailaPoint(point, scale)
 
-/**
- * Real context footprints keep their local building size; only the urban spacing between their
- * source-backed centers expands. This avoids making houses 10x wider while still removing the
- * miniature-board density.
- */
 export const expandBrailaContextBuilding = <T extends BrailaContextBuilding>(
   building: T,
-  scale = BRAILA_PLAYABLE_DISTANCE_SCALE,
+  scale = CITY_PLAYABLE_DISTANCE_SCALE_BASELINE,
 ): T => {
   const center = expandBrailaPoint(building, scale)
   const dx = center.x - building.x
@@ -137,10 +127,9 @@ export const expandBrailaContextBuilding = <T extends BrailaContextBuilding>(
   }
 }
 
-/** River/park centerlines retain their source shape while gaining the same city-distance scale. */
 export const expandBrailaLandscapeFeature = <T extends BrailaLandscapeFeature>(
   feature: T,
-  scale = BRAILA_PLAYABLE_DISTANCE_SCALE,
+  scale = CITY_PLAYABLE_DISTANCE_SCALE_BASELINE,
 ): T => ({
   ...feature,
   points: feature.points.map(point => expandBrailaPoint(point, scale)),
@@ -149,14 +138,18 @@ export const expandBrailaLandscapeFeature = <T extends BrailaLandscapeFeature>(
 export interface BrailaSector { column: number; row: number; id: string }
 export const brailaSectorForPoint = (
   point: BrailaPoint,
-  sectorSize = BRAILA_DETAIL_SECTOR_SIZE,
+  sectorSize = CITY_DETAIL_SECTOR_SIZE,
 ): BrailaSector => {
-  const size = Number.isFinite(sectorSize) && sectorSize > 0 ? sectorSize : BRAILA_DETAIL_SECTOR_SIZE
+  const size = Number.isFinite(sectorSize) && sectorSize > 0 ? sectorSize : CITY_DETAIL_SECTOR_SIZE
   const column = Math.max(0, Math.floor(point.x / size))
   const row = Math.max(0, Math.floor(point.y / size))
   return { column, row, id: `${column}-${row}` }
 }
 
+/**
+ * Compatibility types for the existing #615 handoff. The next locality-generic spatial authority
+ * may move these semantics out of this adapter without changing the global 10x scale contract.
+ */
 export type BrailaRoadDistanceClass = 'local' | 'adjacent-district' | 'cross-city'
 
 export interface BrailaRouteDistanceContext {
@@ -183,12 +176,6 @@ const zoneDistanceSquared = (a: WorldZoneLayout, b: WorldZoneLayout): number => 
   return dx * dx + dy * dy
 }
 
-/**
- * District adjacency is derived from the enlarged governed city structure, not mission quotas.
- * Two districts are adjacent when each is among the other's two closest district identities.
- * This gives #615 a stable spatial class while authoritative road-network distance remains an
- * independent metric for reward/time logic.
- */
 export const brailaAdjacentDistrictIds = (
   zoneId: WorldZoneId,
   zones: readonly WorldZoneLayout[],
@@ -202,11 +189,6 @@ export const brailaAdjacentDistrictIds = (
     .map(zone => zone.id)
 }
 
-/**
- * #615 handoff: classify spatial context from stable district topology and carry the already-
- * computed road-network distance beside it. Straight-line distance is never substituted for road
- * authority, and invalid road distance fails closed through routeDistanceValid=false.
- */
 export const classifyBrailaRouteDistance = (
   context: BrailaRouteDistanceContext,
   zones: readonly WorldZoneLayout[],
