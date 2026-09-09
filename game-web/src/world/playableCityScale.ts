@@ -5,7 +5,8 @@
  * anchors. It does NOT make every locality the same size, does NOT multiply Hero-scale object
  * dimensions blindly, and must never be interpreted as surveyed metres or fabricated geography.
  *
- * Brăila is the premium calibration locality. It consumes this authority; it does not own it.
+ * Locality-specific calibration and compatibility naming belongs in locality adapters outside
+ * this module; this authority remains locality-neutral.
  *
  * Ownership boundary: this module transforms presentation geometry only. It does not define
  * locality adjacency, road connectivity, route classes, mission topology, or logistics truth.
