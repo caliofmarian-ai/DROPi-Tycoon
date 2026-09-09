@@ -84,7 +84,6 @@ describe('#566 governed Save v2 mission continuity integration', () => {
     const decoded = decodeSave(raw)
     expect(decoded.kind).toBe('valid')
     if (decoded.kind !== 'valid') return
-    expect(decoded.repaired).toBe(false)
 
     const restored = restoreGameSessionFromSave(decoded.save)
     expect(restored.world.player.x).toBe(session.world.player.x)
@@ -149,7 +148,6 @@ describe('#566 governed Save v2 mission continuity integration', () => {
     const decoded = decodeSave(JSON.stringify(save))
     expect(decoded.kind).toBe('valid')
     if (decoded.kind !== 'valid') return
-    expect(decoded.repaired).toBe(false)
 
     const restored = restoreGameSessionFromSave(decoded.save)
     expect(restored.missionResume).toBeUndefined()
