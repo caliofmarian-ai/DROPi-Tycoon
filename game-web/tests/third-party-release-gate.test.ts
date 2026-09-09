@@ -17,6 +17,7 @@ const commercialEvidence = JSON.parse(
   mobileReleaseDependencyClosure: {
     status: string
     lockfilePresentAtAudit: boolean
+    lockfileGitBlobSha?: string
     declaredDirectProductionDependencies: Record<string, string>
   }
   mobileBrandingAssets: Array<{
@@ -44,10 +45,11 @@ describe('ISSUE-565 — third-party release evidence gate', () => {
     expect(output).toContain('Third-party inventory/notices/provenance consistency PASSED')
   })
 
-  it('truthfully records the unresolved Android dependency closure until the canonical mobile lockfile exists', () => {
-    expect(existsSync(mobileLockfile)).toBe(false)
-    expect(commercialEvidence.mobileReleaseDependencyClosure.status).toBe('BLOCKED_PENDING_LOCKFILE')
-    expect(commercialEvidence.mobileReleaseDependencyClosure.lockfilePresentAtAudit).toBe(false)
+  it('truthfully records that the canonical Android lockfile exists while release-path dependency review remains blocked', () => {
+    expect(existsSync(mobileLockfile)).toBe(true)
+    expect(commercialEvidence.mobileReleaseDependencyClosure.status).toBe('LOCKFILE_PRESENT_REVIEW_PENDING')
+    expect(commercialEvidence.mobileReleaseDependencyClosure.lockfilePresentAtAudit).toBe(true)
+    expect(commercialEvidence.mobileReleaseDependencyClosure.lockfileGitBlobSha).toMatch(/^[a-f0-9]{40}$/)
     expect(commercialEvidence.mobileReleaseDependencyClosure.declaredDirectProductionDependencies)
       .toEqual(mobilePackage.dependencies)
     expect(commercialEvidence.blockingReviewIds).toContain('mobile-release-dependency-license-closure')
