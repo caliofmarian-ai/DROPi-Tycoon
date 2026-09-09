@@ -107,6 +107,77 @@ export const scaleCityRoad = <T extends WorldRectLayout>(
   }
 }
 
+const clamp = (value: number, minimum: number, maximum: number): number =>
+  Math.max(minimum, Math.min(maximum, value))
+
+const closestPointOnSegment = (
+  point: CityScalePoint,
+  start: CityScalePoint,
+  end: CityScalePoint,
+): CityScalePoint => {
+  const dx = end.x - start.x
+  const dy = end.y - start.y
+  const lengthSquared = dx * dx + dy * dy
+  if (lengthSquared === 0) return { x: start.x, y: start.y }
+  const t = clamp(((point.x - start.x) * dx + (point.y - start.y) * dy) / lengthSquared, 0, 1)
+  return { x: start.x + dx * t, y: start.y + dy * t }
+}
+
+/**
+ * Resolve a source-space road anchor without inventing topology. Curved roads project to the
+ * nearest source centerline segment; legacy rectangle roads project to their long centre axis.
+ */
+export const cityRoadAnchorForPoint = (
+  point: CityScalePoint,
+  road: WorldRectLayout,
+): CityScalePoint => {
+  const centerline = road.centerline
+  if (centerline?.length) {
+    if (centerline.length === 1) return { x: centerline[0].x, y: centerline[0].y }
+    let best = closestPointOnSegment(point, centerline[0], centerline[1])
+    let bestDistanceSquared = (point.x - best.x) ** 2 + (point.y - best.y) ** 2
+    for (let index = 1; index < centerline.length - 1; index++) {
+      const candidate = closestPointOnSegment(point, centerline[index], centerline[index + 1])
+      const distanceSquared = (point.x - candidate.x) ** 2 + (point.y - candidate.y) ** 2
+      if (distanceSquared < bestDistanceSquared) {
+        best = candidate
+        bestDistanceSquared = distanceSquared
+      }
+    }
+    return best
+  }
+
+  if (road.width >= road.height) {
+    return {
+      x: clamp(point.x, road.x - road.width / 2, road.x + road.width / 2),
+      y: road.y,
+    }
+  }
+  return {
+    x: road.x,
+    y: clamp(point.y, road.y - road.height / 2, road.y + road.height / 2),
+  }
+}
+
+/**
+ * A point attached to a road follows the scaled road anchor while retaining its local lateral
+ * offset. This expands city separation without multiplying the point's offset across a fixed-width
+ * carriageway.
+ */
+export const scaleCityRoadAttachedPoint = <T extends CityScalePoint>(
+  point: T,
+  sourceRoad: WorldRectLayout,
+  scale = CITY_PLAYABLE_DISTANCE_SCALE_BASELINE,
+): T => {
+  const sourceAnchor = cityRoadAnchorForPoint(point, sourceRoad)
+  const playableAnchor = scaleCityPoint(sourceAnchor, scale)
+  return {
+    ...point,
+    x: playableAnchor.x + point.x - sourceAnchor.x,
+    y: playableAnchor.y + point.y - sourceAnchor.y,
+  }
+}
+
 /** District footprints remain locally readable while their governed city positions separate. */
 export const scaleCityZone = <T extends WorldZoneLayout>(
   zone: T,
@@ -120,8 +191,9 @@ export const scaleCityZone = <T extends WorldZoneLayout>(
 }
 
 /**
- * Building footprints remain Hero-readable. The center moves through the global city transform and
- * the door follows the same translation, preserving its local attachment to the building.
+ * Building footprints remain Hero-readable. Unanchored buildings scale by their governed centre;
+ * road-facing buildings may instead consume scaleCityBuildingFromAnchor so their local frontage
+ * remains attached to the enlarged road topology.
  */
 export const scaleCityBuilding = <T extends WorldBuildingLayout>(
   building: T,
@@ -139,24 +211,30 @@ export const scaleCityBuilding = <T extends WorldBuildingLayout>(
 }
 
 /**
- * A pickup/drop-off bound to a building follows that building's translation instead of being
- * blindly scaled away from its door. Unbound/generated points still consume the global transform.
+ * Keep a building, its door and its road-facing anchor as one locally scaled assembly. The anchor
+ * gains global city separation; the building keeps the same source-space offset from that anchor.
  */
+export const scaleCityBuildingFromAnchor = <T extends WorldBuildingLayout>(
+  building: T,
+  sourceAnchor: CityScalePoint,
+  playableAnchor: CityScalePoint,
+): T => {
+  const dx = playableAnchor.x - sourceAnchor.x
+  const dy = playableAnchor.y - sourceAnchor.y
+  return {
+    ...building,
+    x: building.x + dx,
+    y: building.y + dy,
+    door: { x: building.door.x + dx, y: building.door.y + dy },
+  }
+}
+
+/** A road-bound pickup/drop-off keeps its local offset from the road while the road gains 10x separation. */
 export const scaleCityRoutePoint = <T extends WorldRoutePoint>(
   point: T,
-  sourceBuilding?: WorldBuildingLayout,
-  playableBuilding?: WorldBuildingLayout,
+  sourceRoad?: WorldRectLayout,
   scale = CITY_PLAYABLE_DISTANCE_SCALE_BASELINE,
-): T => {
-  if (sourceBuilding && playableBuilding) {
-    return {
-      ...point,
-      x: point.x + playableBuilding.x - sourceBuilding.x,
-      y: point.y + playableBuilding.y - sourceBuilding.y,
-    }
-  }
-  return scaleCityPoint(point, scale)
-}
+): T => sourceRoad ? scaleCityRoadAttachedPoint(point, sourceRoad, scale) : scaleCityPoint(point, scale)
 
 /** Context structures keep their local footprint; their source-backed centers gain city spacing. */
 export const scaleCityContextBuilding = <T extends CityContextBuilding>(
