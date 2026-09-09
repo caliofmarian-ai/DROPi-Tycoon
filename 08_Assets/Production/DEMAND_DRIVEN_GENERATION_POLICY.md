@@ -1,10 +1,10 @@
 # DROPi Tycoon — Demand-Driven Asset Generation Policy
 
-Version: 1.1.0
+Version: 1.2.0
 Status: Canonical Production Policy
-Last Updated: 2026-09-09
+Last Updated: 2026-09-10
 Authority: `09_Development/Owner_Directives/2026-09-07_MASTER_OWNER_DIRECTIVE_004_DEMAND_DRIVEN_ASSET_PRODUCTION.md`
-Coordinates: #409, #411, #413, #414
+Coordinates: #409, #411, #413, #414, #565, #643
 
 ## Purpose
 
@@ -17,11 +17,14 @@ Before generation or promotion, DT-19 uses:
 - `08_Assets/Production/asset-inventory.v1.json` as the machine-readable production inventory and lineage index;
 - `08_Assets/Production/Tools/verify_asset_inventory.mjs` as the fail-closed structural/exact-duplicate verifier;
 - the existing approved-source and generated-family Markdown registers as source-family evidence consumed by that inventory;
-- `game-web/public/legal/runtime-provenance.json` only as the DT-13 legal/release evidence authority. DT-19 does not copy or replace DT-13 clearance decisions.
+- `09_Development/Compliance/GLOBAL_ASSET_PROVENANCE_CONTRACT_565_643.md` as the canonical DT-13 legal qualification/release-evidence contract;
+- `game-web/public/legal/runtime-provenance.json` only as the runtime evidence manifest consumed by the qualification process, never as a legal authority of its own.
+
+DT-19 owns production identity, lifecycle and lineage. DT-13 owns legal/provenance qualification for commercial release. A DT-19 lifecycle state never grants `CLEARED`, `REVIEW_REQUIRED` or `BLOCKED`, and the DT-19 registry must not copy or reinterpret those legal conclusions. Missing provider, tool, generation date, applicable terms, reference/input rights or other legal facts stay unknown and fail closed under the DT-13 contract; DT-19 must not invent them.
 
 The inventory distinguishes repository-present artifacts from source families or packages that are only documented. A documented package, board or historical branch is not available production art until its canonical repository presence is attested.
 
-The verifier enforces repository presence, lifecycle structure, source-family references, semantic-family classification and exact binary reuse declarations. Visual near-duplicate classification remains a required human/art review because byte equality alone cannot prove or disprove material visual similarity.
+The verifier enforces repository presence, lifecycle structure, source-family references, semantic-family classification, exact binary reuse declarations and the DT-19/DT-13 authority boundary. Visual near-duplicate classification remains a required human/art review because byte equality alone cannot prove or disprove material visual similarity.
 
 ## Mandatory pre-generation audit
 
@@ -134,6 +137,6 @@ A runtime asset reaches states in order:
 
 `INVENTORIED -> SPECIFIED -> CANDIDATE -> APPROVED_SOURCE -> PRODUCTION_READY -> RUNTIME_INTEGRATED -> ANDROID_VERIFIED`
 
-No stage may be skipped silently.
+No stage may be skipped silently. Legal/provenance qualification remains independent at every stage and is governed by DT-13's canonical contract.
 
-Assets that already existed in runtime before this machine-readable registry are inventoried truthfully with an explicit legacy migration status rather than retroactively fabricating missing lifecycle evidence. This exception documents historical state; it does not authorize any future transition to skip a gate.
+Assets that already existed in runtime before this machine-readable registry are inventoried truthfully with an explicit legacy migration status rather than retroactively fabricating missing lifecycle evidence. This exception documents historical state; it does not authorize any future transition to skip a gate or imply commercial clearance.
