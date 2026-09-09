@@ -13,6 +13,8 @@ const verifierPath = fileURLToPath(
   new URL('../../08_Assets/Production/Tools/verify_asset_inventory.mjs', import.meta.url),
 )
 
+const legalQualificationContract = '09_Development/Compliance/GLOBAL_ASSET_PROVENANCE_CONTRACT_565_643.md'
+const runtimeEvidenceManifest = 'game-web/public/legal/runtime-provenance.json'
 const tempDirs: string[] = []
 
 function loadInventory(): any {
@@ -41,6 +43,13 @@ afterEach(() => {
 
 describe('ISSUE-414 — DT-19 asset inventory and dedup authority', () => {
   it('verifies current canonical families, candidate inventory, runtime lineage and declared exact reuse', () => {
+    const inventory = loadInventory()
+    expect(inventory.policyRefs.legalQualificationContract).toBe(legalQualificationContract)
+    expect(inventory.policyRefs.runtimeEvidenceManifest).toBe(runtimeEvidenceManifest)
+    expect(inventory.policyRefs.legalReleaseAuthority).toBeUndefined()
+    expect(inventory.authorityBoundary.productionLifecycleAuthority).toBe('DT-19')
+    expect(inventory.authorityBoundary.legalQualificationAuthority).toBe('DT-13')
+
     const result = runVerifier()
 
     expect(result.status, result.stderr).toBe(0)
@@ -50,6 +59,55 @@ describe('ISSUE-414 — DT-19 asset inventory and dedup authority', () => {
     expect(summary.inventoriedArtifacts).toBeGreaterThanOrEqual(63)
     expect(summary.runtimeArtifacts).toBe(13)
     expect(summary.declaredReuseSets).toBeGreaterThanOrEqual(2)
+  })
+
+  it('fails closed when runtime evidence is relabeled as the legal release authority', () => {
+    const inventory = loadInventory()
+    inventory.policyRefs.legalReleaseAuthority = runtimeEvidenceManifest
+
+    const result = runVerifier(writeFixture(inventory))
+
+    expect(result.status).not.toBe(0)
+    expect(result.stderr).toContain('legalReleaseAuthority is forbidden')
+    expect(result.stderr).toContain('runtime evidence is not the DT-13 legal qualification authority')
+  })
+
+  it('fails closed when the DT-13 qualification contract is replaced by the runtime evidence manifest', () => {
+    const inventory = loadInventory()
+    inventory.policyRefs.legalQualificationContract = runtimeEvidenceManifest
+    inventory.authorityBoundary.legalQualificationContractRef = runtimeEvidenceManifest
+
+    const result = runVerifier(writeFixture(inventory))
+
+    expect(result.status).not.toBe(0)
+    expect(result.stderr).toContain('policyRefs.legalQualificationContract must equal')
+    expect(result.stderr).toContain(legalQualificationContract)
+  })
+
+  it('fails closed when the runtime evidence manifest is replaced by the DT-13 qualification contract', () => {
+    const inventory = loadInventory()
+    inventory.policyRefs.runtimeEvidenceManifest = legalQualificationContract
+    inventory.authorityBoundary.runtimeEvidenceManifestRef = legalQualificationContract
+
+    const result = runVerifier(writeFixture(inventory))
+
+    expect(result.status).not.toBe(0)
+    expect(result.stderr).toContain('policyRefs.runtimeEvidenceManifest must equal')
+    expect(result.stderr).toContain(runtimeEvidenceManifest)
+  })
+
+  it('fails closed when a runtime artifact labels evidence as legal authority', () => {
+    const inventory = loadInventory()
+    const ordersIcon = inventory.runtimeArtifacts.find(
+      (asset: any) => asset.assetId === 'runtime-orders-icon',
+    )
+    ordersIcon.legalEvidenceRef = ordersIcon.runtimeEvidenceRef
+    delete ordersIcon.runtimeEvidenceRef
+
+    const result = runVerifier(writeFixture(inventory))
+
+    expect(result.status).not.toBe(0)
+    expect(result.stderr).toContain('uses deprecated legalEvidenceRef')
   })
 
   it('fails closed when an exact duplicate is no longer declared as intentional reuse', () => {
