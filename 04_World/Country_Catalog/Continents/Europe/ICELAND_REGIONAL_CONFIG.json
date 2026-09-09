@@ -1,0 +1,137 @@
+{
+  "version": "1.0.0",
+  "issue": 649,
+  "continent": "Europe",
+  "country": {
+    "geometryId": "352",
+    "sourceCountryCode": "IS",
+    "renderedName": "Iceland"
+  },
+  "administrativeModel": {
+    "level": "statistical-regional-lod-over-municipal-local-government",
+    "nativeTermSingular": "landsvæði (statistical LOD) / sveitarfélag (local government)",
+    "nativeTermPlural": "8 landsvæði / 61 sveitarfélög after 16 May 2026",
+    "englishTerm": "statistical region for Country LOD; municipality is the local-government unit",
+    "unitCount": 8,
+    "officialReferences": [
+      "https://www.government.is/library/01-Ministries/Prime-Ministrers-Office/WHO00082_WELLBEING_ECONOMY_AW_WEB.pdf",
+      "https://statice.is/statistics/population/inhabitants/municipalities-and-urban-nuclei/",
+      "https://www.statice.is/publications/news-archive/inhabitants/population-1-january-2026/",
+      "https://www.statice.is/publications/news-archive/inhabitants/population-by-regions-and-municipalities-1-january-2026/",
+      "https://www.samband.is/nanar-um-sveitarfelogin"
+    ],
+    "specialCases": [
+      {
+        "type": "two-government-levels-state-and-municipalities",
+        "note": "Iceland has state and municipal government levels. The eight Country LOD surfaces in this slice are statistical/economic regions and are not presented as an elected regional-government tier."
+      },
+      {
+        "type": "eight-statistics-iceland-regions-as-country-lod",
+        "statisticalRegionCount": 8,
+        "note": "Statistics Iceland publishes eight regional groupings. GeoNames exposes eight aligned IS.* admin1 surfaces, so DROPi uses them as sparse statistical/economic Country LOD identities while preserving municipality-level local-government authority."
+      },
+      {
+        "type": "municipality-count-2026-timing",
+        "statisticsIcelandDate": "2026-01-01",
+        "statisticsIcelandMunicipalityCount": 62,
+        "postElectionReferenceDate": "2026-05-16",
+        "currentMunicipalityCount": 61,
+        "note": "Statistics Iceland reported 62 municipalities on 1 January 2026. The Icelandic Association of Local Authorities reports 61 municipalities after the 16 May 2026 local elections/amalgamation state. The sparse Country LOD remains eight statistical regions, not the municipality count."
+      },
+      {
+        "admin1Code": "43",
+        "type": "current-name-crosswalk",
+        "canonicalName": "Southwest",
+        "sourceName": "Southern Peninsula",
+        "note": "Statistics Iceland currently presents this statistical region as Southwest. The retained GeoNames admin1 source label is Southern Peninsula; DROPi preserves source identity while presenting the current Statistics Iceland English name."
+      },
+      {
+        "type": "reykjavik-national-capital",
+        "admin1Code": "39",
+        "note": "Reykjavík is Iceland's unique national-capital representative and lies in the Capital Region statistical surface. Reykjavík municipality remains a municipality under the same local-government level as other Icelandic municipalities."
+      },
+      {
+        "type": "runtime-geometry-lod-reconciliation",
+        "geometryId": "352",
+        "geometryType": "Polygon",
+        "componentCount": 1,
+        "note": "The current DROPi 110m runtime topology represents Iceland as geometry 352, a single Polygon component. The eight statistical/economic Country LOD identities do not fabricate internal regional polygons."
+      }
+    ]
+  },
+  "source": {
+    "provider": "GeoNames",
+    "license": "Creative Commons Attribution 4.0",
+    "releaseTag": "source-geonames-cities500-2026-09-08-f3cda4f9",
+    "cities500Sha256": "f3cda4f9d256d90045121fb8eebad3ed91695c32370ed93b50fbe0cb616e2bbd",
+    "admin1Sha256": "590651498043f674accda2b7f46d21286cda0e290b02f8561c5005eee9a5448c",
+    "candidateCountryCodes": [
+      "IS"
+    ],
+    "expectedCountryCandidateCount": 50,
+    "administrativeAuthority": "Statistics Iceland / Icelandic Association of Local Authorities",
+    "administrativeAuthorityReference": "https://statice.is/statistics/population/inhabitants/municipalities-and-urban-nuclei/"
+  },
+  "selectionPolicy": {
+    "primaryFeatureCodes": [
+      "PPLC",
+      "PPLA"
+    ],
+    "fallbackFeatureCodes": [
+      "PPLA2",
+      "PPL"
+    ],
+    "expectedPrimarySelections": 8,
+    "expectedFallbackSelections": 0,
+    "highDensityGameplayImport": false,
+    "hardcodedCoordinates": false
+  },
+  "economicEmergence": {
+    "authority": "shared-regional-national-multiplayer-economy",
+    "personalPlayerProgressionUnlock": false,
+    "numericThresholdsDefined": false
+  },
+  "expectedRegions": [
+    {
+      "admin1Code": "39",
+      "canonicalName": "Capital Region",
+      "sourceName": "Capital Region",
+      "presentationRole": "national-capital-and-regional-node"
+    },
+    {
+      "admin1Code": "43",
+      "canonicalName": "Southwest",
+      "sourceName": "Southern Peninsula"
+    },
+    {
+      "admin1Code": "45",
+      "canonicalName": "West",
+      "sourceName": "West"
+    },
+    {
+      "admin1Code": "44",
+      "canonicalName": "Westfjords",
+      "sourceName": "Westfjords"
+    },
+    {
+      "admin1Code": "41",
+      "canonicalName": "Northwest",
+      "sourceName": "Northwest"
+    },
+    {
+      "admin1Code": "40",
+      "canonicalName": "Northeast",
+      "sourceName": "Northeast"
+    },
+    {
+      "admin1Code": "38",
+      "canonicalName": "East",
+      "sourceName": "East"
+    },
+    {
+      "admin1Code": "42",
+      "canonicalName": "South",
+      "sourceName": "South"
+    }
+  ]
+}
