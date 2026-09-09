@@ -1,10 +1,12 @@
 import { describe, expect, it } from 'vitest'
 import type { WorldBuildingLayout, WorldRectLayout, WorldRoutePoint } from '../src/world/legacyCityLayout'
+import { surfaceContains } from '../src/world/worldSurfaces'
 import {
   CITY_DETAIL_SECTOR_LIMIT,
   CITY_PLAYABLE_DISTANCE_SCALE_BASELINE,
   cityPlayableScaleForLocality,
   scaleCityBuilding,
+  scaleCityBuildingFromAnchor,
   scaleCityExtent,
   scaleCityRoad,
   scaleCityRoutePoint,
@@ -13,6 +15,7 @@ import {
   WORLD_BUILDINGS,
   WORLD_HEIGHT,
   WORLD_PLAYABLE_DISTANCE_SCALE,
+  WORLD_ROADS,
   WORLD_ROUTE_POINTS,
   WORLD_SOURCE_BUILDINGS,
   WORLD_SOURCE_HEIGHT,
@@ -36,27 +39,41 @@ describe('global playable city scale authority', () => {
     expect(scaleCityExtent(120)).toBeLessThan(scaleCityExtent(420))
   })
 
-  it('separates governed positions while preserving Hero-scale building footprint, door and route attachment', () => {
-    const sourceBuilding: WorldBuildingLayout = {
-      id: 'generated-workshop', x: 30, y: 40, width: 90, height: 108,
-      texture: 'building_commercial', zoneId: 'business', kind: 'shop', entranceFacing: 'down',
-      door: { x: 34, y: 94 },
+  it('separates city road anchors while preserving Hero-scale frontage, building and door attachment', () => {
+    const sourceRoad: WorldRectLayout = {
+      id: 'generated-road', x: 50, y: 100, width: 100, height: 32, roadWidth: 32,
+      centerline: [{ x: 0, y: 100 }, { x: 100, y: 100 }],
     }
-    const playableBuilding = scaleCityBuilding(sourceBuilding)
-    expect(playableBuilding.x).toBe(300)
-    expect(playableBuilding.y).toBe(400)
-    expect(playableBuilding.width).toBe(sourceBuilding.width)
-    expect(playableBuilding.height).toBe(sourceBuilding.height)
-    expect(playableBuilding.door.x - playableBuilding.x).toBe(sourceBuilding.door.x - sourceBuilding.x)
-    expect(playableBuilding.door.y - playableBuilding.y).toBe(sourceBuilding.door.y - sourceBuilding.y)
+    const playableRoad = scaleCityRoad(sourceRoad)
 
     const sourceRoute: WorldRoutePoint = {
-      label: 'GeneratedPickup', displayName: 'Generated Workshop', buildingId: sourceBuilding.id,
-      roadId: 'generated-road', kind: 'pickup', zoneId: 'business', x: 36, y: 92,
+      label: 'GeneratedPickup', displayName: 'Generated Workshop', buildingId: 'generated-workshop',
+      roadId: sourceRoad.id, kind: 'pickup', zoneId: 'business', x: 36, y: 100,
     }
-    const playableRoute = scaleCityRoutePoint(sourceRoute, sourceBuilding, playableBuilding)
-    expect(playableRoute.x - playableBuilding.x).toBe(sourceRoute.x - sourceBuilding.x)
-    expect(playableRoute.y - playableBuilding.y).toBe(sourceRoute.y - sourceBuilding.y)
+    const playableRoute = scaleCityRoutePoint(sourceRoute, sourceRoad)
+
+    const sourceBuilding: WorldBuildingLayout = {
+      id: sourceRoute.buildingId, x: 36, y: 40, width: 90, height: 108,
+      texture: 'building_commercial', zoneId: 'business', kind: 'shop', entranceFacing: 'down',
+      door: { x: 36, y: 94 },
+    }
+    const playableBuilding = scaleCityBuildingFromAnchor(sourceBuilding, sourceRoute, playableRoute)
+
+    expect(playableRoute.x).toBe(360)
+    expect(playableRoute.y).toBe(1000)
+    expect(surfaceContains(playableRoad, playableRoute.x, playableRoute.y)).toBe(true)
+    expect(playableBuilding.width).toBe(sourceBuilding.width)
+    expect(playableBuilding.height).toBe(sourceBuilding.height)
+    expect(playableBuilding.x - playableRoute.x).toBe(sourceBuilding.x - sourceRoute.x)
+    expect(playableBuilding.y - playableRoute.y).toBe(sourceBuilding.y - sourceRoute.y)
+    expect(playableBuilding.door.x - playableBuilding.x).toBe(sourceBuilding.door.x - sourceBuilding.x)
+    expect(playableBuilding.door.y - playableBuilding.y).toBe(sourceBuilding.door.y - sourceBuilding.y)
+    expect(playableRoute.x).toBe(playableBuilding.door.x)
+    expect(Math.abs(playableRoute.y - playableBuilding.door.y)).toBe(6)
+
+    const unboundBuilding = scaleCityBuilding({ ...sourceBuilding, id: 'generated-unbound', x: 30 })
+    expect(unboundBuilding.x).toBe(300)
+    expect(unboundBuilding.width).toBe(sourceBuilding.width)
   })
 
   it('lengthens roads without multiplying carriageway width', () => {
@@ -70,7 +87,7 @@ describe('global playable city scale authority', () => {
     expect(playableRoad.height).toBe(32)
   })
 
-  it('makes the authored Brăila runtime consume the global authority without changing source identity or local attachments', () => {
+  it('makes the authored Brăila runtime consume the global authority while preserving road and building attachments', () => {
     expect(WORLD_PLAYABLE_DISTANCE_SCALE).toBe(CITY_PLAYABLE_DISTANCE_SCALE_BASELINE)
     expect(WORLD_WIDTH).toBe(WORLD_SOURCE_WIDTH * CITY_PLAYABLE_DISTANCE_SCALE_BASELINE)
     expect(WORLD_HEIGHT).toBe(WORLD_SOURCE_HEIGHT * CITY_PLAYABLE_DISTANCE_SCALE_BASELINE)
@@ -81,8 +98,13 @@ describe('global playable city scale authority', () => {
       const playablePoint = WORLD_ROUTE_POINTS.find(point => point.label === sourcePoint.label)!
       const sourceBuilding = WORLD_SOURCE_BUILDINGS.find(building => building.id === sourcePoint.buildingId)!
       const playableBuilding = WORLD_BUILDINGS.find(building => building.id === sourcePoint.buildingId)!
+      const playableRoad = WORLD_ROADS.find(road => road.id === sourcePoint.roadId)!
+
+      expect(surfaceContains(playableRoad, playablePoint.x, playablePoint.y), sourcePoint.label).toBe(true)
       expect(playablePoint.x - playableBuilding.x).toBeCloseTo(sourcePoint.x - sourceBuilding.x)
       expect(playablePoint.y - playableBuilding.y).toBeCloseTo(sourcePoint.y - sourceBuilding.y)
+      expect(playableBuilding.door.x - playableBuilding.x).toBeCloseTo(sourceBuilding.door.x - sourceBuilding.x)
+      expect(playableBuilding.door.y - playableBuilding.y).toBeCloseTo(sourceBuilding.door.y - sourceBuilding.y)
     }
   })
 
