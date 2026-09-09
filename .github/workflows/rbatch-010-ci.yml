@@ -60,6 +60,9 @@ jobs:
       - name: TypeScript and production build
         run: npm run build
 
+      - name: Guard production web bundle regression
+        run: node scripts/check-production-bundle-size.mjs
+
       - name: Production server HTTP smoke test
         shell: bash
         run: |

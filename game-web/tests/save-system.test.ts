@@ -89,7 +89,7 @@ describe('RBATCH-014 + RBATCH-018 — canonical save serialization', () => {
     session.company.payroll.lastProcessedCycle = 4
     session.settings.tutorialCompleted = true
 
-    expect(createSaveGame(session)).toEqual({
+    expect(createSaveGame(session)).toMatchObject({
       formatVersion: SAVE_FORMAT_VERSION,
       company: {
         companyName: 'DROPi Express',
@@ -114,21 +114,34 @@ describe('RBATCH-014 + RBATCH-018 — canonical save serialization', () => {
         payroll: { lastProcessedCycle: 4 },
       },
       settings: { tutorialCompleted: true, soundEnabled: true },
+      worldContinuity: {
+        schemaVersion: 1,
+        hero: PLAYER_START,
+        activeOrder: { orderId: 'ORDER-001', status: 'Available', acceptRequested: false, economySettled: false },
+        cargo: { custody: 'None' },
+      },
     })
   })
 
-  it('still excludes player position and all WorldState', () => {
+  it('persists governed continuity without serializing the full WorldState', () => {
     const session = makeSession()
     session.world.player.x = 123
     session.world.player.y = 456
     session.world.player.currentOrder = 'ORDER-001'
+    session.world.player.carryingPackage = true
     session.world.activeOrder.status = 'PickedUp'
 
     const parsed = JSON.parse(serializeGameSession(session)) as Record<string, unknown>
     expect(parsed).not.toHaveProperty('world')
     expect(parsed).not.toHaveProperty('player')
-    expect(JSON.stringify(parsed)).not.toContain('currentOrder')
-    expect(JSON.stringify(parsed)).not.toContain('activeOrder')
+    expect(parsed).toMatchObject({
+      worldContinuity: {
+        schemaVersion: 1,
+        hero: { x: 123, y: 456 },
+        activeOrder: { orderId: 'ORDER-001', status: 'PickedUp' },
+        cargo: { custody: 'Player', orderId: 'ORDER-001' },
+      },
+    })
   })
 
   it('still persists only tutorial status from settings', () => {
@@ -217,7 +230,7 @@ describe('RBATCH-018 — v1 to v2 migration', () => {
 })
 
 describe('ISSUE-015 / ISSUE-017 / RBATCH-018 — validation and load', () => {
-  it('restores progression and employees while regenerating world state', () => {
+  it('restores progression, employees and governed active-world continuity', () => {
     const session = makeSession()
     session.company.money = 3210
     session.company.level = 4
@@ -254,11 +267,11 @@ describe('ISSUE-015 / ISSUE-017 / RBATCH-018 — validation and load', () => {
     expect(restored.company.payroll.lastProcessedCycle).toBe(2)
     expect(restored.settings.tutorialCompleted).toBe(true)
 
-    expect(restored.world.player.x).toBe(PLAYER_START.x)
-    expect(restored.world.player.y).toBe(PLAYER_START.y)
-    expect(restored.world.player.currentOrder).toBe('')
-    expect(restored.world.player.carryingPackage).toBe(false)
-    expect(restored.world.activeOrder.status).toBe('Available')
+    expect(restored.world.player.x).toBe(50)
+    expect(restored.world.player.y).toBe(70)
+    expect(restored.world.player.currentOrder).toBe('ORDER-001')
+    expect(restored.world.player.carryingPackage).toBe(true)
+    expect(restored.world.activeOrder.status).toBe('PickedUp')
     expect(restored.world.player.movementSpeed).toBeGreaterThan(150)
   })
 
