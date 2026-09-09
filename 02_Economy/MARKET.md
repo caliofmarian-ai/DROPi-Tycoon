@@ -2,7 +2,7 @@
 
 Document: MARKET.md
 Project: DROPi Tycoon
-Version: 2.1.0
+Version: 2.2.0
 Status: Canonical — Market Specialization
 Author: Marian Caliof & OpenAI
 Language: English
@@ -113,6 +113,8 @@ When a buyer/consumer requires supply, the market may create or surface:
 
 The market may aggregate/queue these opportunities for usability, but it cannot invent economic value unrelated to the underlying requirement.
 
+A missing logistics capability may itself create a legitimate service requirement. For example, a committed buyer/seller pair that cannot move the goods with its own feasible transport capacity may create demand for another eligible carrier.
+
 ---
 
 # 6. Pricing
@@ -135,6 +137,8 @@ Exact formulas belong to `02_Economy/PRICING.md` and balancing data.
 
 The market should not permit trivial infinite arbitrage caused by disconnected local prices or free teleportation.
 
+A transaction that needs a third-party or multi-leg carrier must account for that logistics service as a real economic cost/revenue flow rather than silently absorbing the transport cost.
+
 ---
 
 # 7. Competition and Market Capacity
@@ -156,6 +160,8 @@ For last-mile delivery, roughly five meaningful competitors is an urban design t
 
 These are not universal hardcoded caps. Entry/exit should respond to locality demand, population, infrastructure, company viability and authorization rules while preserving recovery and alternative opportunities.
 
+Transport companies may also compete to fulfill marketplace-generated delivery requirements that the buyer/seller cannot serve themselves.
+
 ---
 
 # 8. Market Information
@@ -170,7 +176,8 @@ Useful market surfaces may show:
 - supply sources;
 - price/cost ranges;
 - route/logistics burden;
-- competitor capacity;
+- route feasibility or unresolved transport requirement;
+- competitor/carrier capacity;
 - contract opportunities;
 - regional surplus/deficit;
 - historical trend;
@@ -196,6 +203,8 @@ The delivered price/opportunity should reflect relevant production, inventory, d
 
 Strategic map selection does not teleport goods; trade requires logistics capacity.
 
+Different transport modes have different governed reach and infrastructure requirements under `03_Logistics/ROUTING.md` and `03_Logistics/VEHICLES.md`.
+
 ---
 
 # 10. Contracts and Relationships
@@ -203,6 +212,8 @@ Strategic map selection does not teleport goods; trade requires logistics capaci
 Repeated successful exchange may develop into stronger commercial relationships, including recurring contracts, preferred-supplier relationships, strategic partnerships, investment and, where eligible, acquisition/concession.
 
 Contracts must define real counterparties, obligations, quantities/service capacity, settlement, deadlines/quality conditions and failure consequences.
+
+A physical trade may therefore include more than two economic counterparties: buyer, seller and one or more logistics providers may each have separate obligations and settlement.
 
 ---
 
@@ -221,13 +232,68 @@ A marketplace listing is an offer to transact. It is not authorization to telepo
 
 For any physical marketplace item, including tradable Specialist Card Fragments when represented as inventory objects, a successful match must create or bind to a governed logistics/custody lifecycle:
 
-`listing -> buyer/seller commitment -> inventory reservation -> pickup -> custody -> transport -> delivery/acceptance -> market settlement`.
+`listing -> buyer/seller commitment -> inventory reservation -> route/capability feasibility -> carrier/leg assignment -> pickup -> custody -> transport/transfers -> delivery/acceptance -> market settlement`.
 
 The authoritative buyer inventory must not receive the physical item until the delivery/custody contract reaches its valid acceptance/settlement boundary.
 
 Same-locality, inter-city, national and later international marketplace trades therefore generate real logistics demand according to available transport/infrastructure rather than instant remote transfer.
 
 A seller, buyer, employed courier, independent courier or logistics company may participate only where the applicable capability/market rules allow it. The market does not grant free transport capacity.
+
+## Transport feasibility before physical settlement
+
+A matched trade is physically fulfillable only when at least one executable delivery chain can connect the source inventory to the recipient.
+
+Feasibility may depend on:
+
+- actual origin/destination;
+- road/path/rail/water/air/drone network connectivity;
+- vehicle/mode range/endurance;
+- payload/handling compatibility;
+- required operator/specialist capability;
+- available company/worker capacity;
+- transfer hubs/DronePorts/terminals where required;
+- time/deadline;
+- weather/restrictions where governed.
+
+Canonical examples:
+
+- a bicycle may serve only a bounded practical range and valid path network;
+- a scooter may extend reach but still depends on its valid terrestrial network;
+- a car/van/truck may serve longer road routes but cannot cross a missing road connection;
+- a drone may serve some disconnected terrestrial points only when the full drone capability contract is valid;
+- long-distance movement may require multiple vehicles, companies, hubs or modes.
+
+Exact range values are balancing/runtime data, not universal prose constants.
+
+If no executable delivery chain currently exists, the marketplace must not finalize physical ownership transfer. The transaction may remain awaiting carrier assignment, be rerouted, be cancelled/expire under its contract, or expose the missing transport requirement to the logistics market.
+
+## Third-party carrier and multi-company fulfillment
+
+The buyer and seller do not need to belong to the same delivery company, and neither must necessarily own the required transport mode.
+
+A physical marketplace trade may be fulfilled by:
+
+- seller-operated delivery;
+- buyer pickup/self-collection where valid;
+- the buyer's or seller's company;
+- an independent courier;
+- another player/company contracted specifically for the movement;
+- several carriers/modes in a multi-leg custody chain.
+
+Example:
+
+Two players trade an item while operating in different companies and their locations are not connected by a usable road route. Neither company has valid drone capability. If a governed drone route is feasible, the unmet transport need may become a paid delivery opportunity for a third player/company that does have the necessary drone, operator/automation and infrastructure capability. The buyer receives the item only after that third-party logistics leg, and any other required legs, complete valid custody/acceptance settlement.
+
+This is an intended source of emergent demand: marketplace exchange creates work for logistics providers when the trading parties lack the needed reach.
+
+## Multi-leg settlement integrity
+
+Each logistics leg may have a different carrier, mode, price, deadline and failure risk, but all legs must belong to one coherent cargo/custody plan.
+
+A transfer point changes custody only through an explicit valid handoff. Failure of an intermediate leg must not duplicate the item or settle the buyer as though delivery succeeded.
+
+Carrier fees/revenues and buyer/seller payment are separate economic flows and must be accounted for once.
 
 ## Specialist Card Fragment trading
 
@@ -249,9 +315,10 @@ In particular:
 - repeated resale does not remint source-earned fragments;
 - self-to-self or collusive wash trades must not mint unexplained XP, entity loyalty, fragments or money;
 - marketplace delivery rewards must derive from legitimate delivery/work settlement, not from the resale price alone;
+- third-party delivery cannot duplicate buyer/seller settlement or source-earned progression rewards;
 - contested multiplayer transactions must become server-authoritative before real-player trading is enabled.
 
-Exact fees, listing limits, exchange ratios, fragment prices and delivery charges are balancing data.
+Exact fees, listing limits, exchange ratios, fragment prices, transport ranges and delivery charges are balancing data.
 
 ---
 
@@ -296,13 +363,15 @@ The target canonical market is dynamic and stock-flow driven. Runtime migration 
 
 The market exists to create meaningful choices, not compulsory spreadsheet analysis.
 
-Early players should see simple work/need information. Advanced procurement, pricing, regional trade and analytics should become visible when the player's profession/company capability requires them.
+Early players should see simple work/need information. Advanced procurement, pricing, regional trade, carrier sourcing and analytics should become visible when the player's profession/company capability requires them.
+
+A player should be able to understand why a trade cannot currently be delivered and what capability/provider could make it possible.
 
 ---
 
 # Canonical Rule
 
-**DROPi Tycoon markets expose and match real modeled supply, demand, inventory, production, service and logistics capacity. Opportunities arise because economic actors need or offer something; prices and competition respond to actual conditions; and the market may surface opportunities but may not invent unexplained rewards, infinite supply, infinite demand or teleported trade. Physical marketplace goods — including tradable Specialist Card Fragments — change authoritative ownership only through a valid custody/delivery settlement.**
+**DROPi Tycoon markets expose and match real modeled supply, demand, inventory, production, service and logistics capacity. Opportunities arise because economic actors need or offer something; prices and competition respond to actual conditions; and the market may surface opportunities but may not invent unexplained rewards, infinite supply, infinite demand or teleported trade. Physical marketplace goods — including tradable Specialist Card Fragments — change authoritative ownership only after a valid, executable custody/delivery chain completes; when buyer/seller capability is insufficient, the missing movement may become legitimate paid demand for third-party or multi-leg logistics providers.**
 
 ---
 
