@@ -169,7 +169,7 @@ export const repairProducerReservationReference = (
     }
 
     const repairedContract = pickupProducerCargo(contract, sourceInventory)
-    if (repairedContract.status === 'rejected' || !repairedContract.contract) {
+    if (repairedContract.status === 'rejected') {
       return {
         status: 'rejected',
         contract,
@@ -328,7 +328,7 @@ export const pickupAcceptedProducerMissionCargo = (
   }
 
   const picked = pickupProducerCargo(repaired.contract, repaired.sourceInventory)
-  if (picked.status === 'rejected' || !picked.contract) {
+  if (picked.status === 'rejected') {
     return rejectedLifecycle(
       input,
       repaired.contract,
@@ -388,7 +388,7 @@ export const completeProducerMissionDelivery = (
   }
 
   const delivered = deliverProducerCargo(repaired.contract, input.destinationInventory)
-  if (delivered.status === 'rejected' || !delivered.contract) {
+  if (delivered.status === 'rejected') {
     return rejectedLifecycle(
       input,
       repaired.contract,
@@ -457,7 +457,7 @@ export const cancelProducerMissionReservation = (
   }
 
   const cancelled = cancelProducerLogisticsContract(repaired.contract, repaired.sourceInventory)
-  if (cancelled.status === 'rejected' || !cancelled.contract) {
+  if (cancelled.status === 'rejected') {
     return rejectedLifecycle(
       input,
       repaired.contract,
@@ -497,7 +497,7 @@ export const failProducerMissionReservation = (
 
   if (repaired.contract.status === 'Reserved') {
     const failed = failProducerLogisticsContract(repaired.contract, repaired.sourceInventory)
-    if (failed.status === 'rejected' || !failed.contract) {
+    if (failed.status === 'rejected') {
       return rejectedLifecycle(
         input,
         repaired.contract,
