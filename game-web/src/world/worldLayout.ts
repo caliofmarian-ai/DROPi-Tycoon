@@ -63,7 +63,7 @@ export const WORLD_ROUTE_POINTS: readonly WorldRoutePoint[] = WORLD_SOURCE_ROUTE
 })
 
 /** #613 compact tuples remain the shipped representation; playable scaling occurs after lossless reconstruction. */
-export const WORLD_SOURCE_CONTEXT_BUILDINGS = __BRAILA_CONTEXT_BUILDINGS.map(([x, y, width, height, pointCoordinates]) => ({
+export const WORLD_SOURCE_CONTEXT_BUILDINGS = __BRAILA_CONTEXT_BUILDINGS__.map(([x, y, width, height, pointCoordinates]) => ({
   x, y, width, height, points: unpackContextPoints(pointCoordinates),
 }))
 export const WORLD_CONTEXT_BUILDINGS = WORLD_SOURCE_CONTEXT_BUILDINGS
