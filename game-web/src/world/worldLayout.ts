@@ -1,8 +1,25 @@
 import layout from './brailaLayout.generated.json'
-import context from './brailaContext.generated.json'
 import type { WorldBuildingLayout, WorldDecorationLayout, WorldRectLayout, WorldRoutePoint, WorldZoneLayout } from './legacyCityLayout'
 import { distanceToSegment, surfaceContains } from './worldSurfaces'
 export type { WorldBuildingLayout, WorldDecorationLayout, WorldRectLayout, WorldRoutePoint, WorldZoneId, WorldZoneLayout } from './legacyCityLayout'
+
+type CompactContextBuilding = readonly [
+  x: number,
+  y: number,
+  width: number,
+  height: number,
+  pointCoordinates: readonly number[],
+]
+
+declare const __BRAILA_CONTEXT_BUILDINGS__: readonly CompactContextBuilding[]
+
+const unpackContextPoints = (coordinates: readonly number[]): Array<{ x: number; y: number }> => {
+  const points: Array<{ x: number; y: number }> = []
+  for (let index = 0; index < coordinates.length; index += 2) {
+    points.push({ x: coordinates[index], y: coordinates[index + 1] })
+  }
+  return points
+}
 
 export const WORLD_WIDTH = layout.width
 export const WORLD_HEIGHT = layout.height
@@ -15,7 +32,9 @@ export const WORLD_SIDEWALKS: readonly WorldRectLayout[] = WORLD_ROADS.map(road 
 }))
 export const WORLD_BUILDINGS: readonly WorldBuildingLayout[] = layout.buildings as WorldBuildingLayout[]
 export const WORLD_ROUTE_POINTS: readonly WorldRoutePoint[] = layout.routes as WorldRoutePoint[]
-export const WORLD_CONTEXT_BUILDINGS = context.buildings
+export const WORLD_CONTEXT_BUILDINGS = __BRAILA_CONTEXT_BUILDINGS__.map(([x, y, width, height, pointCoordinates]) => ({
+  x, y, width, height, points: unpackContextPoints(pointCoordinates),
+}))
 export const WORLD_LANDSCAPE = layout.landscape
 export const WORLD_MARKETPLACE = { x: layout.marketplace.x, y: layout.marketplace.y }
 export const WORLD_CITY_NAME = layout.name
