@@ -2,6 +2,7 @@ import { BALANCING } from '../config/balancing'
 import type { OrderState } from '../types/game'
 import { findWorldRoutePoint, WORLD_ROUTE_POINTS } from '../world/worldLayout'
 import { CITY_LOCATIONS, getCityRouteDistance } from '../world/city'
+import { CITY_PLAYABLE_DISTANCE_SCALE_BASELINE } from '../world/worldScale'
 import { TRANSPORT_PROFILES, type GroundTransport } from './urbanLogistics'
 
 export interface OrderRouteTemplate {
@@ -38,8 +39,15 @@ const routeCandidates = customers.flatMap((_, round) => pickups.map((pickup, mer
   }
 }))
 
+/** Transport tuning predates the enlarged playable coordinate space; preserve its semantic range class under the global scale contract. */
+export const playableRangeForTransport = (transport: GroundTransport): number =>
+  TRANSPORT_PROFILES[transport].range * CITY_PLAYABLE_DISTANCE_SCALE_BASELINE
+
+export const MIN_PLAYABLE_ORDER_ROUTE_DISTANCE = 48 * CITY_PLAYABLE_DISTANCE_SCALE_BASELINE
+
 const buildRoutePool = (range: number): readonly OrderRouteTemplate[] => {
-  const eligible = routeCandidates.filter(route => route.distance > 48 && route.distance <= range)
+  const eligible = routeCandidates.filter(route =>
+    route.distance > MIN_PLAYABLE_ORDER_ROUTE_DISTANCE && route.distance <= range)
   const pool: OrderRouteTemplate[] = legacyRoutes.filter(route => eligible.some(candidate =>
     candidate.pickupLocation === route.pickupLocation && candidate.destination === route.destination))
   const remaining = eligible.filter(route => !pool.some(candidate =>
@@ -58,15 +66,15 @@ const buildRoutePool = (range: number): readonly OrderRouteTemplate[] => {
   return pool
 }
 
-/** Walking work is always feasible; bicycle ownership opens longer connected trips. */
-export const ORDER_ROUTE_TEMPLATES = buildRoutePool(TRANSPORT_PROFILES.walking.range)
-export const BICYCLE_ORDER_ROUTE_TEMPLATES = buildRoutePool(TRANSPORT_PROFILES.bicycle.range)
+/** Walking work remains feasible after world scaling; bicycle ownership opens longer connected trips. */
+export const ORDER_ROUTE_TEMPLATES = buildRoutePool(playableRangeForTransport('walking'))
+export const BICYCLE_ORDER_ROUTE_TEMPLATES = buildRoutePool(playableRangeForTransport('bicycle'))
 const transportRoutes = new Map<GroundTransport, readonly OrderRouteTemplate[]>([
   ['walking', ORDER_ROUTE_TEMPLATES], ['bicycle', BICYCLE_ORDER_ROUTE_TEMPLATES],
 ])
 
 export const orderRoutesForTransport = (transport: GroundTransport = 'walking'): readonly OrderRouteTemplate[] => {
-  if (!transportRoutes.has(transport)) transportRoutes.set(transport, buildRoutePool(TRANSPORT_PROFILES[transport].range))
+  if (!transportRoutes.has(transport)) transportRoutes.set(transport, buildRoutePool(playableRangeForTransport(transport)))
   return transportRoutes.get(transport)!
 }
 
@@ -95,6 +103,7 @@ export const routeForSequence = (
 ): OrderRouteTemplate => {
   const safeSequence = sanitizeSequence(sequence)
   const routes = orderRoutesForTransport(transport)
+  if (routes.length === 0) throw new Error(`No connected ${transport} order routes satisfy the governed playable range`)
   return routes[((safeSequence - 1) % routes.length + seedOffset(seed, routes.length)) % routes.length]
 }
 
