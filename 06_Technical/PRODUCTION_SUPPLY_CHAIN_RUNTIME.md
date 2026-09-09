@@ -10,7 +10,7 @@ This runtime slice establishes the first causal goods path in DROPi Tycoon:
 
 `inputs -> production -> inventory -> demand -> logistics opportunity -> reservation -> custody -> delivery -> downstream settlement intent`.
 
-It is deliberately domain-first and dormant from the current Phaser mission loop. Existing local deliveries therefore remain legacy-compatible while new economic work can be migrated onto real stock state incrementally.
+The production and contract domains remain independent of Phaser presentation. A narrow adapter now materializes real producer opportunities into the merged systemic Mission Framework, while existing local deliveries remain legacy-compatible until a later governed runtime composition activates the new path in the player-facing loop.
 
 ## Reused canonical contracts
 
@@ -95,6 +95,29 @@ The settlement intent contains no invented balance or reward. Agent 3's Personal
 
 Cancellation or failure before pickup releases the reservation exactly once. Once cargo is in custody, the termination helper rejects a synthetic reset because returning/disposing/re-routing that cargo must be represented by a later physical recovery flow rather than teleportation.
 
+## Systemic Mission Framework integration
+
+`game-web/src/trade/producerSystemicMission.ts` is the only production-owned bridge into the merged mission runtime. It does not create a second mission state machine.
+
+A producer mission is materialized only when an existing `LogisticsOpportunity` can still create a real `ProducerLogisticsContract`. Contract creation reserves the real producer inventory first. If the opportunity is stale and stock can no longer be reserved, no systemic mission is materialized.
+
+The resulting mission definition:
+
+- uses `category: ProducerSupplyChain`;
+- uses `source.kind: Systemic`;
+- uses the real `opportunityId` as `causeRef`;
+- requires the real contract to be `Reserved` before the mission becomes available;
+- projects `InCustody` and `Delivered` contract state into stable Mission Framework signal events;
+- projects `Cancelled` or `Failed` into the existing Mission Framework failure event;
+- completes through the existing Mission Framework exactly-once receipt/consequence path;
+- emits only an `EconomicSettlementReference` to the contract's stable `settlement-intent:<contractId>` identity.
+
+No amount, wage, Company Money mutation, Personal Money mutation or guaranteed profit exists in the mission adapter. The real economic authority must consume the referenced settlement intent separately.
+
+`reconcileProducerSystemicMission(...)` is intentionally a projection/reconciliation helper. A delivered contract projects the stable pickup event followed by the stable delivery event, allowing idempotent recovery if the mission runtime has already processed one transition. The canonical Mission Framework remains the sole owner of mission status, stages, processed event IDs, completion receipts and consequence intents.
+
+This adapter is not yet wired into `GameWorldScene`, `PlayerSmartphone` or the current visible delivery loop. That composition belongs to a later orchestrated integration after capability/economy/save boundaries are ready.
+
 ## Regional boundary
 
 Economic nodes can carry stable:
@@ -117,6 +140,8 @@ Before contested multiplayer use, B2/later authority work must persist and trans
 - contract/cargo custody states;
 - settlement-intent consumption;
 - authoritative world-clock progress.
+
+The Mission Framework separately owns mission persistence/resume state. Production stores no shadow copy of mission progress.
 
 The domain's stable IDs and idempotent transitions are designed to support that migration without changing causal rules.
 

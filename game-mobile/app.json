@@ -24,7 +24,8 @@
           "hidden": true,
           "style": "light"
         }
-      ]
+      ],
+      "./plugins/withBundledPhaserRuntime"
     ],
     "extra": {
       "eas": {

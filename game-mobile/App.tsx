@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import {
+  AppState,
   BackHandler,
   Image,
   Platform,
@@ -14,6 +15,10 @@ import {
   type WebViewMessageEvent,
   type WebViewNavigation,
 } from 'react-native-webview'
+import {
+  BUNDLED_RUNTIME_ORIGIN,
+  startBundledPhaserRuntime,
+} from './src/bundledRuntime'
 import { getRuntimeConfiguration } from './src/runtimeConfig'
 
 const runtime = getRuntimeConfiguration()
@@ -48,15 +53,71 @@ true;
 
 const EXIT_GAME_MESSAGE = 'dropi:exit-game'
 
+const LoadingScreen = () => (
+  <View style={styles.container}>
+    <StatusBar hidden />
+    <Image source={brandSplash} style={styles.loadingSplash} resizeMode="contain" />
+    <View style={styles.loadingCaption}>
+      <Text style={styles.loadingText}>Loading your city…</Text>
+    </View>
+  </View>
+)
+
+const ErrorScreen = ({ message }: { message: string }) => (
+  <View style={styles.errorScreen}>
+    <StatusBar hidden />
+    <Image source={brandLogo} style={styles.errorLogo} resizeMode="contain" />
+    <Text style={styles.errorBody}>{message}</Text>
+  </View>
+)
+
 export default function App() {
   const webViewRef = useRef<WebView>(null)
   const [canGoBack, setCanGoBack] = useState(false)
   const [loaded, setLoaded] = useState(false)
+  const [gameUrl, setGameUrl] = useState<string | null>(
+    runtime.mode === 'remote' ? runtime.remoteGameUrl : null,
+  )
+  const [startupError, setStartupError] = useState<string | null>(null)
 
   useEffect(() => {
     void ScreenOrientation.lockAsync(
       ScreenOrientation.OrientationLock.LANDSCAPE,
     ).catch(() => undefined)
+  }, [])
+
+  useEffect(() => {
+    if (runtime.mode !== 'bundled') {
+      return undefined
+    }
+
+    let active = true
+
+    const ensureBundledRuntime = async (): Promise<void> => {
+      try {
+        const localGameUrl = await startBundledPhaserRuntime()
+        if (!active) return
+        setStartupError(null)
+        setGameUrl(localGameUrl)
+      } catch {
+        if (!active) return
+        setStartupError(
+          'The installed Phaser runtime could not start. This is a local app-asset failure, not a Railway/network outage.',
+        )
+      }
+    }
+
+    void ensureBundledRuntime()
+    const appStateSubscription = AppState.addEventListener('change', state => {
+      if (state === 'active') {
+        void ensureBundledRuntime()
+      }
+    })
+
+    return () => {
+      active = false
+      appStateSubscription.remove()
+    }
   }, [])
 
   useEffect(() => {
@@ -84,14 +145,13 @@ export default function App() {
     return () => subscription.remove()
   }, [canGoBack, loaded])
 
-  if (!runtime.gameUrl) {
-    return (
-      <View style={styles.errorScreen}>
-        <StatusBar hidden />
-        <Image source={brandLogo} style={styles.errorLogo} resizeMode="contain" />
-        <Text style={styles.errorBody}>{runtime.configurationError}</Text>
-      </View>
-    )
+  const fatalError = runtime.configurationError ?? startupError
+  if (fatalError) {
+    return <ErrorScreen message={fatalError} />
+  }
+
+  if (!gameUrl) {
+    return <LoadingScreen />
   }
 
   const handleNavigationChange = (navigation: WebViewNavigation) => {
@@ -108,18 +168,41 @@ export default function App() {
     }
   }
 
+  const allowNavigation = ({ url }: { url: string }): boolean => {
+    if (url === 'about:blank') return true
+
+    if (runtime.mode === 'bundled') {
+      return url === BUNDLED_RUNTIME_ORIGIN || url.startsWith(`${BUNDLED_RUNTIME_ORIGIN}/`)
+    }
+
+    return url.startsWith('https://')
+  }
+
+  const handleLoadError = (): void => {
+    setLoaded(false)
+    setStartupError(
+      runtime.mode === 'bundled'
+        ? 'The installed Phaser runtime could not be loaded from local app assets.'
+        : 'The remote development/preview runtime could not be loaded. Check the configured HTTPS runtime and network connection.',
+    )
+  }
+
   return (
     <View style={styles.container}>
       <StatusBar hidden />
       <WebView
         ref={webViewRef}
-        source={{ uri: runtime.gameUrl }}
+        source={{ uri: gameUrl }}
         style={styles.webView}
         containerStyle={styles.webViewContainer}
-        originWhitelist={['https://*']}
+        originWhitelist={runtime.mode === 'bundled' ? [BUNDLED_RUNTIME_ORIGIN] : ['https://*']}
         javaScriptEnabled
         domStorageEnabled
         cacheEnabled
+        allowFileAccess={false}
+        allowFileAccessFromFileURLs={false}
+        allowUniversalAccessFromFileURLs={false}
+        mixedContentMode="never"
         startInLoadingState
         bounces={false}
         overScrollMode="never"
@@ -128,7 +211,10 @@ export default function App() {
         allowsBackForwardNavigationGestures={false}
         mediaPlaybackRequiresUserAction={false}
         injectedJavaScript={PHASER_VIEWPORT_BOOTSTRAP}
+        onLoadStart={() => setLoaded(false)}
         onLoadEnd={() => setLoaded(true)}
+        onError={handleLoadError}
+        onShouldStartLoadWithRequest={allowNavigation}
         onNavigationStateChange={handleNavigationChange}
         onMessage={handleMessage}
       />
