@@ -1,0 +1,101 @@
+{
+  "version": "1.0.0",
+  "issue": 619,
+  "continent": "Europe",
+  "country": {
+    "geometryId": "348",
+    "sourceCountryCode": "HU",
+    "renderedName": "Hungary"
+  },
+  "administrativeModel": {
+    "level": "capital-plus-first-order-varmegyek",
+    "nativeTermSingular": "vármegye / Budapest főváros",
+    "nativeTermPlural": "19 vármegye + Budapest főváros",
+    "englishTerm": "county-level territorial unit / capital",
+    "unitCount": 20,
+    "officialReferences": [
+      "https://www.ksh.hu/teruletiatlasz_kozigazgatasi_egysegek",
+      "https://www.ksh.hu/teruletiatlasz_varmegyek?lang=hu",
+      "https://www.ksh.hu/teruleti-adatok",
+      "https://www.ksh.hu/stadat_files/nep/en/nep0034.html",
+      "https://pestvarmegye.hu/pest-varmegyei-onkormanyzati-hivatal/9"
+    ],
+    "specialCases": [
+      {
+        "type": "current-varmegye-terminology",
+        "effectiveFrom": "2023-01-01",
+        "note": "Under the Eleventh Amendment of Hungary's Fundamental Law, the designation megye changed to vármegye from 1 January 2023. DROPi uses the current vármegye terminology while retaining GeoNames source labels for provenance."
+      },
+      {
+        "admin1Code": "16",
+        "type": "administrative-seat-outside-source-ownership",
+        "label": "Pest vármegye / Budapest seat exception",
+        "note": "Pest Vármegye Önkormányzata and its office are seated in Budapest, while Budapest is a separate capital-level territorial unit. GeoNames source-owns Budapest under HU.05, so DROPi keeps Budapest there as the unique national-capital locality and uses a source-backed representative inside HU.16 without relabeling that representative as the county seat."
+      },
+      {
+        "admin1Code": "06",
+        "type": "current-name-crosswalk",
+        "canonicalName": "Csongrád-Csanád",
+        "sourceName": "Csongrád",
+        "note": "The current official vármegye name is Csongrád-Csanád. The retained GeoNames admin1 source label remains Csongrád; DROPi preserves the source identity while presenting the current official name."
+      },
+      {
+        "type": "budapest-national-capital-and-territorial-unit",
+        "admin1Code": "05",
+        "note": "Budapest is Hungary's capital and a distinct top-level territorial unit. It is the only Hungary representative with national-capital-and-regional-node semantics."
+      },
+      {
+        "type": "runtime-geometry-lod-reconciliation",
+        "geometryId": "348",
+        "geometryType": "Polygon",
+        "note": "The current DROPi 110m runtime topology represents Hungary as geometry 348, a Polygon. The 19 vármegyék plus Budapest remain Country Catalog administrative/economic identities; this slice does not fabricate internal county polygons."
+      }
+    ]
+  },
+  "source": {
+    "provider": "GeoNames",
+    "license": "Creative Commons Attribution 4.0",
+    "releaseTag": "source-geonames-cities500-2026-09-08-f3cda4f9",
+    "cities500Sha256": "f3cda4f9d256d90045121fb8eebad3ed91695c32370ed93b50fbe0cb616e2bbd",
+    "admin1Sha256": "590651498043f674accda2b7f46d21286cda0e290b02f8561c5005eee9a5448c",
+    "candidateCountryCodes": ["HU"],
+    "expectedCountryCandidateCount": 1226,
+    "administrativeAuthority": "Hungarian Central Statistical Office (KSH)",
+    "administrativeAuthorityReference": "https://www.ksh.hu/teruletiatlasz_kozigazgatasi_egysegek"
+  },
+  "selectionPolicy": {
+    "primaryFeatureCodes": ["PPLC", "PPLA"],
+    "fallbackFeatureCodes": ["PPLA2", "PPL"],
+    "expectedPrimarySelections": 19,
+    "expectedFallbackSelections": 1,
+    "highDensityGameplayImport": false,
+    "hardcodedCoordinates": false
+  },
+  "economicEmergence": {
+    "authority": "shared-regional-national-multiplayer-economy",
+    "personalPlayerProgressionUnlock": false,
+    "numericThresholdsDefined": false
+  },
+  "expectedRegions": [
+    {"admin1Code": "05", "canonicalName": "Budapest", "sourceName": "Budapest", "presentationRole": "national-capital-and-regional-node"},
+    {"admin1Code": "01", "canonicalName": "Bács-Kiskun vármegye", "sourceName": "Bács-Kiskun"},
+    {"admin1Code": "02", "canonicalName": "Baranya vármegye", "sourceName": "Baranya"},
+    {"admin1Code": "03", "canonicalName": "Békés vármegye", "sourceName": "Bekes County"},
+    {"admin1Code": "04", "canonicalName": "Borsod-Abaúj-Zemplén vármegye", "sourceName": "Borsod-Abaúj-Zemplén"},
+    {"admin1Code": "06", "canonicalName": "Csongrád-Csanád vármegye", "sourceName": "Csongrád"},
+    {"admin1Code": "08", "canonicalName": "Fejér vármegye", "sourceName": "Fejér"},
+    {"admin1Code": "09", "canonicalName": "Győr-Moson-Sopron vármegye", "sourceName": "Győr-Moson-Sopron"},
+    {"admin1Code": "10", "canonicalName": "Hajdú-Bihar vármegye", "sourceName": "Hajdú-Bihar"},
+    {"admin1Code": "11", "canonicalName": "Heves vármegye", "sourceName": "Heves County"},
+    {"admin1Code": "20", "canonicalName": "Jász-Nagykun-Szolnok vármegye", "sourceName": "Jász-Nagykun-Szolnok"},
+    {"admin1Code": "12", "canonicalName": "Komárom-Esztergom vármegye", "sourceName": "Komárom-Esztergom"},
+    {"admin1Code": "14", "canonicalName": "Nógrád vármegye", "sourceName": "Nógrád"},
+    {"admin1Code": "16", "canonicalName": "Pest vármegye", "sourceName": "Pest County"},
+    {"admin1Code": "17", "canonicalName": "Somogy vármegye", "sourceName": "Somogy County"},
+    {"admin1Code": "18", "canonicalName": "Szabolcs-Szatmár-Bereg vármegye", "sourceName": "Szabolcs-Szatmár-Bereg"},
+    {"admin1Code": "21", "canonicalName": "Tolna vármegye", "sourceName": "Tolna County"},
+    {"admin1Code": "22", "canonicalName": "Vas vármegye", "sourceName": "Vas County"},
+    {"admin1Code": "23", "canonicalName": "Veszprém vármegye", "sourceName": "Veszprém"},
+    {"admin1Code": "24", "canonicalName": "Zala vármegye", "sourceName": "Zala County"}
+  ]
+}
