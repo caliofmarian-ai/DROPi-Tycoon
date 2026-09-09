@@ -2,11 +2,11 @@
 
 Document: MARKET.md
 Project: DROPi Tycoon
-Version: 2.0.0
+Version: 2.1.0
 Status: Canonical — Market Specialization
 Author: Marian Caliof & OpenAI
 Language: English
-Last Updated: 2026-09-08
+Last Updated: 2026-09-09
 
 ---
 
@@ -206,7 +206,56 @@ Contracts must define real counterparties, obligations, quantities/service capac
 
 ---
 
-# 11. Events and Market Change
+# 11. Player Marketplace, Tradable Fragments and Physical Fulfillment
+
+The player-facing marketplace may support governed listings for eligible:
+
+- physical consumer/business goods;
+- raw materials and production inputs;
+- produced items/resources;
+- collectible inventory items;
+- **Specialist Card Fragments** defined by `04_World/NPC.md`;
+- other explicitly tradable World-Instance inventory.
+
+A marketplace listing is an offer to transact. It is not authorization to teleport inventory from seller to buyer.
+
+For any physical marketplace item, including tradable Specialist Card Fragments when represented as inventory objects, a successful match must create or bind to a governed logistics/custody lifecycle:
+
+`listing -> buyer/seller commitment -> inventory reservation -> pickup -> custody -> transport -> delivery/acceptance -> market settlement`.
+
+The authoritative buyer inventory must not receive the physical item until the delivery/custody contract reaches its valid acceptance/settlement boundary.
+
+Same-locality, inter-city, national and later international marketplace trades therefore generate real logistics demand according to available transport/infrastructure rather than instant remote transfer.
+
+A seller, buyer, employed courier, independent courier or logistics company may participate only where the applicable capability/market rules allow it. The market does not grant free transport capacity.
+
+## Specialist Card Fragment trading
+
+Specialist Card Fragments may be bought, sold or exchanged as governed in-game inventory.
+
+Trading an already-existing fragment transfers inventory; it does not create a new fragment merely because the item was transported again.
+
+Completing a fragment set unlocks the recruitment/discovery consequence defined by `04_World/NPC.md`. A market purchase therefore cannot bypass wages, locality, availability, training, facility or company capability requirements associated with the specialist person.
+
+The fragment marketplace is an in-game progression/economic system. It does not imply blockchain, NFT ownership, cryptocurrency or real-money value.
+
+## Anti-farming and wash-trade boundary
+
+Marketplace activity must not create infinite progression through self-dealing or circular resale.
+
+In particular:
+
+- the same fragment cannot exist in two inventories after settlement;
+- repeated resale does not remint source-earned fragments;
+- self-to-self or collusive wash trades must not mint unexplained XP, entity loyalty, fragments or money;
+- marketplace delivery rewards must derive from legitimate delivery/work settlement, not from the resale price alone;
+- contested multiplayer transactions must become server-authoritative before real-player trading is enabled.
+
+Exact fees, listing limits, exchange ratios, fragment prices and delivery charges are balancing data.
+
+---
+
+# 12. Events and Market Change
 
 Events may alter real market state through:
 
@@ -223,7 +272,7 @@ Events do not simply multiply mission rewards. They change the causal economy fr
 
 ---
 
-# 12. World Instance Isolation
+# 13. World Instance Isolation
 
 Each World Instance owns its own market history, prices, inventories, companies, contracts and productive capacity.
 
@@ -233,7 +282,7 @@ Future national currencies/FX remain World-Instance-local economic state.
 
 ---
 
-# 13. Historical Prototype Boundary
+# 14. Historical Prototype Boundary
 
 Early Prototype scopes used limited zones, basic customer demand and static market values.
 
@@ -243,7 +292,7 @@ The target canonical market is dynamic and stock-flow driven. Runtime migration 
 
 ---
 
-# 14. Playability Boundary
+# 15. Playability Boundary
 
 The market exists to create meaningful choices, not compulsory spreadsheet analysis.
 
@@ -253,7 +302,7 @@ Early players should see simple work/need information. Advanced procurement, pri
 
 # Canonical Rule
 
-**DROPi Tycoon markets expose and match real modeled supply, demand, inventory, production, service and logistics capacity. Opportunities arise because economic actors need or offer something; prices and competition respond to actual conditions; and the market may surface opportunities but may not invent unexplained rewards, infinite supply, infinite demand or teleported trade.**
+**DROPi Tycoon markets expose and match real modeled supply, demand, inventory, production, service and logistics capacity. Opportunities arise because economic actors need or offer something; prices and competition respond to actual conditions; and the market may surface opportunities but may not invent unexplained rewards, infinite supply, infinite demand or teleported trade. Physical marketplace goods — including tradable Specialist Card Fragments — change authoritative ownership only through a valid custody/delivery settlement.**
 
 ---
 
