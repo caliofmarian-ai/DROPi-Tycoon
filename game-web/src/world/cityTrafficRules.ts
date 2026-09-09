@@ -1,6 +1,14 @@
 import type { UrbanFacing, UrbanPoint } from './urbanWorld'
 import { isUrbanWalkable } from './urbanWorld'
 import { PLAYER_START, WORLD_ROADS } from './worldLayout'
+import {
+  DEFAULT_CROSSING_CONTROL_PLAN,
+  crossingControlCycleTime,
+  resolveCrossingControlState,
+  type CrossingControlPlan,
+} from '../simulation/crossings/crossingControl'
+import type { HighFootfallKind } from '../simulation/pedestrians/footfall'
+import { resolveVehicleCrossingDecision } from '../simulation/traffic/trafficRules'
 
 export interface ControlledCrossing {
   id: string
@@ -12,6 +20,7 @@ export interface ControlledCrossing {
   halfWidth: number
   approachStopOffset: number
   cycleSeconds: number
+  footfallKind?: HighFootfallKind
 }
 
 export interface CrossingPedestrianPose extends UrbanPoint {
@@ -46,24 +55,29 @@ if (!crossingSite) throw new Error('City plan needs a safe controlled crossing')
 export const CENTRAL_CONTROLLED_CROSSING: ControlledCrossing = {
   id: 'central-station-crossing', x: crossingSite.x, y: crossingSite.y, roadAngle: crossingSite.roadAngle,
   pedestrianAxis: 'vertical', halfLength: crossingSite.halfLength, halfWidth: 24,
-  approachStopOffset: 60, cycleSeconds: 12,
+  approachStopOffset: 60, cycleSeconds: 12, footfallKind: 'station-terminal',
 }
 
 export const CONTROLLED_CROSSINGS: readonly ControlledCrossing[] = [CENTRAL_CONTROLLED_CROSSING]
 
-const positiveModulo = (value: number, divisor: number): number => ((value % divisor) + divisor) % divisor
+const controlPlanFor = (crossing: ControlledCrossing): CrossingControlPlan => ({
+  ...DEFAULT_CROSSING_CONTROL_PLAN,
+  cycleSeconds: crossing.cycleSeconds,
+})
 
 export const crossingCycleTime = (crossing: ControlledCrossing, seconds: number): number =>
-  positiveModulo(Number.isFinite(seconds) ? Math.max(0, seconds) : 0, crossing.cycleSeconds)
+  crossingControlCycleTime(controlPlanFor(crossing), seconds)
 
 /**
  * Two bounded pedestrian crossing windows per cycle. Vehicles yield throughout these windows.
  * The short all-stop buffer on either side avoids a pedestrian/vehicle visual overlap at phase changes.
  */
-export const pedestrianHasCrossingPriority = (crossing: ControlledCrossing, seconds: number): boolean => {
-  const t = crossingCycleTime(crossing, seconds)
-  return (t >= 0.75 && t < 4.25) || (t >= 6.75 && t < 10.25)
-}
+export const pedestrianHasCrossingPriority = (crossing: ControlledCrossing, seconds: number): boolean =>
+  !resolveCrossingControlState(controlPlanFor(crossing), {
+    seconds,
+    pedestrianRequested: true,
+    pedestrianPresent: false,
+  }).vehicleMayProceed
 
 export const sampleControlledCrossingPedestrian = (
   crossing: ControlledCrossing,
@@ -118,7 +132,7 @@ export const isPointInsideControlledCrossing = (crossing: ControlledCrossing, po
 }
 
 /**
- * Clamp a horizontal traffic pose to the correct stop line while pedestrians own the crossing.
+ * Clamp a horizontal traffic pose to the correct stop line while the crossing authority owns priority.
  * Poses that have already cleared the crossing are not pulled backwards.
  */
 export const yieldHorizontalTrafficAtCrossing = (
@@ -126,13 +140,25 @@ export const yieldHorizontalTrafficAtCrossing = (
   seconds: number,
   pose: CrossingPedestrianPose,
 ): CrossingPedestrianPose => {
-  if (crossing.pedestrianAxis !== 'vertical' || !pedestrianHasCrossingPriority(crossing, seconds)) return pose
+  if (crossing.pedestrianAxis !== 'vertical') return pose
 
   const point = crossingLocalPoint(crossing, pose)
   const leftStop = -crossing.approachStopOffset
   const rightStop = crossing.approachStopOffset
   const crossingLeft = -crossing.halfWidth
   const crossingRight = crossing.halfWidth
+  const alreadyCleared = pose.facing === 'right' ? point.x > crossingRight : point.x < crossingLeft
+  const controlState = resolveCrossingControlState(controlPlanFor(crossing), {
+    seconds,
+    pedestrianRequested: true,
+    pedestrianPresent: false,
+  })
+  const decision = resolveVehicleCrossingDecision({
+    crossingState: controlState,
+    footfallKind: crossing.footfallKind ?? 'standard',
+    alreadyClearedCrossing: alreadyCleared,
+  })
+  if (decision.action !== 'yield') return pose
 
   if (pose.facing === 'right' && point.x >= leftStop && point.x <= crossingRight) {
     Object.assign(pose, crossingPoint(crossing, leftStop, point.y))
