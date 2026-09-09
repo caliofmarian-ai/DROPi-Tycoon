@@ -2,7 +2,7 @@
 
 Document: NPC.md
 Project: DROPi Tycoon
-Version: 1.1.0
+Version: 1.2.0
 Status: Canonical
 Author: Marian Caliof & OpenAI
 Language: English
@@ -32,9 +32,9 @@ They create:
 
 NPCs are not simple objects that generate orders.
 
-They represent the living population of the city.
+They represent the living population of the world/locality.
 
-A successful logistics company must understand and serve the needs of the community.
+A successful player/company must understand and serve the needs of the community and may later recruit, employ, train or contract eligible NPC workers under the same constrained economy used for human players.
 
 ---
 
@@ -95,6 +95,7 @@ Examples:
 - Restaurant owners
 - Shop owners
 - Local companies
+- Farm/factory/productive-enterprise owners where modeled
 
 ---
 
@@ -106,6 +107,8 @@ Businesses have:
 - Contract potential
 - Service requirements
 - Growth potential
+- Workforce requirements
+- Productive/service capability where relevant
 
 ---
 
@@ -117,7 +120,7 @@ The player can develop relationships through:
 - Long-term contracts
 - Quality service
 
-Strong relationships create stable revenue.
+Strong relationships create stable revenue and may expose legitimate workforce, investment, supplier or acquisition opportunities under their owning systems.
 
 ---
 
@@ -125,9 +128,9 @@ Strong relationships create stable revenue.
 
 ## Purpose
 
-Employees represent the company's workforce.
+Employees represent company workforce.
 
-They allow the company to scale beyond the player's personal abilities.
+They allow a company to scale beyond one player's personal abilities.
 
 ---
 
@@ -135,11 +138,15 @@ They allow the company to scale beyond the player's personal abilities.
 
 Employees may have:
 
-- Speed
+- Profession / specialist family
+- Qualifications
 - Experience
 - Reliability
-- Salary cost
+- Salary/compensation cost
 - Availability
+- Current locality / mobility constraints
+- Employment/contract relationship
+- Compatible facilities/equipment requirements
 
 ---
 
@@ -150,6 +157,7 @@ Employees can improve through:
 - Experience
 - Training
 - Better equipment
+- Education/qualification paths where governed
 
 ---
 
@@ -176,6 +184,8 @@ NPC behavior is influenced by:
 - Economy
 - Weather
 - Company reputation
+- Employment and available work
+- Qualifications and compatible opportunities
 
 ---
 
@@ -247,6 +257,44 @@ Completing a card does **not**:
 
 The unlocked specialist remains a person/workforce identity. Recruitment/hiring uses the existing labor/company capability authorities. If the specialist later leaves and the company lacks a replacement, capability that depends on that specialist may become unavailable.
 
+## Specialist employment and productive deployment
+
+After legitimate recruitment/contracting, a specialist may be assigned to a compatible job in a real economic entity.
+
+Examples include:
+
+- cattle specialist -> eligible cattle farm;
+- pig husbandry specialist -> eligible pig farm;
+- horticulture/vegetable specialist -> eligible farm/greenhouse/producer;
+- agricultural maintenance/logistics specialist -> eligible agricultural operation;
+- manufacturing specialist -> eligible factory/processing site;
+- warehouse/dispatch/maintenance specialist -> compatible logistics/industrial facility.
+
+The assignment is valid only if the target company/site has the required employment relationship, locality access, facility, equipment, inputs, authorizations and operating capacity.
+
+A specialist may work:
+
+- directly for the player's company;
+- for a company the player legitimately owns/controls or invests in;
+- for another enterprise through a governed staffing/service/placement contract;
+- for another NPC/human employer independently of the player when the labor market permits.
+
+The player does not own the specialist as property.
+
+## Specialist economic-flow boundary
+
+Economic value from a specialist must come from real work and explicit contracts.
+
+Examples:
+
+- an enterprise employs the NPC, pays compensation, and the enterprise earns revenue/profit from real production/service output;
+- a staffing/service company provides the specialist to another enterprise and earns a governed service/placement/management fee while the specialist receives their own compensation;
+- an owner/investor receives only legitimate company profit/dividend/distribution from the enterprise's real results.
+
+The game must not duplicate the same labor value by paying the specialist, the player's company and the player personally from an unexplained source.
+
+A recruited specialist can therefore unlock real company capability, but only as part of the full production/company gate defined by `01_GameDesign/COMPANY_SOCIETY_AND_MULTIPLAYER.md` and the Economy authority.
+
 ## Reward authority and anti-farming
 
 Specialist fragments are consequences of eligible real work, not random geography and not a second mission engine.
@@ -268,6 +316,7 @@ Examples:
 - People going to work
 - Customers visiting businesses
 - Traffic patterns
+- Specialists relocating for employment/training where governed
 
 Movement should support gameplay, not exist only for visual realism.
 
@@ -282,7 +331,7 @@ The first playable version includes:
 - Simple employees
 - Order generation
 
-Advanced NPC behavior is not required initially.
+Advanced specialist recruitment/deployment behavior may be implemented later.
 
 ---
 
@@ -297,6 +346,8 @@ Possible future systems:
 - Competitor companies
 - City population simulation
 - Specialist discovery/recruitment through governed economic relationships
+- Staffing/service-company contracts
+- Specialist migration between companies/localities
 
 ---
 
@@ -307,17 +358,19 @@ NPC systems must:
 - Create meaningful gameplay
 - Support the economy
 - Make the world feel alive
+- Preserve personhood/employment semantics
+- Avoid magical passive income or duplicated labor value
 - Avoid unnecessary simulation complexity
 
 ---
 
 # Canonical Rule
 
-NPCs exist to create a living connection between the player company and the world.
+NPCs exist to create a living connection between the player/company and the world.
 
 Every NPC system must improve gameplay decisions or world immersion.
 
-**Specialist Card Fragments may unlock access to recruitable specialist NPCs only through governed economic affinity and exactly-once progression settlement; they never transfer qualifications or bypass labor, education, infrastructure or company-capability requirements.**
+**Specialist Card Fragments may unlock access to recruitable specialist NPCs only through governed economic affinity and exactly-once progression settlement. A recruited specialist may then create real workforce/company capability through legitimate employment or service contracts, but never transfers qualifications magically, never becomes player-owned property, and never generates unexplained duplicated income.**
 
 ---
 
