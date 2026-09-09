@@ -1,17 +1,21 @@
 import layout from './brailaLayout.generated.json'
-import {
-  BRAILA_PLAYABLE_DISTANCE_SCALE,
-  BRAILA_PLAYABLE_SCALE_VERSION,
-  expandBrailaBuilding,
-  expandBrailaContextBuilding,
-  expandBrailaExtent,
-  expandBrailaLandscapeFeature,
-  expandBrailaPoint,
-  expandBrailaRoad,
-  expandBrailaRoutePoint,
-  expandBrailaZone,
-} from './brailaPlayableScale'
 import type { WorldBuildingLayout, WorldDecorationLayout, WorldRectLayout, WorldRoutePoint, WorldZoneLayout } from './legacyCityLayout'
+import {
+  CITY_PLAYABLE_DISTANCE_SCALE_BASELINE,
+  CITY_PLAYABLE_SCALE_VERSION,
+  cityRoadAnchorForPoint,
+  scaleCityBuilding,
+  scaleCityBuildingFromAnchor,
+  scaleCityContextBuilding,
+  scaleCityExtent,
+  scaleCityLandscapeFeature,
+  scaleCityPoint,
+  scaleCityRoad,
+  scaleCityRoadAttachedPoint,
+  scaleCityRoutePoint,
+  scaleCityZone,
+  type CityScalePoint,
+} from './worldScale'
 import { distanceToSegment, surfaceContains } from './worldSurfaces'
 export type { WorldBuildingLayout, WorldDecorationLayout, WorldRectLayout, WorldRoutePoint, WorldZoneId, WorldZoneLayout } from './legacyCityLayout'
 
@@ -35,33 +39,75 @@ const unpackContextPoints = (coordinates: readonly number[]): Array<{ x: number;
 
 export const WORLD_SOURCE_WIDTH = layout.width
 export const WORLD_SOURCE_HEIGHT = layout.height
-export const WORLD_PLAYABLE_SCALE_VERSION = BRAILA_PLAYABLE_SCALE_VERSION
-export const WORLD_PLAYABLE_DISTANCE_SCALE = BRAILA_PLAYABLE_DISTANCE_SCALE
-export const WORLD_WIDTH = expandBrailaExtent(layout.width)
-export const WORLD_HEIGHT = expandBrailaExtent(layout.height)
-export const PLAYER_START = expandBrailaPoint({ x: layout.playerStart.x, y: layout.playerStart.y })
-export const WORLD_ZONES: readonly WorldZoneLayout[] = (layout.zones as WorldZoneLayout[]).map(zone => expandBrailaZone(zone))
-export const WORLD_ROADS: readonly WorldRectLayout[] = (layout.roads as WorldRectLayout[]).map(road => expandBrailaRoad(road))
+export const WORLD_PLAYABLE_SCALE_VERSION = CITY_PLAYABLE_SCALE_VERSION
+export const WORLD_PLAYABLE_DISTANCE_SCALE = CITY_PLAYABLE_DISTANCE_SCALE_BASELINE
+export const WORLD_WIDTH = scaleCityExtent(WORLD_SOURCE_WIDTH)
+export const WORLD_HEIGHT = scaleCityExtent(WORLD_SOURCE_HEIGHT)
+
+export const WORLD_SOURCE_ZONES: readonly WorldZoneLayout[] = layout.zones as WorldZoneLayout[]
+export const WORLD_ZONES: readonly WorldZoneLayout[] = WORLD_SOURCE_ZONES.map(zone => scaleCityZone(zone))
+
+export const WORLD_SOURCE_ROADS: readonly WorldRectLayout[] = layout.roads as WorldRectLayout[]
+export const WORLD_ROADS: readonly WorldRectLayout[] = WORLD_SOURCE_ROADS.map(road => scaleCityRoad(road))
 export const WORLD_SIDEWALKS: readonly WorldRectLayout[] = WORLD_ROADS.map(road => ({
   ...road, id: `${road.id}-pavement`, width: road.width + 32, height: road.height + 32,
   roadWidth: (road.roadWidth ?? 32) + 32,
 }))
-export const WORLD_BUILDINGS: readonly WorldBuildingLayout[] = (layout.buildings as WorldBuildingLayout[])
-  .map(building => expandBrailaBuilding(building))
-export const WORLD_ROUTE_POINTS: readonly WorldRoutePoint[] = (layout.routes as WorldRoutePoint[])
-  .map(point => expandBrailaRoutePoint(point))
-/** #613 compact tuples remain the shipped representation; expose their exact pre-scale reconstruction for its lossless regression gate. */
-export const WORLD_SOURCE_CONTEXT_BUILDINGS = __BRAILA_CONTEXT_BUILDINGS__
-  .map(([x, y, width, height, pointCoordinates]) => ({
-    x, y, width, height, points: unpackContextPoints(pointCoordinates),
-  }))
-/** #614 applies playable spacing only after #613's compact representation has been reconstructed exactly. */
+
+const nearestSourceRoadForPoint = (point: CityScalePoint): WorldRectLayout | undefined =>
+  WORLD_SOURCE_ROADS
+    .map(road => {
+      const anchor = cityRoadAnchorForPoint(point, road)
+      const dx = point.x - anchor.x
+      const dy = point.y - anchor.y
+      return { road, distanceSquared: dx * dx + dy * dy }
+    })
+    .sort((a, b) => a.distanceSquared - b.distanceSquared || a.road.id.localeCompare(b.road.id))[0]?.road
+
+export const WORLD_SOURCE_PLAYER_START = { x: layout.playerStart.x, y: layout.playerStart.y }
+const playerStartRoad = nearestSourceRoadForPoint(WORLD_SOURCE_PLAYER_START)
+export const PLAYER_START = playerStartRoad
+  ? scaleCityRoadAttachedPoint(WORLD_SOURCE_PLAYER_START, playerStartRoad)
+  : scaleCityPoint(WORLD_SOURCE_PLAYER_START)
+
+export const WORLD_SOURCE_MARKETPLACE = { x: layout.marketplace.x, y: layout.marketplace.y }
+const marketplaceRoad = nearestSourceRoadForPoint(WORLD_SOURCE_MARKETPLACE)
+export const WORLD_MARKETPLACE = marketplaceRoad
+  ? scaleCityRoadAttachedPoint(WORLD_SOURCE_MARKETPLACE, marketplaceRoad)
+  : scaleCityPoint(WORLD_SOURCE_MARKETPLACE)
+
+export const WORLD_SOURCE_ROUTE_POINTS: readonly WorldRoutePoint[] = layout.routes as WorldRoutePoint[]
+export const WORLD_ROUTE_POINTS: readonly WorldRoutePoint[] = WORLD_SOURCE_ROUTE_POINTS.map(point => {
+  const sourceRoad = WORLD_SOURCE_ROADS.find(road => road.id === point.roadId)
+  return scaleCityRoutePoint(point, sourceRoad)
+})
+
+export const WORLD_SOURCE_BUILDINGS: readonly WorldBuildingLayout[] = layout.buildings as WorldBuildingLayout[]
+export const WORLD_BUILDINGS: readonly WorldBuildingLayout[] = WORLD_SOURCE_BUILDINGS.map(building => {
+  const sourceRouteAnchor = WORLD_SOURCE_ROUTE_POINTS.find(point => point.buildingId === building.id)
+  const playableRouteAnchor = sourceRouteAnchor && WORLD_ROUTE_POINTS.find(point => point.label === sourceRouteAnchor.label)
+  if (sourceRouteAnchor && playableRouteAnchor) {
+    return scaleCityBuildingFromAnchor(building, sourceRouteAnchor, playableRouteAnchor)
+  }
+  if (building.id === 'main-hq') {
+    return scaleCityBuildingFromAnchor(building, WORLD_SOURCE_PLAYER_START, PLAYER_START)
+  }
+  if (building.id === 'business-1') {
+    return scaleCityBuildingFromAnchor(building, WORLD_SOURCE_MARKETPLACE, WORLD_MARKETPLACE)
+  }
+  return scaleCityBuilding(building)
+})
+
+/** #613 compact tuples remain the shipped representation; playable scaling occurs after lossless reconstruction. */
+export const WORLD_SOURCE_CONTEXT_BUILDINGS = __BRAILA_CONTEXT_BUILDINGS__.map(([x, y, width, height, pointCoordinates]) => ({
+  x, y, width, height, points: unpackContextPoints(pointCoordinates),
+}))
 export const WORLD_CONTEXT_BUILDINGS = WORLD_SOURCE_CONTEXT_BUILDINGS
-  .map(building => expandBrailaContextBuilding(building))
-export const WORLD_LANDSCAPE = layout.landscape.map(feature => expandBrailaLandscapeFeature(feature))
-export const WORLD_MARKETPLACE = expandBrailaPoint({ x: layout.marketplace.x, y: layout.marketplace.y })
+  .map(building => scaleCityContextBuilding(building))
+
+export const WORLD_LANDSCAPE = layout.landscape.map(feature => scaleCityLandscapeFeature(feature))
 export const WORLD_CITY_NAME = layout.name
-/** Geographic source bounds stay factual; only playable world-unit separation is expanded. */
+/** Source geographic bounds remain factual; the 10x transform applies only to playable world units. */
 export const WORLD_GEO_BOUNDS = layout.geoBounds
 
 // Reusable nature sprites populate safe street edges; trunks never block a frontage or road.
