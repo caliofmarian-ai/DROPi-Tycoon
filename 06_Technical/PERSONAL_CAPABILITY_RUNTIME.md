@@ -46,6 +46,51 @@ Advanced vehicle authorization IDs are requirements only. They become satisfied 
 
 This distinction is deliberate: qualification without equipment is blocked, equipment without qualification is blocked, and both remain blocked without explicit employer authorization.
 
+## Governed road training evidence acquisition
+
+`game-web/src/capabilities/trainingAcquisition.ts` provides the first authority-backed lifecycle for the road-vehicle evidence already consumed by capability/work-access evaluation:
+
+1. `road-vehicle-theory`;
+2. `car-operation-practical`;
+3. `car-operation-qualification`;
+4. `van-cargo-practical`;
+5. `road-delivery-supervised`;
+6. `delivery-van-qualification`.
+
+The ordering is explicit. Car practical training requires completed road theory. The car qualification requires both. Van training additionally requires earned `CarOperation`, then van cargo practice, supervised road-delivery experience and a separate fictional delivery-van assessment.
+
+### Training authority boundary
+
+The capability layer cannot self-author training. Starting and completing a governed session requires a `TrainingAuthorityPort` supplied by the owning instructor/assessment runtime.
+
+The port returns an authority identity, authority role and authorization reference. The lifecycle rejects:
+
+- missing or rejected authority;
+- malformed authority evidence;
+- learner identity attempting to authorize its own evidence;
+- the wrong authority role;
+- completion by a different session authority.
+
+`Instructor`, `Assessor` and `Supervisor` are game-domain authority roles. They do not represent real legal licensing bodies.
+
+The port is a trust/integration hook, not a cryptographic verifier. Future server or institution authority can implement the port without changing capability semantics.
+
+### C1 time and deterministic receipts
+
+Each governed module has a replaceable Phase-1 duration in game minutes. Session start/completion reads World Clock C1 and requires the same World Instance. Wall-clock time and `Date.now()` are not evidence authority.
+
+A training session gets a stable ID from world + learner + evidence. Completion gets a stable receipt ID from the same identity tuple. Replaying a completed session returns the existing receipt and does not append duplicate theory, practical, qualification or supervised-experience evidence.
+
+Supervised experience is therefore incremented once for the governed completion, even when the completion command is replayed.
+
+Completing training does **not** automatically grant the corresponding learned capability. For example, completing road theory + car practical + the fictional car qualification makes `CarOperation` eligible for the existing capability-acquisition path; it does not silently add `CarOperation` itself.
+
+### Persistence and economy boundary
+
+The training lifecycle is currently a domain aggregate only. It does not change Save v2 and does not claim persistence ownership. A later Save-owner integration may persist its sessions/receipts under a separately governed contract.
+
+Training does not debit Personal Money, consume Work Capacity, settle wages or mutate employer treasury. If training later has economic/time costs, the owning economy/runtime must execute those mutations outside the capability layer.
+
 ## Player-readable failure reasons
 
 Evaluation returns stable blocker codes with player-facing messages for training, qualification, equipment, vehicle, cargo capability, facility, employment, employer permission, company capability, world access, Work Capacity, Personal Money, and current-shift availability. Unknown capability/activity IDs fail closed with generic safe explanations rather than exposing raw internal IDs.
