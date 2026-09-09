@@ -1,0 +1,158 @@
+{
+  "version": "1.0.0",
+  "issue": 592,
+  "continent": "Europe",
+  "country": {
+    "geometryId": "300",
+    "sourceCountryCode": "GR",
+    "renderedName": "Greece"
+  },
+  "administrativeModel": {
+    "level": "second-level-local-government-regions-with-constitutional-special-territory",
+    "nativeTermSingular": "Περιφέρεια",
+    "nativeTermPlural": "Περιφέρειες",
+    "englishTerm": "Region",
+    "unitCount": 13,
+    "officialReferences": [
+      "https://www.gov.gr/en/regions",
+      "https://www.gov.gr/upourgeia/upourgeio-esoterikon/topike-autodioikese-periphereies",
+      "https://www.hellenicparliament.gr/vouli-ton-ellinon/to-politevma/syntagma/article-109/"
+    ],
+    "specialCases": [
+      {
+        "type": "thirteen-second-level-local-government-regions",
+        "note": "Gov.gr identifies 13 Περιφέρειες as Greece's second-level local government authorities. DROPi uses those 13 Regions as the ordinary governed regional navigation/economic surfaces."
+      },
+      {
+        "type": "mount-athos-constitutional-self-government",
+        "sourceAdmin1Code": "736572",
+        "sourceRef": "geonames:736572",
+        "sourceSeatRef": "geonames:735972",
+        "note": "Article 105 of the Constitution governs Aghion Oros (Mount Athos) as a self-governed part of the Greek State. GeoNames exposes Mount Athos as an additional GR admin1 source surface with Karyes as PPLA; DROPi preserves that source geography but does not flatten it into a fourteenth ordinary Περιφέρεια or publish Karyes as one of the 13 normal regional representatives."
+      },
+      {
+        "type": "canonical-english-region-name-crosswalk",
+        "canonicalRegionCodes": [
+          "ESYE11",
+          "ESYE42",
+          "ESYE23",
+          "ESYE13"
+        ],
+        "note": "Gov.gr English presentation uses Eastern Macedonia and Thrace, Southern Aegean, Western Greece and Western Macedonia. The retained GeoNames admin1 labels use East Macedonia and Thrace, South Aegean, West Greece and West Macedonia. DROPi preserves the GeoNames source identities while presenting the current Gov.gr English names."
+      },
+      {
+        "type": "athens-national-capital-and-attica-node",
+        "canonicalRegionCode": "ESYE31",
+        "note": "Athens is Greece's national capital and the representative locality of Attica. It is the only Greece node with national-capital-and-regional-node semantics."
+      },
+      {
+        "type": "runtime-geometry-lod-reconciliation",
+        "geometryId": "300",
+        "geometryType": "MultiPolygon",
+        "componentCount": 2,
+        "note": "The current DROPi 110m runtime topology represents Greece as a two-component MultiPolygon. The 13 Regions and the constitutional Mount Athos distinction remain Country Catalog administrative identities; this slice does not fabricate internal regional or special-territory polygons."
+      }
+    ]
+  },
+  "source": {
+    "provider": "GeoNames",
+    "license": "Creative Commons Attribution 4.0",
+    "releaseTag": "source-geonames-cities500-2026-09-08-f3cda4f9",
+    "cities500Sha256": "f3cda4f9d256d90045121fb8eebad3ed91695c32370ed93b50fbe0cb616e2bbd",
+    "admin1Sha256": "590651498043f674accda2b7f46d21286cda0e290b02f8561c5005eee9a5448c",
+    "candidateCountryCodes": [
+      "GR"
+    ],
+    "expectedCountryCandidateCount": 1986,
+    "administrativeAuthority": "Hellenic Republic / Ministry of the Interior / Gov.gr",
+    "administrativeAuthorityReference": "https://www.gov.gr/en/regions"
+  },
+  "selectionPolicy": {
+    "primaryFeatureCodes": [
+      "PPLC",
+      "PPLA"
+    ],
+    "fallbackFeatureCodes": [
+      "PPLA2",
+      "PPLA3",
+      "PPL"
+    ],
+    "expectedPrimarySelections": 13,
+    "expectedFallbackSelections": 0,
+    "highDensityGameplayImport": false,
+    "hardcodedCoordinates": false
+  },
+  "economicEmergence": {
+    "authority": "shared-regional-national-multiplayer-economy",
+    "personalPlayerProgressionUnlock": false,
+    "numericThresholdsDefined": false
+  },
+  "expectedRegions": [
+    {
+      "admin1Code": "ESYE31",
+      "canonicalName": "Attica",
+      "sourceName": "Attica",
+      "presentationRole": "national-capital-and-regional-node"
+    },
+    {
+      "admin1Code": "ESYE24",
+      "canonicalName": "Central Greece",
+      "sourceName": "Central Greece"
+    },
+    {
+      "admin1Code": "ESYE12",
+      "canonicalName": "Central Macedonia",
+      "sourceName": "Central Macedonia"
+    },
+    {
+      "admin1Code": "ESYE43",
+      "canonicalName": "Crete",
+      "sourceName": "Crete"
+    },
+    {
+      "admin1Code": "ESYE11",
+      "canonicalName": "Eastern Macedonia and Thrace",
+      "sourceName": "East Macedonia and Thrace"
+    },
+    {
+      "admin1Code": "ESYE21",
+      "canonicalName": "Epirus",
+      "sourceName": "Epirus"
+    },
+    {
+      "admin1Code": "ESYE22",
+      "canonicalName": "Ionian Islands",
+      "sourceName": "Ionian Islands"
+    },
+    {
+      "admin1Code": "ESYE41",
+      "canonicalName": "North Aegean",
+      "sourceName": "North Aegean"
+    },
+    {
+      "admin1Code": "ESYE25",
+      "canonicalName": "Peloponnese",
+      "sourceName": "Peloponnese"
+    },
+    {
+      "admin1Code": "ESYE42",
+      "canonicalName": "Southern Aegean",
+      "sourceName": "South Aegean"
+    },
+    {
+      "admin1Code": "ESYE14",
+      "canonicalName": "Thessaly",
+      "sourceName": "Thessaly"
+    },
+    {
+      "admin1Code": "ESYE23",
+      "canonicalName": "Western Greece",
+      "sourceName": "West Greece"
+    },
+    {
+      "admin1Code": "ESYE13",
+      "canonicalName": "Western Macedonia",
+      "sourceName": "West Macedonia"
+    }
+  ]
+}
