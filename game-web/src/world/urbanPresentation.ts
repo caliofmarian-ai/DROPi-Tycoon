@@ -15,6 +15,9 @@ import {
 } from './cityArt'
 import { drawCityPavement } from './cityGround'
 import { drawBrailaDistrictIdentity, renderBrailaAddressLabels } from './brailaIdentity'
+import {
+  installBrailaLabelPresentation, type BrailaLabelRole, type BrailaPresentationLabel,
+} from './brailaLabelPresentation'
 import { drawParcel } from './courierArt'
 
 export const HQ_EXPANSION_POINT = URBAN_HQ
@@ -73,7 +76,7 @@ export const drawCityGround = (g: Phaser.GameObjects.Graphics, bounds?: GroundBo
 
   // Shadows and low street furniture are static ground decoration and are therefore baked too.
   WORLD_DECORATIONS.forEach((tree, index) => {
-    if (!visible({ ...tree, width: 100, height: 100 })) return;
+    if (!visible({ ...tree, width: 100, height: 100 })) return
     g.fillStyle(C.shadow, 0.13).fillEllipse(tree.x + tree.radius * 0.4,
       tree.y + 3, tree.radius * 4.6, tree.radius * 1.5)
     if (index % 4 === 0) drawFlowerBox(g, tree.x + tree.radius + 12, tree.y + tree.radius * 0.65, 24)
@@ -99,7 +102,7 @@ export const drawCityGround = (g: Phaser.GameObjects.Graphics, bounds?: GroundBo
       g.fillStyle(C.curb, 0.85).fillCircle(point.x, point.y + 2, 3)
     }
   })
- }
+}
 
 /**
  * Produce one reusable static ground texture. This work occurs once for the Phaser texture manager;
@@ -124,6 +127,22 @@ export const renderUrbanNeighborhood = (
   scene: Phaser.Scene, company?: CompanyState,
 ): Phaser.GameObjects.Graphics | null => {
   const growth = getHQGrowth(company)
+  const semanticLabels: BrailaPresentationLabel[] = []
+  const trackedLabel = (
+    role: BrailaLabelRole,
+    x: number,
+    y: number,
+    text: string,
+    size: number,
+    color?: string,
+    background?: string,
+    priority?: number,
+  ): Phaser.GameObjects.Text => {
+    const label = cityLabel(scene, x, y, text, size, color, background)
+    semanticLabels.push({ text: label, role, priority })
+    return label
+  }
+
   scene.add.image(0, 0, ensureCityGroundTexture(scene))
     .setOrigin(0, 0)
     .setScale(1 / CITY_GROUND_TEXTURE_SCALE)
@@ -146,20 +165,22 @@ export const renderUrbanNeighborhood = (
     scene.add.image(building.x, building.y, ensureBuildingTexture(scene, building, art)).setDepth(5)
     const sign = cityBuildingSign(building, art)
     if (hq || marketplace || building.kind === 'shop' || building.kind === 'depot') {
-      const text = cityLabel(scene, sign.signX, sign.signY, name, hq ? 23 : marketplace ? 12 : 10).setDepth(7)
+      const role: BrailaLabelRole = hq || marketplace ? 'landmark' : 'storefront'
+      const text = trackedLabel(role, sign.signX, sign.signY, name, hq ? 23 : marketplace ? 12 : 10).setDepth(7)
+        .setName(`braila-label:${role}:${building.id}`)
       if (text.width > sign.signWidth) text.setScale(sign.signWidth / text.width)
     }
     if (hq) {
-      cityLabel(scene, building.x, building.y + building.height / 2 + 13, 'LOCAL DELIVERY · HEADQUARTERS', 9,
-        '#175574').setDepth(7)
+      trackedLabel('detail', building.x, building.y + building.height / 2 + 13, 'LOCAL DELIVERY · HEADQUARTERS', 9,
+        '#175574').setDepth(7).setName('braila-label:detail:hq-description')
     }
     if (marketplace) {
-      cityLabel(scene, building.x, building.y + building.height / 2 + 13, 'ENTER · MARKETPLACE', 9,
-        '#175574').setDepth(7)
+      trackedLabel('detail', building.x, building.y + building.height / 2 + 13, 'ENTER · MARKETPLACE', 9,
+        '#175574').setDepth(7).setName('braila-label:detail:marketplace-description')
     }
   })
 
-  renderBrailaAddressLabels(scene)
+  for (const label of renderBrailaAddressLabels(scene)) semanticLabels.push({ text: label, role: 'address' })
 
   WORLD_DECORATIONS.forEach((tree, index) => {
     // The collision disk covers the trunk; the substantial canopy hangs above it.
@@ -169,13 +190,15 @@ export const renderUrbanNeighborhood = (
   for (const zone of WORLD_ZONES) {
     const x = zone.x + zone.width / 2
     const y = zone.y + 34
-    cityLabel(scene, x, y - 48, zone.label.toUpperCase(), 13, '#247c48').setDepth(2).setAlpha(0.8)
+    trackedLabel('district', x, y - 48, zone.label.toUpperCase(), 13, '#247c48')
+      .setDepth(2).setAlpha(0.9).setName(`braila-label:district:${zone.id}`)
   }
   const streetNames = new Set<string>()
   for (const road of WORLD_ROADS) {
     if (!road.name || streetNames.has(road.name) || (road.roadWidth ?? 0) < 42) continue
     streetNames.add(road.name)
-    cityLabel(scene, road.x, road.y - 30, road.name, 12, '#fff4ce', '#344e69').setDepth(4)
+    trackedLabel('street', road.x, road.y - 30, road.name, 12, '#fff4ce', '#344e69')
+      .setDepth(4).setName(`braila-label:street:${road.id}`)
   }
 
   const hq = URBAN_BUILDINGS.find(building => building.kind === 'hq')!
@@ -192,8 +215,10 @@ export const renderUrbanNeighborhood = (
     props.fillStyle(C.metal).fillRoundedRect(x - 2, padY + 18, 4, 12, 1)
     props.fillStyle(C.parcel).fillRect(x - 2, padY + 19, 4, 3)
   }
-  cityLabel(scene, padX, padY - 17, 'MAIN DRONEPORT', 7, '#175574').setDepth(7)
-  cityLabel(scene, padX, padY + 21, 'FUTURE · LOCKED', 7, '#175574').setDepth(7)
+  trackedLabel('detail', padX, padY - 17, 'MAIN DRONEPORT', 7, '#175574')
+    .setDepth(7).setName('braila-label:detail:droneport')
+  trackedLabel('detail', padX, padY + 21, 'FUTURE · LOCKED', 7, '#175574')
+    .setDepth(7).setName('braila-label:detail:droneport-locked')
   const stageX = hq.x - 65
   const stageY = hq.y + hq.height / 2 + 15
   props.fillStyle(C.cream, 0.7).fillRoundedRect(stageX - 29, stageY - 9, 57, 30, 4)
@@ -203,28 +228,34 @@ export const renderUrbanNeighborhood = (
       drawParcel(props, stageX - 17 + box * 17, stageY + 7 - row * 13, 14)
     }
   }
-  cityLabel(scene, stageX, stageY + 31, 'PARCEL STAGING', 8, '#fff4ce', '#175574').setDepth(7)
+  trackedLabel('detail', stageX, stageY + 31, 'PARCEL STAGING', 8, '#fff4ce', '#175574')
+    .setDepth(7).setName('braila-label:detail:parcel-staging')
   if (growth.tier > 1) {
     props.fillStyle(C.metal).fillRect(stageX - 28, stageY - growth.tier * 13 + 4, 3, growth.tier * 13 + 13)
       .fillRect(stageX + 25, stageY - growth.tier * 13 + 4, 3, growth.tier * 13 + 13)
-    cityLabel(scene, hq.x, hq.y - 12, `LEVEL ${growth.level} DEPOT`, 8).setDepth(7)
+    trackedLabel('detail', hq.x, hq.y - 12, `LEVEL ${growth.level} DEPOT`, 8)
+      .setDepth(7).setName('braila-label:detail:hq-level')
   }
 
   // Issue #325: purchased vehicles live inside the physical HQ Fleet Bay. The street no longer
   // receives a parked bicycle as a side effect of ownership.
-  cityLabel(scene, URBAN_HQ.x + 68, URBAN_HQ.y + 25, 'FLEET · INSIDE HQ', 8, '#fff4ce', '#175574').setDepth(7)
+  trackedLabel('detail', URBAN_HQ.x + 68, URBAN_HQ.y + 25, 'FLEET · INSIDE HQ', 8, '#fff4ce', '#175574')
+    .setDepth(7).setName('braila-label:detail:fleet')
   props.fillStyle(COLORS.accentStrong, 0.16).fillCircle(URBAN_HQ.x, URBAN_HQ.y, 25)
   props.lineStyle(2, COLORS.accentStrong, 0.8).strokeCircle(URBAN_HQ.x, URBAN_HQ.y, 25)
-  cityLabel(scene, URBAN_HQ.x, URBAN_HQ.y + 33, 'ENTER HQ', 8, '#fff4ce', '#175574').setDepth(7)
+  trackedLabel('interaction', URBAN_HQ.x, URBAN_HQ.y + 33, 'ENTER HQ', 8, '#fff4ce', '#175574')
+    .setDepth(7).setName('braila-label:interaction:hq')
 
   props.fillStyle(COLORS.accent, 0.14).fillCircle(URBAN_MARKETPLACE.x, URBAN_MARKETPLACE.y, 24)
   props.lineStyle(2, COLORS.accent, 0.82).strokeCircle(URBAN_MARKETPLACE.x, URBAN_MARKETPLACE.y, 24)
-  cityLabel(scene, URBAN_MARKETPLACE.x, URBAN_MARKETPLACE.y + 31, 'ENTER MARKETPLACE', 8, '#fff4ce', '#175574').setDepth(7)
+  trackedLabel('interaction', URBAN_MARKETPLACE.x, URBAN_MARKETPLACE.y + 31, 'ENTER MARKETPLACE', 8, '#fff4ce', '#175574')
+    .setDepth(7).setName('braila-label:interaction:marketplace')
 
   if (growth.staffCount > 0) {
     const worker = drawNeighborhoodNPC(scene, URBAN_HQ.x + 108, URBAN_HQ.y, false, 2)
       .setName('hq-dispatch-staff')
-    cityLabel(scene, worker.x, worker.y + 14, `HQ STAFF · ${growth.staffCount}`, 8, '#175574').setDepth(13)
+    trackedLabel('detail', worker.x, worker.y + 14, `HQ STAFF · ${growth.staffCount}`, 8, '#175574')
+      .setDepth(13).setName('braila-label:detail:hq-staff')
   }
   WORLD_ROUTE_POINTS.forEach((point, index) => {
     const merchant = point.kind === 'pickup'
@@ -236,9 +267,11 @@ export const renderUrbanNeighborhood = (
     drawNeighborhoodNPC(scene, npcX, npcY, merchant, index)
       .setName(profile?.worldActorId ?? `customer:${point.label}`)
     const name = point.displayName.split(' · ')[0]
-    const text = cityLabel(scene, point.x, point.y + (north ? 27 : 24),
-      name, 9, '#fff4ce', '#175574').setDepth(13)
+    const text = trackedLabel('route', point.x, point.y + (north ? 27 : 24),
+      name, 9, '#fff4ce', '#175574').setDepth(13).setName(`braila-label:route:${point.label}`)
     if (text.width > 115) text.setScale(115 / text.width)
   })
+
+  installBrailaLabelPresentation(scene, semanticLabels, WORLD_WIDTH, WORLD_HEIGHT)
   return null
 }
