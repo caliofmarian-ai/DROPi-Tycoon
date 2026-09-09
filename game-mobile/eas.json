@@ -9,6 +9,9 @@
       "developmentClient": true,
       "distribution": "internal",
       "autoIncrement": true,
+      "env": {
+        "EXPO_PUBLIC_DROPITYCOON_RUNTIME_MODE": "remote"
+      },
       "android": {
         "buildType": "apk"
       }
@@ -18,6 +21,9 @@
       "environment": "preview",
       "distribution": "internal",
       "autoIncrement": true,
+      "env": {
+        "EXPO_PUBLIC_DROPITYCOON_RUNTIME_MODE": "remote"
+      },
       "android": {
         "buildType": "apk"
       }
@@ -26,6 +32,9 @@
       "node": "22.13.0",
       "environment": "production",
       "autoIncrement": true,
+      "env": {
+        "EXPO_PUBLIC_DROPITYCOON_RUNTIME_MODE": "bundled"
+      },
       "android": {
         "buildType": "app-bundle"
       }
