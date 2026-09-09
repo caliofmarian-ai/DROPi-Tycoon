@@ -2,11 +2,11 @@
 
 Document: ORDERS.md
 Project: DROPi Tycoon
-Version: 2.0.0
+Version: 2.1.0
 Status: Canonical — Order and Work-Request Specialization
 Author: Marian Caliof & OpenAI
 Language: English
-Last Updated: 2026-09-08
+Last Updated: 2026-09-09
 
 ---
 
@@ -53,7 +53,8 @@ A valid order should normally derive from one or more real causes:
 - medical/service requirement;
 - waste/recycling/reverse logistics;
 - recurring commercial contract;
-- public/community/emergency requirement where governed.
+- public/community/emergency requirement where governed;
+- committed player-marketplace trade that requires physical fulfillment.
 
 The originating state identifies a legitimate buyer/payer/source or another explicitly governed settlement source.
 
@@ -85,7 +86,7 @@ A mature order lifecycle may include:
 
 -> **Settlement**
 
--> **Feedback / Reputation / Inventory / World Consequence**
+-> **Feedback / Reputation / Progression / Inventory / World Consequence**
 
 Failure/cancellation/default may branch at valid stages.
 
@@ -149,6 +150,14 @@ Created under recurring or one-off agreements between real economic actors.
 
 May define volumes, schedules, service levels, price, penalties and qualification/infrastructure requirements.
 
+## Marketplace Fulfillment Orders
+
+Created after a governed marketplace listing is matched/committed and a physical inventory item must move from seller/source custody to buyer/recipient custody.
+
+Marketplace fulfillment may transport ordinary goods, resources, produced items, collectibles or tradable Specialist Card Fragments.
+
+The marketplace match itself does not complete inventory transfer. Physical ownership/custody settles only after the valid fulfillment lifecycle defined here and in `02_Economy/MARKET.md`.
+
 ## Public / Community / Recovery Orders
 
 May support governed infrastructure, emergency, waste, public-service or reconstruction needs where those systems exist.
@@ -178,7 +187,9 @@ A mature order should reference enough authoritative data to explain its cause/e
 - agreed price/payment/settlement terms;
 - failure/cancellation terms;
 - assigned actor/company/vehicle/legs;
-- current state/revision.
+- current state/revision;
+- marketplace listing/transaction ID when the order fulfills a market trade;
+- progression-settlement receipt/key when the order is eligible to award player consequences.
 
 Fields may be introduced incrementally, but separate systems must not create parallel conflicting truth.
 
@@ -197,7 +208,8 @@ Orders may differ by:
 - cold-chain;
 - pallet/industrial handling;
 - hazardous/special handling where later governed;
-- reverse logistics/waste.
+- reverse logistics/waste;
+- collectible/document handling for eligible Specialist Card Fragment cargo.
 
 Higher priority may change price/service terms, but urgency does not magically create additional economic value without a willing/authorized payer.
 
@@ -251,11 +263,40 @@ Successful completion can trigger multiple causally distinct effects:
 - company books revenue/costs;
 - worker wage eligibility/work record updates where applicable;
 - reputation/service history updates;
+- eligible player XP/Level progression updates;
+- eligible entity-specific loyalty updates;
+- eligible Specialist Card Fragment awards tied to the actual governed economic entity/activity;
+- marketplace ownership transfer completes when this order is the physical fulfillment leg of a marketplace transaction;
 - waste/new demand may be generated later through use/consumption.
 
 These effects should be idempotent/exactly-once under shared authority.
 
 An order completion must not independently credit both company and worker with duplicated magical money.
+
+## Progression consequence receipt
+
+When a legitimate completed delivery is eligible for personal progression consequences, the authoritative settlement should emit one replay-safe progression receipt keyed to the completed work/order settlement.
+
+That receipt may include governed consequences such as:
+
+- XP awarded to the actual worker/player;
+- resulting player Level transition, if a threshold was crossed;
+- loyalty delta for the actual persistent recipient/source/business entity;
+- Specialist Card Fragment family/quantity when that entity has a valid specialist affinity.
+
+Exact values and thresholds are balancing data.
+
+The settlement authority must guarantee that retry, reload, duplicate callbacks or replay cannot mint the same XP, loyalty or fragments twice.
+
+## Specialist-affinity boundary
+
+A rural/farm destination does not automatically mean every agriculture fragment is valid.
+
+Fragment eligibility must come from governed economic identity/capability. Examples may include animal husbandry, horticulture/vegetable production, cattle husbandry or pig husbandry only when the relevant simulated node actually supports that activity.
+
+Transporting or reselling an already-existing fragment is ordinary cargo movement. It must not remint that fragment family merely because a new delivery occurred.
+
+Self-delivery, self-dealing or circular marketplace trades must not become an infinite progression loop.
 
 ---
 
@@ -272,7 +313,7 @@ Orders may fail because of:
 - cancellation;
 - counterparty/company failure.
 
-Consequences may include inventory/custody recovery, partial/zero payment, penalty, reputation/trust effects, re-offering/rerouting and continuing shortage/project delay.
+Consequences may include inventory/custody recovery, partial/zero payment, penalty, reputation/trust effects, entity-loyalty loss where causally justified, re-offering/rerouting and continuing shortage/project delay.
 
 Failure should be explainable and recoverable where possible.
 
@@ -286,6 +327,10 @@ For example:
 
 `shop stock below target -> procurement requirement -> order object generated -> eligible logistics providers see opportunity`.
 
+Or:
+
+`marketplace listing matched -> physical inventory reserved -> fulfillment order generated -> custody/delivery -> buyer inventory settlement`.
+
 Not canonical:
 
 `random timer -> unrelated order/reward appears -> completion creates money`.
@@ -296,7 +341,7 @@ Not canonical:
 
 Orders, contracts, inventory/custody and settlement are World-Instance-local economic state.
 
-When shared multiplayer activates, trusted/server authority must own contested order creation, acceptance, assignment, custody transitions, cancellation and settlement.
+When shared multiplayer activates, trusted/server authority must own contested order creation, acceptance, assignment, custody transitions, cancellation, progression consequences and settlement.
 
 Client UI sends intent; it does not declare successful economic settlement.
 
@@ -312,7 +357,9 @@ That implementation remains functional until a staged migration connects:
 - payer/counterparty;
 - Personal Money/company revenue distinctions;
 - cargo requirements/custody;
-- authoritative settlement.
+- authoritative settlement;
+- XP/Level, entity loyalty and Specialist Card Fragment progression receipts;
+- physically fulfilled player-marketplace transactions.
 
 Migration must preserve current technical states or explicitly migrate them with save/testing evidence.
 
@@ -322,13 +369,13 @@ Migration must preserve current technical states or explicitly migrate them with
 
 Orders should create meaningful route/cargo/customer/location choices and avoid repetitive identical waypoint touching.
 
-Exact price, priority, deadlines, volumes and availability coefficients remain balancing data.
+Exact price, priority, deadlines, volumes, XP, loyalty deltas, fragment quantities and availability coefficients remain balancing data.
 
 ---
 
 # Canonical Rule
 
-**An order is an actionable commitment produced by a real modeled economic requirement. It connects counterparties, goods/service, inventory/custody, capability, transport/work, time and settlement; it may surface a business opportunity, but it cannot create unexplained demand or money by itself.**
+**An order is an actionable commitment produced by a real modeled economic requirement or committed marketplace transaction. It connects counterparties, goods/service, inventory/custody, capability, transport/work, time and settlement; it may surface a business or progression opportunity, but it cannot create unexplained demand, money, XP, loyalty, fragments or teleported inventory by itself.**
 
 ---
 
