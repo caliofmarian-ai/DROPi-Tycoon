@@ -1,0 +1,43 @@
+{
+  "schemaVersion": 1,
+  "auditDate": "2026-09-09",
+  "baselineCommit": "65413103c7ae4e1951ac63aacc8e1232643e0bd0",
+  "sourceLockfile": {
+    "path": "game-web/package-lock.json",
+    "gitBlobSha": "29c7efc9b5e9b642e37eb4606757596584e2b38f"
+  },
+  "scope": "production npm dependency closure only",
+  "packages": [
+    {
+      "name": "phaser",
+      "version": "3.90.0",
+      "license": "MIT",
+      "relationship": "direct",
+      "resolved": "https://registry.npmjs.org/phaser/-/phaser-3.90.0.tgz",
+      "licenseSource": "https://github.com/phaserjs/phaser/blob/v3.90.0/LICENSE.md",
+      "noticeSection": "Phaser 3.90.0"
+    },
+    {
+      "name": "eventemitter3",
+      "version": "5.0.4",
+      "license": "MIT",
+      "relationship": "transitive via phaser",
+      "resolved": "https://registry.npmjs.org/eventemitter3/-/eventemitter3-5.0.4.tgz",
+      "licenseSource": "https://github.com/primus/eventemitter3/blob/5.0.4/LICENSE",
+      "noticeSection": "EventEmitter3 5.0.4"
+    },
+    {
+      "name": "postgres",
+      "version": "3.4.9",
+      "license": "Unlicense",
+      "relationship": "direct",
+      "resolved": "https://registry.npmjs.org/postgres/-/postgres-3.4.9.tgz",
+      "licenseSource": "https://github.com/porsager/postgres/blob/v3.4.9/UNLICENSE",
+      "noticeSection": "Postgres.js 3.4.9"
+    }
+  ],
+  "excluded": {
+    "devDependencies": true,
+    "reason": "Development-only packages are not part of the production npm dependency closure validated by this release inventory."
+  }
+}
