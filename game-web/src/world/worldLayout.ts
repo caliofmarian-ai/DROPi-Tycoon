@@ -14,6 +14,7 @@ import {
   scaleCityRoadAttachedPoint,
   scaleCityRoutePoint,
   scaleCityZone,
+  type CityScalePoint,
 } from './worldScale'
 import { distanceToSegment, surfaceContains } from './worldSurfaces'
 export type { WorldBuildingLayout, WorldDecorationLayout, WorldRectLayout, WorldRoutePoint, WorldZoneId, WorldZoneLayout } from './legacyCityLayout'
@@ -53,18 +54,27 @@ export const WORLD_SIDEWALKS: readonly WorldRectLayout[] = WORLD_ROADS.map(road 
   roadWidth: (road.roadWidth ?? 32) + 32,
 }))
 
-const WORLD_SOURCE_PLAYER_START = { x: layout.playerStart.x, y: layout.playerStart.y }
-const playerStartRoad = WORLD_SOURCE_ROADS
-  .map(road => {
-    const anchor = cityRoadAnchorForPoint(WORLD_SOURCE_PLAYER_START, road)
-    const dx = WORLD_SOURCE_PLAYER_START.x - anchor.x
-    const dy = WORLD_SOURCE_PLAYER_START.y - anchor.y
-    return { road, distanceSquared: dx * dx + dy * dy }
-  })
-  .sort((a, b) => a.distanceSquared - b.distanceSquared || a.road.id.localeCompare(b.road.id))[0]?.road
+const nearestSourceRoadForPoint = (point: CityScalePoint): WorldRectLayout | undefined =>
+  WORLD_SOURCE_ROADS
+    .map(road => {
+      const anchor = cityRoadAnchorForPoint(point, road)
+      const dx = point.x - anchor.x
+      const dy = point.y - anchor.y
+      return { road, distanceSquared: dx * dx + dy * dy }
+    })
+    .sort((a, b) => a.distanceSquared - b.distanceSquared || a.road.id.localeCompare(b.road.id))[0]?.road
+
+export const WORLD_SOURCE_PLAYER_START = { x: layout.playerStart.x, y: layout.playerStart.y }
+const playerStartRoad = nearestSourceRoadForPoint(WORLD_SOURCE_PLAYER_START)
 export const PLAYER_START = playerStartRoad
   ? scaleCityRoadAttachedPoint(WORLD_SOURCE_PLAYER_START, playerStartRoad)
   : scaleCityPoint(WORLD_SOURCE_PLAYER_START)
+
+export const WORLD_SOURCE_MARKETPLACE = { x: layout.marketplace.x, y: layout.marketplace.y }
+const marketplaceRoad = nearestSourceRoadForPoint(WORLD_SOURCE_MARKETPLACE)
+export const WORLD_MARKETPLACE = marketplaceRoad
+  ? scaleCityRoadAttachedPoint(WORLD_SOURCE_MARKETPLACE, marketplaceRoad)
+  : scaleCityPoint(WORLD_SOURCE_MARKETPLACE)
 
 export const WORLD_SOURCE_ROUTE_POINTS: readonly WorldRoutePoint[] = layout.routes as WorldRoutePoint[]
 export const WORLD_ROUTE_POINTS: readonly WorldRoutePoint[] = WORLD_SOURCE_ROUTE_POINTS.map(point => {
@@ -74,11 +84,18 @@ export const WORLD_ROUTE_POINTS: readonly WorldRoutePoint[] = WORLD_SOURCE_ROUTE
 
 export const WORLD_SOURCE_BUILDINGS: readonly WorldBuildingLayout[] = layout.buildings as WorldBuildingLayout[]
 export const WORLD_BUILDINGS: readonly WorldBuildingLayout[] = WORLD_SOURCE_BUILDINGS.map(building => {
-  const sourceAnchor = WORLD_SOURCE_ROUTE_POINTS.find(point => point.buildingId === building.id)
-  const playableAnchor = sourceAnchor && WORLD_ROUTE_POINTS.find(point => point.label === sourceAnchor.label)
-  return sourceAnchor && playableAnchor
-    ? scaleCityBuildingFromAnchor(building, sourceAnchor, playableAnchor)
-    : scaleCityBuilding(building)
+  const sourceRouteAnchor = WORLD_SOURCE_ROUTE_POINTS.find(point => point.buildingId === building.id)
+  const playableRouteAnchor = sourceRouteAnchor && WORLD_ROUTE_POINTS.find(point => point.label === sourceRouteAnchor.label)
+  if (sourceRouteAnchor && playableRouteAnchor) {
+    return scaleCityBuildingFromAnchor(building, sourceRouteAnchor, playableRouteAnchor)
+  }
+  if (building.id === 'main-hq') {
+    return scaleCityBuildingFromAnchor(building, WORLD_SOURCE_PLAYER_START, PLAYER_START)
+  }
+  if (building.id === 'business-1') {
+    return scaleCityBuildingFromAnchor(building, WORLD_SOURCE_MARKETPLACE, WORLD_MARKETPLACE)
+  }
+  return scaleCityBuilding(building)
 })
 
 /** #613 compact tuples remain the shipped representation; playable scaling occurs after lossless reconstruction. */
@@ -89,7 +106,6 @@ export const WORLD_CONTEXT_BUILDINGS = WORLD_SOURCE_CONTEXT_BUILDINGS
   .map(building => scaleCityContextBuilding(building))
 
 export const WORLD_LANDSCAPE = layout.landscape.map(feature => scaleCityLandscapeFeature(feature))
-export const WORLD_MARKETPLACE = scaleCityPoint({ x: layout.marketplace.x, y: layout.marketplace.y })
 export const WORLD_CITY_NAME = layout.name
 /** Source geographic bounds remain factual; the 10x transform applies only to playable world units. */
 export const WORLD_GEO_BOUNDS = layout.geoBounds
