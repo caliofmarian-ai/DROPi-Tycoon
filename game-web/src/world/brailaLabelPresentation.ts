@@ -36,6 +36,8 @@ export const BRAILA_LABEL_RULES: Readonly<Record<BrailaLabelRole, BrailaLabelRul
   detail: { levels: ['Hero'], priority: 45, fixedScreenSize: true, gap: 4 },
 }
 
+export const BRAILA_LABEL_MAX_SCREEN_COMPENSATION = 128
+
 export interface BrailaScreenLabelCandidate {
   id: string
   role: BrailaLabelRole
@@ -170,7 +172,9 @@ export const installBrailaLabelPresentation = (
 
     for (const state of states) {
       const rule = BRAILA_LABEL_RULES[state.role]
-      const compensation = rule.fixedScreenSize ? Math.max(0.4, Math.min(32, 1 / Math.max(0.001, camera.zoom))) : 1
+      const compensation = rule.fixedScreenSize
+        ? Math.max(0.4, Math.min(BRAILA_LABEL_MAX_SCREEN_COMPENSATION, 1 / Math.max(0.001, camera.zoom)))
+        : 1
       state.text.setScale(state.baseScaleX * compensation, state.baseScaleY * compensation)
       state.text.setVisible(false).setAlpha(state.baseAlpha)
     }
