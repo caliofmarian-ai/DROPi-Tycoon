@@ -28,6 +28,7 @@ const readNumericExports = source => {
 const isSectorBudgetSymbol = name => {
   const upper = name.toUpperCase()
   if (!upper.includes('SECTOR')) return false
+  if (upper.includes('CHUNK')) return false
   if (upper.includes('SIZE') || upper.includes('RADIUS')) return false
   return upper.includes('LIMIT') || upper.includes('MAX') || upper.includes('BUDGET') || upper.includes('COUNT')
 }
