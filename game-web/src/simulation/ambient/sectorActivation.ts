@@ -158,13 +158,26 @@ const routeDistanceSquared = (route: AmbientSectorRoute, center: AmbientSectorPo
   return dx * dx + dy * dy
 }
 
-const routeDistanceSquaredToFocuses = (
+interface AmbientRouteFocusRank {
+  distanceSquared: number
+  focusIndex: number
+}
+
+const routeFocusRank = (
   route: AmbientSectorRoute,
   focuses: readonly AmbientSectorPoint[],
-): number => focuses.reduce(
-  (best, focus) => Math.min(best, routeDistanceSquared(route, focus)),
-  Number.POSITIVE_INFINITY,
-)
+): AmbientRouteFocusRank => {
+  let distanceSquared = Number.POSITIVE_INFINITY
+  let focusIndex = Number.MAX_SAFE_INTEGER
+  for (let index = 0; index < focuses.length; index += 1) {
+    const candidateDistanceSquared = routeDistanceSquared(route, focuses[index])
+    if (candidateDistanceSquared < distanceSquared) {
+      distanceSquared = candidateDistanceSquared
+      focusIndex = index
+    }
+  }
+  return { distanceSquared, focusIndex }
+}
 
 /**
  * Selects the only ambient actors that may receive full-detail simulation around one or more
@@ -181,8 +194,13 @@ export const resolveAmbientSectorActivationForFocuses = (
   const activeSectorIds = resolveActiveAmbientSectorIdsForFocuses(acceptedFocuses, normalized)
   const selected = routes
     .filter(route => acceptedFocuses.some(focus => routeTouchesActiveWindow(route, focus, normalized)))
-    .sort((a, b) => routeDistanceSquaredToFocuses(a, acceptedFocuses) - routeDistanceSquaredToFocuses(b, acceptedFocuses)
-      || a.id.localeCompare(b.id))
+    .sort((a, b) => {
+      const aRank = routeFocusRank(a, acceptedFocuses)
+      const bRank = routeFocusRank(b, acceptedFocuses)
+      return aRank.distanceSquared - bRank.distanceSquared
+        || aRank.focusIndex - bRank.focusIndex
+        || a.id.localeCompare(b.id)
+    })
     .slice(0, normalized.maxActiveActors)
   const activeIds = new Set(selected.map(route => route.id))
   const inactiveActorIds = routes
