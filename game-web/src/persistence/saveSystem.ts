@@ -45,6 +45,12 @@ import {
   type UrbanProgressState,
 } from '../types/game'
 import type { OwnershipEconomyState } from '../types/ownershipEconomy'
+import {
+  captureWorldContinuity,
+  restoreWorldContinuity,
+  sanitizeWorldContinuity,
+  type SaveWorldContinuityV1,
+} from './worldContinuity'
 
 export const SAVE_FORMAT_VERSION = 2 as const
 export const SAVE_STORAGE_KEY = 'dropi.tycoon.save.v2'
@@ -97,6 +103,8 @@ export interface SaveGameV2 {
   company: SaveCompanyV2
   settings: GameSettingsState
   urban?: UrbanProgressState
+  /** Additive #566 field. Older Save v2 payloads intentionally omit it. */
+  worldContinuity?: SaveWorldContinuityV1
   /** Additive #370 field. Older Save v2 payloads intentionally omit it. */
   personalProgression?: PersonalProgressionState
   /** Additive #390 field. Older Save v2 payloads intentionally omit it. */
@@ -453,6 +461,7 @@ export const createSaveGame = (session: GameSessionState): SaveGameV2 => {
     },
     settings: { tutorialCompleted: session.settings.tutorialCompleted, soundEnabled: session.settings.soundEnabled },
     ...(session.world.urban ? { urban: sanitizeUrban(session.world.urban, session.company).urban } : {}),
+    worldContinuity: captureWorldContinuity(session.world),
     ...(hasPersonalProgressionActivity(personalProgression)
       ? { personalProgression: clonePersonalProgression(personalProgression) }
       : {}),
@@ -479,6 +488,7 @@ export const decodeSave = (raw: string): SaveDecodeResult => {
   const settingsResult = sanitizeSettings(parsed.settings)
   const company = companyResult.company
   const urbanResult = sanitizeUrban(parsed.urban, company)
+  const worldContinuityResult = sanitizeWorldContinuity(parsed.worldContinuity)
   const personalProgressionResult = sanitizePersonalProgression(parsed.personalProgression)
   const ownershipEconomyResult = sanitizeOwnershipEconomyState(parsed.ownershipEconomy)
   const includePersonalProgression = parsed.personalProgression !== undefined ||
@@ -505,6 +515,9 @@ export const decodeSave = (raw: string): SaveDecodeResult => {
       },
       settings: settingsResult.settings,
       urban: urbanResult.urban,
+      ...(worldContinuityResult.continuity
+        ? { worldContinuity: worldContinuityResult.continuity }
+        : {}),
       ...(includePersonalProgression
         ? { personalProgression: clonePersonalProgression(personalProgressionResult.personalProgression) }
         : {}),
@@ -513,7 +526,7 @@ export const decodeSave = (raw: string): SaveDecodeResult => {
         : {}),
     },
     repaired: migratingV1 || companyResult.repaired || settingsResult.repaired || urbanResult.repaired ||
-      personalProgressionResult.repaired || ownershipEconomyResult.repaired,
+      worldContinuityResult.repaired || personalProgressionResult.repaired || ownershipEconomyResult.repaired,
     ...(migratingV1 ? { migratedFrom: 1 as const } : {}),
   }
 }
@@ -535,7 +548,8 @@ export const restoreGameSessionFromSave = (save: SaveGameV2): GameSessionState =
     hq: { constructedDepartments: [...hq.constructedDepartments] },
   }
   company = reconcileLegacyBicycleOwnership(company)
-  const world = synchronizePlayerMovementSpeed(createInitialWorldState(), company)
+  let world = restoreWorldContinuity(createInitialWorldState(), save.worldContinuity)
+  world = synchronizePlayerMovementSpeed(world, company)
   world.urban = sanitizeUrban(save.urban, company).urban
   const personalProgression = save.personalProgression
     ? sanitizePersonalProgression(save.personalProgression).personalProgression
