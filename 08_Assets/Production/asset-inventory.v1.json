@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "authority": "DT-19 — ART ASSET PIPELINE / PRODUCTION LIBRARY",
-  "baselineCommit": "08e33ad71e11e4f17eeb1f38d530386ee447d334",
+  "baselineCommit": "d3a57d9814869eb5110f6f55ca53ce2db2299918",
   "canonicalLifecycle": [
     "INVENTORIED",
     "SPECIFIED",
@@ -18,7 +18,15 @@
     "generationPolicy": "08_Assets/Production/DEMAND_DRIVEN_GENERATION_POLICY.md",
     "approvedSourceRegister": "08_Assets/Production/Approved_Sources/APPROVED_SOURCE_REGISTER.md",
     "generatedFamilyRegister": "08_Assets/Production/Approved_Sources/2026-09-07_GENERATED_FAMILY_REGISTRY.md",
-    "legalReleaseAuthority": "game-web/public/legal/runtime-provenance.json"
+    "legalQualificationContract": "09_Development/Compliance/GLOBAL_ASSET_PROVENANCE_CONTRACT_565_643.md",
+    "runtimeEvidenceManifest": "game-web/public/legal/runtime-provenance.json"
+  },
+  "authorityBoundary": {
+    "productionLifecycleAuthority": "DT-19",
+    "legalQualificationAuthority": "DT-13",
+    "legalQualificationContractRef": "09_Development/Compliance/GLOBAL_ASSET_PROVENANCE_CONTRACT_565_643.md",
+    "runtimeEvidenceManifestRef": "game-web/public/legal/runtime-provenance.json",
+    "rule": "DT-19 records production identity, lifecycle and lineage. DT-13 qualifies legal/commercial release evidence. The runtime evidence manifest is evidence consumed by DT-13/DT-19 and is not itself a legal authority."
   },
   "dedupDimensions": [
     "semanticFamily",
@@ -180,7 +188,7 @@
         "PRODUCTION_READY": "game-web/public/assets/production/icon-orders.webp",
         "RUNTIME_INTEGRATED": "game-web/src/scenes/ApprovedAssetMainMenuScene.ts"
       },
-      "legalEvidenceRef": "game-web/public/legal/runtime-provenance.json"
+      "runtimeEvidenceRef": "game-web/public/legal/runtime-provenance.json"
     },
     {
       "assetId": "runtime-placeholder-building-commercial",
