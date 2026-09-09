@@ -118,6 +118,36 @@ No amount, wage, Company Money mutation, Personal Money mutation or guaranteed p
 
 This adapter is not yet wired into `GameWorldScene`, `PlayerSmartphone` or the current visible delivery loop. That composition belongs to a later orchestrated integration after capability/economy/save boundaries are ready.
 
+## Authoritative mission reservation lifecycle
+
+`game-web/src/trade/producerMissionReservationLifecycle.ts` composes the existing inventory, producer-contract and Mission Framework authorities without introducing a shadow mission engine or a second stock model.
+
+The governed lifecycle is:
+
+`real opportunity -> reserve producer stock -> accept existing systemic mission -> pickup/custody -> delivery result -> consumed reservation or safe release`.
+
+Rules enforced by the lifecycle adapter:
+
+- mission acceptance requires the real producer reservation to still be active;
+- one reservation reduces `availableInventoryQuantity`, so another mission cannot claim the same stock;
+- pickup consumes the existing reservation exactly once and moves the same quantity into explicit cargo custody;
+- duplicate pickup/delivery events reuse existing idempotency and cannot consume or settle twice;
+- cancellation before custody releases the reservation and does not move stock;
+- failure before custody releases the reservation;
+- failure after custody does **not** re-credit producer inventory or release consumed stock: the contract remains `InCustody` and reports `physical-recovery-required` so later recovery/reroute/return logic must represent the real cargo;
+- delivery requires an active (or already-completed replay) producer mission and completes through the existing Mission Framework;
+- the lifecycle creates no money and carries no settlement amount.
+
+Stale reservation references are repaired only when the correction is physically unambiguous:
+
+- a missing pre-custody reservation may be recreated only if the producer still has enough currently available stock;
+- a `Reserved` contract pointing to an already-consumed reservation is advanced deterministically to `InCustody` without consuming stock again;
+- an `InCustody`/`Delivered` contract with a still-active matching reservation consumes that reservation exactly once;
+- a terminal `Cancelled`/`Failed` contract with a still-active matching reservation releases it;
+- a missing or released reservation after cargo has moved is rejected rather than guessing whether stock should be removed or restored.
+
+This lifecycle intentionally does not modify Save v2 (#566), PostgreSQL, Player Economy, UI, Android runtime or the Mission Framework implementation itself.
+
 ## Regional boundary
 
 Economic nodes can carry stable:
