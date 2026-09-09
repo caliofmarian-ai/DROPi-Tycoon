@@ -2,11 +2,12 @@
 
 Document: `ORGANIC_COMMUNITY_LAUNCH_MEASUREMENT_PLAYBOOK.md`
 Project: DROPi Tycoon
-Version: 1.0.0
+Version: 1.0.1
 Status: Canonical design contract — future organic pilot only
 Owner Lane: DT-15 — Marketing / Growth / ASO / Community
 Coordination: DT-13 Legal / Privacy / IP; DT-14 Android / Google Play Release; DT-16 Independent Audit; product-domain owners for routed feedback
 Baseline Main: `b8aa2f622a28234b7907e1935d28538331ff9fe5`
+Latest Reconciliation Main: `d33cb0a60ceaaca16113af752349f1b4aa30d075`
 Prepared: 2026-09-09
 
 ---
@@ -689,6 +690,57 @@ Primary routing: DT-15, with owning feature specialist consulted before claim re
 
 Primary routing: DT-13; affected external community operations pause until reviewed.
 
+## 15.13 Future city-scale, traversal and delivery-distribution quality — owner direction #614/#615
+
+These categories exist so future owner/tester evidence can evaluate the enlarged-city direction without implying that #614 or #615 is already implemented, merged, Android-accepted or marketable.
+
+City-scale and traversal:
+
+- `fb:city-scale:board-like-compression`
+- `fb:city-scale:city-presence`
+- `fb:city-scale:district-separation`
+- `fb:city-scale:urban-hierarchy`
+- `fb:city-scale:local-vs-cross-city-distance`
+- `fb:city-scale:walking-distance-pressure`
+- `fb:city-scale:transport-progression-value`
+- `fb:city-scale:outer-area-dead-space`
+- `fb:city-scale:camera-scale-perception`
+- `fb:city-scale:sector-transition`
+
+Primary routing: DT-01 for playable Brăila scale/presentation, DT-05 for traversal/living-city behavior, DT-11 only after a validated Brăila scale contract is generalized to other cities.
+
+Delivery distribution:
+
+- `fb:delivery-distribution:center-bias`
+- `fb:delivery-distribution:hq-bias`
+- `fb:delivery-distribution:district-variety`
+- `fb:delivery-distribution:local-route-variety`
+- `fb:delivery-distribution:adjacent-district-variety`
+- `fb:delivery-distribution:cross-city-variety`
+- `fb:delivery-distribution:outer-area-coverage`
+- `fb:delivery-distribution:producer-logistics-route`
+- `fb:delivery-distribution:repeat-endpoint-overuse`
+- `fb:delivery-distribution:route-distance-legibility`
+- `fb:delivery-distribution:transport-eligibility-fit`
+
+Primary routing: DT-09 for citywide delivery opportunity/materialization distribution, DT-07 for authoritative supply/demand causes, DT-06 when work-access eligibility is the actual cause, and DT-01/DT-05 where the observed problem is route scale/traversal rather than mission selection.
+
+Android/performance compatibility of the larger-city direction:
+
+- `fb:city-scale-performance:frame-time`
+- `fb:city-scale-performance:streaming-stutter`
+- `fb:city-scale-performance:sector-pop-in`
+- `fb:city-scale-performance:memory-pressure`
+- `fb:city-scale-performance:actor-density-collapse`
+
+Primary routing: DT-04/DT-14 for performance/release evidence, with DT-01/DT-05 consulted for the owning city presentation/simulation contract.
+
+Truthfulness rule:
+
+- #614 and #615 are **future product-quality targets**, not shipped marketing claims;
+- no screenshot, post, trailer, ASO copy or creator brief may describe enlarged-city scale or citywide delivery distribution as current until the exact Android build proves the behavior and required owner acceptance is complete;
+- qualitative reports about these categories are evidence about a tested build only, never evidence that the roadmap target is globally complete.
+
 ---
 
 # 16. Feedback record contract
@@ -826,6 +878,7 @@ Create a new issue only when:
 | Domain | Primary owner |
 |---|---|
 | Brăila Android visual/zoom/HUD | DT-01 |
+| Brăila city-scale / district-distance perception (#614) | DT-01 |
 | Save/world/job/cargo continuity | DT-02 |
 | Player Money/work/wages/hardship | DT-03 |
 | CI / production bundle / Railway planning | DT-04 |
@@ -834,6 +887,7 @@ Create a new issue only when:
 | production/supply/inventory demand | DT-07 |
 | story canon/cast/arc consequences | DT-08 |
 | mission framework/materialization | DT-09 |
+| citywide delivery distribution (#615) | DT-09 |
 | character/dialogue visual presentation | DT-10 |
 | country/locality catalog | DT-11 |
 | commercial catalog/entitlements/pay-to-win perception | DT-12 |
@@ -887,7 +941,9 @@ Do not publish when:
 - a mission registry is presented as visible story presentation when the UI is absent/unaccepted;
 - a commercial entitlement domain is presented as a live purchase system;
 - a Play/privacy declaration has not been reconciled to the exact artifact;
-- the capture contains uncleared branding/assets.
+- the capture contains uncleared branding/assets;
+- #614 enlarged-city intent is presented as current before the exact build visibly demonstrates it;
+- #615 citywide delivery-distribution intent is presented as current before legitimate distributed work is proven in the exact build.
 
 ## 19.4 Content state downgrade
 
@@ -1040,6 +1096,10 @@ decisionUse
 
 No metric should be added merely because it is common in marketing dashboards.
 
+Until lawful/reliable implementation exists, all cross-session retention/engagement measures that require identity linkage remain:
+
+`NOT_MEASURABLE_WITH_CURRENT_INSTRUMENTATION`
+
 ---
 
 # 23. Metric integrity rules
@@ -1055,6 +1115,10 @@ Do not combine incompatible builds in one funnel unless explicitly reporting a m
 ## 23.3 Missing telemetry is not zero
 
 Missing event = `UNKNOWN` unless a reliable upstream/downstream invariant proves otherwise.
+
+Cross-session retention/engagement that cannot be lawfully linked is not `UNKNOWN` and is not zero; it is explicitly:
+
+`NOT_MEASURABLE_WITH_CURRENT_INSTRUMENTATION`
 
 ## 23.4 Bot/invalid traffic
 
@@ -1094,6 +1158,10 @@ Android visuals:
 Controls:
 Story/characters:
 Missions/work loop:
+City scale / district separation:
+Traversal / route-distance perception:
+Delivery geographic distribution:
+Outer-area usefulness / dead-space perception:
 Persistence:
 Performance:
 Marketing expectation fit:
@@ -1130,7 +1198,8 @@ Preferred:
 - short reproduction steps;
 - screenshot or short recording intentionally submitted;
 - whether issue reproduced after relaunch;
-- relevant game location/state.
+- relevant game location/state;
+- for #614/#615 evidence, broad in-game district/area or route class (`local`, `adjacent-district`, `cross-city`) when that concept exists in the tested build—never the tester's real-world location.
 
 Avoid:
 
@@ -1235,6 +1304,16 @@ Candidate questions:
 6. What was the most interesting part?
 7. Would you choose to play another session?
 8. Optional free-text feedback.
+
+For a future build that actually contains #614/#615 work, an owner-approved test script may ask narrowly:
+
+- Did Brăila feel like a city or like a compact board/level?
+- Could you perceive a meaningful difference between a local route and a cross-city route?
+- Did legitimate work appear across distinct areas rather than repeatedly around HQ/center?
+- Did outer areas feel useful or like dead space?
+- Did longer traversal make bicycle/vehicle progression feel more meaningful?
+
+These questions are future feedback prompts only. Their presence does not claim the behavior exists today.
 
 Only ask device model/Android version when needed for a technical issue.
 
@@ -1442,15 +1521,17 @@ Rules:
 
 # 40. Current claim/evidence posture for measurement
 
-As of this document's baseline:
+As of this document's baseline and latest reconciliation:
 
 - merged domain systems may be measured only if/when they are actually wired into the tested player-facing runtime;
 - Save v2 continuity is merged in source but still requires installed Android release-candidate evidence before marketing it as a proven seamless-resume benefit;
 - Story/Mission canon and registries do not by themselves prove visible narrative presentation;
-- #558 remains a separate visible storytelling acceptance path;
+- visible story presentation remains subject to its own Android acceptance path;
 - country catalog expansion does not mean detailed playable global cities;
 - commercial entitlement code does not mean Play Billing or purchases are active;
 - production Android bundled-runtime source work does not replace #568 artifact attestation;
+- #614 is an active owner direction for enlarged playable-city scale, not proof that an exact accepted Android build already provides that experience;
+- #615 is an active owner direction for citywide delivery distribution, not proof that legitimate work is already geographically distributed across the full city in an accepted build;
 - no current analytics event exists merely because this document names it.
 
 ---
@@ -1465,6 +1546,8 @@ The following are **hypotheses to test**, not current user evidence:
 4. Story/recurring characters may broaden appeal once visual presentation is accepted.
 5. Android control/readability defects can erase positioning gains even when systems are deep.
 6. The most valuable early feedback will come from qualified simulation players rather than broad low-intent traffic.
+7. A Brăila build that visibly communicates meaningful district separation and local-vs-cross-city travel should strengthen the value of transport progression, but this remains unproven until tested.
+8. Legitimate work distributed across multiple urban contexts should make a larger city feel purposeful rather than empty, but this remains unproven until #615 behavior is actually present in the tested build.
 
 A hypothesis becomes evidence only after a real pilot produces observations.
 
@@ -1481,6 +1564,8 @@ When authorization arrives, the first pilot should seek evidence for:
 - Does save/relaunch behavior protect confidence?
 - Do story/mission elements fire only when genuinely integrated?
 - Does the build feel like a game rather than a debug/admin interface?
+- If the tested build actually includes #614-scale work, does Brăila feel like a city rather than a compact board?
+- If the tested build actually includes #615 distribution work, do legitimate routes use distinct urban contexts rather than repeatedly clustering around HQ/center?
 - Which claim or screenshot best matches what players actually valued?
 - What is the strongest reason a participant would voluntarily return?
 - What is the strongest reason they would stop?
@@ -1512,7 +1597,8 @@ When discussing early testing publicly:
 - do not imply user counts that cannot be substantiated;
 - do not imply press/creator endorsements;
 - do not imply that a creator's coverage was positive if it was mixed/negative;
-- do not imply privacy properties that have not been reconciled to the exact build.
+- do not imply privacy properties that have not been reconciled to the exact build;
+- do not describe the #614 larger-city direction or #615 citywide work-distribution direction as shipped until exact-build evidence supports it.
 
 ---
 
@@ -1782,6 +1868,7 @@ At this baseline, external pilot activation remains blocked or constrained by:
 - #565 remaining commercial IP/provenance clearance items where relevant to external assets;
 - #561 authentic owner-validated creative capture pack;
 - #317 and visible Android acceptance gates for player-facing quality;
+- #614/#615 owner-directed city-scale and citywide-delivery quality work remains future until exact-build implementation/acceptance evidence exists;
 - unresolved release-audit findings as maintained by DT-16.
 
 This document removes no release blocker.
