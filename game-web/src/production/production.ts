@@ -15,11 +15,29 @@ import {
 } from '../inventory/inventory'
 import { PRODUCT_CATALOG, type ProductId } from './productCatalog'
 
+export type EconomicNodeCityEndpointRole = 'pickup' | 'delivery'
+
+/**
+ * Stable semantic endpoint identity supplied by one governed locality source.
+ * Coordinates are intentionally absent: geometry may evolve while economic identity stays stable.
+ */
+export interface EconomicNodeCityEndpointRef {
+  localityId: string
+  sourceCheckpoint: string
+  worldEndpointId: string
+  role: EconomicNodeCityEndpointRole
+  districtId: string
+  areaId?: string
+  locationRef: string
+  roadRef?: string
+}
+
 export interface EconomicNodeLocation {
   worldInstanceId: string
   countryId: string
   administrativeRegionId?: string
   localityId?: string
+  cityEndpoint?: EconomicNodeCityEndpointRef
 }
 
 export interface ProductAmount {
@@ -56,6 +74,11 @@ export type ProductionCycleResult =
 const validPositiveInteger = (value: number): boolean => Number.isSafeInteger(value) && value > 0
 const validIndex = (value: number): boolean => Number.isFinite(value) && value >= 0
 const groupsFor = (items: readonly ProductAmount[]): ProductGroup[] => [...new Set(items.map(item => item.group))]
+
+const cloneEconomicNodeLocation = (location: EconomicNodeLocation): EconomicNodeLocation => ({
+  ...location,
+  ...(location.cityEndpoint ? { cityEndpoint: { ...location.cityEndpoint } } : {}),
+})
 
 export const createExecutableProductionRecipe = (input: {
   recipeId: string
@@ -113,7 +136,7 @@ export const createProductiveNode = (input: {
   return {
     nodeId: input.nodeId,
     kind: input.kind,
-    location: { ...input.location },
+    location: cloneEconomicNodeLocation(input.location),
     inventory: createInventory({
       inventoryId: `inventory:${input.nodeId}`,
       nodeId: input.nodeId,
