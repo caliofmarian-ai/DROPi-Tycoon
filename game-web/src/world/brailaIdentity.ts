@@ -143,9 +143,8 @@ export const drawBrailaDistrictIdentity = (
 }
 
 /** Addresses are presentation only; real OSM street names continue to come from WORLD_ROADS. */
-export const renderBrailaAddressLabels = (scene: Phaser.Scene): void => {
-  for (const plaque of BRAILA_ADDRESS_PLAQUES) {
+export const renderBrailaAddressLabels = (scene: Phaser.Scene): Phaser.GameObjects.Text[] =>
+  BRAILA_ADDRESS_PLAQUES.map(plaque =>
     cityLabel(scene, plaque.x, plaque.y, `${plaque.number}`, 8, '#175574', '#fff4ce')
-      .setDepth(7).setName(`address:${plaque.buildingId}`)
-  }
-}
+      .setDepth(7).setName(`address:${plaque.buildingId}`),
+  )

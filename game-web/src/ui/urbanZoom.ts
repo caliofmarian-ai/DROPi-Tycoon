@@ -1,5 +1,8 @@
 import { clampCameraZoom, touchDistance, zoomByStep, type TouchPoint } from './cameraControls'
 
+export const URBAN_PINCH_MAX_STEP_RATIO = 1.6
+export const URBAN_PINCH_MIN_STEP_RATIO = 1 / URBAN_PINCH_MAX_STEP_RATIO
+
 /** Only world-owned fingers participate; controls never become pinch anchors. */
 export class UrbanZoomGesture {
   private readonly pointers = new Map<number, TouchPoint>()
@@ -20,9 +23,10 @@ export class UrbanZoomGesture {
     previous.y = point.y
     const oldDistance = this.distance
     this.rebase()
-    return this.distance >= 24 && oldDistance >= 24
-      ? this.clampZoom(zoom * this.distance / oldDistance)
-      : this.clampZoom(zoom)
+    if (this.distance < 24 || oldDistance < 24) return this.clampZoom(zoom)
+    const rawRatio = this.distance / oldDistance
+    const stableRatio = Math.max(URBAN_PINCH_MIN_STEP_RATIO, Math.min(URBAN_PINCH_MAX_STEP_RATIO, rawRatio))
+    return this.clampZoom(zoom * stableRatio)
   }
 
   release(id: number): void { this.pointers.delete(id); this.rebase() }
