@@ -55,9 +55,9 @@ describe('DT-10 #554 visible Account/Profile presentation', () => {
       heroActorId: identity.heroActorId,
       currentLocalityId: localityId,
       activities: [{
-        activityId: 'WalkingLightDelivery',
+        activityId: 'walking-light-document-delivery',
         label: 'Walking light delivery',
-        accessClass: 'ENTRY',
+        accessClass: 'local-walking',
         eligible: true,
         allowedRouteClasses: ['local'],
         blockers: [],
@@ -65,7 +65,7 @@ describe('DT-10 #554 visible Account/Profile presentation', () => {
       routes: [{
         routeClass: 'local',
         eligible: true,
-        eligibleWorkActivityIds: ['WalkingLightDelivery'],
+        eligibleWorkActivityIds: ['walking-light-document-delivery'],
         blockingReasons: [],
       }],
     }
