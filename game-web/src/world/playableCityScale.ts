@@ -6,6 +6,9 @@
  * dimensions blindly, and must never be interpreted as surveyed metres or fabricated geography.
  *
  * Brăila is the premium calibration locality. It consumes this authority; it does not own it.
+ *
+ * Ownership boundary: this module transforms presentation geometry only. It does not define
+ * locality adjacency, road connectivity, route classes, mission topology, or logistics truth.
  */
 export const CITY_PLAYABLE_SCALE_VERSION = 3
 export const CITY_PLAYABLE_DISTANCE_SCALE_BASELINE = 10
@@ -36,9 +39,6 @@ export interface PlayableCityContextBuilding extends PlayableCityRect {
 export interface PlayableCityLandscapeFeature {
   points: readonly PlayableCityPoint[]
 }
-export interface PlayableCityZone<ZoneId extends string = string> extends PlayableCityRect {
-  id: ZoneId
-}
 
 const finiteScale = (value: number): number =>
   Number.isFinite(value) && value > 0 ? value : CITY_PLAYABLE_DISTANCE_SCALE_BASELINE
@@ -63,8 +63,8 @@ export const expandPlayableCityExtent = (
 ): number => Math.ceil(expandPlayableCityCoordinate(value, scale))
 
 /**
- * Road source vertices gain playable separation while carriageway width stays Hero-readable.
- * Scaling all centerline vertices identically preserves the governed source topology.
+ * Road source vertices gain playable visual separation while carriageway width stays Hero-readable.
+ * The transform preserves the supplied centerline shape; it does not infer or author connectivity.
  */
 export const expandPlayableCityRoad = <T extends PlayableCityRoad>(
   road: T,
@@ -85,7 +85,7 @@ export const expandPlayableCityRoad = <T extends PlayableCityRoad>(
   }
 }
 
-/** Zone footprint size stays legible while its governed anchor gains playable separation. */
+/** Zone footprint size stays legible while its supplied anchor gains playable separation. */
 export const expandPlayableCityZone = <T extends PlayableCityRect>(
   zone: T,
   scale = CITY_PLAYABLE_DISTANCE_SCALE_BASELINE,
@@ -118,7 +118,7 @@ export const expandPlayableCityRoutePoint = <T extends PlayableCityPoint>(
   scale = CITY_PLAYABLE_DISTANCE_SCALE_BASELINE,
 ): T => expandPlayableCityPoint(point, scale)
 
-/** Context footprints retain local size; only their governed city position changes. */
+/** Context footprints retain local size; only their supplied city position changes. */
 export const expandPlayableCityContextBuilding = <T extends PlayableCityContextBuilding>(
   building: T,
   scale = CITY_PLAYABLE_DISTANCE_SCALE_BASELINE,
@@ -153,85 +153,3 @@ export const playableCitySectorForPoint = (
   const row = Math.max(0, Math.floor(point.y / size))
   return { column, row, id: `${column}-${row}` }
 }
-
-export type PlayableCityRoadDistanceClass = 'local' | 'adjacent-district' | 'cross-city'
-
-export interface PlayableCityRouteDistanceContext<ZoneId extends string = string> {
-  originZoneId: ZoneId
-  destinationZoneId: ZoneId
-  roadDistance: number
-}
-
-export interface PlayableCityRouteDistanceClassification<ZoneId extends string = string>
-  extends PlayableCityRouteDistanceContext<ZoneId> {
-  spatialClass: PlayableCityRoadDistanceClass
-  routeDistanceValid: boolean
-}
-
-const zoneCenter = <ZoneId extends string>(zone: PlayableCityZone<ZoneId>): PlayableCityPoint => ({
-  x: zone.x + zone.width / 2,
-  y: zone.y + zone.height / 2,
-})
-
-const zoneDistanceSquared = <ZoneId extends string>(
-  a: PlayableCityZone<ZoneId>,
-  b: PlayableCityZone<ZoneId>,
-): number => {
-  const ac = zoneCenter(a)
-  const bc = zoneCenter(b)
-  const dx = ac.x - bc.x
-  const dy = ac.y - bc.y
-  return dx * dx + dy * dy
-}
-
-/**
- * Generic locality topology handoff for #615. Adjacency is deterministic and independent of any
- * mission quota: a zone is adjacent only when it is among the other's two nearest governed zones
- * and that relationship is mutual.
- */
-export const adjacentPlayableCityZoneIds = <ZoneId extends string>(
-  zoneId: ZoneId,
-  zones: readonly PlayableCityZone<ZoneId>[],
-): readonly ZoneId[] => {
-  const origin = zones.find(zone => zone.id === zoneId)
-  if (!origin) return []
-  return zones
-    .filter(zone => zone.id !== zoneId)
-    .sort((a, b) => zoneDistanceSquared(origin, a) - zoneDistanceSquared(origin, b) || a.id.localeCompare(b.id))
-    .slice(0, 2)
-    .map(zone => zone.id)
-}
-
-/**
- * Spatial class comes from governed locality topology. Authoritative road-network distance remains
- * a separate metric and invalid distance fails closed instead of being replaced by straight-line
- * distance.
- */
-export const classifyPlayableCityRouteDistance = <ZoneId extends string>(
-  context: PlayableCityRouteDistanceContext<ZoneId>,
-  zones: readonly PlayableCityZone<ZoneId>[],
-): PlayableCityRouteDistanceClassification<ZoneId> => {
-  const origin = zones.find(zone => zone.id === context.originZoneId)
-  const destination = zones.find(zone => zone.id === context.destinationZoneId)
-  const routeDistanceValid = Number.isFinite(context.roadDistance) && context.roadDistance >= 0
-
-  let spatialClass: PlayableCityRoadDistanceClass = 'cross-city'
-  if (origin && destination) {
-    if (origin.id === destination.id) {
-      spatialClass = 'local'
-    } else {
-      const originNeighbors = adjacentPlayableCityZoneIds(origin.id, zones)
-      const destinationNeighbors = adjacentPlayableCityZoneIds(destination.id, zones)
-      if (originNeighbors.includes(destination.id) && destinationNeighbors.includes(origin.id)) {
-        spatialClass = 'adjacent-district'
-      }
-    }
-  }
-
-  return { ...context, spatialClass, routeDistanceValid }
-}
-
-export const playableCityTravelSeconds = (roadDistance: number, movementSpeed: number): number =>
-  Number.isFinite(roadDistance) && roadDistance >= 0 && Number.isFinite(movementSpeed) && movementSpeed > 0
-    ? roadDistance / movementSpeed
-    : Number.POSITIVE_INFINITY
