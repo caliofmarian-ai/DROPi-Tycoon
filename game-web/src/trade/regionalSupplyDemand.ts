@@ -35,6 +35,11 @@ export interface LogisticsOpportunity {
 
 const validNonNegativeInteger = (value: number): boolean => Number.isSafeInteger(value) && value >= 0
 
+const cloneLocation = (location: EconomicNodeLocation): EconomicNodeLocation => ({
+  ...location,
+  ...(location.cityEndpoint ? { cityEndpoint: { ...location.cityEndpoint } } : {}),
+})
+
 export const deriveSupplyOffer = (input: {
   supplyId: string
   sourceNodeId: string
@@ -49,7 +54,7 @@ export const deriveSupplyOffer = (input: {
   return {
     supplyId: input.supplyId,
     sourceNodeId: input.sourceNodeId,
-    location: { ...input.location },
+    location: cloneLocation(input.location),
     productId: input.productId,
     availableQuantity: Math.max(0, availableInventoryQuantity(input.inventory, input.productId) - retainQuantity),
   }
@@ -69,7 +74,7 @@ export const deriveInventoryDemand = (input: {
   return {
     demandId: input.demandId,
     destinationNodeId: input.destinationNodeId,
-    location: { ...input.location },
+    location: cloneLocation(input.location),
     productId: input.productId,
     targetStockUnits: input.targetStockUnits,
     currentStockUnits,
