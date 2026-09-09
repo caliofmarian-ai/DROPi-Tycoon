@@ -114,17 +114,17 @@ export const selectMirelaFirstServiceHistory = (
   const facts = uniqueFacts(persistedSemanticFactIds)
   const branches: MirelaHistoryBranch[] = [
     {
-      history: 'CLEAN',
+      history: 'CLEAN' as const,
       sourceFactId: BRAILA_FIRST_HOUR_FACT_IDS.oneSmallThingClean,
       continuationFactId: BRAILA_FAMILIAR_ROUTES_FACT_IDS.mirelaAfterClean,
     },
     {
-      history: 'RECOVERED',
+      history: 'RECOVERED' as const,
       sourceFactId: BRAILA_FIRST_HOUR_FACT_IDS.oneSmallThingRecovered,
       continuationFactId: BRAILA_FAMILIAR_ROUTES_FACT_IDS.mirelaAfterRecovered,
     },
     {
-      history: 'FAILED',
+      history: 'FAILED' as const,
       sourceFactId: BRAILA_FIRST_HOUR_FACT_IDS.oneSmallThingFailed,
       continuationFactId: BRAILA_FAMILIAR_ROUTES_FACT_IDS.mirelaAfterFailed,
     },
@@ -275,7 +275,7 @@ const buildMirelaRepeatRoute = (
 })
 
 const buildPetruRepeatRoute = (
-  bindings: BrailaAct1FamiliarRoutesBindings,
+  _bindings: BrailaAct1FamiliarRoutesBindings,
   petru: FamiliarRoutesRepeatDeliveryBinding,
 ): MissionDefinition => ({
   missionId: BRAILA_FAMILIAR_ROUTES_MISSION_IDS.petruRepeatRoute,
