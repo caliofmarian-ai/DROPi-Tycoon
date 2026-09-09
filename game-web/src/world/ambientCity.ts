@@ -4,6 +4,7 @@ import { ensureNeighborAtlas, NEIGHBOR_ANCHOR, NEIGHBOR_CELL } from './cityArt'
 import { courierAnimationFrame, getCourierPose } from './courierPose'
 import { isUrbanWalkable, type UrbanFacing, type UrbanPoint } from './urbanWorld'
 import { PLAYER_START, WORLD_ROADS } from './worldLayout'
+import { surfaceContains } from './worldSurfaces'
 import {
   CENTRAL_CONTROLLED_CROSSING,
   crossingPoint,
@@ -39,6 +40,23 @@ const clearRoute = (start: UrbanPoint, end: UrbanPoint, roadOnly: boolean): bool
   return true
 }
 
+/**
+ * Ambient pedestrian routes are materialized once, then cached. Pixel-cadence validation is
+ * deliberately stricter than runtime pose cadence so no interpolation point can cut a corner,
+ * leave pavement, or enter a road surface outside an explicit controlled crossing.
+ */
+const clearPedestrianRoute = (start: UrbanPoint, end: UrbanPoint): boolean => {
+  const steps = Math.max(1, Math.ceil(Math.hypot(end.x - start.x, end.y - start.y)))
+  for (let step = 0; step <= steps; step++) {
+    const fraction = step / steps
+    const x = start.x + (end.x - start.x) * fraction
+    const y = start.y + (end.y - start.y) * fraction
+    if (!isUrbanWalkable(x, y, false, 6)) return false
+    if (WORLD_ROADS.some(road => surfaceContains(road, x, y))) return false
+  }
+  return true
+}
+
 /** Bounded loops follow safe segments of the active city plan. */
 let cachedRoutes: readonly AmbientRoute[] | undefined
 export const buildAmbientRoutes = (): readonly AmbientRoute[] => {
@@ -60,7 +78,7 @@ export const buildAmbientRoutes = (): readonly AmbientRoute[] => {
       const offset = side * ((road.roadWidth ?? 32) / 2 + 6)
       const start = { x: a.x + dx * 12 - dy * offset, y: a.y + dy * 12 + dx * offset }
       const end = { x: start.x + dx * routeLength, y: start.y + dy * routeLength }
-      if (sidewalkRoutes.length < AMBIENT_ACTOR_LIMIT - 5 && clearRoute(start, end, false)) sidewalkRoutes.push({
+      if (sidewalkRoutes.length < AMBIENT_ACTOR_LIMIT - 5 && clearPedestrianRoute(start, end)) sidewalkRoutes.push({
         id: `neighbor-${index}-${side}`, kind: 'pedestrian', start, end, speed: 24 + index % 4 * 3, phase: index * 2.3,
       })
     }
