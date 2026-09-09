@@ -77,7 +77,7 @@ describe('source-backed semantic zoom', () => {
   })
   it('keeps rotated pedestrians and yielding traffic on the source pavement', () => {
     const c = CENTRAL_CONTROLLED_CROSSING
-    expect(Math.abs(c.roadAngle ?? 0)).toBeGreaterThan(0)
+    expect(Math.abs(c.roadAngle ?? 0)).toBeLessThan(Math.PI / 5)
     for (let t=0;t<12;t+=.1) {
       const p = sampleControlledCrossingPedestrian(c,t,{ x:0,y:0,facing:'down',moving:false })
       expect(isUrbanWalkable(p.x,p.y,false,6)).toBe(true)

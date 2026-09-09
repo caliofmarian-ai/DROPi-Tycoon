@@ -5,8 +5,11 @@ import {
   GAMEWORLD_TOP_BAR_TOUCH_TARGET_PX,
 } from './gameWorldTopBar'
 
-/** Owner-reviewed #324 range: wider city overview and closer inspection without changing world logic. */
-export const CAMERA_MIN_ZOOM = 0.5
+/**
+ * #324 keeps close inspection at 2.5x. #614 extends the lower bound so the 10x Brăila world can
+ * reach a true semantic City overview on compact Android landscape instead of stopping at Area.
+ */
+export const CAMERA_MIN_ZOOM = 0.0015
 export const CAMERA_MAX_ZOOM = 2.5
 export const CAMERA_DEFAULT_ZOOM = 1
 export const CAMERA_ZOOM_STEP = 0.2

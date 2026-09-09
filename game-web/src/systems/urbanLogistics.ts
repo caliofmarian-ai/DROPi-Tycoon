@@ -1,13 +1,19 @@
 import type { ActiveTransport, CompanyState } from '../types/game'
+import { WORLD_PLAYABLE_DISTANCE_SCALE } from '../world/worldLayout'
+
+const playableRange = (sourceRange: number): number =>
+  sourceRange * (Number.isFinite(WORLD_PLAYABLE_DISTANCE_SCALE) && WORLD_PLAYABLE_DISTANCE_SCALE > 0
+    ? WORLD_PLAYABLE_DISTANCE_SCALE
+    : 1)
 
 // Replaceable Tycoon tuning in world pixels/game cost units, not real DROPi specifications.
 export const TRANSPORT_PROFILES = {
-  walking: { speed: 150, range: 1800, cargoCapacity: 1, operatingCost: 0, roadOnly: false },
-  bicycle: { speed: 230, range: 3200, cargoCapacity: 3, operatingCost: 1, roadOnly: false },
-  scooter: { speed: 260, range: 4000, cargoCapacity: 4, operatingCost: 3, roadOnly: true },
-  motorcycle: { speed: 300, range: 5500, cargoCapacity: 6, operatingCost: 5, roadOnly: true },
-  car: { speed: 280, range: 6500, cargoCapacity: 12, operatingCost: 7, roadOnly: true },
-  van: { speed: 250, range: 7500, cargoCapacity: 24, operatingCost: 8, roadOnly: true },
+  walking: { speed: 150, range: playableRange(1800), cargoCapacity: 1, operatingCost: 0, roadOnly: false },
+  bicycle: { speed: 230, range: playableRange(3200), cargoCapacity: 3, operatingCost: 1, roadOnly: false },
+  scooter: { speed: 260, range: playableRange(4000), cargoCapacity: 4, operatingCost: 3, roadOnly: true },
+  motorcycle: { speed: 300, range: playableRange(5500), cargoCapacity: 6, operatingCost: 5, roadOnly: true },
+  car: { speed: 280, range: playableRange(6500), cargoCapacity: 12, operatingCost: 7, roadOnly: true },
+  van: { speed: 250, range: playableRange(7500), cargoCapacity: 24, operatingCost: 8, roadOnly: true },
 } as const
 
 export type GroundTransport = keyof typeof TRANSPORT_PROFILES

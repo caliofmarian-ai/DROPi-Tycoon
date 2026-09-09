@@ -18,6 +18,7 @@ import { createInitialCompanyState, createInitialWorldState } from '../src/state
 import { getUrbanObjective, performUrbanInteraction } from '../src/systems/urbanInteractions'
 import { CITY_LOCATIONS, findCityRoute, getCityRouteDistance } from '../src/world/city'
 import { TRANSPORT_PROFILES } from '../src/systems/urbanLogistics'
+import { WORLD_PLAYABLE_DISTANCE_SCALE } from '../src/world/worldLayout'
 
 const gameStateSource = readFileSync(
   new URL('../src/state/gameState.ts', import.meta.url),
@@ -111,8 +112,8 @@ describe('release blocker #271 — order sequence generation', () => {
       distances.add(distance)
     }
     expect(distances.size).toBeGreaterThan(12)
-    expect(Math.min(...distances)).toBeLessThan(300)
-    expect(Math.max(...distances)).toBeGreaterThan(1500)
+    expect(Math.min(...distances)).toBeLessThan(300 * WORLD_PLAYABLE_DISTANCE_SCALE)
+    expect(Math.max(...distances)).toBeGreaterThan(1500 * WORLD_PLAYABLE_DISTANCE_SCALE)
   })
 
   it('adds bicycle-range work without handing walking couriers an impossible listing', () => {
@@ -139,7 +140,7 @@ describe('release blocker #271 — order sequence generation', () => {
     expect(next.destination).not.toBe(previous.destination)
     expect(createNextOrder(previous)).toEqual(next)
     const cycling = createNextOrder({ ...previous, ...createOrderForSequence(14), status: 'Completed' }, 'bicycle')
-    expect(getCityRouteDistance(cycling.pickupLocation, cycling.destination)).toBeLessThanOrEqual(3200)
+    expect(getCityRouteDistance(cycling.pickupLocation, cycling.destination)).toBeLessThanOrEqual(TRANSPORT_PROFILES.bicycle.range)
   })
 
   it.each(['walking', 'bicycle'] as const)('supports reproducible seeded %s schedules without new saved state', transport => {

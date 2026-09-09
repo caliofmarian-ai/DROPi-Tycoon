@@ -5,7 +5,7 @@ import {
   cargoForPlayer, LOCAL_MERCHANT, marketplaceMerchant, missionForOrder,
   parcelForOrder, prepareMarketplaceOrder, marketplaceMerchants, MARKETPLACE_LISTINGS,
 } from '../src/systems/urbanMarketplace'
-import { isDeliveryMission, loadParcel, unloadParcel } from '../src/systems/urbanLogistics'
+import { isDeliveryMission, loadParcel, TRANSPORT_PROFILES, unloadParcel } from '../src/systems/urbanLogistics'
 import { URBAN_MERCHANT } from '../src/world/urbanWorld'
 import * as city from '../src/world/city'
 
@@ -111,7 +111,7 @@ describe('physical merchant to digital marketplace', () => {
     expect(prepareMarketplaceOrder(world)).toBeNull()
     world.player.carryingPackage = false
     const longRoute = BICYCLE_ORDER_ROUTE_TEMPLATES.findIndex(route =>
-      city.getCityRouteDistance(route.pickupLocation, route.destination) > 1800)
+      city.getCityRouteDistance(route.pickupLocation, route.destination) > TRANSPORT_PROFILES.walking.range)
     expect(longRoute).toBeGreaterThanOrEqual(0)
     world.activeOrder = createOrderForSequence(longRoute + 1, 'bicycle')
     expect(prepareMarketplaceOrder(world, 'walking')).toBeNull()
