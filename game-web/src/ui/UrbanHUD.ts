@@ -17,10 +17,11 @@ import {
   AnalogJoystickInput,
 } from './AnalogJoystick'
 import { PlayerSmartphoneOverlay } from './PlayerSmartphone'
+import { StoryProfileShell, type StoryProfileMode } from './StoryProfileShell'
 import { CITY_COLORS, COLORS, formatMoney, RADII, TYPOGRAPHY } from './theme'
 
 type Direction = 'up' | 'down' | 'left' | 'right'
-const MENU_ROW_COUNT = 3
+const MENU_ROW_COUNT = 5
 const URBAN_TOP_CONTROL_HIT_HEIGHT = 44
 const PORTRAIT_STATUS_Y = 44
 
@@ -159,6 +160,7 @@ export class UrbanHUD {
   private readonly layout
   private readonly pad = new AnalogJoystickInput()
   private readonly smartphone: PlayerSmartphoneOverlay
+  private readonly storyProfile: StoryProfileShell
   private joystickKnob!: Phaser.GameObjects.Arc
   private joystickCenterX = 0
   private joystickCenterY = 0
@@ -174,6 +176,8 @@ export class UrbanHUD {
   private readonly mapCaption: Phaser.GameObjects.Text
   private readonly mapViewport: Phaser.GameObjects.Graphics
   private readonly menuButtons: HUDButton[] = []
+  private latestWorld?: WorldState
+  private latestCompany?: CompanyState
   private transportAvailable?: boolean
   private nearby?: boolean
   private open = false
@@ -244,6 +248,8 @@ export class UrbanHUD {
       .setWordWrapWidth(toast.width - 18).setFixedSize(toast.width, toast.height)
       .setBackgroundColor('#073354').setPadding(9, 6).setVisible(false)
     const rows: [string, () => void][] = [
+      ['Story', () => this.openStoryProfile('story')],
+      ['Account / Profile', () => this.openStoryProfile('profile')],
       ['Save progress', callbacks.save],
       ['Toggle sound', callbacks.audio],
       ['Main menu', callbacks.menu],
@@ -259,8 +265,9 @@ export class UrbanHUD {
       this.menuButtons.push(entry)
     })
 
-    // Created last so the in-world phone always renders above ordinary HUD chrome.
+    // Created last so modal player surfaces always render above ordinary HUD chrome.
     this.smartphone = new PlayerSmartphoneOverlay(scene, layer)
+    this.storyProfile = new StoryProfileShell(scene, layer)
 
     scene.input.on('pointermove', this.moveJoystickPointer)
     scene.input.on('pointerup', this.releasePointer)
@@ -406,6 +413,8 @@ export class UrbanHUD {
     world: WorldState, company: CompanyState, objective: UrbanObjective,
     cameraView?: { x: number; y: number; width: number; height: number },
   ): void {
+    this.latestWorld = world
+    this.latestCompany = company
     this.stats.setText(urbanStatusText(world, company))
     const availableStatsWidth = this.layout.portrait ? this.scene.scale.width - 28 : this.scene.scale.width - this.stats.x - 210
     this.stats.setScale(Math.min(1, availableStatsWidth / Math.max(1, this.stats.width)))
@@ -464,7 +473,23 @@ export class UrbanHUD {
     })
   }
 
+  private openStoryProfile(mode: StoryProfileMode): void {
+    if (this.open) this.setMenuOpen(false)
+    if (this.smartphone.isOpen()) this.smartphone.close()
+    if (!this.latestWorld || !this.latestCompany) {
+      this.notify('Player context is not available yet. No profile/story state was fabricated.')
+      return
+    }
+    this.storyProfile.open(mode, this.latestWorld, this.latestCompany)
+    this.clearMovement()
+  }
+
   toggleMenu(): void {
+    if (this.storyProfile.isOpen()) {
+      this.storyProfile.close()
+      this.clearMovement()
+      return
+    }
     if (this.smartphone.isOpen()) {
       this.smartphone.close()
       this.clearMovement()
@@ -475,12 +500,13 @@ export class UrbanHUD {
 
   togglePhone(): void {
     if (this.open) this.setMenuOpen(false)
+    if (this.storyProfile.isOpen()) this.storyProfile.close()
     this.smartphone.toggle()
     this.clearMovement()
   }
 
   /** Name retained for GameWorld compatibility; true means any modal HUD overlay blocks world input. */
-  isMenuOpen(): boolean { return this.open || this.smartphone.isOpen() }
+  isMenuOpen(): boolean { return this.open || this.smartphone.isOpen() || this.storyProfile.isOpen() }
   movement(): { x: number; y: number } { return this.pad.value() }
   readonly clearMovement = (): void => {
     this.pad.clear()
@@ -494,6 +520,7 @@ export class UrbanHUD {
   destroy(): void {
     this.clearMovement()
     this.toastTimer?.remove()
+    this.storyProfile.destroy()
     this.smartphone.destroy()
     this.scene.input.off('pointermove', this.moveJoystickPointer)
     this.scene.input.off('pointerup', this.releasePointer)
