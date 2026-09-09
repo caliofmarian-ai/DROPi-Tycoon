@@ -1,0 +1,286 @@
+{
+  "schemaVersion": 1,
+  "authority": "DT-19 — ART ASSET PIPELINE / PRODUCTION LIBRARY",
+  "baselineCommit": "08e33ad71e11e4f17eeb1f38d530386ee447d334",
+  "canonicalLifecycle": [
+    "INVENTORIED",
+    "SPECIFIED",
+    "CANDIDATE",
+    "APPROVED_SOURCE",
+    "PRODUCTION_READY",
+    "RUNTIME_INTEGRATED",
+    "ANDROID_VERIFIED"
+  ],
+  "policyRefs": {
+    "assetCanon": "08_Assets/ASSETS.md",
+    "worldAssetBible": "08_Assets/WORLD_ASSET_BIBLE.md",
+    "masterPlan": "08_Assets/MASTER_ASSET_PLAN_V2.md",
+    "generationPolicy": "08_Assets/Production/DEMAND_DRIVEN_GENERATION_POLICY.md",
+    "approvedSourceRegister": "08_Assets/Production/Approved_Sources/APPROVED_SOURCE_REGISTER.md",
+    "generatedFamilyRegister": "08_Assets/Production/Approved_Sources/2026-09-07_GENERATED_FAMILY_REGISTRY.md",
+    "legalReleaseAuthority": "game-web/public/legal/runtime-provenance.json"
+  },
+  "dedupDimensions": [
+    "semanticFamily",
+    "silhouetteOrForm",
+    "runtimeClassOrFootprint",
+    "directionStateAnimation",
+    "biomeRegionCityArchetype",
+    "professionOrIdentity",
+    "productOrLogisticsForm",
+    "transportModeOrCapacity",
+    "sourceLineage",
+    "visualSimilarity"
+  ],
+  "registeredFamilies": [
+    {
+      "familyId": "BRAND-DROPI-TYCOON",
+      "semanticFamily": "product-branding",
+      "lifecycleState": "APPROVED_SOURCE",
+      "repositoryAvailability": "SOURCE_ARTIFACTS_PRESENT",
+      "evidenceRefs": ["08_Assets/ASSETS.md"]
+    },
+    {
+      "familyId": "SRC-20260907-001",
+      "semanticFamily": "mixed-world-asset-audit-seed",
+      "lifecycleState": "APPROVED_SOURCE",
+      "repositoryAvailability": "CANDIDATE_DERIVATIVES_PRESENT",
+      "evidenceRefs": [
+        "08_Assets/Production/Approved_Sources/2026-09-07_GENERATED_FAMILY_REGISTRY.md",
+        "08_Assets/Production/Candidates/Legacy_Board_Crops_v1/README.md"
+      ]
+    },
+    {
+      "familyId": "SRC-20260907-002",
+      "semanticFamily": "civic-special-buildings",
+      "lifecycleState": "APPROVED_SOURCE",
+      "repositoryAvailability": "REGISTRY_ONLY_BINARY_NOT_ATTESTED",
+      "evidenceRefs": ["08_Assets/Production/Approved_Sources/2026-09-07_GENERATED_FAMILY_REGISTRY.md"]
+    },
+    {
+      "familyId": "SRC-20260907-003",
+      "semanticFamily": "multimodal-infrastructure",
+      "lifecycleState": "APPROVED_SOURCE",
+      "repositoryAvailability": "REGISTRY_ONLY_BINARY_NOT_ATTESTED",
+      "evidenceRefs": ["08_Assets/Production/Approved_Sources/2026-09-07_GENERATED_FAMILY_REGISTRY.md"]
+    },
+    {
+      "familyId": "SRC-20260907-004",
+      "semanticFamily": "transport-fleet",
+      "lifecycleState": "APPROVED_SOURCE",
+      "repositoryAvailability": "REGISTRY_ONLY_BINARY_NOT_ATTESTED",
+      "evidenceRefs": ["08_Assets/Production/Approved_Sources/2026-09-07_GENERATED_FAMILY_REGISTRY.md"]
+    },
+    {
+      "familyId": "SRC-20260907-005",
+      "semanticFamily": "industry-energy-utility-production",
+      "lifecycleState": "APPROVED_SOURCE",
+      "repositoryAvailability": "REGISTRY_ONLY_BINARY_NOT_ATTESTED",
+      "evidenceRefs": ["08_Assets/Production/Approved_Sources/2026-09-07_GENERATED_FAMILY_REGISTRY.md"]
+    },
+    {
+      "familyId": "SRC-20260907-006",
+      "semanticFamily": "city-architecture-district-kits",
+      "lifecycleState": "APPROVED_SOURCE",
+      "repositoryAvailability": "REGISTRY_ONLY_BINARY_NOT_ATTESTED",
+      "evidenceRefs": ["08_Assets/Production/Approved_Sources/2026-09-07_GENERATED_FAMILY_REGISTRY.md"]
+    },
+    {
+      "familyId": "SRC-20260907-007",
+      "semanticFamily": "map-network-modules",
+      "lifecycleState": "APPROVED_SOURCE",
+      "repositoryAvailability": "REGISTRY_ONLY_BINARY_NOT_ATTESTED",
+      "evidenceRefs": ["08_Assets/Production/Approved_Sources/2026-09-07_GENERATED_FAMILY_REGISTRY.md"]
+    },
+    {
+      "familyId": "SRC-20260907-008",
+      "semanticFamily": "workforce-specialists",
+      "lifecycleState": "APPROVED_SOURCE",
+      "repositoryAvailability": "REGISTRY_ONLY_BINARY_NOT_ATTESTED",
+      "evidenceRefs": ["08_Assets/Production/Approved_Sources/2026-09-07_GENERATED_FAMILY_REGISTRY.md"]
+    },
+    {
+      "familyId": "SRC-20260907-009",
+      "semanticFamily": "nature-biomes-animals-farm",
+      "lifecycleState": "APPROVED_SOURCE",
+      "repositoryAvailability": "REGISTRY_ONLY_BINARY_NOT_ATTESTED",
+      "evidenceRefs": ["08_Assets/Production/Approved_Sources/2026-09-07_GENERATED_FAMILY_REGISTRY.md"]
+    },
+    {
+      "familyId": "SRC-20260907-010",
+      "semanticFamily": "products-cargo-volume-2",
+      "lifecycleState": "APPROVED_SOURCE",
+      "repositoryAvailability": "REGISTRY_ONLY_BINARY_NOT_ATTESTED",
+      "evidenceRefs": ["08_Assets/Production/Approved_Sources/2026-09-07_GENERATED_FAMILY_REGISTRY.md"]
+    }
+  ],
+  "approvedFamilyAliases": [
+    {"approvedSourceId": "SRC-WORLD-001", "registeredFamilyIds": ["SRC-20260907-001"]},
+    {"approvedSourceId": "SRC-HUMAN-001", "registeredFamilyIds": ["SRC-20260907-001", "SRC-20260907-008"]},
+    {"approvedSourceId": "SRC-PRODUCT-001", "registeredFamilyIds": ["SRC-20260907-001", "SRC-20260907-010"]},
+    {"approvedSourceId": "SRC-BUILDING-001", "registeredFamilyIds": ["SRC-20260907-002", "SRC-20260907-005", "SRC-20260907-006"]},
+    {"approvedSourceId": "SRC-TRANSPORT-001", "registeredFamilyIds": ["SRC-20260907-003", "SRC-20260907-004"]},
+    {"approvedSourceId": "SRC-NATURE-001", "registeredFamilyIds": ["SRC-20260907-009"]},
+    {"approvedSourceId": "SRC-INFRA-001", "registeredFamilyIds": ["SRC-20260907-002", "SRC-20260907-003", "SRC-20260907-006", "SRC-20260907-007"]},
+    {"approvedSourceId": "SRC-UI-001", "registeredFamilyIds": ["SRC-20260907-001", "SRC-20260907-007"]}
+  ],
+  "collections": [
+    {
+      "collectionId": "legacy-board-crops-v1",
+      "root": "08_Assets/Production/Candidates/Legacy_Board_Crops_v1",
+      "lifecycleState": "CANDIDATE",
+      "sourceFamilyId": "SRC-20260907-001",
+      "expectedAssetCount": 50,
+      "extensions": [".webp"],
+      "semanticFamilyByPrefix": {
+        "branding/": "candidate-branding",
+        "buildings/": "candidate-building",
+        "characters/": "candidate-character",
+        "drones/": "candidate-drone",
+        "environments/": "candidate-environment",
+        "items/": "candidate-product-cargo",
+        "map/": "candidate-map-navigation",
+        "misc/": "candidate-utility-status",
+        "status/": "candidate-status-feedback",
+        "ui/elements/": "candidate-ui-controls",
+        "ui/icons/": "candidate-ui-navigation",
+        "vehicles/": "candidate-road-transport"
+      },
+      "artifactOverrides": {
+        "ui/icons/icon_orders.webp": {
+          "semanticFamily": "ui-orders",
+          "reuseGroup": "orders-icon-v1"
+        }
+      }
+    }
+  ],
+  "runtimeArtifacts": [
+    {
+      "assetId": "runtime-web-brand-logo",
+      "path": "game-web/public/assets/branding/dropi-tycoon-logo.png",
+      "semanticFamily": "product-branding",
+      "sourceFamilyId": "BRAND-DROPI-TYCOON",
+      "lifecycleState": "RUNTIME_INTEGRATED",
+      "reuseGroup": "dropi-tycoon-logo-source-v1",
+      "legacyMigrationStatus": "PRE_LIFECYCLE_RUNTIME_ASSET",
+      "evidenceRefs": ["08_Assets/ASSETS.md", "game-web/public/legal/runtime-provenance.json"]
+    },
+    {
+      "assetId": "runtime-orders-icon",
+      "path": "game-web/public/assets/production/icon-orders.webp",
+      "semanticFamily": "ui-orders",
+      "sourceFamilyId": "SRC-20260907-001",
+      "lifecycleState": "RUNTIME_INTEGRATED",
+      "reuseGroup": "orders-icon-v1",
+      "lifecycleEvidence": {
+        "CANDIDATE": "08_Assets/Production/Candidates/Legacy_Board_Crops_v1/ui/icons/icon_orders.webp",
+        "APPROVED_SOURCE": "08_Assets/Production/Approved_Sources/APPROVED_SOURCE_REGISTER.md",
+        "PRODUCTION_READY": "game-web/tests/runtime-art-adoption.test.ts",
+        "RUNTIME_INTEGRATED": "game-web/src/scenes/ApprovedAssetMainMenuScene.ts"
+      },
+      "legalEvidenceRef": "game-web/public/legal/runtime-provenance.json"
+    },
+    {
+      "assetId": "runtime-placeholder-building-commercial",
+      "path": "game-web/public/assets/sprites/building_commercial.png",
+      "semanticFamily": "legacy-placeholder-building",
+      "lifecycleState": "RUNTIME_INTEGRATED",
+      "legacyMigrationStatus": "PRE_LIFECYCLE_RUNTIME_PLACEHOLDER",
+      "evidenceRefs": ["08_Assets/BATCH_003_PLACEHOLDER_PROVENANCE.md", "game-web/public/legal/runtime-provenance.json"]
+    },
+    {
+      "assetId": "runtime-placeholder-building-company-small",
+      "path": "game-web/public/assets/sprites/building_company_small.png",
+      "semanticFamily": "legacy-placeholder-building",
+      "lifecycleState": "RUNTIME_INTEGRATED",
+      "legacyMigrationStatus": "PRE_LIFECYCLE_RUNTIME_PLACEHOLDER",
+      "evidenceRefs": ["08_Assets/BATCH_003_PLACEHOLDER_PROVENANCE.md", "game-web/public/legal/runtime-provenance.json"]
+    },
+    {
+      "assetId": "runtime-placeholder-building-residential",
+      "path": "game-web/public/assets/sprites/building_residential.png",
+      "semanticFamily": "legacy-placeholder-building",
+      "lifecycleState": "RUNTIME_INTEGRATED",
+      "legacyMigrationStatus": "PRE_LIFECYCLE_RUNTIME_PLACEHOLDER",
+      "evidenceRefs": ["08_Assets/BATCH_003_PLACEHOLDER_PROVENANCE.md", "game-web/public/legal/runtime-provenance.json"]
+    },
+    {
+      "assetId": "runtime-placeholder-delivery-marker",
+      "path": "game-web/public/assets/sprites/delivery_point_marker.png",
+      "semanticFamily": "legacy-placeholder-delivery-marker",
+      "lifecycleState": "RUNTIME_INTEGRATED",
+      "legacyMigrationStatus": "PRE_LIFECYCLE_RUNTIME_PLACEHOLDER",
+      "evidenceRefs": ["game-web/public/legal/runtime-provenance.json", "09_Development/CHANGELOG.md"]
+    },
+    {
+      "assetId": "runtime-placeholder-road-tile",
+      "path": "game-web/public/assets/sprites/environment_road_tile.png",
+      "semanticFamily": "legacy-placeholder-road",
+      "lifecycleState": "RUNTIME_INTEGRATED",
+      "legacyMigrationStatus": "PRE_LIFECYCLE_RUNTIME_PLACEHOLDER",
+      "evidenceRefs": ["game-web/public/legal/runtime-provenance.json", "09_Development/CHANGELOG.md"]
+    },
+    {
+      "assetId": "runtime-placeholder-package",
+      "path": "game-web/public/assets/sprites/package_delivery.png",
+      "semanticFamily": "legacy-placeholder-product-cargo",
+      "lifecycleState": "RUNTIME_INTEGRATED",
+      "legacyMigrationStatus": "PRE_LIFECYCLE_RUNTIME_PLACEHOLDER",
+      "evidenceRefs": ["08_Assets/BATCH_003_PLACEHOLDER_PROVENANCE.md", "game-web/public/legal/runtime-provenance.json"]
+    },
+    {
+      "assetId": "runtime-placeholder-player-idle",
+      "path": "game-web/public/assets/sprites/player_character_idle.png",
+      "semanticFamily": "legacy-placeholder-player",
+      "lifecycleState": "RUNTIME_INTEGRATED",
+      "legacyMigrationStatus": "PRE_LIFECYCLE_RUNTIME_PLACEHOLDER",
+      "evidenceRefs": ["08_Assets/BATCH_003_PLACEHOLDER_PROVENANCE.md", "game-web/public/legal/runtime-provenance.json"]
+    },
+    {
+      "assetId": "runtime-placeholder-player-move",
+      "path": "game-web/public/assets/sprites/player_character_move.png",
+      "semanticFamily": "legacy-placeholder-player",
+      "lifecycleState": "RUNTIME_INTEGRATED",
+      "legacyMigrationStatus": "PRE_LIFECYCLE_RUNTIME_PLACEHOLDER",
+      "evidenceRefs": ["08_Assets/BATCH_003_PLACEHOLDER_PROVENANCE.md", "game-web/public/legal/runtime-provenance.json"]
+    },
+    {
+      "assetId": "runtime-mobile-app-icon",
+      "path": "game-mobile/assets/branding/dropi-tycoon-app-icon.png",
+      "semanticFamily": "product-branding",
+      "sourceFamilyId": "BRAND-DROPI-TYCOON",
+      "lifecycleState": "RUNTIME_INTEGRATED",
+      "legacyMigrationStatus": "PRE_LIFECYCLE_RUNTIME_ASSET",
+      "evidenceRefs": ["08_Assets/ASSETS.md"]
+    },
+    {
+      "assetId": "runtime-mobile-brand-logo",
+      "path": "game-mobile/assets/branding/dropi-tycoon-logo.png",
+      "semanticFamily": "product-branding",
+      "sourceFamilyId": "BRAND-DROPI-TYCOON",
+      "lifecycleState": "RUNTIME_INTEGRATED",
+      "reuseGroup": "dropi-tycoon-logo-source-v1",
+      "legacyMigrationStatus": "PRE_LIFECYCLE_RUNTIME_ASSET",
+      "evidenceRefs": ["08_Assets/ASSETS.md"]
+    },
+    {
+      "assetId": "runtime-mobile-splash",
+      "path": "game-mobile/assets/branding/dropi-tycoon-splash.jpg",
+      "semanticFamily": "product-branding",
+      "sourceFamilyId": "BRAND-DROPI-TYCOON",
+      "lifecycleState": "RUNTIME_INTEGRATED",
+      "legacyMigrationStatus": "PRE_LIFECYCLE_RUNTIME_ASSET",
+      "evidenceRefs": ["08_Assets/ASSETS.md"]
+    }
+  ],
+  "documentedPackages": [
+    {
+      "packageId": "batch-001-extracted-candidate-package",
+      "documentedAssetCount": 248,
+      "sha256": "979ceef61c1486a4c5c486ed6433fb24fef9edfbbb78aa8f24fa404fd91aa91d",
+      "repositoryPresence": "DOCUMENTED_NOT_ATTESTED_ON_MAIN",
+      "evidenceRef": "08_Assets/Production/Manifests/BATCH_001_EXTRACTED_CANDIDATE_INDEX.md",
+      "rule": "Documentation of a package does not make its unmirrored binaries available to the canonical library."
+    }
+  ]
+}
