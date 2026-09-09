@@ -10,9 +10,12 @@ import {
   pickupPointForOrder,
   routeForSequence,
   BICYCLE_ORDER_ROUTE_TEMPLATES,
+  MIN_PLAYABLE_ORDER_ROUTE_DISTANCE,
   orderRoutesForTransport,
+  playableRangeForTransport,
 } from '../src/systems/orderGeneration'
 import { findWorldRoutePoint } from '../src/world/worldLayout'
+import { CITY_PLAYABLE_DISTANCE_SCALE_BASELINE } from '../src/world/worldScale'
 import { createInitialCompanyState, createInitialWorldState } from '../src/state/gameState'
 
 import { getUrbanObjective, performUrbanInteraction } from '../src/systems/urbanInteractions'
@@ -105,28 +108,29 @@ describe('release blocker #271 — order sequence generation', () => {
       expect(order.destination).not.toBe(next.destination)
       expect(findCityRoute(order.pickupLocation, order.destination)).not.toBeNull()
       const distance = getCityRouteDistance(order.pickupLocation, order.destination)
-      expect(distance).toBeGreaterThan(48)
-      expect(distance).toBeLessThanOrEqual(TRANSPORT_PROFILES[transport].range)
+      expect(distance).toBeGreaterThan(MIN_PLAYABLE_ORDER_ROUTE_DISTANCE)
+      expect(distance).toBeLessThanOrEqual(playableRangeForTransport(transport))
       expect(order.reward).toBe(BALANCING.ORDER_REWARD)
       distances.add(distance)
     }
     expect(distances.size).toBeGreaterThan(12)
-    expect(Math.min(...distances)).toBeLessThan(300)
-    expect(Math.max(...distances)).toBeGreaterThan(1500)
+    expect(Math.min(...distances)).toBeLessThan(300 * CITY_PLAYABLE_DISTANCE_SCALE_BASELINE)
+    expect(Math.max(...distances)).toBeGreaterThan(1500 * CITY_PLAYABLE_DISTANCE_SCALE_BASELINE)
   })
 
   it('adds bicycle-range work without handing walking couriers an impossible listing', () => {
     expect(BICYCLE_ORDER_ROUTE_TEMPLATES.length).toBeGreaterThan(ORDER_ROUTE_TEMPLATES.length)
     expect(BICYCLE_ORDER_ROUTE_TEMPLATES.some(route =>
-      getCityRouteDistance(route.pickupLocation, route.destination) > TRANSPORT_PROFILES.walking.range)).toBe(true)
+      getCityRouteDistance(route.pickupLocation, route.destination) > playableRangeForTransport('walking'))).toBe(true)
     expect(CITY_LOCATIONS.filter(location => location.kind === 'pickup')).toHaveLength(8)
   })
 
   it.each(['scooter', 'motorcycle', 'car', 'van'] as const)('respects the existing %s profile instead of capping it to bicycle range', transport => {
     const routes = orderRoutesForTransport(transport)
     const distances = routes.map(route => getCityRouteDistance(route.pickupLocation, route.destination))
-    expect(Math.max(...distances)).toBeGreaterThan(TRANSPORT_PROFILES.bicycle.range)
-    expect(distances.every(distance => distance > 48 && distance <= TRANSPORT_PROFILES[transport].range)).toBe(true)
+    expect(Math.max(...distances)).toBeGreaterThan(playableRangeForTransport('bicycle'))
+    expect(distances.every(distance =>
+      distance > MIN_PLAYABLE_ORDER_ROUTE_DISTANCE && distance <= playableRangeForTransport(transport))).toBe(true)
     expect(orderRoutesForTransport(transport)).toBe(routes)
   })
 
@@ -139,7 +143,9 @@ describe('release blocker #271 — order sequence generation', () => {
     expect(next.destination).not.toBe(previous.destination)
     expect(createNextOrder(previous)).toEqual(next)
     const cycling = createNextOrder({ ...previous, ...createOrderForSequence(14), status: 'Completed' }, 'bicycle')
-    expect(getCityRouteDistance(cycling.pickupLocation, cycling.destination)).toBeLessThanOrEqual(3200)
+    expect(getCityRouteDistance(cycling.pickupLocation, cycling.destination)).toBeLessThanOrEqual(
+      playableRangeForTransport('bicycle'),
+    )
   })
 
   it.each(['walking', 'bicycle'] as const)('supports reproducible seeded %s schedules without new saved state', transport => {
