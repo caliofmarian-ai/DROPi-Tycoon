@@ -1,5 +1,4 @@
 import layout from './brailaLayout.generated.json'
-import context from './brailaContext.generated.json'
 import {
   BRAILA_PLAYABLE_DISTANCE_SCALE,
   BRAILA_PLAYABLE_SCALE_VERSION,
@@ -15,6 +14,24 @@ import {
 import type { WorldBuildingLayout, WorldDecorationLayout, WorldRectLayout, WorldRoutePoint, WorldZoneLayout } from './legacyCityLayout'
 import { distanceToSegment, surfaceContains } from './worldSurfaces'
 export type { WorldBuildingLayout, WorldDecorationLayout, WorldRectLayout, WorldRoutePoint, WorldZoneId, WorldZoneLayout } from './legacyCityLayout'
+
+type CompactContextBuilding = readonly [
+  x: number,
+  y: number,
+  width: number,
+  height: number,
+  pointCoordinates: readonly number[],
+]
+
+declare const __BRAILA_CONTEXT_BUILDINGS__: readonly CompactContextBuilding[]
+
+const unpackContextPoints = (coordinates: readonly number[]): Array<{ x: number; y: number }> => {
+  const points: Array<{ x: number; y: number }> = []
+  for (let index = 0; index < coordinates.length; index += 2) {
+    points.push({ x: coordinates[index], y: coordinates[index + 1] })
+  }
+  return points
+}
 
 export const WORLD_SOURCE_WIDTH = layout.width
 export const WORLD_SOURCE_HEIGHT = layout.height
@@ -33,7 +50,12 @@ export const WORLD_BUILDINGS: readonly WorldBuildingLayout[] = (layout.buildings
   .map(building => expandBrailaBuilding(building))
 export const WORLD_ROUTE_POINTS: readonly WorldRoutePoint[] = (layout.routes as WorldRoutePoint[])
   .map(point => expandBrailaRoutePoint(point))
-export const WORLD_CONTEXT_BUILDINGS = context.buildings.map(building => expandBrailaContextBuilding(building))
+/** #613 compact tuples remain the shipped representation; #614 expands only after reconstruction. */
+export const WORLD_CONTEXT_BUILDINGS = __BRAILA_CONTEXT_BUILDINGS__
+  .map(([x, y, width, height, pointCoordinates]) => ({
+    x, y, width, height, points: unpackContextPoints(pointCoordinates),
+  }))
+  .map(building => expandBrailaContextBuilding(building))
 export const WORLD_LANDSCAPE = layout.landscape.map(feature => expandBrailaLandscapeFeature(feature))
 export const WORLD_MARKETPLACE = expandBrailaPoint({ x: layout.marketplace.x, y: layout.marketplace.y })
 export const WORLD_CITY_NAME = layout.name
