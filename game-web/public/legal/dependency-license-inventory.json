@@ -2,11 +2,12 @@
   "schemaVersion": 1,
   "auditDate": "2026-09-09",
   "baselineCommit": "65413103c7ae4e1951ac63aacc8e1232643e0bd0",
+  "component": "game-web",
   "sourceLockfile": {
     "path": "game-web/package-lock.json",
     "gitBlobSha": "29c7efc9b5e9b642e37eb4606757596584e2b38f"
   },
-  "scope": "production npm dependency closure only",
+  "scope": "exact game-web production npm dependency closure only; Android/mobile shell closure is tracked separately by commercial-release-evidence.json and remains blocked pending game-mobile/package-lock.json",
   "packages": [
     {
       "name": "phaser",
@@ -38,6 +39,6 @@
   ],
   "excluded": {
     "devDependencies": true,
-    "reason": "Development-only packages are not part of the production npm dependency closure validated by this release inventory."
+    "reason": "Development-only packages are not part of the game-web production npm dependency closure validated by this release inventory."
   }
 }
