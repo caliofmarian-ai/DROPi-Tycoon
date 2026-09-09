@@ -1,0 +1,154 @@
+{
+  "schemaVersion": 1,
+  "auditDate": "2026-09-09",
+  "baselineCommit": "ca1a463539635312654a7ba680fee615d03330d8",
+  "commercialReleaseReady": false,
+  "scope": "Evidence-only commercial IP, dependency, branding/media and notice-placement closure for issue #565. This file does not make legal clearance claims.",
+  "blockingReviewIds": [
+    "generated-orders-icon-chain-of-title",
+    "branding-chain-of-title-and-trademark",
+    "osm-commercial-distribution-characterization",
+    "mobile-release-dependency-license-closure"
+  ],
+  "webRuntimeDependencyClosure": {
+    "status": "EXACT_LOCKFILE_INVENTORY_PRESENT",
+    "manifestPath": "game-web/package.json",
+    "lockfilePath": "game-web/package-lock.json",
+    "inventoryPath": "game-web/public/legal/dependency-license-inventory.json",
+    "note": "The existing inventory is the exact production npm closure for game-web only."
+  },
+  "mobileReleaseDependencyClosure": {
+    "status": "BLOCKED_PENDING_LOCKFILE",
+    "blocker": "mobile-release-dependency-license-closure",
+    "linkedIssue": 568,
+    "manifestPath": "game-mobile/package.json",
+    "manifestGitBlobSha": "38f3f5834c4b2cfdc78bb3fb34640e18da4397e8",
+    "requiredLockfilePath": "game-mobile/package-lock.json",
+    "lockfilePresentAtAudit": false,
+    "declaredDirectProductionDependencies": {
+      "@dr.pogodin/react-native-fs": "2.40.1",
+      "@dr.pogodin/react-native-static-server": "0.27.1",
+      "expo": "~57.0.9",
+      "expo-dev-client": "~57.0.18",
+      "expo-screen-orientation": "~57.0.2",
+      "expo-status-bar": "~57.0.1",
+      "expo-system-ui": "~57.0.3",
+      "react": "19.2.3",
+      "react-native": "0.86.3",
+      "react-native-webview": "13.16.1"
+    },
+    "releaseRequirement": "Generate and commit the canonical mobile lockfile under #568, resolve the exact production/native dependency closure used by the release AAB, record licence/notice obligations, and update the shipped notices before commercial distribution.",
+    "legalStatus": "EVIDENCE INCOMPLETE — DO NOT INFER TRANSITIVE LICENCES FROM THE UNLOCKED MANIFEST"
+  },
+  "mobileBrandingAssets": [
+    {
+      "assetId": "BRAND-LOGO-001",
+      "path": "game-mobile/assets/branding/dropi-tycoon-logo.png",
+      "gitBlobSha": "82d261d62f301b51cc5adb93789c7a15a7165a81",
+      "declaredSha256": "3aa62f1c6f38d06d52403477ff796665428a55178f5e3a975f38b527f7654616",
+      "role": "official game logo source / bundled Phaser and native error branding",
+      "ownerApprovalEvidence": "game-mobile/assets/branding/README.md; 08_Assets/ASSETS.md; 09_Development/Owner_Directives/2026-09-05_MASTER_OWNER_DIRECTIVE_002_Product_Identity_and_Visible_Operations.md",
+      "externalUseEvidence": "00_Project/LAUNCH_PRESS_KIT_CREATOR_OUTREACH_PACKAGE.md",
+      "status": "REVIEW_REQUIRED",
+      "blocker": "branding-chain-of-title-and-trademark",
+      "ownerInputRequired": "Creation/provider/source chain and any applicable generation/design terms.",
+      "qualifiedReviewRequired": "Trademark/name/logo clearance and final commercial chain-of-title conclusion."
+    },
+    {
+      "assetId": "BRAND-ICON-001",
+      "path": "game-mobile/assets/branding/dropi-tycoon-app-icon.png",
+      "gitBlobSha": "32977187a830cc621cd908a0df2a118f733a2b4b",
+      "declaredSha256": "f02072f431e93cb822afa40b177f07e1540e539998a3e662b6e8bcfed61fc24f",
+      "role": "Android launcher / intended store icon source",
+      "ownerApprovalEvidence": "game-mobile/assets/branding/README.md; 08_Assets/ASSETS.md; game-mobile/app.json",
+      "externalUseEvidence": "00_Project/LAUNCH_PRESS_KIT_CREATOR_OUTREACH_PACKAGE.md",
+      "status": "REVIEW_REQUIRED",
+      "blocker": "branding-chain-of-title-and-trademark",
+      "ownerInputRequired": "Creation/provider/source chain and any applicable generation/design terms.",
+      "qualifiedReviewRequired": "Trademark/icon clearance and final commercial chain-of-title conclusion."
+    },
+    {
+      "assetId": "BRAND-SPLASH-001",
+      "path": "game-mobile/assets/branding/dropi-tycoon-splash.jpg",
+      "gitBlobSha": "be9d1fbea0f734b07c1faceec669162c03b153c8",
+      "declaredSha256": "0524e0a265e5a775d8ae1c6a5ec36f00f7511d9fa548d09ce21054e550ad485c",
+      "role": "installed-app splash/loading artwork source",
+      "ownerApprovalEvidence": "game-mobile/assets/branding/README.md; 08_Assets/ASSETS.md; game-mobile/README.md",
+      "externalUseEvidence": "00_Project/LAUNCH_PRESS_KIT_CREATOR_OUTREACH_PACKAGE.md",
+      "status": "REVIEW_REQUIRED",
+      "blocker": "branding-chain-of-title-and-trademark",
+      "ownerInputRequired": "Creation/provider/source chain, source/reference inputs and any applicable generation/design terms.",
+      "qualifiedReviewRequired": "Final commercial chain-of-title and reference/input-risk conclusion."
+    }
+  ],
+  "generatedRuntimeAssetEvidence": {
+    "path": "game-web/public/assets/production/icon-orders.webp",
+    "runtimeProvenancePath": "game-web/public/legal/runtime-provenance.json",
+    "approvedFamilyRegistry": "08_Assets/Production/Approved_Sources/2026-09-07_GENERATED_FAMILY_REGISTRY.md",
+    "status": "BLOCKED",
+    "blocker": "generated-orders-icon-chain-of-title",
+    "repositoryTruth": "Owner/runtime approval and approved-family lineage are recorded. Exact provider/tool, generation date, provider terms/account entitlement, prompt/reference inputs and derivative chain are not recorded in repository evidence.",
+    "ownerInputRequired": "Exact generation session/provider/tool/date/account entitlement and retained input/reference lineage, if available.",
+    "qualifiedReviewRequired": "Commercial chain-of-title/provider-terms conclusion after the factual record is complete."
+  },
+  "geographicDataEvidence": {
+    "openStreetMap": {
+      "status": "ATTRIBUTION_AND_PROVENANCE_PRESENT__QUALIFIED_REVIEW_REQUIRED",
+      "noticeSurface": "/legal/third-party-notices.html#openstreetmap",
+      "runtimeAttribution": "UrbanHUD footer: © OpenStreetMap contributors · ODbL",
+      "blocker": "osm-commercial-distribution-characterization",
+      "qualifiedReviewRequired": "Characterize exact final distributed artifacts under ODbL and approve any source-availability/share-alike mechanism."
+    },
+    "geoNames": {
+      "status": "ATTRIBUTION_AND_TRANSFORMATION_NOTICE_PRESENT",
+      "noticeSurface": "/legal/third-party-notices.html#geonames",
+      "license": "CC BY 4.0",
+      "sourceSnapshotEvidence": "cities500.zip SHA-256 f3cda4f9d256d90045121fb8eebad3ed91695c32370ed93b50fbe0cb616e2bbd; admin1CodesASCII.txt SHA-256 590651498043f674accda2b7f46d21286cda0e290b02f8561c5005eee9a5448c"
+    },
+    "naturalEarth": {
+      "status": "PUBLIC_DOMAIN_PROVENANCE_AND_NOTICE_PRESENT",
+      "noticeSurface": "/legal/third-party-notices.html#natural-earth",
+      "sourceEvidence": "04_World/GLOBAL_MAP_DATASET.md; game-web/public/legal/runtime-provenance.json"
+    }
+  },
+  "mediaFamilyAudit": {
+    "bundledCustomFontFilesFound": false,
+    "fontFaceDeclarationsFound": false,
+    "bundledAudioMusicVoiceFilesFound": false,
+    "finding": "No repository evidence of shipped custom font binaries or audio/music/voice media was found in this audit. Future adoption requires provenance before runtime/store/press use.",
+    "searchScope": "Current repository source and shipped runtime/mobile asset paths as of audit baseline."
+  },
+  "noticePlacement": {
+    "webRuntimePath": "/legal/third-party-notices.html",
+    "mainMenuNavigation": "Main Menu -> Information -> Third-party notices",
+    "androidBundleRequirement": [
+      "legal/third-party-notices.html",
+      "legal/dependency-license-inventory.json",
+      "legal/runtime-provenance.json",
+      "legal/commercial-release-evidence.json"
+    ],
+    "releaseRule": "Production Android preparation must fail if any required legal evidence file is absent from the bundled Phaser output."
+  },
+  "explicitUnresolvedEvidenceSlots": [
+    {
+      "id": "branding-chain-of-title-and-trademark",
+      "type": "OWNER INPUT REQUIRED + QUALIFIED REVIEW REQUIRED",
+      "mustNotGuess": true
+    },
+    {
+      "id": "generated-orders-icon-chain-of-title",
+      "type": "OWNER INPUT REQUIRED + QUALIFIED REVIEW REQUIRED",
+      "mustNotGuess": true
+    },
+    {
+      "id": "osm-commercial-distribution-characterization",
+      "type": "QUALIFIED REVIEW REQUIRED",
+      "mustNotGuess": true
+    },
+    {
+      "id": "mobile-release-dependency-license-closure",
+      "type": "ENGINEERING EVIDENCE REQUIRED UNDER #568; QUALIFIED REVIEW IF LICENCE TERMS REQUIRE IT",
+      "mustNotGuess": true
+    }
+  ]
+}
