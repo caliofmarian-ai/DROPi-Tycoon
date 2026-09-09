@@ -143,7 +143,7 @@ const failurePolicyFor = (
       if (!validDelay(contract.delayMinutes)) throw new Error('Invalid oneSmallThingRecovery.delayMinutes')
       return { kind: 'DelayedSecondChance', delayMinutes: contract.delayMinutes, stageId: 'pickup' }
     case 'TerminalFailure': {
-      const unlockMissionIds = [BRAILA_FIRST_HOUR_MISSION_IDS.firstConsequence]
+      const unlockMissionIds: string[] = [BRAILA_FIRST_HOUR_MISSION_IDS.firstConsequence]
       if (terminalContinuationMissionId && !unlockMissionIds.includes(terminalContinuationMissionId)) {
         unlockMissionIds.push(terminalContinuationMissionId)
       }
