@@ -151,10 +151,10 @@ export const materializeProducerSystemicMission = (
     transportCapacityUnits: input.transportCapacityUnits,
   })
 
-  if (created.status === 'rejected' || !created.contract) {
+  if (created.status === 'rejected') {
     return {
       status: 'rejected',
-      reason: created.reason ?? 'producer-contract-materialization-failed',
+      reason: created.reason,
       sourceInventory: created.sourceInventory ?? input.sourceInventory,
       destinationInventory: created.destinationInventory ?? input.destinationInventory,
     }
