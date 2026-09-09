@@ -10,6 +10,7 @@ import {
 import { TRANSPORT_PROFILES } from '../systems/urbanLogistics'
 import { getUrbanObjective, performUrbanInteraction } from '../systems/urbanInteractions'
 import type { ActiveTransport, CompanyState, WorldState } from '../types/game'
+import { NarrativePresentationOverlay } from '../ui/NarrativePresentation'
 import { UrbanHUD, isUrbanHUDPoint } from '../ui/UrbanHUD'
 import { UrbanCameraPan, cameraScrollFromDrag } from '../ui/UrbanCameraPan'
 import { UrbanZoomGesture } from '../ui/urbanZoom'
@@ -42,6 +43,7 @@ export class GameWorldScene extends Phaser.Scene {
   private companyState!: CompanyState
   private playerVisual!: PlayerVisual
   private hud!: UrbanHUD
+  private narrative!: NarrativePresentationOverlay
   private objectiveMarker!: Phaser.GameObjects.Container
   private parcel!: Phaser.GameObjects.Container
   private parkedBicycle: Phaser.GameObjects.Graphics | null = null
@@ -120,6 +122,8 @@ export class GameWorldScene extends Phaser.Scene {
       recenter: () => this.recenterCamera(),
       worldMap: () => this.openGlobalMap(),
     })
+    // Created after ordinary HUD overlays so authoritative story signals can present above the existing UI.
+    this.narrative = new NarrativePresentationOverlay(this, this.fixedUiLayer)
     this.input.addPointer(Math.max(0, 4 - this.input.manager.pointers.length))
     this.keys = (this.input.keyboard?.addKeys('W,A,S,D,UP,DOWN,LEFT,RIGHT,E,T,ESC') ?? {}) as typeof this.keys
     this.input.on('pointerdown', this.unlockAudio)
@@ -152,10 +156,12 @@ export class GameWorldScene extends Phaser.Scene {
     this.groundDetail?.update(this.cameras.main.worldView, this.cameras.main.zoom)
     const down = (key: string): number => this.keys[key]?.isDown ? 1 : 0
     const touch = this.hud.movement()
-    const input = this.hud.isMenuOpen() || this.zoomGesture.isPinching() ? { x: 0, y: 0 } : {
-      x: touch.x + down('D') + down('RIGHT') - down('A') - down('LEFT'),
-      y: touch.y + down('S') + down('DOWN') - down('W') - down('UP'),
-    }
+    const input = this.hud.isMenuOpen() || this.zoomGesture.isPinching() ? { x: 0, y: 0 }
+      : (this.narrative?.isOpen() ?? false) ? { x: 0, y: 0 }
+      : {
+        x: touch.x + down('D') + down('RIGHT') - down('A') - down('LEFT'),
+        y: touch.y + down('S') + down('DOWN') - down('W') - down('UP'),
+      }
     const transport = this.worldState.urban!.activeTransport
     const profile = TRANSPORT_PROFILES[transport]
     const before = this.worldState.player
@@ -177,9 +183,12 @@ export class GameWorldScene extends Phaser.Scene {
       this.ambient?.update(this.ambientUpdateAccumulator, this.cameras.main.worldView)
       this.ambientUpdateAccumulator = 0
     }
-    if (this.keys.ESC && Phaser.Input.Keyboard.JustDown(this.keys.ESC)) this.hud.toggleMenu()
-    if (this.keys.E && Phaser.Input.Keyboard.JustDown(this.keys.E) && !this.hud.isMenuOpen()) this.onAction()
-    if (this.keys.T && Phaser.Input.Keyboard.JustDown(this.keys.T) && !this.hud.isMenuOpen()) this.switchTransport()
+    if (this.keys.ESC && Phaser.Input.Keyboard.JustDown(this.keys.ESC)) {
+      if (!this.narrative.handleBack()) this.hud.toggleMenu()
+      this.clearInput()
+    }
+    if (this.keys.E && Phaser.Input.Keyboard.JustDown(this.keys.E) && !this.isModalOpen()) this.onAction()
+    if (this.keys.T && Phaser.Input.Keyboard.JustDown(this.keys.T) && !this.isModalOpen()) this.switchTransport()
     if (time - this.lastHudUpdate > HUD_REFRESH_MS) {
       this.refreshPresentation()
       this.lastHudUpdate = time
@@ -187,7 +196,7 @@ export class GameWorldScene extends Phaser.Scene {
   }
 
   private onAction(): void {
-    if (this.hud.isMenuOpen()) return
+    if (this.isModalOpen()) return
     if (inInteractionRange(this.worldState.player, URBAN_HQ)) {
       this.enterInterior('HQInterior')
       return
@@ -205,6 +214,8 @@ export class GameWorldScene extends Phaser.Scene {
     this.refreshPresentation()
   }
 
+  private isModalOpen(): boolean { return this.hud.isMenuOpen() || (this.narrative?.isOpen() ?? false) }
+
   private enterInterior(scene: 'HQInterior' | 'MarketplaceInterior'): void {
     this.clearInput()
     this.persist('progression-changed')
@@ -213,7 +224,7 @@ export class GameWorldScene extends Phaser.Scene {
   }
 
   private switchTransport(): void {
-    if (this.hud.isMenuOpen()) return
+    if (this.isModalOpen()) return
     if (!inInteractionRange(this.worldState.player, URBAN_HQ)) {
       this.hud.notify('Change transport at the HQ Fleet Bay.')
       return
@@ -263,6 +274,7 @@ export class GameWorldScene extends Phaser.Scene {
   }
 
   private openGlobalMap(focus?: string): void {
+    if (this.isModalOpen()) return
     this.clearInput()
     this.syncRuntimeSession()
     this.scene.launch('GlobalMap', { focus })
@@ -270,6 +282,7 @@ export class GameWorldScene extends Phaser.Scene {
   }
 
   private navigate(scene: string): void {
+    if (this.narrative.isOpen()) return
     this.clearInput()
     this.persist('progression-changed')
     this.scene.start(scene)
@@ -294,7 +307,7 @@ export class GameWorldScene extends Phaser.Scene {
   }
 
   private setWorldZoom(zoom: number, focal?: { x: number; y: number }): void {
-    if (this.hud.isMenuOpen()) return
+    if (this.isModalOpen()) return
     if (zoom < this.cityFit() * 0.82) { this.openGlobalMap('home'); return }
     const camera = this.cameras.main, previousZoom = camera.zoom
     const worldFocal = focal ? { x: camera.scrollX + camera.width / 2 + (focal.x - camera.width / 2) / previousZoom,
@@ -321,7 +334,7 @@ export class GameWorldScene extends Phaser.Scene {
   }
 
   private readonly beginWorldGesture = (pointer: Phaser.Input.Pointer): void => {
-    if (this.hud.isMenuOpen() || isUrbanHUDPoint(this.scale.width, this.scale.height, pointer.x, pointer.y)) return
+    if (this.isModalOpen() || isUrbanHUDPoint(this.scale.width, this.scale.height, pointer.x, pointer.y)) return
     this.zoomGesture.press(pointer.id, pointer)
     if (this.zoomGesture.isPinching()) {
       this.cameraPan.clear()
@@ -440,6 +453,7 @@ export class GameWorldScene extends Phaser.Scene {
     this.clearInput()
     this.resizeRestartTimer?.remove()
     this.resizeRestartTimer = undefined
+    this.narrative.destroy()
     this.hud.destroy()
     this.scale.off(Phaser.Scale.Events.RESIZE, this.handleResize)
     this.game.events.off(Phaser.Core.Events.BLUR, this.clearInput)
