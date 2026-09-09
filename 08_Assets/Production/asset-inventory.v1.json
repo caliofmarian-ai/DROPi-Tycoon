@@ -155,6 +155,10 @@
         "vehicles/": "candidate-road-transport"
       },
       "artifactOverrides": {
+        "branding/logo_main.webp": {
+          "semanticFamily": "candidate-branding",
+          "reuseGroup": "dropi-tycoon-logo-source-v1"
+        },
         "ui/icons/icon_orders.webp": {
           "semanticFamily": "ui-orders",
           "reuseGroup": "orders-icon-v1"
