@@ -1,0 +1,663 @@
+{
+  "version": "1.0.0",
+  "issue": 619,
+  "continent": "Europe",
+  "country": {
+    "geometryId": "348",
+    "sourceCountryCode": "HU",
+    "renderedName": "Hungary"
+  },
+  "administrativeModel": {
+    "level": "capital-plus-first-order-varmegyek",
+    "nativeTermSingular": "vármegye / Budapest főváros",
+    "nativeTermPlural": "19 vármegye + Budapest főváros",
+    "englishTerm": "county-level territorial unit / capital",
+    "unitCount": 20,
+    "officialReferences": [
+      "https://www.ksh.hu/teruletiatlasz_kozigazgatasi_egysegek",
+      "https://www.ksh.hu/teruletiatlasz_varmegyek?lang=hu",
+      "https://www.ksh.hu/teruleti-adatok",
+      "https://www.ksh.hu/stadat_files/nep/en/nep0034.html",
+      "https://pestvarmegye.hu/pest-varmegyei-onkormanyzati-hivatal/9"
+    ],
+    "specialCases": [
+      {
+        "type": "current-varmegye-terminology",
+        "effectiveFrom": "2023-01-01",
+        "note": "Under the Eleventh Amendment of Hungary's Fundamental Law, the designation megye changed to vármegye from 1 January 2023. DROPi uses the current vármegye terminology while retaining GeoNames source labels for provenance."
+      },
+      {
+        "admin1Code": "16",
+        "type": "administrative-seat-outside-source-ownership",
+        "label": "Pest vármegye / Budapest seat exception",
+        "note": "Pest Vármegye Önkormányzata and its office are seated in Budapest, while Budapest is a separate capital-level territorial unit. GeoNames source-owns Budapest under HU.05, so DROPi keeps Budapest there as the unique national-capital locality and uses a source-backed representative inside HU.16 without relabeling that representative as the county seat."
+      },
+      {
+        "admin1Code": "06",
+        "type": "current-name-crosswalk",
+        "canonicalName": "Csongrád-Csanád",
+        "sourceName": "Csongrád",
+        "note": "The current official vármegye name is Csongrád-Csanád. The retained GeoNames admin1 source label remains Csongrád; DROPi preserves the source identity while presenting the current official name."
+      },
+      {
+        "type": "budapest-national-capital-and-territorial-unit",
+        "admin1Code": "05",
+        "note": "Budapest is Hungary's capital and a distinct top-level territorial unit. It is the only Hungary representative with national-capital-and-regional-node semantics."
+      },
+      {
+        "type": "runtime-geometry-lod-reconciliation",
+        "geometryId": "348",
+        "geometryType": "Polygon",
+        "note": "The current DROPi 110m runtime topology represents Hungary as geometry 348, a Polygon. The 19 vármegyék plus Budapest remain Country Catalog administrative/economic identities; this slice does not fabricate internal county polygons."
+      }
+    ]
+  },
+  "source": {
+    "provider": "GeoNames",
+    "license": "Creative Commons Attribution 4.0",
+    "releaseTag": "source-geonames-cities500-2026-09-08-f3cda4f9",
+    "cities500Sha256": "f3cda4f9d256d90045121fb8eebad3ed91695c32370ed93b50fbe0cb616e2bbd",
+    "admin1Sha256": "590651498043f674accda2b7f46d21286cda0e290b02f8561c5005eee9a5448c",
+    "candidateCountryCodes": [
+      "HU"
+    ],
+    "expectedCountryCandidateCount": 1226,
+    "administrativeAuthority": "Hungarian Central Statistical Office (KSH)",
+    "administrativeAuthorityReference": "https://www.ksh.hu/teruletiatlasz_kozigazgatasi_egysegek",
+    "publishedGameplayRepresentativeCount": 20
+  },
+  "selectionModel": {
+    "primaryFeatureCodes": [
+      "PPLC",
+      "PPLA"
+    ],
+    "fallbackFeatureCodes": [
+      "PPLA2",
+      "PPL"
+    ],
+    "expectedPrimarySelections": 19,
+    "expectedFallbackSelections": 1,
+    "highDensityGameplayImport": false,
+    "hardcodedCoordinates": false,
+    "rule": "One source-backed representative locality per governed first-order region; retained high-density source remains reference-only."
+  },
+  "developmentModel": {
+    "authority": "shared-regional-national-multiplayer-economy",
+    "personalPlayerProgressionUnlock": false,
+    "numericThresholdsDefined": false,
+    "signalsPlanned": [
+      "company-activity",
+      "employment-demand",
+      "production",
+      "logistics-throughput",
+      "construction-investment",
+      "transport-connectivity",
+      "trade-volume",
+      "population-economic-simulation",
+      "regional-national-policy"
+    ],
+    "rule": "Representative locality prominence and development are shared-world economic outcomes, not personal progression rewards."
+  },
+  "units": [
+    {
+      "admin1Code": "05",
+      "regionName": "Budapest",
+      "regionSourceName": "Budapest",
+      "regionAsciiName": "Budapest",
+      "regionSourceRef": "geonames:3054638",
+      "representativeLocality": {
+        "localityId": "dropi:locality:geonames:3054643",
+        "sourceRef": "geonames:3054643",
+        "sourceCountryCode": "HU",
+        "sourceAdmin1Code": "05",
+        "sourceScope": "admin1",
+        "name": "Budapest",
+        "asciiName": "Budapest",
+        "latitude": 47.49835,
+        "longitude": 19.04045,
+        "featureCode": "PPLC",
+        "populationSourceValue": 1741041,
+        "selectionBasis": "source-first-order-seat-role",
+        "presentationRole": "national-capital-and-regional-node"
+      },
+      "economicEmergence": {
+        "authority": "shared-regional-national-multiplayer-economy",
+        "personalPlayerProgressionUnlock": false,
+        "numericThresholdsDefined": false,
+        "presentationState": "economy-system-governed"
+      }
+    },
+    {
+      "admin1Code": "01",
+      "regionName": "Bács-Kiskun vármegye",
+      "regionSourceName": "Bács-Kiskun",
+      "regionAsciiName": "Bacs-Kiskun",
+      "regionSourceRef": "geonames:3055744",
+      "representativeLocality": {
+        "localityId": "dropi:locality:geonames:3050434",
+        "sourceRef": "geonames:3050434",
+        "sourceCountryCode": "HU",
+        "sourceAdmin1Code": "01",
+        "sourceScope": "admin1",
+        "name": "Kecskemét",
+        "asciiName": "Kecskemet",
+        "latitude": 46.90618,
+        "longitude": 19.69128,
+        "featureCode": "PPLA",
+        "populationSourceValue": 109847,
+        "selectionBasis": "source-first-order-seat-role",
+        "presentationRole": "regional-representative-locality"
+      },
+      "economicEmergence": {
+        "authority": "shared-regional-national-multiplayer-economy",
+        "personalPlayerProgressionUnlock": false,
+        "numericThresholdsDefined": false,
+        "presentationState": "economy-system-governed"
+      }
+    },
+    {
+      "admin1Code": "02",
+      "regionName": "Baranya vármegye",
+      "regionSourceName": "Baranya",
+      "regionAsciiName": "Baranya",
+      "regionSourceRef": "geonames:3055399",
+      "representativeLocality": {
+        "localityId": "dropi:locality:geonames:3046526",
+        "sourceRef": "geonames:3046526",
+        "sourceCountryCode": "HU",
+        "sourceAdmin1Code": "02",
+        "sourceScope": "admin1",
+        "name": "Pécs",
+        "asciiName": "Pecs",
+        "latitude": 46.07617,
+        "longitude": 18.22814,
+        "featureCode": "PPLA",
+        "populationSourceValue": 145347,
+        "selectionBasis": "source-first-order-seat-role",
+        "presentationRole": "regional-representative-locality"
+      },
+      "economicEmergence": {
+        "authority": "shared-regional-national-multiplayer-economy",
+        "personalPlayerProgressionUnlock": false,
+        "numericThresholdsDefined": false,
+        "presentationState": "economy-system-governed"
+      }
+    },
+    {
+      "admin1Code": "03",
+      "regionName": "Békés vármegye",
+      "regionSourceName": "Bekes County",
+      "regionAsciiName": "Bekes County",
+      "regionSourceRef": "geonames:722433",
+      "representativeLocality": {
+        "localityId": "dropi:locality:geonames:722437",
+        "sourceRef": "geonames:722437",
+        "sourceCountryCode": "HU",
+        "sourceAdmin1Code": "03",
+        "sourceScope": "admin1",
+        "name": "Békéscsaba",
+        "asciiName": "Bekescsaba",
+        "latitude": 46.68333,
+        "longitude": 21.1,
+        "featureCode": "PPLA",
+        "populationSourceValue": 59732,
+        "selectionBasis": "source-first-order-seat-role",
+        "presentationRole": "regional-representative-locality"
+      },
+      "economicEmergence": {
+        "authority": "shared-regional-national-multiplayer-economy",
+        "personalPlayerProgressionUnlock": false,
+        "numericThresholdsDefined": false,
+        "presentationState": "economy-system-governed"
+      }
+    },
+    {
+      "admin1Code": "04",
+      "regionName": "Borsod-Abaúj-Zemplén vármegye",
+      "regionSourceName": "Borsod-Abaúj-Zemplén",
+      "regionAsciiName": "Borsod-Abauj-Zemplen",
+      "regionSourceRef": "geonames:722064",
+      "representativeLocality": {
+        "localityId": "dropi:locality:geonames:717582",
+        "sourceRef": "geonames:717582",
+        "sourceCountryCode": "HU",
+        "sourceAdmin1Code": "04",
+        "sourceScope": "admin1",
+        "name": "Miskolc",
+        "asciiName": "Miskolc",
+        "latitude": 48.10327,
+        "longitude": 20.77806,
+        "featureCode": "PPLA",
+        "populationSourceValue": 154521,
+        "selectionBasis": "source-first-order-seat-role",
+        "presentationRole": "regional-representative-locality"
+      },
+      "economicEmergence": {
+        "authority": "shared-regional-national-multiplayer-economy",
+        "personalPlayerProgressionUnlock": false,
+        "numericThresholdsDefined": false,
+        "presentationState": "economy-system-governed"
+      }
+    },
+    {
+      "admin1Code": "06",
+      "regionName": "Csongrád-Csanád vármegye",
+      "regionSourceName": "Csongrád",
+      "regionAsciiName": "Csongrad",
+      "regionSourceRef": "geonames:721589",
+      "representativeLocality": {
+        "localityId": "dropi:locality:geonames:715429",
+        "sourceRef": "geonames:715429",
+        "sourceCountryCode": "HU",
+        "sourceAdmin1Code": "06",
+        "sourceScope": "admin1",
+        "name": "Szeged",
+        "asciiName": "Szeged",
+        "latitude": 46.253,
+        "longitude": 20.14824,
+        "featureCode": "PPLA",
+        "populationSourceValue": 160766,
+        "selectionBasis": "source-first-order-seat-role",
+        "presentationRole": "regional-representative-locality"
+      },
+      "economicEmergence": {
+        "authority": "shared-regional-national-multiplayer-economy",
+        "personalPlayerProgressionUnlock": false,
+        "numericThresholdsDefined": false,
+        "presentationState": "economy-system-governed"
+      }
+    },
+    {
+      "admin1Code": "08",
+      "regionName": "Fejér vármegye",
+      "regionSourceName": "Fejér",
+      "regionAsciiName": "Fejer",
+      "regionSourceRef": "geonames:3053028",
+      "representativeLocality": {
+        "localityId": "dropi:locality:geonames:3044774",
+        "sourceRef": "geonames:3044774",
+        "sourceCountryCode": "HU",
+        "sourceAdmin1Code": "08",
+        "sourceScope": "admin1",
+        "name": "Székesfehérvár",
+        "asciiName": "Szekesfehervar",
+        "latitude": 47.18995,
+        "longitude": 18.41034,
+        "featureCode": "PPLA",
+        "populationSourceValue": 101600,
+        "selectionBasis": "source-first-order-seat-role",
+        "presentationRole": "regional-representative-locality"
+      },
+      "economicEmergence": {
+        "authority": "shared-regional-national-multiplayer-economy",
+        "personalPlayerProgressionUnlock": false,
+        "numericThresholdsDefined": false,
+        "presentationState": "economy-system-governed"
+      }
+    },
+    {
+      "admin1Code": "09",
+      "regionName": "Győr-Moson-Sopron vármegye",
+      "regionSourceName": "Győr-Moson-Sopron",
+      "regionAsciiName": "Gyor-Moson-Sopron",
+      "regionSourceRef": "geonames:3051977",
+      "representativeLocality": {
+        "localityId": "dropi:locality:geonames:3052009",
+        "sourceRef": "geonames:3052009",
+        "sourceCountryCode": "HU",
+        "sourceAdmin1Code": "09",
+        "sourceScope": "admin1",
+        "name": "Győr",
+        "asciiName": "Gyor",
+        "latitude": 47.68333,
+        "longitude": 17.63512,
+        "featureCode": "PPLA",
+        "populationSourceValue": 129301,
+        "selectionBasis": "source-first-order-seat-role",
+        "presentationRole": "regional-representative-locality"
+      },
+      "economicEmergence": {
+        "authority": "shared-regional-national-multiplayer-economy",
+        "personalPlayerProgressionUnlock": false,
+        "numericThresholdsDefined": false,
+        "presentationState": "economy-system-governed"
+      }
+    },
+    {
+      "admin1Code": "10",
+      "regionName": "Hajdú-Bihar vármegye",
+      "regionSourceName": "Hajdú-Bihar",
+      "regionAsciiName": "Hajdu-Bihar",
+      "regionSourceRef": "geonames:720293",
+      "representativeLocality": {
+        "localityId": "dropi:locality:geonames:721472",
+        "sourceRef": "geonames:721472",
+        "sourceCountryCode": "HU",
+        "sourceAdmin1Code": "10",
+        "sourceScope": "admin1",
+        "name": "Debrecen",
+        "asciiName": "Debrecen",
+        "latitude": 47.53167,
+        "longitude": 21.62444,
+        "featureCode": "PPLA",
+        "populationSourceValue": 202402,
+        "selectionBasis": "source-first-order-seat-role",
+        "presentationRole": "regional-representative-locality"
+      },
+      "economicEmergence": {
+        "authority": "shared-regional-national-multiplayer-economy",
+        "personalPlayerProgressionUnlock": false,
+        "numericThresholdsDefined": false,
+        "presentationState": "economy-system-governed"
+      }
+    },
+    {
+      "admin1Code": "11",
+      "regionName": "Heves vármegye",
+      "regionSourceName": "Heves County",
+      "regionAsciiName": "Heves County",
+      "regionSourceRef": "geonames:720002",
+      "representativeLocality": {
+        "localityId": "dropi:locality:geonames:721239",
+        "sourceRef": "geonames:721239",
+        "sourceCountryCode": "HU",
+        "sourceAdmin1Code": "11",
+        "sourceScope": "admin1",
+        "name": "Eger",
+        "asciiName": "Eger",
+        "latitude": 47.90265,
+        "longitude": 20.37329,
+        "featureCode": "PPLA",
+        "populationSourceValue": 53876,
+        "selectionBasis": "source-first-order-seat-role",
+        "presentationRole": "regional-representative-locality"
+      },
+      "economicEmergence": {
+        "authority": "shared-regional-national-multiplayer-economy",
+        "personalPlayerProgressionUnlock": false,
+        "numericThresholdsDefined": false,
+        "presentationState": "economy-system-governed"
+      }
+    },
+    {
+      "admin1Code": "20",
+      "regionName": "Jász-Nagykun-Szolnok vármegye",
+      "regionSourceName": "Jász-Nagykun-Szolnok",
+      "regionAsciiName": "Jasz-Nagykun-Szolnok",
+      "regionSourceRef": "geonames:719637",
+      "representativeLocality": {
+        "localityId": "dropi:locality:geonames:715126",
+        "sourceRef": "geonames:715126",
+        "sourceCountryCode": "HU",
+        "sourceAdmin1Code": "20",
+        "sourceScope": "admin1",
+        "name": "Szolnok",
+        "asciiName": "Szolnok",
+        "latitude": 47.18066,
+        "longitude": 20.19835,
+        "featureCode": "PPLA",
+        "populationSourceValue": 71285,
+        "selectionBasis": "source-first-order-seat-role",
+        "presentationRole": "regional-representative-locality"
+      },
+      "economicEmergence": {
+        "authority": "shared-regional-national-multiplayer-economy",
+        "personalPlayerProgressionUnlock": false,
+        "numericThresholdsDefined": false,
+        "presentationState": "economy-system-governed"
+      }
+    },
+    {
+      "admin1Code": "12",
+      "regionName": "Komárom-Esztergom vármegye",
+      "regionSourceName": "Komárom-Esztergom",
+      "regionAsciiName": "Komarom-Esztergom",
+      "regionSourceRef": "geonames:3049518",
+      "representativeLocality": {
+        "localityId": "dropi:locality:geonames:3044082",
+        "sourceRef": "geonames:3044082",
+        "sourceCountryCode": "HU",
+        "sourceAdmin1Code": "12",
+        "sourceScope": "admin1",
+        "name": "Tatabánya",
+        "asciiName": "Tatabanya",
+        "latitude": 47.59247,
+        "longitude": 18.38099,
+        "featureCode": "PPLA",
+        "populationSourceValue": 65849,
+        "selectionBasis": "source-first-order-seat-role",
+        "presentationRole": "regional-representative-locality"
+      },
+      "economicEmergence": {
+        "authority": "shared-regional-national-multiplayer-economy",
+        "personalPlayerProgressionUnlock": false,
+        "numericThresholdsDefined": false,
+        "presentationState": "economy-system-governed"
+      }
+    },
+    {
+      "admin1Code": "14",
+      "regionName": "Nógrád vármegye",
+      "regionSourceName": "Nógrád",
+      "regionAsciiName": "Nograd",
+      "regionSourceRef": "geonames:3047348",
+      "representativeLocality": {
+        "localityId": "dropi:locality:geonames:3045643",
+        "sourceRef": "geonames:3045643",
+        "sourceCountryCode": "HU",
+        "sourceAdmin1Code": "14",
+        "sourceScope": "admin1",
+        "name": "Salgótarján",
+        "asciiName": "Salgotarjan",
+        "latitude": 48.09872,
+        "longitude": 19.80303,
+        "featureCode": "PPLA",
+        "populationSourceValue": 34627,
+        "selectionBasis": "source-first-order-seat-role",
+        "presentationRole": "regional-representative-locality"
+      },
+      "economicEmergence": {
+        "authority": "shared-regional-national-multiplayer-economy",
+        "personalPlayerProgressionUnlock": false,
+        "numericThresholdsDefined": false,
+        "presentationState": "economy-system-governed"
+      }
+    },
+    {
+      "admin1Code": "16",
+      "regionName": "Pest vármegye",
+      "regionSourceName": "Pest County",
+      "regionAsciiName": "Pest County",
+      "regionSourceRef": "geonames:3046431",
+      "representativeLocality": {
+        "localityId": "dropi:locality:geonames:3053281",
+        "sourceRef": "geonames:3053281",
+        "sourceCountryCode": "HU",
+        "sourceAdmin1Code": "16",
+        "sourceScope": "admin1",
+        "name": "Érd",
+        "asciiName": "Erd",
+        "latitude": 47.39489,
+        "longitude": 18.91361,
+        "featureCode": "PPLA2",
+        "populationSourceValue": 62408,
+        "selectionBasis": "source-admin-fallback",
+        "presentationRole": "regional-representative-locality"
+      },
+      "economicEmergence": {
+        "authority": "shared-regional-national-multiplayer-economy",
+        "personalPlayerProgressionUnlock": false,
+        "numericThresholdsDefined": false,
+        "presentationState": "economy-system-governed"
+      }
+    },
+    {
+      "admin1Code": "17",
+      "regionName": "Somogy vármegye",
+      "regionSourceName": "Somogy County",
+      "regionAsciiName": "Somogy County",
+      "regionSourceRef": "geonames:3045226",
+      "representativeLocality": {
+        "localityId": "dropi:locality:geonames:3050616",
+        "sourceRef": "geonames:3050616",
+        "sourceCountryCode": "HU",
+        "sourceAdmin1Code": "17",
+        "sourceScope": "admin1",
+        "name": "Kaposvár",
+        "asciiName": "Kaposvar",
+        "latitude": 46.36667,
+        "longitude": 17.8,
+        "featureCode": "PPLA",
+        "populationSourceValue": 64280,
+        "selectionBasis": "source-first-order-seat-role",
+        "presentationRole": "regional-representative-locality"
+      },
+      "economicEmergence": {
+        "authority": "shared-regional-national-multiplayer-economy",
+        "personalPlayerProgressionUnlock": false,
+        "numericThresholdsDefined": false,
+        "presentationState": "economy-system-governed"
+      }
+    },
+    {
+      "admin1Code": "18",
+      "regionName": "Szabolcs-Szatmár-Bereg vármegye",
+      "regionSourceName": "Szabolcs-Szatmár-Bereg",
+      "regionAsciiName": "Szabolcs-Szatmar-Bereg",
+      "regionSourceRef": "geonames:715593",
+      "representativeLocality": {
+        "localityId": "dropi:locality:geonames:716935",
+        "sourceRef": "geonames:716935",
+        "sourceCountryCode": "HU",
+        "sourceAdmin1Code": "18",
+        "sourceScope": "admin1",
+        "name": "Nyíregyháza",
+        "asciiName": "Nyiregyhaza",
+        "latitude": 47.95539,
+        "longitude": 21.71671,
+        "featureCode": "PPLA",
+        "populationSourceValue": 117689,
+        "selectionBasis": "source-first-order-seat-role",
+        "presentationRole": "regional-representative-locality"
+      },
+      "economicEmergence": {
+        "authority": "shared-regional-national-multiplayer-economy",
+        "personalPlayerProgressionUnlock": false,
+        "numericThresholdsDefined": false,
+        "presentationState": "economy-system-governed"
+      }
+    },
+    {
+      "admin1Code": "21",
+      "regionName": "Tolna vármegye",
+      "regionSourceName": "Tolna County",
+      "regionAsciiName": "Tolna County",
+      "regionSourceRef": "geonames:3043845",
+      "representativeLocality": {
+        "localityId": "dropi:locality:geonames:3044760",
+        "sourceRef": "geonames:3044760",
+        "sourceCountryCode": "HU",
+        "sourceAdmin1Code": "21",
+        "sourceScope": "admin1",
+        "name": "Szekszárd",
+        "asciiName": "Szekszard",
+        "latitude": 46.34723,
+        "longitude": 18.71189,
+        "featureCode": "PPLA",
+        "populationSourceValue": 34174,
+        "selectionBasis": "source-first-order-seat-role",
+        "presentationRole": "regional-representative-locality"
+      },
+      "economicEmergence": {
+        "authority": "shared-regional-national-multiplayer-economy",
+        "personalPlayerProgressionUnlock": false,
+        "numericThresholdsDefined": false,
+        "presentationState": "economy-system-governed"
+      }
+    },
+    {
+      "admin1Code": "22",
+      "regionName": "Vas vármegye",
+      "regionSourceName": "Vas County",
+      "regionAsciiName": "Vas County",
+      "regionSourceRef": "geonames:3043047",
+      "representativeLocality": {
+        "localityId": "dropi:locality:geonames:3044310",
+        "sourceRef": "geonames:3044310",
+        "sourceCountryCode": "HU",
+        "sourceAdmin1Code": "22",
+        "sourceScope": "admin1",
+        "name": "Szombathely",
+        "asciiName": "Szombathely",
+        "latitude": 47.23088,
+        "longitude": 16.62155,
+        "featureCode": "PPLA",
+        "populationSourceValue": 78025,
+        "selectionBasis": "source-first-order-seat-role",
+        "presentationRole": "regional-representative-locality"
+      },
+      "economicEmergence": {
+        "authority": "shared-regional-national-multiplayer-economy",
+        "personalPlayerProgressionUnlock": false,
+        "numericThresholdsDefined": false,
+        "presentationState": "economy-system-governed"
+      }
+    },
+    {
+      "admin1Code": "23",
+      "regionName": "Veszprém vármegye",
+      "regionSourceName": "Veszprém",
+      "regionAsciiName": "Veszprem",
+      "regionSourceRef": "geonames:3042925",
+      "representativeLocality": {
+        "localityId": "dropi:locality:geonames:3042929",
+        "sourceRef": "geonames:3042929",
+        "sourceCountryCode": "HU",
+        "sourceAdmin1Code": "23",
+        "sourceScope": "admin1",
+        "name": "Veszprém",
+        "asciiName": "Veszprem",
+        "latitude": 47.09327,
+        "longitude": 17.91149,
+        "featureCode": "PPLA",
+        "populationSourceValue": 56927,
+        "selectionBasis": "source-first-order-seat-role",
+        "presentationRole": "regional-representative-locality"
+      },
+      "economicEmergence": {
+        "authority": "shared-regional-national-multiplayer-economy",
+        "personalPlayerProgressionUnlock": false,
+        "numericThresholdsDefined": false,
+        "presentationState": "economy-system-governed"
+      }
+    },
+    {
+      "admin1Code": "24",
+      "regionName": "Zala vármegye",
+      "regionSourceName": "Zala County",
+      "regionAsciiName": "Zala County",
+      "regionSourceRef": "geonames:3042613",
+      "representativeLocality": {
+        "localityId": "dropi:locality:geonames:3042638",
+        "sourceRef": "geonames:3042638",
+        "sourceCountryCode": "HU",
+        "sourceAdmin1Code": "24",
+        "sourceScope": "admin1",
+        "name": "Zalaegerszeg",
+        "asciiName": "Zalaegerszeg",
+        "latitude": 46.83695,
+        "longitude": 16.84401,
+        "featureCode": "PPLA",
+        "populationSourceValue": 61898,
+        "selectionBasis": "source-first-order-seat-role",
+        "presentationRole": "regional-representative-locality"
+      },
+      "economicEmergence": {
+        "authority": "shared-regional-national-multiplayer-economy",
+        "personalPlayerProgressionUnlock": false,
+        "numericThresholdsDefined": false,
+        "presentationState": "economy-system-governed"
+      }
+    }
+  ]
+}
