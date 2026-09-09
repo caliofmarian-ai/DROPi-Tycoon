@@ -5,6 +5,7 @@ import {
   CURRENT_WORLD_BASELINE_VERSION,
 } from '../src/systems/worldIdentitySystem'
 import { runWorldInstanceMigrations } from '../server/postgres-world-instances.mjs'
+import { createRuntimeAuthorityServices } from '../server/runtime-authority.mjs'
 import { createPostgresWorldInstanceRuntimeAdapter } from '../server/world-instance-runtime-adapter.mjs'
 
 const databaseUrl = process.env.AUTHORITY_TEST_DATABASE_URL
@@ -48,6 +49,35 @@ describePostgres('issue #616 PostgreSQL World Instance runtime adapter', () => {
     expect(worldCount.count).toBe(0)
     expect(actorCount.count).toBe(0)
     await adapter.close()
+  })
+
+  it('composes the B2 repository into PostgreSQL runtime services without creating a public identity surface', async () => {
+    const services = await createRuntimeAuthorityServices({
+      authorityStore: 'postgres',
+      databaseUrl,
+    })
+
+    expect(services.authorityRegistry.persistent).toBe(true)
+    expect(services.worldInstanceRuntime).toMatchObject({
+      durability: 'postgresql',
+      authentication: 'required-unavailable',
+      publicRoutes: false,
+      publicClientIdentityInput: false,
+    })
+    await expect(services.worldInstanceRuntime?.ensureIdentity({
+      worldInstanceId: 'client-world',
+      accountId: 'client-account',
+    })).resolves.toEqual({
+      kind: 'blocked',
+      code: 'AUTHENTICATED_IDENTITY_REQUIRED',
+    })
+
+    if (!admin) return
+    const [worldCount] = await admin`SELECT COUNT(*)::int AS count FROM world_instances`
+    const [actorCount] = await admin`SELECT COUNT(*)::int AS count FROM world_instance_actors`
+    expect(worldCount.count).toBe(0)
+    expect(actorCount.count).toBe(0)
+    await services.close()
   })
 
   it('returns the same durable identity on retry and after repository recreation', async () => {
