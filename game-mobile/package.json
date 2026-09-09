@@ -3,6 +3,7 @@
   "version": "0.0.0",
   "private": true,
   "main": "node_modules/expo/AppEntry.js",
+  "packageManager": "npm@10.9.2",
   "engines": {
     "node": ">=22.13.0 <23"
   },
@@ -12,9 +13,11 @@
     "postinstall": "node scripts/prepare-bundled-runtime.mjs",
     "runtime:prepare": "node scripts/prepare-bundled-runtime.mjs --force",
     "runtime:validate": "node scripts/validate-bundled-runtime.mjs",
+    "release:preflight": "npm run version:validate && npm run typecheck && npm run doctor",
+    "release:attest:aab": "node scripts/attest-android-aab.mjs",
     "typecheck": "tsc --noEmit",
     "doctor": "npx -y expo-doctor",
-    "version:validate": "node scripts/validate-release-version.mjs && node scripts/validate-bundled-runtime.mjs"
+    "version:validate": "node scripts/validate-release-version.mjs && node scripts/validate-bundled-runtime.mjs && node scripts/validate-release-inputs.mjs && node --check scripts/attest-android-aab.mjs"
   },
   "dependencies": {
     "@dr.pogodin/react-native-fs": "2.40.1",
