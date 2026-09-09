@@ -241,7 +241,7 @@ describe('urban physical delivery scene', () => {
     expect(world).toEqual(before)
   })
 
-  it.each(['Accepted', 'PickedUp'] as const)('continues %s work during navigation but resets the job on disk load', status => {
+  it.each(['Accepted', 'PickedUp'] as const)('continues %s work during navigation and across disk load', status => {
     const world = createInitialWorldState()
     const company = createInitialCompanyState()
     world.urban = { merchantOnboarded: true, activeTransport: 'walking' }
@@ -251,9 +251,10 @@ describe('urban physical delivery scene', () => {
     world.player.carryingPackage = status === 'PickedUp'
     const saved = createSaveGame({ world, company, settings: createInitialGameSettingsState() })
     const loaded = restoreGameSessionFromSave(saved)
-    expect(loaded.world.activeOrder.status).toBe('Available')
-    expect(loaded.world.player.carryingPackage).toBe(false)
-    expect(loaded.world.player.currentOrder).toBe('')
+    expect(loaded.world.activeOrder.status).toBe(status)
+    expect(loaded.world.activeOrder.orderId).toBe(world.activeOrder.orderId)
+    expect(loaded.world.player.carryingPackage).toBe(status === 'PickedUp')
+    expect(loaded.world.player.currentOrder).toBe(world.activeOrder.orderId)
     expect(loaded.world.urban?.merchantOnboarded).toBe(true)
     expect(loaded.company.money).toBe(company.money)
     replaceGameSession(world, company)
