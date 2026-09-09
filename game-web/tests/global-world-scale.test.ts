@@ -12,13 +12,17 @@ import {
   scaleCityRoutePoint,
 } from '../src/world/worldScale'
 import {
+  PLAYER_START,
   WORLD_BUILDINGS,
   WORLD_HEIGHT,
+  WORLD_MARKETPLACE,
   WORLD_PLAYABLE_DISTANCE_SCALE,
   WORLD_ROADS,
   WORLD_ROUTE_POINTS,
   WORLD_SOURCE_BUILDINGS,
   WORLD_SOURCE_HEIGHT,
+  WORLD_SOURCE_MARKETPLACE,
+  WORLD_SOURCE_PLAYER_START,
   WORLD_SOURCE_ROUTE_POINTS,
   WORLD_SOURCE_WIDTH,
   WORLD_WIDTH,
@@ -106,6 +110,21 @@ describe('global playable city scale authority', () => {
       expect(playableBuilding.door.x - playableBuilding.x).toBeCloseTo(sourceBuilding.door.x - sourceBuilding.x)
       expect(playableBuilding.door.y - playableBuilding.y).toBeCloseTo(sourceBuilding.door.y - sourceBuilding.y)
     }
+  })
+
+  it('keeps authored HQ and Marketplace frontages attached to roads and their buildings', () => {
+    const sourceHq = WORLD_SOURCE_BUILDINGS.find(building => building.id === 'main-hq')!
+    const playableHq = WORLD_BUILDINGS.find(building => building.id === 'main-hq')!
+    const sourceMarketplace = WORLD_SOURCE_BUILDINGS.find(building => building.id === 'business-1')!
+    const playableMarketplace = WORLD_BUILDINGS.find(building => building.id === 'business-1')!
+
+    expect(WORLD_ROADS.some(road => surfaceContains(road, PLAYER_START.x, PLAYER_START.y))).toBe(true)
+    expect(WORLD_ROADS.some(road => surfaceContains(road, WORLD_MARKETPLACE.x, WORLD_MARKETPLACE.y))).toBe(true)
+
+    expect(PLAYER_START.x - playableHq.x).toBeCloseTo(WORLD_SOURCE_PLAYER_START.x - sourceHq.x)
+    expect(PLAYER_START.y - playableHq.y).toBeCloseTo(WORLD_SOURCE_PLAYER_START.y - sourceHq.y)
+    expect(WORLD_MARKETPLACE.x - playableMarketplace.x).toBeCloseTo(WORLD_SOURCE_MARKETPLACE.x - sourceMarketplace.x)
+    expect(WORLD_MARKETPLACE.y - playableMarketplace.y).toBeCloseTo(WORLD_SOURCE_MARKETPLACE.y - sourceMarketplace.y)
   })
 
   it('bounds resident ground detail independently of total city extent', () => {
