@@ -154,13 +154,14 @@ describe('Workstream F — Settings sound toggle wires the audio system', () => 
   })
 
   it('respects the persisted sound setting on cold startup, before Continue Game is pressed', () => {
-    expect(mainMenuSource).toContain('this.saveSlot.kind === \'valid\'')
+    expect(mainMenuSource).toContain("this.saveSlot.kind === 'valid'")
     expect(mainMenuSource).toContain('? this.saveSlot.save.settings.soundEnabled')
   })
 
-  it('only shows the sound toggle while the Settings panel is open', () => {
-    expect(mainMenuSource).toContain('this.setSoundToggleVisible(panel === \'settings\')')
-    expect(mainMenuSource).toContain('this.setSoundToggleVisible(false)')
+  it('keeps the shared secondary modal action available for Settings and Information', () => {
+    expect(mainMenuSource).toContain("this.setSoundToggleVisible(panel === 'settings' || panel === 'information')")
+    expect(mainMenuSource).toContain('private handleSecondaryAction(): void')
+    expect(mainMenuSource).toContain('this.toggleSound()')
   })
 
   it('unlocks audio and plays a ui-tap cue from the shared menu button handler', () => {
@@ -170,5 +171,14 @@ describe('Workstream F — Settings sound toggle wires the audio system', () => 
     )
     expect(createButtonBody).toContain('getAudioController().unlock()')
     expect(createButtonBody).toContain("getAudioController().play('ui-tap')")
+  })
+})
+
+describe('ISSUE-565 — MainMenu exposes shipped third-party notices', () => {
+  it('opens the packaged legal notice from Information without changing gameplay state', () => {
+    expect(mainMenuSource).toContain("const THIRD_PARTY_NOTICES_URL = '/legal/third-party-notices.html'")
+    expect(mainMenuSource).toContain("this.menuState.activePanel === 'information'")
+    expect(mainMenuSource).toContain("'Third-party notices'")
+    expect(mainMenuSource).toContain("window.open(THIRD_PARTY_NOTICES_URL, '_blank', 'noopener,noreferrer')")
   })
 })

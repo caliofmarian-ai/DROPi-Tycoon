@@ -1,0 +1,174 @@
+{
+  "version": "1.0.0",
+  "issue": 579,
+  "continent": "Europe",
+  "country": {
+    "geometryId": "276",
+    "sourceCountryCode": "DE",
+    "renderedName": "Germany"
+  },
+  "administrativeModel": {
+    "level": "federal-states",
+    "nativeTermSingular": "Land",
+    "nativeTermPlural": "Länder",
+    "englishTerm": "federal state",
+    "unitCount": 16,
+    "officialReferences": [
+      "https://gdz.bkg.bund.de/index.php/default/verwaltungskarte-1-2-500-000-laender-vk2500-l.html",
+      "https://www.bundesregierung.de/breg-de/schwerpunkte/deutsche-einheit/einigungsvertrag-353990",
+      "https://www.migration-gesundheit.bund.de/fileadmin/Dateien/pdfs_neu_2022/gesundheitswesen/willkommen-in-deutschland_english.pdf",
+      "https://www.transparenz.bremen.de/metainformationen/landesverfassung-der-freien-hansestadt-bremen-in-der-fassung-der-bekanntmachung-vom-12-august-2019-150860",
+      "https://www.hamburg.de/politik-und-verwaltung/"
+    ],
+    "specialCases": [
+      {
+        "type": "three-city-states",
+        "canonicalLandCodes": [
+          "03",
+          "04",
+          "16"
+        ],
+        "note": "Berlin, Bremen and Hamburg are city-states (Stadtstaaten). DROPi retains them as full Land-level regional nodes rather than treating them as subordinate municipalities."
+      },
+      {
+        "type": "bremen-two-city-land",
+        "canonicalLandCode": "03",
+        "note": "The Freie Hansestadt Bremen is the Land formed from the municipalities Bremen and Bremerhaven. Bremen is used as the one representative locality because it is the Land capital; Bremerhaven remains source geography and is not duplicated as a second Land representative."
+      },
+      {
+        "type": "berlin-federal-and-land-capital",
+        "canonicalLandCode": "16",
+        "note": "Berlin is both Germany's federal capital and the capital/representative locality of the Land Berlin. It is the only Germany node with national-capital-and-regional-node semantics."
+      },
+      {
+        "type": "canonical-german-land-name-crosswalk",
+        "note": "The retained GeoNames admin1 source uses several English or ASCII-oriented labels. DROPi preserves those source identities while presenting the official German Land names Baden-Württemberg, Bayern, Hessen, Niedersachsen, Nordrhein-Westfalen, Sachsen, Thüringen and Berlin."
+      },
+      {
+        "type": "runtime-geometry-lod-reconciliation",
+        "geometryId": "276",
+        "geometryType": "Polygon",
+        "componentCount": 1,
+        "note": "The current DROPi 110m runtime topology represents Germany as one Polygon. The 16 Länder remain Country Catalog administrative identities; this slice does not fabricate internal Land polygons."
+      }
+    ]
+  },
+  "source": {
+    "provider": "GeoNames",
+    "license": "Creative Commons Attribution 4.0",
+    "releaseTag": "source-geonames-cities500-2026-09-08-f3cda4f9",
+    "cities500Sha256": "f3cda4f9d256d90045121fb8eebad3ed91695c32370ed93b50fbe0cb616e2bbd",
+    "admin1Sha256": "590651498043f674accda2b7f46d21286cda0e290b02f8561c5005eee9a5448c",
+    "candidateCountryCodes": [
+      "DE"
+    ],
+    "expectedCountryCandidateCount": 11920,
+    "administrativeAuthority": "Federal Republic of Germany / Bundesamt für Kartographie und Geodäsie",
+    "administrativeAuthorityReference": "https://gdz.bkg.bund.de/index.php/default/verwaltungskarte-1-2-500-000-laender-vk2500-l.html"
+  },
+  "selectionPolicy": {
+    "primaryFeatureCodes": [
+      "PPLC",
+      "PPLA"
+    ],
+    "fallbackFeatureCodes": [
+      "PPLA2",
+      "PPLA3",
+      "PPL"
+    ],
+    "expectedPrimarySelections": 16,
+    "expectedFallbackSelections": 0,
+    "highDensityGameplayImport": false,
+    "hardcodedCoordinates": false
+  },
+  "economicEmergence": {
+    "authority": "shared-regional-national-multiplayer-economy",
+    "personalPlayerProgressionUnlock": false,
+    "numericThresholdsDefined": false
+  },
+  "expectedRegions": [
+    {
+      "admin1Code": "01",
+      "canonicalName": "Baden-Württemberg",
+      "sourceName": "Baden-Wurttemberg"
+    },
+    {
+      "admin1Code": "02",
+      "canonicalName": "Bayern",
+      "sourceName": "Bavaria"
+    },
+    {
+      "admin1Code": "03",
+      "canonicalName": "Bremen",
+      "sourceName": "Bremen",
+      "presentationRole": "city-state-capital-and-regional-node"
+    },
+    {
+      "admin1Code": "04",
+      "canonicalName": "Hamburg",
+      "sourceName": "Hamburg",
+      "presentationRole": "city-state-capital-and-regional-node"
+    },
+    {
+      "admin1Code": "05",
+      "canonicalName": "Hessen",
+      "sourceName": "Hesse"
+    },
+    {
+      "admin1Code": "06",
+      "canonicalName": "Niedersachsen",
+      "sourceName": "Lower Saxony"
+    },
+    {
+      "admin1Code": "07",
+      "canonicalName": "Nordrhein-Westfalen",
+      "sourceName": "North Rhine-Westphalia"
+    },
+    {
+      "admin1Code": "08",
+      "canonicalName": "Rheinland-Pfalz",
+      "sourceName": "Rheinland-Pfalz"
+    },
+    {
+      "admin1Code": "09",
+      "canonicalName": "Saarland",
+      "sourceName": "Saarland"
+    },
+    {
+      "admin1Code": "10",
+      "canonicalName": "Schleswig-Holstein",
+      "sourceName": "Schleswig-Holstein"
+    },
+    {
+      "admin1Code": "11",
+      "canonicalName": "Brandenburg",
+      "sourceName": "Brandenburg"
+    },
+    {
+      "admin1Code": "12",
+      "canonicalName": "Mecklenburg-Vorpommern",
+      "sourceName": "Mecklenburg-Vorpommern"
+    },
+    {
+      "admin1Code": "13",
+      "canonicalName": "Sachsen",
+      "sourceName": "Saxony"
+    },
+    {
+      "admin1Code": "14",
+      "canonicalName": "Sachsen-Anhalt",
+      "sourceName": "Saxony-Anhalt"
+    },
+    {
+      "admin1Code": "15",
+      "canonicalName": "Thüringen",
+      "sourceName": "Thuringia"
+    },
+    {
+      "admin1Code": "16",
+      "canonicalName": "Berlin",
+      "sourceName": "State of Berlin",
+      "presentationRole": "national-capital-and-regional-node"
+    }
+  ]
+}

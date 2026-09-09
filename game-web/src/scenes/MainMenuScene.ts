@@ -36,6 +36,7 @@ const MODAL_DEPTH = 90
 const BRAND_LOGO_KEY = 'dropi-tycoon-logo'
 const BRAND_LOGO_URL = '/assets/branding/dropi-tycoon-logo.png'
 const EXIT_GAME_MESSAGE = 'dropi:exit-game'
+const THIRD_PARTY_NOTICES_URL = '/legal/third-party-notices.html'
 
 type NativeBridgeWindow = Window & {
   ReactNativeWebView?: {
@@ -428,11 +429,11 @@ export class MainMenuScene extends Phaser.Scene {
       modal.secondaryActionY,
       modal.secondaryActionWidth,
       modal.actionHeight,
-    ).on('pointerdown', this.stopAnd(() => this.toggleSound()))
+    ).on('pointerdown', this.stopAnd(() => this.handleSecondaryAction()))
     this.soundToggleLabel = this.createModalActionLabel(
       centerX,
       modal.secondaryActionY,
-      this.soundToggleText(),
+      this.secondaryActionText(),
       modal.textFontSize,
     )
   }
@@ -485,7 +486,7 @@ export class MainMenuScene extends Phaser.Scene {
     const lines = panel === 'settings' ? SETTINGS_PANEL_LINES : INFORMATION_PANEL_LINES
     this.modalText.setText([...lines])
     this.setModalVisible(true, false)
-    this.setSoundToggleVisible(panel === 'settings')
+    this.setSoundToggleVisible(panel === 'settings' || panel === 'information')
   }
 
   private showMessage(message: string): void {
@@ -541,10 +542,24 @@ export class MainMenuScene extends Phaser.Scene {
     return getAudioController().isEnabled() ? 'Sound: ON' : 'Sound: OFF'
   }
 
+  private secondaryActionText(): string {
+    return this.menuState.activePanel === 'information'
+      ? 'Third-party notices'
+      : this.soundToggleText()
+  }
+
   private setSoundToggleVisible(visible: boolean): void {
-    this.soundToggleLabel.setText(this.soundToggleText())
+    this.soundToggleLabel.setText(this.secondaryActionText())
     this.soundToggleButton.setVisible(visible)
     this.soundToggleLabel.setVisible(visible)
+  }
+
+  private handleSecondaryAction(): void {
+    if (this.menuState.activePanel === 'information') {
+      window.open(THIRD_PARTY_NOTICES_URL, '_blank', 'noopener,noreferrer')
+      return
+    }
+    this.toggleSound()
   }
 
   private toggleSound(): void {
@@ -586,6 +601,6 @@ export class MainMenuScene extends Phaser.Scene {
     if (getAudioController().isEnabled()) {
       getAudioController().play('positive')
     }
-    this.soundToggleLabel.setText(this.soundToggleText())
+    this.soundToggleLabel.setText(this.secondaryActionText())
   }
 }
