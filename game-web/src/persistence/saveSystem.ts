@@ -3,6 +3,11 @@ import {
   createInitialGameSettingsState,
   createInitialWorldState,
 } from '../state/gameState'
+import {
+  MISSION_RESUME_CONTRACT_KIND,
+  MISSION_RESUME_CONTRACT_VERSION,
+  type MissionResumePayloadV1,
+} from '../missions/missionResumeContract'
 import { synchronizePlayerMovementSpeed } from '../systems/bicycleSystem'
 import {
   cloneOwnershipEconomyForSave,
@@ -105,6 +110,11 @@ export interface SaveGameV2 {
   urban?: UrbanProgressState
   /** Additive #566 field. Older Save v2 payloads intentionally omit it. */
   worldContinuity?: SaveWorldContinuityV1
+  /**
+   * Additive #566 mission handoff. Save owns only the versioned envelope; mission
+   * semantics are restored and repaired by DT-09 after world/order/cargo materialize.
+   */
+  missionResume?: MissionResumePayloadV1
   /** Additive #370 field. Older Save v2 payloads intentionally omit it. */
   personalProgression?: PersonalProgressionState
   /** Additive #390 field. Older Save v2 payloads intentionally omit it. */
@@ -139,6 +149,30 @@ export type AutosaveResult =
 
 const isRecord = (value: unknown): value is Record<string, unknown> =>
   typeof value === 'object' && value !== null && !Array.isArray(value)
+
+const cloneMissionResumePayload = (payload: MissionResumePayloadV1): MissionResumePayloadV1 =>
+  JSON.parse(JSON.stringify(payload)) as MissionResumePayloadV1
+
+const sanitizeMissionResumeEnvelope = (
+  value: unknown,
+): { missionResume?: MissionResumePayloadV1; repaired: boolean } => {
+  if (value === undefined) return { repaired: false }
+  if (!isRecord(value) ||
+    value.kind !== MISSION_RESUME_CONTRACT_KIND ||
+    value.version !== MISSION_RESUME_CONTRACT_VERSION ||
+    !isRecord(value.runtime)) {
+    return { repaired: true }
+  }
+
+  try {
+    return {
+      missionResume: cloneMissionResumePayload(value as unknown as MissionResumePayloadV1),
+      repaired: false,
+    }
+  } catch {
+    return { repaired: true }
+  }
+}
 
 const normalizeError = (error: unknown): string =>
   error instanceof Error ? error.message : String(error)
@@ -436,6 +470,7 @@ const clonePersonalProgression = (state: PersonalProgressionState): PersonalProg
 export const createSaveGame = (session: GameSessionState): SaveGameV2 => {
   const personalProgression = sanitizePersonalProgression(session.personalProgression).personalProgression
   const ownershipEconomy = cloneOwnershipEconomyForSave(session.ownershipEconomy)
+  const missionResumeResult = sanitizeMissionResumeEnvelope(session.missionResume)
   return {
     formatVersion: SAVE_FORMAT_VERSION,
     company: {
@@ -462,6 +497,9 @@ export const createSaveGame = (session: GameSessionState): SaveGameV2 => {
     settings: { tutorialCompleted: session.settings.tutorialCompleted, soundEnabled: session.settings.soundEnabled },
     ...(session.world.urban ? { urban: sanitizeUrban(session.world.urban, session.company).urban } : {}),
     worldContinuity: captureWorldContinuity(session.world),
+    ...(missionResumeResult.missionResume
+      ? { missionResume: missionResumeResult.missionResume }
+      : {}),
     ...(hasPersonalProgressionActivity(personalProgression)
       ? { personalProgression: clonePersonalProgression(personalProgression) }
       : {}),
@@ -489,6 +527,7 @@ export const decodeSave = (raw: string): SaveDecodeResult => {
   const company = companyResult.company
   const urbanResult = sanitizeUrban(parsed.urban, company)
   const worldContinuityResult = sanitizeWorldContinuity(parsed.worldContinuity)
+  const missionResumeResult = sanitizeMissionResumeEnvelope(parsed.missionResume)
   const personalProgressionResult = sanitizePersonalProgression(parsed.personalProgression)
   const ownershipEconomyResult = sanitizeOwnershipEconomyState(parsed.ownershipEconomy)
   const includePersonalProgression = parsed.personalProgression !== undefined ||
@@ -518,6 +557,9 @@ export const decodeSave = (raw: string): SaveDecodeResult => {
       ...(worldContinuityResult.continuity
         ? { worldContinuity: worldContinuityResult.continuity }
         : {}),
+      ...(missionResumeResult.missionResume
+        ? { missionResume: missionResumeResult.missionResume }
+        : {}),
       ...(includePersonalProgression
         ? { personalProgression: clonePersonalProgression(personalProgressionResult.personalProgression) }
         : {}),
@@ -526,7 +568,8 @@ export const decodeSave = (raw: string): SaveDecodeResult => {
         : {}),
     },
     repaired: migratingV1 || companyResult.repaired || settingsResult.repaired || urbanResult.repaired ||
-      worldContinuityResult.repaired || personalProgressionResult.repaired || ownershipEconomyResult.repaired,
+      worldContinuityResult.repaired || missionResumeResult.repaired || personalProgressionResult.repaired ||
+      ownershipEconomyResult.repaired,
     ...(migratingV1 ? { migratedFrom: 1 as const } : {}),
   }
 }
@@ -563,6 +606,9 @@ export const restoreGameSessionFromSave = (save: SaveGameV2): GameSessionState =
     settings: { ...save.settings },
     personalProgression: clonePersonalProgression(personalProgression),
     ownershipEconomy: cloneOwnershipEconomyForSave(ownershipEconomy),
+    ...(save.missionResume
+      ? { missionResume: cloneMissionResumePayload(save.missionResume) }
+      : {}),
   }
 }
 
