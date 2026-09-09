@@ -1,0 +1,334 @@
+{
+  "version": "1.0.0",
+  "issue": 649,
+  "continent": "Europe",
+  "country": {
+    "geometryId": "352",
+    "sourceCountryCode": "IS",
+    "renderedName": "Iceland"
+  },
+  "administrativeModel": {
+    "level": "statistical-regional-lod-over-municipal-local-government",
+    "nativeTermSingular": "landsvæði (statistical LOD) / sveitarfélag (local government)",
+    "nativeTermPlural": "8 landsvæði / 61 sveitarfélög after 16 May 2026",
+    "englishTerm": "statistical region for Country LOD; municipality is the local-government unit",
+    "unitCount": 8,
+    "officialReferences": [
+      "https://www.government.is/library/01-Ministries/Prime-Ministrers-Office/WHO00082_WELLBEING_ECONOMY_AW_WEB.pdf",
+      "https://statice.is/statistics/population/inhabitants/municipalities-and-urban-nuclei/",
+      "https://www.statice.is/publications/news-archive/inhabitants/population-1-january-2026/",
+      "https://www.statice.is/publications/news-archive/inhabitants/population-by-regions-and-municipalities-1-january-2026/",
+      "https://www.samband.is/nanar-um-sveitarfelogin"
+    ],
+    "specialCases": [
+      {
+        "type": "two-government-levels-state-and-municipalities",
+        "note": "Iceland has state and municipal government levels. The eight Country LOD surfaces in this slice are statistical/economic regions and are not presented as an elected regional-government tier."
+      },
+      {
+        "type": "eight-statistics-iceland-regions-as-country-lod",
+        "statisticalRegionCount": 8,
+        "note": "Statistics Iceland publishes eight regional groupings. GeoNames exposes eight aligned IS.* admin1 surfaces, so DROPi uses them as sparse statistical/economic Country LOD identities while preserving municipality-level local-government authority."
+      },
+      {
+        "type": "municipality-count-2026-timing",
+        "statisticsIcelandDate": "2026-01-01",
+        "statisticsIcelandMunicipalityCount": 62,
+        "postElectionReferenceDate": "2026-05-16",
+        "currentMunicipalityCount": 61,
+        "note": "Statistics Iceland reported 62 municipalities on 1 January 2026. The Icelandic Association of Local Authorities reports 61 municipalities after the 16 May 2026 local elections/amalgamation state. The sparse Country LOD remains eight statistical regions, not the municipality count."
+      },
+      {
+        "admin1Code": "43",
+        "type": "current-name-crosswalk",
+        "canonicalName": "Southwest",
+        "sourceName": "Southern Peninsula",
+        "note": "Statistics Iceland currently presents this statistical region as Southwest. The retained GeoNames admin1 source label is Southern Peninsula; DROPi preserves source identity while presenting the current Statistics Iceland English name."
+      },
+      {
+        "type": "reykjavik-national-capital",
+        "admin1Code": "39",
+        "note": "Reykjavík is Iceland's unique national-capital representative and lies in the Capital Region statistical surface. Reykjavík municipality remains a municipality under the same local-government level as other Icelandic municipalities."
+      },
+      {
+        "type": "runtime-geometry-lod-reconciliation",
+        "geometryId": "352",
+        "geometryType": "Polygon",
+        "componentCount": 1,
+        "note": "The current DROPi 110m runtime topology represents Iceland as geometry 352, a single Polygon component. The eight statistical/economic Country LOD identities do not fabricate internal regional polygons."
+      }
+    ]
+  },
+  "source": {
+    "provider": "GeoNames",
+    "license": "Creative Commons Attribution 4.0",
+    "releaseTag": "source-geonames-cities500-2026-09-08-f3cda4f9",
+    "cities500Sha256": "f3cda4f9d256d90045121fb8eebad3ed91695c32370ed93b50fbe0cb616e2bbd",
+    "admin1Sha256": "590651498043f674accda2b7f46d21286cda0e290b02f8561c5005eee9a5448c",
+    "candidateCountryCodes": [
+      "IS"
+    ],
+    "expectedCountryCandidateCount": 50,
+    "administrativeAuthority": "Statistics Iceland / Icelandic Association of Local Authorities",
+    "administrativeAuthorityReference": "https://statice.is/statistics/population/inhabitants/municipalities-and-urban-nuclei/",
+    "publishedGameplayRepresentativeCount": 8
+  },
+  "selectionModel": {
+    "primaryFeatureCodes": [
+      "PPLC",
+      "PPLA"
+    ],
+    "fallbackFeatureCodes": [
+      "PPLA2",
+      "PPL"
+    ],
+    "expectedPrimarySelections": 8,
+    "expectedFallbackSelections": 0,
+    "highDensityGameplayImport": false,
+    "hardcodedCoordinates": false,
+    "rule": "One source-backed representative locality per governed first-order region; retained high-density source remains reference-only."
+  },
+  "developmentModel": {
+    "authority": "shared-regional-national-multiplayer-economy",
+    "personalPlayerProgressionUnlock": false,
+    "numericThresholdsDefined": false,
+    "signalsPlanned": [
+      "company-activity",
+      "employment-demand",
+      "production",
+      "logistics-throughput",
+      "construction-investment",
+      "transport-connectivity",
+      "trade-volume",
+      "population-economic-simulation",
+      "regional-national-policy"
+    ],
+    "rule": "Representative locality prominence and development are shared-world economic outcomes, not personal progression rewards."
+  },
+  "units": [
+    {
+      "admin1Code": "39",
+      "regionName": "Capital Region",
+      "regionSourceName": "Capital Region",
+      "regionAsciiName": "Capital Region",
+      "regionSourceRef": "geonames:3426182",
+      "representativeLocality": {
+        "localityId": "dropi:locality:geonames:3413829",
+        "sourceRef": "geonames:3413829",
+        "sourceCountryCode": "IS",
+        "sourceAdmin1Code": "39",
+        "sourceScope": "admin1",
+        "name": "Reykjavík",
+        "asciiName": "Reykjavik",
+        "latitude": 64.13548,
+        "longitude": -21.89541,
+        "featureCode": "PPLC",
+        "populationSourceValue": 118918,
+        "selectionBasis": "source-first-order-seat-role",
+        "presentationRole": "national-capital-and-regional-node"
+      },
+      "economicEmergence": {
+        "authority": "shared-regional-national-multiplayer-economy",
+        "personalPlayerProgressionUnlock": false,
+        "numericThresholdsDefined": false,
+        "presentationState": "economy-system-governed"
+      }
+    },
+    {
+      "admin1Code": "43",
+      "regionName": "Southwest",
+      "regionSourceName": "Southern Peninsula",
+      "regionAsciiName": "Southern Peninsula",
+      "regionSourceRef": "geonames:3426183",
+      "representativeLocality": {
+        "localityId": "dropi:locality:geonames:3415496",
+        "sourceRef": "geonames:3415496",
+        "sourceCountryCode": "IS",
+        "sourceAdmin1Code": "43",
+        "sourceScope": "admin1",
+        "name": "Keflavík",
+        "asciiName": "Keflavik",
+        "latitude": 64.00492,
+        "longitude": -22.56242,
+        "featureCode": "PPLA",
+        "populationSourceValue": 15930,
+        "selectionBasis": "source-first-order-seat-role",
+        "presentationRole": "regional-representative-locality"
+      },
+      "economicEmergence": {
+        "authority": "shared-regional-national-multiplayer-economy",
+        "personalPlayerProgressionUnlock": false,
+        "numericThresholdsDefined": false,
+        "presentationState": "economy-system-governed"
+      }
+    },
+    {
+      "admin1Code": "45",
+      "regionName": "West",
+      "regionSourceName": "West",
+      "regionAsciiName": "West",
+      "regionSourceRef": "geonames:3426184",
+      "representativeLocality": {
+        "localityId": "dropi:locality:geonames:3418076",
+        "sourceRef": "geonames:3418076",
+        "sourceCountryCode": "IS",
+        "sourceAdmin1Code": "45",
+        "sourceScope": "admin1",
+        "name": "Borgarnes",
+        "asciiName": "Borgarnes",
+        "latitude": 64.53834,
+        "longitude": -21.92064,
+        "featureCode": "PPLA",
+        "populationSourceValue": 1875,
+        "selectionBasis": "source-first-order-seat-role",
+        "presentationRole": "regional-representative-locality"
+      },
+      "economicEmergence": {
+        "authority": "shared-regional-national-multiplayer-economy",
+        "personalPlayerProgressionUnlock": false,
+        "numericThresholdsDefined": false,
+        "presentationState": "economy-system-governed"
+      }
+    },
+    {
+      "admin1Code": "44",
+      "regionName": "Westfjords",
+      "regionSourceName": "Westfjords",
+      "regionAsciiName": "Westfjords",
+      "regionSourceRef": "geonames:3426185",
+      "representativeLocality": {
+        "localityId": "dropi:locality:geonames:3415667",
+        "sourceRef": "geonames:3415667",
+        "sourceCountryCode": "IS",
+        "sourceAdmin1Code": "44",
+        "sourceScope": "admin1",
+        "name": "Ísafjörður",
+        "asciiName": "Isafjoerdur",
+        "latitude": 66.07475,
+        "longitude": -23.13498,
+        "featureCode": "PPLA",
+        "populationSourceValue": 2736,
+        "selectionBasis": "source-first-order-seat-role",
+        "presentationRole": "regional-representative-locality"
+      },
+      "economicEmergence": {
+        "authority": "shared-regional-national-multiplayer-economy",
+        "personalPlayerProgressionUnlock": false,
+        "numericThresholdsDefined": false,
+        "presentationState": "economy-system-governed"
+      }
+    },
+    {
+      "admin1Code": "41",
+      "regionName": "Northwest",
+      "regionSourceName": "Northwest",
+      "regionAsciiName": "Northwest",
+      "regionSourceRef": "geonames:3337403",
+      "representativeLocality": {
+        "localityId": "dropi:locality:geonames:2627309",
+        "sourceRef": "geonames:2627309",
+        "sourceCountryCode": "IS",
+        "sourceAdmin1Code": "41",
+        "sourceScope": "admin1",
+        "name": "Sauðárkrókur",
+        "asciiName": "Saudarkrokur",
+        "latitude": 65.74611,
+        "longitude": -19.63944,
+        "featureCode": "PPLA",
+        "populationSourceValue": 2614,
+        "selectionBasis": "source-first-order-seat-role",
+        "presentationRole": "regional-representative-locality"
+      },
+      "economicEmergence": {
+        "authority": "shared-regional-national-multiplayer-economy",
+        "personalPlayerProgressionUnlock": false,
+        "numericThresholdsDefined": false,
+        "presentationState": "economy-system-governed"
+      }
+    },
+    {
+      "admin1Code": "40",
+      "regionName": "Northeast",
+      "regionSourceName": "Northeast",
+      "regionAsciiName": "Northeast",
+      "regionSourceRef": "geonames:3337404",
+      "representativeLocality": {
+        "localityId": "dropi:locality:geonames:2633274",
+        "sourceRef": "geonames:2633274",
+        "sourceCountryCode": "IS",
+        "sourceAdmin1Code": "40",
+        "sourceScope": "admin1",
+        "name": "Akureyri",
+        "asciiName": "Akureyri",
+        "latitude": 65.68353,
+        "longitude": -18.0878,
+        "featureCode": "PPLA",
+        "populationSourceValue": 19219,
+        "selectionBasis": "source-first-order-seat-role",
+        "presentationRole": "regional-representative-locality"
+      },
+      "economicEmergence": {
+        "authority": "shared-regional-national-multiplayer-economy",
+        "personalPlayerProgressionUnlock": false,
+        "numericThresholdsDefined": false,
+        "presentationState": "economy-system-governed"
+      }
+    },
+    {
+      "admin1Code": "38",
+      "regionName": "East",
+      "regionSourceName": "East",
+      "regionAsciiName": "East",
+      "regionSourceRef": "geonames:3337405",
+      "representativeLocality": {
+        "localityId": "dropi:locality:geonames:2632132",
+        "sourceRef": "geonames:2632132",
+        "sourceCountryCode": "IS",
+        "sourceAdmin1Code": "38",
+        "sourceScope": "admin1",
+        "name": "Egilsstaðir",
+        "asciiName": "Egilsstadir",
+        "latitude": 65.26687,
+        "longitude": -14.39485,
+        "featureCode": "PPLA",
+        "populationSourceValue": 2572,
+        "selectionBasis": "source-first-order-seat-role",
+        "presentationRole": "regional-representative-locality"
+      },
+      "economicEmergence": {
+        "authority": "shared-regional-national-multiplayer-economy",
+        "personalPlayerProgressionUnlock": false,
+        "numericThresholdsDefined": false,
+        "presentationState": "economy-system-governed"
+      }
+    },
+    {
+      "admin1Code": "42",
+      "regionName": "South",
+      "regionSourceName": "South",
+      "regionAsciiName": "South",
+      "regionSourceRef": "geonames:3337406",
+      "representativeLocality": {
+        "localityId": "dropi:locality:geonames:3413604",
+        "sourceRef": "geonames:3413604",
+        "sourceCountryCode": "IS",
+        "sourceAdmin1Code": "42",
+        "sourceScope": "admin1",
+        "name": "Selfoss",
+        "asciiName": "Selfoss",
+        "latitude": 63.93311,
+        "longitude": -20.99712,
+        "featureCode": "PPLA",
+        "populationSourceValue": 9000,
+        "selectionBasis": "source-first-order-seat-role",
+        "presentationRole": "regional-representative-locality"
+      },
+      "economicEmergence": {
+        "authority": "shared-regional-national-multiplayer-economy",
+        "personalPlayerProgressionUnlock": false,
+        "numericThresholdsDefined": false,
+        "presentationState": "economy-system-governed"
+      }
+    }
+  ]
+}
