@@ -2,11 +2,11 @@
 
 Document: PROGRESSION.md
 Project: DROPi Tycoon
-Version: 2.1.0
+Version: 2.2.0
 Status: Canonical
 Author: Marian Caliof & OpenAI
 Language: English
-Last Updated: 2026-09-08
+Last Updated: 2026-09-09
 
 ---
 
@@ -42,7 +42,7 @@ Growth should create a meaningful new decision, freedom, responsibility, or worl
 
 The player should not merely earn larger numbers while repeating the same action forever.
 
-The player should also remain capable of setbacks and recovery; progress is history/capability plus current economic position, not an irreversible upward XP staircase.
+A visible player XP/Level history may rise as legitimate experience accumulates, but the player's actual economic position and effective capability can still suffer setbacks. Level is therefore a useful progression/history surface, not an irreversible guarantee of wealth, employment, equipment, qualification or company capacity.
 
 ---
 
@@ -154,13 +154,17 @@ A player may become more qualified while temporarily becoming poorer. A player m
 
 ---
 
-# 5. Personal Experience and Progression Resources
+# 5. Personal Experience, Level and Progression Resources
 
-Personal progression may be driven by multiple governed signals, including:
+Personal progression is driven by multiple governed signals rather than money alone.
+
+Canonical progression resources/signals may include:
 
 - completed legitimate work;
-- experience/practical mastery;
-- progression points where useful;
+- player XP / practical experience;
+- visible player Level derived from governed XP thresholds;
+- entity-specific loyalty / relationship history;
+- Specialist Card Fragments tied to eligible governed economic activities;
 - reputation/track record where appropriate;
 - course completion;
 - practical assessment;
@@ -173,7 +177,80 @@ Personal progression may be driven by multiple governed signals, including:
 
 Company Money cannot be treated as the player's personal wallet.
 
-Exact experience values, point costs, course prices, wages, and thresholds are balancing data unless separately approved as permanent canon.
+## Delivery progression receipt
+
+A legitimate completed delivery/work settlement should normally produce one authoritative, replay-safe progression consequence for the actual worker/player in addition to its legitimate money/wage/economic consequence.
+
+The target progression stack is conceptually:
+
+`legitimate delivery settlement -> money/wage consequence + player XP + eligible entity loyalty + eligible Specialist Card Fragments`.
+
+Not every recipient supports every optional consequence. XP is a general work-history consequence; loyalty requires a persistent governed entity relationship; specialist fragments require a valid economic/professional affinity.
+
+The same settlement must not mint the same progression consequence twice after retry, callback replay, save reload or duplicate processing.
+
+## Player XP and Level
+
+Successful legitimate work awards governed XP.
+
+XP contributes to a visible **Player Level**.
+
+Player Level communicates accumulated experience/history and may gate or surface suitable progression opportunities where explicitly designed, but **Level alone never replaces**:
+
+- required education/qualification;
+- practical training/assessment;
+- Personal Money or Company Money where legitimately required;
+- Work Capacity;
+- equipment/vehicle capability;
+- infrastructure/facilities;
+- specialist workforce;
+- employer/company authorization;
+- geographic access or other real prerequisites.
+
+A high-Level player can therefore still be poor, unemployed, without a required license/qualification, without a vehicle or unable to operate an advanced company system.
+
+Exact XP awards and Level thresholds are balancing data.
+
+## Entity-specific loyalty
+
+Successful service to a persistent governed economic entity may increase loyalty/trust with that specific entity.
+
+Examples include a farm, merchant, factory, warehouse, household, institution or other modeled counterparty.
+
+Loyalty is not one universal point pool. Relationship history remains attached to the actual entity and may influence future recurring work, preferred relationships, trust or other governed benefits.
+
+Failed/poor service may reduce or damage the relationship where causally appropriate.
+
+Exact loyalty gains/losses and thresholds are balancing data.
+
+## Specialist Card Fragments
+
+Eligible deliveries may award collectible **Specialist Card Fragments** associated with specialist families that are legitimately connected to the economic entity/activity served.
+
+For example, rural/farm work may expose agricultural specialist families such as:
+
+- animal husbandry;
+- horticulture / vegetable production;
+- cattle husbandry;
+- pig husbandry;
+- farm operations;
+- agricultural maintenance/logistics;
+
+only where the governed source economic node actually supports that affinity.
+
+A rural visual theme, route label or arbitrary map position alone must not generate unrelated fragments.
+
+Accumulating the governed fragment threshold may unlock access to a recruitable specialist NPC/profile under `04_World/NPC.md`.
+
+Completing the fragment set does not transfer that specialist's qualification to the player/company and does not bypass hiring, wages, locality, availability, migration, facilities, equipment, training or company-capability requirements.
+
+Specialist Card Fragments are World-Instance inventory and may be tradable through the governed marketplace. When traded as physical inventory, ownership changes only through the marketplace/custody/delivery settlement defined by `02_Economy/MARKET.md` and `03_Logistics/ORDERS.md`.
+
+Transporting or reselling an already-existing fragment does not remint the specialist fragment merely because another delivery occurred.
+
+Self-dealing/wash-trade loops must not create infinite XP, loyalty, fragments or money.
+
+Exact fragment quantities, thresholds, award/drop curves and market prices are balancing data unless separately approved as permanent canon.
 
 ---
 
@@ -402,6 +479,8 @@ Core experience:
 - smartphone/work app;
 - light local delivery/service work;
 - wage settlement;
+- visible XP/Level growth from legitimate work;
+- early entity-specific relationship/loyalty feedback;
 - basic food/water/living-cost pressure;
 - finite Work Capacity;
 - first equipment/bicycle/training goal;
@@ -417,6 +496,7 @@ Growth may include:
 - access to better employers/contracts;
 - compatible side work;
 - stronger personal financial stability;
+- specialist-fragment collection/discovery tied to legitimate work;
 - first entrepreneurial preparation.
 
 ## Horizon C — Entrepreneur / Starter Organization
@@ -454,6 +534,7 @@ Growth may include:
 - customer acquisition/retention;
 - NPC and future real competing companies;
 - local products/marketplace depth;
+- tradable Specialist Card Fragment inventory and physically fulfilled marketplace logistics;
 - stronger specialization;
 - technology differentiation;
 - local infrastructure investment;
@@ -548,6 +629,8 @@ Examples:
 
 Company Money alone does not replace these relationships.
 
+Unlocking a Specialist Card likewise does not replace them; it creates access to a recruitable specialist identity, not a free company capability flag.
+
 ---
 
 # 12. HQ Progression
@@ -586,6 +669,7 @@ Later capability may include:
 - training;
 - company communication;
 - marketplace browsing;
+- Specialist Card Fragment inventory/listings;
 - weather/news;
 - analytics;
 - investment information;
@@ -593,6 +677,8 @@ Later capability may include:
 - authorized remote monitoring/control.
 
 The phone does not bypass required physical progression.
+
+Marketplace browsing/commitment does not teleport physical goods; fulfillment still requires the governed custody/delivery flow.
 
 See `07_UI/PLAYER_SMARTPHONE.md`.
 
@@ -653,9 +739,13 @@ A fresh world may inherit only explicitly non-economic account information by de
 - account achievements/history;
 - tutorial familiarity.
 
-Economic progression is world-local by default:
+Economic/progression state is world-local by default:
 
 - Personal Money/Company Money;
+- player XP/Level;
+- entity-specific loyalty/history;
+- Specialist Card Fragment inventory and completed-card state;
+- recruited/hired specialist relationships;
 - productive qualifications/capability;
 - reputation;
 - vehicles/equipment;
@@ -680,12 +770,14 @@ The progression order is:
 
 1. establish stable local domain rules;
 2. establish stable person/account/World Instance identity;
-3. establish server-authoritative persistence, time, economy, inventory/custody, company state, and migration;
+3. establish server-authoritative persistence, time, economy, inventory/custody, company state, progression receipts and migration;
 4. enable real-player employment/membership/communication;
 5. enable contested/shared transactions and assets only when authority is safe;
 6. expand shared worlds and markets without breaking low-population play.
 
 Bounded NPC/simulated participants remain valid at every world population level but must obey real economic constraints rather than supply infinite free resources.
+
+Real-player fragment trading must become server-authoritative before it is enabled as a contested multiplayer transaction.
 
 ---
 
@@ -709,7 +801,9 @@ Examples:
 
 Setbacks should create decisions and recovery work.
 
-Normal failure does not delete the human identity, history, or valid earned qualification merely because current wealth collapses.
+Normal failure does not delete the human identity, accumulated legitimate XP/Level history, or valid earned qualification merely because current wealth collapses.
+
+Entity relationships may worsen and tradable fragment inventory may be sold/transferred through legitimate market activity; those are separate from the persistence of the player's historical identity.
 
 The game must preserve a legitimate productive path back from severe poverty/bankruptcy, including access to basic work when the player still satisfies ordinary requirements.
 
@@ -753,6 +847,8 @@ Player-facing progression should regularly provide:
 - recovery paths;
 - attachment to people/places/assets/organizations.
 
+XP/Level, loyalty and Specialist Card Fragment feedback should be visible enough that the player understands why a delivery mattered, without obscuring the underlying money, custody, relationship and world consequences.
+
 Until replaced by a later canonical implementation policy, player-facing slices should be evaluated against `09_Development/Research/GAME_LOGIC/R9_PLAYABILITY_INTEGRATION_GATE.md`.
 
 ---
@@ -763,7 +859,10 @@ This document defines progression relationships, not permanent prototype numbers
 
 Replaceable balancing values include:
 
-- experience amounts;
+- XP amounts;
+- Level thresholds;
+- entity-loyalty gains/losses and thresholds;
+- Specialist Card Fragment quantities, thresholds and award curves;
 - wages;
 - money costs;
 - unlock thresholds;
@@ -776,7 +875,8 @@ Replaceable balancing values include:
 - course prices;
 - cooldowns;
 - competitor density thresholds;
-- travel duration/time compression.
+- travel duration/time compression;
+- marketplace fees/listing limits/exchange ratios.
 
 Such values should be centralized and testable.
 
@@ -802,13 +902,15 @@ The current runtime already provides important foundations:
 
 These systems are retained as implementation history.
 
-However, the current starter-company ownership and per-delivery Company Money reward loop are legacy/prototype behaviors. Future work should migrate them into the employee-first personal economy and stock-flow model without restarting the project or silently destroying existing saves.
+However, the current starter-company ownership and per-delivery Company Money reward loop are legacy/prototype behaviors. The governed XP/Level + entity-loyalty + Specialist Card Fragment receipt and physically fulfilled player-marketplace transaction model are target canon, not proof that those systems are already runtime-integrated.
+
+Future work should migrate the legacy loop into the employee-first personal economy and stock-flow model without restarting the project or silently destroying existing saves.
 
 ---
 
 # Canonical Rule
 
-**DROPi Tycoon progression is the coupled evolution of a real person, productive organizations, and access to the wider world. The player begins with limited means, survives through legitimate work, learns and earns capability through the right combination of experience, education, people, money, equipment, infrastructure, reputation and authority, and can suffer recoverable economic setbacks without losing their identity.**
+**DROPi Tycoon progression is the coupled evolution of a real person, productive organizations, and access to the wider world. Legitimate deliveries build visible XP/Level history, entity-specific relationships and eligible specialist discovery in addition to their real economic settlement; none of those progression resources may bypass required education, people, money, equipment, infrastructure, authority or physical logistics. Tradable Specialist Card Fragments remain World-Instance inventory and move through governed marketplace custody/delivery rather than teleportation.**
 
 ---
 
