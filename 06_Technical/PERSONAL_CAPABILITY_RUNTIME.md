@@ -23,6 +23,29 @@ Training and qualification concepts are fictional Tycoon gameplay abstractions, 
 
 `BicycleOperation` requires separate bicycle theory and practical-training evidence. `bicycle-light-parcel-delivery` then requires that earned capability plus a compatible bicycle, Bicycle vehicle class, light-parcel cargo capability, employer authorization, Work Capacity, and shift availability.
 
+## Powered two-wheel and road-delivery eligibility
+
+The same work-access evaluator now covers the first governed advanced courier activities:
+
+- `electric-scooter-light-parcel-delivery`;
+- `motorcycle-light-parcel-delivery`;
+- `car-light-parcel-delivery`;
+- `delivery-van-light-parcel-delivery`.
+
+These are eligibility contracts, not automatic vehicle unlocks. A learned capability ID is necessary but not sufficient. Work access re-checks the relevant theory/practical evidence and fictional vehicle-operation qualification, then also requires active employment, explicit employer authorization, the correct equipment/vehicle fact, compatible light-parcel handling, authoritative Work Capacity, and current-shift availability.
+
+`DeliveryVanOperation` additionally preserves its existing van cargo-practice, supervised road-delivery experience, and delivery-van qualification requirements.
+
+The current runtime vehicle catalog has `ElectricScooter`, `Motorcycle`, and `DeliveryVan`. It does not yet expose a player `Car` vehicle type. The car eligibility contract therefore fails closed until an owning runtime supplies a real `Car` equipment/vehicle fact; capability code does not create or imply car ownership.
+
+### Employer authorization boundary
+
+Starter `LightDeliveryEmployee` employment continues to derive only the already-canonical starter `light-delivery` authorization. It does **not** manufacture bicycle, scooter, motorcycle, car, or van authorization.
+
+Advanced vehicle authorization IDs are requirements only. They become satisfied solely when the owning employer/runtime explicitly supplies the corresponding fact through `PlayerWorkAccessFacts.employerPermissionIds`. Capability code never promotes employment, capability, equipment ownership, or profession selection into employer permission.
+
+This distinction is deliberate: qualification without equipment is blocked, equipment without qualification is blocked, and both remain blocked without explicit employer authorization.
+
 ## Player-readable failure reasons
 
 Evaluation returns stable blocker codes with player-facing messages for training, qualification, equipment, vehicle, cargo capability, facility, employment, employer permission, company capability, world access, Work Capacity, Personal Money, and current-shift availability. Unknown capability/activity IDs fail closed with generic safe explanations rather than exposing raw internal IDs.
@@ -31,7 +54,7 @@ Evaluation returns stable blocker codes with player-facing messages for training
 
 Player Economy owns Personal Money, employment state, wage settlement, living costs, productive-work records, and Work Capacity mutation in `game-web/src/economy/playerEconomy.ts`.
 
-The capability domain now integrates that state through `game-web/src/capabilities/playerEconomyWorkAccess.ts`. The adapter is deliberately read-only and exposes only the existing `CapabilityEconomyPort` queries:
+The capability domain integrates that state through `game-web/src/capabilities/playerEconomyWorkAccess.ts`. The adapter is deliberately read-only and exposes only the existing `CapabilityEconomyPort` queries:
 
 - `isEmployee()`;
 - `hasWorkCapacity(requiredUnits)`;
@@ -43,13 +66,13 @@ The adapter derives only facts already explicit in the merged fresh-employee eco
 - the employer-provided starter smartphone satisfies the smartphone equipment requirement;
 - the starter light-delivery role supplies the current light-document handling fact.
 
-Bicycle access is not inferred from the starter walking role. Bicycle work still requires explicit Bicycle Operation evidence, bicycle employer authorization, bicycle equipment/vehicle availability, and light-parcel handling capability from the owning runtime.
+Bicycle and advanced road-vehicle access are not inferred from the starter walking role. Their employer authorization, equipment/vehicle availability, and light-parcel handling capability must be supplied explicitly by the owning runtime.
 
 ### Work Capacity scale
 
 The original capability prototype used placeholder Work Capacity values `1` and `2`. Productive Player Economy work consumes `starterDeliveryCapacityCost`, currently `100` under `phase1-player-economy-v1`.
 
-Economy-backed work-access evaluation therefore builds its activity definitions from the Player Economy policy and uses that authoritative delivery-cost scale. Both current walking and bicycle eligibility use the same Player Economy basic-delivery cost until the economy domain exposes a differentiated bicycle execution cost. The capability domain does not invent or mutate a second Work Capacity ledger.
+Economy-backed work-access evaluation therefore uses the Player Economy policy's authoritative `starterDeliveryCapacityCost` for walking, bicycle, powered two-wheel, car, and delivery-van eligibility until the economy domain exposes differentiated execution costs. The capability domain does not invent or mutate a second Work Capacity ledger.
 
 Actual Work Capacity consumption remains exclusively in Player Economy. Once productive work exhausts the economy aggregate, capability work-access evaluation immediately returns `insufficient-work-capacity` without any duplicated state synchronization.
 
