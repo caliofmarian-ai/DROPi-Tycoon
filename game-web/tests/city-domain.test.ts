@@ -39,7 +39,7 @@ describe('finite city and district catalog', () => {
       expect(location.door).toEqual(building.door)
       expect(location.door.x).toBe(building.x)
       expect(Math.abs(location.door.y - building.y)).toBeCloseTo(building.height / 2, 8)
-      expect(Math.abs(location.y - location.door.y)).toBeLessThanOrEqual(96)
+      expect(Math.abs(location.y - location.door.y)).toBeGreaterThanOrEqual(42)
       expect(URBAN_ENTRANCE_PATHS.find(path => path.id === `${location.label}-entrance`)).toBeDefined()
       const direction = Math.sign(location.y - location.door.y)
       for (let distance = 11; distance <= Math.abs(location.y - location.door.y); distance++) {

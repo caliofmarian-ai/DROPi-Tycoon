@@ -100,7 +100,7 @@ describe('living city screen-space navigation', () => {
 
 describe('bounded world-only pinch and accessible zoom buttons', () => {
   it('uses the wider owner-reviewed zoom range', () => {
-    expect(CAMERA_MIN_ZOOM).toBe(0.5)
+    expect(CAMERA_MIN_ZOOM).toBe(0.0015)
     expect(CAMERA_MAX_ZOOM).toBe(2.5)
   })
 

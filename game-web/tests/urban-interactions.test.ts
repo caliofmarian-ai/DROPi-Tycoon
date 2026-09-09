@@ -5,7 +5,7 @@ import {
   getUrbanCargo, getUrbanDeliveryMission, getUrbanObjective, getUrbanOrderListing,
   getUrbanRouteDistance, isUrbanRouteWithinTransportRange, performUrbanInteraction, URBAN_MERCHANT_PROFILES,
 } from '../src/systems/urbanInteractions'
-import { isCargoLoad, isDeliveryMission } from '../src/systems/urbanLogistics'
+import { isCargoLoad, isDeliveryMission, TRANSPORT_PROFILES } from '../src/systems/urbanLogistics'
 import { LOCAL_LISTING, LOCAL_MERCHANT, prepareMarketplaceOrder } from '../src/systems/urbanMarketplace'
 import { findWorldRoutePoint } from '../src/world/worldLayout'
 import { CITY_MERCHANTS, CITY_ROAD_NETWORK, findCityRoute, getCityRouteDistance } from '../src/world/city'
@@ -219,7 +219,7 @@ describe('pure urban merchant listings and physical logistics', () => {
 
   it('lets restored legitimate cargo finish before onboarding even after parking a bicycle', () => {
     const sequence = BICYCLE_ORDER_ROUTE_TEMPLATES.findIndex(route =>
-      getCityRouteDistance(route.pickupLocation, route.destination) > 1800) + 1
+      getCityRouteDistance(route.pickupLocation, route.destination) > TRANSPORT_PROFILES.walking.range) + 1
     expect(sequence).toBeGreaterThan(0)
     const world = createInitialWorldState()
     const company = createInitialCompanyState()
