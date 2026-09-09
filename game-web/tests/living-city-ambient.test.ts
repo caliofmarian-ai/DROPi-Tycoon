@@ -28,13 +28,26 @@ const ambientScene = () => {
     })
     return graphics
   })
-  const object = () => ({
-    setRotation: vi.fn().mockReturnThis(), setOrigin: vi.fn().mockReturnThis(), setDepth: vi.fn().mockReturnThis(),
-    setName: vi.fn().mockReturnThis(), setVisible: vi.fn().mockReturnThis(),
-    setPosition: vi.fn().mockReturnThis(), setFrame: vi.fn().mockReturnThis(),
-    setTexture: vi.fn().mockReturnThis(), setScale: vi.fn().mockReturnThis(),
-    setAlpha: vi.fn().mockReturnThis(), add: vi.fn().mockReturnThis(),
-  })
+  const object = () => {
+    const result = {
+      name: '',
+      setRotation: vi.fn(), setOrigin: vi.fn(), setDepth: vi.fn(),
+      setName: vi.fn(), setVisible: vi.fn(),
+      setPosition: vi.fn(), setFrame: vi.fn(),
+      setTexture: vi.fn(), setScale: vi.fn(),
+      setAlpha: vi.fn(), add: vi.fn(),
+    }
+    for (const method of [
+      result.setRotation, result.setOrigin, result.setDepth, result.setVisible,
+      result.setPosition, result.setFrame, result.setTexture, result.setScale,
+      result.setAlpha, result.add,
+    ]) method.mockReturnValue(result)
+    result.setName.mockImplementation((name: string) => {
+      result.name = name
+      return result
+    })
+    return result
+  }
   const images: ReturnType<typeof object>[] = []
   const containers: ReturnType<typeof object>[] = []
   const rectangles: ReturnType<typeof object>[] = []
@@ -144,23 +157,38 @@ describe('bounded deterministic city life', () => {
   it('culls inactive sectors and resumes a returning actor from global elapsed time instead of route zero', () => {
     const mock = ambientScene()
     const city = new AmbientCity(mock.scene)
-    const targetRoute = buildAmbientRoutes()[0]
+    const routes = buildAmbientRoutes()
+    const targetRoute = routes[0]
     expect(targetRoute).toBeDefined()
+    const routeIds = new Set(routes.map(route => route.id))
+    const actorById = new Map(mock.containers
+      .filter(container => routeIds.has(container.name))
+      .map(container => [container.name, container] as const))
+    expect(actorById.size).toBe(routes.length)
+
     const offscreen = { x: -5000, y: -5000, right: -4900, bottom: -4900 } as Phaser.Geom.Rectangle
     city.update(0, offscreen)
     const initialFrames = mock.images.map(image => image.setFrame.mock.calls.length)
+    const baselinePositionWrites = new Map(routes.map(route => [
+      route.id,
+      actorById.get(route.id)!.setPosition.mock.calls.length,
+    ] as const))
     for (let tick = 0; tick < 100; tick++) city.update(100, offscreen)
-    expect(mock.containers.every(container => container.setPosition.mock.calls.length === 0)).toBe(true)
+    for (const route of routes) {
+      const actor = actorById.get(route.id)!
+      expect(actor.setPosition.mock.calls.length, route.id).toBe(baselinePositionWrites.get(route.id))
+      expect(actor.setVisible, route.id).toHaveBeenLastCalledWith(false)
+    }
     expect(mock.images.map(image => image.setFrame.mock.calls.length)).toEqual(initialFrames)
-    expect(mock.containers.every(container => container.setVisible.mock.calls.length === 1)).toBe(true)
 
     city.setActivationFocuses([routeMidpoint(targetRoute)])
     city.update(NaN, routeView(targetRoute))
     const pose = sampleAmbientRoute(targetRoute, 10, { x: 0, y: 0, facing: 'down', moving: false })
-    const [x, y] = mock.containers[0].setPosition.mock.calls.at(-1)!
+    const targetActor = actorById.get(targetRoute.id)!
+    const [x, y] = targetActor.setPosition.mock.calls.at(-1)!
     expect(x).toBeCloseTo(pose.x, 8)
     expect(y).toBeCloseTo(pose.y, 8)
-    expect(mock.containers[0].setVisible).toHaveBeenLastCalledWith(true)
+    expect(targetActor.setVisible).toHaveBeenLastCalledWith(true)
   })
 
   it('accepts bounded corridor look-ahead focuses without creating gameplay state', () => {
@@ -169,7 +197,9 @@ describe('bounded deterministic city life', () => {
     const routes = buildAmbientRoutes()
     city.setActivationFocuses(routes.slice(0, 10).map(routeMidpoint))
     city.update(16, routeView(routes[0]))
-    const visibleWrites = mock.containers.filter(container => container.setPosition.mock.calls.length > 0).length
+    const routeIds = new Set(routes.map(route => route.id))
+    const visibleWrites = mock.containers.filter(container =>
+      routeIds.has(container.name) && container.setPosition.mock.calls.length > 0).length
     expect(visibleWrites).toBeLessThanOrEqual(AMBIENT_ACTOR_LIMIT)
     expect(visibleWrites).toBeGreaterThan(0)
   })
