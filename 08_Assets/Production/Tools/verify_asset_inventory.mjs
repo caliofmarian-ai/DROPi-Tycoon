@@ -8,6 +8,8 @@ import { fileURLToPath } from 'node:url'
 const SCRIPT_PATH = fileURLToPath(import.meta.url)
 const DEFAULT_REPO_ROOT = resolve(dirname(SCRIPT_PATH), '../../..')
 const DEFAULT_INVENTORY = '08_Assets/Production/asset-inventory.v1.json'
+const LEGAL_QUALIFICATION_CONTRACT = '09_Development/Compliance/GLOBAL_ASSET_PROVENANCE_CONTRACT_565_643.md'
+const RUNTIME_EVIDENCE_MANIFEST = 'game-web/public/legal/runtime-provenance.json'
 const EXPECTED_LIFECYCLE = [
   'INVENTORIED',
   'SPECIFIED',
@@ -93,6 +95,48 @@ function assertCanonicalLifecycle(inventory) {
   }
 }
 
+function assertLegalQualificationBoundary(inventory, repoRoot) {
+  const policyRefs = inventory.policyRefs ?? {}
+  if (Object.prototype.hasOwnProperty.call(policyRefs, 'legalReleaseAuthority')) {
+    throw new Error('policyRefs.legalReleaseAuthority is forbidden: runtime evidence is not the DT-13 legal qualification authority')
+  }
+  if (policyRefs.legalQualificationContract !== LEGAL_QUALIFICATION_CONTRACT) {
+    throw new Error(`policyRefs.legalQualificationContract must equal ${LEGAL_QUALIFICATION_CONTRACT}`)
+  }
+  if (policyRefs.runtimeEvidenceManifest !== RUNTIME_EVIDENCE_MANIFEST) {
+    throw new Error(`policyRefs.runtimeEvidenceManifest must equal ${RUNTIME_EVIDENCE_MANIFEST}`)
+  }
+
+  requireFile(repoRoot, policyRefs.legalQualificationContract, 'DT-13 legal qualification contract')
+  requireFile(repoRoot, policyRefs.runtimeEvidenceManifest, 'Runtime legal/provenance evidence manifest')
+
+  const boundary = inventory.authorityBoundary
+  if (!boundary || typeof boundary !== 'object') throw new Error('authorityBoundary is required')
+  if (boundary.productionLifecycleAuthority !== 'DT-19') {
+    throw new Error('authorityBoundary.productionLifecycleAuthority must remain DT-19')
+  }
+  if (boundary.legalQualificationAuthority !== 'DT-13') {
+    throw new Error('authorityBoundary.legalQualificationAuthority must remain DT-13')
+  }
+  if (boundary.legalQualificationContractRef !== policyRefs.legalQualificationContract) {
+    throw new Error('authorityBoundary legal qualification contract must match policyRefs.legalQualificationContract')
+  }
+  if (boundary.runtimeEvidenceManifestRef !== policyRefs.runtimeEvidenceManifest) {
+    throw new Error('authorityBoundary runtime evidence manifest must match policyRefs.runtimeEvidenceManifest')
+  }
+  if (boundary.legalQualificationContractRef === boundary.runtimeEvidenceManifestRef) {
+    throw new Error('DT-13 legal qualification contract and runtime evidence manifest must remain distinct')
+  }
+
+  const contract = readFileSync(repoPath(repoRoot, policyRefs.legalQualificationContract), 'utf8')
+  if (!contract.includes('It does not replace the DT-19 asset lifecycle or asset registries.')) {
+    throw new Error('DT-13 legal qualification contract no longer declares the DT-19 lifecycle boundary')
+  }
+  if (!contract.includes('Legal/provenance status is an independent release dimension.')) {
+    throw new Error('DT-13 legal qualification contract no longer keeps legal status independent from DT-19 lifecycle')
+  }
+}
+
 function validateEvidenceRefs(repoRoot, refs, context) {
   if (!Array.isArray(refs) || refs.length === 0) throw new Error(`${context} must provide evidenceRefs`)
   for (const ref of refs) requireFile(repoRoot, ref, context)
@@ -116,6 +160,7 @@ function validateInventory(inventory, repoRoot) {
     throw new Error('Asset inventory authority must remain DT-19')
   }
   assertCanonicalLifecycle(inventory)
+  assertLegalQualificationBoundary(inventory, repoRoot)
 
   const requiredDedupDimensions = [
     'semanticFamily',
@@ -227,7 +272,15 @@ function validateInventory(inventory, repoRoot) {
         requireFile(repoRoot, evidenceRef, `Runtime asset ${asset.assetId} lifecycle ${state}`)
       }
     }
-    if (asset.legalEvidenceRef) requireFile(repoRoot, asset.legalEvidenceRef, `Runtime asset ${asset.assetId}`)
+    if (Object.prototype.hasOwnProperty.call(asset, 'legalEvidenceRef')) {
+      throw new Error(`Runtime asset ${asset.assetId} uses deprecated legalEvidenceRef; runtime evidence must not be labeled legal authority`)
+    }
+    if (asset.runtimeEvidenceRef) {
+      if (asset.runtimeEvidenceRef !== inventory.policyRefs.runtimeEvidenceManifest) {
+        throw new Error(`Runtime asset ${asset.assetId} runtimeEvidenceRef must use the canonical runtime evidence manifest`)
+      }
+      requireFile(repoRoot, asset.runtimeEvidenceRef, `Runtime asset ${asset.assetId} runtime evidence`)
+    }
 
     inventoryArtifacts.push({
       path: asset.path,
