@@ -43,9 +43,10 @@ describe('release blocker #269 — camera control math', () => {
     expect(zoomByStep(CAMERA_MIN_ZOOM, 'out')).toBe(CAMERA_MIN_ZOOM)
   })
 
-  it('maps pinch distance changes to bounded zoom', () => {
+  it('maps pinch distance changes continuously and still clamps extreme zoom', () => {
     expect(zoomFromPinch(1, 100, 150)).toBe(1.5)
-    expect(zoomFromPinch(1, 100, 50)).toBe(CAMERA_MIN_ZOOM)
+    expect(zoomFromPinch(1, 100, 50)).toBe(0.5)
+    expect(zoomFromPinch(1, 100, 0.1)).toBe(CAMERA_MIN_ZOOM)
     expect(zoomFromPinch(1, 0, 200)).toBe(1)
   })
 
