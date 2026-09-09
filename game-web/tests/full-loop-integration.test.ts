@@ -176,14 +176,15 @@ describe('RBATCH-016 — full-loop integration verification', () => {
     expect(continued.settings.tutorialCompleted).toBe(true)
     expect(continued.world.player.movementSpeed).toBe(BALANCING.BICYCLE_MOVEMENT_SPEED)
 
-    // ODR-001=A and transient-state policy: load regenerates the world/order,
-    // rather than restoring completed order/player-position state.
-    expect(continued.world.activeOrder.status).toBe('Available')
-    expect(continued.world.activeOrder.economySettled).toBe(false)
+    // Governed Save v2 continuity preserves the terminal order and its exactly-once
+    // settlement marker while still clearing duplicated assignment/cargo flags.
+    expect(continued.world.activeOrder.status).toBe('Completed')
+    expect(continued.world.activeOrder.orderId).toBe(bicycleWorld.activeOrder.orderId)
+    expect(continued.world.activeOrder.economySettled).toBe(true)
     expect(continued.world.player.currentOrder).toBe('')
     expect(continued.world.player.carryingPackage).toBe(false)
-    expect(continued.world.player.x).toBe(createInitialWorldState().player.x)
-    expect(continued.world.player.y).toBe(createInitialWorldState().player.y)
+    expect(continued.world.player.x).toBe(bicycleWorld.player.x)
+    expect(continued.world.player.y).toBe(bicycleWorld.player.y)
   })
 
   it('connects fresh startup → accept → pickup → wrong destination → failure → reputation autosave → continue', () => {
@@ -220,7 +221,10 @@ describe('RBATCH-016 — full-loop integration verification', () => {
     expect(continued.company.reputation).toBe(
       BALANCING.INITIAL_REPUTATION + BALANCING.REPUTATION_ON_FAILURE,
     )
-    expect(continued.world.activeOrder.status).toBe('Available')
+    expect(continued.world.activeOrder.status).toBe('Failed')
+    expect(continued.world.activeOrder.orderId).toBe(failed.world.activeOrder.orderId)
+    expect(continued.world.activeOrder.economySettled).toBe(true)
+    expect(continued.world.player.currentOrder).toBe('')
     expect(continued.world.player.carryingPackage).toBe(false)
   })
 
