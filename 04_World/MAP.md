@@ -2,11 +2,11 @@
 
 Document: MAP.md
 Project: DROPi Tycoon
-Version: 2.1.0
+Version: 2.2.0
 Status: Canonical
 Author: Marian Caliof & OpenAI
 Language: English
-Last Updated: 2026-09-08
+Last Updated: 2026-09-09
 
 ---
 
@@ -14,298 +14,416 @@ Last Updated: 2026-09-08
 
 ## Purpose
 
-The map is the spatial backbone of DROPi Tycoon. It represents one coherent global logistics/economic world at several levels of detail rather than one giant continuously rendered scene.
+The map is the spatial backbone of DROPi Tycoon. It represents one coherent global logistics/economic world through hierarchical data, semantic zoom and bounded local rendering rather than one giant continuously simulated scene.
 
 Canonical zoom hierarchy:
 
-**Global -> Country -> First-order Administrative Region -> Representative Locality / External Economic Node -> Detailed Local Scene.**
+**Global -> Country -> Administrative Region -> Locality / External Economic Node -> District/Area where present -> Hero.**
 
-The strategic map and the player smartphone/GPS must use this same hierarchy.
+The strategic map and the player smartphone/GPS use this same governed hierarchy.
 
-The map is not an omniscient teleport menu. It is a world-observation, planning, navigation, trade and travel surface backed by real simulated geography, infrastructure and economic state.
+The map is not a teleport menu. It is a world-observation, planning, navigation, trade, migration and travel surface backed by authoritative geography, infrastructure and economic state.
 
----
-
-# 1. Global Layer
-
-The maximum zoom-out level represents the whole planet and all supported sovereign countries using recognizable real-world geography and approximate real placement.
-
-The product target is global participation: all countries represented by the versioned world dataset can participate in the same World Instance economy even though only a sparse subset of localities is modeled in detail.
-
-At this level the game may show:
-
-- countries and borders appropriate to the versioned map dataset;
-- major international freight corridors;
-- international sea, air, rail and road flows;
-- country-level demand, supply, population, infrastructure and trade summaries;
-- major commodity and energy pressure;
-- migration/tourism pressure;
-- major events or disruptions;
-- player/company influence at an appropriate aggregated scale.
-
-Individual streets, buildings, citizens and local vehicles are not rendered at global scale.
-
-Global traffic is summarized from real simulated flows. Decorative moving lines must not imply cargo or economic activity that does not exist in authoritative world state.
+This document is reconciled with `00_Project/GLOBAL_WORLD_ECONOMY_CANON.md` and `04_World/SETTLEMENT_EVOLUTION.md`.
 
 ---
 
-# 2. Country Layer
+# 1. Global Identity Coverage
 
-A country is represented sparsely rather than by every real settlement.
+The world dataset may contain governed identity for all supported countries, administrative regions, localities, strategically important external economic nodes, gateways and corridors.
 
-A normal country may expose up to nine representative locality nodes:
+**Identity coverage is not the same as rendering coverage.**
 
-1. its real capital at its approximate real position;
-2. up to one representative urban city in the North;
-3. up to one representative urban city in the East;
-4. up to one representative urban city in the South;
-5. up to one representative urban city in the West;
-6. up to one rural/small locality in the North-East;
-7. up to one rural/small locality in the South-East;
-8. up to one rural/small locality in the South-West;
-9. up to one rural/small locality in the North-West.
+A locality may exist in the global model while being:
 
-These are coverage roles, not a requirement to force nine nodes into every country. Microstates, island states, elongated countries and unusual geographies may legitimately use fewer nodes. Never invent a settlement merely to complete the compass.
+- latent/undeveloped;
+- rural;
+- a hamlet/village;
+- a town/city;
+- strategically summarized;
+- not currently streamed;
+- not yet release-verified for local entry.
 
-A city is a point at this scale. Streets and individual buildings appear only after entering its detailed local scene.
-
-Representative node selection should consider real geography, regional coverage, economic specialization, logistics relevance, population/importance and gameplay variety.
-
-Country layers may also contain strategically important external facilities, national gateways and corridors that are not locality nodes.
+The runtime must not load or high-frequency simulate every locality at once.
 
 ---
 
-# 3. Administrative Region Layer
+# 2. Global Layer
+
+The maximum zoom-out level represents the planet and supported sovereign-country geography using a versioned real-world-inspired baseline.
+
+At this level the game may show authoritative summaries of:
+
+- countries/borders appropriate to the pinned dataset;
+- major freight/trade corridors;
+- country demand/supply pressure;
+- resource/energy pressure where governed;
+- population and migration trends;
+- major infrastructure/gateways;
+- international flows;
+- major events/disruptions;
+- player/company influence at aggregated scale.
+
+Decorative movement must not imply economic flow that does not exist in authoritative state.
+
+---
+
+# 3. Country Layer
+
+A country is **not limited to a fixed handful of locality identities**.
+
+All governed locality identities may exist in the country dataset. The country layer may simplify labels/markers for readability by importance, zoom, settlement class, player relevance, economic activity and current events.
+
+This replaces the older interpretation that a normal country is represented only by a maximum set of compass-based locality nodes.
+
+At broad country zoom:
+
+- major cities/towns may be labeled prominently;
+- smaller settlements may use small markers or be grouped/hidden until deeper zoom;
+- latent/rural localities may appear only when relevant or at deeper zoom;
+- strategically important farms, mines, industrial sites, ports, terminals and resource nodes may appear independently of settlement size;
+- visible prominence can change as settlements and economies evolve.
+
+A locality that grows economically may become more visually prominent on the country map without changing its stable identity.
+
+---
+
+# 4. Administrative Region Layer
 
 The world model must not hardcode the term `county` globally.
 
-Use a country-neutral first-order administrative region that can specialize to the real local concept, such as:
+Use a country-neutral first-order administrative region specialized to the real local concept where appropriate, including state, province, county, județ, region, governorate, canton or equivalent.
 
-- state;
-- province;
-- county;
-- județ;
-- region;
-- governorate;
-- canton;
-- another appropriate first-order division.
+This layer may summarize:
 
-Romania specializes this layer as județe.
+- population/workforce;
+- natural-resource state;
+- production;
+- inventories/deficits;
+- specialist capacity;
+- education/research capacity;
+- infrastructure;
+- trade;
+- settlement development;
+- company activity;
+- migration;
+- construction/investment.
 
-This layer summarizes regional population, production, infrastructure, demand, workforce, trade and transport without requiring every real settlement to exist in the simulation.
-
----
-
-# 4. Representative Localities
-
-Locality roles are:
-
-- Capital;
-- Urban North / East / South / West;
-- Rural or Small North-East / South-East / South-West / North-West.
-
-Urban detailed areas target no more than roughly **5 meaningful active last-mile delivery competitors** unless later balancing proves a different local capacity is healthier.
-
-Rural/small-locality detailed areas normally target **1-2 meaningful active last-mile delivery competitors**.
-
-These are competition design targets, not magical counters detached from population, demand, economics or market-entry rules.
-
-Each locality may have its own:
-
-- architecture family;
-- population and workforce;
-- specialist availability;
-- local marketplace;
-- physical inventories and consumption demand;
-- supply/price pressure;
-- transport capacity;
-- public and private infrastructure;
-- industrial/commercial specialization;
-- housing/service capacity;
-- tourism and migration pressure;
-- waste and utility flows;
-- visible growth or decline.
+Regional aggregation must conserve the same lower-level economy rather than creating independent values.
 
 ---
 
-# 5. External Economic Nodes
+# 5. Locality Identity and Settlement Development
 
-Important productive infrastructure may exist outside any locality and must be represented as independent map nodes.
+Every governed locality has stable identity independent of settlement class.
 
-Examples include:
+Settlement development is dynamic World Instance state, conceptually:
 
-- steelworks/metallurgical complexes;
-- paper/pulp mills;
-- chemical and fertilizer plants;
-- refineries;
-- mines and quarries;
-- power plants;
-- large farms, livestock and forestry operations;
-- food-processing plants;
-- construction-material and machinery plants;
-- warehouses/distribution centers;
-- industrial ports;
-- rail freight terminals;
-- airport cargo terminals;
-- waste-treatment/recycling facilities;
-- water and utility infrastructure.
+`LATENT / UNDEVELOPED -> RURAL_POINT -> HAMLET -> VILLAGE -> SMALL_TOWN -> TOWN -> CITY -> LARGE_CITY / METROPOLITAN`
 
-These nodes do not consume representative-locality slots.
+Exact labels/thresholds are implementation/balance data.
 
-They consume real modeled inputs, workforce/specialist capability, time, energy/infrastructure and capacity; they create output inventories, jobs, contracts, logistics demand, waste/by-products and economic consequences.
+A locality may decline as well as grow.
 
-Their business relationship with a player/company may evolve from occasional work to recurring contract, investment, concession, lease or eligible acquisition/privatization under the approved business/economy rules.
+At local zoom, presentation must match its current settlement state:
 
-A site receives a high-detail scene only when gameplay value requires one; a remote steelworks or farm does not require an invented surrounding city.
+- low-tier places may show undeveloped land, farms, 1–2 isolated houses/buildings, a road junction or a small cluster;
+- towns expose more streets, services, commerce and work;
+- cities expose districts/areas, broader transport and larger business ecosystems;
+- large cities use chunked/sectorized streaming and wider route classes.
+
+Do not fabricate a mature city merely because a locality name exists in the catalog.
 
 ---
 
-# 6. Detailed Local Scene
+# 6. Locality Readiness Is Separate From Development
 
-The detailed scene is the high-fidelity playable layer containing streets, districts, individual buildings, citizens, employees, merchants, local traffic, parcels/cargo, company facilities, utilities and last-mile logistics.
+Data/readiness and settlement development are orthogonal.
 
-Only the active detailed area carries local-frame rendering and actor simulation cost.
+Recommended readiness lifecycle:
 
-The current playable city becomes one locality destination inside the global hierarchy rather than the entire world.
+`CATALOGED -> SOURCE_READY -> PLAYABLE_CONTRACT_READY -> RELEASE_VERIFIED`
 
-Meaningful work should leave visible local consequences where practical: construction advances, inventories refill, facilities operate or stop, traffic changes, waste is collected, businesses open/close and districts grow or decline.
+Recommended settlement lifecycle:
+
+`LATENT -> RURAL_POINT -> HAMLET -> VILLAGE -> TOWN -> CITY -> LARGE_CITY`
+
+A locality can therefore be `SOURCE_READY + HAMLET` or `RELEASE_VERIFIED + VILLAGE`.
+
+A release-supported locality must have truthful entry behavior appropriate to its current development. It does not need to pretend to be a city.
 
 ---
 
-# 7. Geography Fidelity
+# 7. Detailed Local Scene
+
+The local scene contains the highest-fidelity playable space appropriate to the settlement tier, including where present:
+
+- streets/routes;
+- buildings/facilities;
+- farms/resource sites;
+- individual economic nodes;
+- local citizens/traffic;
+- merchants/employers;
+- cargo/inventory interactions;
+- company facilities;
+- construction;
+- utilities/services;
+- districts/areas;
+- last-mile and local logistics.
+
+Only the active relevant area carries high-frequency rendering/simulation cost.
+
+---
+
+# 8. Global 10x Playable-Distance Baseline
+
+Every governed playable settlement consumes one reusable playable-distance scale authority:
+
+**`CITY_PLAYABLE_DISTANCE_SCALE_BASELINE = 10`**
+
+Brăila is the calibration/reference implementation, not the owner of the scale policy.
+
+The baseline applies to governed intra-settlement positional separation and traversal scale. It does not blindly multiply road widths, doors, building footprints or hero dimensions.
+
+Settlement size remains proportional to its actual governed urbanized footprint and topology.
+
+When economic development creates new streets, districts, factories, farms or housing, the new geometry inherits the same global scale automatically.
+
+---
+
+# 9. Geography Fidelity
 
 DROPi Tycoon is inspired by real geography, not a GIS clone.
 
 Requirements:
 
 - country shapes and relative placement should be recognizable;
-- capitals and representative settlements should use approximate real positions;
-- coastlines, major rivers, mountain barriers and transport-relevant geography may affect routes where useful;
-- geography may be simplified for Android readability/performance;
-- geography datasets are versioned so existing World Instances remain reproducible;
-- a later real-world-inspired baseline update must not silently rewrite the history of an existing World Instance.
+- localities use governed real positions where available;
+- roads/street identity may use source-backed geometry where quality allows;
+- coastlines, rivers, mountains and transport barriers may affect routes;
+- geography can be simplified/compressed selectively for gameplay and Android performance without reverting to miniature-board scale;
+- source datasets are versioned;
+- baseline updates do not silently rewrite existing World Instance history.
 
 Real geography seeds the world. Simulation owns its future.
 
 ---
 
-# 8. Transport by Scale
+# 10. Global Style, Local Architecture
+
+Every playable locality follows the canonical **Stylized 3D Pre-Rendered Mobile World** art language.
+
+This does not mean every city uses identical buildings.
+
+Visual identity should derive from governed local/regional reality where possible, including:
+
+- architecture families;
+- facade/material/roof patterns;
+- street form and density;
+- vegetation/climate;
+- industrial/agricultural character;
+- infrastructure;
+- locally relevant urban/rural details.
+
+Scalable art pipeline:
+
+`Global Art Style -> Regional/Local Archetype -> Locality-Specific Variants -> Runtime Derivatives`
+
+Missing runtime-required assets may be generated under the approved asset pipeline, then cut out, cleaned, optimized and integrated with provenance.
+
+---
+
+# 11. Natural Resources and Productive Geography
+
+Important economic activity may exist outside settlements.
+
+Examples:
+
+- farms;
+- mines/quarries;
+- forests;
+- fisheries;
+- power/energy sites;
+- steel/metallurgical facilities;
+- paper/pulp mills;
+- chemical/fertilizer plants;
+- refineries;
+- food processors;
+- warehouses;
+- rail/port/airport cargo facilities;
+- utilities/waste/recycling sites.
+
+Map visuals do not establish resource quantity. Resource facts come from the governed resource authority.
+
+External economic nodes may later stimulate nearby settlement development through jobs, roads, housing, services and trade.
+
+---
+
+# 12. Transport by Scale
 
 ## Global / International
 - sea shipping;
 - international air cargo;
 - cross-border rail;
 - cross-border road freight;
-- major multimodal gateways.
+- multimodal gateways.
 
-## National
-- highway freight;
-- national rail;
+## National / Regional
+- highway/road freight;
+- rail;
 - domestic air where useful;
-- river/sea transport where geographically valid;
-- national distribution hubs.
-
-## Regional
-- regional road/rail;
-- feeder hubs;
-- warehouses and terminals.
+- river/sea where geographically valid;
+- warehouses/distribution hubs;
+- feeder infrastructure.
 
 ## Local
 - walking;
 - bicycle;
 - scooter/motorcycle;
-- car/van/company fleet;
+- car/van/fleet;
 - public transport where modeled;
 - drone where unlocked;
-- final-mile delivery.
+- local/final-mile logistics.
 
-Traffic is simulated at the frequency appropriate to its layer. The game must never update every global vehicle at local-scene frequency.
-
----
-
-# 9. Travel and Presence
-
-Opening or zooming the map does not move the hero or cargo.
-
-Economic presence changes through legitimate transport and infrastructure:
-
-- walking/local movement;
-- road/public transport;
-- rail;
-- air;
-- river/sea;
-- other later unlocked transport.
-
-Long journeys may use time compression, summarized travel or hub-to-hub presentation for playability, but they must still consume the relevant modeled time, cost, access and transport capacity.
-
-Cargo follows the custody/leg model in `00_Project/LOGISTICS_DESIGN.md`; strategic-map selection cannot teleport inventory between markets.
+Flows run at frequencies appropriate to their scale.
 
 ---
 
-# 10. Strategic Map Information
+# 13. Travel and Presence
 
-Map layers may expose summarized:
+Opening/zooming the map does not move the hero or cargo.
 
-- product demand and supply;
-- inventory and price pressure;
+Physical/economic presence changes through legitimate transport, infrastructure, time and cost.
+
+Long journeys may use time compression or summarized presentation, but custody/inventory and travel consequence remain authoritative.
+
+Migration/relocation changes `currentLocalityId` only through governed transitions and persistence.
+
+---
+
+# 14. Player Origin and Starting Locality
+
+Brăila is not the universal spawn.
+
+Onboarding distinguishes home/origin, starting locality and current locality.
+
+A player should begin in a supported locality appropriate to the selected/validated origin rules.
+
+If that locality is currently a village or other low-tier settlement in the World Instance, the player begins in that truthful settlement state rather than receiving a hidden Brăila substitute.
+
+Local starter work must adapt to the legitimate local economy.
+
+---
+
+# 15. Strategic Map Information
+
+Map overlays may project authoritative summaries such as:
+
+- product supply/demand;
+- inventory/scarcity;
+- natural-resource state where governed;
 - productive capacity;
 - agricultural output;
-- energy/utility pressure;
-- workforce/specialist availability;
-- population trend and migration;
-- infrastructure capacity;
+- energy/water pressure;
+- workforce/specialists;
+- schools/training/research hubs;
+- population/migration;
+- settlement development;
+- infrastructure;
 - trade corridors;
 - congestion;
+- construction/projects;
 - contracts/opportunities;
-- active construction/community projects;
-- waste/recycling pressure;
-- current events/disruptions.
+- events/disruptions.
 
-The map exists to create economic, social, travel and logistics decisions, not merely navigation.
-
-A map overlay is a projection of authoritative state. It must not fabricate economic truth for visual effect.
+An overlay is a projection of authoritative state and cannot fabricate economic truth for visual effect.
 
 ---
 
-# 11. Evolution and Player Contribution
+# 16. Economy-Driven Map Evolution
 
-Map entities persist and may change over world time.
+The map evolves because the economy evolves.
 
-Localities may grow or shrink; industries may open, expand, close or change ownership; infrastructure may be built; eligible undeveloped territory may later support new settlements; population and specialist distribution may shift; national and international trade routes may change.
+Canonical loop:
 
-Players and companies may contribute to these changes through work, supply, contracts, investment, construction, infrastructure operation and community-scale projects.
+`resource / need / route opportunity`
+`-> company/institution investment`
+`-> production/infrastructure/jobs`
+`-> population/specialists`
+`-> housing/services/commerce`
+`-> larger urbanized footprint`
+`-> new companies/demand/trade routes`
 
-These changes belong to the same world economy and must become visible at the appropriate zoom level.
+Players/groups/companies can visibly contribute through construction, production, logistics, education/research investment and infrastructure.
 
-The playability principle is:
-
-**Your work leaves a mark.**
-
-The map should increasingly let players see where their personal, company and community activity changed the world.
-
----
-
-# 12. World Instance Boundary
-
-Every strategic map is viewed inside a specific World Instance.
-
-Geography may begin from a shared versioned baseline, but prices, ownership, infrastructure, industrial state, population, trade flows, migration, events and territorial development belong to that World Instance's history.
-
-Economic state must never be silently mixed between World Instances.
+A new road, factory, farm, warehouse, school or district should become visible from the same authoritative state that created its economic effect.
 
 ---
 
-# 13. Performance Rule
+# 17. Decline and Recovery
 
-Global scale is achieved through hierarchical state and simulation, not brute-force rendering.
+Localities and economic nodes may decline through employer closure, resource depletion, route loss, infrastructure failure, population outflow or prolonged weak demand.
 
-The game must not simultaneously render or high-frequency simulate every city, citizen, building or vehicle on Earth. Inactive areas use summarized lower-frequency state and deterministic catch-up while preserving economic conservation and authoritative history.
+The map can show:
+
+- closed facilities;
+- reduced traffic;
+- underused buildings;
+- stalled construction;
+- shrinking settlement prominence;
+- disrupted trade.
+
+Recovery through new investment, trade, infrastructure, specialists or migration must remain possible.
+
+---
+
+# 18. World Instance Boundary
+
+Every map belongs to one World Instance.
+
+Shared geography may begin from a common versioned baseline, but settlement class, ownership, prices, production, population, trade, infrastructure, construction and company history belong to that World Instance.
+
+Economic state never silently crosses World Instances.
+
+---
+
+# 19. Performance Rule
+
+Global scale is achieved through hierarchical state, data streaming and bounded simulation.
+
+Use:
+
+- strategic aggregation;
+- deterministic catch-up;
+- chunks/sectors;
+- LOD;
+- culling;
+- bounded ambient actors;
+- locality-scoped asset/data loading.
+
+Do not high-frequency simulate or render every global locality simultaneously.
+
+Performance optimization may reduce active detail; it may not collapse 10x cities back into miniature boards.
+
+---
+
+# 20. Release Proof
+
+Before claiming global-world architecture complete, prove the full lifecycle across materially different localities:
+
+- Brăila premium reference;
+- another Romanian locality;
+- a non-Romanian European locality;
+- a materially different archetype/scale;
+- a low-tier settlement that grows from legitimate economic causes.
+
+Proof must include zoom/entry, local work/economy, transport, story/consequence, persistence and relocation without Brăila fallback.
 
 ---
 
 # Canonical Rule
 
-**DROPi Tycoon represents the whole planet through sparse layered geography. Every country can participate in one coherent World Instance economy; strategic maps project real simulated state, travel remains infrastructure-backed, and progressively deeper layers reveal how people, companies, industries and communities change the world over time.**
+**DROPi Tycoon maps a globally identified but dynamically developed world. Every governed locality can exist without being a mature city; settlement prominence and built form evolve from real economic state; all playable growth inherits the global 10x scale; and one shared art language preserves locally authentic architecture, infrastructure and character.**
 
 ---
 
