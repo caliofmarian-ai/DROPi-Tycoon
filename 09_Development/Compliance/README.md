@@ -11,5 +11,6 @@ Current evidence packages:
 - `ACCOUNT_DATA_RIGHTS_LIFECYCLE_562.md` — implementation-ready account deletion/retention/data-rights lifecycle contract; production accounts remain blocked pending #560 and remaining #562 implementation.
 - `THIRD_PARTY_RELEASE_GATE_565.md` — first engineering implementation of the third-party release gate.
 - `COMMERCIAL_IP_PROVENANCE_EVIDENCE_565.md` — current evidence-only continuation covering mobile dependency closure, native branding/media evidence, attribution surfaces and Android legal-notice packaging.
+- `GLOBAL_ASSET_PROVENANCE_CONTRACT_565_643.md` — scalable family/batch provenance and release-gate contract for global locality art expansion without per-city duplication of shared legal facts.
 
 Commercial release must remain blocked wherever the referenced evidence package explicitly records an unresolved `OWNER INPUT REQUIRED`, `ENGINEERING EVIDENCE REQUIRED`, or `QUALIFIED REVIEW REQUIRED` item.
