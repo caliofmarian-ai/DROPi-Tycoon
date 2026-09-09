@@ -54,6 +54,10 @@ const requiredOutput = [
   'assets/branding/dropi-tycoon-logo.png',
   'assets/production/icon-orders.webp',
   'data/playable-city-location-v1.json',
+  'legal/third-party-notices.html',
+  'legal/dependency-license-inventory.json',
+  'legal/runtime-provenance.json',
+  'legal/commercial-release-evidence.json',
 ]
 
 for (const relativePath of requiredOutput) {

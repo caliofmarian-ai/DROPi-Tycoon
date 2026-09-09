@@ -13,7 +13,16 @@ const assert = (condition, message) => {
   if (!condition) throw new Error(message)
 }
 
-const [packageJson, easJson, appJson, runtimeConfig, bundledRuntime, appSource, pluginSource] = await Promise.all([
+const [
+  packageJson,
+  easJson,
+  appJson,
+  runtimeConfig,
+  bundledRuntime,
+  appSource,
+  pluginSource,
+  prepareBundledRuntime,
+] = await Promise.all([
   readJson('package.json'),
   readJson('eas.json'),
   readJson('app.json'),
@@ -21,6 +30,7 @@ const [packageJson, easJson, appJson, runtimeConfig, bundledRuntime, appSource, 
   readText('src/bundledRuntime.ts'),
   readText('App.tsx'),
   readText('plugins/withBundledPhaserRuntime.js'),
+  readText('scripts/prepare-bundled-runtime.mjs'),
 ])
 
 for (const profile of ['development', 'preview']) {
@@ -86,5 +96,17 @@ assert(appSource.includes('startBundledPhaserRuntime'), 'App must start the bund
 assert(appSource.includes('BUNDLED_RUNTIME_ORIGIN'), 'App must enforce the local runtime origin.')
 assert(appSource.includes('onShouldStartLoadWithRequest={allowNavigation}'), 'WebView navigation allowlist must remain active.')
 assert(!appSource.includes('source={{ uri: runtime.gameUrl }}'), 'Legacy direct remote-only WebView source must not return.')
+
+for (const legalPath of [
+  'legal/third-party-notices.html',
+  'legal/dependency-license-inventory.json',
+  'legal/runtime-provenance.json',
+  'legal/commercial-release-evidence.json',
+]) {
+  assert(
+    prepareBundledRuntime.includes(`'${legalPath}'`),
+    `Production bundled runtime must require legal evidence output: ${legalPath}`,
+  )
+}
 
 console.log('Bundled Phaser runtime configuration validation passed.')
