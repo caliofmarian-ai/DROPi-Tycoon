@@ -7,7 +7,7 @@ Owner lane: DT-02 World Persistence
 
 DROPi Tycoon Save v2 must no longer turn a valid in-progress local delivery into a fresh job at the starting position after reload. This contract adds the smallest governed continuity payload needed to resume the existing local gameplay loop without creating a second gameplay authority or breaking historical Save v2 data.
 
-The top-level save format remains **version 2**. `worldContinuity` is an additive optional field so existing Save v2 payloads remain readable.
+The top-level save format remains **version 2**. `worldContinuity` and `missionResume` are additive optional fields so existing Save v2 payloads remain readable.
 
 ## Persisted authority
 
@@ -61,25 +61,41 @@ A non-terminal order carrying `economySettled: true` is invalid. Decode repairs 
 
 ## Save v2 compatibility and repair
 
-Historical Save v2 payloads do not contain `worldContinuity`. Missing continuity is valid and intentionally keeps the previous safe fallback: materialize a fresh bounded `WorldState` while retaining the historical company/settings/progression domains.
+Historical Save v2 payloads do not contain `worldContinuity` or `missionResume`. Missing optional continuity is valid and intentionally keeps the previous safe fallback for the absent domain.
 
-New saves include `worldContinuity`. Malformed optional continuity does not make the whole Save v2 slot incompatible:
+New saves include `worldContinuity` and may include `missionResume`. Malformed optional continuity does not make the whole Save v2 slot incompatible:
 
-- invalid structure or invalid active-order identity drops the continuity extension and falls back safely;
+- invalid world-continuity structure or active-order identity drops the world extension and falls back safely;
 - invalid hero coordinates repair to `PLAYER_START`;
 - cargo mismatch repairs from the validated order stage;
 - transient accept intent is cleared;
-- impossible non-terminal settlement markers are cleared.
+- impossible non-terminal settlement markers are cleared;
+- an invalid outer mission-resume kind/version/runtime envelope is dropped and the save is marked repaired without discarding valid world continuity.
 
 The existing staging/primary write protocol, corrupted-save backup behavior, legacy v1 migration and unknown-version rejection remain unchanged.
 
-## Mission Framework boundary
+## Unified Mission Framework handoff
 
-The merged Mission Framework already owns a JSON-safe mission runtime model and sanitization under `game-web/src/missions/**`. DT-02 does **not** copy or reinterpret that model inside `worldContinuity`.
+DT-09 PR #582 introduced the versioned mission-side resume contract under `game-web/src/missions/**`. Save v2 now embeds that contract as the optional `missionResume` field in the **same save aggregate** as `worldContinuity`; there is no second mission storage source.
 
-The save schema is the DT-02 authority; mission serialization/resume semantics remain the DT-09 lane. Integration must use the mission-side persistence/resume adapter produced for #566 rather than introducing a second mission engine or duplicating order/cargo/economy state inside mission data.
+Ownership remains layered:
 
-Until that adapter is integrated, this slice provides complete continuity for the currently live delivery job but does not claim complete authored/systemic mission-chain persistence.
+- DT-02 owns Save v2, storage, world/order/cargo restore ordering and the outer mission envelope;
+- DT-09 owns `MissionResumePayloadV1` semantics, mission-runtime sanitization, exactly-once mission receipts/consequence identities and external-reference validation;
+- the mission payload does not copy hero position, cargo custody, order objects, company balances or settlement authority.
+
+The restore order is deliberate:
+
+1. decode and repair the Save v2 aggregate;
+2. restore company and authoritative `worldContinuity` first;
+3. derive player assignment/cargo from the validated order stage and clear transient input;
+4. carry the cloned `missionResume` envelope into the restored session without replaying mission events;
+5. materialize mission state through `restoreMissionResumePayload(...)` using current mission definitions/facts;
+6. validate unresolved mission order/delivery references against the already-restored authoritative world/logistics state through `validateMissionResumeReferences(...)`.
+
+Save v2 validates only the outer mission contract (`kind`, `version`, JSON-object runtime). It intentionally does not duplicate DT-09's semantic mission sanitizer. A structurally valid envelope with malformed nested mission state therefore remains available to the mission owner, which can repair it deterministically using the current definitions and world facts.
+
+Historical Save v2 without `missionResume` maps to DT-09's explicit `legacy-missing` path and receives fresh mission runtime state without affecting the rest of the restored save.
 
 ## World Instance / PostgreSQL boundary
 
@@ -96,6 +112,9 @@ Automated coverage must prove:
 - already-settled terminal work cannot settle twice after reload;
 - historical Save v2 without continuity remains readable;
 - malformed optional continuity repairs or falls back safely;
-- invalid duplicated player/cargo facts cannot override the validated order stage.
+- invalid duplicated player/cargo facts cannot override the validated order stage;
+- an active mission round-trips in the same Save v2 aggregate and resolves against the same restored order identity;
+- malformed outer mission envelopes do not destroy valid world continuity;
+- historical saves without mission data take the DT-09 legacy-safe resume path.
 
-Installed Android process-kill/relaunch validation remains an owner/release checkpoint once the relevant Android runtime is deployable. This non-visual persistence PR does not claim `ANDROID_VERIFIED`.
+Installed Android process-kill/relaunch validation remains an owner/release checkpoint on the bundled production runtime. This non-visual persistence PR does not claim `ANDROID_VERIFIED`.
