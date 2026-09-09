@@ -159,6 +159,10 @@ const validateOpportunityCause = (input: {
       opportunity.sourceNodeId !== supply.sourceNodeId || opportunity.destinationNodeId !== demand.destinationNodeId) {
     throw new Error('Citywide logistics opportunity does not match authoritative supply/demand nodes')
   }
+  if (supply.sourceNodeId === demand.destinationNodeId ||
+      opportunity.sourceNodeId === opportunity.destinationNodeId) {
+    throw new Error('Citywide logistics endpoints must be distinct')
+  }
   if (opportunity.productId !== supply.productId || opportunity.productId !== demand.productId) {
     throw new Error('Citywide logistics opportunity product mismatch')
   }
@@ -183,9 +187,6 @@ export const bindLogisticsOpportunityToCitywideEndpoints = (input: {
   validateOpportunityCause(input)
   const origin = bindSupplyOfferToCitywideEndpoint({ supply: input.supply })
   const destination = bindDemandRequirementToCitywideEndpoint({ demand: input.demand })
-  if (origin.endpointId === destination.endpointId) {
-    throw new Error('Citywide logistics endpoints must be distinct')
-  }
   return {
     opportunity: { ...input.opportunity },
     origin,
