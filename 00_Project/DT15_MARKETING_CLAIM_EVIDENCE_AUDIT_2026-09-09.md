@@ -21,12 +21,12 @@ For production store, press, creator, community, trailer, screenshot, or acquisi
 
 At this audited SHA:
 
-- `main` was created by the owner-directed merge of #641 with a known Prototype CI failure accepted temporarily;
-- that merge explicitly states that it is neither `ORCHESTRATOR_TECHNICALLY_VERIFIED` nor `ANDROID_VERIFIED`;
-- #568 still lacks the actual production AAB / Play Internal / physical Android acceptance evidence;
+- the #641 merge message records a Prototype CI failure that was accepted temporarily at merge time; this is historical merge-time evidence only, not the current CI status of the audited SHA;
+- exact `main` `08e33ad71e11e4f17eeb1f38d530386ee447d334` subsequently completed both `DROPi Tycoon Prototype CI` and `Production Docker Runtime Smoke` successfully;
+- those green repository checks do not establish Android physical, visual or Play acceptance, and #568 still lacks the actual production AAB / Play Internal / physical Android acceptance evidence;
 - #317 remains an open player-facing quality gate;
 - #565 remains an open commercial provenance/legal gate;
-- #566 remains an open save/mission continuity P0 blocker;
+- #566 world continuity is materially repaired at source/test level through governed Save v2 `worldContinuity` / mission-resume contracts and reload/idempotency coverage, but qualifying production-candidate physical Android process-kill/relaunch acceptance is still absent;
 - #643 remains an open global functional-locality P0 program.
 
 Therefore **source evidence may be useful for planning capture, but no current player-facing marketing claim is promoted to production `GREEN` by this audit.**
@@ -49,15 +49,15 @@ Repository documents, data catalogs, unit tests, issue descriptions, domain cont
 |---|---|---|---|---|---|---|
 | `EV-01` | DROPi Tycoon targets Android landscape gameplay. | `game-mobile/app.json`: Android platform, landscape orientation, package `com.dropi.tycoon`, bundled Phaser runtime plugin. | Repository version remains `0.0.0`. Existing `BUILD_RECORD_0.0.0.md` is a **preview/internal** build from source `b398ed6...`, not this audited SHA; physical validation remains pending. | Installed exact-candidate Android launch showing landscape game, no browser chrome/dev shell; provenance record tied to the same source SHA. | `BLOCKED` | DT-14 / #568, #570. |
 | `EV-02` | The player can experience a playable Brăila locality. | `game-web/src/world/city.ts` constructs the current `CITY` as `cityId: 'braila'` from governed world zones, roads, buildings and route points. `worldLayout.ts` consumes the generated Brăila layout. | No exact current-main Android candidate is physically validated. | Clean Android gameplay frame showing the player inside the actual Brăila runtime at readable street/locality scale; no debug-dominant presentation. | `BLOCKED` | #317 + DT-14 exact candidate. |
-| `EV-03` | Brăila currently uses a 10× playable-distance calibration. | `game-web/src/world/brailaPlayableScale.ts` defines `BRAILA_PLAYABLE_DISTANCE_SCALE = 10`; `worldLayout.ts` consumes the Brăila expansion helpers. | #641 is merged into this SHA, but the merge records known Prototype CI failure and explicitly lacks technical/Android verification. | Android footage showing meaningful district/travel separation and camera readability at the shipped scale; capture must not imply surveyed real-world metres. | `BLOCKED` | #614 reconciliation / DT-01, DT-04, DT-14. |
+| `EV-03` | Brăila currently uses a 10× playable-distance calibration. | `game-web/src/world/brailaPlayableScale.ts` defines `BRAILA_PLAYABLE_DISTANCE_SCALE = 10`; `worldLayout.ts` consumes the Brăila expansion helpers. | The #641 merge-time message records an accepted temporary Prototype CI failure, but the exact audited SHA subsequently completed Prototype CI and Production Docker Runtime Smoke successfully. These green checks still do not establish Android acceptance. | Android footage showing meaningful district/travel separation and camera readability at the shipped scale; capture must not imply surveyed real-world metres. | `BLOCKED` | #614 reconciliation / DT-01, DT-14. |
 | `EV-04` | The shipped runtime has one reusable global 10× playable-city authority. | **Contradicted by current code.** `worldLayout.ts` imports `BRAILA_PLAYABLE_DISTANCE_SCALE`, `BRAILA_PLAYABLE_SCALE_VERSION` and `expandBraila*`; `city.ts` exports the current `CITY` as Brăila. Canonical documents describe a global baseline, but the audited runtime still exposes Brăila-specific authority. | No exact multi-locality candidate evidence. | Before this claim can exist: real captures from multiple materially different localities on one governed build, all consuming a locality-generic runtime contract. | `BLOCKED` | DT-01/DT-11/#614/#643. Do not market documentation as runtime proof. |
 | `EV-05` | The in-world smartphone exposes Delivery, Map and Money & Assets. | `game-web/src/ui/PlayerSmartphone.ts` defines those three live apps and projects current order, objective, route/cargo/reward, local area/transport/target/distance, and authoritative money/ownership/team/fleet/HQ state. The phone is an overlay rather than a replacement Phaser scene. | No exact current-main Android visual acceptance. | Android landscape capture with the phone open over the real game context; the shown order/money/fleet values must be live state, not edited text. A close/reopen clip should preserve game context if that behavior is part of the message. | `BLOCKED` | DT-21/#349/#317 + DT-14 capture evidence. |
-| `EV-06` | Local delivery work exists as a real runtime foundation. | Existing city/order runtime plus `game-web/src/missions/citywideDeliveryDistribution.ts`, which consumes an existing order/delivery reference, governed origin/destination identities, spatial classification and work-eligibility authority without manufacturing demand, cargo, money or capability. | No exact current-main end-to-end Android proof; save continuity remains blocked by #566. | One uninterrupted Android clip: legitimate available work -> accept -> pickup/custody -> travel -> deliver -> accepted completion/result. Any reward text shown must be the real authoritative result. | `BLOCKED` | DT-09/DT-03/DT-06 integration evidence + #566 + #317/DT-14. |
+| `EV-06` | Local delivery work exists as a real runtime foundation. | Existing city/order runtime plus `game-web/src/missions/citywideDeliveryDistribution.ts`, which consumes an existing order/delivery reference, governed origin/destination identities, spatial classification and work-eligibility authority without manufacturing demand, cargo, money or capability. | No exact current-main end-to-end Android proof. Governed Save v2 source/tests materially preserve hero/order/cargo continuity, so this row is not blocked by the former source-level fresh-job behavior. | One uninterrupted Android clip: legitimate available work -> accept -> pickup/custody -> travel -> deliver -> accepted completion/result. Any reward text shown must be the real authoritative result. | `BLOCKED` | DT-09/DT-03/DT-06 integration evidence + #317/DT-14 exact-candidate capture. |
 | `EV-07` | Citywide route variety can include local, adjacent-district and cross-city work. | `citywideDeliveryDistribution.ts` recognizes `local`, `adjacent-district`, `cross-city` and delegates classification to world spatial authority rather than inventing DT-09 distance thresholds. | Current spatial implementation remains coupled to Brăila-specific scale/classification code; no Android acceptance. | A future capture set must show genuinely different route classes produced by the candidate, not staged labels. At least one route should visibly communicate materially greater cross-city travel. | `BLOCKED` | DT-01/#614 + DT-09/#615 + exact Android proof. |
-| `EV-08` | The first-hour story has authored/locality-aware runtime handoff foundations. | `game-web/src/narrative/firstHourStoryRuntimeHandoff.ts` defines portable narrative role IDs, explicit Brăila character bindings, mission/outcome-gated presentation triggers and the rule that there is **no Brăila fallback** for another locality's missing role binding. | No exact current-main Android visual-story acceptance. | Android footage of the actual first-hour presentation in normal play: named character/presentation -> real mission beat -> real consequence. No document-only story promise. | `BLOCKED` | DT-08/DT-10 player-facing integration + #317 + DT-14. |
+| `EV-08` | The first-hour story has authored/locality-aware runtime handoff foundations. | `game-web/src/narrative/firstHourStoryRuntimeHandoff.ts` defines portable narrative role IDs, explicit Brăila character bindings, mission/outcome-gated presentation triggers and the rule that there is **no Brăila fallback** for another locality's missing role binding. Save v2 also carries governed world-continuity and mission-resume envelopes needed for material source-level first-hour continuity. | No exact current-main Android visual-story or process-kill/relaunch acceptance. | Android footage of the actual first-hour presentation in normal play: named character/presentation -> real mission beat -> real consequence. Any persistence claim additionally needs exact-candidate process-kill/relaunch proof. No document-only story promise. | `BLOCKED` | DT-08/DT-10 player-facing integration + #317 + DT-14 exact-candidate acceptance. |
 | `EV-09` | Company / HQ / employees / fleet are part of current player-facing state. | `PlayerSmartphone.ts` projects company name/money, active employees, fleet counts/assignments and constructed HQ departments from runtime state; the older preview build record also lists existing economy/employees. | The available build record is not the current SHA, and #317 explicitly rejects developer/prototype-style presentation as commercial proof. | Commercial-quality Android frame/clip showing the actual company/HQ/fleet interaction, not merely a debug/status readout. | `BLOCKED` | DT-20 + DT-21/#317 + DT-14. |
 | `EV-10` | Supply/demand can causally create logistics opportunities. | `citywideDeliveryDistribution.ts` requires a real `causeRef`, existing order and exact delivery reference; it does not create demand itself. This proves a consumption boundary, not the complete visible causal economy loop. | No exact Android candidate proves the full cause -> opportunity -> mission -> settlement -> world consequence loop. | A truthful sequence must show a source-backed/local economic cause, resulting legitimate work, completion and visible consequence without manually staged values. | `BLOCKED` | DT-07 + DT-09 + DT-03 + DT-18 integration. |
-| `EV-11` | Saving/relaunching resumes the same active hero/job/cargo state. | Current authoritative release issue #566 states the active `WorldState` is not preserved and the runtime reconstructs active job/cargo/hero continuity. | No qualifying Android process-kill/relaunch acceptance exists. | Only after #566: record exact candidate, accept/pick up cargo, move materially, save/kill process, relaunch, continue same valid hero/job/cargo with no duplicate settlement. | `BLOCKED` | DT-02/#566. This claim is currently prohibited. |
+| `EV-11` | Saving/relaunching resumes the same active hero/job/cargo state. | Exact audited source contains additive Save v2 `worldContinuity` plus mission-resume handoff. `save-world-continuity.test.ts` verifies restoration of the same picked-up delivery, hero location and player cargo custody, and verifies that an already-settled terminal order cannot settle twice after reload. This materially repairs the former source-level continuity defect. | No qualifying production release candidate/AAB plus physical Android process-kill/relaunch acceptance exists for this claim. | Record the exact production candidate: accept/pick up cargo, move materially, save, kill the app process, relaunch, continue the same valid hero/job/cargo with no duplicate settlement. | `BLOCKED` | DT-14 physical Android acceptance, coordinated with DT-02/#566 acceptance evidence. Source/test repair alone is not marketing proof. |
 | `EV-12` | DROPi Tycoon is globally playable city-by-city in the current build. | **Not proven and current runtime evidence is Brăila-specific.** #643 also explicitly separates catalog/source records from playable locality readiness. | No exact candidate demonstrates the required multi-locality lifecycle. | Multi-locality proof described in Section 4, captured from one exact candidate with materially different local realities. | `BLOCKED` | DT-11/#643 + DT-16 release acceptance. |
 | `EV-13` | DROPi Tycoon is Google Play / production Android ready. | Repository-side release preflight and AAB attestation tooling exists after #659, but #568 records that the actual production AAB, artifact inspection, Play Internal evidence and physical Android acceptance remain pending. | No production AAB attestation for this audited SHA. | Not a screenshot-only claim. Requires DT-14 artifact attestation + Play Internal/pre-launch evidence + physical Android verification. | `BLOCKED` | DT-14/#568/#570; #565 also remains a commercial gate. |
 | `EV-14` | Creator/press seeding can start now. | `LAUNCH_PRESS_KIT_CREATOR_OUTREACH_PACKAGE.md` exists, but its canonical status is `PACKAGE_READY_FOR_REVIEW — OUTREACH_NOT_AUTHORIZED`; #561 also records an orchestrator hold on paid growth/outreach while global/core product evidence is incomplete. | No approved creator candidate build or production media set is tied to this SHA. | Before seeding: exact approved build instructions, owner-validated screenshots/B-roll, known issues, cleared media/branding, public contact and a source-backed creator shortlist. | `BLOCKED` | DT-15 remains on evidence-preparation only; DT-13/14/Owner gates. |
@@ -118,16 +118,16 @@ Purpose: prove the architecture is not a fixed Brăila-shaped template.
 
 ### `ML-EV-05` — relocation / continuity evidence
 
-Only after DT-02 and #643 dependencies permit it:
+Once relocation and #643 locality dependencies permit this player flow:
 
 - begin in one supported locality;
 - preserve authoritative state;
 - relocate exactly once through the governed flow;
 - enter the destination's legitimate runtime;
-- save/relaunch where continuity is material;
+- save and perform physical Android process-kill/relaunch where continuity is part of the external claim;
 - prove no silent return to Brăila and no duplicated economic settlement.
 
-Purpose: support any future claim that the player can move between functional localities.
+Purpose: support any future claim that the player can move between functional localities. Existing source/test continuity does not replace exact-candidate Android acceptance.
 
 ## 5. Creative evidence requirements for #561
 
@@ -181,17 +181,17 @@ Not authorized now:
 - a Brăila runtime locality with 10× Brăila-specific playable-distance implementation;
 - in-world smartphone projection of live Delivery / Map / Money & Assets state;
 - citywide delivery-distribution authority that consumes legitimate existing causes/orders/delivery references;
-- locality-aware first-hour narrative handoff foundations.
+- locality-aware first-hour narrative handoff foundations;
+- governed Save v2 world/mission continuity with automated hero/order/cargo reload and settlement replay-safety coverage.
 
 ### Strongest current blockers
 
-1. current `main` explicitly carries an accepted Prototype CI failure and lacks technical/Android verification after #641;
-2. no exact production AAB / Play Internal / physical Android evidence for this SHA;
-3. #317 commercial visual-quality gate remains open;
-4. #566 save/mission/cargo continuity remains a P0 blocker;
-5. #643 multi-locality functional proof is absent;
-6. current runtime city/scale authority still exposes Brăila-specific implementation where global reusable authority is required;
-7. #565 commercial provenance/legal gate remains open.
+1. no exact production AAB / Play Internal / physical Android evidence for this SHA; repository CI at exact `08e33ad...` is green and the #641 accepted-failure note is historical merge-time evidence only;
+2. #317 commercial visual-quality gate remains open;
+3. #566 still lacks qualifying production-candidate physical Android process-kill/relaunch acceptance even though the former source/test continuity defect is materially repaired;
+4. #643 multi-locality functional proof is absent;
+5. current runtime city/scale authority still exposes Brăila-specific implementation where global reusable authority is required;
+6. #565 commercial provenance/legal gate remains open.
 
 ### DT-15 release/growth verdict
 
@@ -208,7 +208,7 @@ No existing `AMBER`, `BLUE` or source-only feature is promoted to `PUBLIC_GREEN`
 ## 8. Cross-DT dependencies
 
 - DT-01 / #614: locality-generic playable-scale/spatial authority and Brăila visual calibration.
-- DT-02 / #566: authoritative active-world save/relaunch continuity.
+- DT-02 / #566: maintain the governed continuity contract and coordinate exact-candidate process-kill/relaunch acceptance; no current source-level fresh-job defect is asserted by this audit.
 - DT-03, DT-06, DT-07, DT-09, DT-18: prove the real causal work/economy chain if it is marketed.
 - DT-08 / DT-10: player-facing story/character proof.
 - DT-11 / #643: Catalog -> PlayableLocalityInstance/readiness and multi-locality proof.
