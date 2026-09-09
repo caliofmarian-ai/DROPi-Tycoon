@@ -1,26 +1,15 @@
 import { describe, expect, it } from 'vitest'
+import * as playableCityScale from '../src/world/playableCityScale'
 import {
   CITY_PLAYABLE_DISTANCE_SCALE_BASELINE,
   CITY_PLAYABLE_SCALE_VERSION,
   PLAYABLE_CITY_DETAIL_SECTOR_LIMIT,
-  classifyPlayableCityRouteDistance,
   expandPlayableCityBuilding,
   expandPlayableCityExtent,
   expandPlayableCityPoint,
   expandPlayableCityRoad,
   expandPlayableCityZone,
 } from '../src/world/playableCityScale'
-
-/**
- * Deliberately synthetic locality fixture. It proves reusable game translation without making any
- * factual claim about a real non-Brăila place or inventing source geography.
- */
-const syntheticZones = [
-  { id: 'north', x: 0, y: 0, width: 40, height: 40 },
-  { id: 'centre', x: 100, y: 0, width: 40, height: 40 },
-  { id: 'south', x: 1000, y: 0, width: 40, height: 40 },
-  { id: 'edge', x: 1100, y: 0, width: 40, height: 40 },
-] as const
 
 describe('global playable-city scale authority', () => {
   it('owns the canonical 10x baseline independently of Brăila', () => {
@@ -37,7 +26,7 @@ describe('global playable-city scale authority', () => {
     expect(expandPlayableCityExtent(majorSourceWidth)).toBeGreaterThan(expandPlayableCityExtent(smallSourceWidth))
   })
 
-  it('separates governed anchors without blindly enlarging Hero-scale widths', () => {
+  it('separates supplied anchors without blindly enlarging Hero-scale widths', () => {
     const road = {
       id: 'synthetic-road', x: 50, y: 10, width: 100, height: 24, roadWidth: 24,
       centerline: [{ x: 0, y: 10 }, { x: 100, y: 10 }],
@@ -64,19 +53,8 @@ describe('global playable-city scale authority', () => {
     expect(zone.height).toBe(80)
   })
 
-  it('derives route class from generic governed topology rather than Brăila functions or quotas', () => {
-    const zones = syntheticZones.map(zone => expandPlayableCityZone(zone))
-    expect(classifyPlayableCityRouteDistance({
-      originZoneId: 'north', destinationZoneId: 'north', roadDistance: 400,
-    }, zones).spatialClass).toBe('local')
-    expect(classifyPlayableCityRouteDistance({
-      originZoneId: 'north', destinationZoneId: 'centre', roadDistance: 1200,
-    }, zones).spatialClass).toBe('adjacent-district')
-    expect(classifyPlayableCityRouteDistance({
-      originZoneId: 'north', destinationZoneId: 'edge', roadDistance: 9800,
-    }, zones).spatialClass).toBe('cross-city')
-    expect(classifyPlayableCityRouteDistance({
-      originZoneId: 'north', destinationZoneId: 'edge', roadDistance: Number.NaN,
-    }, zones).routeDistanceValid).toBe(false)
+  it('does not author locality adjacency or route classification in the visual-scale module', () => {
+    expect('adjacentPlayableCityZoneIds' in playableCityScale).toBe(false)
+    expect('classifyPlayableCityRouteDistance' in playableCityScale).toBe(false)
   })
 })
