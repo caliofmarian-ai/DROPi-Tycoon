@@ -10,7 +10,7 @@ import {
   BRAILA_PLAYABLE_SCALE_VERSION,
   brailaSectorForPoint,
   brailaTravelSeconds,
-  classifyBrailaRoadDistance,
+  classifyBrailaRouteDistance,
 } from '../src/world/brailaPlayableScale'
 import { CITY_DETAIL_MIN_ZOOM, CITY_DETAIL_TILE_LIMIT, CITY_DETAIL_TILE_SIZE, cityGroundTiles } from '../src/world/cityGroundDetail'
 import { cityFitZoom, cityScaleLevel } from '../src/world/semanticMapCamera'
@@ -27,6 +27,7 @@ import {
   WORLD_SOURCE_HEIGHT,
   WORLD_SOURCE_WIDTH,
   WORLD_WIDTH,
+  WORLD_ZONES,
 } from '../src/world/worldLayout'
 
 describe('Brăila canonical playable city scale', () => {
@@ -93,6 +94,7 @@ describe('Brăila canonical playable city scale', () => {
     const scaledDistance = Math.hypot(scaledB.x - scaledA.x, scaledB.y - scaledA.y)
     expect(scaledDistance / rawDistance).toBeCloseTo(BRAILA_PLAYABLE_DISTANCE_SCALE, 5)
     expect(WORLD_ROUTE_POINTS.map(point => point.label)).toEqual(rawLayout.routes.map(point => point.label))
+    expect(WORLD_ROUTE_POINTS.map(point => point.zoneId)).toEqual(rawLayout.routes.map(point => point.zoneId))
   })
 
   it('restores a true City semantic overview on compact Android landscape', () => {
@@ -107,20 +109,56 @@ describe('Brăila canonical playable city scale', () => {
     expect(zoomByStep(0.1, 'out')).toBe(CAMERA_MIN_ZOOM)
   })
 
-  it('keeps Android detailed ground bounded to local sectors regardless of total city size', () => {
+  it('keeps Android detailed ground within the five-sector DT-04 ceiling regardless of total city size', () => {
+    expect(BRAILA_DETAIL_SECTOR_LIMIT).toBe(5)
     expect(CITY_DETAIL_TILE_SIZE).toBe(BRAILA_DETAIL_SECTOR_SIZE)
     expect(CITY_DETAIL_TILE_LIMIT).toBe(BRAILA_DETAIL_SECTOR_LIMIT)
     expect(CITY_DETAIL_MIN_ZOOM).toBe(BRAILA_DETAIL_MIN_ZOOM)
     expect(cityGroundTiles({ x: 0, y: 0, width: WORLD_WIDTH, height: WORLD_HEIGHT }, 0.3)).toEqual([])
     expect(cityGroundTiles({ x: PLAYER_START.x - 900, y: PLAYER_START.y - 500, width: 1800, height: 1000 }, 1).length)
-      .toBeLessThanOrEqual(BRAILA_DETAIL_SECTOR_LIMIT)
+      .toBeLessThanOrEqual(5)
     expect(brailaSectorForPoint(PLAYER_START).id).toMatch(/^\d+-\d+$/)
   })
 
-  it('provides #615 road-distance classes without pretending straight-line distance is authoritative', () => {
-    expect(classifyBrailaRoadDistance(1200)).toBe('local')
-    expect(classifyBrailaRoadDistance(3600)).toBe('adjacent-district')
-    expect(classifyBrailaRoadDistance(9000)).toBe('cross-city')
+  it('derives #615 spatial classes from stable enlarged district topology, not mission quotas', () => {
+    const center = (zone: (typeof WORLD_ZONES)[number]) => ({
+      x: zone.x + zone.width / 2,
+      y: zone.y + zone.height / 2,
+    })
+    const pairs = WORLD_ZONES.flatMap((a, index) => WORLD_ZONES.slice(index + 1).map(b => {
+      const ac = center(a)
+      const bc = center(b)
+      return { a, b, distance: Math.hypot(ac.x - bc.x, ac.y - bc.y) }
+    })).sort((a, b) => a.distance - b.distance)
+
+    const closest = pairs[0]
+    const farthest = pairs[pairs.length - 1]
+    const local = classifyBrailaRouteDistance({
+      originZoneId: WORLD_ZONES[0].id,
+      destinationZoneId: WORLD_ZONES[0].id,
+      roadDistance: 1200,
+    }, WORLD_ZONES)
+    const adjacent = classifyBrailaRouteDistance({
+      originZoneId: closest.a.id,
+      destinationZoneId: closest.b.id,
+      roadDistance: 3600,
+    }, WORLD_ZONES)
+    const crossCity = classifyBrailaRouteDistance({
+      originZoneId: farthest.a.id,
+      destinationZoneId: farthest.b.id,
+      roadDistance: 9000,
+    }, WORLD_ZONES)
+
+    expect(local.spatialClass).toBe('local')
+    expect(adjacent.spatialClass).toBe('adjacent-district')
+    expect(crossCity.spatialClass).toBe('cross-city')
+    expect(crossCity.roadDistance).toBe(9000)
+    expect(crossCity.routeDistanceValid).toBe(true)
+    expect(classifyBrailaRouteDistance({
+      originZoneId: WORLD_ZONES[0].id,
+      destinationZoneId: WORLD_ZONES[1].id,
+      roadDistance: Number.NaN,
+    }, WORLD_ZONES).routeDistanceValid).toBe(false)
     expect(brailaTravelSeconds(9000, 150)).toBe(60)
     expect(brailaTravelSeconds(9000, 0)).toBe(Number.POSITIVE_INFINITY)
   })
