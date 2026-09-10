@@ -1,15 +1,15 @@
 import type Phaser from 'phaser'
 import {
-  BRAILA_DETAIL_MIN_ZOOM,
-  BRAILA_DETAIL_SECTOR_LIMIT,
-  BRAILA_DETAIL_SECTOR_SIZE,
-} from './brailaPlayableScale'
+  PLAYABLE_CITY_DETAIL_MIN_ZOOM,
+  PLAYABLE_CITY_DETAIL_SECTOR_LIMIT,
+  PLAYABLE_CITY_DETAIL_SECTOR_SIZE,
+} from './playableCityScale'
 import { drawCityGround } from './urbanPresentation'
 import { WORLD_WIDTH, WORLD_HEIGHT } from './worldLayout'
 
-export const CITY_DETAIL_TILE_SIZE = BRAILA_DETAIL_SECTOR_SIZE
-export const CITY_DETAIL_TILE_LIMIT = BRAILA_DETAIL_SECTOR_LIMIT
-export const CITY_DETAIL_MIN_ZOOM = BRAILA_DETAIL_MIN_ZOOM
+export const CITY_DETAIL_TILE_SIZE = PLAYABLE_CITY_DETAIL_SECTOR_SIZE
+export const CITY_DETAIL_TILE_LIMIT = PLAYABLE_CITY_DETAIL_SECTOR_LIMIT
+export const CITY_DETAIL_MIN_ZOOM = PLAYABLE_CITY_DETAIL_MIN_ZOOM
 interface Tile { id: string; x: number; y: number }
 export const cityGroundTiles = (view: { x: number; y: number; width: number; height: number }, zoom: number): Tile[] => {
   if (zoom < CITY_DETAIL_MIN_ZOOM || view.width <= 0 || view.height <= 0) return []
@@ -24,10 +24,10 @@ export const cityGroundTiles = (view: { x: number; y: number; width: number; hei
 }
 
 /**
- * Crisp local pavement over a cheap city overview. The #614 enlarged city therefore increases
- * total world sectors, never the resident Android detail budget: at most five local textures and
- * one newly materialized tile per frame. DT-04 may later add chunk-level guardrails underneath
- * this stable presentation contract without changing city geometry.
+ * Crisp local pavement over a cheap city overview. Enlarging any governed city increases total
+ * possible world sectors, never the resident Android detail budget: at most five local textures
+ * and one newly materialized tile per frame. DT-04 may add chunk-level guardrails underneath this
+ * stable presentation contract without changing locality geometry.
  */
 export class CityGroundDetail {
   private resident = new Map<string, Phaser.GameObjects.Image>()
