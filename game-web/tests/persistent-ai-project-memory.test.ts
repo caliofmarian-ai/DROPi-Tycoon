@@ -1,8 +1,11 @@
 import { describe, expect, it } from 'vitest';
 import { readFileSync } from 'node:fs';
+import { execFileSync } from 'node:child_process';
+import { fileURLToPath } from 'node:url';
 
 const currentStateUrl = new URL('../../09_Development/AI_Project_Memory/CURRENT_STATE.json', import.meta.url);
 const handoffsUrl = new URL('../../09_Development/AI_Project_Memory/HANDOFFS.json', import.meta.url);
+const validatorUrl = new URL('../../09_Development/AI_Project_Memory/validate-memory.mjs', import.meta.url);
 
 function readJson(url: URL) {
   return JSON.parse(readFileSync(url, 'utf8'));
@@ -67,5 +70,14 @@ describe('persistent AI project memory governance', () => {
         prOwners.set(handoff.pr, handoff.agentId);
       }
     }
+  });
+
+  it('runs the exact repository memory validator under the existing test suite', () => {
+    const output = execFileSync(process.execPath, [fileURLToPath(validatorUrl)], {
+      encoding: 'utf8',
+    });
+    expect(output).toContain('PERSISTENT_AI_MEMORY_VALIDATION = PASS');
+    expect(output).toContain('handoffs=23');
+    expect(output).toContain('activePullRequests=8');
   });
 });
