@@ -5,9 +5,10 @@
 ## Active #683 acceptance
 
 ### U-683-001 — Final candidate PR/head
-- Status: `UNKNOWN` until the implementation branch diverges and the PR is opened.
-- Resolution: live-read the #683 PR and exact head after implementation commits.
-- Safe action: do not claim exact-head acceptance or merge before that reconciliation.
+- Historical state: before PR creation, the final PR/head was `UNKNOWN`.
+- Current state: PR #684 exists on `agent/dt00-683-persistent-ai-memory`; the exact live head must be read from GitHub because a commit cannot embed its own containing SHA and implementation-stage writes move the branch.
+- Resolution condition: implementation stops changing, live PR #684 is re-read, and its exact head is used for CI, fresh-context recovery, DT-00 audit and expected-head merge protection.
+- Safe action: do not claim exact-head acceptance or merge from a persisted pre-write SHA.
 
 ### U-683-002 — Fresh-context final verdict
 - Status: `UNKNOWN`.
