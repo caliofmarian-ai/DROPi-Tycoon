@@ -73,11 +73,12 @@ describe('persistent AI project memory governance', () => {
   });
 
   it('runs the exact repository memory validator under the existing test suite', () => {
+    const state = readJson(currentStateUrl);
     const output = execFileSync(process.execPath, [fileURLToPath(validatorUrl)], {
       encoding: 'utf8',
     });
     expect(output).toContain('PERSISTENT_AI_MEMORY_VALIDATION = PASS');
     expect(output).toContain('handoffs=23');
-    expect(output).toContain('activePullRequests=9');
+    expect(output).toContain(`activePullRequests=${state.activePullRequests.length}`);
   });
 });
