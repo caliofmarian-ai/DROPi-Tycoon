@@ -60,6 +60,7 @@ function optionValue(args, flag) {
 const state = readJson('CURRENT_STATE.json');
 const doc = readJson('HANDOFFS.json');
 const statePrSet = new Set();
+const handoffPrOwner = new Map();
 
 if (state) {
   requireKeys(state, [
@@ -113,7 +114,6 @@ if (doc) {
     'nextSafeAction','canonicalReportReferences'
   ];
   const seenAgent = new Set();
-  const seenPr = new Map();
   const exclusiveClaims = new Map();
 
   for (const stored of doc.handoffs ?? []) {
@@ -143,9 +143,9 @@ if (doc) {
       exclusiveClaims.set(claim, handoff.agentId);
     }
     if (Number.isInteger(handoff.pr)) {
-      const previous = seenPr.get(handoff.pr);
+      const previous = handoffPrOwner.get(handoff.pr);
       if (previous && previous !== handoff.agentId) failures.push(`PR #${handoff.pr} assigned to multiple current agents: ${previous} and ${handoff.agentId}`);
-      seenPr.set(handoff.pr, handoff.agentId);
+      handoffPrOwner.set(handoff.pr, handoff.agentId);
     }
   }
 
@@ -155,7 +155,14 @@ if (doc) {
   }
 }
 
-if (state && doc && state.observedMainSha !== doc.observedMainSha) failures.push('CURRENT_STATE and HANDOFFS observedMainSha contradict each other');
+if (state && doc) {
+  if (state.observedMainSha !== doc.observedMainSha) failures.push('CURRENT_STATE and HANDOFFS observedMainSha contradict each other');
+  for (const item of state.activePullRequests ?? []) {
+    const handoffOwner = handoffPrOwner.get(item.pr);
+    if (!handoffOwner) failures.push(`active PR #${item.pr} has no durable handoff owner`);
+    else if (handoffOwner !== item.dt) failures.push(`active PR #${item.pr} owner mismatch: CURRENT_STATE=${item.dt}, HANDOFFS=${handoffOwner}`);
+  }
+}
 
 const args = process.argv.slice(2);
 const suppliedMain = optionValue(args, '--current-main');
