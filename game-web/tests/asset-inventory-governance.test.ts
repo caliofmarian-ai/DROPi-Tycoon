@@ -49,6 +49,7 @@ describe('ISSUE-414 — DT-19 asset inventory and dedup authority', () => {
     expect(inventory.policyRefs.legalReleaseAuthority).toBeUndefined()
     expect(inventory.authorityBoundary.productionLifecycleAuthority).toBe('DT-19')
     expect(inventory.authorityBoundary.legalQualificationAuthority).toBe('DT-13')
+    expect(inventory.collections.find((item: any) => item.collectionId === 'legacy-board-crops-v1')?.lifecycleState).toBe('CANDIDATE')
 
     const result = runVerifier()
 
@@ -108,6 +109,31 @@ describe('ISSUE-414 — DT-19 asset inventory and dedup authority', () => {
 
     expect(result.status).not.toBe(0)
     expect(result.stderr).toContain('uses deprecated legalEvidenceRef')
+  })
+
+  it('fails closed when DT-19 registry tries to write a DT-13 legal qualification verdict', () => {
+    const inventory = loadInventory()
+    inventory.registeredFamilies[0].legalStatus = 'CLEARED'
+
+    const result = runVerifier(writeFixture(inventory))
+
+    expect(result.status).not.toBe(0)
+    expect(result.stderr).toContain('DT-19 registry must not define legal qualification field')
+    expect(result.stderr).toContain('DT-13 owns legal/licence/provenance qualification')
+  })
+
+  it('keeps the mirrored legacy board crops at CANDIDATE until a real promotion gate exists', () => {
+    const inventory = loadInventory()
+    const collection = inventory.collections.find(
+      (item: any) => item.collectionId === 'legacy-board-crops-v1',
+    )
+    collection.lifecycleState = 'APPROVED_SOURCE'
+
+    const result = runVerifier(writeFixture(inventory))
+
+    expect(result.status).not.toBe(0)
+    expect(result.stderr).toContain('legacy-board-crops-v1 must remain CANDIDATE')
+    expect(result.stderr).toContain('does not grant APPROVED_SOURCE')
   })
 
   it('fails closed when an exact duplicate is no longer declared as intentional reuse', () => {
