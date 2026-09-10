@@ -1,0 +1,240 @@
+{
+  "schemaVersion": 1,
+  "snapshotId": "DT00-683-INITIAL-BACKFILL-2026-09-10",
+  "snapshotType": "OPERATIONAL_PROJECT_MEMORY",
+  "repository": "caliofmarian-ai/DROPi-Tycoon",
+  "issue": 683,
+  "observedAt": "2026-09-10T20:58:00Z",
+  "observedMainSha": "f8453cbaa522a54406940d5056f5a5943627d86c",
+  "liveReconciliationRequired": true,
+  "mutableStateAuthority": "LIVE_GITHUB",
+  "mainChecksAtObservedSha": {
+    "validate": "SUCCESS",
+    "validate-mobile-shell": "SUCCESS",
+    "production-image-smoke": "SUCCESS",
+    "evidence": "Live GitHub check-runs on observedMainSha"
+  },
+  "implementationLane": {
+    "owner": "DT-00",
+    "branch": "agent/dt00-683-persistent-ai-memory",
+    "baseSha": "f8453cbaa522a54406940d5056f5a5943627d86c",
+    "recordedHeadSha": "f8453cbaa522a54406940d5056f5a5943627d86c",
+    "recordedHeadMeaning": "PRE_IMPLEMENTATION_HEAD; the containing commit cannot embed its own SHA, so live branch reconciliation is mandatory",
+    "status": "IMPLEMENTATION_BACKFILL_VALIDATION",
+    "mergeLock": "#683 must complete fresh-context recovery and DT-00 exact-head audit before normal specialist merges unless DT-00 records a new dependency decision"
+  },
+  "authorityLayers": {
+    "canonicalProjectDomainAuthority": "Existing canonical project/domain documents; operational memory never overrides them",
+    "historicalAIReports": "09_Development/AI_Reports/",
+    "operationalProjectMemory": "09_Development/AI_Project_Memory/CURRENT_STATE.json",
+    "agentSessionHandoffs": "09_Development/AI_Project_Memory/HANDOFFS.json",
+    "durableDecisionRecords": "09_Development/AI_Project_Memory/DECISIONS.md",
+    "unknownBlockerRegister": "09_Development/AI_Project_Memory/UNKNOWN_BLOCKERS.md"
+  },
+  "activePullRequests": [
+    {
+      "pr": 679,
+      "dt": "DT-19",
+      "issue": 414,
+      "baseSha": "f8453cbaa522a54406940d5056f5a5943627d86c",
+      "headSha": "c37c430ef421043e0b3eb82fb2c30252a61300e7",
+      "branch": "agent/dt19-414-asset-inventory-dedup-authority",
+      "state": "OPEN",
+      "draft": false,
+      "mergeable": true,
+      "workState": "PARALLEL_PREP",
+      "ci": {
+        "state": "SUCCESS",
+        "checks": {
+          "validate": "SUCCESS",
+          "validate-mobile-shell": "SUCCESS",
+          "production-image-smoke": "SUCCESS"
+        },
+        "evidence": "Live PR metadata refreshed 2026-09-10; CI from live exact-head check-runs for #679 or DT-22 Pass 004 where head remained unchanged."
+      }
+    },
+    {
+      "pr": 674,
+      "dt": "DT-17",
+      "issue": 560,
+      "baseSha": "08e33ad71e11e4f17eeb1f38d530386ee447d334",
+      "headSha": "dbc817e736d03fe03df09402651b3dac4ccb673b",
+      "branch": "agent/dt17-560-authenticated-authority-boundary",
+      "state": "OPEN",
+      "draft": false,
+      "mergeable": true,
+      "workState": "PARALLEL_PREP",
+      "ci": {
+        "state": "FAILURE_RECORDED",
+        "checks": {
+          "validate": "FAILURE",
+          "validate-mobile-shell": "UNKNOWN",
+          "production-image-smoke": "SUCCESS"
+        },
+        "evidence": "Live PR metadata refreshed 2026-09-10; CI from live exact-head check-runs for #679 or DT-22 Pass 004 where head remained unchanged."
+      }
+    },
+    {
+      "pr": 666,
+      "dt": "DT-06",
+      "issue": 437,
+      "baseSha": "8016dfe6d6e7f5f0a5dcb53f216691c555f5b0fa",
+      "headSha": "7807d0e555509b1f4fbc3e1b6aeaf245e67d65c6",
+      "branch": "agent/dt06-437-specialist-capability-boundary",
+      "state": "OPEN",
+      "draft": false,
+      "mergeable": true,
+      "workState": "WAIT_MERGE_LANE",
+      "ci": {
+        "state": "SUCCESS_RECORDED",
+        "checks": {
+          "validate": "SUCCESS",
+          "validate-mobile-shell": "UNKNOWN",
+          "production-image-smoke": "SUCCESS"
+        },
+        "evidence": "Live PR metadata refreshed 2026-09-10; CI from live exact-head check-runs for #679 or DT-22 Pass 004 where head remained unchanged."
+      }
+    },
+    {
+      "pr": 677,
+      "dt": "DT-20",
+      "issue": 438,
+      "baseSha": "8016dfe6d6e7f5f0a5dcb53f216691c555f5b0fa",
+      "headSha": "37bfcc814eb801c2289eed36e67989bc9466bf12",
+      "branch": "agent/dt20-438-company-operations-contract",
+      "state": "OPEN",
+      "draft": false,
+      "mergeable": true,
+      "workState": "WAIT_MERGE_LANE",
+      "ci": {
+        "state": "FAILURE_RECORDED",
+        "checks": {
+          "validate": "FAILURE",
+          "validate-mobile-shell": "UNKNOWN",
+          "production-image-smoke": "SUCCESS"
+        },
+        "evidence": "Live PR metadata refreshed 2026-09-10; CI from live exact-head check-runs for #679 or DT-22 Pass 004 where head remained unchanged."
+      }
+    },
+    {
+      "pr": 678,
+      "dt": "DT-09",
+      "issue": 615,
+      "baseSha": "8016dfe6d6e7f5f0a5dcb53f216691c555f5b0fa",
+      "headSha": "c154d1006932912492c25f236564f8457b749510",
+      "branch": "agent/dt09-643-locality-delivery-materialization",
+      "state": "OPEN",
+      "draft": false,
+      "mergeable": true,
+      "workState": "WAIT_MERGE_LANE",
+      "ci": {
+        "state": "SUCCESS_RECORDED",
+        "checks": {
+          "validate": "SUCCESS",
+          "validate-mobile-shell": "UNKNOWN",
+          "production-image-smoke": "SUCCESS"
+        },
+        "evidence": "Live PR metadata refreshed 2026-09-10; CI from live exact-head check-runs for #679 or DT-22 Pass 004 where head remained unchanged."
+      }
+    },
+    {
+      "pr": 671,
+      "dt": "DT-21",
+      "issue": 349,
+      "baseSha": "8016dfe6d6e7f5f0a5dcb53f216691c555f5b0fa",
+      "headSha": "d842cabafe3598d7696f2c0af1a3c80e2ad91cfe",
+      "branch": "agent/dt21-349-player-profile",
+      "state": "OPEN",
+      "draft": false,
+      "mergeable": true,
+      "workState": "WAIT_MERGE_LANE",
+      "ci": {
+        "state": "SUCCESS_RECORDED",
+        "checks": {
+          "validate": "SUCCESS",
+          "validate-mobile-shell": "UNKNOWN",
+          "production-image-smoke": "SUCCESS"
+        },
+        "evidence": "Live PR metadata refreshed 2026-09-10; CI from live exact-head check-runs for #679 or DT-22 Pass 004 where head remained unchanged."
+      }
+    },
+    {
+      "pr": 676,
+      "dt": "DT-07",
+      "issue": 493,
+      "baseSha": "8016dfe6d6e7f5f0a5dcb53f216691c555f5b0fa",
+      "headSha": "84e3411282311769b1ba9658cc0d5f547218098f",
+      "branch": "agent/dt07-493-governed-resource-extraction",
+      "state": "OPEN",
+      "draft": false,
+      "mergeable": true,
+      "workState": "HOLD_SCOPE",
+      "ci": {
+        "state": "FAILURE_RECORDED",
+        "checks": {
+          "validate": "FAILURE",
+          "validate-mobile-shell": "UNKNOWN",
+          "production-image-smoke": "SUCCESS"
+        },
+        "evidence": "Live PR metadata refreshed 2026-09-10; CI from live exact-head check-runs for #679 or DT-22 Pass 004 where head remained unchanged."
+      }
+    },
+    {
+      "pr": 667,
+      "dt": "DT-16",
+      "issue": "INDEPENDENT_RELEASE_AUDIT",
+      "baseSha": "8016dfe6d6e7f5f0a5dcb53f216691c555f5b0fa",
+      "headSha": "5fe15b8e2beb9e123e6d90f3fccf0fd69dcc7d09",
+      "branch": "agent/dt16-current-release-audit",
+      "state": "OPEN",
+      "draft": false,
+      "mergeable": true,
+      "workState": "HOLD_FINAL_AUDIT",
+      "ci": {
+        "state": "FAILURE_RECORDED",
+        "checks": {
+          "validate": "FAILURE",
+          "validate-mobile-shell": "UNKNOWN",
+          "production-image-smoke": "SUCCESS"
+        },
+        "evidence": "Live PR metadata refreshed 2026-09-10; CI from live exact-head check-runs for #679 or DT-22 Pass 004 where head remained unchanged."
+      }
+    }
+  ],
+  "recentlyMergedConstraints": [
+    {
+      "pr": 665,
+      "dt": "DT-18",
+      "issue": 651,
+      "mergedHeadSha": "b627cb238b2912e71bb6256b87b67acf23d04d34",
+      "mergeCommitSha": "f8453cbaa522a54406940d5056f5a5943627d86c",
+      "status": "MERGED_EXACT_MAIN_VERIFIED",
+      "constraint": "#651 remains OPEN; first bounded evolution slice only. No population, seasons or higher settlement tiers without a new mission."
+    },
+    {
+      "pr": 673,
+      "dt": "DT-03",
+      "status": "MERGED",
+      "constraint": "One root transaction/idempotency identity governs exactly-once delivery progression settlement across money, XP, entity loyalty and eligible specialist fragments. Fragments do not grant qualification, employment, specialist capability or company capability."
+    },
+    {
+      "pr": 669,
+      "dt": "DT-13",
+      "status": "MERGED",
+      "constraint": "Global asset provenance/legal contract is canonical. UNKNOWN remains UNKNOWN and contract existence does not make assets commercial-cleared."
+    }
+  ],
+  "dependencyAndMergeOrder": [
+    "#683 persistent-memory migration first",
+    "After #683 merge, re-read live main and every candidate PR head/base/check before selecting a merge slot",
+    "DT-19 #679 is first priority for DT-00 re-audit because it is current-base, exact-head green and gates governed Library-to-repository asset preparation",
+    "DT-17 #674 may prepare in parallel but cannot merge until current-main reconciliation and exact-head green",
+    "DT-06 #666 remains the next people-capability merge lane after higher-priority current work is resolved/rebased",
+    "DT-20 #677, DT-09 #678 and DT-21 #671 remain WAIT_MERGE_LANE until DT-00 releases them after dependency re-evaluation",
+    "DT-07 #676 remains HOLD_SCOPE",
+    "DT-16 #667 remains HOLD_FINAL_AUDIT and last in the implementation wave",
+    "DT-22 #681 remains governance/read-audit-report under DT-00 missions"
+  ],
+  "ownerVisibleRule": "Owner-facing execution reports are in Romanian; technical identifiers may remain English. GitHub is technical evidence; chat summaries explain BEFORE, CHANGED, AFTER, PLAYER/GAME IMPACT, MERGE STATUS, RISKS/WHAT REMAINS and NEXT OWNER ACTION.",
+  "nextSafeOrchestratorAction": "Finish #683 repository implementation/backfill, run the mechanical validator, open PR, obtain exact-head CI, run a genuinely fresh-context disaster-recovery audit, then independently audit and merge only on PASS."
+}
