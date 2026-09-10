@@ -131,6 +131,14 @@ describe('connected street distance, not a central-avenue shortcut', () => {
       expect(isUrbanWalkable(node.x, node.y, true), node.id).toBe(true)
       expect(visited.has(node.id), node.id).toBe(true)
     }
+    const blockedRouteSamples: Array<{
+      location: string
+      segment: number
+      step: number
+      steps: number
+      x: number
+      y: number
+    }> = []
     for (const location of CITY_LOCATIONS) {
       const route = findRoadRoute(CITY_ROAD_NETWORK, PLAYER_START, location)!
       expect(route.points[0]).toEqual(PLAYER_START)
@@ -143,12 +151,17 @@ describe('connected street distance, not a central-avenue shortcut', () => {
         length += distance
         const steps = Math.ceil(distance / 8)
         for (let step = 0; step <= steps; step++) {
-          expect(isUrbanWalkable(a.x + (b.x - a.x) * step / steps, a.y + (b.y - a.y) * step / steps, true))
-            .toBe(true)
+          const x = a.x + (b.x - a.x) * step / steps
+          const y = a.y + (b.y - a.y) * step / steps
+          if (!isUrbanWalkable(x, y, true)) {
+            blockedRouteSamples.push({ location: location.label, segment: i - 1, step, steps, x, y })
+          }
         }
       }
       expect(length).toBeCloseTo(route.distance, 8)
     }
+    // Preserve every 8 px collision-map sample while avoiding one Vitest assertion object per sample.
+    expect(blockedRouteSamples).toEqual([])
   })
 
   it('uses source streets and returns symmetric distances', () => {
