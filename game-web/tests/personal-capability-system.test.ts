@@ -142,11 +142,14 @@ describe('#370 personal capability foundation', () => {
     const raw = serializeGameSession(session)
     const parsed = JSON.parse(raw) as Record<string, unknown>
     expect(parsed.personalProgression).toEqual(session.personalProgression)
+    const parsedWorldContinuity = parsed.worldContinuity as Record<string, unknown> | undefined
+    expect(Object.prototype.hasOwnProperty.call(parsedWorldContinuity ?? {}, 'personalProgression')).toBe(false)
 
     const decoded = decodeSave(raw)
     expect(decoded.kind).toBe('valid')
     if (decoded.kind !== 'valid') throw new Error('Expected a valid Save v2 payload')
     expect(decoded.save.personalProgression).toEqual(session.personalProgression)
+    expect(Object.prototype.hasOwnProperty.call(decoded.save.worldContinuity ?? {}, 'personalProgression')).toBe(false)
 
     const restored = restoreGameSessionFromSave(decoded.save)
     expect(restored.personalProgression).toEqual(session.personalProgression)
