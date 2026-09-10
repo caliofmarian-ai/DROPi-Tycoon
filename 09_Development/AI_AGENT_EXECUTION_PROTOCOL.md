@@ -1,11 +1,11 @@
 # Document Information
 
-Document: AI_AGENT_EXECUTION_PROTOCOL.md  
-Project: DROPi Tycoon  
-Version: 1.3.0  
-Status: AI Development Operations  
-Author: Marian Caliof & OpenAI  
-Language: English  
+Document: AI_AGENT_EXECUTION_PROTOCOL.md
+Project: DROPi Tycoon
+Version: 1.3.0
+Status: AI Development Operations
+Author: Marian Caliof & OpenAI
+Language: English
 Last Updated: 2026-09-10
 
 ---
@@ -14,206 +14,382 @@ Last Updated: 2026-09-10
 
 ## Purpose
 
-This document defines how AI development agents operate during the creation of DROPi Tycoon. Agents collaborate through explicit authority, GitHub evidence, persistent repository-backed handoffs and current canonical project documents.
+This document defines how AI development agents operate during the creation of DROPi Tycoon.
 
-AI agents are production assistants. The Project Owner remains vision owner, final decision maker and quality controller.
+The goal is to create a controlled workflow where AI agents collaborate while maintaining project consistency.
 
-## Deterministic session bootstrap
+---
 
-Every new DT-00 or DT specialist session MUST begin at:
+# Operating Principle
+
+AI agents are production assistants.
+
+They do not replace project direction.
+
+The human role remains:
+
+- Vision owner
+- Final decision maker
+- Quality controller
+
+---
+
+# Agent Execution Order
+
+Agents must operate in the following sequence:
+
+```
+Architecture Agent
+
+↓
+
+Game Design Agent
+
+↓
+
+Implementation Agent
+
+↓
+
+Testing Agent
+
+↓
+
+Documentation Agent
+```
+
+---
+
+# 1. Architecture Agent
+
+## Mission
+
+Protect the project structure.
+
+## Responsibilities
+
+- Verify consistency between documents
+- Check dependencies
+- Prevent unnecessary complexity
+- Confirm implementation direction
+
+## Output
+
+Architecture approval or correction request.
+
+---
+
+# 2. Game Design Agent
+
+## Mission
+
+Transform concepts into playable mechanics.
+
+## Responsibilities
+
+- Define gameplay rules
+- Review player experience
+- Validate progression
+- Maintain MVP focus
+
+## Output
+
+Gameplay specifications.
+
+---
+
+# 3. Implementation Agent
+
+## Mission
+
+Convert approved specifications into the current approved runtime and application architecture.
+
+## Responsibilities
+
+- Inspect the current canonical platform/runtime documents before choosing tools or targets
+- Create or modify scenes and application surfaces
+- Configure game/runtime objects
+- Build game logic through the authoritative game runtime
+- Connect systems without duplicating canonical domain rules in platform shells
+
+## Output
+
+Working game components in the currently approved architecture.
+
+Historical GDevelop, Web-First, or other superseded implementation reports must not be treated as current platform authority.
+
+---
+
+# 4. Testing Agent
+
+## Mission
+
+Verify functionality and player experience.
+
+## Responsibilities
+
+- Test features
+- Identify problems
+- Verify requirements
+- Suggest improvements
+
+## Output
+
+Testing report.
+
+---
+
+# 5. Documentation Agent
+
+## Mission
+
+Maintain project knowledge.
+
+## Responsibilities
+
+- Update MD files
+- Record changes
+- Maintain version history
+
+## Output
+
+Updated documentation.
+
+---
+
+# Agent Communication Rules
+
+Agents must communicate through:
+
+- Documentation
+- Defined outputs
+- Clear decisions
+
+Avoid:
+
+- Hidden assumptions
+- Unrecorded changes
+- Conflicting implementations
+
+---
+
+# Persistent AI Reporting Requirement
+
+For significant AI tasks, agents must follow:
+
+`09_Development/AI_REPORTING_PROTOCOL.md`
+
+A significant task is not operationally complete until the required persistent report is created or updated according to that protocol.
+
+---
+
+# Persistent AI Project Memory and Handoff Requirement
+
+Every DT-00 and DT specialist session must begin at the deterministic repository bootstrap:
 
 `09_Development/AI_Project_Memory/BOOTSTRAP.md`
 
-A session must not rely on prior ChatGPT conversation memory to reconstruct current operational state.
-
-The bootstrap defines the mandatory read order, live-GitHub reconciliation rule, authority-layer separation and safe-resume procedure.
-
-## Persistent operational-memory invariant
+A session must not depend on prior ChatGPT conversation memory to reconstruct current operational state.
 
 For every significant session:
 
 `NO DURABLE HANDOFF = SESSION NOT OPERATIONALLY COMPLETE`
 
-Before a significant session is considered closed, paused, superseded, READY, HOLD or handed off, repository-backed state must preserve at least:
+Before a significant session is considered closed, paused, superseded, READY, HOLD, or handed off, the repository-backed handoff must preserve at least:
 
 - agent identity;
 - ownership boundary;
 - mission;
-- observed canonical main SHA and live-reconciliation requirement;
+- observed canonical `main` SHA plus a live-reconciliation requirement;
 - Issue/PR/branch/head SHA where applicable;
 - exact status;
 - material findings and evidence;
 - Owner decisions/directives;
 - materially important rejected assumptions;
-- unresolved UNKNOWNs;
+- unresolved `UNKNOWN`s;
 - blockers/dependencies;
 - exact-head CI state where relevant;
 - currently forbidden actions;
 - next safe action;
 - canonical/report references.
 
-Missing evidence is `UNKNOWN`. It must never be filled from assumption or fabricated history.
+Missing evidence remains `UNKNOWN` and must not be reconstructed from assumption.
 
-The current durable handoff authority is:
-
-`09_Development/AI_Project_Memory/HANDOFFS.json`
-
-The current project-operational snapshot is:
-
-`09_Development/AI_Project_Memory/CURRENT_STATE.json`
-
-## Live GitHub rule
-
-Repository memory stores the last durable observation. Before implementation, READY, audit, merge or lifecycle mutation, agents must re-read live GitHub for mutable state including:
-
-- current `main` SHA;
-- Issue state/body/comments;
-- PR state/base/head/draft/mergeability;
-- branch head;
-- exact-head checks/CI;
-- merge state.
-
-Live GitHub wins for mutable GitHub state. Persisted values must be classified `CURRENT`, `STALE`, `CONTRADICTORY` or `UNKNOWN` when reconciled.
-
-## Authority-layer separation
-
-Agents must keep these layers distinct:
+The persistent-memory layers are intentionally separate:
 
 1. canonical project/domain authority;
 2. historical `09_Development/AI_Reports/`;
 3. operational project memory;
 4. agent/session handoffs;
 5. durable decision records;
-6. UNKNOWN/blocker register.
+6. the `UNKNOWN`/blocker register.
 
-Operational memory and AI reports must never silently rewrite gameplay, architecture, economy, legal or other domain authority.
+Current operational files live under:
 
-Raw/hidden model chain-of-thought is out of scope. Persist useful engineering conclusions, evidence, decisions, appropriate rationale, constraints, rejected assumptions, ownership, blockers, UNKNOWNs, status and next safe action only.
+`09_Development/AI_Project_Memory/`
 
-## Agent execution roles
+Live GitHub remains authoritative for mutable GitHub state. Before implementation, READY, audit, merge, or lifecycle mutation, agents must re-read current `main`, Issue/PR state, branch/head, mergeability, and exact-head CI as applicable. Persisted state must be reconciled as `CURRENT`, `STALE`, `CONTRADICTORY`, or `UNKNOWN`.
 
-Where a task uses the legacy execution-role model, the sequence remains:
+Raw or hidden model chain-of-thought is out of scope. Persist useful engineering conclusions, evidence, decisions, appropriate rationale, constraints, rejected assumptions, ownership, blockers, `UNKNOWN`s, status, and next safe action only.
 
-```text
-Architecture Agent
--> Game Design Agent
--> Implementation Agent
--> Testing Agent
--> Documentation Agent
-```
+DT ownership and orchestration assigned by DT-00 take precedence over generic execution-role wording when the repository contains a current DT handoff. No agent may silently take another DT lane's authority.
 
-DT ownership and orchestration assigned by DT-00 take precedence for current multi-agent work. No role may take another DT lane's canonical authority without explicit reconciliation.
+No self-merge or auto-merge is authorized by this memory protocol.
 
-### Architecture Agent
-Protect project structure, verify consistency/dependencies, prevent unnecessary complexity and confirm implementation direction.
-
-### Game Design Agent
-Transform approved concepts into playable mechanics, review player experience/progression and maintain MVP focus.
-
-### Implementation Agent
-Convert approved specifications into the current runtime/application architecture. Inspect current canonical platform/runtime documents before selecting tools or targets. Do not revive superseded GDevelop/Web-First assumptions or duplicate canonical domain rules in platform shells.
-
-### Testing Agent
-Verify requirements, functionality, regressions and player experience using exact evidence.
-
-### Documentation Agent
-Maintain project knowledge, canonical documentation where authorized, version history, persistent reports and durable operational handoffs.
-
-## Agent communication rules
-
-Agents communicate through repository documentation, defined outputs, GitHub evidence, durable handoffs and clear decisions.
-
-Avoid hidden assumptions, unrecorded changes, stale-state claims and conflicting implementations.
-
-Owner-facing material execution reports must follow the current DT-00 reporting contract. Marian-facing operational explanations are written in Romanian; technical identifiers, paths, SHAs, code, commands and machine-status tokens may remain in English.
-
-## Persistent AI reporting requirement
-
-Significant AI tasks must also follow:
-
-`09_Development/AI_REPORTING_PROTOCOL.md`
-
-Historical reporting and current operational handoff are complementary requirements. Completing one does not waive the other.
-
-## Task execution format
-
-Every task should define:
-
-```text
-Task Name
-Objective
-Required Input
-Expected Output
-Validation Method
-```
-
-## Change approval and ownership rules
-
-Agents must not independently change game vision, add major systems, modify architecture, expand MVP scope or take another specialist's authority. Material conflicts or scope expansion require DT-00/Owner reconciliation.
-
-No self-merge or auto-merge is authorized by this protocol. Current DT-00 governance controls merge approval and exact-head verification.
-
-## Owner Directives inspection rule
-
-Before proposing or implementing any major change to architecture, universe design, business model, logistics, economy, marketplace, runtime or documentation structure, inspect:
-
-`09_Development/Owner_Directives/`
-
-Rules:
-
-1. Relevant Owner Directives must be acknowledged and considered.
-2. They must never be silently ignored.
-3. They must not be copied wholesale into canonical domain documents; integration requires a governed task.
-4. Conflicts with existing canon must be surfaced, never silently overwritten.
-
-Owner Directives are authoritative strategic inputs, not automatically canonical domain specifications. See `09_Development/Owner_Directives/README.md`.
-
-## Mobile platform canon inspection rule
-
-Before major platform/runtime/Android/Expo/deployment/camera/viewport/persistence-adapter/distribution change, read and reconcile:
-
-1. `00_Project/VISION.md`;
-2. `06_Technical/ARCHITECTURE.md`;
-3. `06_Technical/MOBILE_APPLICATION_PLATFORM.md`;
-4. `06_Technical/SAVE_SYSTEM.md` when persistence is affected;
-5. `00_Project/PROJECT_STATUS.md` and the active GitHub Issue/PR.
-
-Do not assume Chrome/Railway is the primary final gameplay surface, that the browser is the Owner acceptance target, that Expo requires rewriting Phaser gameplay in React Native, that one fixed browser/camera geometry fits all Android devices, or that a native shell authorizes unrelated gameplay/economy/domain changes.
-
-If required canonical platform documents disagree, surface the contradiction before implementation.
-
-## Error handling
-
-When information is missing or conflicting:
-
-- first inspect the deterministic bootstrap, durable handoff, referenced GitHub state and relevant canonical authority;
-- record unresolved information as `UNKNOWN`;
-- stop only the unsafe dependent action when the conflict cannot be resolved from authoritative evidence;
-- escalate through DT-00/Owner when a real authority decision is required.
-
-Do not ask the Owner to manually reconstruct project context that #683 requires the repository to preserve.
-
-## Version control and validation
-
-Important AI-generated changes require traceable commits, clear description and validation evidence. Exact-head CI must be used when relevant to a merge/readiness decision.
-
-Persistent-memory structure can be checked with:
+The memory validator may be run with:
 
 ```bash
 node 09_Development/AI_Project_Memory/validate-memory.mjs
 ```
 
-The validator supplements, but never replaces, live GitHub reconciliation and DT-00 audit.
+The validator supplements, but does not replace, live GitHub reconciliation and DT-00 exact-head audit.
 
-## MVP protection
+Owner-facing material operational reports for Marian are written in Romanian. Exact technical identifiers, paths, SHAs, code, commands, and machine-status tokens may remain in English.
 
-Prioritize core gameplay, stability and simplicity. Avoid feature inflation, premature optimization and unnecessary complexity.
+---
 
-## Canonical rule
+# Task Execution Format
 
-AI agents build according to the vision, current canonical architecture, current DT ownership and repository-backed operational state.
+Every task should contain:
 
-They do not create a different game, revive superseded platform assumptions or depend on private conversation memory for project continuity.
+```
+Task Name
+
+Objective
+
+Required Input
+
+Expected Output
+
+Validation Method
+```
+
+---
+
+# Change Approval Rules
+
+AI agents must request approval before:
+
+- Changing game vision
+- Adding major systems
+- Modifying architecture
+- Expanding MVP scope
+
+---
+
+# Owner Directives Inspection Rule
+
+Before proposing or implementing any major change to architecture, universe design, business model, logistics, economy, marketplace, runtime, or documentation structure, AI agents **must** inspect:
+
+`09_Development/Owner_Directives/`
+
+**Rules:**
+
+1. If a relevant Owner Directive exists, its contents must be acknowledged and considered before any proposal proceeds.
+2. An Owner Directive must never be silently ignored.
+3. An Owner Directive must never be copied wholesale into canonical documents. Integration requires a dedicated canonical integration task.
+4. If a directive conflicts with existing canonical documents, the conflict must be surfaced and reported — never silently merged or overwritten.
+
+Owner Directives are authoritative strategic inputs from the Project Owner. They are not automatically canonical documentation. See `09_Development/Owner_Directives/README.md` for the complete governance rules.
+
+---
+
+# Mobile Platform Canon Inspection Rule
+
+Before proposing or implementing any major platform, runtime, Android packaging, Expo/native-shell, deployment, camera, viewport, persistence-adapter, or distribution change, AI agents **must** read and reconcile:
+
+1. `00_Project/VISION.md`;
+2. `06_Technical/ARCHITECTURE.md`;
+3. `06_Technical/MOBILE_APPLICATION_PLATFORM.md`;
+4. `06_Technical/SAVE_SYSTEM.md` when persistence is affected;
+5. `00_Project/PROJECT_STATUS.md` and the active GitHub issue/PR.
+
+Current platform authority explicitly supersedes older historical Web-First or GDevelop implementation reports where they conflict.
+
+Agents must not assume that:
+
+- Chrome/Railway is the primary final gameplay surface;
+- the browser is still the Project Owner acceptance target;
+- adding an Expo/React Native shell means rewriting Phaser gameplay in React Native;
+- fixed browser dimensions or one hardcoded camera zoom are acceptable for all Android devices;
+- a native-shell migration authorizes changes to gameplay, economy, employees, reviews, or other domain rules;
+- Vehicle Fleet PR #288 should resume before the Android application/camera foundation receives Project Owner acceptance.
+
+If the required canonical platform documents disagree, the agent must surface the contradiction before implementation rather than choosing one silently.
+
+---
+
+# Error Handling
+
+If an agent detects:
+
+- Missing information
+- Conflicting documents
+- Unclear requirements
+
+It must stop and request clarification.
+
+For missing project-continuity context covered by Issue #683, the agent must first exhaust the deterministic repository bootstrap, current handoff, referenced live GitHub state, and relevant canonical authority. It must not require the Project Owner to manually reconstruct context that the persistent-memory protocol is required to preserve. Unresolved evidence remains `UNKNOWN`.
+
+---
+
+# Version Control
+
+Each important AI-generated change should have:
+
+- Version number
+- Description
+- Test result
+
+---
+
+# MVP Protection
+
+Agents must prioritize:
+
+- Core gameplay
+- Stability
+- Simplicity
+
+Agents must avoid:
+
+- Feature inflation
+- Premature optimization
+- Unnecessary complexity
+
+---
+
+# Final Objective
+
+The AI agent system should transform:
+
+Vision
+
+↓
+
+Design
+
+↓
+
+Implementation
+
+↓
+
+Testing
+
+↓
+
+Playable Prototype
+
+---
+
+# Canonical Rule
+
+AI agents build according to the vision and current canonical architecture.
+
+They do not create a different game and they do not revive superseded platform assumptions without Project Owner approval.
+
+For operational continuity, they also consume and maintain the repository-backed Persistent AI Project Memory defined by `09_Development/AI_Project_Memory/BOOTSTRAP.md`; this operational layer does not replace canonical domain authority.
 
 ---
 
