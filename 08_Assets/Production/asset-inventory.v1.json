@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "authority": "DT-19 — ART ASSET PIPELINE / PRODUCTION LIBRARY",
-  "baselineCommit": "d3a57d9814869eb5110f6f55ca53ce2db2299918",
+  "baselineCommit": "f8453cbaa522a54406940d5056f5a5943627d86c",
   "canonicalLifecycle": [
     "INVENTORIED",
     "SPECIFIED",
@@ -28,6 +28,20 @@
     "runtimeEvidenceManifestRef": "game-web/public/legal/runtime-provenance.json",
     "rule": "DT-19 records production identity, lifecycle and lineage. DT-13 qualifies legal/commercial release evidence. The runtime evidence manifest is evidence consumed by DT-13/DT-19 and is not itself a legal authority."
   },
+  "presenceModel": {
+    "libraryPresenceValues": [
+      "LIBRARY_PRESENT",
+      "LIBRARY_NOT_FOUND_IN_AUDIT",
+      "LIBRARY_NOT_AUDITED"
+    ],
+    "repositoryPresenceValues": [
+      "REPOSITORY_ATTESTED",
+      "REPOSITORY_ATTESTED_DERIVATIVES_ONLY",
+      "NOT_ATTESTED_ON_MAIN"
+    ],
+    "ingestionOwner": "#413",
+    "rule": "Persistent Library presence, canonical GitHub repository attestation, DT-19 lifecycle state and DT-13 legal/commercial qualification are independent dimensions. Library evidence is an input to deduplication and generation decisions; it does not ingest, promote or legally clear an asset."
+  },
   "dedupDimensions": [
     "semanticFamily",
     "silhouetteOrForm",
@@ -45,14 +59,18 @@
       "familyId": "BRAND-DROPI-TYCOON",
       "semanticFamily": "product-branding",
       "lifecycleState": "APPROVED_SOURCE",
-      "repositoryAvailability": "SOURCE_ARTIFACTS_PRESENT",
+      "libraryPresence": "LIBRARY_PRESENT",
+      "repositoryPresence": "REPOSITORY_ATTESTED",
+      "libraryArtifactRef": "library-approved-assets-2026-09-05",
       "evidenceRefs": ["08_Assets/ASSETS.md"]
     },
     {
       "familyId": "SRC-20260907-001",
       "semanticFamily": "mixed-world-asset-audit-seed",
       "lifecycleState": "APPROVED_SOURCE",
-      "repositoryAvailability": "CANDIDATE_DERIVATIVES_PRESENT",
+      "libraryPresence": "LIBRARY_PRESENT",
+      "repositoryPresence": "REPOSITORY_ATTESTED_DERIVATIVES_ONLY",
+      "libraryArtifactRef": "library-source-board-src-20260907-001",
       "evidenceRefs": [
         "08_Assets/Production/Approved_Sources/2026-09-07_GENERATED_FAMILY_REGISTRY.md",
         "08_Assets/Production/Candidates/Legacy_Board_Crops_v1/README.md"
@@ -62,64 +80,218 @@
       "familyId": "SRC-20260907-002",
       "semanticFamily": "civic-special-buildings",
       "lifecycleState": "APPROVED_SOURCE",
-      "repositoryAvailability": "REGISTRY_ONLY_BINARY_NOT_ATTESTED",
+      "libraryPresence": "LIBRARY_PRESENT",
+      "repositoryPresence": "NOT_ATTESTED_ON_MAIN",
+      "libraryArtifactRef": "library-source-board-src-20260907-002",
       "evidenceRefs": ["08_Assets/Production/Approved_Sources/2026-09-07_GENERATED_FAMILY_REGISTRY.md"]
     },
     {
       "familyId": "SRC-20260907-003",
       "semanticFamily": "multimodal-infrastructure",
       "lifecycleState": "APPROVED_SOURCE",
-      "repositoryAvailability": "REGISTRY_ONLY_BINARY_NOT_ATTESTED",
+      "libraryPresence": "LIBRARY_PRESENT",
+      "repositoryPresence": "NOT_ATTESTED_ON_MAIN",
+      "libraryArtifactRef": "library-source-board-src-20260907-003",
       "evidenceRefs": ["08_Assets/Production/Approved_Sources/2026-09-07_GENERATED_FAMILY_REGISTRY.md"]
     },
     {
       "familyId": "SRC-20260907-004",
       "semanticFamily": "transport-fleet",
       "lifecycleState": "APPROVED_SOURCE",
-      "repositoryAvailability": "REGISTRY_ONLY_BINARY_NOT_ATTESTED",
+      "libraryPresence": "LIBRARY_PRESENT",
+      "repositoryPresence": "NOT_ATTESTED_ON_MAIN",
+      "libraryArtifactRef": "library-source-board-src-20260907-004",
       "evidenceRefs": ["08_Assets/Production/Approved_Sources/2026-09-07_GENERATED_FAMILY_REGISTRY.md"]
     },
     {
       "familyId": "SRC-20260907-005",
       "semanticFamily": "industry-energy-utility-production",
       "lifecycleState": "APPROVED_SOURCE",
-      "repositoryAvailability": "REGISTRY_ONLY_BINARY_NOT_ATTESTED",
+      "libraryPresence": "LIBRARY_PRESENT",
+      "repositoryPresence": "NOT_ATTESTED_ON_MAIN",
+      "libraryArtifactRef": "library-source-board-src-20260907-005",
       "evidenceRefs": ["08_Assets/Production/Approved_Sources/2026-09-07_GENERATED_FAMILY_REGISTRY.md"]
     },
     {
       "familyId": "SRC-20260907-006",
       "semanticFamily": "city-architecture-district-kits",
       "lifecycleState": "APPROVED_SOURCE",
-      "repositoryAvailability": "REGISTRY_ONLY_BINARY_NOT_ATTESTED",
+      "libraryPresence": "LIBRARY_PRESENT",
+      "repositoryPresence": "NOT_ATTESTED_ON_MAIN",
+      "libraryArtifactRef": "library-source-board-src-20260907-006",
       "evidenceRefs": ["08_Assets/Production/Approved_Sources/2026-09-07_GENERATED_FAMILY_REGISTRY.md"]
     },
     {
       "familyId": "SRC-20260907-007",
       "semanticFamily": "map-network-modules",
       "lifecycleState": "APPROVED_SOURCE",
-      "repositoryAvailability": "REGISTRY_ONLY_BINARY_NOT_ATTESTED",
+      "libraryPresence": "LIBRARY_PRESENT",
+      "repositoryPresence": "NOT_ATTESTED_ON_MAIN",
+      "libraryArtifactRef": "library-source-board-src-20260907-007",
       "evidenceRefs": ["08_Assets/Production/Approved_Sources/2026-09-07_GENERATED_FAMILY_REGISTRY.md"]
     },
     {
       "familyId": "SRC-20260907-008",
       "semanticFamily": "workforce-specialists",
       "lifecycleState": "APPROVED_SOURCE",
-      "repositoryAvailability": "REGISTRY_ONLY_BINARY_NOT_ATTESTED",
+      "libraryPresence": "LIBRARY_PRESENT",
+      "repositoryPresence": "NOT_ATTESTED_ON_MAIN",
+      "libraryArtifactRef": "library-source-board-src-20260907-008",
       "evidenceRefs": ["08_Assets/Production/Approved_Sources/2026-09-07_GENERATED_FAMILY_REGISTRY.md"]
     },
     {
       "familyId": "SRC-20260907-009",
       "semanticFamily": "nature-biomes-animals-farm",
       "lifecycleState": "APPROVED_SOURCE",
-      "repositoryAvailability": "REGISTRY_ONLY_BINARY_NOT_ATTESTED",
+      "libraryPresence": "LIBRARY_PRESENT",
+      "repositoryPresence": "NOT_ATTESTED_ON_MAIN",
+      "libraryArtifactRef": "library-source-board-src-20260907-009",
       "evidenceRefs": ["08_Assets/Production/Approved_Sources/2026-09-07_GENERATED_FAMILY_REGISTRY.md"]
     },
     {
       "familyId": "SRC-20260907-010",
       "semanticFamily": "products-cargo-volume-2",
       "lifecycleState": "APPROVED_SOURCE",
-      "repositoryAvailability": "REGISTRY_ONLY_BINARY_NOT_ATTESTED",
+      "libraryPresence": "LIBRARY_PRESENT",
+      "repositoryPresence": "NOT_ATTESTED_ON_MAIN",
+      "libraryArtifactRef": "library-source-board-src-20260907-010",
       "evidenceRefs": ["08_Assets/Production/Approved_Sources/2026-09-07_GENERATED_FAMILY_REGISTRY.md"]
+    }
+  ],
+  "externalLibraryArtifacts": [
+    {
+      "artifactId": "library-approved-assets-2026-09-05",
+      "classification": "OWNER_APPROVED_ASSET_PACKAGE",
+      "libraryPresence": "LIBRARY_PRESENT",
+      "repositoryPresence": "NOT_ATTESTED_ON_MAIN",
+      "libraryFileId": "file_000000002ec8821084f3cc999d6af6e8",
+      "libraryPath": "/DROPi Tycon/DROPi_Tycoon_Approved_Assets_2026-09-05.zip",
+      "sha256": "53f1b51dccb404c9eefbe97d6dc7fead7c9ad47dea6c16ee87e0355f315237bf",
+      "repositoryContentMatches": [
+        "game-mobile/assets/branding/dropi-tycoon-logo.png",
+        "game-mobile/assets/branding/dropi-tycoon-app-icon.png",
+        "game-mobile/assets/branding/dropi-tycoon-splash.jpg"
+      ],
+      "libraryOnlyMembers": [
+        "reference/delivery-progression-reference.jpg",
+        "reference/dropi-tycoon-brand-concept-e.jpg",
+        "reference/dropi-port-employee-activity-reference.jpg"
+      ],
+      "rule": "The ZIP itself is Library-only. Three production members have exact SHA-256 identities already attested by the canonical mobile branding contract/runtime files; the three reference members remain Library-only in this audit."
+    },
+    {
+      "artifactId": "library-source-board-src-20260907-001",
+      "familyId": "SRC-20260907-001",
+      "classification": "SOURCE_BOARD",
+      "libraryPresence": "LIBRARY_PRESENT",
+      "repositoryPresence": "NOT_ATTESTED_ON_MAIN",
+      "libraryFileId": "file_00000000565881f4b05d16b4a2f58b0d",
+      "libraryPath": "/DROPi Tycon/Auditoria de activos Dropi Tycoon.png"
+    },
+    {
+      "artifactId": "library-source-board-src-20260907-002",
+      "familyId": "SRC-20260907-002",
+      "classification": "SOURCE_BOARD",
+      "libraryPresence": "LIBRARY_PRESENT",
+      "repositoryPresence": "NOT_ATTESTED_ON_MAIN",
+      "libraryFileId": "file_00000000ff2c81f4b146df2c8ebe64c8",
+      "libraryPath": "/DROPi Tycon/image-gen-1(8).png"
+    },
+    {
+      "artifactId": "library-source-board-src-20260907-003",
+      "familyId": "SRC-20260907-003",
+      "classification": "SOURCE_BOARD",
+      "libraryPresence": "LIBRARY_PRESENT",
+      "repositoryPresence": "NOT_ATTESTED_ON_MAIN",
+      "libraryFileId": "file_00000000290081f4a028a6b7642e5425",
+      "libraryPath": "/DROPi Tycon/image-gen-2(8).png"
+    },
+    {
+      "artifactId": "library-source-board-src-20260907-004",
+      "familyId": "SRC-20260907-004",
+      "classification": "SOURCE_BOARD",
+      "libraryPresence": "LIBRARY_PRESENT",
+      "repositoryPresence": "NOT_ATTESTED_ON_MAIN",
+      "libraryFileId": "file_00000000bcf88210ad58621f4fd6eea1",
+      "libraryPath": "/DROPi Tycon/image-gen-3(5).png"
+    },
+    {
+      "artifactId": "library-source-board-src-20260907-005",
+      "familyId": "SRC-20260907-005",
+      "classification": "SOURCE_BOARD",
+      "libraryPresence": "LIBRARY_PRESENT",
+      "repositoryPresence": "NOT_ATTESTED_ON_MAIN",
+      "libraryFileId": "file_00000000427c82108f9acb5019bc8d05",
+      "libraryPath": "/DROPi Tycon/image-gen-4(2).png"
+    },
+    {
+      "artifactId": "library-source-board-src-20260907-006",
+      "familyId": "SRC-20260907-006",
+      "classification": "SOURCE_BOARD",
+      "libraryPresence": "LIBRARY_PRESENT",
+      "repositoryPresence": "NOT_ATTESTED_ON_MAIN",
+      "libraryFileId": "file_00000000a5cc81f49304e75f2d85cca4",
+      "libraryPath": "/DROPi Tycon/image-gen-5(1).png"
+    },
+    {
+      "artifactId": "library-source-board-src-20260907-007",
+      "familyId": "SRC-20260907-007",
+      "classification": "SOURCE_BOARD",
+      "libraryPresence": "LIBRARY_PRESENT",
+      "repositoryPresence": "NOT_ATTESTED_ON_MAIN",
+      "libraryFileId": "file_00000000c6d08210862952401db2646c",
+      "libraryPath": "/DROPi Tycon/image-gen-6(1).png"
+    },
+    {
+      "artifactId": "library-source-board-src-20260907-008",
+      "familyId": "SRC-20260907-008",
+      "classification": "SOURCE_BOARD",
+      "libraryPresence": "LIBRARY_PRESENT",
+      "repositoryPresence": "NOT_ATTESTED_ON_MAIN",
+      "libraryFileId": "file_00000000d18081f4bea0b1b6172e1fb7",
+      "libraryPath": "/DROPi Tycon/image-gen-7(1).png"
+    },
+    {
+      "artifactId": "library-source-board-src-20260907-009",
+      "familyId": "SRC-20260907-009",
+      "classification": "SOURCE_BOARD",
+      "libraryPresence": "LIBRARY_PRESENT",
+      "repositoryPresence": "NOT_ATTESTED_ON_MAIN",
+      "libraryFileId": "file_00000000fd308243a84bd623d24ddc50",
+      "libraryPath": "/DROPi Tycon/image-gen-8.png"
+    },
+    {
+      "artifactId": "library-source-board-src-20260907-010",
+      "familyId": "SRC-20260907-010",
+      "classification": "SOURCE_BOARD",
+      "libraryPresence": "LIBRARY_PRESENT",
+      "repositoryPresence": "NOT_ATTESTED_ON_MAIN",
+      "libraryFileId": "file_00000000f95081f48b8dbd41fc77e30a",
+      "libraryPath": "/DROPi Tycon/image-gen-9.png"
+    },
+    {
+      "artifactId": "library-crops-q55",
+      "familyId": "SRC-20260907-001",
+      "classification": "ALTERNATE_CANDIDATE_ARCHIVE",
+      "libraryPresence": "LIBRARY_PRESENT",
+      "repositoryPresence": "NOT_ATTESTED_ON_MAIN",
+      "libraryFileId": "file_000000009e3882108833d09a3e27f79e",
+      "libraryPath": "/DROPi Tycon/crops_q55.zip",
+      "sha256": "7d40b94db14fc0c81e18936ff6ae40b2b4b0dae27b01f0fec0201f8a2ccc5a46",
+      "memberAssetCount": 50,
+      "rule": "Same 50 logical candidate paths as the repository crop collection, but direct member hashes differ; this is a Library-only alternate derivative archive, not repository attestation."
+    },
+    {
+      "artifactId": "library-crops-q68",
+      "familyId": "SRC-20260907-001",
+      "classification": "ALTERNATE_CANDIDATE_ARCHIVE",
+      "libraryPresence": "LIBRARY_PRESENT",
+      "repositoryPresence": "NOT_ATTESTED_ON_MAIN",
+      "libraryFileId": "file_00000000b22481f48156c90474b1de5d",
+      "libraryPath": "/DROPi Tycon/crops_q68.zip",
+      "sha256": "ecaad32e48489185aabede8dbaae04469db0a1460e2c3cc8f591157999943032",
+      "memberAssetCount": 50,
+      "rule": "Same 50 logical candidate paths as the repository crop collection, but direct member hashes differ; this is a Library-only alternate derivative archive, not repository attestation."
     }
   ],
   "approvedFamilyAliases": [
@@ -292,9 +464,10 @@
       "packageId": "batch-001-extracted-candidate-package",
       "documentedAssetCount": 248,
       "sha256": "979ceef61c1486a4c5c486ed6433fb24fef9edfbbb78aa8f24fa404fd91aa91d",
-      "repositoryPresence": "DOCUMENTED_NOT_ATTESTED_ON_MAIN",
+      "libraryPresence": "LIBRARY_NOT_FOUND_IN_AUDIT",
+      "repositoryPresence": "NOT_ATTESTED_ON_MAIN",
       "evidenceRef": "08_Assets/Production/Manifests/BATCH_001_EXTRACTED_CANDIDATE_INDEX.md",
-      "rule": "Documentation of a package does not make its unmirrored binaries available to the canonical library."
+      "rule": "Documentation alone does not make unmirrored bytes REPOSITORY_ATTESTED. The 2026-09-10 Library audit did not identify this package by recorded hash/name; that audit result is not a claim that the package cannot exist elsewhere."
     }
   ]
 }
