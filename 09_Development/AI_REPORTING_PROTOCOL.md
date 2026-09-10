@@ -2,11 +2,11 @@
 
 Document: AI_REPORTING_PROTOCOL.md
 Project: DROPi Tycoon
-Version: 1.0.0
+Version: 1.1.0
 Status: Persistent AI Task Reporting Governance
 Author: Marian Caliof & OpenAI
 Language: English
-Last Updated: 2026-07-12
+Last Updated: 2026-09-10
 
 ---
 
@@ -81,6 +81,22 @@ If a task is not clearly trivial, create a report.
 # Operational Completion Rule
 
 A significant AI task is not operationally complete until its persistent report is created or updated under this protocol.
+
+For DT-00 and DT specialist sessions, historical reporting is complemented by repository-backed operational memory.
+
+`NO DURABLE HANDOFF = SESSION NOT OPERATIONALLY COMPLETE`
+
+Before a significant DT session is closed, paused, superseded, marked READY/HOLD, or handed off, the current operational handoff must also be persisted under:
+
+`09_Development/AI_Project_Memory/HANDOFFS.json`
+
+A historical report does not replace the current handoff, and the current handoff does not replace the historical report.
+
+A fresh DT session starts from:
+
+`09_Development/AI_Project_Memory/BOOTSTRAP.md`
+
+Mutable GitHub facts must be re-read from live GitHub before implementation, READY, audit, merge, or lifecycle mutation. Persisted GitHub state is a durable observation, not immutable truth. Missing evidence remains `UNKNOWN`.
 
 ---
 
@@ -285,6 +301,8 @@ AI task reports are historical records.
 
 They must not be treated as canonical gameplay, architecture, prototype scope, or implementation specifications unless a canonical document is explicitly updated and approved.
 
+Operational memory under `09_Development/AI_Project_Memory/` is also not canonical domain authority. It records resumable execution state and references the authorities that control the work.
+
 ---
 
 # Report Integrity Rules
@@ -298,6 +316,26 @@ They must not be treated as canonical gameplay, architecture, prototype scope, o
 
 ---
 
+# Owner-Facing DT Reporting Rule
+
+For material DT work cycles, GitHub remains the technical evidence/journal while the Project Owner receives a concise operational report in Romanian.
+
+That owner-facing report must explain:
+
+- BEFORE
+- CHANGED
+- AFTER
+- PLAYER/GAME IMPACT, explicitly `NO PLAYER-VISIBLE CHANGE` when applicable
+- MERGE STATUS
+- RISKS / WHAT REMAINS
+- NEXT OWNER ACTION
+
+Technical identifiers, file paths, branch names, SHA values, code, commands, and machine-status tokens such as PASS, FAIL, READY, HOLD, UNKNOWN, CURRENT, STALE, and CONTRADICTORY may remain in English.
+
+A specialist must not reduce a material owner-facing report to only `continua`, `HOLD`, `READY`, or another status word.
+
+---
+
 # Relationship with Other Governance Documents
 
 This protocol is mandatory and complementary to:
@@ -305,6 +343,7 @@ This protocol is mandatory and complementary to:
 - `00_Project/PROJECT_INTAKE_PROTOCOL.md`
 - `09_Development/AI_AGENT_EXECUTION_PROTOCOL.md`
 - `09_Development/GITHUB_WORKFLOW.md`
+- `09_Development/AI_Project_Memory/BOOTSTRAP.md`
 - Future audit documents
 
 If a conflict is detected, escalate for human resolution and do not expand scope.
@@ -316,6 +355,8 @@ If a conflict is detected, escalate for human resolution and do not expand scope
 Significant AI work must be persisted, traceable, and reviewable through reports in:
 
 `09_Development/AI_Reports/`
+
+For DT sessions, the required current operational handoff is additionally persisted under `09_Development/AI_Project_Memory/` and live-reconciled before action.
 
 ---
 

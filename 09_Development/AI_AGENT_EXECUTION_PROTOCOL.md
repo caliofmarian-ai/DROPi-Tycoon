@@ -2,11 +2,11 @@
 
 Document: AI_AGENT_EXECUTION_PROTOCOL.md
 Project: DROPi Tycoon
-Version: 1.2.0
+Version: 1.3.0
 Status: AI Development Operations
 Author: Marian Caliof & OpenAI
 Language: English
-Last Updated: 2026-09-05
+Last Updated: 2026-09-10
 
 ---
 
@@ -183,6 +183,71 @@ A significant task is not operationally complete until the required persistent r
 
 ---
 
+# Persistent AI Project Memory and Handoff Requirement
+
+Every DT-00 and DT specialist session must begin at the deterministic repository bootstrap:
+
+`09_Development/AI_Project_Memory/BOOTSTRAP.md`
+
+A session must not depend on prior ChatGPT conversation memory to reconstruct current operational state.
+
+For every significant session:
+
+`NO DURABLE HANDOFF = SESSION NOT OPERATIONALLY COMPLETE`
+
+Before a significant session is considered closed, paused, superseded, READY, HOLD, or handed off, the repository-backed handoff must preserve at least:
+
+- agent identity;
+- ownership boundary;
+- mission;
+- observed canonical `main` SHA plus a live-reconciliation requirement;
+- Issue/PR/branch/head SHA where applicable;
+- exact status;
+- material findings and evidence;
+- Owner decisions/directives;
+- materially important rejected assumptions;
+- unresolved `UNKNOWN`s;
+- blockers/dependencies;
+- exact-head CI state where relevant;
+- currently forbidden actions;
+- next safe action;
+- canonical/report references.
+
+Missing evidence remains `UNKNOWN` and must not be reconstructed from assumption.
+
+The persistent-memory layers are intentionally separate:
+
+1. canonical project/domain authority;
+2. historical `09_Development/AI_Reports/`;
+3. operational project memory;
+4. agent/session handoffs;
+5. durable decision records;
+6. the `UNKNOWN`/blocker register.
+
+Current operational files live under:
+
+`09_Development/AI_Project_Memory/`
+
+Live GitHub remains authoritative for mutable GitHub state. Before implementation, READY, audit, merge, or lifecycle mutation, agents must re-read current `main`, Issue/PR state, branch/head, mergeability, and exact-head CI as applicable. Persisted state must be reconciled as `CURRENT`, `STALE`, `CONTRADICTORY`, or `UNKNOWN`.
+
+Raw or hidden model chain-of-thought is out of scope. Persist useful engineering conclusions, evidence, decisions, appropriate rationale, constraints, rejected assumptions, ownership, blockers, `UNKNOWN`s, status, and next safe action only.
+
+DT ownership and orchestration assigned by DT-00 take precedence over generic execution-role wording when the repository contains a current DT handoff. No agent may silently take another DT lane's authority.
+
+No self-merge or auto-merge is authorized by this memory protocol.
+
+The memory validator may be run with:
+
+```bash
+node 09_Development/AI_Project_Memory/validate-memory.mjs
+```
+
+The validator supplements, but does not replace, live GitHub reconciliation and DT-00 exact-head audit.
+
+Owner-facing material operational reports for Marian are written in Romanian. Exact technical identifiers, paths, SHAs, code, commands, and machine-status tokens may remain in English.
+
+---
+
 # Task Execution Format
 
 Every task should contain:
@@ -264,6 +329,8 @@ If an agent detects:
 
 It must stop and request clarification.
 
+For missing project-continuity context covered by Issue #683, the agent must first exhaust the deterministic repository bootstrap, current handoff, referenced live GitHub state, and relevant canonical authority. It must not require the Project Owner to manually reconstruct context that the persistent-memory protocol is required to preserve. Unresolved evidence remains `UNKNOWN`.
+
 ---
 
 # Version Control
@@ -321,6 +388,8 @@ Playable Prototype
 AI agents build according to the vision and current canonical architecture.
 
 They do not create a different game and they do not revive superseded platform assumptions without Project Owner approval.
+
+For operational continuity, they also consume and maintain the repository-backed Persistent AI Project Memory defined by `09_Development/AI_Project_Memory/BOOTSTRAP.md`; this operational layer does not replace canonical domain authority.
 
 ---
 
