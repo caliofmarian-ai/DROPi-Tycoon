@@ -2,12 +2,24 @@
   "schemaVersion": 1,
   "snapshotId": "DT00-683-INITIAL-BACKFILL-2026-09-10",
   "snapshotType": "OPERATIONAL_PROJECT_MEMORY",
+  "projectIdentity": {
+    "name": "DROPi Tycoon",
+    "owner": "Marian / caliofmarian-ai"
+  },
   "repository": "caliofmarian-ai/DROPi-Tycoon",
   "issue": 683,
   "observedAt": "2026-09-10T21:27:00Z",
   "observedMainSha": "f8453cbaa522a54406940d5056f5a5943627d86c",
   "liveReconciliationRequired": true,
   "mutableStateAuthority": "LIVE_GITHUB",
+  "canonicalAuthorityPointers": {
+    "vision": "00_Project/VISION.md",
+    "projectStatus": "00_Project/PROJECT_STATUS.md",
+    "architecture": "06_Technical/ARCHITECTURE.md",
+    "mobileApplicationPlatform": "06_Technical/MOBILE_APPLICATION_PLATFORM.md",
+    "saveSystemWhenPersistenceIsRelevant": "06_Technical/SAVE_SYSTEM.md",
+    "rule": "Read the relevant canonical files before asserting current architecture/runtime/domain truth; operational memory references but does not replace them."
+  },
   "mainChecksAtObservedSha": {
     "validate": "SUCCESS",
     "validate-mobile-shell": "SUCCESS",
