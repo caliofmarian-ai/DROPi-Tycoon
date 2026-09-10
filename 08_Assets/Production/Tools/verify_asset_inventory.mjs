@@ -10,6 +10,7 @@ const DEFAULT_REPO_ROOT = resolve(dirname(SCRIPT_PATH), '../../..')
 const DEFAULT_INVENTORY = '08_Assets/Production/asset-inventory.v1.json'
 const LEGAL_QUALIFICATION_CONTRACT = '09_Development/Compliance/GLOBAL_ASSET_PROVENANCE_CONTRACT_565_643.md'
 const RUNTIME_EVIDENCE_MANIFEST = 'game-web/public/legal/runtime-provenance.json'
+const LEGACY_BOARD_CROPS_COLLECTION = 'legacy-board-crops-v1'
 const EXPECTED_LIFECYCLE = [
   'INVENTORIED',
   'SPECIFIED',
@@ -19,6 +20,17 @@ const EXPECTED_LIFECYCLE = [
   'RUNTIME_INTEGRATED',
   'ANDROID_VERIFIED',
 ]
+const DT13_QUALIFICATION_FIELDS = new Set([
+  'legalStatus',
+  'legalQualification',
+  'legalQualificationStatus',
+  'commercialReleaseStatus',
+  'clearanceStatus',
+  'rightsStatus',
+  'licenceStatus',
+  'licenseStatus',
+  'releaseStatus',
+])
 
 function parseArgs(argv) {
   const args = { repoRoot: DEFAULT_REPO_ROOT, inventory: DEFAULT_INVENTORY }
@@ -95,6 +107,23 @@ function assertCanonicalLifecycle(inventory) {
   }
 }
 
+function assertNoDt13QualificationFields(value, path = 'inventory') {
+  if (Array.isArray(value)) {
+    value.forEach((item, index) => assertNoDt13QualificationFields(item, `${path}[${index}]`))
+    return
+  }
+  if (!value || typeof value !== 'object') return
+
+  for (const [key, child] of Object.entries(value)) {
+    if (DT13_QUALIFICATION_FIELDS.has(key)) {
+      throw new Error(
+        `DT-19 registry must not define legal qualification field ${path}.${key}; DT-13 owns legal/licence/provenance qualification`,
+      )
+    }
+    assertNoDt13QualificationFields(child, `${path}.${key}`)
+  }
+}
+
 function assertLegalQualificationBoundary(inventory, repoRoot) {
   const policyRefs = inventory.policyRefs ?? {}
   if (Object.prototype.hasOwnProperty.call(policyRefs, 'legalReleaseAuthority')) {
@@ -135,6 +164,14 @@ function assertLegalQualificationBoundary(inventory, repoRoot) {
   if (!contract.includes('Legal/provenance status is an independent release dimension.')) {
     throw new Error('DT-13 legal qualification contract no longer keeps legal status independent from DT-19 lifecycle')
   }
+  if (!contract.includes('A family/batch record must not claim facts that are unknown.')) {
+    throw new Error('DT-13 legal qualification contract no longer preserves unknown provenance facts as unknown')
+  }
+  if (!contract.includes('A derivative cannot become legally `CLEARED` merely because the parent is visually `APPROVED_SOURCE` or technically `RUNTIME_INTEGRATED`.')) {
+    throw new Error('DT-13 legal qualification contract no longer preserves the lifecycle-versus-clearance boundary')
+  }
+
+  assertNoDt13QualificationFields(inventory)
 }
 
 function validateEvidenceRefs(repoRoot, refs, context) {
@@ -221,6 +258,9 @@ function validateInventory(inventory, repoRoot) {
   for (const collection of collections) {
     if (!EXPECTED_LIFECYCLE.includes(collection.lifecycleState)) {
       throw new Error(`Collection ${collection.collectionId} has invalid lifecycleState: ${collection.lifecycleState}`)
+    }
+    if (collection.collectionId === LEGACY_BOARD_CROPS_COLLECTION && collection.lifecycleState !== 'CANDIDATE') {
+      throw new Error(`Collection ${LEGACY_BOARD_CROPS_COLLECTION} must remain CANDIDATE; collection inventory does not grant APPROVED_SOURCE`)
     }
     if (!familyIds.has(collection.sourceFamilyId)) {
       throw new Error(`Collection ${collection.collectionId} references unknown sourceFamilyId ${collection.sourceFamilyId}`)
