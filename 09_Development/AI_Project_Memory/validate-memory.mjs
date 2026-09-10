@@ -42,19 +42,30 @@ function requireArray(value, label) {
   if (!Array.isArray(value)) failures.push(`${label} must be an array`);
 }
 
+function requireNonEmptyString(value, label) {
+  if (typeof value !== 'string' || !value.trim()) failures.push(`${label} must be a non-empty string`);
+}
+
 const state = readJson('CURRENT_STATE.json');
 const doc = readJson('HANDOFFS.json');
 
 if (state) {
   requireKeys(state, [
-    'schemaVersion','snapshotId','snapshotType','repository','observedAt',
+    'schemaVersion','snapshotId','snapshotType','projectIdentity','repository','observedAt',
     'observedMainSha','liveReconciliationRequired','mutableStateAuthority',
-    'authorityLayers','activePullRequests','dependencyAndMergeOrder',
+    'canonicalAuthorityPointers','authorityLayers','activePullRequests','dependencyAndMergeOrder',
     'nextSafeOrchestratorAction'
   ], 'CURRENT_STATE');
   if (!sha40.test(state.observedMainSha ?? '')) failures.push('CURRENT_STATE observedMainSha must be a 40-character lowercase Git SHA');
   if (state.liveReconciliationRequired !== true) failures.push('CURRENT_STATE must require live GitHub reconciliation');
   if (state.mutableStateAuthority !== 'LIVE_GITHUB') failures.push('CURRENT_STATE mutableStateAuthority must be LIVE_GITHUB');
+  requireObject(state.projectIdentity, 'CURRENT_STATE.projectIdentity');
+  requireNonEmptyString(state.projectIdentity?.name, 'CURRENT_STATE.projectIdentity.name');
+  requireNonEmptyString(state.projectIdentity?.owner, 'CURRENT_STATE.projectIdentity.owner');
+  requireObject(state.canonicalAuthorityPointers, 'CURRENT_STATE.canonicalAuthorityPointers');
+  for (const key of ['vision','projectStatus','architecture','mobileApplicationPlatform','rule']) {
+    requireNonEmptyString(state.canonicalAuthorityPointers?.[key], `CURRENT_STATE.canonicalAuthorityPointers.${key}`);
+  }
   requireArray(state.activePullRequests, 'CURRENT_STATE.activePullRequests');
   requireArray(state.dependencyAndMergeOrder, 'CURRENT_STATE.dependencyAndMergeOrder');
 
