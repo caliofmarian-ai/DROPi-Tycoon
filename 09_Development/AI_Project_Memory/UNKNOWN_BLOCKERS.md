@@ -4,18 +4,33 @@
 
 ## Active #683 acceptance
 
-### U-683-001 — Final candidate PR/head
-- Historical state: before PR creation, the final PR/head was `UNKNOWN`.
-- Current state: PR #684 exists on `agent/dt00-683-persistent-ai-memory`; the exact live head must be read from GitHub because a commit cannot embed its own containing SHA and implementation-stage writes move the branch.
-- Resolution condition: implementation stops changing, live PR #684 is re-read, and its exact head is used for CI, fresh-context recovery, DT-00 audit and expected-head merge protection.
-- Safe action: do not claim exact-head acceptance or merge from a persisted pre-write SHA.
+### U-683-001 — Final corrected candidate PR/head
+- Historical state: PR #684 exact head `89565d26856ccb8776750d072ae2303971550f9c` had all three CI gates `SUCCESS` and fresh-context Auditor #2 returned `FRESH-CONTEXT RECOVERY = PASS`.
+- Superseding fact: Auditor #2 found that live DRAFT PR #682 / DT-01 had been omitted from `CURRENT_STATE.json` and the DT-01 handoff. DT-00 accepted this as a material backfill defect and changed PR #684 to correct it.
+- Current state: the final corrected PR #684 head is `UNKNOWN` until correction writes stop and live GitHub is re-read. The containing commit cannot embed its own SHA.
+- Resolution condition: freeze the corrected live PR head, obtain exact-head CI, run a new independent fresh-context audit on that same head, then perform DT-00 exact-head audit.
+- Safe action: the Auditor #2 PASS proves recoverability at the superseded head but does not authorize merge of the corrected head.
 
-### U-683-002 — Fresh-context final verdict
+### U-683-002 — Fresh-context final verdict on corrected head
 - Status: `UNKNOWN`.
-- Dependency: a genuinely fresh AI context with zero prior DROPi Tycoon conversation history must start from `BOOTSTRAP.md` and execute the disaster-recovery audit.
-- Safe action: merge #683 only after `FRESH-CONTEXT RECOVERY = PASS`.
+- Historical evidence: Auditor #2 PASS on `89565d26856ccb8776750d072ae2303971550f9c`.
+- Dependency: Auditor #3 must use a genuinely fresh AI context, start from `BOOTSTRAP.md`, and audit the corrected exact head after revised CI is green.
+- Safe action: merge #683 only after the corrected exact head receives `FRESH-CONTEXT RECOVERY = PASS` and DT-00 independent audit.
+
+### U-683-003 — Open-PR omission detection
+- Historical defect: the original backfill and validator could validate only PRs already persisted; they could not detect a live open PR omitted by absence. Auditor #2 exposed this through PR #682.
+- Current correction: bootstrap now mandates complete live open-PR enumeration and set comparison; `validate-memory.mjs --current-open-prs <complete-live-set>` fails when the supplied live set contains a PR missing from the snapshot.
+- Remaining requirement: revised exact-head CI and Auditor #3 must verify this correction.
 
 ## Active specialist blockers
+
+### U-DT01-001 — PR #682 orchestration position
+- Status: `UNKNOWN`.
+- Resolved facts: PR #682 exists, is OPEN and DRAFT, is owned by DT-01 / Issue #491, is based on observed current main `f8453cbaa522a54406940d5056f5a5943627d86c`, has head `8cf6bec6ffa05e255f0282f137668fac3424f782`, and all three exact-head workflow runs are `SUCCESS`.
+- Historical defect: #682 existed before the #683 snapshot but was omitted from the first backfill.
+- Boundary: #682 is semantic locality-presentation work and is separate from the later Owner-priority DT-19 crop/prep/ingestion -> DT-01 visible city asset-integration sequence.
+- Unknown: exact post-#683 merge/rework/order position remains `UNKNOWN` until DT-00 performs a live dependency audit.
+- Safe action: HOLD; do not merge/undraft/expand #682 as part of #683.
 
 ### U-DT17-001 — #674 current-main reconciliation
 - Status: `BLOCKED`.
