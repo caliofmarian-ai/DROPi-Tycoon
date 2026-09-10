@@ -20,6 +20,16 @@ const EXPECTED_LIFECYCLE = [
   'RUNTIME_INTEGRATED',
   'ANDROID_VERIFIED',
 ]
+const LIBRARY_PRESENCE_VALUES = [
+  'LIBRARY_PRESENT',
+  'LIBRARY_NOT_FOUND_IN_AUDIT',
+  'LIBRARY_NOT_AUDITED',
+]
+const REPOSITORY_PRESENCE_VALUES = [
+  'REPOSITORY_ATTESTED',
+  'REPOSITORY_ATTESTED_DERIVATIVES_ONLY',
+  'NOT_ATTESTED_ON_MAIN',
+]
 const DT13_QUALIFICATION_FIELDS = new Set([
   'legalStatus',
   'legalQualification',
@@ -174,6 +184,80 @@ function assertLegalQualificationBoundary(inventory, repoRoot) {
   assertNoDt13QualificationFields(inventory)
 }
 
+function assertPresenceValue(value, allowed, context) {
+  if (!allowed.includes(value)) {
+    throw new Error(`${context} has invalid presence value: ${value}`)
+  }
+}
+
+function assertPresenceBoundary(inventory, familyIds) {
+  const model = inventory.presenceModel
+  if (!model || typeof model !== 'object') throw new Error('presenceModel is required')
+  if (JSON.stringify(model.libraryPresenceValues) !== JSON.stringify(LIBRARY_PRESENCE_VALUES)) {
+    throw new Error('presenceModel.libraryPresenceValues must preserve the canonical Library audit states')
+  }
+  if (JSON.stringify(model.repositoryPresenceValues) !== JSON.stringify(REPOSITORY_PRESENCE_VALUES)) {
+    throw new Error('presenceModel.repositoryPresenceValues must preserve the canonical GitHub attestation states')
+  }
+  if (model.ingestionOwner !== '#413') {
+    throw new Error('presenceModel.ingestionOwner must remain #413; #414 does not ingest Library binaries')
+  }
+
+  const external = inventory.externalLibraryArtifacts ?? []
+  assertUnique(external.map((artifact) => artifact.artifactId), 'external Library artifactId')
+  const externalById = new Map(external.map((artifact) => [artifact.artifactId, artifact]))
+
+  for (const artifact of external) {
+    assertPresenceValue(artifact.libraryPresence, LIBRARY_PRESENCE_VALUES, `External Library artifact ${artifact.artifactId}`)
+    assertPresenceValue(artifact.repositoryPresence, REPOSITORY_PRESENCE_VALUES, `External Library artifact ${artifact.artifactId}`)
+    if (artifact.libraryPresence === 'LIBRARY_PRESENT') {
+      if (typeof artifact.libraryFileId !== 'string' || artifact.libraryFileId.trim() === '') {
+        throw new Error(`Library-present artifact ${artifact.artifactId} must retain libraryFileId audit evidence`)
+      }
+      if (typeof artifact.libraryPath !== 'string' || !artifact.libraryPath.startsWith('/DROPi Tycon/')) {
+        throw new Error(`Library-present artifact ${artifact.artifactId} must retain its /DROPi Tycon/ libraryPath`)
+      }
+    }
+    if (artifact.familyId && !familyIds.has(artifact.familyId)) {
+      throw new Error(`External Library artifact ${artifact.artifactId} references unknown family ${artifact.familyId}`)
+    }
+    if (artifact.repositoryPresence === 'REPOSITORY_ATTESTED' && artifact.libraryPresence === 'LIBRARY_PRESENT') {
+      throw new Error(
+        `External Library artifact ${artifact.artifactId} cannot become REPOSITORY_ATTESTED from Library presence alone; repository bytes/evidence must be inventoried separately`,
+      )
+    }
+  }
+
+  for (const family of inventory.registeredFamilies ?? []) {
+    assertPresenceValue(family.libraryPresence, LIBRARY_PRESENCE_VALUES, `Family ${family.familyId}`)
+    assertPresenceValue(family.repositoryPresence, REPOSITORY_PRESENCE_VALUES, `Family ${family.familyId}`)
+    if (family.libraryPresence === 'LIBRARY_PRESENT') {
+      if (!family.libraryArtifactRef) {
+        throw new Error(`Library-present family ${family.familyId} must reference audited Library evidence`)
+      }
+      const externalArtifact = externalById.get(family.libraryArtifactRef)
+      if (!externalArtifact) {
+        throw new Error(`Family ${family.familyId} references unknown Library artifact ${family.libraryArtifactRef}`)
+      }
+      if (externalArtifact.familyId && externalArtifact.familyId !== family.familyId) {
+        throw new Error(`Family ${family.familyId} Library artifact points at ${externalArtifact.familyId}`)
+      }
+    }
+  }
+
+  for (const packageRecord of inventory.documentedPackages ?? []) {
+    assertPresenceValue(packageRecord.libraryPresence, LIBRARY_PRESENCE_VALUES, `Package ${packageRecord.packageId}`)
+    assertPresenceValue(packageRecord.repositoryPresence, REPOSITORY_PRESENCE_VALUES, `Package ${packageRecord.packageId}`)
+    if (packageRecord.libraryPresence === 'LIBRARY_PRESENT' && packageRecord.repositoryPresence === 'REPOSITORY_ATTESTED') {
+      throw new Error(
+        `Package ${packageRecord.packageId} cannot become REPOSITORY_ATTESTED from Library presence alone; repository evidence is required`,
+      )
+    }
+  }
+
+  return external.length
+}
+
 function validateEvidenceRefs(repoRoot, refs, context) {
   if (!Array.isArray(refs) || refs.length === 0) throw new Error(`${context} must provide evidenceRefs`)
   for (const ref of refs) requireFile(repoRoot, ref, context)
@@ -229,6 +313,8 @@ function validateInventory(inventory, repoRoot) {
     if (!family.semanticFamily) throw new Error(`Family ${family.familyId} is missing semanticFamily`)
     validateEvidenceRefs(repoRoot, family.evidenceRefs, `Family ${family.familyId}`)
   }
+
+  const externalLibraryArtifacts = assertPresenceBoundary(inventory, familyIds)
 
   const generatedFamilyRegister = readFileSync(repoPath(repoRoot, inventory.policyRefs.generatedFamilyRegister), 'utf8')
   for (const family of families.filter((item) => item.familyId.startsWith('SRC-20260907-'))) {
@@ -356,16 +442,17 @@ function validateInventory(inventory, repoRoot) {
   }
 
   for (const packageRecord of inventory.documentedPackages ?? []) {
-    if (packageRecord.repositoryPresence === 'DOCUMENTED_NOT_ATTESTED_ON_MAIN' && !packageRecord.evidenceRef) {
-      throw new Error(`Documented-only package ${packageRecord.packageId} must retain its evidenceRef`)
+    if (!packageRecord.evidenceRef) {
+      throw new Error(`Documented package ${packageRecord.packageId} must retain its evidenceRef`)
     }
-    if (packageRecord.evidenceRef) requireFile(repoRoot, packageRecord.evidenceRef, `Package ${packageRecord.packageId}`)
+    requireFile(repoRoot, packageRecord.evidenceRef, `Package ${packageRecord.packageId}`)
   }
 
   return {
     schemaVersion: inventory.schemaVersion,
     families: families.length,
     collections: collections.length,
+    externalLibraryArtifacts,
     inventoriedArtifacts: inventoryArtifacts.length,
     runtimeArtifacts: runtimeArtifacts.length,
     declaredReuseSets,
