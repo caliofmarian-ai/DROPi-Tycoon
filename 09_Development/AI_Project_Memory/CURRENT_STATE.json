@@ -4,7 +4,7 @@
   "snapshotType": "OPERATIONAL_PROJECT_MEMORY",
   "repository": "caliofmarian-ai/DROPi-Tycoon",
   "issue": 683,
-  "observedAt": "2026-09-10T20:58:00Z",
+  "observedAt": "2026-09-10T21:27:00Z",
   "observedMainSha": "f8453cbaa522a54406940d5056f5a5943627d86c",
   "liveReconciliationRequired": true,
   "mutableStateAuthority": "LIVE_GITHUB",
@@ -16,12 +16,14 @@
   },
   "implementationLane": {
     "owner": "DT-00",
+    "issue": 683,
+    "pr": 684,
     "branch": "agent/dt00-683-persistent-ai-memory",
     "baseSha": "f8453cbaa522a54406940d5056f5a5943627d86c",
-    "recordedHeadSha": "f8453cbaa522a54406940d5056f5a5943627d86c",
-    "recordedHeadMeaning": "PRE_IMPLEMENTATION_HEAD; the containing commit cannot embed its own SHA, so live branch reconciliation is mandatory",
-    "status": "IMPLEMENTATION_BACKFILL_VALIDATION",
-    "mergeLock": "#683 must complete fresh-context recovery and DT-00 exact-head audit before normal specialist merges unless DT-00 records a new dependency decision"
+    "recordedHeadSha": "8e53b90caaf56db1dbe346bc59aac66d59df9737",
+    "recordedHeadMeaning": "LAST_OBSERVED_PRE_CURRENT_STATE_WRITE; the containing commit cannot embed its own SHA, so live branch/PR reconciliation is mandatory",
+    "status": "READY_FOR_EXTERNAL_RECOVERY",
+    "mergeLock": "#683 must complete exact-head CI, fresh-context recovery and DT-00 exact-head audit before normal specialist merges unless DT-00 records a new dependency decision"
   },
   "authorityLayers": {
     "canonicalProjectDomainAuthority": "Existing canonical project/domain documents; operational memory never overrides them",
@@ -32,6 +34,23 @@
     "unknownBlockerRegister": "09_Development/AI_Project_Memory/UNKNOWN_BLOCKERS.md"
   },
   "activePullRequests": [
+    {
+      "pr": 684,
+      "dt": "DT-00",
+      "issue": 683,
+      "baseSha": "f8453cbaa522a54406940d5056f5a5943627d86c",
+      "headSha": "8e53b90caaf56db1dbe346bc59aac66d59df9737",
+      "branch": "agent/dt00-683-persistent-ai-memory",
+      "state": "OPEN",
+      "draft": false,
+      "mergeable": false,
+      "workState": "READY_FOR_EXTERNAL_RECOVERY",
+      "ci": {
+        "state": "PENDING_AT_RECORD_TIME",
+        "checks": {},
+        "evidence": "Live PR #684 reconciliation required after this state write."
+      }
+    },
     {
       "pr": 679,
       "dt": "DT-19",
@@ -45,12 +64,8 @@
       "workState": "PARALLEL_PREP",
       "ci": {
         "state": "SUCCESS",
-        "checks": {
-          "validate": "SUCCESS",
-          "validate-mobile-shell": "SUCCESS",
-          "production-image-smoke": "SUCCESS"
-        },
-        "evidence": "Live PR metadata refreshed 2026-09-10; CI from live exact-head check-runs for #679 or DT-22 Pass 004 where head remained unchanged."
+        "checks": {"validate": "SUCCESS", "validate-mobile-shell": "SUCCESS", "production-image-smoke": "SUCCESS"},
+        "evidence": "Live exact-head evidence refreshed during #683 backfill."
       }
     },
     {
@@ -66,12 +81,8 @@
       "workState": "PARALLEL_PREP",
       "ci": {
         "state": "FAILURE_RECORDED",
-        "checks": {
-          "validate": "FAILURE",
-          "validate-mobile-shell": "UNKNOWN",
-          "production-image-smoke": "SUCCESS"
-        },
-        "evidence": "Live PR metadata refreshed 2026-09-10; CI from live exact-head check-runs for #679 or DT-22 Pass 004 where head remained unchanged."
+        "checks": {"validate": "FAILURE", "validate-mobile-shell": "UNKNOWN", "production-image-smoke": "SUCCESS"},
+        "evidence": "DT-22 Pass 004/live PR metadata; live reconciliation required."
       }
     },
     {
@@ -87,12 +98,8 @@
       "workState": "WAIT_MERGE_LANE",
       "ci": {
         "state": "SUCCESS_RECORDED",
-        "checks": {
-          "validate": "SUCCESS",
-          "validate-mobile-shell": "UNKNOWN",
-          "production-image-smoke": "SUCCESS"
-        },
-        "evidence": "Live PR metadata refreshed 2026-09-10; CI from live exact-head check-runs for #679 or DT-22 Pass 004 where head remained unchanged."
+        "checks": {"validate": "SUCCESS", "validate-mobile-shell": "UNKNOWN", "production-image-smoke": "SUCCESS"},
+        "evidence": "DT-22 Pass 004; live reconciliation required."
       }
     },
     {
@@ -108,12 +115,8 @@
       "workState": "WAIT_MERGE_LANE",
       "ci": {
         "state": "FAILURE_RECORDED",
-        "checks": {
-          "validate": "FAILURE",
-          "validate-mobile-shell": "UNKNOWN",
-          "production-image-smoke": "SUCCESS"
-        },
-        "evidence": "Live PR metadata refreshed 2026-09-10; CI from live exact-head check-runs for #679 or DT-22 Pass 004 where head remained unchanged."
+        "checks": {"validate": "FAILURE", "validate-mobile-shell": "UNKNOWN", "production-image-smoke": "SUCCESS"},
+        "evidence": "DT-22 Pass 004; live reconciliation required."
       }
     },
     {
@@ -129,12 +132,8 @@
       "workState": "WAIT_MERGE_LANE",
       "ci": {
         "state": "SUCCESS_RECORDED",
-        "checks": {
-          "validate": "SUCCESS",
-          "validate-mobile-shell": "UNKNOWN",
-          "production-image-smoke": "SUCCESS"
-        },
-        "evidence": "Live PR metadata refreshed 2026-09-10; CI from live exact-head check-runs for #679 or DT-22 Pass 004 where head remained unchanged."
+        "checks": {"validate": "SUCCESS", "validate-mobile-shell": "UNKNOWN", "production-image-smoke": "SUCCESS"},
+        "evidence": "DT-22 Pass 004; live reconciliation required."
       }
     },
     {
@@ -150,12 +149,8 @@
       "workState": "WAIT_MERGE_LANE",
       "ci": {
         "state": "SUCCESS_RECORDED",
-        "checks": {
-          "validate": "SUCCESS",
-          "validate-mobile-shell": "UNKNOWN",
-          "production-image-smoke": "SUCCESS"
-        },
-        "evidence": "Live PR metadata refreshed 2026-09-10; CI from live exact-head check-runs for #679 or DT-22 Pass 004 where head remained unchanged."
+        "checks": {"validate": "SUCCESS", "validate-mobile-shell": "UNKNOWN", "production-image-smoke": "SUCCESS"},
+        "evidence": "DT-22 Pass 004; live reconciliation required."
       }
     },
     {
@@ -171,12 +166,8 @@
       "workState": "HOLD_SCOPE",
       "ci": {
         "state": "FAILURE_RECORDED",
-        "checks": {
-          "validate": "FAILURE",
-          "validate-mobile-shell": "UNKNOWN",
-          "production-image-smoke": "SUCCESS"
-        },
-        "evidence": "Live PR metadata refreshed 2026-09-10; CI from live exact-head check-runs for #679 or DT-22 Pass 004 where head remained unchanged."
+        "checks": {"validate": "FAILURE", "validate-mobile-shell": "UNKNOWN", "production-image-smoke": "SUCCESS"},
+        "evidence": "DT-22 Pass 004; live reconciliation required."
       }
     },
     {
@@ -192,12 +183,8 @@
       "workState": "HOLD_FINAL_AUDIT",
       "ci": {
         "state": "FAILURE_RECORDED",
-        "checks": {
-          "validate": "FAILURE",
-          "validate-mobile-shell": "UNKNOWN",
-          "production-image-smoke": "SUCCESS"
-        },
-        "evidence": "Live PR metadata refreshed 2026-09-10; CI from live exact-head check-runs for #679 or DT-22 Pass 004 where head remained unchanged."
+        "checks": {"validate": "FAILURE", "validate-mobile-shell": "UNKNOWN", "production-image-smoke": "SUCCESS"},
+        "evidence": "DT-22 Pass 004; live reconciliation required."
       }
     }
   ],
@@ -225,7 +212,7 @@
     }
   ],
   "dependencyAndMergeOrder": [
-    "#683 persistent-memory migration first",
+    "#683 / PR #684 persistent-memory migration first",
     "After #683 merge, re-read live main and every candidate PR head/base/check before selecting a merge slot",
     "DT-19 #679 is first priority for DT-00 re-audit because it is current-base, exact-head green and gates governed Library-to-repository asset preparation",
     "DT-17 #674 may prepare in parallel but cannot merge until current-main reconciliation and exact-head green",
@@ -236,5 +223,5 @@
     "DT-22 #681 remains governance/read-audit-report under DT-00 missions"
   ],
   "ownerVisibleRule": "Owner-facing execution reports are in Romanian; technical identifiers may remain English. GitHub is technical evidence; chat summaries explain BEFORE, CHANGED, AFTER, PLAYER/GAME IMPACT, MERGE STATUS, RISKS/WHAT REMAINS and NEXT OWNER ACTION.",
-  "nextSafeOrchestratorAction": "Finish #683 repository implementation/backfill, run the mechanical validator, open PR, obtain exact-head CI, run a genuinely fresh-context disaster-recovery audit, then independently audit and merge only on PASS."
+  "nextSafeOrchestratorAction": "Re-read PR #684 exact head, obtain green exact-head CI, run a genuinely new fresh-context disaster-recovery audit from BOOTSTRAP.md, then independently audit and merge only on PASS."
 }
