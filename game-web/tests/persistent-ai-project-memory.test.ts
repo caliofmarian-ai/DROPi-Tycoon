@@ -78,6 +78,6 @@ describe('persistent AI project memory governance', () => {
     });
     expect(output).toContain('PERSISTENT_AI_MEMORY_VALIDATION = PASS');
     expect(output).toContain('handoffs=23');
-    expect(output).toContain('activePullRequests=8');
+    expect(output).toContain('activePullRequests=9');
   });
 });
