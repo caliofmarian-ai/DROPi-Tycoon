@@ -46,18 +46,31 @@ function requireNonEmptyString(value, label) {
   if (typeof value !== 'string' || !value.trim()) failures.push(`${label} must be a non-empty string`);
 }
 
+function optionValue(args, flag) {
+  const index = args.indexOf(flag);
+  if (index === -1) return null;
+  const supplied = args[index + 1];
+  if (!supplied || supplied.startsWith('--')) {
+    failures.push(`${flag} requires a value`);
+    return null;
+  }
+  return supplied;
+}
+
 const state = readJson('CURRENT_STATE.json');
 const doc = readJson('HANDOFFS.json');
+const statePrSet = new Set();
 
 if (state) {
   requireKeys(state, [
     'schemaVersion','snapshotId','snapshotType','projectIdentity','repository','observedAt',
-    'observedMainSha','liveReconciliationRequired','mutableStateAuthority',
-    'canonicalAuthorityPointers','authorityLayers','activePullRequests','dependencyAndMergeOrder',
-    'nextSafeOrchestratorAction'
+    'observedMainSha','liveReconciliationRequired','liveOpenPullRequestEnumerationRequired',
+    'mutableStateAuthority','canonicalAuthorityPointers','authorityLayers','activePullRequests',
+    'dependencyAndMergeOrder','nextSafeOrchestratorAction'
   ], 'CURRENT_STATE');
   if (!sha40.test(state.observedMainSha ?? '')) failures.push('CURRENT_STATE observedMainSha must be a 40-character lowercase Git SHA');
   if (state.liveReconciliationRequired !== true) failures.push('CURRENT_STATE must require live GitHub reconciliation');
+  if (state.liveOpenPullRequestEnumerationRequired !== true) failures.push('CURRENT_STATE must require complete live open-PR enumeration');
   if (state.mutableStateAuthority !== 'LIVE_GITHUB') failures.push('CURRENT_STATE mutableStateAuthority must be LIVE_GITHUB');
   requireObject(state.projectIdentity, 'CURRENT_STATE.projectIdentity');
   requireNonEmptyString(state.projectIdentity?.name, 'CURRENT_STATE.projectIdentity.name');
@@ -69,11 +82,11 @@ if (state) {
   requireArray(state.activePullRequests, 'CURRENT_STATE.activePullRequests');
   requireArray(state.dependencyAndMergeOrder, 'CURRENT_STATE.dependencyAndMergeOrder');
 
-  const seenPr = new Set();
   for (const item of state.activePullRequests ?? []) {
     requireKeys(item, ['pr','dt','issue','baseSha','headSha','branch','state','draft','mergeable','workState','ci'], `CURRENT_STATE PR ${item?.pr ?? 'UNKNOWN'}`);
-    if (seenPr.has(item.pr)) failures.push(`duplicate active PR record: ${item.pr}`);
-    seenPr.add(item.pr);
+    if (!Number.isInteger(item.pr) || item.pr <= 0) failures.push(`CURRENT_STATE has invalid active PR number: ${item.pr}`);
+    if (statePrSet.has(item.pr)) failures.push(`duplicate active PR record: ${item.pr}`);
+    statePrSet.add(item.pr);
     if (!/^DT-\d{2}$/.test(item.dt ?? '')) failures.push(`PR ${item.pr} has invalid DT id`);
     if (!sha40.test(item.baseSha ?? '')) failures.push(`PR ${item.pr} has malformed baseSha`);
     if (!sha40.test(item.headSha ?? '')) failures.push(`PR ${item.pr} has malformed headSha`);
@@ -145,11 +158,32 @@ if (doc) {
 if (state && doc && state.observedMainSha !== doc.observedMainSha) failures.push('CURRENT_STATE and HANDOFFS observedMainSha contradict each other');
 
 const args = process.argv.slice(2);
-const idx = args.indexOf('--current-main');
-if (idx !== -1) {
-  const supplied = args[idx + 1];
-  if (!sha40.test(supplied ?? '')) failures.push('--current-main requires a 40-character lowercase Git SHA');
-  else if (state && supplied !== state.observedMainSha) warnings.push(`STALE: persisted observedMainSha=${state.observedMainSha}; supplied live main=${supplied}`);
+const suppliedMain = optionValue(args, '--current-main');
+if (suppliedMain !== null) {
+  if (!sha40.test(suppliedMain)) failures.push('--current-main requires a 40-character lowercase Git SHA');
+  else if (state && suppliedMain !== state.observedMainSha) warnings.push(`STALE: persisted observedMainSha=${state.observedMainSha}; supplied live main=${suppliedMain}`);
+}
+
+const suppliedOpenPrs = optionValue(args, '--current-open-prs');
+if (suppliedOpenPrs !== null) {
+  const raw = suppliedOpenPrs.split(',').map((item) => item.trim());
+  const livePrSet = new Set();
+  for (const token of raw) {
+    if (!/^[1-9]\d*$/.test(token)) {
+      failures.push(`--current-open-prs contains invalid PR number: ${token || '<empty>'}`);
+      continue;
+    }
+    const pr = Number(token);
+    if (livePrSet.has(pr)) failures.push(`--current-open-prs contains duplicate PR number: ${pr}`);
+    livePrSet.add(pr);
+  }
+
+  if (state) {
+    const missing = [...livePrSet].filter((pr) => !statePrSet.has(pr)).sort((a, b) => a - b);
+    const stale = [...statePrSet].filter((pr) => !livePrSet.has(pr)).sort((a, b) => a - b);
+    if (missing.length) failures.push(`missing live open PR(s) from CURRENT_STATE.activePullRequests: ${missing.join(',')}`);
+    if (stale.length) warnings.push(`STALE: persisted active PR(s) no longer present in supplied live open set: ${stale.join(',')}`);
+  }
 }
 
 if (failures.length) {
