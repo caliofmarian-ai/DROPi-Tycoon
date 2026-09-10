@@ -4,12 +4,14 @@ on:
   pull_request:
     paths:
       - 'game-mobile/**'
+      - 'game-web/**'
       - '.github/workflows/game-mobile-ci.yml'
   push:
     branches:
       - main
     paths:
       - 'game-mobile/**'
+      - 'game-web/**'
       - '.github/workflows/game-mobile-ci.yml'
 
 jobs:
@@ -27,10 +29,20 @@ jobs:
         with:
           node-version: 22.13.0
           cache: npm
-          cache-dependency-path: game-mobile/package.json
+          cache-dependency-path: |
+            game-mobile/package-lock.json
+            game-web/package-lock.json
 
-      - name: Install mobile dependencies
-        run: npm install
+      - name: Install mobile dependencies deterministically
+        run: npm ci
+
+      - name: Prepare and validate bundled Phaser production runtime
+        env:
+          EAS_BUILD_PROFILE: production
+          EXPO_PUBLIC_DROPITYCOON_RUNTIME_MODE: bundled
+        run: |
+          npm run runtime:prepare
+          npm run runtime:validate
 
       - name: Release version validation
         run: npm run version:validate
@@ -38,12 +50,14 @@ jobs:
       - name: TypeScript validation
         run: npm run typecheck
 
-      - name: Expo configuration validation
+      - name: Expo production configuration validation
         env:
-          EXPO_PUBLIC_DROPITYCOON_GAME_URL: https://example.com/
+          EAS_BUILD_PROFILE: production
+          EXPO_PUBLIC_DROPITYCOON_RUNTIME_MODE: bundled
         run: npx expo config --type public >/tmp/dropi-tycoon-expo-config.json
 
       - name: Expo Doctor validation
         env:
-          EXPO_PUBLIC_DROPITYCOON_GAME_URL: https://example.com/
+          EAS_BUILD_PROFILE: production
+          EXPO_PUBLIC_DROPITYCOON_RUNTIME_MODE: bundled
         run: npm run doctor
