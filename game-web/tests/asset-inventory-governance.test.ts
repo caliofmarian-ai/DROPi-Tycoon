@@ -42,14 +42,46 @@ afterEach(() => {
 })
 
 describe('ISSUE-414 — DT-19 asset inventory and dedup authority', () => {
-  it('verifies current canonical families, candidate inventory, runtime lineage and declared exact reuse', () => {
+  it('verifies current canonical families, Library audit, candidate inventory, runtime lineage and declared exact reuse', () => {
     const inventory = loadInventory()
     expect(inventory.policyRefs.legalQualificationContract).toBe(legalQualificationContract)
     expect(inventory.policyRefs.runtimeEvidenceManifest).toBe(runtimeEvidenceManifest)
     expect(inventory.policyRefs.legalReleaseAuthority).toBeUndefined()
     expect(inventory.authorityBoundary.productionLifecycleAuthority).toBe('DT-19')
     expect(inventory.authorityBoundary.legalQualificationAuthority).toBe('DT-13')
+    expect(inventory.presenceModel.ingestionOwner).toBe('#413')
     expect(inventory.collections.find((item: any) => item.collectionId === 'legacy-board-crops-v1')?.lifecycleState).toBe('CANDIDATE')
+
+    const civicFamily = inventory.registeredFamilies.find(
+      (family: any) => family.familyId === 'SRC-20260907-002',
+    )
+    expect(civicFamily.libraryPresence).toBe('LIBRARY_PRESENT')
+    expect(civicFamily.repositoryPresence).toBe('NOT_ATTESTED_ON_MAIN')
+
+    const initialFamily = inventory.registeredFamilies.find(
+      (family: any) => family.familyId === 'SRC-20260907-001',
+    )
+    expect(initialFamily.libraryPresence).toBe('LIBRARY_PRESENT')
+    expect(initialFamily.repositoryPresence).toBe('REPOSITORY_ATTESTED_DERIVATIVES_ONLY')
+
+    const q55 = inventory.externalLibraryArtifacts.find(
+      (artifact: any) => artifact.artifactId === 'library-crops-q55',
+    )
+    const q68 = inventory.externalLibraryArtifacts.find(
+      (artifact: any) => artifact.artifactId === 'library-crops-q68',
+    )
+    expect(q55.libraryPresence).toBe('LIBRARY_PRESENT')
+    expect(q55.repositoryPresence).toBe('NOT_ATTESTED_ON_MAIN')
+    expect(q55.memberAssetCount).toBe(50)
+    expect(q68.libraryPresence).toBe('LIBRARY_PRESENT')
+    expect(q68.repositoryPresence).toBe('NOT_ATTESTED_ON_MAIN')
+    expect(q68.memberAssetCount).toBe(50)
+
+    const historicalPackage = inventory.documentedPackages.find(
+      (item: any) => item.packageId === 'batch-001-extracted-candidate-package',
+    )
+    expect(historicalPackage.libraryPresence).toBe('LIBRARY_NOT_FOUND_IN_AUDIT')
+    expect(historicalPackage.repositoryPresence).toBe('NOT_ATTESTED_ON_MAIN')
 
     const result = runVerifier()
 
@@ -57,6 +89,7 @@ describe('ISSUE-414 — DT-19 asset inventory and dedup authority', () => {
     const summary = JSON.parse(result.stdout.trim())
     expect(summary.ok).toBe(true)
     expect(summary.families).toBeGreaterThanOrEqual(11)
+    expect(summary.externalLibraryArtifacts).toBe(13)
     expect(summary.inventoriedArtifacts).toBeGreaterThanOrEqual(63)
     expect(summary.runtimeArtifacts).toBe(13)
     expect(summary.declaredReuseSets).toBeGreaterThanOrEqual(2)
@@ -134,6 +167,43 @@ describe('ISSUE-414 — DT-19 asset inventory and dedup authority', () => {
     expect(result.status).not.toBe(0)
     expect(result.stderr).toContain('legacy-board-crops-v1 must remain CANDIDATE')
     expect(result.stderr).toContain('does not grant APPROVED_SOURCE')
+  })
+
+  it('fails closed when Library presence is rewritten as repository attestation without repository ingestion', () => {
+    const inventory = loadInventory()
+    const civicBoard = inventory.externalLibraryArtifacts.find(
+      (artifact: any) => artifact.artifactId === 'library-source-board-src-20260907-002',
+    )
+    civicBoard.repositoryPresence = 'REPOSITORY_ATTESTED'
+
+    const result = runVerifier(writeFixture(inventory))
+
+    expect(result.status).not.toBe(0)
+    expect(result.stderr).toContain('cannot become REPOSITORY_ATTESTED from Library presence alone')
+  })
+
+  it('fails closed when a Library-present source loses its persistent Library identity evidence', () => {
+    const inventory = loadInventory()
+    const natureBoard = inventory.externalLibraryArtifacts.find(
+      (artifact: any) => artifact.artifactId === 'library-source-board-src-20260907-009',
+    )
+    delete natureBoard.libraryFileId
+
+    const result = runVerifier(writeFixture(inventory))
+
+    expect(result.status).not.toBe(0)
+    expect(result.stderr).toContain('must retain libraryFileId audit evidence')
+  })
+
+  it('fails closed when #414 tries to take Library ingestion ownership from #413', () => {
+    const inventory = loadInventory()
+    inventory.presenceModel.ingestionOwner = '#414'
+
+    const result = runVerifier(writeFixture(inventory))
+
+    expect(result.status).not.toBe(0)
+    expect(result.stderr).toContain('ingestionOwner must remain #413')
+    expect(result.stderr).toContain('#414 does not ingest Library binaries')
   })
 
   it('fails closed when an exact duplicate is no longer declared as intentional reuse', () => {
