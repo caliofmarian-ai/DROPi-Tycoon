@@ -1,16 +1,16 @@
 import layout from './brailaLayout.generated.json'
 import {
-  BRAILA_PLAYABLE_DISTANCE_SCALE,
-  BRAILA_PLAYABLE_SCALE_VERSION,
-  expandBrailaBuilding,
-  expandBrailaContextBuilding,
-  expandBrailaExtent,
-  expandBrailaLandscapeFeature,
-  expandBrailaPoint,
-  expandBrailaRoad,
-  expandBrailaRoutePoint,
-  expandBrailaZone,
-} from './brailaPlayableScale'
+  CITY_PLAYABLE_DISTANCE_SCALE_BASELINE,
+  CITY_PLAYABLE_SCALE_VERSION,
+  expandPlayableCityBuilding,
+  expandPlayableCityContextBuilding,
+  expandPlayableCityExtent,
+  expandPlayableCityLandscapeFeature,
+  expandPlayableCityPoint,
+  expandPlayableCityRoad,
+  expandPlayableCityRoutePoint,
+  expandPlayableCityZone,
+} from './playableCityScale'
 import type { WorldBuildingLayout, WorldDecorationLayout, WorldRectLayout, WorldRoutePoint, WorldZoneLayout } from './legacyCityLayout'
 import { distanceToSegment, surfaceContains } from './worldSurfaces'
 export type { WorldBuildingLayout, WorldDecorationLayout, WorldRectLayout, WorldRoutePoint, WorldZoneId, WorldZoneLayout } from './legacyCityLayout'
@@ -35,31 +35,31 @@ const unpackContextPoints = (coordinates: readonly number[]): Array<{ x: number;
 
 export const WORLD_SOURCE_WIDTH = layout.width
 export const WORLD_SOURCE_HEIGHT = layout.height
-export const WORLD_PLAYABLE_SCALE_VERSION = BRAILA_PLAYABLE_SCALE_VERSION
-export const WORLD_PLAYABLE_DISTANCE_SCALE = BRAILA_PLAYABLE_DISTANCE_SCALE
-export const WORLD_WIDTH = expandBrailaExtent(layout.width)
-export const WORLD_HEIGHT = expandBrailaExtent(layout.height)
-export const PLAYER_START = expandBrailaPoint({ x: layout.playerStart.x, y: layout.playerStart.y })
-export const WORLD_ZONES: readonly WorldZoneLayout[] = (layout.zones as WorldZoneLayout[]).map(zone => expandBrailaZone(zone))
-export const WORLD_ROADS: readonly WorldRectLayout[] = (layout.roads as WorldRectLayout[]).map(road => expandBrailaRoad(road))
+export const WORLD_PLAYABLE_SCALE_VERSION = CITY_PLAYABLE_SCALE_VERSION
+export const WORLD_PLAYABLE_DISTANCE_SCALE = CITY_PLAYABLE_DISTANCE_SCALE_BASELINE
+export const WORLD_WIDTH = expandPlayableCityExtent(layout.width)
+export const WORLD_HEIGHT = expandPlayableCityExtent(layout.height)
+export const PLAYER_START = expandPlayableCityPoint({ x: layout.playerStart.x, y: layout.playerStart.y })
+export const WORLD_ZONES: readonly WorldZoneLayout[] = (layout.zones as WorldZoneLayout[]).map(zone => expandPlayableCityZone(zone))
+export const WORLD_ROADS: readonly WorldRectLayout[] = (layout.roads as WorldRectLayout[]).map(road => expandPlayableCityRoad(road))
 export const WORLD_SIDEWALKS: readonly WorldRectLayout[] = WORLD_ROADS.map(road => ({
   ...road, id: `${road.id}-pavement`, width: road.width + 32, height: road.height + 32,
   roadWidth: (road.roadWidth ?? 32) + 32,
 }))
 export const WORLD_BUILDINGS: readonly WorldBuildingLayout[] = (layout.buildings as WorldBuildingLayout[])
-  .map(building => expandBrailaBuilding(building))
+  .map(building => expandPlayableCityBuilding(building))
 export const WORLD_ROUTE_POINTS: readonly WorldRoutePoint[] = (layout.routes as WorldRoutePoint[])
-  .map(point => expandBrailaRoutePoint(point))
+  .map(point => expandPlayableCityRoutePoint(point))
 /** #613 compact tuples remain the shipped representation; expose their exact pre-scale reconstruction for its lossless regression gate. */
 export const WORLD_SOURCE_CONTEXT_BUILDINGS = __BRAILA_CONTEXT_BUILDINGS__
   .map(([x, y, width, height, pointCoordinates]) => ({
     x, y, width, height, points: unpackContextPoints(pointCoordinates),
   }))
-/** #614 applies playable spacing only after #613's compact representation has been reconstructed exactly. */
+/** #614 applies the global playable spacing only after #613's compact representation is reconstructed exactly. */
 export const WORLD_CONTEXT_BUILDINGS = WORLD_SOURCE_CONTEXT_BUILDINGS
-  .map(building => expandBrailaContextBuilding(building))
-export const WORLD_LANDSCAPE = layout.landscape.map(feature => expandBrailaLandscapeFeature(feature))
-export const WORLD_MARKETPLACE = expandBrailaPoint({ x: layout.marketplace.x, y: layout.marketplace.y })
+  .map(building => expandPlayableCityContextBuilding(building))
+export const WORLD_LANDSCAPE = layout.landscape.map(feature => expandPlayableCityLandscapeFeature(feature))
+export const WORLD_MARKETPLACE = expandPlayableCityPoint({ x: layout.marketplace.x, y: layout.marketplace.y })
 export const WORLD_CITY_NAME = layout.name
 /** Geographic source bounds stay factual; only playable world-unit separation is expanded. */
 export const WORLD_GEO_BOUNDS = layout.geoBounds
