@@ -1,126 +1,150 @@
 # Document Information
 
-Document: AI_REPORTING_PROTOCOL.md  
-Project: DROPi Tycoon  
-Version: 1.1.0  
-Status: Persistent AI Task Reporting Governance  
-Author: Marian Caliof & OpenAI  
-Language: English  
+Document: AI_REPORTING_PROTOCOL.md
+Project: DROPi Tycoon
+Version: 1.1.0
+Status: Persistent AI Task Reporting Governance
+Author: Marian Caliof & OpenAI
+Language: English
 Last Updated: 2026-09-10
 
 ---
 
 # AI Reporting Protocol
 
-## Purpose and scope
+## Purpose and Scope
 
-This document defines the canonical protocol for persisting significant AI task history inside the repository so work remains reviewable by the Project Owner, future AI agents and external reviewers.
+This document defines the canonical protocol for persisting significant AI task outputs inside the repository.
 
-This is governance and traceability. It does not redefine gameplay, architecture, prototype scope or implementation design.
+The protocol ensures that AI work is reviewable by:
 
-## Historical reports are not operational memory
+- Project Owner
+- Future AI agents
+- External reviewers
 
-Mandatory historical report folder:
+This is a governance and traceability protocol.
+
+It does not redefine gameplay, architecture, prototype scope, or implementation design.
+
+---
+
+# Canonical Report Storage
+
+Mandatory report folder:
 
 `09_Development/AI_Reports/`
-
-These reports preserve significant task history and evidence. They are **historical records** and must not silently become current operational truth.
-
-Current operational project state and resumable session handoffs are maintained separately under:
-
-`09_Development/AI_Project_Memory/`
-
-The deterministic entry point is:
-
-`09_Development/AI_Project_Memory/BOOTSTRAP.md`
-
-A significant session therefore has two complementary persistence duties:
-
-1. preserve its historical task/report evidence under this protocol; and
-2. preserve/update the current durable handoff required by the execution/memory protocol.
-
-Completing one does not waive the other.
-
-## Operational completion invariant
-
-For significant sessions:
-
-`NO DURABLE HANDOFF = SESSION NOT OPERATIONALLY COMPLETE`
-
-A historical report alone is not sufficient to mark a significant DT session closed, paused, superseded, READY, HOLD or handed off.
-
-The effective handoff must preserve the required current fields defined by `AI_AGENT_EXECUTION_PROTOCOL.md` and `AI_Project_Memory/BOOTSTRAP.md`.
-
-## Canonical report storage
 
 Mandatory report filename format:
 
 `YYYY-MM-DD_NNN_REPORT_NAME.md`
 
-Example only:
+Example format only:
 
 `2026-07-12_001_TASK_REPORT.md`
 
-### Sequential numbering
+---
 
-- `NNN` is a three-digit global sequence for `AI_Reports/`.
-- New report number is the next unused number after the highest existing report number.
-- Never reuse a number, including cancelled/superseded reports.
-- Concurrent numbering conflicts must be resolved before merge by taking the next available number.
+# Sequential Numbering Rules
 
-## Tasks requiring persistent reports
+- `NNN` is a three-digit sequence (`001`, `002`, `003`, ...).
+- Sequence is global for the report folder, not per agent.
+- New report number = next unused number after the highest existing report number.
+- Do not reuse numbers, including when a report is cancelled or superseded.
+- If two tasks conflict on numbering, resolve by using the next available number before merge.
 
-A report is mandatory for significant AI tasks including:
+---
 
-- analysis producing findings/recommendations/decisions;
-- process/governance documentation changes;
-- code, asset, configuration or structure modifications;
-- audits, reviews, investigations or validation;
-- failed, blocked, cancelled or partial tasks.
+# Which Tasks Require Persistent Reports
 
-Only trivial formatting/typo-only work with no substantive impact may be exempt.
+A persistent report is mandatory for significant AI tasks, including:
 
-## Required report metadata
+- Analysis that produces findings, recommendations, or decisions
+- Documentation updates that affect process, governance, or project operations
+- Code, asset, configuration, or structure modifications
+- Audits, reviews, investigations, or validation activities
+- Tasks that are failed, blocked, cancelled, or partially completed
 
-Every report records, when available:
+---
 
-- Report ID;
-- Report title;
-- Date;
-- Project;
-- Task type;
-- Agent/model;
-- Repository;
-- Branch;
-- Base commit;
-- Resulting commit;
-- Pull Request;
-- Human approval status.
+# Trivial Task Exemptions
 
-Unavailable historical metadata may use `N/A` with a brief explanation. Current operational uncertainty belongs in the handoff/UNKNOWN register and uses `UNKNOWN`, not invented values.
+Reports may be exempt only for trivial tasks with no substantive project impact, such as:
 
-## Required report sections
+- Minor formatting-only edits
+- Typo-only corrections
+- Non-substantive wording cleanup without behavioral, governance, or decision impact
 
-Every report includes:
+If a task is not clearly trivial, create a report.
 
-- Original task instruction;
-- Objective;
-- Scope;
-- Files inspected;
-- Files created;
-- Files modified;
-- Files moved or renamed;
-- Files deleted;
-- Actions performed;
-- Findings;
-- Recommendations;
-- Validation performed;
-- Validation results;
-- Unresolved issues;
-- Final result/status;
-- Follow-up actions.
+---
 
-## Mandatory report template
+# Operational Completion Rule
+
+A significant AI task is not operationally complete until its persistent report is created or updated under this protocol.
+
+For DT-00 and DT specialist sessions, historical reporting is complemented by repository-backed operational memory.
+
+`NO DURABLE HANDOFF = SESSION NOT OPERATIONALLY COMPLETE`
+
+Before a significant DT session is closed, paused, superseded, marked READY/HOLD, or handed off, the current operational handoff must also be persisted under:
+
+`09_Development/AI_Project_Memory/HANDOFFS.json`
+
+A historical report does not replace the current handoff, and the current handoff does not replace the historical report.
+
+A fresh DT session starts from:
+
+`09_Development/AI_Project_Memory/BOOTSTRAP.md`
+
+Mutable GitHub facts must be re-read from live GitHub before implementation, READY, audit, merge, or lifecycle mutation. Persisted GitHub state is a durable observation, not immutable truth. Missing evidence remains `UNKNOWN`.
+
+---
+
+# Required Report Metadata
+
+Every report must include, when available:
+
+- Report ID
+- Report title
+- Date
+- Project
+- Task type
+- Agent/model
+- Repository
+- Branch
+- Base commit
+- Resulting commit
+- Pull Request
+- Human approval status
+
+If data is unavailable, write `N/A` and explain briefly.
+
+---
+
+# Required Report Sections
+
+Every report must include all sections below:
+
+- Original task instruction
+- Objective
+- Scope
+- Files inspected
+- Files created
+- Files modified
+- Files moved or renamed
+- Files deleted
+- Actions performed
+- Findings
+- Recommendations
+- Validation performed
+- Validation results
+- Unresolved issues
+- Final result/status
+- Follow-up actions
+
+---
+
+# Mandatory Report Template
 
 ```md
 # Report Metadata
@@ -140,7 +164,7 @@ Every report includes:
 
 # Original Task Instruction
 
-<Paste original instruction exactly, or reference an immutable GitHub Issue body/comment when the exact instruction is already preserved there and duplicating it would create competing history.>
+<Paste original instruction exactly>
 
 # Objective
 
@@ -173,82 +197,166 @@ Every report includes:
 # Follow-up Actions
 ```
 
-## Task-type rules
+---
 
-### Analysis-only tasks
-- Record exact analysis scope/boundaries.
-- Preserve substantive findings/recommendations.
-- Record validation and results.
-- Significant analysis still receives a report even if no implementation file changed.
+# Task-Type Rules
 
-### Implementation/modification tasks
+## Analysis-Only Tasks
+
+- Record exact analysis scope and boundaries.
+- Record all substantive findings and recommendations.
+- Record validations executed and their results.
+- If no file was changed, still persist a report for significant analysis tasks.
+
+## Implementation/Modification Tasks
+
 - Record exactly what changed and why.
-- Record exact files read/changed.
-- Record resulting commits/PR when available.
-- Record validation and outcomes.
+- Record exact files read and changed.
+- Record resulting commits and PR when available.
+- Record validation steps and outcomes.
 
-### Failed, blocked, cancelled or partial tasks
-The report must state the status, what completed, what did not, blocking reason/failure cause and recommended next action.
+---
 
-## Identity and traceability
+# Failed, Blocked, Cancelled, or Partial Tasks
 
-When available, reports record agent/model identity, repository, branch, base/resulting commit and PR reference.
+These tasks still require a report if significant.
 
-Current resumable state must not be reconstructed by scanning all reports; it belongs in `AI_Project_Memory/HANDOFFS.json` and is live-reconciled through GitHub.
+The report must clearly state:
 
-## File traceability
+- Status (`Failed`, `Blocked`, `Cancelled`, or `Partial`)
+- What was completed
+- What was not completed
+- Blocking reason or failure cause
+- Recommended next action
 
-Reports record exact repository paths for files read, created, modified, moved/renamed or deleted. Avoid vague labels.
+---
 
-## Original instruction preservation
+# Identity and Traceability Rules
 
-Preserve the original task instruction verbatim when it is not already durably and immutably present in the referenced GitHub Issue/comment.
+When available, reports must record:
 
-For Issue-backed missions such as #683, a report may cite the exact Issue/comment URL/number instead of duplicating a very large instruction body, provided the report identifies that reference as the complete original instruction authority.
+- Agent identity
+- Model identity
+- Repository
+- Branch
+- Base commit
+- Resulting commit
+- Pull Request reference
 
-## Substantive result preservation
+Missing metadata must be marked `N/A`.
 
-Reports preserve substantive findings, recommendations, validation/results and unresolved issues. They must not be stripped down to status words.
+---
 
-## Human approval status
+# File Traceability Rules
 
-Every report explicitly states human approval status, such as Pending review, Approved, Approved with conditions or Rejected. Amend history; do not silently erase prior approval state.
+Reports must record exact repository paths for:
 
-## Non-canonical specification rule
+- Files read/inspected
+- Files created
+- Files modified
+- Files moved or renamed
+- Files deleted
 
-AI task reports are historical records. They are not canonical gameplay, architecture, prototype scope or implementation specifications unless an authorized canonical document is explicitly updated and approved.
+Do not summarize with vague labels.
 
-Operational memory is also not canonical domain authority. It records current execution state and references the domain authorities that control the work.
+---
 
-## Report integrity
+# Original Instruction Preservation Rule
 
-- Do not silently rewrite prior reports.
-- Corrections use an amendment section or a new report referencing the corrected report.
-- State what was wrong, why and the corrected evidence.
+The original task instruction must be preserved verbatim in the report.
 
-## Durable handoff update
+Do not paraphrase or shorten the instruction in that section.
 
-Before a significant session is considered operationally complete, update the applicable repository-backed handoff so a fresh AI can resume without prior conversation history.
+---
 
-At minimum preserve the fields required by `AI_AGENT_EXECUTION_PROTOCOL.md` and the bootstrap protocol, including status, evidence, UNKNOWNs, blockers, forbidden actions and next safe action.
+# Substantive Result Preservation Rule
 
-If live GitHub has moved, reconcile first. Historical report text never overrides live GitHub state.
+Reports must preserve the complete substantive output of the task, including:
 
-## Relationship with other governance documents
+- Findings
+- Recommendations
+- Validation activity and results
+- Unresolved issues
+
+Do not remove substantive conclusions from the persistent report.
+
+---
+
+# Human Approval Status Rule
+
+Every report must state human approval status explicitly, for example:
+
+- Pending review
+- Approved
+- Approved with conditions
+- Rejected
+
+Update approval status by amending with a new entry, not by deleting prior history.
+
+---
+
+# Non-Canonical Specification Rule
+
+AI task reports are historical records.
+
+They must not be treated as canonical gameplay, architecture, prototype scope, or implementation specifications unless a canonical document is explicitly updated and approved.
+
+Operational memory under `09_Development/AI_Project_Memory/` is also not canonical domain authority. It records resumable execution state and references the authorities that control the work.
+
+---
+
+# Report Integrity Rules
+
+- Agents must not silently edit prior reports.
+- Corrections must be made through a new amendment section or a new report referencing the corrected report ID.
+- The correction must identify:
+  - What was wrong
+  - Why it was wrong
+  - What the corrected information is
+
+---
+
+# Owner-Facing DT Reporting Rule
+
+For material DT work cycles, GitHub remains the technical evidence/journal while the Project Owner receives a concise operational report in Romanian.
+
+That owner-facing report must explain:
+
+- BEFORE
+- CHANGED
+- AFTER
+- PLAYER/GAME IMPACT, explicitly `NO PLAYER-VISIBLE CHANGE` when applicable
+- MERGE STATUS
+- RISKS / WHAT REMAINS
+- NEXT OWNER ACTION
+
+Technical identifiers, file paths, branch names, SHA values, code, commands, and machine-status tokens such as PASS, FAIL, READY, HOLD, UNKNOWN, CURRENT, STALE, and CONTRADICTORY may remain in English.
+
+A specialist must not reduce a material owner-facing report to only `continua`, `HOLD`, `READY`, or another status word.
+
+---
+
+# Relationship with Other Governance Documents
 
 This protocol is mandatory and complementary to:
 
-- `00_Project/PROJECT_INTAKE_PROTOCOL.md`;
-- `09_Development/AI_AGENT_EXECUTION_PROTOCOL.md`;
-- `09_Development/GITHUB_WORKFLOW.md`;
-- `09_Development/AI_Project_Memory/BOOTSTRAP.md`;
-- future audit documents.
+- `00_Project/PROJECT_INTAKE_PROTOCOL.md`
+- `09_Development/AI_AGENT_EXECUTION_PROTOCOL.md`
+- `09_Development/GITHUB_WORKFLOW.md`
+- `09_Development/AI_Project_Memory/BOOTSTRAP.md`
+- Future audit documents
 
-A real conflict that cannot be resolved from authority/evidence must be escalated rather than silently normalized.
+If a conflict is detected, escalate for human resolution and do not expand scope.
 
-## Canonical rule
+---
 
-Significant AI work must be historically traceable through `09_Development/AI_Reports/` **and** operationally resumable through the repository-backed persistent-memory/handoff layer.
+# Canonical Rule
+
+Significant AI work must be persisted, traceable, and reviewable through reports in:
+
+`09_Development/AI_Reports/`
+
+For DT sessions, the required current operational handoff is additionally persisted under `09_Development/AI_Project_Memory/` and live-reconciled before action.
 
 ---
 
