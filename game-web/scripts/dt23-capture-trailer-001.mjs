@@ -129,11 +129,13 @@ try {
   await clickCanvas(912, 209)
   await sleep(900)
 
-  await sweepStreetInteraction('KeyD', 'merchant-introduction')
+  // Verified from the rendered HUD and diagnostic frames: Mara is west of the fresh-start hero.
+  await sweepStreetInteraction('KeyA', 'merchant-introduction')
   await sleep(900)
   await shot('CAP-003-merchant-introduced')
 
-  await sweepStreetInteraction('KeyA', 'hq-return')
+  // After onboarding, return east to the physical HQ entrance.
+  await sweepStreetInteraction('KeyD', 'hq-return')
   await sleep(1200)
   await shot('CAP-004-hq-interior')
 
@@ -150,7 +152,8 @@ try {
   await page.keyboard.press('Escape')
   await sleep(2000)
 
-  await sweepStreetInteraction('KeyD', 'parcel-pickup')
+  // Accepted work sends the player west back to Mara for the physical parcel pickup.
+  await sweepStreetInteraction('KeyA', 'parcel-pickup')
   await sleep(1200)
   await shot('CAP-006-parcel-picked-up')
   await sleep(1200)
