@@ -1,4 +1,5 @@
 import { chromium } from 'playwright'
+import { PNG } from 'pngjs'
 import { copyFile, mkdir, stat, writeFile } from 'node:fs/promises'
 import path from 'node:path'
 
@@ -91,6 +92,103 @@ const shot = async name => {
   })
 }
 
+const isObjectiveGold = (r, g, b) =>
+  r >= 225 && r <= 255 && g >= 160 && g <= 225 && b >= 25 && b <= 120
+
+/**
+ * Detect the visible gold objective marker strictly from rendered pixels.
+ * This deliberately does not inspect Phaser scene state, registries, mission objects,
+ * world coordinates or save data. The capture agent sees what a player sees.
+ */
+const findVisibleGoldObjective = async () => {
+  const buffer = await page.screenshot({ fullPage: false })
+  const png = PNG.sync.read(buffer)
+  const bins = new Map()
+  const points = []
+  const binSize = 32
+
+  for (let y = 110; y < Math.min(png.height - 100, 620); y += 1) {
+    for (let x = 80; x < Math.min(png.width - 80, 1200); x += 1) {
+      const offset = (y * png.width + x) * 4
+      const r = png.data[offset]
+      const g = png.data[offset + 1]
+      const b = png.data[offset + 2]
+      if (!isObjectiveGold(r, g, b)) continue
+      points.push({ x, y })
+      const bx = Math.floor(x / binSize)
+      const by = Math.floor(y / binSize)
+      const key = `${bx},${by}`
+      bins.set(key, (bins.get(key) ?? 0) + 1)
+    }
+  }
+
+  if (!points.length) return null
+
+  let best = null
+  for (const key of bins.keys()) {
+    const [bx, by] = key.split(',').map(Number)
+    let score = 0
+    for (let dx = -1; dx <= 1; dx += 1) {
+      for (let dy = -1; dy <= 1; dy += 1) {
+        score += bins.get(`${bx + dx},${by + dy}`) ?? 0
+      }
+    }
+    if (!best || score > best.score) best = { bx, by, score }
+  }
+
+  if (!best || best.score < 45) return null
+  const centerX = (best.bx + 0.5) * binSize
+  const centerY = (best.by + 0.5) * binSize
+  const cluster = points.filter(({ x, y }) => Math.hypot(x - centerX, y - centerY) <= 105)
+  if (cluster.length < 35) return null
+
+  return {
+    x: cluster.reduce((sum, point) => sum + point.x, 0) / cluster.length,
+    y: cluster.reduce((sum, point) => sum + point.y, 0) / cluster.length,
+    pixels: cluster.length,
+    score: best.score,
+  }
+}
+
+/**
+ * Move through the actual public tap-to-move input. If the objective is not visible,
+ * zoom out using the real HUD minus control until the gold marker is visible.
+ */
+const navigateToVisibleObjective = async label => {
+  for (let attempt = 1; attempt <= 8; attempt += 1) {
+    const target = await findVisibleGoldObjective()
+    if (!target) {
+      mark(`${label}-objective-not-visible`, { attempt })
+      await clickCanvas(1155, 200) // real HUD zoom-out button at canonical 1280x720 layout
+      await sleep(900)
+      continue
+    }
+
+    const centerDistance = Math.hypot(target.x - VIEWPORT.width / 2, target.y - VIEWPORT.height / 2)
+    mark(`${label}-objective-visible`, {
+      attempt,
+      screenX: Math.round(target.x),
+      screenY: Math.round(target.y),
+      pixels: target.pixels,
+      centerDistance: Math.round(centerDistance),
+    })
+
+    if (centerDistance <= 105) {
+      await sleep(650)
+      return target
+    }
+
+    await clickCanvas(target.x, target.y)
+    await sleep(2200)
+  }
+
+  const last = await findVisibleGoldObjective()
+  if (!last) throw new Error(`Could not visually resolve objective marker for ${label}.`)
+  await clickCanvas(last.x, last.y)
+  await sleep(1800)
+  return last
+}
+
 let video
 try {
   mark('navigation-start', { gameUrl: GAME_URL })
@@ -125,22 +223,18 @@ try {
   await sleep(1000)
   mark('player-phone-closed')
 
-  // Walk only through the runtime's real keyboard controls and walkable city surfaces.
-  // HQ (380,270) -> central vertical -> Mara/PickupZone (620,910).
-  await hold('KeyD', 2800)
-  await hold('KeyS', 4260)
-  await hold('KeyA', 1200)
-  mark('merchant-arrival-attempt')
+  // Follow the visible mission marker through the game's own tap-to-move system.
+  await navigateToVisibleObjective('merchant-onboarding')
   await pressAction()
+  await sleep(1500)
+  mark('merchant-interaction')
   await shot('CAP-003-merchant-interaction')
 
-  // Mara -> HQ. The first E at HQ legitimately enters the physical HQ interior.
-  await hold('KeyD', 1200)
-  await hold('KeyW', 4260)
-  await hold('KeyA', 2800)
-  mark('hq-entrance-attempt')
+  // The next visible objective returns the player to HQ.
+  await navigateToVisibleObjective('hq-return')
   await pressAction()
   await sleep(1800)
+  mark('hq-entered')
   await shot('CAP-004-hq-interior')
 
   // HQ interior spawn is (600,620). Walk to the real Parcel Operations staging interaction
@@ -148,9 +242,9 @@ try {
   // delegates to the same authoritative performUrbanInteraction path used by the game.
   await hold('KeyD', 1900)
   await hold('KeyW', 760)
-  mark('hq-parcel-operations-attempt')
   await pressAction()
   await sleep(1600)
+  mark('hq-parcel-operations-used')
   await shot('CAP-005-job-accepted')
 
   // ESC is the real HQ interior exit control. It returns to the sleeping GameWorldScene
@@ -159,24 +253,18 @@ try {
   await sleep(2200)
   mark('hq-exited-after-acceptance')
 
-  // HQ -> merchant again, then authoritative pickup.
-  await hold('KeyD', 2800)
-  await hold('KeyS', 4260)
-  await hold('KeyA', 1200)
-  mark('pickup-arrival-attempt')
+  // Follow the now-authoritative pickup objective on the live map.
+  await navigateToVisibleObjective('pickup')
   await pressAction()
-  await sleep(1400)
+  await sleep(1600)
+  mark('parcel-pickup-interaction')
   await shot('CAP-006-parcel-picked-up')
 
-  // PickupZone (620,910) -> first canonical DeliveryZone (560,290).
-  // The route stays on real walkable surfaces: east to the central vertical corridor,
-  // north to the residential lane, then west to the customer.
-  await hold('KeyD', 1200)
-  await hold('KeyW', 4140)
-  await hold('KeyA', 1600)
-  mark('delivery-arrival-attempt')
+  // Follow the delivery objective using the same player-visible marker and tap-to-move path.
+  await navigateToVisibleObjective('delivery')
   await pressAction()
-  await sleep(3500)
+  await sleep(4200)
+  mark('delivery-interaction')
   await shot('CAP-007-delivery-result')
 
   mark('capture-complete')
@@ -197,7 +285,7 @@ if (videoInfo.size < 50_000) {
 }
 
 const manifest = {
-  schemaVersion: 2,
+  schemaVersion: 3,
   captureType: 'AUTHENTIC_GAMEPLAY_SOURCE',
   gameUrl: GAME_URL,
   viewport: VIEWPORT,
@@ -210,7 +298,7 @@ const manifest = {
   truthfulness: {
     generatedPseudoGameplayUsed: false,
     internalGameStateMutationUsed: false,
-    captureMethod: 'visible Phaser canvas + real pointer/keyboard inputs',
+    captureMethod: 'rendered-pixel objective detection + visible Phaser pointer/keyboard inputs',
     hqAcceptanceMethod: 'physical HQ Parcel Operations interaction',
   },
 }
