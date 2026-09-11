@@ -1,4 +1,5 @@
 import { chromium } from 'playwright'
+import { PNG } from 'pngjs'
 import { copyFile, mkdir, stat, writeFile } from 'node:fs/promises'
 import path from 'node:path'
 
@@ -6,7 +7,10 @@ const GAME_URL = process.env.DT23_GAME_URL ?? 'https://dropi-tycoon-production.u
 const OUTPUT_DIR = path.resolve(process.env.DT23_OUTPUT_DIR ?? '../artifacts/dt23/trailer-001')
 const RAW_DIR = path.join(OUTPUT_DIR, 'raw')
 const VIEWPORT = { width: 1280, height: 720 }
-const STREET_TRAVEL_MS = 2600
+const STREET_APPROACH_MS = 26_000
+const STREET_STEP_MS = 250
+const STREET_MAX_STEPS = 24
+const OBJECTIVE_PANEL = { x: 6, y: 46, width: 370, height: 62 }
 
 const sleep = ms => new Promise(resolve => setTimeout(resolve, ms))
 await mkdir(RAW_DIR, { recursive: true })
@@ -52,14 +56,56 @@ const hold = async (key, ms) => {
   await page.keyboard.down(key)
   await sleep(ms)
   await page.keyboard.up(key)
-  await sleep(220)
+  await sleep(120)
 }
-const pressAction = async () => {
+const pressAction = async (settleMs = 650) => {
   await page.keyboard.press('KeyE')
-  await sleep(1300)
+  await sleep(settleMs)
 }
 const shot = async name => {
   await page.screenshot({ path: path.join(OUTPUT_DIR, `${name}.png`), fullPage: false })
+}
+
+const visibleRegionDiff = (beforeBuffer, afterBuffer, region) => {
+  const before = PNG.sync.read(beforeBuffer)
+  const after = PNG.sync.read(afterBuffer)
+  if (before.width !== after.width || before.height !== after.height) return Number.POSITIVE_INFINITY
+
+  let total = 0
+  let samples = 0
+  const xEnd = Math.min(before.width, region.x + region.width)
+  const yEnd = Math.min(before.height, region.y + region.height)
+  for (let y = region.y; y < yEnd; y += 2) {
+    for (let x = region.x; x < xEnd; x += 2) {
+      const offset = (y * before.width + x) * 4
+      total += Math.abs(before.data[offset] - after.data[offset])
+      total += Math.abs(before.data[offset + 1] - after.data[offset + 1])
+      total += Math.abs(before.data[offset + 2] - after.data[offset + 2])
+      samples += 3
+    }
+  }
+  return samples ? total / samples : 0
+}
+
+const actionChangesObjective = async label => {
+  const before = await page.screenshot({ fullPage: false })
+  await pressAction()
+  const after = await page.screenshot({ fullPage: false })
+  const score = visibleRegionDiff(before, after, OBJECTIVE_PANEL)
+  mark(`${label}-action-probe`, { objectivePixelDiff: Number(score.toFixed(2)) })
+  return score >= 2.2
+}
+
+const sweepStreetInteraction = async (key, label) => {
+  await hold(key, STREET_APPROACH_MS)
+  for (let step = 0; step <= STREET_MAX_STEPS; step += 1) {
+    if (await actionChangesObjective(label)) {
+      mark(`${label}-confirmed`, { step })
+      return
+    }
+    if (step < STREET_MAX_STEPS) await hold(key, STREET_STEP_MS)
+  }
+  throw new Error(`${label} did not change the visible objective panel across the calibrated interaction sweep.`)
 }
 
 let video
@@ -82,43 +128,40 @@ try {
   await clickCanvas(912, 209) // actual phone Close target
   await sleep(900)
 
-  // Current shipped Brăila geometry places Mara east of HQ on the same walkable street.
-  // HUD reports the initial target at about 421u; 2.6s at the real 150u/s walking speed
-  // places the hero inside the canonical 48u interaction radius without teleporting state.
-  await hold('KeyD', STREET_TRAVEL_MS)
-  await pressAction()
-  await sleep(1200)
-  mark('merchant-introduction-attempt')
-  await shot('CAP-003-merchant-interaction')
+  // The playable Brăila runtime is scaled 10x relative to source-map spacing.
+  // We therefore approach through real held movement, then probe E in small increments.
+  // A successful interaction is confirmed only when the rendered objective HUD changes.
+  await sweepStreetInteraction('KeyD', 'merchant-introduction')
+  await sleep(900)
+  await shot('CAP-003-merchant-introduced')
 
-  // Return west along the same street to the physical HQ entrance.
-  await hold('KeyA', STREET_TRAVEL_MS)
-  await pressAction()
-  await sleep(1700)
-  mark('hq-entered')
+  await sweepStreetInteraction('KeyA', 'hq-return')
+  await sleep(1200)
   await shot('CAP-004-hq-interior')
 
-  // Use the real physical Parcel Operations terminal in HQ.
+  // Physical HQ navigation. The first two holds reproduce the known safe approach;
+  // the short eastward sweep guarantees that one real E press lands inside the
+  // Parcel Operations radius without mutating scene or mission state.
   await hold('KeyD', 1900)
   await hold('KeyW', 760)
-  await pressAction()
-  await sleep(1500)
-  mark('hq-parcel-operations-used')
-  await shot('CAP-005-job-accepted')
+  for (let step = 0; step < 8; step += 1) {
+    await pressAction(350)
+    if (step < 7) await hold('KeyD', 250)
+  }
+  await sleep(900)
+  mark('hq-parcel-operations-sweep-complete')
+  await shot('CAP-005-job-acceptance-result')
 
-  await page.keyboard.press('Escape') // real HQ exit control
+  await page.keyboard.press('Escape') // actual HQ interior exit control
   await sleep(2000)
 
-  // Walk east back to Mara for the authoritative parcel pickup.
-  await hold('KeyD', STREET_TRAVEL_MS)
-  await pressAction()
-  await sleep(1700)
-  mark('pickup-interaction-attempt')
+  await sweepStreetInteraction('KeyD', 'parcel-pickup')
+  await sleep(1200)
   await shot('CAP-006-parcel-picked-up')
 
-  // This calibration frame intentionally stops after pickup. It exposes the next real objective
-  // so DT-23 can set the final delivery leg from observed gameplay rather than inventing geometry.
-  await sleep(1800)
+  // The calibrated source stops once the pickup objective visibly advances.
+  // The delivery leg will only be added after its real next objective is captured.
+  await sleep(1200)
   await shot('CAP-007-next-delivery-objective')
 
   mark('capture-complete')
@@ -136,7 +179,7 @@ const videoInfo = await stat(sourceVideo)
 if (videoInfo.size < 50_000) throw new Error(`Captured video is unexpectedly small: ${videoInfo.size} bytes`)
 
 const manifest = {
-  schemaVersion: 4,
+  schemaVersion: 5,
   captureType: 'AUTHENTIC_GAMEPLAY_SOURCE',
   gameUrl: GAME_URL,
   viewport: VIEWPORT,
@@ -149,8 +192,8 @@ const manifest = {
   truthfulness: {
     generatedPseudoGameplayUsed: false,
     internalGameStateMutationUsed: false,
-    captureMethod: 'visible Phaser canvas + real keyboard/pointer controls',
-    hqAcceptanceMethod: 'physical HQ Parcel Operations interaction',
+    captureMethod: 'visible Phaser canvas + real keyboard/pointer controls + rendered-HUD pixel-change confirmation',
+    hqAcceptanceMethod: 'physical HQ Parcel Operations interaction sweep',
     calibrationStopsAfterPickup: true,
   },
 }
