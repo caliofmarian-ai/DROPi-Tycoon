@@ -14,6 +14,7 @@ export const PLAYABLE_LOCALITY_DELIVERY_MATERIALIZATION_VERSION = 1 as const
 type CurrentLocalityMaterializationInput = Parameters<
   typeof materializeDeliveryWorkForCurrentLocality
 >[0]
+
 type CurrentLocalitySettlementInput = Parameters<
   typeof requestCanonicalDt03DeliverySettlement
 >[0]
