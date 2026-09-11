@@ -113,3 +113,22 @@ While the migration is in flight, normal specialist merges do not leapfrog #683 
 **Decision:** Existing evidence shows `main` branch protection/required-check enforcement is not active. #683 does not silently change that state; any change requires the owning governance/CI decision.
 
 **Source:** DT-22 #681 audit evidence.
+
+---
+
+## D-TOOLS-001 — Figma and Canva are Owner-authorized project tools
+
+**Decision:** The Project Owner explicitly authorizes AI agents working on DROPi Tycoon to use the connected paid Figma and Canva capabilities whenever they materially improve project work and remain inside the existing DT ownership boundaries.
+
+Authorized usage includes, without creating new domain authority:
+
+- **Figma:** UI/UX exploration, screen design, mobile layouts, HUD/menu/component work, design-system work, prototypes, visual specifications and design-to-implementation handoff.
+- **Canva:** presentations, promotional layouts, campaign/social assets, store/launch presentation material, pitch material and other communication-oriented visual production.
+
+**Authority boundary:** Figma and Canva are production/design tools, not canonical sources of gameplay, economy, architecture, legal status, release readiness or feature truth. Repository-backed canonical documents and live GitHub remain authoritative. Any artifact that becomes implementation/release evidence must be referenced, imported, attested or governed through the applicable existing repository and DT workflows.
+
+**Ownership boundary:** This authorization does not transfer ownership between DT lanes and does not permit an agent to bypass DT-13 legal/provenance requirements, DT-19 asset governance, DT-14 release evidence, DT-21/other UI ownership, DT-23 creative-claims rules, or any other established specialist boundary.
+
+**Source:** Explicit Project Owner directive, 2026-09-12.
+
+**Rejected assumption:** Paid external design-tool access is unavailable or requires a new Owner approval for each ordinary in-scope use.
