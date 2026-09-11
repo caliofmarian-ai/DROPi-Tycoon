@@ -393,7 +393,7 @@ export class GameWorldScene extends Phaser.Scene {
     const camera = this.cameras.main
     const framing = heroStreetCameraFraming(camera.width, camera.height, this.facing, HERO_STREET_TARGET_ZOOM)
     camera.setZoom(framing.zoom)
-    camera.startFollow(this.playerVisual.container, false, 0.14, 0.14, framing.offsetX, framing.offsetY)
+    this.cameras.main.startFollow(this.playerVisual.container, false, 0.14, 0.14, framing.offsetX, framing.offsetY)
     if (notify && this.hud) this.hud.notify('Street camera on courier · movement direction opens the view ahead · drag for free-look')
   }
 
