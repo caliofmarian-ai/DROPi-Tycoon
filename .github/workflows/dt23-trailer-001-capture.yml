@@ -34,24 +34,32 @@ jobs:
         uses: actions/setup-node@v7
         with:
           node-version: 22.12.0
-          cache: npm
-          cache-dependency-path: game-web/package-lock.json
 
-      - name: Install project dependencies
-        working-directory: game-web
-        run: npm ci
-
-      - name: Install ephemeral Playwright capture dependency
-        working-directory: game-web
-        run: npm install --no-save --package-lock=false playwright@1.55.0
+      - name: Prepare isolated Playwright capture runner
+        shell: bash
+        run: |
+          set -euo pipefail
+          CAPTURE_RUNNER="$RUNNER_TEMP/dt23-playwright"
+          mkdir -p "$CAPTURE_RUNNER"
+          cp game-web/scripts/dt23-capture-trailer-001.mjs "$CAPTURE_RUNNER/capture.mjs"
+          cd "$CAPTURE_RUNNER"
+          npm init -y >/dev/null
+          npm install --no-audit --no-fund playwright@1.55.0
+          echo "DT23_CAPTURE_RUNNER=$CAPTURE_RUNNER" >> "$GITHUB_ENV"
 
       - name: Install Chromium for capture
-        working-directory: game-web
-        run: npx playwright install --with-deps chromium
+        shell: bash
+        run: |
+          set -euo pipefail
+          cd "$DT23_CAPTURE_RUNNER"
+          npx playwright install --with-deps chromium
 
       - name: Capture authentic gameplay source
-        working-directory: game-web
-        run: node scripts/dt23-capture-trailer-001.mjs
+        shell: bash
+        run: |
+          set -euo pipefail
+          cd "$DT23_CAPTURE_RUNNER"
+          node capture.mjs
 
       - name: Install ffmpeg if needed
         shell: bash
