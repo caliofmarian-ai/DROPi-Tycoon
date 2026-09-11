@@ -1,50 +1,23 @@
 import type Phaser from 'phaser'
-import { cityFitZoom, cityScaleLevel, reserveLabel, type MapViewport, type SemanticMapLevel } from './semanticMapCamera'
+import {
+  LOCALITY_PRESENTATION_BASELINE,
+  isLocalityLabelVisibleAtLevel,
+  localityLabelScaleCompensation,
+  selectLocalityScreenLabels,
+  type LocalityLabelRole,
+  type LocalityScreenBox,
+  type LocalityScreenLabelCandidate,
+} from './localityPresentationProfile'
+import { cityFitZoom, cityScaleLevel, type MapViewport, type SemanticMapLevel } from './semanticMapCamera'
 
-export type BrailaLabelRole =
-  | 'district'
-  | 'street'
-  | 'landmark'
-  | 'storefront'
-  | 'interaction'
-  | 'route'
-  | 'address'
-  | 'detail'
+/** Brăila is the premium calibration consumer, not the global presentation authority. */
+export const BRAILA_PRESENTATION_PROFILE = LOCALITY_PRESENTATION_BASELINE
+export type BrailaLabelRole = LocalityLabelRole
+export type BrailaScreenLabelCandidate = LocalityScreenLabelCandidate
 
-interface ScreenBox {
-  left: number
-  top: number
-  right: number
-  bottom: number
-}
-
-interface BrailaLabelRule {
-  levels: readonly SemanticMapLevel[]
-  priority: number
-  fixedScreenSize: boolean
-  gap: number
-}
-
-export const BRAILA_LABEL_RULES: Readonly<Record<BrailaLabelRole, BrailaLabelRule>> = {
-  district: { levels: ['City', 'District'], priority: 90, fixedScreenSize: true, gap: 7 },
-  street: { levels: ['District', 'Area', 'Hero'], priority: 70, fixedScreenSize: true, gap: 5 },
-  landmark: { levels: ['Area', 'Hero'], priority: 110, fixedScreenSize: true, gap: 7 },
-  storefront: { levels: ['Area', 'Hero'], priority: 82, fixedScreenSize: true, gap: 5 },
-  interaction: { levels: ['Hero'], priority: 120, fixedScreenSize: true, gap: 7 },
-  route: { levels: ['Hero'], priority: 88, fixedScreenSize: true, gap: 5 },
-  address: { levels: ['Hero'], priority: 52, fixedScreenSize: true, gap: 3 },
-  detail: { levels: ['Hero'], priority: 45, fixedScreenSize: true, gap: 4 },
-}
-
+export const BRAILA_LABEL_RULES = BRAILA_PRESENTATION_PROFILE.labelRules
 /** Keeps fixed-screen labels readable even at the 10x-city semantic overview zoom. */
-export const BRAILA_LABEL_MAX_SCREEN_COMPENSATION = 1024
-
-export interface BrailaScreenLabelCandidate {
-  id: string
-  role: BrailaLabelRole
-  box: ScreenBox
-  priority?: number
-}
+export const BRAILA_LABEL_MAX_SCREEN_COMPENSATION = BRAILA_PRESENTATION_PROFILE.maxScreenCompensation
 
 export interface BrailaPresentationLabel {
   text: Phaser.GameObjects.Text
@@ -52,23 +25,18 @@ export interface BrailaPresentationLabel {
   priority?: number
 }
 
-const inflate = (box: ScreenBox, gap: number): ScreenBox => ({
-  left: box.left - gap,
-  top: box.top - gap,
-  right: box.right + gap,
-  bottom: box.bottom + gap,
-})
-
 export const isBrailaLabelVisibleAtLevel = (role: BrailaLabelRole, level: SemanticMapLevel): boolean =>
-  BRAILA_LABEL_RULES[role].levels.includes(level)
+  isLocalityLabelVisibleAtLevel(BRAILA_PRESENTATION_PROFILE, role, level)
 
 /**
  * World labels are kept out of the fixed Android HUD without coupling the map renderer to HUD objects.
  * These rectangles mirror the owner-reviewed landscape controls conservatively: header + mission,
  * minimap/zoom, joystick, action stack and attribution. Hiding a world label is preferable to drawing
  * it under a thumb target or mission panel.
+ *
+ * This remains a Brăila runtime adapter. Generic HUD/smartphone geometry is not authored here.
  */
-export const brailaReservedScreenBoxes = (width: number, height: number): readonly ScreenBox[] => {
+export const brailaReservedScreenBoxes = (width: number, height: number): readonly LocalityScreenBox[] => {
   const w = Math.max(1, width)
   const h = Math.max(1, height)
   const portrait = w < 600
@@ -97,27 +65,16 @@ export const selectBrailaScreenLabels = (
   candidates: readonly BrailaScreenLabelCandidate[],
   level: SemanticMapLevel,
   viewport: MapViewport,
-  reserved: readonly ScreenBox[] = [],
-): readonly string[] => {
-  const occupied: ScreenBox[] = [...reserved]
-  const ranked = candidates
-    .map((candidate, index) => ({ candidate, index }))
-    .filter(({ candidate }) => isBrailaLabelVisibleAtLevel(candidate.role, level))
-    .sort((a, b) =>
-      (b.candidate.priority ?? BRAILA_LABEL_RULES[b.candidate.role].priority) -
-        (a.candidate.priority ?? BRAILA_LABEL_RULES[a.candidate.role].priority) ||
-      a.index - b.index,
-    )
-  const accepted: string[] = []
-  for (const { candidate } of ranked) {
-    const box = inflate(candidate.box, BRAILA_LABEL_RULES[candidate.role].gap)
-    if (!reserveLabel(occupied, box, viewport)) continue
-    accepted.push(candidate.id)
-  }
-  return accepted
-}
+  reserved: readonly LocalityScreenBox[] = [],
+): readonly string[] => selectLocalityScreenLabels(
+  BRAILA_PRESENTATION_PROFILE,
+  candidates,
+  level,
+  viewport,
+  reserved,
+)
 
-const labelScreenBox = (text: Phaser.GameObjects.Text, camera: Phaser.Cameras.Scene2D.Camera): ScreenBox => {
+const labelScreenBox = (text: Phaser.GameObjects.Text, camera: Phaser.Cameras.Scene2D.Camera): LocalityScreenBox => {
   const zoom = camera.zoom
   const x = camera.x + (text.x - camera.worldView.x) * zoom
   const y = camera.y + (text.y - camera.worldView.y) * zoom
@@ -172,10 +129,11 @@ export const installBrailaLabelPresentation = (
     const viewport: MapViewport = { left: camera.x, top: camera.y, width: camera.width, height: camera.height }
 
     for (const state of states) {
-      const rule = BRAILA_LABEL_RULES[state.role]
-      const compensation = rule.fixedScreenSize
-        ? Math.max(0.4, Math.min(BRAILA_LABEL_MAX_SCREEN_COMPENSATION, 1 / Math.max(0.001, camera.zoom)))
-        : 1
+      const compensation = localityLabelScaleCompensation(
+        BRAILA_PRESENTATION_PROFILE,
+        state.role,
+        camera.zoom,
+      )
       state.text.setScale(state.baseScaleX * compensation, state.baseScaleY * compensation)
       state.text.setVisible(false).setAlpha(state.baseAlpha)
     }

@@ -1,15 +1,12 @@
 import type Phaser from 'phaser'
-import {
-  PLAYABLE_CITY_DETAIL_MIN_ZOOM,
-  PLAYABLE_CITY_DETAIL_SECTOR_LIMIT,
-  PLAYABLE_CITY_DETAIL_SECTOR_SIZE,
-} from './playableCityScale'
+import { LOCALITY_ANDROID_PRESENTATION_BUDGET } from './localityPresentationProfile'
 import { drawCityGround } from './urbanPresentation'
 import { WORLD_WIDTH, WORLD_HEIGHT } from './worldLayout'
 
-export const CITY_DETAIL_TILE_SIZE = PLAYABLE_CITY_DETAIL_SECTOR_SIZE
-export const CITY_DETAIL_TILE_LIMIT = PLAYABLE_CITY_DETAIL_SECTOR_LIMIT
-export const CITY_DETAIL_MIN_ZOOM = PLAYABLE_CITY_DETAIL_MIN_ZOOM
+export const CITY_DETAIL_TILE_SIZE = LOCALITY_ANDROID_PRESENTATION_BUDGET.detailSectorSize
+export const CITY_DETAIL_TILE_LIMIT = LOCALITY_ANDROID_PRESENTATION_BUDGET.maxResidentDetailSectors
+export const CITY_DETAIL_MIN_ZOOM = LOCALITY_ANDROID_PRESENTATION_BUDGET.minDetailZoom
+export const CITY_DETAIL_MATERIALIZE_PER_FRAME = LOCALITY_ANDROID_PRESENTATION_BUDGET.maxMaterializedDetailSectorsPerFrame
 interface Tile { id: string; x: number; y: number }
 export const cityGroundTiles = (view: { x: number; y: number; width: number; height: number }, zoom: number): Tile[] => {
   if (zoom < CITY_DETAIL_MIN_ZOOM || view.width <= 0 || view.height <= 0) return []
@@ -38,7 +35,7 @@ export class CityGroundDetail {
     for (const [id, sprite] of this.resident) if (!wanted.has(id)) {
       sprite.destroy(); this.scene.textures.remove(`city-detail-${id}`); this.resident.delete(id)
     }
-    const next = tiles.find(t => !this.resident.has(t.id))
+    const [next] = tiles.filter(t => !this.resident.has(t.id)).slice(0, CITY_DETAIL_MATERIALIZE_PER_FRAME)
     if (!next) return
     const size = CITY_DETAIL_TILE_SIZE, key = `city-detail-${next.id}`
     const g = this.scene.make.graphics({ x: 0, y: 0 })
