@@ -41,37 +41,60 @@ export const COLORS = {
   textSuccess: '#bbf7d0',
 } as const
 
-/** Original, code-drawn city art shares the same warm daylight palette. */
+/**
+ * Runtime art-direction contract for Owner quality gates #317 / #327.
+ * Approved reference boards are design targets only; gameplay remains real,
+ * interactive geometry rendered by the authoritative Phaser runtime.
+ */
+export const CITY_ART_DIRECTION = {
+  version: 2,
+  referenceFamily: '08_Assets/Approved_References',
+  identity: 'dropi-blue-cyan-warm-daylight',
+  principles: {
+    dropiBlueCyanIdentity: true,
+    warmArchitecturalHighlights: true,
+    coolDimensionalShadows: true,
+    saturatedFoliage: true,
+    warmReadableStreetSurfaces: true,
+  },
+} as const
+
+/**
+ * Code-drawn city art palette aligned to the approved gameplay references.
+ * The cooler blue/cyan structural tones and warmer stone/facade highlights
+ * deliberately replace the flatter prototype palette without changing
+ * geometry, collision, locality identity or gameplay authority.
+ */
 export const CITY_COLORS = {
-  grass: 0x80c95b,
-  lawn: 0xa7df72,
-  grassShade: 0x59aa53,
-  road: 0x4b657e,
-  roadEdge: 0x344e69,
-  lane: 0xfff4ce,
-  sidewalk: 0xf4dfb4,
-  pavingLine: 0xd5ba90,
-  curb: 0xfff5da,
-  shadow: 0x123d55,
-  water: 0x23bce0,
-  waterLight: 0x85ebf5,
-  leafDark: 0x247c48,
-  leaf: 0x42aa4c,
-  leafLight: 0x8fce45,
-  leafSun: 0xc8e864,
-  trunk: 0x855037,
-  cream: 0xffedc5,
-  wall: 0xf8ce92,
-  wallShade: 0xe4a86b,
-  roof: 0xe56848,
-  roofShade: 0xba493b,
-  roofBlue: 0x258acb,
-  glass: 0x57d4e2,
-  glassShade: 0x167ca7,
-  windowLight: 0xffe98c,
+  grass: 0x73c867,
+  lawn: 0xa8df78,
+  grassShade: 0x3f9854,
+  road: 0x355b72,
+  roadEdge: 0x173b57,
+  lane: 0xffeab7,
+  sidewalk: 0xf2d7a8,
+  pavingLine: 0xc9a979,
+  curb: 0xffefcc,
+  shadow: 0x0d3148,
+  water: 0x00b4df,
+  waterLight: 0x80ebff,
+  leafDark: 0x1d7549,
+  leaf: 0x36a955,
+  leafLight: 0x78c957,
+  leafSun: 0xc6e66a,
+  trunk: 0x7a4a34,
+  cream: 0xffedc8,
+  wall: 0xf4c683,
+  wallShade: 0xd59357,
+  roof: 0xdf6a4c,
+  roofShade: 0xa9443e,
+  roofBlue: 0x0c92c8,
+  glass: 0x5cdded,
+  glassShade: 0x0a759d,
+  windowLight: 0xffe39c,
   flower: 0xff8f6b,
   flowerPink: 0xf370b8,
-  metal: 0x175574,
+  metal: 0x0f506e,
   parcel: 0xe6a644,
   tape: 0xffe1a0,
   skin: 0xf4c69b,
