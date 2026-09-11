@@ -17,7 +17,43 @@ const compactLocationLabel = (value: string): string => {
   return aliased.length > 13 ? `${aliased.slice(0, 12)}…` : aliased
 }
 
-const compactOrderId = (value: string): string => value.replace(/^ORDER-/, '#')
+/**
+ * Screen-copy-only money compaction for the shallow GameWorld HUD.
+ * This does not alter economy values or settlement math.
+ */
+const compactMoneyLabel = (value: number): string => {
+  const rounded = Math.round(value)
+  const absolute = Math.abs(rounded)
+  const sign = rounded < 0 ? '-' : ''
+
+  const scaled = (divisor: number, suffix: string): string => {
+    const amount = absolute / divisor
+    const digits = amount < 10 ? 1 : 0
+    return `${sign}$${amount.toFixed(digits).replace(/\.0$/, '')}${suffix}`
+  }
+
+  if (absolute >= 1_000_000_000) return scaled(1_000_000_000, 'b')
+  if (absolute >= 1_000_000) return scaled(1_000_000, 'm')
+  if (absolute >= 1_000) return scaled(1_000, 'k')
+  return `${sign}$${absolute}`
+}
+
+/**
+ * Converts canonical active-order state into the immediate player cue.
+ * State ownership remains in the order system; this is presentation only.
+ */
+const compactOrderStage = (status: HUDData['orderStatus']): string => {
+  switch (status) {
+    case 'Available':
+      return 'Available'
+    case 'Accepted':
+      return 'Pickup'
+    case 'PickedUp':
+      return 'Carry'
+    default:
+      return status
+  }
+}
 
 /**
  * Player-facing GameWorld HUD.
@@ -62,10 +98,11 @@ export class GameHUD {
       .setDepth(HUD_DEPTH)
 
     this.companyText = scene.add
-      .text(layout.companyPanel.left + 6, layout.companyPanel.top + 7, '', {
+      .text(layout.companyPanel.left + 6, layout.companyPanel.top + 3, '', {
         fontFamily: 'Arial',
         fontSize: `${layout.companyFontSize}px`,
         color: '#f8fafc',
+        lineSpacing: -1,
       })
       .setScrollFactor(0)
       .setDepth(HUD_DEPTH + 1)
@@ -140,7 +177,7 @@ export class GameHUD {
   }
 
   update(data: HUDData): void {
-    this.companyText.setText(`M ${data.money} · R ${data.reputation}`)
+    this.companyText.setText(`Co ${compactMoneyLabel(data.money)}\nRep ${data.reputation}`)
 
     const showOrder = data.showActiveOrder
     this.orderBg.setVisible(showOrder)
@@ -148,7 +185,7 @@ export class GameHUD {
 
     if (showOrder) {
       this.orderText.setText(
-        `${compactOrderId(data.orderId)} ${data.orderStatus} +${data.reward} · ${compactLocationLabel(data.pickupLocation)}→${compactLocationLabel(data.destination)} · ${data.carryingPackage ? 'Carry' : 'Empty'}`,
+        `${compactOrderStage(data.orderStatus)} · ${compactLocationLabel(data.pickupLocation)}→${compactLocationLabel(data.destination)} · +${compactMoneyLabel(data.reward)}`,
       )
     }
 
