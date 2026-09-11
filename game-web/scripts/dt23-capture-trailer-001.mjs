@@ -7,9 +7,9 @@ const GAME_URL = process.env.DT23_GAME_URL ?? 'https://dropi-tycoon-production.u
 const OUTPUT_DIR = path.resolve(process.env.DT23_OUTPUT_DIR ?? '../artifacts/dt23/trailer-001')
 const RAW_DIR = path.join(OUTPUT_DIR, 'raw')
 const VIEWPORT = { width: 1280, height: 720 }
-const STREET_APPROACH_MS = 22_000
-const STREET_STEP_MS = 250
-const STREET_MAX_STEPS = 48
+const STREET_CLEAR_MS = 700
+const STREET_STEP_MS = 180
+const STREET_MAX_STEPS = 40
 const OBJECTIVE_PANEL = { x: 6, y: 46, width: 370, height: 62 }
 
 const sleep = ms => new Promise(resolve => setTimeout(resolve, ms))
@@ -57,9 +57,9 @@ const hold = async (key, ms) => {
   await page.keyboard.down(key)
   await sleep(ms)
   await page.keyboard.up(key)
-  await sleep(100)
+  await sleep(80)
 }
-const pressAction = async (settleMs = 400) => {
+const pressAction = async (settleMs = 320) => {
   await page.keyboard.press('KeyE')
   await sleep(settleMs)
 }
@@ -96,7 +96,9 @@ const actionChangesObjective = async (label, step) => {
 }
 
 const sweepStreetInteraction = async (key, label) => {
-  await hold(key, STREET_APPROACH_MS)
+  // Move just far enough to clear the interaction we are leaving (for example HQ),
+  // then probe frequently enough that a 48u interaction window cannot be skipped.
+  await hold(key, STREET_CLEAR_MS)
   for (let step = 0; step <= STREET_MAX_STEPS; step += 1) {
     if (step % 8 === 0) await shot(`DIAG-${label}-step-${String(step).padStart(2, '0')}`)
     if (await actionChangesObjective(label, step)) {
@@ -129,13 +131,14 @@ try {
   await clickCanvas(912, 209)
   await sleep(900)
 
-  // Verified from the rendered HUD and diagnostic frames: Mara is west of the fresh-start hero.
-  await sweepStreetInteraction('KeyA', 'merchant-introduction')
+  // The rendered objective HUD starts with E toward Mara. Probe while moving east instead of
+  // making one long hold that can overshoot the canonical 48u interaction radius.
+  await sweepStreetInteraction('KeyD', 'merchant-introduction')
   await sleep(900)
   await shot('CAP-003-merchant-introduced')
 
-  // After onboarding, return east to the physical HQ entrance.
-  await sweepStreetInteraction('KeyD', 'hq-return')
+  // Mara is east of HQ, so the return leg is west.
+  await sweepStreetInteraction('KeyA', 'hq-return')
   await sleep(1200)
   await shot('CAP-004-hq-interior')
 
@@ -152,8 +155,8 @@ try {
   await page.keyboard.press('Escape')
   await sleep(2000)
 
-  // Accepted work sends the player west back to Mara for the physical parcel pickup.
-  await sweepStreetInteraction('KeyA', 'parcel-pickup')
+  // Accepted work sends the player east back to Mara for the physical parcel pickup.
+  await sweepStreetInteraction('KeyD', 'parcel-pickup')
   await sleep(1200)
   await shot('CAP-006-parcel-picked-up')
   await sleep(1200)
@@ -180,7 +183,7 @@ if (video) {
 }
 
 const manifest = {
-  schemaVersion: 6,
+  schemaVersion: 7,
   captureType: 'AUTHENTIC_GAMEPLAY_SOURCE',
   gameUrl: GAME_URL,
   viewport: VIEWPORT,
