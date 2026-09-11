@@ -1,32 +1,27 @@
-name: DT-23 Full Target Canon Film v1
+name: DT-23 Full Target Canon Film v1 — REJECTED HISTORICAL
 
+# REJECTED / SUPERSEDED on 2026-09-12 by Owner Directive 004.
+# This workflow is intentionally manual-only and exists solely for audit/history.
+# It must not be used to produce current visual-target material.
 on:
   workflow_dispatch:
-  pull_request:
-    branches:
-      - main
-    paths:
-      - '.github/workflows/dt23-full-target-canon-film-v1.yml'
-      - 'scripts/dt23/render_full_target_canon_film_v1.py'
-      - '00_Project/DT23_FULL_TARGET_CANON_FILM_V1.md'
-  push:
-    branches:
-      - main
-    paths:
-      - '.github/workflows/dt23-full-target-canon-film-v1.yml'
-      - 'scripts/dt23/render_full_target_canon_film_v1.py'
-      - '00_Project/DT23_FULL_TARGET_CANON_FILM_V1.md'
 
 permissions:
   contents: read
 
 jobs:
-  render:
+  historical-render:
     runs-on: ubuntu-latest
     timeout-minutes: 15
     env:
       DT23_FILM_OUT: artifacts/dt23/full-target-canon-v1/DROPi_Tycoon_Full_Target_Canon_Film_v1.mp4
     steps:
+      - name: Historical warning
+        shell: bash
+        run: |
+          echo 'REJECTED / SUPERSEDED visual target.'
+          echo 'Current authority: 00_Project/THIRD_PERSON_OPEN_WORLD_VISUAL_EXPERIENCE_CANON.md'
+
       - name: Checkout
         uses: actions/checkout@v7
 
@@ -45,40 +40,14 @@ jobs:
             sudo apt-get install -y ffmpeg fonts-dejavu-core
           fi
 
-      - name: Render target-canon film
+      - name: Render rejected historical film
         shell: bash
         run: |
           set -euo pipefail
           python scripts/dt23/render_full_target_canon_film_v1.py
           test -s "$DT23_FILM_OUT"
 
-      - name: Verify media contract
-        shell: bash
-        run: |
-          set -euo pipefail
-          DURATION=$(ffprobe -v error -show_entries format=duration -of default=nw=1:nk=1 "$DT23_FILM_OUT")
-          WIDTH=$(ffprobe -v error -select_streams v:0 -show_entries stream=width -of default=nw=1:nk=1 "$DT23_FILM_OUT")
-          HEIGHT=$(ffprobe -v error -select_streams v:0 -show_entries stream=height -of default=nw=1:nk=1 "$DT23_FILM_OUT")
-          RATE=$(ffprobe -v error -select_streams v:0 -show_entries stream=r_frame_rate -of default=nw=1:nk=1 "$DT23_FILM_OUT")
-          python - "$DURATION" "$WIDTH" "$HEIGHT" "$RATE" <<'PY'
-          import sys
-          duration=float(sys.argv[1]); width=int(sys.argv[2]); height=int(sys.argv[3]); rate=sys.argv[4]
-          assert 41.8 <= duration <= 42.2, duration
-          assert (width,height)==(1280,720), (width,height)
-          assert rate=='24/1', rate
-          print(f'PASS duration={duration:.3f}s size={width}x{height} fps={rate}')
-          PY
-
-      - name: Extract review frames
-        shell: bash
-        run: |
-          set -euo pipefail
-          OUT=artifacts/dt23/full-target-canon-v1
-          for T in 1.5 6.8 11.5 15.8 20.5 26.5 33.0 36.5 40.5; do
-            ffmpeg -y -loglevel error -ss "$T" -i "$DT23_FILM_OUT" -frames:v 1 "$OUT/review-${T}s.png"
-          done
-
-      - name: Write provenance
+      - name: Write rejected provenance
         shell: bash
         run: |
           set -euo pipefail
@@ -88,17 +57,16 @@ jobs:
           repository=${GITHUB_REPOSITORY}
           commit=${GITHUB_SHA}
           workflow_run_id=${GITHUB_RUN_ID}
-          classification=CINEMATIC / NON-GAMEPLAY — TARGET CANON
+          classification=HISTORICAL / REJECTED — DO NOT USE AS VISUAL TARGET
           authentic_gameplay_claim=false
-          generated_numeric_rewards=false
-          visual_authority=08_Assets/WORLD_ASSET_BIBLE.md
-          sequence=start -> phone/job -> route -> HQ -> pickup -> delivery -> handoff -> result
+          current_visual_authority=00_Project/THIRD_PERSON_OPEN_WORLD_VISUAL_EXPERIENCE_CANON.md
+          superseded_by=09_Development/Owner_Directives/2026-09-12_MASTER_OWNER_DIRECTIVE_004_THIRD_PERSON_OPEN_WORLD_VISUAL_EXPERIENCE.md
           EOF
 
-      - name: Upload target-canon film artifact
+      - name: Upload rejected historical artifact
         uses: actions/upload-artifact@v4
         with:
-          name: dropi-tycoon-full-target-canon-film-v1
+          name: dropi-tycoon-full-target-canon-film-v1-REJECTED-HISTORICAL
           path: artifacts/dt23/full-target-canon-v1/
           if-no-files-found: error
-          retention-days: 30
+          retention-days: 7
