@@ -7,9 +7,9 @@ const GAME_URL = process.env.DT23_GAME_URL ?? 'https://dropi-tycoon-production.u
 const OUTPUT_DIR = path.resolve(process.env.DT23_OUTPUT_DIR ?? '../artifacts/dt23/trailer-001')
 const RAW_DIR = path.join(OUTPUT_DIR, 'raw')
 const VIEWPORT = { width: 1280, height: 720 }
-const STREET_APPROACH_MS = 26_000
+const STREET_APPROACH_MS = 22_000
 const STREET_STEP_MS = 250
-const STREET_MAX_STEPS = 24
+const STREET_MAX_STEPS = 48
 const OBJECTIVE_PANEL = { x: 6, y: 46, width: 370, height: 62 }
 
 const sleep = ms => new Promise(resolve => setTimeout(resolve, ms))
@@ -34,8 +34,9 @@ const failedResponses = []
 
 const mark = (label, extra = {}) => {
   const atMs = Date.now() - startedAt
-  marks.push({ label, atMs, ...extra })
-  console.log(`[DT23] ${label} @ ${(atMs / 1000).toFixed(2)}s`)
+  const entry = { label, atMs, ...extra }
+  marks.push(entry)
+  console.log(`[DT23] ${label} @ ${(atMs / 1000).toFixed(2)}s ${JSON.stringify(extra)}`)
 }
 page.on('pageerror', error => pageErrors.push(String(error?.stack ?? error)))
 page.on('response', response => {
@@ -56,27 +57,25 @@ const hold = async (key, ms) => {
   await page.keyboard.down(key)
   await sleep(ms)
   await page.keyboard.up(key)
-  await sleep(120)
+  await sleep(100)
 }
-const pressAction = async (settleMs = 650) => {
+const pressAction = async (settleMs = 400) => {
   await page.keyboard.press('KeyE')
   await sleep(settleMs)
 }
 const shot = async name => {
   await page.screenshot({ path: path.join(OUTPUT_DIR, `${name}.png`), fullPage: false })
 }
+const objectiveCrop = async () => page.screenshot({ clip: OBJECTIVE_PANEL })
 
-const visibleRegionDiff = (beforeBuffer, afterBuffer, region) => {
+const visibleImageDiff = (beforeBuffer, afterBuffer) => {
   const before = PNG.sync.read(beforeBuffer)
   const after = PNG.sync.read(afterBuffer)
   if (before.width !== after.width || before.height !== after.height) return Number.POSITIVE_INFINITY
-
   let total = 0
   let samples = 0
-  const xEnd = Math.min(before.width, region.x + region.width)
-  const yEnd = Math.min(before.height, region.y + region.height)
-  for (let y = region.y; y < yEnd; y += 2) {
-    for (let x = region.x; x < xEnd; x += 2) {
+  for (let y = 0; y < before.height; y += 2) {
+    for (let x = 0; x < before.width; x += 2) {
       const offset = (y * before.width + x) * 4
       total += Math.abs(before.data[offset] - after.data[offset])
       total += Math.abs(before.data[offset + 1] - after.data[offset + 1])
@@ -87,19 +86,20 @@ const visibleRegionDiff = (beforeBuffer, afterBuffer, region) => {
   return samples ? total / samples : 0
 }
 
-const actionChangesObjective = async label => {
-  const before = await page.screenshot({ fullPage: false })
+const actionChangesObjective = async (label, step) => {
+  const before = await objectiveCrop()
   await pressAction()
-  const after = await page.screenshot({ fullPage: false })
-  const score = visibleRegionDiff(before, after, OBJECTIVE_PANEL)
-  mark(`${label}-action-probe`, { objectivePixelDiff: Number(score.toFixed(2)) })
+  const after = await objectiveCrop()
+  const score = visibleImageDiff(before, after)
+  mark(`${label}-action-probe`, { step, objectivePixelDiff: Number(score.toFixed(3)) })
   return score >= 2.2
 }
 
 const sweepStreetInteraction = async (key, label) => {
   await hold(key, STREET_APPROACH_MS)
   for (let step = 0; step <= STREET_MAX_STEPS; step += 1) {
-    if (await actionChangesObjective(label)) {
+    if (step % 8 === 0) await shot(`DIAG-${label}-step-${String(step).padStart(2, '0')}`)
+    if (await actionChangesObjective(label, step)) {
       mark(`${label}-confirmed`, { step })
       return
     }
@@ -109,6 +109,7 @@ const sweepStreetInteraction = async (key, label) => {
 }
 
 let video
+let captureError = null
 try {
   mark('navigation-start', { gameUrl: GAME_URL })
   const response = await page.goto(GAME_URL, { waitUntil: 'domcontentloaded', timeout: 60_000 })
@@ -117,20 +118,17 @@ try {
   await sleep(3000)
   await shot('CAP-000-main-menu')
 
-  await clickCanvas(478, 221) // actual Start Game button
+  await clickCanvas(478, 221)
   await sleep(5000)
   mark('game-world-visible')
   await shot('CAP-001-game-world')
 
-  await clickCanvas(1138, 22) // actual Player Phone button
+  await clickCanvas(1138, 22)
   await sleep(2500)
   await shot('CAP-002-player-phone')
-  await clickCanvas(912, 209) // actual phone Close target
+  await clickCanvas(912, 209)
   await sleep(900)
 
-  // The playable Brăila runtime is scaled 10x relative to source-map spacing.
-  // We therefore approach through real held movement, then probe E in small increments.
-  // A successful interaction is confirmed only when the rendered objective HUD changes.
   await sweepStreetInteraction('KeyD', 'merchant-introduction')
   await sleep(900)
   await shot('CAP-003-merchant-introduced')
@@ -139,53 +137,55 @@ try {
   await sleep(1200)
   await shot('CAP-004-hq-interior')
 
-  // Physical HQ navigation. The first two holds reproduce the known safe approach;
-  // the short eastward sweep guarantees that one real E press lands inside the
-  // Parcel Operations radius without mutating scene or mission state.
   await hold('KeyD', 1900)
   await hold('KeyW', 760)
   for (let step = 0; step < 8; step += 1) {
-    await pressAction(350)
+    await pressAction(300)
     if (step < 7) await hold('KeyD', 250)
   }
   await sleep(900)
   mark('hq-parcel-operations-sweep-complete')
   await shot('CAP-005-job-acceptance-result')
 
-  await page.keyboard.press('Escape') // actual HQ interior exit control
+  await page.keyboard.press('Escape')
   await sleep(2000)
 
   await sweepStreetInteraction('KeyD', 'parcel-pickup')
   await sleep(1200)
   await shot('CAP-006-parcel-picked-up')
-
-  // The calibrated source stops once the pickup objective visibly advances.
-  // The delivery leg will only be added after its real next objective is captured.
   await sleep(1200)
   await shot('CAP-007-next-delivery-objective')
 
   mark('capture-complete')
-  video = page.video()
+} catch (error) {
+  captureError = error
+  mark('capture-error', { message: error instanceof Error ? error.message : String(error) })
+  await shot('DIAG-capture-error-final')
 } finally {
+  video = page.video()
   await context.close()
   await browser.close()
 }
 
-if (!video) throw new Error('Playwright did not create a video stream.')
-const rawVideoPath = await video.path()
-const sourceVideo = path.join(OUTPUT_DIR, 'DROPi_Tycoon_Trailer_001_Gameplay_Source.webm')
-await copyFile(rawVideoPath, sourceVideo)
-const videoInfo = await stat(sourceVideo)
-if (videoInfo.size < 50_000) throw new Error(`Captured video is unexpectedly small: ${videoInfo.size} bytes`)
+let sourceVideo = null
+let sourceVideoBytes = 0
+if (video) {
+  const rawVideoPath = await video.path()
+  sourceVideo = path.join(OUTPUT_DIR, 'DROPi_Tycoon_Trailer_001_Gameplay_Source.webm')
+  await copyFile(rawVideoPath, sourceVideo)
+  sourceVideoBytes = (await stat(sourceVideo)).size
+}
 
 const manifest = {
-  schemaVersion: 5,
+  schemaVersion: 6,
   captureType: 'AUTHENTIC_GAMEPLAY_SOURCE',
   gameUrl: GAME_URL,
   viewport: VIEWPORT,
-  sourceVideo: path.basename(sourceVideo),
-  sourceVideoBytes: videoInfo.size,
+  sourceVideo: sourceVideo ? path.basename(sourceVideo) : null,
+  sourceVideoBytes,
   recordedAtUtc: new Date().toISOString(),
+  captureSucceeded: !captureError,
+  captureError: captureError ? (captureError instanceof Error ? captureError.message : String(captureError)) : null,
   marks,
   pageErrors,
   failedResponses,
@@ -198,4 +198,7 @@ const manifest = {
   },
 }
 await writeFile(path.join(OUTPUT_DIR, 'capture-manifest.json'), `${JSON.stringify(manifest, null, 2)}\n`, 'utf8')
-console.log(`[DT23] Authentic gameplay source recorded: ${sourceVideo}`)
+
+if (sourceVideoBytes > 0) console.log(`[DT23] Gameplay source bytes preserved: ${sourceVideoBytes}`)
+if (captureError) throw captureError
+if (!sourceVideo || sourceVideoBytes < 50_000) throw new Error(`Captured video is unexpectedly small: ${sourceVideoBytes} bytes`)
