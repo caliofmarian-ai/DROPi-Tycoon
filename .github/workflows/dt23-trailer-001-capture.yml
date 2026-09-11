@@ -1,0 +1,130 @@
+name: DT-23 Trailer 001 Gameplay Capture
+
+on:
+  workflow_dispatch:
+  pull_request:
+    branches:
+      - main
+    paths:
+      - '.github/workflows/dt23-trailer-001-capture.yml'
+      - 'game-web/scripts/dt23-capture-trailer-001.mjs'
+  push:
+    branches:
+      - main
+    paths:
+      - '.github/workflows/dt23-trailer-001-capture.yml'
+      - 'game-web/scripts/dt23-capture-trailer-001.mjs'
+
+permissions:
+  contents: read
+
+jobs:
+  capture:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      DT23_GAME_URL: https://dropi-tycoon-production.up.railway.app/
+      DT23_OUTPUT_DIR: ${{ github.workspace }}/artifacts/dt23/trailer-001
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Setup Node 22.12.0
+        uses: actions/setup-node@v7
+        with:
+          node-version: 22.12.0
+          cache: npm
+          cache-dependency-path: game-web/package-lock.json
+
+      - name: Install project dependencies
+        working-directory: game-web
+        run: npm ci
+
+      - name: Install ephemeral Playwright capture dependency
+        working-directory: game-web
+        run: npm install --no-save --package-lock=false playwright@1.55.0
+
+      - name: Install Chromium for capture
+        working-directory: game-web
+        run: npx playwright install --with-deps chromium
+
+      - name: Capture authentic gameplay source
+        working-directory: game-web
+        run: node scripts/dt23-capture-trailer-001.mjs
+
+      - name: Install ffmpeg if needed
+        shell: bash
+        run: |
+          set -euo pipefail
+          if ! command -v ffmpeg >/dev/null 2>&1; then
+            sudo apt-get update
+            sudo apt-get install -y ffmpeg
+          fi
+          ffmpeg -version | head -n 1
+
+      - name: Transcode browser capture to viewable MP4
+        shell: bash
+        run: |
+          set -euo pipefail
+          OUT='artifacts/dt23/trailer-001'
+          SRC="$OUT/DROPi_Tycoon_Trailer_001_Gameplay_Source.webm"
+          MP4="$OUT/DROPi_Tycoon_Trailer_001_Gameplay_Source.mp4"
+          test -s "$SRC"
+          ffmpeg -y -i "$SRC" \
+            -c:v libx264 -preset medium -crf 20 -pix_fmt yuv420p \
+            -movflags +faststart -an "$MP4"
+          test -s "$MP4"
+          SIZE=$(stat -c%s "$MP4")
+          if [ "$SIZE" -lt 50000 ]; then
+            echo "MP4 is unexpectedly small: $SIZE bytes"
+            exit 1
+          fi
+          echo "Gameplay MP4 created: $MP4 ($SIZE bytes)"
+
+      - name: Create 30-second gameplay preview
+        shell: bash
+        run: |
+          set -euo pipefail
+          OUT='artifacts/dt23/trailer-001'
+          SRC="$OUT/DROPi_Tycoon_Trailer_001_Gameplay_Source.mp4"
+          PREVIEW="$OUT/DROPi_Tycoon_Trailer_001_30s_Gameplay_Preview.mp4"
+          # Skip the menu/startup lead-in and retain only real recorded gameplay.
+          ffmpeg -y -ss 00:00:07 -i "$SRC" -t 30 \
+            -c:v libx264 -preset medium -crf 20 -pix_fmt yuv420p \
+            -movflags +faststart -an "$PREVIEW"
+          test -s "$PREVIEW"
+
+      - name: Extract review thumbnails
+        shell: bash
+        run: |
+          set -euo pipefail
+          OUT='artifacts/dt23/trailer-001'
+          SRC="$OUT/DROPi_Tycoon_Trailer_001_Gameplay_Source.mp4"
+          ffmpeg -y -ss 00:00:10 -i "$SRC" -frames:v 1 "$OUT/review-10s.png"
+          ffmpeg -y -ss 00:00:25 -i "$SRC" -frames:v 1 "$OUT/review-25s.png"
+          ffmpeg -y -ss 00:00:40 -i "$SRC" -frames:v 1 "$OUT/review-40s.png"
+
+      - name: Write artifact provenance
+        shell: bash
+        run: |
+          set -euo pipefail
+          OUT='artifacts/dt23/trailer-001'
+          cat > "$OUT/ARTIFACT_PROVENANCE.txt" <<EOF
+          DROPi Tycoon DT-23 Trailer 001 gameplay capture
+          repository=${GITHUB_REPOSITORY}
+          commit=${GITHUB_SHA}
+          workflow_run_id=${GITHUB_RUN_ID}
+          workflow_run_attempt=${GITHUB_RUN_ATTEMPT}
+          source_runtime=${DT23_GAME_URL}
+          classification=AUTHENTIC_GAMEPLAY_SOURCE
+          generated_pseudo_gameplay=false
+          EOF
+
+      - name: Upload gameplay video artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: dropi-tycoon-trailer-001-gameplay-video
+          path: artifacts/dt23/trailer-001/
+          if-no-files-found: error
+          retention-days: 30
