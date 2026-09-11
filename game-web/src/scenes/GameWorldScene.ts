@@ -17,6 +17,7 @@ import { UrbanZoomGesture } from '../ui/urbanZoom'
 import { cityFitZoom, clamp } from '../world/semanticMapCamera'
 import { CITY_COLORS, COLORS } from '../ui/theme'
 import { createPlayerVisual, type PlayerVisual, type PlayerVisualState } from '../world/playerVisual'
+import { HERO_STREET_TARGET_ZOOM, heroStreetCameraFraming } from '../world/heroStreetCamera'
 import { renderUrbanNeighborhood } from '../world/urbanPresentation'
 import {
   URBAN_HQ, URBAN_MARKETPLACE, inInteractionRange, moveUrbanPlayer, movementFacing, repairUrbanPosition,
@@ -175,6 +176,7 @@ export class GameWorldScene extends Phaser.Scene {
     if (moving) {
       this.facing = movementFacing(displacement, this.facing)
       this.playerVisual.setFacing(this.facing)
+      if (!this.cameraFreeLook) this.updateHeroStreetFollowOffset()
     }
     this.playerVisual.setMoving(moving)
     this.playerVisual.update(delta)
@@ -324,6 +326,7 @@ export class GameWorldScene extends Phaser.Scene {
       this.cameras.main.stopFollow(); this.cameraFreeLook = true
       if (zoom <= this.cityFit() * 1.3) this.cameras.main.centerOn(WORLD_WIDTH / 2, WORLD_HEIGHT / 2)
     }
+    if (!this.cameraFreeLook && this.cameras.main.zoom >= 0.4) this.updateHeroStreetFollowOffset()
   }
 
   private cityFit(): number { return cityFitZoom(this.scale.width, this.scale.height, WORLD_WIDTH, WORLD_HEIGHT) }
@@ -375,14 +378,23 @@ export class GameWorldScene extends Phaser.Scene {
     this.cameraPan.release(pointer.id)
   }
 
+  private updateHeroStreetFollowOffset(): void {
+    if (!this.playerVisual || this.cameraFreeLook) return
+    const camera = this.cameras.main
+    const framing = heroStreetCameraFraming(camera.width, camera.height, this.facing, camera.zoom)
+    camera.setFollowOffset(framing.offsetX, framing.offsetY)
+  }
+
   private recenterCamera(notify = true): void {
     if (!this.playerVisual) return
     this.zoomGesture.clear()
     this.cameraPan.clear()
     this.cameraFreeLook = false
-    if (notify && this.cameras.main.zoom < .45) this.cameras.main.setZoom(1)
-    this.cameras.main.startFollow(this.playerVisual.container, false, 0.18, 0.18)
-    if (notify && this.hud) this.hud.notify('Camera centered on courier · drag the city to enter free-look again')
+    const camera = this.cameras.main
+    const framing = heroStreetCameraFraming(camera.width, camera.height, this.facing, HERO_STREET_TARGET_ZOOM)
+    camera.setZoom(framing.zoom)
+    camera.startFollow(this.playerVisual.container, false, 0.14, 0.14, framing.offsetX, framing.offsetY)
+    if (notify && this.hud) this.hud.notify('Street camera on courier · movement direction opens the view ahead · drag for free-look')
   }
 
   private scheduleResizeRestart(): void {
