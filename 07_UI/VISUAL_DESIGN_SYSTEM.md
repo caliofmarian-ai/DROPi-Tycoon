@@ -2,11 +2,11 @@
 
 Document: VISUAL_DESIGN_SYSTEM.md
 Project: DROPi Tycoon
-Version: 1.1.0
+Version: 1.2.0
 Status: Canonical
 Author: Marian Caliof & OpenAI
 Language: English
-Last Updated: 2026-09-07
+Last Updated: 2026-09-12
 
 ---
 
@@ -196,6 +196,49 @@ High-fidelity portraits, characters, vehicles, buildings, animation, lighting an
 Temporary/runtime-procedural assets must remain replaceable without changing simulation state or gameplay rules.
 
 A future real-time 3D rendering migration, if ever considered, is a Technical/Product decision and may not be inferred merely from the three-dimensional appearance of pre-rendered art.
+
+---
+
+# Authorized Design Tooling — Figma and Canva
+
+The Project Owner has explicitly authorized the use of the connected paid **Figma** and **Canva** capabilities for DROPi Tycoon work when they materially improve quality, speed, consistency or communication.
+
+## Figma
+
+Figma is an authorized design and implementation-support workspace for:
+
+- UI/UX exploration and review;
+- mobile screen layouts;
+- HUD, menus and interaction surfaces;
+- reusable UI components and design-system work;
+- prototypes and flow validation;
+- visual specifications;
+- design-to-implementation handoff when supported by the active workflow.
+
+Figma does not become a second gameplay or product authority. A Figma design may express canonical truth, but it may not invent gameplay, economy, account, legal, monetization, world or release truth that is absent from the owning canonical source.
+
+## Canva
+
+Canva is an authorized communication and promotional-design workspace for:
+
+- presentations and pitch material;
+- campaign and social assets;
+- promotional layouts;
+- launch/store presentation material;
+- visual communication derived from already approved project truth.
+
+Canva material must preserve the distinction between authentic current gameplay, cinematic/non-gameplay presentation and future creative concepts. It may not manufacture public claims, features, release states, reviews, metrics or other unsupported product truth.
+
+## Canonical and Ownership Boundary
+
+External design workspaces are tools, not project authority.
+
+- GitHub repository-backed canonical documents remain the durable source of project truth.
+- Existing DT ownership boundaries remain unchanged.
+- Assets or specifications intended for implementation/release must enter the applicable repository, provenance, legal, asset and release-evidence workflows before being treated as implementation/release authority.
+- Ordinary in-scope use of Figma or Canva does not require a new Owner approval each time; material product-direction changes still require the approval required by the owning canonical process.
+
+The durable operational authorization is also recorded in `09_Development/AI_Project_Memory/DECISIONS.md` as `D-TOOLS-001`.
 
 ---
 
