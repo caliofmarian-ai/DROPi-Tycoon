@@ -134,13 +134,30 @@ try {
   await pressAction()
   await shot('CAP-003-merchant-interaction')
 
-  // Mara -> HQ. E uses the same authoritative interaction path as the player Action control.
+  // Mara -> HQ. The first E at HQ legitimately enters the physical HQ interior.
   await hold('KeyD', 1200)
   await hold('KeyW', 4260)
   await hold('KeyA', 2800)
-  mark('hq-return-attempt')
+  mark('hq-entrance-attempt')
   await pressAction()
-  await shot('CAP-004-job-acceptance')
+  await sleep(1800)
+  await shot('CAP-004-hq-interior')
+
+  // HQ interior spawn is (600,620). Walk to the real Parcel Operations staging interaction
+  // around (945,485), then use E. This invokes BaseInteriorScene.useOperationsDesk(), which
+  // delegates to the same authoritative performUrbanInteraction path used by the game.
+  await hold('KeyD', 1900)
+  await hold('KeyW', 760)
+  mark('hq-parcel-operations-attempt')
+  await pressAction()
+  await sleep(1600)
+  await shot('CAP-005-job-accepted')
+
+  // ESC is the real HQ interior exit control. It returns to the sleeping GameWorldScene
+  // while preserving the authoritative accepted order.
+  await page.keyboard.press('Escape')
+  await sleep(2200)
+  mark('hq-exited-after-acceptance')
 
   // HQ -> merchant again, then authoritative pickup.
   await hold('KeyD', 2800)
@@ -148,22 +165,19 @@ try {
   await hold('KeyA', 1200)
   mark('pickup-arrival-attempt')
   await pressAction()
-  await shot('CAP-005-parcel-picked-up')
+  await sleep(1400)
+  await shot('CAP-006-parcel-picked-up')
 
   // PickupZone (620,910) -> first canonical DeliveryZone (560,290).
+  // The route stays on real walkable surfaces: east to the central vertical corridor,
+  // north to the residential lane, then west to the customer.
   await hold('KeyD', 1200)
   await hold('KeyW', 4140)
   await hold('KeyA', 1600)
   mark('delivery-arrival-attempt')
   await pressAction()
   await sleep(3500)
-  await shot('CAP-006-delivery-result')
-
-  // Capture the real phone state again after the attempted settlement.
-  await clickCanvas(1138, 22)
-  await sleep(2500)
-  mark('post-delivery-phone-open')
-  await shot('CAP-007-post-delivery-phone')
+  await shot('CAP-007-delivery-result')
 
   mark('capture-complete')
   video = page.video()
@@ -183,7 +197,7 @@ if (videoInfo.size < 50_000) {
 }
 
 const manifest = {
-  schemaVersion: 1,
+  schemaVersion: 2,
   captureType: 'AUTHENTIC_GAMEPLAY_SOURCE',
   gameUrl: GAME_URL,
   viewport: VIEWPORT,
@@ -197,6 +211,7 @@ const manifest = {
     generatedPseudoGameplayUsed: false,
     internalGameStateMutationUsed: false,
     captureMethod: 'visible Phaser canvas + real pointer/keyboard inputs',
+    hqAcceptanceMethod: 'physical HQ Parcel Operations interaction',
   },
 }
 
