@@ -44,7 +44,7 @@ jobs:
           cp game-web/scripts/dt23-capture-trailer-001.mjs "$CAPTURE_RUNNER/capture.mjs"
           cd "$CAPTURE_RUNNER"
           npm init -y >/dev/null
-          npm install --no-audit --no-fund playwright@1.55.0
+          npm install --no-audit --no-fund playwright@1.55.0 pngjs@7.0.0
           echo "DT23_CAPTURE_RUNNER=$CAPTURE_RUNNER" >> "$GITHUB_ENV"
 
       - name: Install Chromium for capture
