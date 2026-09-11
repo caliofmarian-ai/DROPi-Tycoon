@@ -23,8 +23,9 @@ A fresh agent MUST start here and then read, in order:
 5. `09_Development/AI_Project_Memory/HANDOFFS.json`
 6. `09_Development/AI_Project_Memory/DECISIONS.md`
 7. `09_Development/AI_Project_Memory/UNKNOWN_BLOCKERS.md`
-8. The active GitHub Issue/PR/comments referenced by the applicable handoff.
-9. Any canonical project/domain documents referenced by that mission.
+8. `09_Development/AI_Project_Memory/AUTHORIZED_TOOLING.md`
+9. The active GitHub Issue/PR/comments referenced by the applicable handoff.
+10. Any canonical project/domain documents referenced by that mission.
 
 Do not replace this bounded read order with repository-wide guesswork.
 
@@ -40,6 +41,12 @@ The following layers have different purposes and MUST NOT silently override one 
 6. **UNKNOWN/blocker register** — `UNKNOWN_BLOCKERS.md`. Missing or unresolved evidence remains explicit.
 
 If two layers conflict, do not silently choose the convenient one. Apply the authority and reconciliation rules below.
+
+## Standing authorized tooling
+
+The Project Owner's standing authorization for connected paid Figma and Canva capabilities is recorded in `D-TOOLS-001` in `DECISIONS.md` and summarized in `AUTHORIZED_TOOLING.md`.
+
+Tool access is a capability, not domain authority. It does not expand a DT lane's ownership, and any output intended to become implementation or release evidence must pass through the applicable canonical repository, provenance, legal, asset and release workflows.
 
 ## Live GitHub reconciliation — mandatory before action
 
