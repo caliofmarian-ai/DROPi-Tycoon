@@ -1,0 +1,162 @@
+name: DT-23 Teaser 001 Authentic Gameplay
+
+on:
+  workflow_dispatch:
+  pull_request:
+    branches:
+      - main
+    paths:
+      - '.github/workflows/dt23-trailer-001-capture.yml'
+      - 'game-web/scripts/dt23-capture-trailer-001.mjs'
+  push:
+    branches:
+      - main
+    paths:
+      - '.github/workflows/dt23-trailer-001-capture.yml'
+      - 'game-web/scripts/dt23-capture-trailer-001.mjs'
+
+permissions:
+  contents: read
+
+jobs:
+  capture:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      DT23_GAME_URL: https://dropi-tycoon-production.up.railway.app/
+      DT23_OUTPUT_DIR: ${{ github.workspace }}/artifacts/dt23/teaser-001
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Setup Node 22.12.0
+        uses: actions/setup-node@v7
+        with:
+          node-version: 22.12.0
+
+      - name: Prepare isolated Playwright capture runner
+        shell: bash
+        run: |
+          set -euo pipefail
+          CAPTURE_RUNNER="$RUNNER_TEMP/dt23-playwright"
+          mkdir -p "$CAPTURE_RUNNER"
+          cp game-web/scripts/dt23-capture-trailer-001.mjs "$CAPTURE_RUNNER/capture.mjs"
+          cd "$CAPTURE_RUNNER"
+          npm init -y >/dev/null
+          npm install --no-audit --no-fund playwright@1.55.0
+          echo "DT23_CAPTURE_RUNNER=$CAPTURE_RUNNER" >> "$GITHUB_ENV"
+
+      - name: Install Chromium for capture
+        shell: bash
+        run: |
+          set -euo pipefail
+          cd "$DT23_CAPTURE_RUNNER"
+          npx playwright install --with-deps chromium
+
+      - name: Capture authentic gameplay source
+        shell: bash
+        run: |
+          set -euo pipefail
+          cd "$DT23_CAPTURE_RUNNER"
+          node capture.mjs
+
+      - name: Install ffmpeg if needed
+        shell: bash
+        run: |
+          set -euo pipefail
+          if ! command -v ffmpeg >/dev/null 2>&1; then
+            sudo apt-get update
+            sudo apt-get install -y ffmpeg
+          fi
+          ffmpeg -version | head -n 1
+
+      - name: Build 15-second authentic gameplay teaser
+        shell: bash
+        run: |
+          set -euo pipefail
+          OUT='artifacts/dt23/teaser-001'
+          SRC="$OUT/DROPi_Tycoon_Teaser_001_Gameplay_Source.webm"
+          MANIFEST="$OUT/capture-manifest.json"
+          FINAL="$OUT/DROPi_Tycoon_Teaser_001_15s_Authentic_Gameplay.mp4"
+          WORK="$RUNNER_TEMP/dt23-teaser-edit"
+          mkdir -p "$WORK"
+          test -s "$SRC"
+          test -s "$MANIFEST"
+
+          mapfile -t CUTS < <(python3 - "$MANIFEST" <<'PY'
+          import json, sys
+          data = json.load(open(sys.argv[1], encoding='utf-8'))
+          marks = {m['label']: m['atMs'] / 1000 for m in data['marks']}
+          for name, offset in [('game-world-visible', 0.35), ('player-phone-open', 0.35), ('movement-start', 0.0)]:
+              if name not in marks:
+                  raise SystemExit(f'missing capture mark: {name}')
+              print(f"{marks[name] + offset:.3f}")
+          PY
+          )
+          GAME_START="${CUTS[0]}"
+          PHONE_START="${CUTS[1]}"
+          MOVE_START="${CUTS[2]}"
+
+          ffmpeg -hide_banner -loglevel error -y -ss "$GAME_START" -i "$SRC" -t 3 \
+            -an -c:v libx264 -preset medium -crf 20 -pix_fmt yuv420p "$WORK/a.mp4"
+          ffmpeg -hide_banner -loglevel error -y -ss "$PHONE_START" -i "$SRC" -t 4.5 \
+            -an -c:v libx264 -preset medium -crf 20 -pix_fmt yuv420p "$WORK/b.mp4"
+          ffmpeg -hide_banner -loglevel error -y -ss "$MOVE_START" -i "$SRC" -t 4 \
+            -an -c:v libx264 -preset medium -crf 20 -pix_fmt yuv420p "$WORK/c.mp4"
+          ffmpeg -hide_banner -loglevel error -y -f lavfi -i color=c=0x073C4B:s=1280x720:d=3.5:r=25 \
+            -vf "drawtext=fontfile=/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf:text='DROPi TYCOON':fontcolor=white:fontsize=68:x=(w-text_w)/2:y=(h-text_h)/2-45,drawtext=fontfile=/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf:text='YOUR WORK LEAVES A MARK.':fontcolor=white:fontsize=34:x=(w-text_w)/2:y=(h-text_h)/2+55" \
+            -an -c:v libx264 -preset medium -crf 20 -pix_fmt yuv420p "$WORK/d.mp4"
+
+          printf "file '%s'\nfile '%s'\nfile '%s'\nfile '%s'\n" \
+            "$WORK/a.mp4" "$WORK/b.mp4" "$WORK/c.mp4" "$WORK/d.mp4" > "$WORK/list.txt"
+          ffmpeg -hide_banner -loglevel error -y -f concat -safe 0 -i "$WORK/list.txt" \
+            -c copy -movflags +faststart "$FINAL"
+
+          test -s "$FINAL"
+          DURATION=$(ffprobe -v error -show_entries format=duration -of default=nw=1:nk=1 "$FINAL")
+          SIZE=$(stat -c%s "$FINAL")
+          echo "Teaser created: $FINAL duration=${DURATION}s bytes=$SIZE"
+          python3 - "$DURATION" <<'PY'
+          import sys
+          duration = float(sys.argv[1])
+          if not 14.8 <= duration <= 15.3:
+              raise SystemExit(f'unexpected teaser duration: {duration}')
+          PY
+
+      - name: Extract teaser review frames
+        shell: bash
+        run: |
+          set -euo pipefail
+          OUT='artifacts/dt23/teaser-001'
+          SRC="$OUT/DROPi_Tycoon_Teaser_001_15s_Authentic_Gameplay.mp4"
+          ffmpeg -hide_banner -loglevel error -y -ss 1 -i "$SRC" -frames:v 1 "$OUT/review-game-world.png"
+          ffmpeg -hide_banner -loglevel error -y -ss 5 -i "$SRC" -frames:v 1 "$OUT/review-player-phone.png"
+          ffmpeg -hide_banner -loglevel error -y -ss 10 -i "$SRC" -frames:v 1 "$OUT/review-movement.png"
+          ffmpeg -hide_banner -loglevel error -y -ss 13.5 -i "$SRC" -frames:v 1 "$OUT/review-end-card.png"
+
+      - name: Write artifact provenance
+        shell: bash
+        run: |
+          set -euo pipefail
+          OUT='artifacts/dt23/teaser-001'
+          cat > "$OUT/ARTIFACT_PROVENANCE.txt" <<EOF
+          DROPi Tycoon DT-23 Teaser 001
+          repository=${GITHUB_REPOSITORY}
+          commit=${GITHUB_SHA}
+          workflow_run_id=${GITHUB_RUN_ID}
+          workflow_run_attempt=${GITHUB_RUN_ATTEMPT}
+          source_runtime=${DT23_GAME_URL}
+          classification=AUTHENTIC_GAMEPLAY
+          generated_pseudo_gameplay=false
+          internal_game_state_mutation=false
+          public_claims=live game world; real Player Phone; real player movement
+          EOF
+
+      - name: Upload authentic gameplay teaser
+        uses: actions/upload-artifact@v4
+        with:
+          name: dropi-tycoon-teaser-001-authentic-gameplay
+          path: artifacts/dt23/teaser-001/
+          if-no-files-found: error
+          retention-days: 30
