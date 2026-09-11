@@ -97,7 +97,6 @@ jobs:
           OUT='artifacts/dt23/trailer-001'
           SRC="$OUT/DROPi_Tycoon_Trailer_001_Gameplay_Source.mp4"
           PREVIEW="$OUT/DROPi_Tycoon_Trailer_001_30s_Gameplay_Preview.mp4"
-          # Skip the menu/startup lead-in and retain only real recorded gameplay.
           ffmpeg -y -ss 00:00:07 -i "$SRC" -t 30 \
             -c:v libx264 -preset medium -crf 20 -pix_fmt yuv420p \
             -movflags +faststart -an "$PREVIEW"
@@ -114,10 +113,12 @@ jobs:
           ffmpeg -y -ss 00:00:40 -i "$SRC" -frames:v 1 "$OUT/review-40s.png"
 
       - name: Write artifact provenance
+        if: always()
         shell: bash
         run: |
           set -euo pipefail
           OUT='artifacts/dt23/trailer-001'
+          mkdir -p "$OUT"
           cat > "$OUT/ARTIFACT_PROVENANCE.txt" <<EOF
           DROPi Tycoon DT-23 Trailer 001 gameplay capture
           repository=${GITHUB_REPOSITORY}
@@ -130,9 +131,10 @@ jobs:
           EOF
 
       - name: Upload gameplay video artifact
+        if: always()
         uses: actions/upload-artifact@v4
         with:
           name: dropi-tycoon-trailer-001-gameplay-video
           path: artifacts/dt23/trailer-001/
-          if-no-files-found: error
+          if-no-files-found: warn
           retention-days: 30
