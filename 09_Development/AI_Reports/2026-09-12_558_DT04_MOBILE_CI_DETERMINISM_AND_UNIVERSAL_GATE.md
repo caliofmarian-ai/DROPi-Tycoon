@@ -9,7 +9,8 @@
 - Repository: `caliofmarian-ai/DROPi-Tycoon`
 - Branch: `agent/dt04-mobile-ci-determinism`
 - Base commit: `d11b446d916f3910ecf4f457ec13deb5ae74e181`
-- Resulting functional commit: `27357dcfd939f9991030c9da125c2df2578ce81b`
+- Initial functional commit: `27357dcfd939f9991030c9da125c2df2578ce81b`
+- First report-containing head: `14700654eff9553470cbae275c75d85774429e2b`
 - Final report-containing commit: `N/A` — the containing commit cannot record its own SHA; live reconciliation is required.
 - Pull Request: #714 — `[DT-04][CI] Make Mobile Shell gate deterministic and universal`
 - Human approval status: Pending review
@@ -20,11 +21,11 @@
 
 # Objective
 
-Make the existing `validate-mobile-shell` check reproducible and present on every pull request and every push to `main`, without changing Expo runtime packages, gameplay, Android runtime behavior, branch protection, Railway, or deployment state.
+Make the existing `validate-mobile-shell` check reproducible and present on every pull request and every push to `main`. Align only the Expo SDK 57 patch versions that the pinned Doctor proves are required, without changing gameplay, Android architecture, branch protection, Railway, or deployment state.
 
 # Scope
 
-The implementation is restricted to the Mobile Shell workflow, the development-only Expo Doctor tool declaration and lockfile, this historical report, and DT-04's durable handoff object.
+The implementation is restricted to the Mobile Shell workflow, the development-only Expo Doctor tool declaration, the three required Expo SDK 57 patch alignments, their deterministic lockfile closure, the dependency snapshot in existing commercial evidence, this historical report, and DT-04's durable handoff object.
 
 # Files Inspected
 
@@ -54,6 +55,7 @@ The implementation is restricted to the Mobile Shell workflow, the development-o
 - `.github/workflows/game-mobile-ci.yml`
 - `game-mobile/package.json`
 - `game-mobile/package-lock.json`
+- `game-web/public/legal/commercial-release-evidence.json`
 - DT-04 object only in `09_Development/AI_Project_Memory/HANDOFFS.json`
 
 # Files Moved or Renamed
@@ -73,13 +75,17 @@ None.
 5. Updated `game-mobile/package-lock.json` using npm `10.9.2`; the lockfile delta contains only the root devDependency and the exact `expo-doctor@1.20.4` package record.
 6. Removed workflow-level `paths` filters, limited both PR and push triggers to `main`, added `workflow_dispatch`, and added `permissions: contents: read`.
 7. Opened PR #714 without enabling auto-merge or changing branch protection or Railway.
+8. Read the exact-head Mobile Shell failure on `14700654eff9553470cbae275c75d85774429e2b`; the pinned Doctor deterministically required `expo ~57.0.22`, `expo-dev-client ~57.0.19`, and `expo-system-ui ~57.0.4`.
+9. Applied only those three SDK-compatible patch alignments and regenerated their transitive lockfile closure with npm `10.9.2`.
+10. Updated only the existing mobile dependency snapshot and manifest/lockfile Git blob SHAs in `commercial-release-evidence.json`; `commercialReleaseReady` remains `false` and `mobile-release-dependency-license-closure` remains blocked.
 
 # Findings
 
 - The previous `npx -y expo-doctor` command fetched mutable tool state and had produced contradictory results on the same application dependency set.
 - The path-filtered Mobile Shell workflow left exact-current-`main` mobile evidence absent after changes outside `game-mobile/**` and `game-web/**`.
-- `expo-doctor@1.20.4` is development-only. Existing commercial/provenance validation passes without changes, so no legal/commercial evidence file was modified and no `UNKNOWN` was promoted.
-- PR #705 changes Expo runtime dependency patches and currently has a separate repository validation failure. PR #714 does not absorb that broader runtime dependency update.
+- `expo-doctor@1.20.4` is development-only, but its exact-head verdict proved that three existing Expo SDK 57 runtime patch declarations were stale. Those three patches are now aligned without an SDK, React Native, architecture, or product-scope migration.
+- The legal evidence update records the changed direct-dependency declarations and exact candidate blobs only. It does not perform licence closure, remove the blocker, or promote any `UNKNOWN`.
+- PR #705 contains the same three patch intentions but omits the required commercial-evidence synchronization. PR #714 performs the bounded current-main reconciliation rather than transplanting that stale branch.
 - The production Railway service and `main` branch rules remain unchanged by this task.
 
 # Recommendations
@@ -109,15 +115,17 @@ After PR #714 receives independent DT-00 audit and is merged, establish a protec
 - Release version/input validation: PASS.
 - Mobile TypeScript: PASS.
 - Expo public configuration generation: PASS.
-- Pinned Expo Doctor: `21/21 PASS` in the initial exact-version validation. A later retry reached `19/21` solely because DNS access to `exp.host` failed; no package incompatibility was reported. Exact-head GitHub CI remains authoritative.
+- Pinned Expo Doctor before patch alignment: one exact-head GitHub failure deterministically identified the same three patch mismatches observed by the previous unpinned workflow. Local retries also encountered a separate transient DNS failure for `exp.host`.
+- Corrected Expo patch alignment: deterministic install with Node `22.13.0` and npm `10.9.2`, bundled-runtime prepare/validate, release version/input validation, TypeScript, and Expo public configuration generation all PASS locally. A local Doctor retry was non-conclusive only because its two online checks could not resolve `exp.host` (`EAI_AGAIN`); it reported no remaining package-version mismatch. Final exact-head GitHub CI remains PENDING until the corrective commit is pushed.
 - Web production dependency audit: PASS, 0 vulnerabilities.
 - Full Vitest first run: 156 files PASS, 3 SKIPPED, 1 timing timeout in `tests/city-domain.test.ts`; no assertion failed.
 - Isolated replay of `tests/city-domain.test.ts`: PASS, 11/11 tests.
 - Web TypeScript/Vite production build: PASS.
 - Production bundle regression guard: PASS.
-- Third-party inventory/notices/provenance consistency: PASS.
+- Third-party inventory/notices/provenance consistency after the corrective dependency-evidence update: PASS; focused release-gate tests PASS, 5/5.
 - Whitespace validation: PASS.
-- Final report-containing exact-head GitHub CI: PENDING at report creation.
+- First report-containing head `14700654eff9553470cbae275c75d85774429e2b`: `production-image-smoke` PASS; `validate-mobile-shell` FAIL on the three explicit patch mismatches; `validate` was still running when correction began.
+- Final corrective report-containing exact-head GitHub CI: PENDING at report update.
 
 # Unresolved Issues
 
