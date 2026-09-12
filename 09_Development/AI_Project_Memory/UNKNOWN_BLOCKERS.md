@@ -2,86 +2,86 @@
 
 `UNKNOWN` is a first-class safe state. Missing evidence must never be converted into a fact by inference.
 
-## Active #683 acceptance
+Observed canonical `main`: `60ffc3bf8054b283fd34d3304247b4586462eec5` on 2026-09-12. Mutable repository, CI, deployment and PR state must still be reconciled live before action.
 
-### U-683-001 — Final corrected candidate PR/head
-- Historical state: PR #684 exact head `89565d26856ccb8776750d072ae2303971550f9c` had all three CI gates `SUCCESS` and fresh-context Auditor #2 returned `FRESH-CONTEXT RECOVERY = PASS`.
-- Superseding fact: Auditor #2 found that live DRAFT PR #682 / DT-01 had been omitted from `CURRENT_STATE.json` and the DT-01 handoff. DT-00 accepted this as a material backfill defect and changed PR #684 to correct it.
-- Current state: the final corrected PR #684 head is `UNKNOWN` until correction writes stop and live GitHub is re-read. The containing commit cannot embed its own SHA.
-- Resolution condition: freeze the corrected live PR head, obtain exact-head CI, run a new independent fresh-context audit on that same head, then perform DT-00 exact-head audit.
-- Safe action: the Auditor #2 PASS proves recoverability at the superseded head but does not authorize merge of the corrected head.
+## Third-person runtime decision
 
-### U-683-002 — Fresh-context final verdict on corrected head
-- Status: `UNKNOWN`.
-- Historical evidence: Auditor #2 PASS on `89565d26856ccb8776750d072ae2303971550f9c`.
-- Dependency: Auditor #3 must use a genuinely fresh AI context, start from `BOOTSTRAP.md`, and audit the corrected exact head after revised CI is green.
-- Safe action: merge #683 only after the corrected exact head receives `FRESH-CONTEXT RECOVERY = PASS` and DT-00 independent audit.
+### U-ARCH-001 — Babylon Android visual and performance evidence
 
-### U-683-003 — Open-PR omission detection
-- Historical defect: the original backfill and validator could validate only PRs already persisted; they could not detect a live open PR omitted by absence. Auditor #2 exposed this through PR #682.
-- Current correction: bootstrap now mandates complete live open-PR enumeration and set comparison; `validate-memory.mjs --current-open-prs <complete-live-set>` fails when the supplied live set contains a PR missing from the snapshot.
-- Remaining requirement: revised exact-head CI and Auditor #3 must verify this correction.
+- Status: `DEVICE_EVIDENCE_PENDING`.
+- Evidence: DRAFT PR #712 provides a strict TypeScript Babylon graybox and exact-build CI evidence, but hosted GitHub runners cannot prove real WebGL output, camera behavior or physical Android performance.
+- Safe action: keep #712 DRAFT; distribute the separately packaged internal evaluation APK from the exact successful workflow head; collect Owner evidence for `PRESENCE`, `SCALE`, `CAMERA`, `MOTION`, `WORLD READABILITY`, `LIFE` and `POLISH` before the Issue #710 decision.
 
-## Active specialist blockers
+### U-ARCH-002 — Authoritative-state-to-3D integration boundary
 
-### U-DT01-001 — PR #682 orchestration position
-- Status: `UNKNOWN`.
-- Resolved facts: PR #682 exists, is OPEN and DRAFT, is owned by DT-01 / Issue #491, is based on observed current main `f8453cbaa522a54406940d5056f5a5943627d86c`, has head `8cf6bec6ffa05e255f0282f137668fac3424f782`, and all three exact-head workflow runs are `SUCCESS`.
-- Historical defect: #682 existed before the #683 snapshot but was omitted from the first backfill.
-- Boundary: #682 is semantic locality-presentation work and is separate from the later Owner-priority DT-19 crop/prep/ingestion -> DT-01 visible city asset-integration sequence.
-- Unknown: exact post-#683 merge/rework/order position remains `UNKNOWN` until DT-00 performs a live dependency audit.
-- Safe action: HOLD; do not merge/undraft/expand #682 as part of #683.
+- Status: `BLOCKED_BY_U-ARCH-001`.
+- Evidence: the Babylon spike deliberately owns no production economy, mission, save, locality persistence or game-state authority.
+- Safe action: only after a promising Android architecture-family verdict, design one compact Brăila integration slice that consumes existing domain/state contracts without duplicating authority.
 
-### U-DT17-001 — #674 current-main reconciliation
-- Status: `BLOCKED`.
-- Evidence: #674 base predates observed canonical main; DT-22 Pass 004 records exact-head `validate` failure.
-- Safe action: DT-17 may reconcile/fix/test only; no merge until current-base/exact-head green and DT-00 re-audit.
+### U-CANON-001 — Older Phaser/soft-isometric wording conflicts with Owner Directive 004
 
-### U-DT19-001 — Library ingestion not yet executed
-- Status: `BLOCKED_DEPENDENCY`.
-- Evidence: #679 explicitly does not ingest binaries; #413 owns Library-to-repository ingestion.
-- Safe action: after #683 and DT-00 re-audit/merge decision on #679, assign a governed #413 crop/prep/ingestion slice.
+- Status: `CONTRADICTORY`.
+- Evidence: `00_Project/THIRD_PERSON_OPEN_WORLD_VISUAL_EXPERIENCE_CANON.md` explicitly makes conflicting older soft-isometric local-play wording `STALE`, while `00_Project/PROJECT_STATUS.md`, `00_Project/ROADMAP.md`, `00_Project/DOCUMENT_INDEX.md`, `06_Technical/MOBILE_APPLICATION_PLATFORM.md`, `07_UI/VISUAL_DESIGN_SYSTEM.md`, `04_World/WORLD.md` and related documents still present Phaser or elevated soft-isometric presentation as the active baseline.
+- Safe action: run a bounded canonical reconciliation after the Issue #710 architecture evidence is available. Preserve historical reports as history; update active canonical/current-state wording without rewriting authoritative domain systems.
 
-### U-DT19-002 — Visual near-duplicates
-- Status: `UNKNOWN`.
-- Evidence: byte hashing detects exact duplicates only.
-- Safe action: require human/art review where semantic/visual near-duplicate judgement matters.
+## CI and deployment governance
 
-### U-DT13-001 — Asset commercial/legal clearance
+### U-GOV-001 — Main branch and Railway are not yet CI-gated
+
+- Status: `PREREQUISITE_RESOLVED_SETTING_PENDING`.
+- Evidence: PR #714 merged at `60ffc3bf8054b283fd34d3304247b4586462eec5`; exact-main `validate`, `validate-mobile-shell` and `production-image-smoke` all passed. Live `main` remains unprotected, and Railway still reports `source.checkSuites:false`.
+- Safe action: establish required checks `validate`, `validate-mobile-shell` and `production-image-smoke`, then enable Railway waiting for successful check suites through a separately verified settings mutation path. Do not weaken or rename checks to obtain enforcement.
+
+### U-RAILWAY-001 — Railway configuration source is contradictory
+
+- Status: `CONTRADICTORY`.
+- Evidence: the Railway control plane labels the build as `RAILPACK`, while deployment logs show the repository `game-web/Dockerfile` and its healthcheck being used successfully. Effective restart-policy evidence is also incomplete.
+- Safe action: preserve the one existing project/environment/service; normalize repository/control-plane configuration only in a bounded DT-04 mission with exact deployment evidence. Do not create another service or environment.
+
+### U-TEST-001 — Expensive city connectivity test has intermittent local timeout
+
+- Status: `NON_BLOCKING_FLAKE_RISK`.
+- Evidence: one full local Vitest run timed out at the 5-second test limit in `tests/city-domain.test.ts`; immediate isolated replay passed 11/11, and exact-head plus exact-main GitHub CI passed the complete suite.
+- Safe action: retain the assertion and track runtime separately; optimize or assign a justified timeout only if repeated controlled CI evidence proves instability. Do not remove coverage.
+
+## Active PR and release blockers
+
+### U-PR-001 — Historical open branches require rebuild-or-close decisions
+
+- Status: `HOLD_RECONCILIATION`.
+- Evidence: PRs #667, #674, #676, #678, #687 and #704 predate the current visual/runtime direction, fail one or more current gates, are non-mergeable, or change player-visible presentation that needs Owner acceptance. PR #685 was replayed on current main but still fails `validate` and carries pre-third-person 2D isometric candidates without an explicit local-runtime exclusion.
+- Safe action: do not transplant them blindly. DT-00 must classify each as rebuild from fresh main, superseded/close, or later bounded work after the renderer decision.
+
+### U-ASSET-001 — Asset commercial/legal clearance
+
 - Status: `UNKNOWN` except where DT-13 evidence explicitly qualifies an asset.
-- Safe action: never infer `CLEARED` from Library presence, repository presence, `APPROVED_SOURCE` or runtime integration.
+- Evidence: Library presence, repository presence, an asset manifest or technical integration does not prove provenance or commercial rights.
+- Safe action: preserve DT-13/DT-19 gates before third-party or generated assets enter production/release use.
 
-### U-DT07-001 — #676 scope/dependency release
-- Status: `BLOCKED`.
-- Evidence: DT-22 Pass 004 preserves `HOLD_SCOPE`; #491/#492 sequencing/scope reconciliation remains unresolved.
-- Safe action: no DT-07 continuation until DT-00 explicitly releases the hold.
+### U-ASSET-002 — Pre-third-person isometric candidates
 
-### U-DT16-001 — Final release audit timing
-- Status: `BLOCKED_DEPENDENCY`.
-- Evidence: DT-16 remains `HOLD_FINAL_AUDIT`.
-- Safe action: refresh only after DT-00 declares the upstream merge wave complete enough.
+- Status: `HOLD_SCOPE`.
+- Evidence: the four PR #685 WebP derivatives are 120-144 px 2D isometric/miniature images. They remain technically traceable candidates, but they do not satisfy the canonical local human-scale third-person visual family.
+- Safe action: never place them in local playable runtime. Retain only as strategic-map/reference candidates if PR #685 explicitly records that boundary and later passes fresh-main memory reconciliation plus all exact-head checks.
 
-## Governance/evidence gaps
+### U-ANDROID-001 — Production Android/Google Play evidence
 
-### U-GOV-001 — Main branch protection decision
-- Status: `UNKNOWN_OWNER_GOVERNANCE_DECISION`.
-- Evidence: DT-22 observed main unprotected/required checks unenforced.
-- Safe action: do not change it as part of #683.
+- Status: `BLOCKED_RELEASE_EVIDENCE`.
+- Evidence: a CI-built debug-signed evaluation APK is not a production AAB, Play artifact, production signing result or physical acceptance record.
+- Safe action: DT-14 and the Owner collect exact production artifact/device/Play evidence only when a release candidate exists.
 
-### U-GOV-002 — #569 lifecycle contradiction
-- Status: `UNKNOWN_RESOLUTION`.
-- Evidence: DT-22 found closed/completed state contradicting an issue comment saying it intentionally remained open with blockers.
-- Safe action: DT-00/domain owners reconcile before lifecycle normalization.
+### U-GOV-002 — GitHub Project board state
 
-### U-GOV-003 — #562 completion evidence gap
-- Status: `UNKNOWN_RESOLUTION`.
-- Evidence: DT-22 found closed/completed state while unresolved P0 requirements remained in body and no completion evidence existed in thread.
-- Safe action: DT-00/domain owners reconcile before lifecycle normalization.
-
-### U-GOV-004 — GitHub Project board state
 - Status: `UNKNOWN`.
-- Evidence: available connector did not expose sufficient Projects-v2 enumeration/mutation during DT-22 audit.
-- Safe action: do not invent Project-board existence/status.
+- Evidence: the available repository connector has not exposed sufficient Projects-v2 enumeration/mutation evidence.
+- Safe action: do not invent board status; use Issues, PRs, commits, checks and durable repository memory as the current operational evidence.
+
+## Resolved in the 2026-09-12 orchestration reset
+
+- Historical #683 memory-migration gates are resolved; PR #684 is merged and the active registry is being replaced by the live 2026-09-12 snapshot.
+- DT-22 Pass 005 closed six proven duplicate/superseded PRs without merge: #686, #702, #671, #690, #688 and #689.
+- PR #714 resolved the unpinned/path-filtered Mobile Shell CI prerequisite and was merged with exact-head and exact-main verification.
+- PR #705 was then closed unmerged as superseded by #714.
 
 ## Rule
 

@@ -22,9 +22,10 @@ A fresh agent MUST start here and then read, in order:
 4. `09_Development/AI_Project_Memory/CURRENT_STATE.json`
 5. `09_Development/AI_Project_Memory/HANDOFFS.json`
 6. `09_Development/AI_Project_Memory/DECISIONS.md`
-7. `09_Development/AI_Project_Memory/UNKNOWN_BLOCKERS.md`
-8. The active GitHub Issue/PR/comments referenced by the applicable handoff.
-9. Any canonical project/domain documents referenced by that mission.
+7. `09_Development/AI_Project_Memory/AUTHORIZED_TOOLING.md`
+8. `09_Development/AI_Project_Memory/UNKNOWN_BLOCKERS.md`
+9. The active GitHub Issue/PR/comments referenced by the applicable handoff.
+10. Any canonical project/domain documents referenced by that mission.
 
 Do not replace this bounded read order with repository-wide guesswork.
 
@@ -163,6 +164,14 @@ This memory system records operational knowledge. It does not authorize:
 - domain-authority rewrites;
 - unrelated refactors;
 - CI workflow changes outside DT-04 ownership.
+
+## Owner operating surface
+
+Normal work is GitHub-first: branch, Pull Request, exact-head CI, DT-00 audit, controlled merge and post-merge verification. Do not require Marian to use a PC or Termux/TMux for routine development, previews or testing.
+
+Use Termux/TMux-assisted commands only when Marian explicitly requests repository synchronization/copying to a phone, computer or server, or separately approves another exceptional operation. If such a command is required, provide one complete copy-paste block with all paths and no interactive editor.
+
+Connected Figma, Canva, Runway and Higgsfield capabilities may be used under `AUTHORIZED_TOOLING.md`. They remain auxiliary work surfaces; GitHub remains the single source of truth and all implementation code stays repository-backed.
 
 ## Owner-facing language
 

@@ -7,106 +7,166 @@
 - Issue: `#413`
 - Pull request: `#685`
 - Branch: `agent/dt19-413-city-world-ingest-batch-001-r1`
-- Green canonical reconciliation base: `60ffc3bf8054b283fd34d3304247b4586462eec5`
-- Pre-reconciliation branch head: `4d977912358d28481f2ef4470fce5b9405a6abf8`
-- Live reconciliation required: `true`
-- Status at containing-write time: `RECONCILED — EXACT-HEAD CI PENDING SELF-SHA RE-READ`
+- Canonical reconciliation base: `f1d4396f64aa7a0fcfbcc37322d9fe6a6731066f`
+- Pre-correction branch head: `fabe73e437d6a7fe4d439ac33b14260a0a6a2ce4`
+- Containing correction head: `UNKNOWN — SELF-SHA / LIVE GITHUB RE-READ REQUIRED`
+- Status at containing-write time: `ACTIVE — LOCAL VALIDATION PASS / EXACT-HEAD CI PENDING`
 
 ## Mission
 
-Reconcile the same bounded four-asset PR #685 onto the now-green canonical `main`, preserving exact asset bytes, `CANDIDATE` lifecycle, DT-13 legal/commercial `UNKNOWN`, DT-19 authority boundaries, and the #683 durable handoff contract. No DT-01 placement, DT-11 locality mutation, source generation, mobile dependency change, or CI-rule change is part of this slice.
+Reconcile the same bounded four-byte PR #685 onto current canonical `main` without overwriting the operational registry introduced by PR #713. Preserve the exact WebP bytes and `CANDIDATE` lifecycle while enforcing the owner-approved third-person visual canon and fail-closing every unproven rights fact.
 
-## Green canonical-main gate
+This PR performs no runtime placement, gameplay, economy, save, backend, mobile, CI-workflow or locality mutation.
 
-Canonical `main` is `60ffc3bf8054b283fd34d3304247b4586462eec5`, produced by merged PR #714. The equivalent DT-14/mobile-shell unblocker is therefore canonical even though historical PR #686 itself closed unmerged.
+## Canonical visual-use gate
 
-Exact-main evidence on `60ffc3bf8054b283fd34d3304247b4586462eec5`:
+Batch classification:
 
-- `validate` / DROPi Tycoon Prototype CI — `SUCCESS`, run `34713872714`.
-- `validate-mobile-shell` / DROPi Tycoon Mobile Shell CI — `SUCCESS`, run `34713872645`.
-- `production-image-smoke` / Production Docker Runtime Smoke — `SUCCESS`, run `34713872694`.
+- `STRATEGIC_MAP_OR_REFERENCE_ONLY`
+- `FORBIDDEN_FOR_LOCAL_HUMAN_SCALE_THIRD_PERSON_RUNTIME`
+- `NOT_SUITABLE_AS_DIRECT_LOCAL_THIRD_PERSON_GAMEPLAY_ART`
+
+The four assets are small 2D isometric/miniature WebP images. They cannot directly represent full-height, human-scale local buildings under `00_Project/THIRD_PERSON_OPEN_WORLD_VISUAL_EXPERIENCE_CANON.md`.
+
+Strategic-map use is only a possible future review lane. Repository ingestion does not itself approve any player-visible use.
 
 ## Exact bounded asset list and immutable byte identity
 
-1. `08_Assets/Production/Candidates/City_World_Ingest_Batch_001/SRC-20260907-002/civic/school_01.webp`
-   - asset ID: `dt19-b001-school-01`
-   - source family: `SRC-20260907-002`
-   - persistent Library source: `/DROPi Tycoon/image-gen-1(8).png`
-   - Library file ID: `file_00000000ff2c81f4b146df2c8ebe64c8`
-   - derivative Git blob SHA-1: `27a3f73904456d937a34f6132862fad01d96b115`
-2. `08_Assets/Production/Candidates/City_World_Ingest_Batch_001/SRC-20260907-003/infrastructure/train_station_01.webp`
-   - asset ID: `dt19-b001-train-station-01`
-   - source family: `SRC-20260907-003`
-   - persistent Library source: `/DROPi Tycoon/image-gen-2(8).png`
-   - Library file ID: `file_00000000290081f4a028a6b7642e5425`
-   - derivative Git blob SHA-1: `f6a16d79ab9d09c41e76fd71ff38202e1329c477`
-3. `08_Assets/Production/Candidates/City_World_Ingest_Batch_001/SRC-20260907-006/architecture/historic_european_building_01.webp`
-   - asset ID: `dt19-b001-historic-european-building-01`
-   - source family: `SRC-20260907-006`
-   - persistent Library source: `/DROPi Tycoon/image-gen-5(1).png`
-   - Library file ID: `file_00000000a5cc81f49304e75f2d85cca4`
-   - derivative Git blob SHA-1: `32b848f03a55aa55737b692e11406f541e7e6af3`
-4. `08_Assets/Production/Candidates/City_World_Ingest_Batch_001/SRC-20260907-006/architecture/modern_office_building_01.webp`
-   - asset ID: `dt19-b001-modern-office-building-01`
-   - source family: `SRC-20260907-006`
-   - persistent Library source: `/DROPi Tycoon/image-gen-5(1).png`
-   - Library file ID: `file_00000000a5cc81f49304e75f2d85cca4`
-   - derivative Git blob SHA-1: `05eca6138d396a90e1d2cafc798223d83f086c8e`
+| Asset | Dimensions | Bytes | Git blob SHA-1 | SHA-256 | Asset-use classification |
+|---|---:|---:|---|---|---|
+| `school_01.webp` | 144x85 | 6,294 | `27a3f73904456d937a34f6132862fad01d96b115` | `f2cbaae170893eb82ee59f557cddf9e390836716852c4b5e20a03b94cb0b57a0` | `REFERENCE_ONLY`; embedded `SCHOOL` text |
+| `train_station_01.webp` | 144x86 | 6,540 | `f6a16d79ab9d09c41e76fd71ff38202e1329c477` | `4378545827c30c98a8e360407d536733ce9ff20372136104571b04c2ff8859e6` | `REFERENCE_ONLY`; embedded `TRAIN STATION` text |
+| `historic_european_building_01.webp` | 144x122 | 7,780 | `32b848f03a55aa55737b692e11406f541e7e6af3` | `aea4e74511f3d860357c9e5b7adcf05fa3f580a02c7378bf6ef6c9346b1262bc` | `STRATEGIC_MAP_OR_REFERENCE_ONLY` |
+| `modern_office_building_01.webp` | 120x142 | 4,374 | `05eca6138d396a90e1d2cafc798223d83f086c8e` | `d97f1c104a764ebd9334919129f8b778c1cbca1b3d6df020812d74479567ecc2` | `STRATEGIC_MAP_OR_REFERENCE_ONLY` |
 
-All four remain `CANDIDATE`. Repository ingestion does not grant `PRODUCTION_READY`, `RUNTIME_INTEGRATED`, `ANDROID_VERIFIED`, or legal/commercial clearance.
+All four remain `CANDIDATE`. Their Git blob identities are unchanged from pre-correction head `fabe73e437d6a7fe4d439ac33b14260a0a6a2ce4`.
 
-## Reconciliation performed
+Issue #413 requires label-contaminated crops to be reference-only. The school and station candidates therefore cannot be promoted as strategic-map art without a new clean derivative and a separately governed review.
 
-- Replayed the DT-19 bounded asset-ingestion slice directly on canonical main `60ffc3bf8054b283fd34d3304247b4586462eec5`.
-- Preserved the exact four WebP Git blob identities above; no binary was regenerated, re-encoded, or replaced.
-- Reconciled `asset-inventory.v1.json` with canonical `/DROPi Tycoon/` Library-path spelling while retaining the three batch collections and `REPOSITORY_ATTESTED_DERIVATIVES_ONLY` evidence for source families `SRC-20260907-002`, `SRC-20260907-003`, and `SRC-20260907-006`.
-- Reconciled `CITY_WORLD_INGEST_BATCH_001.json` to the exact green-main baseline and canonical Library identities without changing derivative bytes or lifecycle.
-- Updated only the DT-19 record in `HANDOFFS.json`; no other DT record or `CURRENT_STATE.json` is modified by this reconciliation.
+## Source-board metadata evidence
 
-## Ownership boundary
+Read-only Library metadata established:
 
-DT-19 owns asset inventory, production lineage, controlled derivative identity, Library/repository presence, candidate lifecycle and exact-byte dedup governance. DT-13 remains sole legal/licence/provenance qualification authority. DT-01 remains runtime visual placement/presentation authority. DT-11 remains locality identity/topology authority.
+| Source board | Library file ID | Created UTC | Bytes | Evidence |
+|---|---|---|---:|---|
+| `/DROPi Tycoon/image-gen-1(8).png` | `file_00000000ff2c81f4b146df2c8ebe64c8` | `2026-09-07T19:41:51.514314Z` | 2,593,109 | `model_generated: true` |
+| `/DROPi Tycoon/image-gen-2(8).png` | `file_00000000290081f4a028a6b7642e5425` | `2026-09-07T19:41:55.863924Z` | 2,705,120 | `model_generated: true` |
+| `/DROPi Tycoon/image-gen-5(1).png` | `file_00000000a5cc81f49304e75f2d85cca4` | `2026-09-07T19:42:05.150483Z` | 2,505,992 | `model_generated: true` |
 
-## What DT-01 can consume after DT-00 accepts/merges this slice
+This metadata proves Library presence, file identity/path, creation time and the model-generated indicator only.
 
-DT-01 may consume these four repository-available `CANDIDATE` derivative bytes as bounded visual-source inputs for a separately assigned visible-city integration slice. Repository presence does not authorize lifecycle promotion, legal clearance, locality identity, or placement by itself.
+The following remain fail-closed `UNKNOWN_OR_UNCLEARED` because no retained evidence was found:
 
-## Remaining UNKNOWNs
+- exact provider;
+- generation tool;
+- model/product;
+- applicable provider terms/licence evidence;
+- input/reference set rights;
+- commercial-use review;
+- redistribution review;
+- DT-13 legal/commercial qualification.
 
-- DT-13 legal/commercial qualification remains `UNKNOWN` unless separately proven by DT-13.
-- Historical derivative encoder/compression parameters remain `UNKNOWN_RECOVERED_EXISTING_WORK`.
-- Near-duplicate visual similarity remains human/art review; exact-byte duplicate enforcement remains mechanical DT-19 governance.
-- The containing reconciliation commit cannot persist its own final SHA or exact-head CI result. Under the #683 Self-SHA rule these are live-read from GitHub after this write.
+Independent source-board byte, dimension and recovered-region re-verification remains `UNKNOWN`: the Library materialization attempt returned HTTP 502. The manifest retains the previously recorded source SHA-256, dimensions and recovered regions as declared lineage, not as newly independently verified facts.
+
+Commercial release remains `BLOCKED_PENDING_DT13_EVIDENCE`. Owner approval, `APPROVED_SOURCE`, repository presence, CI or future runtime wiring cannot substitute for DT-13 evidence.
+
+## Reproducibility truth
+
+Two different reproducibility claims must remain separate:
+
+1. The exact committed candidate derivative bytes are reproducible from Git by their path, Git blob SHA-1, SHA-256 and file size.
+2. Recreating those same bytes from the Library source boards is `NOT_REPRODUCIBLE_FROM_RECORDED_EVIDENCE`.
+
+The historical crop, alpha-cleaning, resize, encoder product/version, encoder options and quality settings remain `UNKNOWN_RECOVERED_EXISTING_WORK`. This PR does not pretend that a source board plus a region rectangle can reproduce the exact derivative encoding.
+
+## Inventory and runtime boundary
+
+The inventory:
+
+- records three source-family collections and exactly four files;
+- keeps all three collections at `CANDIDATE`;
+- records `STRATEGIC_MAP_OR_REFERENCE_ONLY`;
+- records `FORBIDDEN_FOR_LOCAL_HUMAN_SCALE_THIRD_PERSON_RUNTIME`;
+- fail-closes provenance and commercial/redistribution evidence as `UNKNOWN_OR_UNCLEARED`;
+- records school/station as `REFERENCE_ONLY`;
+- references the canonical third-person visual authority.
+
+The four files exist only under `08_Assets/Production/Candidates/City_World_Ingest_Batch_001/`. They are not present in `game-web/public`, are not referenced by `game-web/src`, are absent from `runtimeArtifacts`, and are not bundled by the production `game-web` Docker context.
+
+## Registry reconciliation
+
+PR #713 is canonical on main through merge commit `f1d4396f64aa7a0fcfbcc37322d9fe6a6731066f`.
+
+This reconciliation:
+
+- preserves every DT-00 through DT-23 record from that main;
+- replaces only the DT-19 record;
+- does not modify `CURRENT_STATE.json`;
+- removes the invalid historical status `RECONCILED_PENDING_EXACT_HEAD_CI`;
+- preserves live reconciliation and Self-SHA requirements.
+
+## Local validation before publication
+
+- Modified JSON parse: `PASS`.
+- `verify_asset_inventory.mjs`: `PASS` — 11 families, 4 collections, 13 Library artifacts, 67 inventoried artifacts, 13 runtime artifacts, 2 declared reuse sets.
+- Persistent-memory validator: `PASS` — 24 handoffs, 10 active PRs.
+- Focused asset/inventory tests: `PASS` — 2 files, 14 tests.
+- Full automated test suite: `PASS` — 158 files passed, 3 skipped; 1,660 tests passed, 18 skipped.
+- TypeScript and Vite production build: `PASS` — 117 modules.
+- `git diff --check`: `PASS`.
+
+The existing approximately 3.2 MB minified / 973 kB gzip production bundle warning is unchanged by this candidate-only PR; none of these four assets enter the runtime bundle.
 
 ## Exact-head acceptance still required
 
-The containing reconciliation commit must independently return all three on the same exact PR head:
+After publication, the same containing head must return:
 
 - `validate = SUCCESS`
 - `validate-mobile-shell = SUCCESS`
 - `production-image-smoke = SUCCESS`
 
-Only after that live evidence exists may DT-19 report `READY FOR DT-00 RE-AUDIT`.
+Local validation and green unrelated workflows do not substitute for this exact-head gate. DT-19 does not self-merge or enable auto-merge.
+
+## Permitted future use
+
+After merge, the bytes may remain in the governed repository candidate library.
+
+A future bounded mission may assess:
+
+- the two unlabelled architecture candidates for a strategic-map presentation;
+- the labelled school/station images as reference inputs only;
+- creation of new clean strategic-map derivatives, if justified and rights-qualified.
+
+No future task may treat this ingestion as authorization to use any of these four images in the local human-scale third-person world.
+
+## Remaining blockers
+
+- Exact-head CI for the containing correction commit is pending live GitHub evidence.
+- Provider/tool/model, terms/licence, reference/input rights and commercial/redistribution evidence remain `UNKNOWN_OR_UNCLEARED`.
+- DT-13 qualification is required before any commercial/runtime promotion.
+- Strategic-map use remains unaccepted pending a separate bounded visual/runtime review.
+- Production 3D asset structure remains downstream of the Issue #710 renderer architecture decision.
 
 ## Forbidden actions preserved
 
-- Do not modify or regenerate the four WebP bytes.
-- Do not expand the batch or generate new source assets.
-- Do not perform DT-01 runtime placement.
-- Do not modify DT-11 locality identity/topology.
-- Do not modify mobile dependencies, Expo, or CI workflows.
-- Do not infer DT-13 legal/commercial clearance.
+- Do not modify or regenerate the four WebP bytes in this PR.
+- Do not promote them beyond `CANDIDATE`.
+- Do not integrate them into runtime.
+- Do not use them as local human-scale third-person buildings.
+- Do not infer legal/commercial clearance.
+- Do not overwrite another DT handoff or modify `CURRENT_STATE.json`.
 - Do not self-merge or enable auto-merge.
 
 ## References
 
 - PR #685
 - Issue #413
-- Issue #683
-- PR #714 / canonical main `60ffc3bf8054b283fd34d3304247b4586462eec5`
-- historical PR #686 (closed unmerged; superseded by canonical equivalent unblocker)
+- Issue #710
+- PR #713 / canonical main `f1d4396f64aa7a0fcfbcc37322d9fe6a6731066f`
+- `00_Project/THIRD_PERSON_OPEN_WORLD_VISUAL_EXPERIENCE_CANON.md`
 - `08_Assets/Production/Manifests/CITY_WORLD_INGEST_BATCH_001.json`
 - `08_Assets/Production/asset-inventory.v1.json`
+- `09_Development/Compliance/GLOBAL_ASSET_PROVENANCE_CONTRACT_565_643.md`
 - `game-web/tests/asset-city-world-ingest-batch-001.test.ts`
 - `game-web/tests/asset-inventory-governance.test.ts`
 - `09_Development/AI_Project_Memory/HANDOFFS.json`

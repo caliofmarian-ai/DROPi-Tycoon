@@ -15,6 +15,7 @@ const verifierPath = fileURLToPath(
 
 const legalQualificationContract = '09_Development/Compliance/GLOBAL_ASSET_PROVENANCE_CONTRACT_565_643.md'
 const runtimeEvidenceManifest = 'game-web/public/legal/runtime-provenance.json'
+const thirdPersonVisualCanon = '00_Project/THIRD_PERSON_OPEN_WORLD_VISUAL_EXPERIENCE_CANON.md'
 const tempDirs: string[] = []
 
 function loadInventory(): any {
@@ -46,6 +47,7 @@ describe('ISSUE-414 — DT-19 asset inventory and dedup authority', () => {
     const inventory = loadInventory()
     expect(inventory.policyRefs.legalQualificationContract).toBe(legalQualificationContract)
     expect(inventory.policyRefs.runtimeEvidenceManifest).toBe(runtimeEvidenceManifest)
+    expect(inventory.policyRefs.thirdPersonVisualCanon).toBe(thirdPersonVisualCanon)
     expect(inventory.policyRefs.legalReleaseAuthority).toBeUndefined()
     expect(inventory.authorityBoundary.productionLifecycleAuthority).toBe('DT-19')
     expect(inventory.authorityBoundary.legalQualificationAuthority).toBe('DT-13')
@@ -94,6 +96,18 @@ describe('ISSUE-414 — DT-19 asset inventory and dedup authority', () => {
     expect(summary.inventoriedArtifacts).toBeGreaterThanOrEqual(67)
     expect(summary.runtimeArtifacts).toBe(13)
     expect(summary.declaredReuseSets).toBeGreaterThanOrEqual(2)
+
+    const cityWorldBatch = inventory.collections.filter((item: any) =>
+      item.collectionId.startsWith('city-world-ingest-batch-001-'),
+    )
+    expect(cityWorldBatch).toHaveLength(3)
+    for (const collection of cityWorldBatch) {
+      expect(collection.lifecycleState).toBe('CANDIDATE')
+      expect(collection.visualUseClassification).toBe('STRATEGIC_MAP_OR_REFERENCE_ONLY')
+      expect(collection.localHumanScaleThirdPersonRuntime).toBe(
+        'FORBIDDEN_FOR_LOCAL_HUMAN_SCALE_THIRD_PERSON_RUNTIME',
+      )
+    }
   })
 
   it('fails closed when runtime evidence is relabeled as the legal release authority', () => {
