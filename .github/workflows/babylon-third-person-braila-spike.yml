@@ -38,9 +38,37 @@ jobs:
           grep -q "NOT AUTHENTIC GAMEPLAY" index.html
           grep -q "DROPi TYCOON" index.html
 
-      - name: Upload static spike build
+      - name: Record bundle size
+        run: du -sh dist && find dist -maxdepth 2 -type f -printf '%p %k KB\n' | sort
+
+      - name: Capture exact-build screenshot
+        run: |
+          mkdir -p evidence
+          npm run preview -- --port 4173 > /tmp/dropi-babylon-preview.log 2>&1 &
+          PREVIEW_PID=$!
+          trap 'kill ${PREVIEW_PID} || true' EXIT
+          for i in {1..20}; do
+            if curl -fsS http://127.0.0.1:4173/ >/dev/null; then break; fi
+            sleep 1
+          done
+          CHROME="$(command -v google-chrome || command -v google-chrome-stable || command -v chromium || true)"
+          test -n "$CHROME" || { echo 'No headless Chrome binary available'; exit 1; }
+          "$CHROME" \
+            --headless=new \
+            --no-sandbox \
+            --disable-dev-shm-usage \
+            --hide-scrollbars \
+            --window-size=1280,720 \
+            --virtual-time-budget=5000 \
+            --screenshot=evidence/babylon-third-person-braila-v1.png \
+            http://127.0.0.1:4173/
+          test -s evidence/babylon-third-person-braila-v1.png
+
+      - name: Upload static spike build and exact-build evidence
         uses: actions/upload-artifact@v4
         with:
           name: dropi-babylon-third-person-braila-v1
-          path: 09_Development/Spikes/BABYLON_THIRD_PERSON_BRAILA_V1/dist
+          path: |
+            09_Development/Spikes/BABYLON_THIRD_PERSON_BRAILA_V1/dist
+            09_Development/Spikes/BABYLON_THIRD_PERSON_BRAILA_V1/evidence
           retention-days: 14
