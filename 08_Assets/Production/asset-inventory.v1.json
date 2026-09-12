@@ -165,7 +165,7 @@
       "libraryPresence": "LIBRARY_PRESENT",
       "repositoryPresence": "NOT_ATTESTED_ON_MAIN",
       "libraryFileId": "file_000000002ec8821084f3cc999d6af6e8",
-      "libraryPath": "/DROPi Tycon/DROPi_Tycoon_Approved_Assets_2026-09-05.zip",
+      "libraryPath": "/DROPi Tycoon/DROPi_Tycoon_Approved_Assets_2026-09-05.zip",
       "sha256": "53f1b51dccb404c9eefbe97d6dc7fead7c9ad47dea6c16ee87e0355f315237bf",
       "repositoryContentMatches": [
         "game-mobile/assets/branding/dropi-tycoon-logo.png",
@@ -186,7 +186,7 @@
       "libraryPresence": "LIBRARY_PRESENT",
       "repositoryPresence": "NOT_ATTESTED_ON_MAIN",
       "libraryFileId": "file_00000000565881f4b05d16b4a2f58b0d",
-      "libraryPath": "/DROPi Tycon/Auditoria de activos Dropi Tycoon.png"
+      "libraryPath": "/DROPi Tycoon/Auditoria de activos Dropi Tycoon.png"
     },
     {
       "artifactId": "library-source-board-src-20260907-002",
@@ -195,7 +195,7 @@
       "libraryPresence": "LIBRARY_PRESENT",
       "repositoryPresence": "NOT_ATTESTED_ON_MAIN",
       "libraryFileId": "file_00000000ff2c81f4b146df2c8ebe64c8",
-      "libraryPath": "/DROPi Tycon/image-gen-1(8).png"
+      "libraryPath": "/DROPi Tycoon/image-gen-1(8).png"
     },
     {
       "artifactId": "library-source-board-src-20260907-003",
@@ -204,7 +204,7 @@
       "libraryPresence": "LIBRARY_PRESENT",
       "repositoryPresence": "NOT_ATTESTED_ON_MAIN",
       "libraryFileId": "file_00000000290081f4a028a6b7642e5425",
-      "libraryPath": "/DROPi Tycon/image-gen-2(8).png"
+      "libraryPath": "/DROPi Tycoon/image-gen-2(8).png"
     },
     {
       "artifactId": "library-source-board-src-20260907-004",
@@ -213,7 +213,7 @@
       "libraryPresence": "LIBRARY_PRESENT",
       "repositoryPresence": "NOT_ATTESTED_ON_MAIN",
       "libraryFileId": "file_00000000bcf88210ad58621f4fd6eea1",
-      "libraryPath": "/DROPi Tycon/image-gen-3(5).png"
+      "libraryPath": "/DROPi Tycoon/image-gen-3(5).png"
     },
     {
       "artifactId": "library-source-board-src-20260907-005",
@@ -222,7 +222,7 @@
       "libraryPresence": "LIBRARY_PRESENT",
       "repositoryPresence": "NOT_ATTESTED_ON_MAIN",
       "libraryFileId": "file_00000000427c82108f9acb5019bc8d05",
-      "libraryPath": "/DROPi Tycon/image-gen-4(2).png"
+      "libraryPath": "/DROPi Tycoon/image-gen-4(2).png"
     },
     {
       "artifactId": "library-source-board-src-20260907-006",
@@ -231,7 +231,7 @@
       "libraryPresence": "LIBRARY_PRESENT",
       "repositoryPresence": "NOT_ATTESTED_ON_MAIN",
       "libraryFileId": "file_00000000a5cc81f49304e75f2d85cca4",
-      "libraryPath": "/DROPi Tycon/image-gen-5(1).png"
+      "libraryPath": "/DROPi Tycoon/image-gen-5(1).png"
     },
     {
       "artifactId": "library-source-board-src-20260907-007",
@@ -240,7 +240,7 @@
       "libraryPresence": "LIBRARY_PRESENT",
       "repositoryPresence": "NOT_ATTESTED_ON_MAIN",
       "libraryFileId": "file_00000000c6d08210862952401db2646c",
-      "libraryPath": "/DROPi Tycon/image-gen-6(1).png"
+      "libraryPath": "/DROPi Tycoon/image-gen-6(1).png"
     },
     {
       "artifactId": "library-source-board-src-20260907-008",
@@ -249,7 +249,7 @@
       "libraryPresence": "LIBRARY_PRESENT",
       "repositoryPresence": "NOT_ATTESTED_ON_MAIN",
       "libraryFileId": "file_00000000d18081f4bea0b1b6172e1fb7",
-      "libraryPath": "/DROPi Tycon/image-gen-7(1).png"
+      "libraryPath": "/DROPi Tycoon/image-gen-7(1).png"
     },
     {
       "artifactId": "library-source-board-src-20260907-009",
@@ -258,7 +258,7 @@
       "libraryPresence": "LIBRARY_PRESENT",
       "repositoryPresence": "NOT_ATTESTED_ON_MAIN",
       "libraryFileId": "file_00000000fd308243a84bd623d24ddc50",
-      "libraryPath": "/DROPi Tycon/image-gen-8.png"
+      "libraryPath": "/DROPi Tycoon/image-gen-8.png"
     },
     {
       "artifactId": "library-source-board-src-20260907-010",
@@ -267,7 +267,7 @@
       "libraryPresence": "LIBRARY_PRESENT",
       "repositoryPresence": "NOT_ATTESTED_ON_MAIN",
       "libraryFileId": "file_00000000f95081f48b8dbd41fc77e30a",
-      "libraryPath": "/DROPi Tycon/image-gen-9.png"
+      "libraryPath": "/DROPi Tycoon/image-gen-9.png"
     },
     {
       "artifactId": "library-crops-q55",
@@ -276,7 +276,7 @@
       "libraryPresence": "LIBRARY_PRESENT",
       "repositoryPresence": "NOT_ATTESTED_ON_MAIN",
       "libraryFileId": "file_000000009e3882108833d09a3e27f79e",
-      "libraryPath": "/DROPi Tycon/crops_q55.zip",
+      "libraryPath": "/DROPi Tycoon/crops_q55.zip",
       "sha256": "7d40b94db14fc0c81e18936ff6ae40b2b4b0dae27b01f0fec0201f8a2ccc5a46",
       "memberAssetCount": 50,
       "rule": "Same 50 logical candidate paths as the repository crop collection, but direct member hashes differ; this is a Library-only alternate derivative archive, not repository attestation."
@@ -288,7 +288,7 @@
       "libraryPresence": "LIBRARY_PRESENT",
       "repositoryPresence": "NOT_ATTESTED_ON_MAIN",
       "libraryFileId": "file_00000000b22481f48156c90474b1de5d",
-      "libraryPath": "/DROPi Tycon/crops_q68.zip",
+      "libraryPath": "/DROPi Tycoon/crops_q68.zip",
       "sha256": "ecaad32e48489185aabede8dbaae04469db0a1460e2c3cc8f591157999943032",
       "memberAssetCount": 50,
       "rule": "Same 50 logical candidate paths as the repository crop collection, but direct member hashes differ; this is a Library-only alternate derivative archive, not repository attestation."

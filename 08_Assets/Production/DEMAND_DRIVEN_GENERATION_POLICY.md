@@ -17,7 +17,7 @@ Before generation or promotion, DT-19 uses:
 - `08_Assets/Production/asset-inventory.v1.json` as the machine-readable production inventory and lineage index;
 - `08_Assets/Production/Tools/verify_asset_inventory.mjs` as the fail-closed structural/exact-duplicate verifier;
 - the existing approved-source and generated-family Markdown registers as source-family evidence consumed by that inventory;
-- the persistent DROPi Tycon Library as an audited source-presence input when source artifacts exist there but have not yet been ingested into GitHub;
+- the persistent DROPi Tycoon Library as an audited source-presence input when source artifacts exist there but have not yet been ingested into GitHub;
 - `09_Development/Compliance/GLOBAL_ASSET_PROVENANCE_CONTRACT_565_643.md` as the canonical DT-13 legal qualification/release-evidence contract;
 - `game-web/public/legal/runtime-provenance.json` only as the runtime evidence manifest consumed by the qualification process, never as a legal authority of its own.
 

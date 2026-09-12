@@ -214,8 +214,8 @@ function assertPresenceBoundary(inventory, familyIds) {
       if (typeof artifact.libraryFileId !== 'string' || artifact.libraryFileId.trim() === '') {
         throw new Error(`Library-present artifact ${artifact.artifactId} must retain libraryFileId audit evidence`)
       }
-      if (typeof artifact.libraryPath !== 'string' || !artifact.libraryPath.startsWith('/DROPi Tycon/')) {
-        throw new Error(`Library-present artifact ${artifact.artifactId} must retain its /DROPi Tycon/ libraryPath`)
+      if (typeof artifact.libraryPath !== 'string' || !artifact.libraryPath.startsWith('/DROPi Tycoon/')) {
+        throw new Error(`Library-present artifact ${artifact.artifactId} must retain its /DROPi Tycoon/ libraryPath`)
       }
     }
     if (artifact.familyId && !familyIds.has(artifact.familyId)) {
