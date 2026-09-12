@@ -121,8 +121,6 @@ jobs:
     runs-on: ubuntu-latest
     env:
       DROPI_ANDROID_VERSION_CODE: ${{ github.run_number }}
-      DROPI_STAGE_ROOT: ${{ runner.temp }}/dropi-babylon-android-evaluation-${{ github.run_id }}-${{ github.run_attempt }}
-      DROPI_APK_OUTPUT: ${{ runner.temp }}/dropi-babylon-android-eval-${{ github.event.pull_request.head.sha || github.sha }}
 
     steps:
       - name: Checkout exact source head
@@ -139,6 +137,11 @@ jobs:
             exit 1
           fi
           echo "DROPI_CHECKOUT_SHA=$ACTUAL_CHECKOUT_SHA" >> "$GITHUB_ENV"
+
+      - name: Define isolated runner-temporary paths
+        run: |
+          echo "DROPI_STAGE_ROOT=$RUNNER_TEMP/dropi-babylon-android-evaluation-$DROPI_RUN_ID-$DROPI_RUN_ATTEMPT" >> "$GITHUB_ENV"
+          echo "DROPI_APK_OUTPUT=$RUNNER_TEMP/dropi-babylon-android-eval-$DROPI_HEAD_SHA" >> "$GITHUB_ENV"
 
       - name: Setup Node 22.13.0
         uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
@@ -174,22 +177,25 @@ jobs:
             "$DROPI_STAGE_ROOT"
 
       - name: Install lockfile-pinned mobile dependencies
-        working-directory: ${{ env.DROPI_STAGE_ROOT }}/game-mobile
-        run: npm ci --no-audit --no-fund
+        run: |
+          cd "$DROPI_STAGE_ROOT/game-mobile"
+          npm ci --no-audit --no-fund
 
       - name: Validate CI-only mobile overlay TypeScript
-        working-directory: ${{ env.DROPI_STAGE_ROOT }}/game-mobile
         env:
           EXPO_PUBLIC_DROPITYCOON_RUNTIME_MODE: bundled
-        run: npm run typecheck
+        run: |
+          cd "$DROPI_STAGE_ROOT/game-mobile"
+          npm run typecheck
 
       - name: Generate isolated Android native project
-        working-directory: ${{ env.DROPI_STAGE_ROOT }}/game-mobile
         env:
           CI: '1'
           NODE_ENV: production
           EXPO_PUBLIC_DROPITYCOON_RUNTIME_MODE: bundled
-        run: ./node_modules/.bin/expo prebuild --platform android --clean --no-install
+        run: |
+          cd "$DROPI_STAGE_ROOT/game-mobile"
+          ./node_modules/.bin/expo prebuild --platform android --clean --no-install
 
       - name: Verify isolated native configuration and bundled spike
         run: |
@@ -204,12 +210,13 @@ jobs:
             "$DROPI_STAGE_ROOT/game-mobile/android/app/src/main/assets/dropi-game/dropi-runtime-manifest.json"
 
       - name: Build debug-signed release-mode evaluation APK
-        working-directory: ${{ env.DROPI_STAGE_ROOT }}/game-mobile/android
         env:
           CI: '1'
           NODE_ENV: production
           EXPO_PUBLIC_DROPITYCOON_RUNTIME_MODE: bundled
-        run: ./gradlew --no-daemon --stacktrace :app:assembleRelease
+        run: |
+          cd "$DROPI_STAGE_ROOT/game-mobile/android"
+          ./gradlew --no-daemon --stacktrace :app:assembleRelease
 
       - name: Verify APK payload and write attestation
         run: |
@@ -233,7 +240,7 @@ jobs:
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
           name: dropi-babylon-android-eval-${{ github.event.pull_request.head.sha || github.sha }}
-          path: ${{ env.DROPI_APK_OUTPUT }}
+          path: ${{ runner.temp }}/dropi-babylon-android-eval-${{ github.event.pull_request.head.sha || github.sha }}
           if-no-files-found: error
           compression-level: 0
           retention-days: 14
