@@ -1,0 +1,126 @@
+name: Reconcile DROPi Tycoon spelling
+
+on:
+  push:
+    branches:
+      - owner/reconcile-tycoon-spelling
+
+permissions:
+  contents: write
+
+jobs:
+  reconcile:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout branch
+        uses: actions/checkout@v4
+        with:
+          ref: owner/reconcile-tycoon-spelling
+          fetch-depth: 0
+
+      - name: Normalize standalone Tycon spelling repository-wide
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          from pathlib import Path
+          import re
+
+          root = Path('.')
+          pattern = re.compile(r'\btycon\b', re.IGNORECASE)
+          workflow_path = Path('.github/workflows/reconcile-tycoon-spelling.yml')
+
+          def replacement(match):
+              value = match.group(0)
+              if value == 'TYCON':
+                  return 'TYCOON'
+              if value == 'tycon':
+                  return 'tycoon'
+              return 'Tycoon'
+
+          changed_files = []
+          replacement_count = 0
+
+          for path in sorted(root.rglob('*')):
+              if not path.is_file() or '.git' in path.parts or path == workflow_path:
+                  continue
+              data = path.read_bytes()
+              if b'\x00' in data:
+                  continue
+              try:
+                  text = data.decode('utf-8')
+              except UnicodeDecodeError:
+                  continue
+              updated, count = pattern.subn(replacement, text)
+              if count:
+                  path.write_text(updated, encoding='utf-8')
+                  changed_files.append(str(path))
+                  replacement_count += count
+
+          renamed_paths = []
+          candidates = [p for p in root.rglob('*') if '.git' not in p.parts and p != workflow_path]
+          for path in sorted(candidates, key=lambda p: len(p.parts), reverse=True):
+              if not path.exists():
+                  continue
+              new_name, count = pattern.subn(replacement, path.name)
+              if not count or new_name == path.name:
+                  continue
+              target = path.with_name(new_name)
+              if target.exists():
+                  raise SystemExit(f'Refusing path collision: {path} -> {target}')
+              path.rename(target)
+              renamed_paths.append(f'{path} -> {target}')
+              replacement_count += count
+
+          if replacement_count == 0:
+              raise SystemExit('No standalone Tycon spelling found; expected at least one correction.')
+
+          remaining = []
+          for path in sorted(root.rglob('*')):
+              if '.git' in path.parts or path == workflow_path:
+                  continue
+              if any(pattern.search(part) for part in path.parts):
+                  remaining.append(f'PATH {path}')
+              if not path.is_file():
+                  continue
+              data = path.read_bytes()
+              if b'\x00' in data:
+                  continue
+              try:
+                  text = data.decode('utf-8')
+              except UnicodeDecodeError:
+                  continue
+              for lineno, line in enumerate(text.splitlines(), 1):
+                  if pattern.search(line):
+                      remaining.append(f'CONTENT {path}:{lineno}: {line}')
+
+          print(f'Corrected standalone spelling occurrences: {replacement_count}')
+          print('Changed files:')
+          for item in changed_files:
+              print(f'  {item}')
+          print('Renamed paths:')
+          for item in renamed_paths:
+              print(f'  {item}')
+
+          if remaining:
+              print('Remaining misspellings:')
+              print('\n'.join(remaining))
+              raise SystemExit(1)
+          print('PASS: no standalone Tycon/tycon/TYCON residue remains in repository text or paths.')
+          PY
+
+      - name: Remove temporary reconciliation workflow
+        shell: bash
+        run: rm -f .github/workflows/reconcile-tycoon-spelling.yml
+
+      - name: Commit reconciled spelling
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name "DROPi Canon Reconciler"
+          git config user.email "actions@users.noreply.github.com"
+          git add -A
+          git diff --cached --check
+          git diff --cached --quiet && { echo 'No diff to commit'; exit 1; }
+          git commit -m "Normalize DROPi Tycoon spelling repository-wide"
+          git push origin HEAD:owner/reconcile-tycoon-spelling
