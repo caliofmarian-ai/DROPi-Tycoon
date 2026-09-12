@@ -1,6 +1,7 @@
 html, body {
   width: 100%;
   height: 100%;
+  height: 100dvh;
   margin: 0;
   overflow: hidden;
   background: #071522;
@@ -23,6 +24,7 @@ html, body {
   top: max(16px, env(safe-area-inset-top));
   z-index: 10;
   width: min(430px, calc(100vw - 32px));
+  box-sizing: border-box;
   padding: 14px 16px;
   border: 1px solid rgba(93, 214, 255, .25);
   border-radius: 14px;
@@ -58,13 +60,29 @@ html, body {
 
 #controls {
   position: fixed;
-  left: max(18px, env(safe-area-inset-left));
-  bottom: max(22px, env(safe-area-inset-bottom));
+  inset: 0;
   z-index: 12;
+  pointer-events: none;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+#movement-pad {
+  position: absolute;
+  left: max(18px, env(safe-area-inset-left));
+  bottom: max(18px, env(safe-area-inset-bottom));
   display: grid;
   justify-items: center;
   gap: 8px;
-  user-select: none;
+}
+
+#action-stack {
+  position: absolute;
+  right: max(18px, env(safe-area-inset-right));
+  bottom: max(18px, env(safe-area-inset-bottom));
+  display: grid;
+  justify-items: end;
+  gap: 10px;
 }
 
 .control-row {
@@ -83,6 +101,8 @@ html, body {
   font-weight: 800;
   box-shadow: 0 8px 18px rgba(0, 0, 0, .25);
   touch-action: none;
+  pointer-events: auto;
+  -webkit-tap-highlight-color: transparent;
 }
 
 #controls button:active,
@@ -93,17 +113,46 @@ html, body {
 
 #interact {
   min-width: 190px !important;
-  margin-top: 2px;
   color: #071522 !important;
-  background: #5dd6ff !important;
+  background: rgba(93, 214, 255, .72) !important;
   font-size: 13px !important;
   letter-spacing: .12em;
+}
+
+#interact.ready {
+  background: #5dd6ff !important;
+  box-shadow: 0 0 0 3px rgba(93, 214, 255, .2), 0 8px 18px rgba(0, 0, 0, .25);
+}
+
+#recenter {
+  min-width: 150px !important;
+  min-height: 42px !important;
+  font-size: 10px !important;
+  letter-spacing: .08em;
+}
+
+#orientation-hint {
+  display: none;
+  position: fixed;
+  left: 50%;
+  bottom: calc(max(16px, env(safe-area-inset-bottom)) + 148px);
+  z-index: 9;
+  max-width: 70vw;
+  transform: translateX(-50%);
+  padding: 7px 10px;
+  border-radius: 10px;
+  background: rgba(3, 15, 26, .68);
+  color: rgba(255, 255, 255, .82);
+  font-size: 10px;
+  font-weight: 700;
+  text-align: center;
+  pointer-events: none;
 }
 
 #truth {
   position: fixed;
   right: max(14px, env(safe-area-inset-right));
-  bottom: max(14px, env(safe-area-inset-bottom));
+  bottom: calc(max(14px, env(safe-area-inset-bottom)) + 112px);
   z-index: 8;
   max-width: 44vw;
   padding: 7px 10px;
@@ -120,5 +169,86 @@ html, body {
 @media (min-width: 900px) {
   #controls {
     opacity: .82;
+  }
+}
+
+@media (orientation: portrait) {
+  #orientation-hint {
+    display: block;
+    top: 50%;
+    bottom: auto;
+  }
+
+  #action-stack {
+    bottom: calc(max(18px, env(safe-area-inset-bottom)) + 132px);
+  }
+
+  #truth {
+    bottom: calc(max(14px, env(safe-area-inset-bottom)) + 248px);
+  }
+}
+
+@media (orientation: landscape) and (max-height: 600px) {
+  #hud {
+    left: max(10px, env(safe-area-inset-left));
+    top: max(10px, env(safe-area-inset-top));
+    width: min(390px, 46vw);
+    padding: 9px 12px;
+    border-radius: 11px;
+  }
+
+  #hud h1 {
+    margin: 1px 0 3px;
+    font-size: 18px;
+  }
+
+  #objective {
+    font-size: 12px;
+  }
+
+  #telemetry {
+    margin-top: 4px;
+    font-size: 9px;
+  }
+
+  #movement-pad {
+    left: max(10px, env(safe-area-inset-left));
+    bottom: max(8px, env(safe-area-inset-bottom));
+    gap: 5px;
+  }
+
+  #action-stack {
+    right: max(10px, env(safe-area-inset-right));
+    bottom: max(8px, env(safe-area-inset-bottom));
+    gap: 6px;
+  }
+
+  #controls button {
+    min-width: 48px;
+    min-height: 44px;
+    border-radius: 11px;
+    font-size: 17px;
+  }
+
+  .control-row {
+    gap: 5px;
+  }
+
+  #interact {
+    min-width: 154px !important;
+    min-height: 46px !important;
+  }
+
+  #recenter {
+    min-width: 132px !important;
+    min-height: 34px !important;
+  }
+
+  #truth {
+    right: max(10px, env(safe-area-inset-right));
+    top: max(10px, env(safe-area-inset-top));
+    bottom: auto;
+    max-width: 39vw;
+    font-size: 8px;
   }
 }

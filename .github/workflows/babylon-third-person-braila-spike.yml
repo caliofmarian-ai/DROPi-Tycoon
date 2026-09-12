@@ -13,6 +13,8 @@ permissions:
 jobs:
   build-spike:
     runs-on: ubuntu-latest
+    env:
+      VITE_COMMIT_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
     defaults:
       run:
         working-directory: 09_Development/Spikes/BABYLON_THIRD_PERSON_BRAILA_V1
@@ -26,17 +28,26 @@ jobs:
         with:
           node-version: 22.12.0
 
-      - name: Install pinned spike dependencies
-        run: npm install --ignore-scripts --no-audit --no-fund
+      - name: Install lockfile-pinned spike dependencies
+        run: npm ci --ignore-scripts --no-audit --no-fund
 
-      - name: TypeScript syntax pass + Vite build
+      - name: Strict TypeScript + Vite build
         run: npm run build
+
+      - name: Reject disabled spike type checking
+        run: |
+          if grep -Eq '"noCheck"[[:space:]]*:[[:space:]]*true' tsconfig.json; then
+            echo 'tsconfig.json must not disable type checking.' >&2
+            exit 1
+          fi
 
       - name: Verify deterministic spike truth labels
         run: |
           grep -q "NON-AUTHORITATIVE VISUAL SPIKE" index.html
           grep -q "NOT AUTHENTIC GAMEPLAY" index.html
           grep -q "DROPi TYCOON" index.html
+          grep -R -F -q "$VITE_COMMIT_SHA" dist/assets
+          printf 'commit_sha=%s\nrenderer=Babylon.js 9.26.0\nclassification=NON-AUTHORITATIVE VISUAL SPIKE\nissue=710\n' "$VITE_COMMIT_SHA" > dist/build-evidence.txt
 
       - name: Record preview payload
         run: |

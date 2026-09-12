@@ -1,12 +1,12 @@
 import './style.css'
 import {
   AbstractMesh,
+  ArcRotateCamera,
   Color3,
   Color4,
   DirectionalLight,
   DynamicTexture,
   Engine,
-  FollowCamera,
   HemisphericLight,
   Mesh,
   MeshBuilder,
@@ -18,17 +18,43 @@ import {
   Vector3,
 } from '@babylonjs/core'
 
-type Obstacle = { x: number; z: number; halfX: number; halfZ: number }
+type Obstacle = { name: string; x: number; z: number; halfX: number; halfZ: number; height: number }
 type Waypoint = { label: string; position: Vector3 }
 type InputAction = 'forward' | 'back' | 'left' | 'right'
+type PerformanceSample = {
+  averageFps: number
+  p95FrameMs: number
+  slowFramePercent: number
+  sampleCount: number
+}
 
-const canvas = document.querySelector<HTMLCanvasElement>('#renderCanvas')
-const objectiveEl = document.querySelector<HTMLElement>('#objective')
-const telemetryEl = document.querySelector<HTMLElement>('#telemetry')
+const requireElement = <T extends Element>(selector: string): T => {
+  const element = document.querySelector<T>(selector)
+  if (!element) throw new Error(`Spike UI failed to initialize: ${selector}`)
+  return element
+}
 
-if (!canvas || !objectiveEl || !telemetryEl) throw new Error('Spike UI failed to initialize')
+const canvas = requireElement<HTMLCanvasElement>('#renderCanvas')
+const objectiveEl = requireElement<HTMLElement>('#objective')
+const telemetryEl = requireElement<HTMLElement>('#telemetry')
+const interactButton = requireElement<HTMLButtonElement>('#interact')
+const recenterButton = requireElement<HTMLButtonElement>('#recenter')
 
 const engine = new Engine(canvas, true, { stencil: true, preserveDrawingBuffer: false })
+const MAX_RENDER_DPR = 1.5
+const BUILD_SHA = import.meta.env.VITE_COMMIT_SHA || 'LOCAL'
+
+const resizeRenderer = (): void => {
+  const deviceDpr = Math.max(1, window.devicePixelRatio || 1)
+  engine.setHardwareScalingLevel(deviceDpr / Math.min(deviceDpr, MAX_RENDER_DPR))
+  engine.resize()
+}
+
+const scheduleResize = (): void => {
+  window.requestAnimationFrame(() => window.requestAnimationFrame(resizeRenderer))
+}
+
+resizeRenderer()
 const scene = new Scene(engine)
 scene.clearColor = new Color4(0.58, 0.76, 0.86, 1)
 scene.collisionsEnabled = true
@@ -121,7 +147,7 @@ for (const x of [0, 16]) {
 }
 
 const obstacles: Obstacle[] = []
-const buildingMaterials = [
+const buildingMaterials: [StandardMaterial, StandardMaterial, StandardMaterial, StandardMaterial, StandardMaterial] = [
   mat('facade-sand', '#b99d80'),
   mat('facade-brick', '#8f6250'),
   mat('facade-stone', '#9e9f98'),
@@ -171,7 +197,7 @@ const createBuilding = (
   building.material = material
   building.checkCollisions = true
   registerShadow(building)
-  obstacles.push({ x, z, halfX: width / 2, halfZ: depth / 2 })
+  obstacles.push({ name, x, z, halfX: width / 2, halfZ: depth / 2, height })
 
   const roof = MeshBuilder.CreateBox(`${name}-roof`, { width: width + 0.3, depth: depth + 0.3, height: 0.35 }, scene)
   roof.position.set(x, height + 0.17, z)
@@ -207,7 +233,7 @@ const genericBuildings: Array<[number, number, number, number, number]> = [
 ]
 
 genericBuildings.forEach(([x, z, w, d, h], index) => {
-  createBuilding(`building-${index}`, x, z, w, d, h, buildingMaterials[index % buildingMaterials.length])
+  createBuilding(`building-${index}`, x, z, w, d, h, buildingMaterials[index % buildingMaterials.length] ?? buildingMaterials[0])
 })
 
 const createTree = (x: number, z: number, scale = 1): void => {
@@ -249,32 +275,47 @@ createCar('car-1', -15, 3, carMatA, Math.PI / 2)
 createCar('car-2', 43, -3, carMatB, -Math.PI / 2)
 createCar('car-3', 6, 25, carMatA, 0)
 
+const HERO_START = new Vector3(-2, 0, 20)
+const HERO_VISUAL_HEIGHT_M = 1.78
 const hero = new TransformNode('hero', scene)
-hero.position.set(-2, 0, 20)
+hero.position.copyFrom(HERO_START)
 hero.rotation.y = Math.PI
 
-const torso = MeshBuilder.CreateCylinder('hero-torso', { height: 0.95, diameterTop: 0.43, diameterBottom: 0.52, tessellation: 12 }, scene)
+const torso = MeshBuilder.CreateCylinder('hero-torso', { height: 0.84, diameterTop: 0.43, diameterBottom: 0.5, tessellation: 12 }, scene)
 torso.parent = hero
-torso.position.y = 1.15
+torso.position.y = 1.1
 torso.material = heroMat
 registerShadow(torso)
 
-const head = MeshBuilder.CreateSphere('hero-head', { diameter: 0.42, segments: 12 }, scene)
+const head = MeshBuilder.CreateSphere('hero-head', { diameter: 0.38, segments: 12 }, scene)
 head.parent = hero
-head.position.y = 1.82
+head.position.y = 1.59
 head.material = skinMat
 registerShadow(head)
 
 const leftLeg = MeshBuilder.CreateBox('hero-leg-l', { width: 0.18, height: 0.72, depth: 0.2 }, scene)
 leftLeg.parent = hero
-leftLeg.position.set(-0.13, 0.42, 0)
+leftLeg.position.set(-0.13, 0.36, 0)
 leftLeg.material = heroDark
 registerShadow(leftLeg)
 
-const rightLeg = leftLeg.clone('hero-leg-r')
+const rightLeg = MeshBuilder.CreateBox('hero-leg-r', { width: 0.18, height: 0.72, depth: 0.2 }, scene)
 rightLeg.parent = hero
-rightLeg.position.x = 0.13
+rightLeg.position.set(0.13, 0.36, 0)
+rightLeg.material = heroDark
 registerShadow(rightLeg)
+
+const leftArm = MeshBuilder.CreateBox('hero-arm-l', { width: 0.14, height: 0.72, depth: 0.17 }, scene)
+leftArm.parent = hero
+leftArm.position.set(-0.31, 1.1, 0)
+leftArm.material = heroMat
+registerShadow(leftArm)
+
+const rightArm = MeshBuilder.CreateBox('hero-arm-r', { width: 0.14, height: 0.72, depth: 0.17 }, scene)
+rightArm.parent = hero
+rightArm.position.set(0.31, 1.1, 0)
+rightArm.material = heroMat
+registerShadow(rightArm)
 
 const parcel = MeshBuilder.CreateBox('hero-parcel', { width: 0.68, height: 0.48, depth: 0.46 }, scene)
 parcel.parent = hero
@@ -283,19 +324,55 @@ parcel.material = parcelMat
 parcel.setEnabled(false)
 registerShadow(parcel)
 
-const camera = new FollowCamera('third-person-camera', new Vector3(0, 3.2, 7), scene)
-camera.radius = 6.8
-camera.heightOffset = 2.15
-camera.rotationOffset = 180
-camera.cameraAcceleration = 0.065
-camera.maxCameraSpeed = 12
-camera.lowerRadiusLimit = 4.2
-camera.upperRadiusLimit = 9.5
+const CAMERA_RADIUS_M = 6.4
+const CAMERA_BETA = 1.17
+const CAMERA_TARGET_HEIGHT_M = 1.18
+const initialCameraAlpha = hero.rotation.y - Math.PI / 2
+const cameraTarget = new TransformNode('third-person-camera-target', scene)
+cameraTarget.position.copyFromFloats(hero.position.x, hero.position.y + CAMERA_TARGET_HEIGHT_M, hero.position.z)
+
+const camera = new ArcRotateCamera(
+  'third-person-camera',
+  initialCameraAlpha,
+  CAMERA_BETA,
+  CAMERA_RADIUS_M,
+  cameraTarget.position,
+  scene,
+)
+camera.setTarget(cameraTarget, false, false, true)
+camera.lowerRadiusLimit = 3.1
+camera.upperRadiusLimit = CAMERA_RADIUS_M
+camera.lowerBetaLimit = 0.86
+camera.upperBetaLimit = 1.36
+camera.angularSensibilityX = 1650
+camera.angularSensibilityY = 1850
+camera.panningSensibility = 0
+camera.pinchPrecision = 38
+camera.useNaturalPinchZoom = true
+camera.wheelPrecision = 45
+camera.keysUp = []
+camera.keysDown = []
+camera.keysLeft = []
+camera.keysRight = []
+camera.inertia = 0.72
+camera.minZ = 0.08
+camera.maxZ = 220
 camera.checkCollisions = true
-camera.collisionRadius = new Vector3(0.35, 0.35, 0.35)
-camera.lockedTarget = hero
-camera.attachControl(canvas, true)
+camera.collisionRadius = new Vector3(0.42, 0.34, 0.42)
+camera.attachControl(true)
 scene.activeCamera = camera
+
+let cameraCollisionCount = 0
+let lastCameraCollision = 'none'
+let lastCameraCollisionAt = -Infinity
+camera.onCollide = collidedMesh => {
+  const now = performance.now()
+  if (collidedMesh.name !== lastCameraCollision || now - lastCameraCollisionAt > 300) {
+    cameraCollisionCount += 1
+  }
+  lastCameraCollision = collidedMesh.name
+  lastCameraCollisionAt = now
+}
 
 const createMarker = (name: string, position: Vector3, material: StandardMaterial): Mesh => {
   const marker = MeshBuilder.CreateTorus(name, { diameter: 2.3, thickness: 0.12, tessellation: 32 }, scene)
@@ -308,18 +385,24 @@ const createMarker = (name: string, position: Vector3, material: StandardMateria
 
 const waypoints: Waypoint[] = [
   { label: 'DROPi HQ', position: new Vector3(29, 0, 8) },
-  { label: "Mara's Market", position: new Vector3(-27, 0, -7) },
-  { label: 'Customer', position: new Vector3(34, 0, -16) },
+  { label: "Mara's Market", position: new Vector3(-27, 0, -19) },
+  { label: 'Customer', position: new Vector3(34, 0, -30) },
 ]
 
-const marker = createMarker('objective-marker', waypoints[0].position, dropiMat)
+const firstWaypoint = waypoints[0]
+if (!firstWaypoint) throw new Error('Spike route has no starting waypoint')
+const marker = createMarker('objective-marker', firstWaypoint.position, dropiMat)
 let phase = 0
 
-const npcMat = [mat('npc-blue', '#496b86'), mat('npc-green', '#71886c'), mat('npc-rust', '#956655')]
+const npcMat: [StandardMaterial, StandardMaterial, StandardMaterial] = [
+  mat('npc-blue', '#496b86'),
+  mat('npc-green', '#71886c'),
+  mat('npc-rust', '#956655'),
+]
 const npcs = Array.from({ length: 8 }, (_, index) => {
   const npc = MeshBuilder.CreateCapsule(`npc-${index}`, { height: 1.7, radius: 0.24, tessellation: 8 }, scene)
   npc.position.set(-54 + index * 14, 0.86, index % 2 === 0 ? 10.7 : -10.7)
-  npc.material = npcMat[index % npcMat.length]
+  npc.material = npcMat[index % npcMat.length] ?? npcMat[0]
   registerShadow(npc)
   return { mesh: npc, originX: npc.position.x, speed: 0.45 + (index % 3) * 0.16, phase: index * 0.8 }
 })
@@ -328,6 +411,15 @@ const input: Record<InputAction, boolean> = { forward: false, back: false, left:
 const keyMap: Record<string, InputAction> = {
   KeyW: 'forward', ArrowUp: 'forward', KeyS: 'back', ArrowDown: 'back', KeyA: 'left', ArrowLeft: 'left', KeyD: 'right', ArrowRight: 'right',
 }
+let cameraPointerActive = false
+let cameraManualUntil = 0
+
+const resetMovementInput = (): void => {
+  for (const action of Object.keys(input) as InputAction[]) input[action] = false
+  for (const button of document.querySelectorAll<HTMLButtonElement>('[data-action]')) {
+    button.classList.remove('active')
+  }
+}
 
 window.addEventListener('keydown', event => {
   const action = keyMap[event.code]
@@ -335,7 +427,7 @@ window.addEventListener('keydown', event => {
     input[action] = true
     event.preventDefault()
   }
-  if (event.code === 'KeyE' || event.code === 'Space') tryInteract()
+  if (!event.repeat && (event.code === 'KeyE' || event.code === 'Space')) tryInteract()
 })
 window.addEventListener('keyup', event => {
   const action = keyMap[event.code]
@@ -343,6 +435,30 @@ window.addEventListener('keyup', event => {
     input[action] = false
     event.preventDefault()
   }
+})
+window.addEventListener('blur', resetMovementInput)
+document.addEventListener('visibilitychange', () => {
+  if (document.hidden) resetMovementInput()
+})
+
+canvas.addEventListener('pointerdown', () => {
+  cameraPointerActive = true
+  cameraManualUntil = Number.POSITIVE_INFINITY
+})
+window.addEventListener('pointerup', () => {
+  if (!cameraPointerActive) return
+  cameraPointerActive = false
+  cameraManualUntil = performance.now() + 1400
+})
+window.addEventListener('pointercancel', () => {
+  cameraPointerActive = false
+  cameraManualUntil = performance.now() + 600
+})
+
+recenterButton.addEventListener('pointerdown', event => {
+  event.preventDefault()
+  cameraPointerActive = false
+  cameraManualUntil = 0
 })
 
 for (const button of document.querySelectorAll<HTMLButtonElement>('[data-action]')) {
@@ -372,6 +488,9 @@ for (const button of document.querySelectorAll<HTMLButtonElement>('[data-action]
 }
 
 const distanceXZ = (a: Vector3, b: Vector3): number => Math.hypot(a.x - b.x, a.z - b.z)
+const INTERACTION_RADIUS_M = 2.8
+let interactionFeedback = ''
+let interactionFeedbackUntil = 0
 
 function objectiveText(): string {
   if (phase === 0) return 'Approach DROPi HQ and interact.'
@@ -380,22 +499,51 @@ function objectiveText(): string {
   return 'Visual route complete. Press INTERACT to restart the technical route.'
 }
 
+function activeWaypoint(): Waypoint | null {
+  if (phase > 2) return null
+  return waypoints[phase] ?? null
+}
+
 function updateObjective(): void {
-  objectiveEl.textContent = objectiveText()
-  if (phase <= 2) marker.position.copyFrom(waypoints[phase].position)
-  marker.setEnabled(phase <= 2)
+  const target = activeWaypoint()
+  if (target) marker.position.copyFrom(target.position)
+  marker.setEnabled(Boolean(target))
+
+  const distance = target ? distanceXZ(hero.position, target.position) : 0
+  const ready = Boolean(target && distance <= INTERACTION_RADIUS_M)
+  interactButton.classList.toggle('ready', ready || phase > 2)
+  interactButton.dataset.ready = String(ready || phase > 2)
+
+  if (performance.now() < interactionFeedbackUntil) {
+    objectiveEl.textContent = interactionFeedback
+  } else if (ready) {
+    objectiveEl.textContent = `${target?.label ?? 'Objective'} reached — press INTERACT.`
+  } else {
+    objectiveEl.textContent = objectiveText()
+  }
 }
 
 function tryInteract(): void {
   if (phase > 2) {
     phase = 0
     parcel.setEnabled(false)
+    hero.position.copyFrom(HERO_START)
+    hero.rotation.y = Math.PI
+    currentSpeed = 0
+    resetMovementInput()
+    cameraManualUntil = 0
+    interactionFeedback = 'Technical route restarted at the Brăila graybox start.'
+    interactionFeedbackUntil = performance.now() + 1600
     updateObjective()
     return
   }
-  const target = waypoints[phase]
-  if (distanceXZ(hero.position, target.position) > 3.4) {
-    objectiveEl.textContent = `${target.label} is too far away — move closer.`
+  const target = activeWaypoint()
+  if (!target) return
+  const distance = distanceXZ(hero.position, target.position)
+  if (distance > INTERACTION_RADIUS_M) {
+    interactionFeedback = `${target.label} is ${distance.toFixed(1)} m away — move within ${INTERACTION_RADIUS_M.toFixed(1)} m.`
+    interactionFeedbackUntil = performance.now() + 1800
+    updateObjective()
     return
   }
   if (phase === 0) {
@@ -407,6 +555,8 @@ function tryInteract(): void {
     parcel.setEnabled(false)
     phase = 3
   }
+  interactionFeedback = ''
+  interactionFeedbackUntil = 0
   updateObjective()
 }
 
@@ -419,25 +569,100 @@ const blocked = (position: Vector3): boolean => {
   )
 }
 
+const moveHeroWithSlide = (delta: Vector3): number => {
+  const startX = hero.position.x
+  const startZ = hero.position.z
+
+  const xCandidate = hero.position.clone()
+  xCandidate.x += delta.x
+  if (!blocked(xCandidate)) hero.position.x = xCandidate.x
+
+  const zCandidate = hero.position.clone()
+  zCandidate.z += delta.z
+  if (!blocked(zCandidate)) hero.position.z = zCandidate.z
+
+  return Math.hypot(hero.position.x - startX, hero.position.z - startZ)
+}
+
+const moveTowards = (current: number, target: number, maxDelta: number): number => {
+  if (Math.abs(target - current) <= maxDelta) return target
+  return current + Math.sign(target - current) * maxDelta
+}
+
+const shortestAngleDelta = (from: number, to: number): number =>
+  Math.atan2(Math.sin(to - from), Math.cos(to - from))
+
+const cameraClippingObstacle = (): Obstacle | null => obstacles.find(obstacle =>
+  camera.position.y > 0 &&
+  camera.position.y < obstacle.height &&
+  Math.abs(camera.position.x - obstacle.x) < obstacle.halfX &&
+  Math.abs(camera.position.z - obstacle.z) < obstacle.halfZ,
+) ?? null
+
+const FRAME_SAMPLE_LIMIT = 300
+const frameTimesMs: number[] = []
+const telemetryWarmupEndsAt = performance.now() + 1500
+
+const getPerformanceSample = (): PerformanceSample => {
+  if (frameTimesMs.length === 0) {
+    return { averageFps: engine.getFps(), p95FrameMs: 0, slowFramePercent: 0, sampleCount: 0 }
+  }
+  const averageFrameMs = frameTimesMs.reduce((sum, value) => sum + value, 0) / frameTimesMs.length
+  const sorted = [...frameTimesMs].sort((a, b) => a - b)
+  const p95Index = Math.min(sorted.length - 1, Math.floor(sorted.length * 0.95))
+  const p95FrameMs = sorted[p95Index] ?? 0
+  const slowFrames = frameTimesMs.filter(value => value > 33.34).length
+  return {
+    averageFps: 1000 / averageFrameMs,
+    p95FrameMs,
+    slowFramePercent: (slowFrames / frameTimesMs.length) * 100,
+    sampleCount: frameTimesMs.length,
+  }
+}
+
 let walkPhase = 0
 let telemetryAccumulator = 0
+let currentSpeed = 0
 
 scene.onBeforeRenderObservable.add(() => {
-  const dt = Math.min(engine.getDeltaTime() / 1000, 0.05)
+  const rawFrameMs = engine.getDeltaTime()
+  const dt = Math.min(rawFrameMs / 1000, 0.05)
   const turn = (input.right ? 1 : 0) - (input.left ? 1 : 0)
   const move = (input.forward ? 1 : 0) - (input.back ? 1 : 0)
 
-  hero.rotation.y += turn * 1.9 * dt
-  if (move !== 0) {
+  hero.rotation.y += turn * 2.05 * dt
+  const targetSpeed = move > 0 ? 4.25 : move < 0 ? -2.75 : 0
+  const acceleration = move === 0 ? 11.5 : 8.5
+  currentSpeed = moveTowards(currentSpeed, targetSpeed, acceleration * dt)
+
+  let movedDistance = 0
+  if (Math.abs(currentSpeed) > 0.01) {
     const direction = new Vector3(Math.sin(hero.rotation.y), 0, Math.cos(hero.rotation.y))
-    const candidate = hero.position.add(direction.scale(move * 4.35 * dt))
-    if (!blocked(candidate)) hero.position.copyFrom(candidate)
-    walkPhase += dt * 10.5
+    const expectedDistance = Math.abs(currentSpeed * dt)
+    movedDistance = moveHeroWithSlide(direction.scale(currentSpeed * dt))
+    if (expectedDistance > 0.01 && movedDistance < expectedDistance * 0.08) currentSpeed = 0
+  }
+
+  if (movedDistance > 0.0001) {
+    walkPhase += movedDistance * 5.2
     leftLeg.rotation.x = Math.sin(walkPhase) * 0.34
     rightLeg.rotation.x = -Math.sin(walkPhase) * 0.34
+    if (!parcel.isEnabled()) {
+      leftArm.rotation.x = -Math.sin(walkPhase) * 0.22
+      rightArm.rotation.x = Math.sin(walkPhase) * 0.22
+    }
   } else {
     leftLeg.rotation.x *= 0.78
     rightLeg.rotation.x *= 0.78
+    if (!parcel.isEnabled()) {
+      leftArm.rotation.x *= 0.78
+      rightArm.rotation.x *= 0.78
+    }
+  }
+
+  if (parcel.isEnabled()) {
+    leftArm.rotation.x += (-0.48 - leftArm.rotation.x) * Math.min(1, dt * 10)
+    rightArm.rotation.x += (-0.48 - rightArm.rotation.x) * Math.min(1, dt * 10)
   }
 
   const now = performance.now() / 1000
@@ -446,26 +671,68 @@ scene.onBeforeRenderObservable.add(() => {
     npc.mesh.rotation.y = Math.cos(now * npc.speed + npc.phase) >= 0 ? Math.PI / 2 : -Math.PI / 2
   })
 
+  const targetFollow = 1 - Math.exp(-10 * dt)
+  cameraTarget.position.x += (hero.position.x - cameraTarget.position.x) * targetFollow
+  cameraTarget.position.y += (hero.position.y + CAMERA_TARGET_HEIGHT_M - cameraTarget.position.y) * targetFollow
+  cameraTarget.position.z += (hero.position.z - cameraTarget.position.z) * targetFollow
+
+  if (performance.now() > cameraManualUntil) {
+    const cameraFollow = 1 - Math.exp(-5.5 * dt)
+    const desiredAlpha = hero.rotation.y - Math.PI / 2
+    camera.alpha += shortestAngleDelta(camera.alpha, desiredAlpha) * cameraFollow
+    camera.beta += (CAMERA_BETA - camera.beta) * cameraFollow
+    camera.radius += (CAMERA_RADIUS_M - camera.radius) * cameraFollow
+  }
+
   marker.rotation.z += dt * 0.7
+  if (performance.now() >= telemetryWarmupEndsAt && rawFrameMs > 0 && rawFrameMs < 250) {
+    frameTimesMs.push(rawFrameMs)
+    if (frameTimesMs.length > FRAME_SAMPLE_LIMIT) frameTimesMs.shift()
+  }
+
   telemetryAccumulator += dt
   if (telemetryAccumulator > 0.4) {
-    const distance = phase <= 2 ? distanceXZ(hero.position, waypoints[phase].position) : 0
-    telemetryEl.textContent = `Babylon.js 9.26 · ${engine.getFps().toFixed(0)} FPS · hero ${hero.position.x.toFixed(1)}, ${hero.position.z.toFixed(1)} m${phase <= 2 ? ` · objective ${distance.toFixed(1)} m` : ''}`
+    const target = activeWaypoint()
+    const distance = target ? distanceXZ(hero.position, target.position) : 0
+    const sample = getPerformanceSample()
+    const clippingRisk = cameraClippingObstacle()
+    const recentCollision = performance.now() - lastCameraCollisionAt < 850
+    const cameraState = clippingRisk ? `CLIP-RISK:${clippingRisk.name}` : recentCollision ? `COLLISION:${lastCameraCollision}` : 'CLEAR'
+    const orientation = window.innerWidth >= window.innerHeight ? 'landscape' : 'portrait'
+    telemetryEl.textContent = `build ${BUILD_SHA.slice(0, 8)} · ${sample.averageFps.toFixed(0)} avg FPS · p95 ${sample.p95FrameMs.toFixed(1)} ms · slow ${sample.slowFramePercent.toFixed(0)}% · ${engine.getRenderWidth()}×${engine.getRenderHeight()} · ${orientation} · camera ${cameraState}${target ? ` · objective ${distance.toFixed(1)} m` : ''}`
+    updateObjective()
     telemetryAccumulator = 0
   }
 })
 
 updateObjective()
 engine.runRenderLoop(() => scene.render())
-window.addEventListener('resize', () => engine.resize())
+window.addEventListener('resize', scheduleResize, { passive: true })
+window.addEventListener('orientationchange', scheduleResize, { passive: true })
+window.visualViewport?.addEventListener('resize', scheduleResize, { passive: true })
+screen.orientation?.addEventListener('change', scheduleResize)
+canvas.addEventListener('contextmenu', event => event.preventDefault())
 
 Object.assign(window, {
   __DROPiBabylonSpike: {
     classification: 'NON-AUTHORITATIVE VISUAL SPIKE',
     renderer: 'Babylon.js 9.26.0',
     issue: 710,
+    buildSha: BUILD_SHA,
+    heroVisualHeightMeters: HERO_VISUAL_HEIGHT_M,
+    interactionRadiusMeters: INTERACTION_RADIUS_M,
     getFps: () => engine.getFps(),
+    getPerformanceSample,
     getPhase: () => phase,
     getHeroPosition: () => ({ x: hero.position.x, y: hero.position.y, z: hero.position.z }),
+    getCameraState: () => ({
+      alpha: camera.alpha,
+      beta: camera.beta,
+      radius: camera.radius,
+      position: { x: camera.position.x, y: camera.position.y, z: camera.position.z },
+      collisionCount: cameraCollisionCount,
+      lastCollision: lastCameraCollision,
+      clippingRisk: cameraClippingObstacle()?.name ?? null,
+    }),
   },
 })

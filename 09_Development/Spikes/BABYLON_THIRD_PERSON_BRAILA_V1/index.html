@@ -17,15 +17,21 @@
     </section>
 
     <section id="controls" aria-label="Touch controls">
-      <button data-action="forward" aria-label="Move forward">▲</button>
-      <div class="control-row">
-        <button data-action="left" aria-label="Turn left">◀</button>
-        <button data-action="back" aria-label="Move backward">▼</button>
-        <button data-action="right" aria-label="Turn right">▶</button>
+      <div id="movement-pad">
+        <button type="button" data-action="forward" aria-label="Move forward">▲</button>
+        <div class="control-row">
+          <button type="button" data-action="left" aria-label="Turn left">◀</button>
+          <button type="button" data-action="back" aria-label="Move backward">▼</button>
+          <button type="button" data-action="right" aria-label="Turn right">▶</button>
+        </div>
       </div>
-      <button id="interact" data-action="interact">INTERACT</button>
+      <div id="action-stack">
+        <button type="button" id="recenter" aria-label="Recenter camera behind hero">RECENTER CAMERA</button>
+        <button type="button" id="interact" data-action="interact">INTERACT</button>
+      </div>
     </section>
 
+    <div id="orientation-hint">Rotate to landscape for the intended Android evaluation.</div>
     <div id="truth">TECHNICAL GRAYBOX · NOT AUTHENTIC GAMEPLAY · NO ECONOMY SETTLEMENT</div>
     <script type="module" src="/src/main.ts"></script>
   </body>

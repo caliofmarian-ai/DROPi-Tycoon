@@ -14,7 +14,7 @@
     "resolveJsonModule": true,
     "isolatedModules": true,
     "noEmit": true,
-    "noCheck": true
+    "noUncheckedIndexedAccess": true
   },
   "include": ["src"]
 }

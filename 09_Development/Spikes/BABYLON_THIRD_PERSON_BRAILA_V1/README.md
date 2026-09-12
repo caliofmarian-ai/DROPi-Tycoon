@@ -24,17 +24,25 @@ It provides:
 - DROPi HQ, Mara's Market and customer destinations;
 - visible parcel pickup/carry/handoff state;
 - simple pedestrians, parked vehicles, trees and street depth;
-- keyboard and Android-friendly touch controls;
-- player/building collision boundaries;
-- FPS telemetry exposed in the HUD and `window.__DROPiBabylonSpike`.
+- keyboard and Android-friendly touch controls with stuck-input recovery;
+- touch camera orbit/pinch plus an explicit behind-hero recenter control;
+- player/building collision boundaries with corner sliding;
+- a collision-aware `ArcRotateCamera` with clipping-risk telemetry;
+- strict TypeScript checking for the spike source;
+- rolling average FPS, p95 frame time, slow-frame percentage, render size,
+  orientation, camera state and exact build SHA in the HUD and
+  `window.__DROPiBabylonSpike`.
 
-Camera collision/clipping is **not yet an accepted capability in v1** and must be evaluated/fixed in a later spike before production promotion.
+Camera collision/clipping is implemented for this spike, but its truth status is
+`DEVICE EVIDENCE PENDING`. Source/build success does not make it an accepted
+capability; it must be exercised beside building corners and façades on the
+owner's Android device before any production promotion.
 
 ## What this does NOT prove
 
 - production art quality;
 - final character animation;
-- accepted camera collision behavior;
+- owner-accepted camera collision behavior;
 - authoritative mission/economy settlement;
 - save/load integration;
 - locality persistence;
@@ -46,7 +54,7 @@ Camera collision/clipping is **not yet an accepted capability in v1** and must b
 
 ```bash
 cd 09_Development/Spikes/BABYLON_THIRD_PERSON_BRAILA_V1
-npm install
+npm ci
 npm run dev
 ```
 
@@ -73,6 +81,9 @@ Desktop:
 Android/touch:
 
 - on-screen directional controls;
+- drag the open scene to orbit the camera;
+- pinch to inspect the allowed camera-distance range;
+- `RECENTER CAMERA` to restore the canonical behind-hero view;
 - `INTERACT` button.
 
 ## Technical boundary
@@ -81,13 +92,18 @@ This package is deliberately isolated under `09_Development/Spikes/`.
 
 It does not import or modify production Phaser rendering code and does not create a second canonical gameplay authority. If Babylon passes the architecture spike, DT-00 must still define how the renderer consumes existing authoritative domain/state systems before production integration.
 
-The current TypeScript configuration uses `noCheck` only for the initial rendering graybox because Babylon 9.26 typing differences were intentionally not allowed to block visual-family evaluation. Full type-safe integration is required before any production promotion.
+The initial `noCheck` escape hatch has been removed. The spike now runs strict
+TypeScript checking, including unchecked-array-index protection, before Vite
+builds the artifact. `package-lock.json` pins the full dependency graph and CI
+uses `npm ci`.
 
 ## CI evidence boundary
 
 CI proves that the static Babylon build is reproducible and records bundle size. GitHub-hosted headless Chromium in the current runner cannot initialize a usable WebGL/ANGLE device, so CI screenshots are **not** accepted as visual evidence for this spike.
 
-Real visual acceptance must be performed in a WebGL-capable browser/device, beginning with the owner's Android handset.
+Real visual acceptance must be performed in a WebGL-capable browser/device,
+beginning with the owner's Android handset. The artifact HUD shows the exact
+commit prefix so device feedback can be tied to one immutable build.
 
 ## Initial acceptance questions
 
