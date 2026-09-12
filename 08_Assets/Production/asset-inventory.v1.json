@@ -18,6 +18,7 @@
     "generationPolicy": "08_Assets/Production/DEMAND_DRIVEN_GENERATION_POLICY.md",
     "approvedSourceRegister": "08_Assets/Production/Approved_Sources/APPROVED_SOURCE_REGISTER.md",
     "generatedFamilyRegister": "08_Assets/Production/Approved_Sources/2026-09-07_GENERATED_FAMILY_REGISTRY.md",
+    "thirdPersonVisualCanon": "00_Project/THIRD_PERSON_OPEN_WORLD_VISUAL_EXPERIENCE_CANON.md",
     "legalQualificationContract": "09_Development/Compliance/GLOBAL_ASSET_PROVENANCE_CONTRACT_565_643.md",
     "runtimeEvidenceManifest": "game-web/public/legal/runtime-provenance.json"
   },
@@ -81,18 +82,24 @@
       "semanticFamily": "civic-special-buildings",
       "lifecycleState": "APPROVED_SOURCE",
       "libraryPresence": "LIBRARY_PRESENT",
-      "repositoryPresence": "NOT_ATTESTED_ON_MAIN",
+      "repositoryPresence": "REPOSITORY_ATTESTED_DERIVATIVES_ONLY",
       "libraryArtifactRef": "library-source-board-src-20260907-002",
-      "evidenceRefs": ["08_Assets/Production/Approved_Sources/2026-09-07_GENERATED_FAMILY_REGISTRY.md"]
+      "evidenceRefs": [
+        "08_Assets/Production/Approved_Sources/2026-09-07_GENERATED_FAMILY_REGISTRY.md",
+        "08_Assets/Production/Manifests/CITY_WORLD_INGEST_BATCH_001.json"
+      ]
     },
     {
       "familyId": "SRC-20260907-003",
       "semanticFamily": "multimodal-infrastructure",
       "lifecycleState": "APPROVED_SOURCE",
       "libraryPresence": "LIBRARY_PRESENT",
-      "repositoryPresence": "NOT_ATTESTED_ON_MAIN",
+      "repositoryPresence": "REPOSITORY_ATTESTED_DERIVATIVES_ONLY",
       "libraryArtifactRef": "library-source-board-src-20260907-003",
-      "evidenceRefs": ["08_Assets/Production/Approved_Sources/2026-09-07_GENERATED_FAMILY_REGISTRY.md"]
+      "evidenceRefs": [
+        "08_Assets/Production/Approved_Sources/2026-09-07_GENERATED_FAMILY_REGISTRY.md",
+        "08_Assets/Production/Manifests/CITY_WORLD_INGEST_BATCH_001.json"
+      ]
     },
     {
       "familyId": "SRC-20260907-004",
@@ -117,9 +124,12 @@
       "semanticFamily": "city-architecture-district-kits",
       "lifecycleState": "APPROVED_SOURCE",
       "libraryPresence": "LIBRARY_PRESENT",
-      "repositoryPresence": "NOT_ATTESTED_ON_MAIN",
+      "repositoryPresence": "REPOSITORY_ATTESTED_DERIVATIVES_ONLY",
       "libraryArtifactRef": "library-source-board-src-20260907-006",
-      "evidenceRefs": ["08_Assets/Production/Approved_Sources/2026-09-07_GENERATED_FAMILY_REGISTRY.md"]
+      "evidenceRefs": [
+        "08_Assets/Production/Approved_Sources/2026-09-07_GENERATED_FAMILY_REGISTRY.md",
+        "08_Assets/Production/Manifests/CITY_WORLD_INGEST_BATCH_001.json"
+      ]
     },
     {
       "familyId": "SRC-20260907-007",
@@ -195,7 +205,15 @@
       "libraryPresence": "LIBRARY_PRESENT",
       "repositoryPresence": "NOT_ATTESTED_ON_MAIN",
       "libraryFileId": "file_00000000ff2c81f4b146df2c8ebe64c8",
-      "libraryPath": "/DROPi Tycoon/image-gen-1(8).png"
+      "libraryPath": "/DROPi Tycoon/image-gen-1(8).png",
+      "libraryMetadataEvidence": {"modelGenerated": true, "createdAt": "2026-09-07T19:41:51.514314Z", "sizeBytes": 2593109},
+      "provider": "UNKNOWN_OR_UNCLEARED",
+      "generationTool": "UNKNOWN_OR_UNCLEARED",
+      "modelProduct": "UNKNOWN_OR_UNCLEARED",
+      "providerTermsLicenceEvidence": "UNKNOWN_OR_UNCLEARED",
+      "inputReferenceRightsEvidence": "UNKNOWN_OR_UNCLEARED",
+      "commercialUseReviewEvidence": "UNKNOWN_OR_UNCLEARED",
+      "redistributionReviewEvidence": "UNKNOWN_OR_UNCLEARED"
     },
     {
       "artifactId": "library-source-board-src-20260907-003",
@@ -204,7 +222,15 @@
       "libraryPresence": "LIBRARY_PRESENT",
       "repositoryPresence": "NOT_ATTESTED_ON_MAIN",
       "libraryFileId": "file_00000000290081f4a028a6b7642e5425",
-      "libraryPath": "/DROPi Tycoon/image-gen-2(8).png"
+      "libraryPath": "/DROPi Tycoon/image-gen-2(8).png",
+      "libraryMetadataEvidence": {"modelGenerated": true, "createdAt": "2026-09-07T19:41:55.863924Z", "sizeBytes": 2705120},
+      "provider": "UNKNOWN_OR_UNCLEARED",
+      "generationTool": "UNKNOWN_OR_UNCLEARED",
+      "modelProduct": "UNKNOWN_OR_UNCLEARED",
+      "providerTermsLicenceEvidence": "UNKNOWN_OR_UNCLEARED",
+      "inputReferenceRightsEvidence": "UNKNOWN_OR_UNCLEARED",
+      "commercialUseReviewEvidence": "UNKNOWN_OR_UNCLEARED",
+      "redistributionReviewEvidence": "UNKNOWN_OR_UNCLEARED"
     },
     {
       "artifactId": "library-source-board-src-20260907-004",
@@ -231,7 +257,15 @@
       "libraryPresence": "LIBRARY_PRESENT",
       "repositoryPresence": "NOT_ATTESTED_ON_MAIN",
       "libraryFileId": "file_00000000a5cc81f49304e75f2d85cca4",
-      "libraryPath": "/DROPi Tycoon/image-gen-5(1).png"
+      "libraryPath": "/DROPi Tycoon/image-gen-5(1).png",
+      "libraryMetadataEvidence": {"modelGenerated": true, "createdAt": "2026-09-07T19:42:05.150483Z", "sizeBytes": 2505992},
+      "provider": "UNKNOWN_OR_UNCLEARED",
+      "generationTool": "UNKNOWN_OR_UNCLEARED",
+      "modelProduct": "UNKNOWN_OR_UNCLEARED",
+      "providerTermsLicenceEvidence": "UNKNOWN_OR_UNCLEARED",
+      "inputReferenceRightsEvidence": "UNKNOWN_OR_UNCLEARED",
+      "commercialUseReviewEvidence": "UNKNOWN_OR_UNCLEARED",
+      "redistributionReviewEvidence": "UNKNOWN_OR_UNCLEARED"
     },
     {
       "artifactId": "library-source-board-src-20260907-007",
@@ -334,6 +368,76 @@
         "ui/icons/icon_orders.webp": {
           "semanticFamily": "ui-orders",
           "reuseGroup": "orders-icon-v1"
+        }
+      }
+    },
+    {
+      "collectionId": "city-world-ingest-batch-001-civic",
+      "root": "08_Assets/Production/Candidates/City_World_Ingest_Batch_001/SRC-20260907-002/civic",
+      "lifecycleState": "CANDIDATE",
+      "sourceFamilyId": "SRC-20260907-002",
+      "visualUseClassification": "STRATEGIC_MAP_OR_REFERENCE_ONLY",
+      "localHumanScaleThirdPersonRuntime": "FORBIDDEN_FOR_LOCAL_HUMAN_SCALE_THIRD_PERSON_RUNTIME",
+      "provenanceEvidenceState": "UNKNOWN_OR_UNCLEARED",
+      "commercialUseAndRedistributionEvidence": "UNKNOWN_OR_UNCLEARED",
+      "expectedAssetCount": 1,
+      "extensions": [".webp"],
+      "semanticFamilyByPrefix": {
+        "school_01.webp": "candidate-civic-building"
+      },
+      "artifactOverrides": {
+        "school_01.webp": {
+          "assetUseClassification": "REFERENCE_ONLY",
+          "embeddedText": "SCHOOL",
+          "localHumanScaleThirdPersonRuntime": "FORBIDDEN_FOR_LOCAL_HUMAN_SCALE_THIRD_PERSON_RUNTIME"
+        }
+      }
+    },
+    {
+      "collectionId": "city-world-ingest-batch-001-infrastructure",
+      "root": "08_Assets/Production/Candidates/City_World_Ingest_Batch_001/SRC-20260907-003/infrastructure",
+      "lifecycleState": "CANDIDATE",
+      "sourceFamilyId": "SRC-20260907-003",
+      "visualUseClassification": "STRATEGIC_MAP_OR_REFERENCE_ONLY",
+      "localHumanScaleThirdPersonRuntime": "FORBIDDEN_FOR_LOCAL_HUMAN_SCALE_THIRD_PERSON_RUNTIME",
+      "provenanceEvidenceState": "UNKNOWN_OR_UNCLEARED",
+      "commercialUseAndRedistributionEvidence": "UNKNOWN_OR_UNCLEARED",
+      "expectedAssetCount": 1,
+      "extensions": [".webp"],
+      "semanticFamilyByPrefix": {
+        "train_station_01.webp": "candidate-rail-infrastructure"
+      },
+      "artifactOverrides": {
+        "train_station_01.webp": {
+          "assetUseClassification": "REFERENCE_ONLY",
+          "embeddedText": "TRAIN STATION",
+          "localHumanScaleThirdPersonRuntime": "FORBIDDEN_FOR_LOCAL_HUMAN_SCALE_THIRD_PERSON_RUNTIME"
+        }
+      }
+    },
+    {
+      "collectionId": "city-world-ingest-batch-001-architecture",
+      "root": "08_Assets/Production/Candidates/City_World_Ingest_Batch_001/SRC-20260907-006/architecture",
+      "lifecycleState": "CANDIDATE",
+      "sourceFamilyId": "SRC-20260907-006",
+      "visualUseClassification": "STRATEGIC_MAP_OR_REFERENCE_ONLY",
+      "localHumanScaleThirdPersonRuntime": "FORBIDDEN_FOR_LOCAL_HUMAN_SCALE_THIRD_PERSON_RUNTIME",
+      "provenanceEvidenceState": "UNKNOWN_OR_UNCLEARED",
+      "commercialUseAndRedistributionEvidence": "UNKNOWN_OR_UNCLEARED",
+      "expectedAssetCount": 2,
+      "extensions": [".webp"],
+      "semanticFamilyByPrefix": {
+        "historic_european_building_01.webp": "candidate-city-architecture",
+        "modern_office_building_01.webp": "candidate-city-architecture"
+      },
+      "artifactOverrides": {
+        "historic_european_building_01.webp": {
+          "assetUseClassification": "STRATEGIC_MAP_OR_REFERENCE_ONLY",
+          "localHumanScaleThirdPersonRuntime": "FORBIDDEN_FOR_LOCAL_HUMAN_SCALE_THIRD_PERSON_RUNTIME"
+        },
+        "modern_office_building_01.webp": {
+          "assetUseClassification": "STRATEGIC_MAP_OR_REFERENCE_ONLY",
+          "localHumanScaleThirdPersonRuntime": "FORBIDDEN_FOR_LOCAL_HUMAN_SCALE_THIRD_PERSON_RUNTIME"
         }
       }
     }
