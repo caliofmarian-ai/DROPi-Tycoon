@@ -1,10 +1,10 @@
 import type Phaser from 'phaser'
-import { getOrCreateGameSession } from '../state/gameSession'
+import { peekGameSession } from '../state/gameSession'
 import { ACTIVE_TRANSPORT_LABELS } from '../systems/activeTransportSystem'
-import { sanitizeOwnershipEconomyState } from '../systems/ownershipEconomySystem'
 import type { UrbanObjective } from '../systems/urbanInteractions'
-import type { CompanyState, WorldState } from '../types/game'
+import type { CompanyState, PersonalProgressionState, WorldState } from '../types/game'
 import type { OwnershipEconomyState } from '../types/ownershipEconomy'
+import type { WorldIdentityState } from '../types/worldIdentity'
 import { WORLD_ZONES, WORLD_CITY_NAME } from '../world/worldLayout'
 import { COLORS, formatMoney, RADII, TOUCH_TARGET_MIN_PX, TYPOGRAPHY } from './theme'
 
@@ -12,6 +12,7 @@ export const SMARTPHONE_LIVE_APPS = [
   { id: 'delivery', label: 'Delivery' },
   { id: 'map', label: 'Map' },
   { id: 'assets', label: 'Money & Assets' },
+  { id: 'profile', label: 'Profile' },
 ] as const
 
 export type SmartphoneAppId = (typeof SMARTPHONE_LIVE_APPS)[number]['id']
@@ -34,6 +35,7 @@ export interface SmartphoneSnapshot {
   delivery: SmartphoneAppSnapshot
   map: SmartphoneAppSnapshot
   assets: SmartphoneAppSnapshot
+  profile: SmartphoneAppSnapshot
 }
 
 const districtForPoint = (point: { x: number; y: number }): string =>
@@ -66,27 +68,62 @@ const dividendIncome = (ownership: OwnershipEconomyState): number => {
     .reduce((sum, entry) => sum + entry.delta, 0) ?? 0
 }
 
+const worldProfileLabel = (identity: WorldIdentityState): string =>
+  identity.mode === 'FreshLocal' ? 'Fresh local world' : 'Legacy local world'
+
+/**
+ * Player-facing Profile projection. Missing authority fails closed instead of synthesizing
+ * identity or progression state. Company is displayed only as neutral runtime context until
+ * membership/employment/ownership relationship semantics are supplied by their owning lane.
+ */
+export const buildPlayerProfileSnapshot = (
+  company: CompanyState,
+  personalProgression?: PersonalProgressionState,
+  worldIdentity?: WorldIdentityState,
+): SmartphoneAppSnapshot => ({
+  heading: 'PLAYER PROFILE',
+  lines: [
+    worldIdentity ? 'Identity: Local player' : 'Identity: UNAVAILABLE',
+    worldIdentity ? `World profile: ${worldProfileLabel(worldIdentity)}` : 'World profile: UNAVAILABLE',
+    personalProgression
+      ? `Progress: ${personalProgression.experiencePoints} XP · ${personalProgression.progressionPoints} pts`
+      : 'Progress: UNAVAILABLE',
+    personalProgression
+      ? `Capabilities: ${personalProgression.learnedCapabilityIds.length} learned`
+      : 'Capabilities: UNAVAILABLE',
+    `Company context: ${company.companyName}`,
+    'Online account: FUTURE',
+    'Username & avatar: FUTURE',
+  ],
+})
+
 /**
  * Pure player-facing projection of already-authoritative runtime state.
- * The phone owns no economy, mission, fleet or progression truth of its own.
+ * The phone owns no economy, mission, fleet, identity or progression truth of its own.
  */
 export const buildSmartphoneSnapshot = (
   world: WorldState,
   company: CompanyState,
-  ownership: OwnershipEconomyState,
+  ownership: OwnershipEconomyState | undefined,
   objective: UrbanObjective,
+  personalProgression?: PersonalProgressionState,
+  worldIdentity?: WorldIdentityState,
 ): SmartphoneSnapshot => {
   const transport = ACTIVE_TRANSPORT_LABELS[world.urban?.activeTransport ?? 'walking']
   const distance = Math.round(Math.hypot(objective.point.x - world.player.x, objective.point.y - world.player.y))
   const activeEmployees = company.employees.filter(employee => employee.status === 'Active').length
   const assignedVehicles = company.vehicles.filter(vehicle => vehicle.assignedEmployeeId).length
-  const personalAccount = ownership.personalAccounts.find(account => account.actorId === ownership.playerActorId)
-  const internalHeld = heldUnits(ownership, 'InternalMember')
-  const externalHeld = heldUnits(ownership, 'ExternalMarket')
-  const internalTreasury = treasuryUnits(ownership, 'InternalMember')
-  const externalTreasury = treasuryUnits(ownership, 'ExternalMarket')
-  const founder = ownership.equity.founderActorId === ownership.playerActorId ? 'You' : 'Historical founder'
-  const executive = ownership.equity.executiveActorId === ownership.playerActorId ? 'You' : 'Company member'
+  const personalAccount = ownership?.personalAccounts.find(account => account.actorId === ownership.playerActorId)
+  const internalHeld = ownership ? heldUnits(ownership, 'InternalMember') : undefined
+  const externalHeld = ownership ? heldUnits(ownership, 'ExternalMarket') : undefined
+  const internalTreasury = ownership ? treasuryUnits(ownership, 'InternalMember') : undefined
+  const externalTreasury = ownership ? treasuryUnits(ownership, 'ExternalMarket') : undefined
+  const founder = ownership
+    ? (ownership.equity.founderActorId === ownership.playerActorId ? 'You' : 'Historical founder')
+    : undefined
+  const executive = ownership
+    ? (ownership.equity.executiveActorId === ownership.playerActorId ? 'You' : 'Company member')
+    : undefined
   const departmentCount = company.hq.constructedDepartments.length
 
   return {
@@ -115,15 +152,16 @@ export const buildSmartphoneSnapshot = (
       lines: [
         `${company.companyName}`,
         `Company Money: ${formatMoney(company.money)}`,
-        `Personal Money: ${formatMoney(personalAccount?.balance ?? 0)}`,
-        `Your shares: ${internalHeld} internal · ${externalHeld} external`,
-        `Treasury shares: ${internalTreasury} internal · ${externalTreasury} external`,
-        `Dividends received: ${formatMoney(dividendIncome(ownership))}`,
-        `Founder: ${founder} · Executive: ${executive}`,
+        ownership ? `Personal Money: ${formatMoney(personalAccount?.balance ?? 0)}` : 'Personal Money: UNAVAILABLE',
+        ownership ? `Your shares: ${internalHeld} internal · ${externalHeld} external` : 'Your shares: UNAVAILABLE',
+        ownership ? `Treasury shares: ${internalTreasury} internal · ${externalTreasury} external` : 'Treasury shares: UNAVAILABLE',
+        ownership ? `Dividends received: ${formatMoney(dividendIncome(ownership))}` : 'Dividends received: UNAVAILABLE',
+        ownership ? `Founder: ${founder} · Executive: ${executive}` : 'Founder / Executive: UNAVAILABLE',
         `Rep ${company.reputation} · Team ${activeEmployees}/${company.employees.length} active`,
         `Fleet ${company.vehicles.length} owned/${assignedVehicles} assigned · HQ ${departmentCount} dept${departmentCount === 1 ? '' : 's'}`,
       ],
     },
+    profile: buildPlayerProfileSnapshot(company, personalProgression, worldIdentity),
   }
 }
 
@@ -405,8 +443,16 @@ export class PlayerSmartphoneOverlay {
   }
 
   update(world: WorldState, company: CompanyState, objective: UrbanObjective): void {
-    const ownership = sanitizeOwnershipEconomyState(getOrCreateGameSession().ownershipEconomy).state
-    this.snapshot = buildSmartphoneSnapshot(world, company, ownership, objective)
+    const session = peekGameSession()
+
+    this.snapshot = buildSmartphoneSnapshot(
+      world,
+      company,
+      session?.ownershipEconomy,
+      objective,
+      session?.personalProgression,
+      session?.worldIdentity,
+    )
     if (this.isOpen()) this.renderSnapshot()
   }
 
