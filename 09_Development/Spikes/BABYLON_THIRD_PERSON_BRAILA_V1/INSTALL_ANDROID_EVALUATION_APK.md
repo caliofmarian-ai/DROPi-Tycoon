@@ -38,6 +38,9 @@ workflow run do not agree. The artifact also contains:
 - pinch: adjust camera distance inside the bounded test range;
 - `RECENTER CAMERA`: restore the behind-hero view;
 - `INTERACT`: complete HQ → Mara pickup → customer handoff.
+- Android Back: reset active controls and exit `DROPi Babylon Eval` through the
+  existing native WebView bridge. A standalone browser does not synthesize a
+  navigation or exit action.
 
 ## Owner evidence
 

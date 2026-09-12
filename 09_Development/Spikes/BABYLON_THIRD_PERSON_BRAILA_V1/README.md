@@ -29,6 +29,9 @@ It provides:
 - player/building collision boundaries with corner sliding;
 - a collision-aware `ArcRotateCamera` with clipping-risk telemetry;
 - strict TypeScript checking for the spike source;
+- Android Back uses the existing shell bridge (`dropi:native-back` → input
+  reset → `dropi:exit-game`) and performs no synthetic navigation in a
+  standalone browser;
 - rolling average FPS, p95 frame time, slow-frame percentage, render size,
   orientation, camera state and exact build SHA in the HUD and
   `window.__DROPiBabylonSpike`.
@@ -85,6 +88,8 @@ Android/touch:
 - pinch to inspect the allowed camera-distance range;
 - `RECENTER CAMERA` to restore the canonical behind-hero view;
 - `INTERACT` button.
+- Android Back exits the evaluation APK through the existing native WebView
+  bridge; in a standalone browser it only resets active input.
 
 ## Technical boundary
 

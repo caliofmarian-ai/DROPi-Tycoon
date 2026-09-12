@@ -83,6 +83,8 @@ jobs:
           grep -q "NOT AUTHENTIC GAMEPLAY" index.html
           grep -q "DROPi TYCOON" index.html
           grep -R -F -q "$DROPI_HEAD_SHA" dist/assets
+          grep -R -F -q 'dropi:native-back' dist/assets
+          grep -R -F -q 'dropi:exit-game' dist/assets
           grep -F -q "head_sha=$DROPI_HEAD_SHA" dist/build-evidence.txt
           grep -F -q "checkout_sha=$DROPI_HEAD_SHA" dist/build-evidence.txt
           grep -F -q '"productionEligible": false' dist/dropi-runtime-manifest.json

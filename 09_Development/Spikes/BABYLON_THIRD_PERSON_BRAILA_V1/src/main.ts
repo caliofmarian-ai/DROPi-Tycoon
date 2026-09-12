@@ -28,6 +28,18 @@ type PerformanceSample = {
   sampleCount: number
 }
 
+declare global {
+  interface Window {
+    ReactNativeWebView?: {
+      postMessage(message: string): void
+    }
+  }
+
+  interface WindowEventMap {
+    'dropi:native-back': Event
+  }
+}
+
 const requireElement = <T extends Element>(selector: string): T => {
   const element = document.querySelector<T>(selector)
   if (!element) throw new Error(`Spike UI failed to initialize: ${selector}`)
@@ -43,6 +55,8 @@ const recenterButton = requireElement<HTMLButtonElement>('#recenter')
 const engine = new Engine(canvas, true, { stencil: true, preserveDrawingBuffer: false })
 const MAX_RENDER_DPR = 1.5
 const BUILD_SHA = import.meta.env.VITE_COMMIT_SHA || 'LOCAL'
+const NATIVE_BACK_EVENT = 'dropi:native-back'
+const NATIVE_EXIT_GAME_MESSAGE = 'dropi:exit-game'
 
 const resizeRenderer = (): void => {
   const deviceDpr = Math.max(1, window.devicePixelRatio || 1)
@@ -420,6 +434,13 @@ const resetMovementInput = (): void => {
     button.classList.remove('active')
   }
 }
+
+window.addEventListener(NATIVE_BACK_EVENT, () => {
+  resetMovementInput()
+  cameraPointerActive = false
+  cameraManualUntil = 0
+  window.ReactNativeWebView?.postMessage(NATIVE_EXIT_GAME_MESSAGE)
+})
 
 window.addEventListener('keydown', event => {
   const action = keyMap[event.code]
