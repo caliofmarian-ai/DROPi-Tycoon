@@ -51,12 +51,16 @@ jobs:
             if curl -fsS http://127.0.0.1:4173/ >/dev/null; then break; fi
             sleep 1
           done
+          curl -fsS http://127.0.0.1:4173/ >/dev/null
           CHROME="$(command -v google-chrome || command -v google-chrome-stable || command -v chromium || true)"
           test -n "$CHROME" || { echo 'No headless Chrome binary available'; exit 1; }
-          "$CHROME" \
+          timeout 30s "$CHROME" \
             --headless=new \
             --no-sandbox \
             --disable-dev-shm-usage \
+            --use-gl=swiftshader \
+            --enable-webgl \
+            --ignore-gpu-blocklist \
             --hide-scrollbars \
             --window-size=1280,720 \
             --virtual-time-budget=5000 \
