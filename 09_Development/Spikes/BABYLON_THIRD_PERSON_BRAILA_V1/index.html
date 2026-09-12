@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <meta name="theme-color" content="#071522" />
+    <title>DROPi Tycoon — Babylon Third-Person Brăila Spike</title>
+  </head>
+  <body>
+    <canvas id="renderCanvas" aria-label="DROPi Tycoon Babylon third-person technical spike"></canvas>
+
+    <section id="hud" aria-live="polite">
+      <div class="eyebrow">NON-AUTHORITATIVE VISUAL SPIKE · ISSUE #710</div>
+      <h1>DROPi TYCOON</h1>
+      <div id="objective">Approach DROPi HQ and interact.</div>
+      <div id="telemetry">Starting renderer…</div>
+    </section>
+
+    <section id="controls" aria-label="Touch controls">
+      <div id="movement-pad">
+        <button type="button" data-action="forward" aria-label="Move forward">▲</button>
+        <div class="control-row">
+          <button type="button" data-action="left" aria-label="Turn left">◀</button>
+          <button type="button" data-action="back" aria-label="Move backward">▼</button>
+          <button type="button" data-action="right" aria-label="Turn right">▶</button>
+        </div>
+      </div>
+      <div id="action-stack">
+        <button type="button" id="recenter" aria-label="Recenter camera behind hero">RECENTER CAMERA</button>
+        <button type="button" id="interact" data-action="interact">INTERACT</button>
+      </div>
+    </section>
+
+    <div id="orientation-hint">Rotate to landscape for the intended Android evaluation.</div>
+    <div id="truth">TECHNICAL GRAYBOX · NOT AUTHENTIC GAMEPLAY · NO ECONOMY SETTLEMENT</div>
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>
