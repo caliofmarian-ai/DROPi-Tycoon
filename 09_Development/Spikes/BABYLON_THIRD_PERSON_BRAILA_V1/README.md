@@ -64,9 +64,9 @@ Build:
 npm run build
 ```
 
-For the owner's Android/Termux path see:
+For the owner's GitHub-built Android evaluation APK path see:
 
-`RUN_ON_ANDROID_TERMUX.md`
+`INSTALL_ANDROID_EVALUATION_APK.md`
 
 ## Controls
 
@@ -104,6 +104,11 @@ CI proves that the static Babylon build is reproducible and records bundle size.
 Real visual acceptance must be performed in a WebGL-capable browser/device,
 beginning with the owner's Android handset. The artifact HUD shows the exact
 commit prefix so device feedback can be tied to one immutable build.
+
+The draft-PR workflow also packages the exact spike into the existing
+`game-mobile` WebView/loopback architecture under the isolated Android package
+`com.dropi.tycoon.babyloneval`. The CI-only overlay does not modify the tracked
+production shell, use production signing or create another gameplay authority.
 
 ## Initial acceptance questions
 
