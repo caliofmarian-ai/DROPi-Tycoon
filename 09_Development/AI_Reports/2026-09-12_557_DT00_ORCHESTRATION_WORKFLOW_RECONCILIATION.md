@@ -65,6 +65,7 @@ No gameplay, economy, save, backend, renderer, asset binary, mobile runtime or R
 - `09_Development/AI_Project_Memory/HANDOFFS.json`
 - `09_Development/AI_Project_Memory/UNKNOWN_BLOCKERS.md`
 - `09_Development/AI_Project_Memory/validate-memory.mjs`
+- `game-web/tests/persistent-ai-project-memory.test.ts`
 
 # Files Moved or Renamed
 
@@ -92,6 +93,8 @@ None.
 14. Audited the Android bridge introduced for DRAFT PR #712 and found that its first all-green APK consumed Android Back without a spike-side exit response; rejected that artifact as `STALE` before Owner handoff.
 15. Routed the bounded correction, independently rebuilt and reviewed strict TypeScript output, then verified exact corrected head `364d1e2f0dd15d4721efc0f4f1d49042effa62d3` with all general workflows plus the Babylon/APK workflow `SUCCESS`.
 16. Downloaded and independently checked final Android artifact `10304742795`: ZIP digest matched GitHub, internal checksum passed, APK payload contained the exact runtime manifest and both `dropi:native-back` / `dropi:exit-game` bridge messages, and the package remained isolated from production.
+17. Rejected PR #713 containing head `53ba92a5866500b07b670b6024e0a88cfb883c58` after exact-head Prototype CI exposed that the pre-existing test still asserted 23 handoffs even though the validator and registry now correctly require DT-00 through DT-23.
+18. Updated the test contract to 24 handoffs, extended duplicate-PR coverage to `additionalPullRequests`, and verified the focused test locally at 5/5 PASS before publishing a new containing head.
 
 # Findings
 
@@ -129,6 +132,7 @@ None.
 - PR #714 exact head `b52b05a72ba623a86fbbaf0b603506d3480a29a1`: `validate`, `validate-mobile-shell`, `production-image-smoke` all `SUCCESS`.
 - Exact main `60ffc3bf8054b283fd34d3304247b4586462eec5`: all three workflows `SUCCESS`; Railway deployment `87811765-d8c1-4749-9c60-382731e58c26` `SUCCESS`.
 - DRAFT PR #712 corrected exact head `364d1e2f0dd15d4721efc0f4f1d49042effa62d3`: runs `34714873671`, `34714873668`, `34714873678` and `34714873681` all `SUCCESS`; static artifact `10304407698`; Android artifact `10304742795`; APK SHA-256 `aefe63e5b7a16ef2f262000e7e36330ccde086d3a37e984b0a697abe6fb6225a`.
+- PR #713 containing head `53ba92a5866500b07b670b6024e0a88cfb883c58`: Mobile Shell run `34715558625` and Docker run `34715558628` `SUCCESS`; Prototype run `34715558636` `FAILURE` on two stale `handoffs=23` expectations. The bounded correction passes `game-web/tests/persistent-ai-project-memory.test.ts` locally, 5/5.
 - One local full-suite run encountered the documented 5-second timeout in `tests/city-domain.test.ts`; the immediate isolated replay passed 11/11 and both exact-head/exact-main GitHub full suites passed. Coverage was not weakened.
 - Final PR #713 structural validation and exact-head CI are recorded live after the complete registry commit is pushed; the containing commit cannot embed its own SHA.
 

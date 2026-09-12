@@ -46,9 +46,9 @@
     "pr": 713,
     "branch": "openai/dt00-orchestration-reset-2026-09-12",
     "baseSha": "d11b446d916f3910ecf4f457ec13deb5ae74e181",
-    "recordedHeadSha": "8f6672abe4b1c308ee003afd316573ab75aee66a",
-    "recordedHeadMeaning": "FIRST_GREEN_HEAD_BEFORE_LIVE_REGISTRY_AND_CURRENT_MAIN_RECONCILIATION",
-    "status": "ACTIVE_FINAL_RECONCILIATION",
+    "recordedHeadSha": "53ba92a5866500b07b670b6024e0a88cfb883c58",
+    "recordedHeadMeaning": "FAILED_CONTAINING_HEAD_BEFORE_DT23_TEST_CONTRACT_CORRECTION",
+    "status": "ACTIVE_FINAL_CI_CORRECTION",
     "mergeLock": "Final containing head must reconcile main 60ffc3bf8054b283fd34d3304247b4586462eec5, pass all universal exact-head checks, and receive DT-00 final diff audit before merge."
   },
   "authorityLayers": {
@@ -217,17 +217,17 @@
       "pr": 713,
       "dt": "DT-00",
       "issue": 681,
-      "baseSha": "d11b446d916f3910ecf4f457ec13deb5ae74e181",
-      "headSha": "8f6672abe4b1c308ee003afd316573ab75aee66a",
+      "baseSha": "60ffc3bf8054b283fd34d3304247b4586462eec5",
+      "headSha": "53ba92a5866500b07b670b6024e0a88cfb883c58",
       "branch": "openai/dt00-orchestration-reset-2026-09-12",
       "state": "OPEN",
       "draft": false,
       "mergeable": false,
-      "workState": "ACTIVE_RECONCILE_CURRENT_MAIN",
+      "workState": "ACTIVE_FIX_EXACT_HEAD_TEST_CONTRACT",
       "ci": {
-        "state": "SUCCESS_SUPERSEDED_BY_CONTAINING_COMMIT",
-        "checks": {"validate":"SUCCESS","validate-mobile-shell":"ABSENT","production-image-smoke":"SUCCESS"},
-        "evidence": "First head runs 34712692787 and 34712692689 passed. The containing registry/current-main reconciliation commit requires all three universal checks."
+        "state": "FAILURE_RECORDED",
+        "checks": {"validate":"FAILURE","validate-mobile-shell":"SUCCESS","production-image-smoke":"SUCCESS"},
+        "evidence": "Containing head 53ba92a5866500b07b670b6024e0a88cfb883c58: runs 34715558636 FAILURE, 34715558625 SUCCESS and 34715558628 SUCCESS. validate exposed the stale test expectation of 23 handoffs after DT-23 became required; the final containing correction requires fresh exact-head CI."
       }
     }
   ],
@@ -256,5 +256,5 @@
     "Required-check and Railway Wait for CI settings follow only through a separately verified governance mutation path."
   ],
   "ownerVisibleRule": "Owner-facing execution reports are in Romanian; technical identifiers may remain English. GitHub is the single code/integration source of truth. Player-visible runtime changes require applicable Owner/Android acceptance and are never merged only because CI is green.",
-  "nextSafeOrchestratorAction": "Freeze and push the complete PR #713 reconciliation on current main, validate its exact head, merge only on PASS, then verify exact-main CI/Railway, close superseded PR #703 and collect Owner Android evidence from PR #712 artifact 10304742795."
+  "nextSafeOrchestratorAction": "Push the bounded PR #713 test-contract correction, validate its new exact head, merge only on PASS, then verify exact-main CI/Railway, close superseded PR #703 and collect Owner Android evidence from PR #712 artifact 10304742795."
 }
