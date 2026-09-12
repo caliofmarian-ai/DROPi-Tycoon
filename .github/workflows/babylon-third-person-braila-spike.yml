@@ -1,0 +1,46 @@
+name: Babylon Third-Person Brăila Spike
+
+on:
+  pull_request:
+    paths:
+      - '09_Development/Spikes/BABYLON_THIRD_PERSON_BRAILA_V1/**'
+      - '.github/workflows/babylon-third-person-braila-spike.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build-spike:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: 09_Development/Spikes/BABYLON_THIRD_PERSON_BRAILA_V1
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node 22.12.0
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22.12.0
+
+      - name: Install pinned spike dependencies
+        run: npm install --ignore-scripts --no-audit --no-fund
+
+      - name: TypeScript + Vite build
+        run: npm run build
+
+      - name: Verify deterministic spike truth labels
+        run: |
+          grep -q "NON-AUTHORITATIVE VISUAL SPIKE" index.html
+          grep -q "NOT AUTHENTIC GAMEPLAY" index.html
+          grep -q "DROPi TYCOON" index.html
+
+      - name: Upload static spike build
+        uses: actions/upload-artifact@v4
+        with:
+          name: dropi-babylon-third-person-braila-v1
+          path: 09_Development/Spikes/BABYLON_THIRD_PERSON_BRAILA_V1/dist
+          retention-days: 14

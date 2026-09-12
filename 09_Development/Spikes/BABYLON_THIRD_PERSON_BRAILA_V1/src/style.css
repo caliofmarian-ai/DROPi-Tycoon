@@ -1,0 +1,124 @@
+html, body {
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  overflow: hidden;
+  background: #071522;
+  font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  color: #f4f8fb;
+  touch-action: none;
+}
+
+#renderCanvas {
+  width: 100%;
+  height: 100%;
+  display: block;
+  outline: none;
+  touch-action: none;
+}
+
+#hud {
+  position: fixed;
+  left: max(16px, env(safe-area-inset-left));
+  top: max(16px, env(safe-area-inset-top));
+  z-index: 10;
+  width: min(430px, calc(100vw - 32px));
+  padding: 14px 16px;
+  border: 1px solid rgba(93, 214, 255, .25);
+  border-radius: 14px;
+  background: rgba(3, 15, 26, .72);
+  backdrop-filter: blur(10px);
+  box-shadow: 0 14px 36px rgba(0, 0, 0, .24);
+  pointer-events: none;
+}
+
+#hud h1 {
+  margin: 3px 0 7px;
+  font-size: clamp(20px, 3.2vw, 30px);
+  letter-spacing: .12em;
+}
+
+.eyebrow {
+  color: #5dd6ff;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: .12em;
+}
+
+#objective {
+  font-weight: 700;
+  line-height: 1.3;
+}
+
+#telemetry {
+  margin-top: 8px;
+  color: #b6c7d4;
+  font-size: 12px;
+}
+
+#controls {
+  position: fixed;
+  left: max(18px, env(safe-area-inset-left));
+  bottom: max(22px, env(safe-area-inset-bottom));
+  z-index: 12;
+  display: grid;
+  justify-items: center;
+  gap: 8px;
+  user-select: none;
+}
+
+.control-row {
+  display: flex;
+  gap: 8px;
+}
+
+#controls button {
+  min-width: 58px;
+  min-height: 54px;
+  border: 1px solid rgba(255, 255, 255, .18);
+  border-radius: 14px;
+  background: rgba(7, 25, 40, .78);
+  color: white;
+  font-size: 20px;
+  font-weight: 800;
+  box-shadow: 0 8px 18px rgba(0, 0, 0, .25);
+  touch-action: none;
+}
+
+#controls button:active,
+#controls button.active {
+  transform: scale(.96);
+  background: rgba(20, 160, 205, .88);
+}
+
+#interact {
+  min-width: 190px !important;
+  margin-top: 2px;
+  color: #071522 !important;
+  background: #5dd6ff !important;
+  font-size: 13px !important;
+  letter-spacing: .12em;
+}
+
+#truth {
+  position: fixed;
+  right: max(14px, env(safe-area-inset-right));
+  bottom: max(14px, env(safe-area-inset-bottom));
+  z-index: 8;
+  max-width: 44vw;
+  padding: 7px 10px;
+  border-radius: 10px;
+  color: rgba(255, 255, 255, .72);
+  background: rgba(3, 15, 26, .58);
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: .08em;
+  text-align: right;
+  pointer-events: none;
+}
+
+@media (min-width: 900px) {
+  #controls {
+    opacity: .82;
+  }
+}
