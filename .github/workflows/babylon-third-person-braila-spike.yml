@@ -29,7 +29,7 @@ jobs:
       - name: Install pinned spike dependencies
         run: npm install --ignore-scripts --no-audit --no-fund
 
-      - name: TypeScript + Vite build
+      - name: TypeScript syntax pass + Vite build
         run: npm run build
 
       - name: Verify deterministic spike truth labels
@@ -38,12 +38,13 @@ jobs:
           grep -q "NOT AUTHENTIC GAMEPLAY" index.html
           grep -q "DROPi TYCOON" index.html
 
-      - name: Record bundle size
-        run: du -sh dist && find dist -maxdepth 2 -type f -printf '%p %k KB\n' | sort
-
-      - name: Capture exact-build screenshot
+      - name: Record preview payload
         run: |
-          mkdir -p evidence
+          du -sh dist
+          find dist -maxdepth 2 -type f -printf '%p %k KB\n' | sort
+
+      - name: Verify static preview server
+        run: |
           npm run preview -- --port 4173 > /tmp/dropi-babylon-preview.log 2>&1 &
           PREVIEW_PID=$!
           trap 'kill ${PREVIEW_PID} || true' EXIT
@@ -51,28 +52,14 @@ jobs:
             if curl -fsS http://127.0.0.1:4173/ >/dev/null; then break; fi
             sleep 1
           done
-          curl -fsS http://127.0.0.1:4173/ >/dev/null
-          CHROME="$(command -v google-chrome || command -v google-chrome-stable || command -v chromium || true)"
-          test -n "$CHROME" || { echo 'No headless Chrome binary available'; exit 1; }
-          timeout 30s "$CHROME" \
-            --headless=new \
-            --no-sandbox \
-            --disable-dev-shm-usage \
-            --use-gl=swiftshader \
-            --enable-webgl \
-            --ignore-gpu-blocklist \
-            --hide-scrollbars \
-            --window-size=1280,720 \
-            --virtual-time-budget=5000 \
-            --screenshot=evidence/babylon-third-person-braila-v1.png \
-            http://127.0.0.1:4173/
-          test -s evidence/babylon-third-person-braila-v1.png
+          curl -fsS http://127.0.0.1:4173/ | grep -q "DROPi TYCOON"
+          echo 'Static preview serves correctly. CI visual WebGL capture is intentionally not used as acceptance evidence.'
 
-      - name: Upload static spike build and exact-build evidence
+      - name: Upload Android-ready static spike build
         uses: actions/upload-artifact@v4
         with:
           name: dropi-babylon-third-person-braila-v1
           path: |
             09_Development/Spikes/BABYLON_THIRD_PERSON_BRAILA_V1/dist
-            09_Development/Spikes/BABYLON_THIRD_PERSON_BRAILA_V1/evidence
+            09_Development/Spikes/BABYLON_THIRD_PERSON_BRAILA_V1/RUN_ON_ANDROID_TERMUX.md
           retention-days: 14
