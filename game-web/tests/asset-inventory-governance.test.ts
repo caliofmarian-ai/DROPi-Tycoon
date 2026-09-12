@@ -56,7 +56,7 @@ describe('ISSUE-414 — DT-19 asset inventory and dedup authority', () => {
       (family: any) => family.familyId === 'SRC-20260907-002',
     )
     expect(civicFamily.libraryPresence).toBe('LIBRARY_PRESENT')
-    expect(civicFamily.repositoryPresence).toBe('NOT_ATTESTED_ON_MAIN')
+    expect(civicFamily.repositoryPresence).toBe('REPOSITORY_ATTESTED_DERIVATIVES_ONLY')
 
     const initialFamily = inventory.registeredFamilies.find(
       (family: any) => family.familyId === 'SRC-20260907-001',
@@ -89,8 +89,9 @@ describe('ISSUE-414 — DT-19 asset inventory and dedup authority', () => {
     const summary = JSON.parse(result.stdout.trim())
     expect(summary.ok).toBe(true)
     expect(summary.families).toBeGreaterThanOrEqual(11)
+    expect(summary.collections).toBe(4)
     expect(summary.externalLibraryArtifacts).toBe(13)
-    expect(summary.inventoriedArtifacts).toBeGreaterThanOrEqual(63)
+    expect(summary.inventoriedArtifacts).toBeGreaterThanOrEqual(67)
     expect(summary.runtimeArtifacts).toBe(13)
     expect(summary.declaredReuseSets).toBeGreaterThanOrEqual(2)
   })

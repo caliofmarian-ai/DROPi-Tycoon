@@ -81,18 +81,24 @@
       "semanticFamily": "civic-special-buildings",
       "lifecycleState": "APPROVED_SOURCE",
       "libraryPresence": "LIBRARY_PRESENT",
-      "repositoryPresence": "NOT_ATTESTED_ON_MAIN",
+      "repositoryPresence": "REPOSITORY_ATTESTED_DERIVATIVES_ONLY",
       "libraryArtifactRef": "library-source-board-src-20260907-002",
-      "evidenceRefs": ["08_Assets/Production/Approved_Sources/2026-09-07_GENERATED_FAMILY_REGISTRY.md"]
+      "evidenceRefs": [
+        "08_Assets/Production/Approved_Sources/2026-09-07_GENERATED_FAMILY_REGISTRY.md",
+        "08_Assets/Production/Manifests/CITY_WORLD_INGEST_BATCH_001.json"
+      ]
     },
     {
       "familyId": "SRC-20260907-003",
       "semanticFamily": "multimodal-infrastructure",
       "lifecycleState": "APPROVED_SOURCE",
       "libraryPresence": "LIBRARY_PRESENT",
-      "repositoryPresence": "NOT_ATTESTED_ON_MAIN",
+      "repositoryPresence": "REPOSITORY_ATTESTED_DERIVATIVES_ONLY",
       "libraryArtifactRef": "library-source-board-src-20260907-003",
-      "evidenceRefs": ["08_Assets/Production/Approved_Sources/2026-09-07_GENERATED_FAMILY_REGISTRY.md"]
+      "evidenceRefs": [
+        "08_Assets/Production/Approved_Sources/2026-09-07_GENERATED_FAMILY_REGISTRY.md",
+        "08_Assets/Production/Manifests/CITY_WORLD_INGEST_BATCH_001.json"
+      ]
     },
     {
       "familyId": "SRC-20260907-004",
@@ -117,9 +123,12 @@
       "semanticFamily": "city-architecture-district-kits",
       "lifecycleState": "APPROVED_SOURCE",
       "libraryPresence": "LIBRARY_PRESENT",
-      "repositoryPresence": "NOT_ATTESTED_ON_MAIN",
+      "repositoryPresence": "REPOSITORY_ATTESTED_DERIVATIVES_ONLY",
       "libraryArtifactRef": "library-source-board-src-20260907-006",
-      "evidenceRefs": ["08_Assets/Production/Approved_Sources/2026-09-07_GENERATED_FAMILY_REGISTRY.md"]
+      "evidenceRefs": [
+        "08_Assets/Production/Approved_Sources/2026-09-07_GENERATED_FAMILY_REGISTRY.md",
+        "08_Assets/Production/Manifests/CITY_WORLD_INGEST_BATCH_001.json"
+      ]
     },
     {
       "familyId": "SRC-20260907-007",
@@ -335,6 +344,40 @@
           "semanticFamily": "ui-orders",
           "reuseGroup": "orders-icon-v1"
         }
+      }
+    },
+    {
+      "collectionId": "city-world-ingest-batch-001-civic",
+      "root": "08_Assets/Production/Candidates/City_World_Ingest_Batch_001/SRC-20260907-002/civic",
+      "lifecycleState": "CANDIDATE",
+      "sourceFamilyId": "SRC-20260907-002",
+      "expectedAssetCount": 1,
+      "extensions": [".webp"],
+      "semanticFamilyByPrefix": {
+        "school_01.webp": "candidate-civic-building"
+      }
+    },
+    {
+      "collectionId": "city-world-ingest-batch-001-infrastructure",
+      "root": "08_Assets/Production/Candidates/City_World_Ingest_Batch_001/SRC-20260907-003/infrastructure",
+      "lifecycleState": "CANDIDATE",
+      "sourceFamilyId": "SRC-20260907-003",
+      "expectedAssetCount": 1,
+      "extensions": [".webp"],
+      "semanticFamilyByPrefix": {
+        "train_station_01.webp": "candidate-rail-infrastructure"
+      }
+    },
+    {
+      "collectionId": "city-world-ingest-batch-001-architecture",
+      "root": "08_Assets/Production/Candidates/City_World_Ingest_Batch_001/SRC-20260907-006/architecture",
+      "lifecycleState": "CANDIDATE",
+      "sourceFamilyId": "SRC-20260907-006",
+      "expectedAssetCount": 2,
+      "extensions": [".webp"],
+      "semanticFamilyByPrefix": {
+        "historic_european_building_01.webp": "candidate-city-architecture",
+        "modern_office_building_01.webp": "candidate-city-architecture"
       }
     }
   ],
