@@ -4,6 +4,7 @@ Status: CANONICAL
 Owner: Marian / caliofmarian-ai
 Effective: 2026-09-12
 Authority source: `09_Development/Owner_Directives/2026-09-12_MASTER_OWNER_DIRECTIVE_004_THIRD_PERSON_OPEN_WORLD_VISUAL_EXPERIENCE.md`
+Runtime handoff: `00_Project/DT23_VISUAL_TARGET_RUNTIME_HANDOFF_V1.md`
 
 ## Canonical statement
 
@@ -55,6 +56,14 @@ DT-23 creative must visually converge on the same experience:
 `third-person hero -> work opportunity -> human-scale travel -> interaction -> pickup -> delivery -> result -> growth possibility`
 
 Promotional material may be `CINEMATIC / NON-GAMEPLAY — TARGET CANON` until the runtime reaches this standard, but it must never be mislabeled as authentic gameplay.
+
+## Runtime convergence
+
+The owner-approved V2 third-person film is the visual north star for runtime convergence.
+
+Implementation owners must consume `00_Project/DT23_VISUAL_TARGET_RUNTIME_HANDOFF_V1.md` for the translation of this canon into camera, scale, characters, city geometry, materials, lighting, motion, interaction, Android constraints and acceptance evidence.
+
+The target is to make the real playable build look and feel as close as technically practical to the approved V2 visual direction while preserving authoritative gameplay, truthful evidence and viable Android performance.
 
 ## Superseded wording
 
