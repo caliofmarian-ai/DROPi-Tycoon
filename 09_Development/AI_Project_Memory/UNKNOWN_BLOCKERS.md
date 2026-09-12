@@ -63,6 +63,21 @@
 
 ## Governance/evidence gaps
 
+### U-GOV-005 — CI-gated main and Railway deployment
+- Status: `BLOCKED_PREREQUISITE`.
+- Evidence: live `main` is unprotected; there are no repository rulesets or required checks; Railway reports `source.checkSuites:false`; `validate-mobile-shell` is absent on exact current main because of workflow path filters and its unpinned `expo-doctor` command has produced tool-drift contradictions.
+- Safe action: DT-04 first pins the validator and makes the stable Mobile Shell check run on every PR/main SHA. DT-00 audits/merges that prerequisite before any required-check or Railway wait-for-CI setting mutation.
+
+### U-ANDROID-001 — Babylon Android device evidence without Termux/TMux
+- Status: `DEVICE_EVIDENCE_PENDING`.
+- Evidence: PR #712 strict build and static artifact are green, but hosted CI cannot supply trustworthy WebGL visual evidence and the previous Termux guide conflicts with the current Owner workflow.
+- Safe action: keep PR #712 DRAFT; produce a separately packaged GitHub Actions evaluation APK that reuses the existing `game-mobile` shell without EAS/Railway/production signing, then collect exact-build Owner Android evidence.
+
+### U-GOV-006 — Full operational PR registry is stale
+- Status: `CONTRADICTORY`.
+- Evidence: `CURRENT_STATE.json` records a historical open-PR set while live GitHub contains 16 PRs at the start of the DT-00 orchestration reset.
+- Safe action: use live GitHub for every decision, complete DT-22's bounded duplicate/superseded cleanup, then update the entire registry atomically rather than partially normalizing stale entries.
+
 ### U-GOV-001 — Main branch protection decision
 - Status: `UNKNOWN_OWNER_GOVERNANCE_DECISION`.
 - Evidence: DT-22 observed main unprotected/required checks unenforced.
