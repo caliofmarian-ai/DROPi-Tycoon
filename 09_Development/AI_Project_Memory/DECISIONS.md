@@ -132,3 +132,29 @@ Authorized usage includes, without creating new domain authority:
 **Source:** Explicit Project Owner directive, 2026-09-12.
 
 **Rejected assumption:** Paid external design-tool access is unavailable or requires a new Owner approval for each ordinary in-scope use.
+
+---
+
+## D-TOOLS-002 — Runway is reserved for the final production phase
+
+**Decision:** The Project Owner authorizes the connected paid Runway capability for DROPi Tycoon, but explicitly reserves Runway credit-consuming generation/editing for the **final production phase**. During current design, prototype, implementation and ordinary iteration phases, AI agents must use Figma and Canva where suitable and must not consume Runway credits.
+
+Final-phase authorized usage includes, without creating new gameplay/domain authority:
+
+- final cinematic teasers, trailers and launch-film production;
+- final image-to-video, text-to-video or multi-shot promotional sequences;
+- animation of approved final concept art or campaign stills;
+- final targeted video editing, reframing/expansion and visual cleanup;
+- final image/video upscaling or background-isolation preparation where appropriate.
+
+**Credit-preservation rule:** `NO RUNWAY CREDIT CONSUMPTION BEFORE FINAL PHASE`. Any exception before the final phase requires a new explicit Project Owner directive. Merely having Runway connected or available is not permission to spend credits early.
+
+**Truth boundary:** A Runway-generated image or video is creative/cinematic material unless separately proven as authentic gameplay capture. It may not be used to imply that gameplay, UI, economy, world systems, multiplayer, release state, metrics, reviews or other product claims exist when they are not supported by canonical/runtime evidence.
+
+**Ownership boundary:** DT-23 owns creative advertising/cinematics and evidence labeling; DT-19 owns asset inventory/production lineage when generated material becomes a governed project asset; DT-13 owns legal/licence/provenance qualification; DT-14 owns release/store artifact evidence. Existing DT ownership remains unchanged.
+
+**Authority boundary:** Runway is a final-phase production tool, not canonical project authority. Repository-backed canonical documents and live GitHub remain authoritative. Any generated material promoted into project assets, public marketing or release evidence must enter the applicable repository, provenance, legal, asset, creative-claims and release workflows.
+
+**Source:** Explicit Project Owner directives, 2026-09-12; connected Runway workspace availability verified in-session.
+
+**Rejected assumption:** Runway should be used during ordinary design/prototype iteration merely because the paid workspace is connected.
