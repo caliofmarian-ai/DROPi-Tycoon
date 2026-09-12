@@ -1,10 +1,20 @@
 # DT-23 — Full Target Canon Film v2 — Third-Person Open World
 
-Status: `IN PRODUCTION — TARGET CANON`
+Status: `OWNER-APPROVED VISUAL NORTH STAR — TARGET CANON`
 Classification: `CINEMATIC / NON-GAMEPLAY — TARGET CANON`
+Owner acceptance: 2026-09-12
 Owner lane: DT-23 Creative Marketing / Advertising / Cinematics
 Issue: #692
 Visual authority: `00_Project/THIRD_PERSON_OPEN_WORLD_VISUAL_EXPERIENCE_CANON.md`
+Runtime handoff: `00_Project/DT23_VISUAL_TARGET_RUNTIME_HANDOFF_V1.md`
+
+## Owner acceptance
+
+The owner approved the assembled V2 third-person film as the visual north star for DROPi Tycoon.
+
+The intended runtime direction is to look and feel as close as technically practical to this film while preserving authoritative gameplay, truthful evidence and viable Android performance.
+
+This approval does **not** change the film's truth classification. It remains `CINEMATIC / NON-GAMEPLAY — TARGET CANON` until exact runtime evidence qualifies captured footage as authentic gameplay.
 
 ## Creative objective
 
