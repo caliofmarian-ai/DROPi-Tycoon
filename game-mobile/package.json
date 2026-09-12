@@ -16,23 +16,24 @@
     "release:preflight": "npm run version:validate && npm run typecheck && npm run doctor",
     "release:attest:aab": "node scripts/attest-android-aab.mjs",
     "typecheck": "tsc --noEmit",
-    "doctor": "npx -y expo-doctor",
+    "doctor": "expo-doctor",
     "version:validate": "node scripts/validate-release-version.mjs && node scripts/validate-bundled-runtime.mjs && node scripts/validate-release-inputs.mjs && node --check scripts/attest-android-aab.mjs"
   },
   "dependencies": {
     "@dr.pogodin/react-native-fs": "2.40.1",
     "@dr.pogodin/react-native-static-server": "0.27.1",
-    "expo": "~57.0.9",
-    "expo-dev-client": "~57.0.18",
+    "expo": "~57.0.22",
+    "expo-dev-client": "~57.0.19",
     "expo-screen-orientation": "~57.0.2",
     "expo-status-bar": "~57.0.1",
-    "expo-system-ui": "~57.0.3",
+    "expo-system-ui": "~57.0.4",
     "react": "19.2.3",
     "react-native": "0.86.3",
     "react-native-webview": "13.16.1"
   },
   "devDependencies": {
     "@types/react": "^19.2.0",
+    "expo-doctor": "1.20.4",
     "typescript": "~6.0.3"
   }
 }

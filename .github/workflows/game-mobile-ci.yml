@@ -1,18 +1,16 @@
 name: DROPi Tycoon Mobile Shell CI
 
 on:
+  workflow_dispatch:
   pull_request:
-    paths:
-      - 'game-mobile/**'
-      - 'game-web/**'
-      - '.github/workflows/game-mobile-ci.yml'
+    branches:
+      - main
   push:
     branches:
       - main
-    paths:
-      - 'game-mobile/**'
-      - 'game-web/**'
-      - '.github/workflows/game-mobile-ci.yml'
+
+permissions:
+  contents: read
 
 jobs:
   validate-mobile-shell:

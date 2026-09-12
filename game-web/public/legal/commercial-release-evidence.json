@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
-  "auditDate": "2026-09-09",
-  "baselineCommit": "ca1a463539635312654a7ba680fee615d03330d8",
+  "auditDate": "2026-09-12",
+  "baselineCommit": "d11b446d916f3910ecf4f457ec13deb5ae74e181",
   "commercialReleaseReady": false,
   "scope": "Evidence-only commercial IP, dependency, branding/media and notice-placement closure for issue #565. This file does not make legal clearance claims.",
   "blockingReviewIds": [
@@ -22,18 +22,18 @@
     "blocker": "mobile-release-dependency-license-closure",
     "linkedIssue": 568,
     "manifestPath": "game-mobile/package.json",
-    "manifestGitBlobSha": "8c851a9c3938f7a8752cefb77c72ed798011f86e",
+    "manifestGitBlobSha": "70b1aaf275c5c66c08f5794dfcd49fffeed77074",
     "requiredLockfilePath": "game-mobile/package-lock.json",
-    "lockfileGitBlobSha": "b63f21e25f6257f87be3f9542e1a45c6dee42fe8",
+    "lockfileGitBlobSha": "1537b36f48da9ea9321c8d5848f0d3f6ae7969cc",
     "lockfilePresentAtAudit": true,
     "declaredDirectProductionDependencies": {
       "@dr.pogodin/react-native-fs": "2.40.1",
       "@dr.pogodin/react-native-static-server": "0.27.1",
-      "expo": "~57.0.9",
-      "expo-dev-client": "~57.0.18",
+      "expo": "~57.0.22",
+      "expo-dev-client": "~57.0.19",
       "expo-screen-orientation": "~57.0.2",
       "expo-status-bar": "~57.0.1",
-      "expo-system-ui": "~57.0.3",
+      "expo-system-ui": "~57.0.4",
       "react": "19.2.3",
       "react-native": "0.86.3",
       "react-native-webview": "13.16.1"
