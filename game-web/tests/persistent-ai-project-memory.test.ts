@@ -29,7 +29,7 @@ describe('persistent AI project memory governance', () => {
       .toBe(state.activePullRequests.length);
   });
 
-  it('provides one effective durable handoff for DT-00 through DT-22', () => {
+  it('provides one effective durable handoff for DT-00 through DT-23', () => {
     const doc = readJson(handoffsUrl);
     expect(doc.completionInvariant).toBe('NO DURABLE HANDOFF = SESSION NOT OPERATIONALLY COMPLETE');
     expect(doc.liveReconciliationRequired).toBe(true);
@@ -38,10 +38,10 @@ describe('persistent AI project memory governance', () => {
       ...doc.defaultFields,
       ...record,
     }));
-    expect(effective).toHaveLength(23);
-    expect(new Set(effective.map((item: { agentId: string }) => item.agentId)).size).toBe(23);
+    expect(effective).toHaveLength(24);
+    expect(new Set(effective.map((item: { agentId: string }) => item.agentId)).size).toBe(24);
 
-    for (let index = 0; index <= 22; index += 1) {
+    for (let index = 0; index <= 23; index += 1) {
       const id = `DT-${String(index).padStart(2, '0')}`;
       const handoff = effective.find((item: { agentId: string }) => item.agentId === id);
       expect(handoff, `missing ${id}`).toBeTruthy();
@@ -70,9 +70,13 @@ describe('persistent AI project memory governance', () => {
         expect(pathOwners.has(path), `duplicate ownership for ${path}`).toBe(false);
         pathOwners.set(path, handoff.agentId);
       }
-      if (Number.isInteger(handoff.pr)) {
-        expect(prOwners.has(handoff.pr), `duplicate PR ownership for #${handoff.pr}`).toBe(false);
-        prOwners.set(handoff.pr, handoff.agentId);
+      const currentPullRequests = [
+        ...(Number.isInteger(handoff.pr) ? [handoff.pr] : []),
+        ...(Array.isArray(handoff.additionalPullRequests) ? handoff.additionalPullRequests : []),
+      ];
+      for (const pr of currentPullRequests) {
+        expect(prOwners.has(pr), `duplicate PR ownership for #${pr}`).toBe(false);
+        prOwners.set(pr, handoff.agentId);
       }
     }
   });
@@ -85,7 +89,7 @@ describe('persistent AI project memory governance', () => {
     ], { encoding: 'utf8' });
 
     expect(output).toContain('PERSISTENT_AI_MEMORY_VALIDATION = PASS');
-    expect(output).toContain('handoffs=23');
+    expect(output).toContain('handoffs=24');
     expect(output).toContain(`activePullRequests=${state.activePullRequests.length}`);
   });
 

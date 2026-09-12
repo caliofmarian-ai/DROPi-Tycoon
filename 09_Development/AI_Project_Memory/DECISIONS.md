@@ -116,19 +116,39 @@ While the migration is in flight, normal specialist merges do not leapfrog #683 
 
 ---
 
-## D-TOOLS-001 — Figma and Canva are Owner-authorized project tools
+## D-TOOLS-001 — Figma, Canva, Runway and Higgsfield are Owner-authorized project tools
 
-**Decision:** The Project Owner explicitly authorizes AI agents working on DROPi Tycoon to use the connected paid Figma and Canva capabilities whenever they materially improve project work and remain inside the existing DT ownership boundaries.
+**Decision:** The Project Owner explicitly authorizes AI agents working on DROPi Tycoon to use the connected paid Figma, Canva, Runway and Higgsfield capabilities whenever they materially improve project work, remain inside the existing DT ownership boundaries and stay within existing subscription/credit allowances.
 
 Authorized usage includes, without creating new domain authority:
 
 - **Figma:** UI/UX exploration, screen design, mobile layouts, HUD/menu/component work, design-system work, prototypes, visual specifications and design-to-implementation handoff.
 - **Canva:** presentations, promotional layouts, campaign/social assets, store/launch presentation material, pitch material and other communication-oriented visual production.
+- **Runway:** cinematic/motion exploration, bounded image/video generation or editing, storyboards, shots, transitions, target-film and marketing asset work.
+- **Higgsfield:** bounded image/video/motion/3D experimentation, visual concept and asset-candidate generation, and marketing creative variants.
 
-**Authority boundary:** Figma and Canva are production/design tools, not canonical sources of gameplay, economy, architecture, legal status, release readiness or feature truth. Repository-backed canonical documents and live GitHub remain authoritative. Any artifact that becomes implementation/release evidence must be referenced, imported, attested or governed through the applicable existing repository and DT workflows.
+**Authority boundary:** GitHub remains the single source of truth for code, runtime implementation, canonical documents, contracts, asset manifests, validation and integration history. External tools are production/design/creative aids, not canonical sources of gameplay, economy, architecture, legal status, release readiness or feature truth. Code must not be fragmented into a parallel external project. Any artifact that becomes implementation/release evidence must be exported or referenced, then imported, attested or governed through the applicable repository and DT workflows.
 
 **Ownership boundary:** This authorization does not transfer ownership between DT lanes and does not permit an agent to bypass DT-13 legal/provenance requirements, DT-19 asset governance, DT-14 release evidence, DT-21/other UI ownership, DT-23 creative-claims rules, or any other established specialist boundary.
 
+**Cost boundary:** Existing included credits may be consumed for assigned project work. No new account, paid service, subscription, upgrade, top-up or credit purchase is authorized without explicit Project Owner approval.
+
+**Truth boundary:** Tool-generated or edited imagery/video does not become `AUTHENTIC GAMEPLAY`. Only exact verified runtime capture can receive that classification.
+
 **Source:** Explicit Project Owner directive, 2026-09-12.
 
-**Rejected assumption:** Paid external design-tool access is unavailable or requires a new Owner approval for each ordinary in-scope use.
+**Rejected assumptions:** Paid external tool access is unavailable; each ordinary in-scope use requires a new Owner approval; an external workspace may replace or fragment GitHub; or cinematic/generated output may be presented as authentic gameplay.
+
+---
+
+## D-WORKFLOW-001 — GitHub-first DT-00 orchestration without routine Termux/TMux
+
+**Decision:** DT-00 is the central orchestrator. Routine project work is performed through live GitHub inspection, scoped branches and Pull Requests, exact-head CI, DT-00 audit, merge sequencing and post-merge verification. Marian is not required to operate Termux/TMux or a PC for ordinary development.
+
+Termux/TMux-assisted commands are reserved for an explicit Project Owner request to synchronize or copy the Git repository to a phone, computer or server, or for another separately approved exceptional operation. They are not the normal build, preview, testing or deployment path.
+
+DT-00 may implement cross-lane/integration work directly or assign a bounded mission to the owning specialist. Specialists do not self-merge or enable auto-merge. A player-visible runtime change is not merged only because CI is green; the applicable owner/device acceptance remains required. For routine non-visible work already authorized by the owner, DT-00 may merge after canonical review and exact-head gates pass, then must verify exact-main CI and deployment evidence and remediate regressions before reporting completion.
+
+**Source:** Explicit Project Owner workflow directives, 2026-09-12.
+
+**Rejected assumptions:** Marian must copy routine commands between systems; Termux/TMux is the default development surface; specialist self-reports replace DT-00 verification; or green CI alone authorizes a player-visible merge.

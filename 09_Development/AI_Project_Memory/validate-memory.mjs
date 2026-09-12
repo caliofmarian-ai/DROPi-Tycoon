@@ -108,7 +108,7 @@ if (doc) {
 
   const required = [
     'agentId','role','ownershipBoundary','mission','observedMainSha',
-    'liveReconciliationRequired','issue','pr','branch','headSha','status',
+    'liveReconciliationRequired','issue','pr','additionalPullRequests','branch','headSha','status',
     'materialFindings','evidence','ownerDirectives','rejectedAssumptions',
     'unknowns','blockersDependencies','exactHeadCi','forbiddenActions',
     'nextSafeAction','canonicalReportReferences'
@@ -129,6 +129,7 @@ if (doc) {
     for (const key of ['materialFindings','evidence','ownerDirectives','rejectedAssumptions','unknowns','blockersDependencies','forbiddenActions','canonicalReportReferences']) {
       requireArray(handoff[key], `${handoff.agentId}.${key}`);
     }
+    requireArray(handoff.additionalPullRequests, `${handoff.agentId}.additionalPullRequests`);
     requireObject(handoff.exactHeadCi, `${handoff.agentId}.exactHeadCi`);
 
     const head = handoff.headSha;
@@ -142,14 +143,28 @@ if (doc) {
       if (previous && previous !== handoff.agentId) failures.push(`duplicate exclusive ownership claim ${claim}: ${previous} and ${handoff.agentId}`);
       exclusiveClaims.set(claim, handoff.agentId);
     }
-    if (Number.isInteger(handoff.pr)) {
-      const previous = handoffPrOwner.get(handoff.pr);
-      if (previous && previous !== handoff.agentId) failures.push(`PR #${handoff.pr} assigned to multiple current agents: ${previous} and ${handoff.agentId}`);
-      handoffPrOwner.set(handoff.pr, handoff.agentId);
+    const pullRequests = [
+      ...(Number.isInteger(handoff.pr) ? [handoff.pr] : []),
+      ...handoff.additionalPullRequests,
+    ];
+    const seenHandoffPr = new Set();
+    for (const pr of pullRequests) {
+      if (!Number.isInteger(pr) || pr <= 0) {
+        failures.push(`${handoff.agentId} has invalid current PR number: ${pr}`);
+        continue;
+      }
+      if (seenHandoffPr.has(pr)) {
+        failures.push(`${handoff.agentId} lists current PR #${pr} more than once`);
+        continue;
+      }
+      seenHandoffPr.add(pr);
+      const previous = handoffPrOwner.get(pr);
+      if (previous && previous !== handoff.agentId) failures.push(`PR #${pr} assigned to multiple current agents: ${previous} and ${handoff.agentId}`);
+      handoffPrOwner.set(pr, handoff.agentId);
     }
   }
 
-  for (let i = 0; i <= 22; i += 1) {
+  for (let i = 0; i <= 23; i += 1) {
     const id = `DT-${String(i).padStart(2, '0')}`;
     if (!seenAgent.has(id)) failures.push(`missing durable handoff for ${id}`);
   }

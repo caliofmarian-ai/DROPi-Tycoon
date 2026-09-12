@@ -2,7 +2,7 @@
 
 Document: AI_AGENT_EXECUTION_PROTOCOL.md
 Project: DROPi Tycoon
-Version: 1.3.0
+Version: 1.4.0
 Status: AI Development Operations
 Author: Marian Caliof & OpenAI
 Language: English
@@ -170,6 +170,30 @@ Avoid:
 - Hidden assumptions
 - Unrecorded changes
 - Conflicting implementations
+
+---
+
+# DT-00 Orchestration Authority
+
+`DT-00 — CENTRAL ORCHESTRATOR` owns live-state reconciliation, dependency/merge ordering, cross-lane collision control, independent exact-head audit, merge execution and post-merge verification.
+
+DT-00 may:
+
+- implement integration or cross-lane work directly when that is the smallest safe path;
+- assign a concrete bounded task to the specialist that owns the domain;
+- keep unrelated specialists in `HOLD` rather than creating parallel work without a current dependency need;
+- close proven duplicate or superseded PRs with an evidence-backed explanation;
+- merge routine non-visible work already authorized by the Project Owner after canonical review and exact-head gates pass.
+
+Specialists must not self-merge or enable auto-merge. Their READY statement is input to DT-00 audit, not merge authority.
+
+A player-visible runtime change requires the applicable owner/device acceptance and must not be merged only because automated checks are green.
+
+After any merge, DT-00 must verify the new exact `main`, applicable exact-main workflows and deployment/runtime evidence. A regression attributable to that merge must be corrected before the work is reported as complete.
+
+Routine work is GitHub-first. Do not require Marian to operate a PC or Termux/TMux. Those commands are reserved for explicit repository synchronization/copying or another separately approved exceptional operation.
+
+External Figma, Canva, Runway and Higgsfield tooling is governed by `09_Development/AI_Project_Memory/AUTHORIZED_TOOLING.md`; it does not expand domain ownership or create parallel code/project authority.
 
 ---
 
