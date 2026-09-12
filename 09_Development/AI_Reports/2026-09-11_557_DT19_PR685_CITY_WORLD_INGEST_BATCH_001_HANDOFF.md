@@ -109,13 +109,15 @@ This reconciliation:
 
 - Modified JSON parse: `PASS`.
 - `verify_asset_inventory.mjs`: `PASS` — 11 families, 4 collections, 13 Library artifacts, 67 inventoried artifacts, 13 runtime artifacts, 2 declared reuse sets.
-- Persistent-memory validator: `PASS` — 24 handoffs, 10 active PRs.
+- Persistent-memory validator: `PASS` — 24 handoffs / 10 persisted snapshot PR records.
 - Focused asset/inventory tests: `PASS` — 2 files, 14 tests.
 - Full automated test suite: `PASS` — 158 files passed, 3 skipped; 1,660 tests passed, 18 skipped.
 - TypeScript and Vite production build: `PASS` — 117 modules.
 - `git diff --check`: `PASS`.
 
 The existing approximately 3.2 MB minified / 973 kB gzip production bundle warning is unchanged by this candidate-only PR; none of these four assets enter the runtime bundle.
+
+The persisted snapshot count is not a live GitHub count. After PR #713 merged and superseded PR #703 closed, live GitHub contained eight open PRs at this re-read. PR #685 does not modify `CURRENT_STATE.json`; live GitHub remains the operational authority and must be re-read by DT-00.
 
 ## Exact-head acceptance still required
 
