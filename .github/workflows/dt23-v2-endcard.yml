@@ -1,0 +1,73 @@
+name: DT-23 V2 Result and End Card
+
+on:
+  workflow_dispatch:
+  pull_request:
+    branches: [main]
+    paths:
+      - 'Marketing/DT23/README.md'
+      - '.github/workflows/dt23-v2-endcard.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'Marketing/DT23/README.md'
+      - '.github/workflows/dt23-v2-endcard.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  render:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install ffmpeg
+        shell: bash
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y ffmpeg fonts-dejavu-core
+
+      - name: Render deterministic result and end card
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p artifacts/dt23/v2
+          FONT=/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf
+          BOLD=/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf
+
+          ffmpeg -y \
+            -f lavfi -i 'color=c=0x071729:s=1280x720:r=30:d=2' \
+            -f lavfi -i 'anullsrc=channel_layout=stereo:sample_rate=48000:d=2' \
+            -vf "drawbox=x=120:y=116:w=10:h=488:color=0x20d4ff:t=fill,drawtext=fontfile=${BOLD}:text='DELIVERY COMPLETE':fontcolor=white:fontsize=58:x=170:y=160,drawtext=fontfile=${FONT}:text='PERSONAL MONEY':fontcolor=0x20d4ff:fontsize=34:x=172:y=302,drawtext=fontfile=${FONT}:text='XP':fontcolor=0x9cf46d:fontsize=34:x=172:y=370,drawtext=fontfile=${FONT}:text='LOYALTY':fontcolor=0xffbd4a:fontsize=34:x=172:y=438,drawtext=fontfile=${FONT}:text='Your delivery changed your progression.':fontcolor=0xc7d4e2:fontsize=25:x=172:y=535,fade=t=in:st=0:d=0.25,fade=t=out:st=1.65:d=0.35,format=yuv420p" \
+            -c:v libx264 -preset medium -crf 18 -c:a aac -b:a 160k -shortest \
+            artifacts/dt23/v2/result.mp4
+
+          ffmpeg -y \
+            -f lavfi -i 'color=c=0x061322:s=1280x720:r=30:d=3' \
+            -f lavfi -i 'anullsrc=channel_layout=stereo:sample_rate=48000:d=3' \
+            -vf "drawbox=x=0:y=0:w=1280:h=9:color=0x20d4ff:t=fill,drawtext=fontfile=${BOLD}:text='DROPi TYCOON':fontcolor=white:fontsize=82:x=(w-text_w)/2:y=236,drawtext=fontfile=${BOLD}:text='YOUR WORK LEAVES A MARK.':fontcolor=0x20d4ff:fontsize=34:x=(w-text_w)/2:y=352,drawtext=fontfile=${FONT}:text='CINEMATIC / NON-GAMEPLAY - TARGET CANON':fontcolor=0x8395a8:fontsize=19:x=(w-text_w)/2:y=642,fade=t=in:st=0:d=0.35,fade=t=out:st=2.65:d=0.35,format=yuv420p" \
+            -c:v libx264 -preset medium -crf 18 -c:a aac -b:a 160k -shortest \
+            artifacts/dt23/v2/endcard.mp4
+
+          printf "file 'result.mp4'\nfile 'endcard.mp4'\n" > artifacts/dt23/v2/concat.txt
+          ffmpeg -y -f concat -safe 0 -i artifacts/dt23/v2/concat.txt -c copy \
+            artifacts/dt23/v2/DROPi_Tycoon_V2_Result_And_EndCard.mp4
+
+      - name: Verify media
+        shell: bash
+        run: |
+          set -euo pipefail
+          FILE=artifacts/dt23/v2/DROPi_Tycoon_V2_Result_And_EndCard.mp4
+          test -s "$FILE"
+          ffprobe -v error -show_entries format=duration -show_entries stream=codec_name,width,height,r_frame_rate "$FILE"
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: dropi-tycoon-v2-result-endcard
+          path: artifacts/dt23/v2/DROPi_Tycoon_V2_Result_And_EndCard.mp4
+          if-no-files-found: error
+          retention-days: 90
