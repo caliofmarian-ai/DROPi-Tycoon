@@ -1,15 +1,32 @@
 {
-  "schemaVersion": "1.0.0",
+  "schemaVersion": "1.1.0",
   "project": "DROPi Tycoon",
   "authorityIssue": 723,
   "parentPolicy": "09_Development/AI_Project_Memory/AUTONOMOUS_AGENT_POLICY.json",
-  "mode": "PILOT",
+  "mode": "PILOT_HOLD_COST_OPTIMIZATION",
   "githubIsCanonical": true,
+  "costHold": true,
+  "costHoldReason": "OWNER_REQUEST_AFTER_UNEXPECTED_API_SPEND",
   "pilotMaxConcurrentIssues": 1,
   "scheduledIssueQueue": [723],
-  "schedule": "hourly",
+  "schedule": "every_6_hours_when_cost_hold_is_released",
   "stopAfterFirstPilotPass": true,
   "pilotSuccessMarker": "<!-- DT00-PILOT-VALIDATED -->",
+  "meteredRuntime": {
+    "implementationModel": "gpt-5.6-luna",
+    "implementationEffort": "low",
+    "auditModel": "gpt-5.6-luna",
+    "auditEffort": "low",
+    "maxOpenAICallsPerOrchestratorRun": 2,
+    "maxImplementationAttemptsPer24Hours": 1,
+    "maxIndependentAuditCallsPerExactHead": 1,
+    "automaticAiAuditOnPullRequest": false,
+    "auditOnlyAfterDeterministicEvidencePasses": true,
+    "maxChangedFilesForAiAudit": 20,
+    "maxDiffBytesForAiAudit": 250000,
+    "monthlyBudgetUsd": null,
+    "hardSpendLimitRequiredBeforeCostHoldRelease": true
+  },
   "implementationAgentWritablePaths": [
     "09_Development/AutonomousAgents/runtime/**"
   ],
@@ -30,9 +47,10 @@
   "postMergeVerificationRequired": true,
   "ownerReportLanguage": "ro",
   "notes": [
-    "This file narrows the initial pilot below the canonical maximum concurrency; it does not expand policy authority.",
+    "costHold is authoritative for the pilot runtime and blocks all new metered OpenAI calls until explicitly released by a governed change.",
+    "The initial pilot uses GPT-5.6 Luna at low effort for both implementation and audit to minimize API cost.",
+    "Independent AI audit is explicit-dispatch only and must run after deterministic evidence passes, never automatically on every pull_request update.",
     "The implementation agent may not modify its own control-plane, policy, merge evaluator, audit schema or runtime pilot configuration.",
-    "The hourly scheduler stops dispatching after the first fully verified pilot PASS marker until a later governed queue expansion.",
     "Issue 730 remains dependent on the authenticated runtime and is not part of the initial scheduled queue."
   ]
 }
