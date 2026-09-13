@@ -1,5 +1,5 @@
 {
-  "schemaVersion": "1.1.0",
+  "schemaVersion": "1.2.0",
   "project": "DROPi Tycoon",
   "authorityIssue": 723,
   "parentPolicy": "09_Development/AI_Project_Memory/AUTONOMOUS_AGENT_POLICY.json",
@@ -9,7 +9,8 @@
   "costHoldReason": "OWNER_REQUEST_AFTER_UNEXPECTED_API_SPEND",
   "pilotMaxConcurrentIssues": 1,
   "scheduledIssueQueue": [723],
-  "schedule": "every_6_hours_when_cost_hold_is_released",
+  "continuationMode": "EVENT_DRIVEN_IMMEDIATE",
+  "clockPollingRequired": false,
   "stopAfterFirstPilotPass": true,
   "pilotSuccessMarker": "<!-- DT00-PILOT-VALIDATED -->",
   "meteredRuntime": {
@@ -18,7 +19,7 @@
     "auditModel": "gpt-5.6-luna",
     "auditEffort": "low",
     "maxOpenAICallsPerOrchestratorRun": 2,
-    "maxImplementationAttemptsPer24Hours": 1,
+    "maxImplementationAttemptsPerIssue": 3,
     "maxIndependentAuditCallsPerExactHead": 1,
     "automaticAiAuditOnPullRequest": false,
     "auditOnlyAfterDeterministicEvidencePasses": true,
@@ -26,6 +27,17 @@
     "maxDiffBytesForAiAudit": 250000,
     "monthlyBudgetUsd": null,
     "hardSpendLimitRequiredBeforeCostHoldRelease": true
+  },
+  "eventDrivenRuntime": {
+    "wakeOnManualDispatch": true,
+    "wakeOnEligibleIssueEvent": true,
+    "wakeOnRelevantPullRequestCompletion": true,
+    "wakeOnRelevantWorkflowCompletion": true,
+    "wakeOnDeploymentStatusChange": true,
+    "selfChainAfterCompletedStage": true,
+    "selfChainTransport": "repository_dispatch",
+    "selfChainEventType": "dt00-continue",
+    "idleWhenNoEligibleWork": true
   },
   "implementationAgentWritablePaths": [
     "09_Development/AutonomousAgents/runtime/**"
@@ -48,6 +60,8 @@
   "ownerReportLanguage": "ro",
   "notes": [
     "costHold is authoritative for the pilot runtime and blocks all new metered OpenAI calls until explicitly released by a governed change.",
+    "The pilot is event-driven, not clock-driven: the next orchestration cycle must start immediately after a relevant stage/event completes.",
+    "The implementation attempt limit is per Issue, not a time throttle; rework may continue immediately while remaining bounded.",
     "The initial pilot uses GPT-5.6 Luna at low effort for both implementation and audit to minimize API cost.",
     "Independent AI audit is explicit-dispatch only and must run after deterministic evidence passes, never automatically on every pull_request update.",
     "The implementation agent may not modify its own control-plane, policy, merge evaluator, audit schema or runtime pilot configuration.",
