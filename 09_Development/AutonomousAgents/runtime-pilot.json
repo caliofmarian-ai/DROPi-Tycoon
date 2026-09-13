@@ -1,0 +1,35 @@
+{
+  "schemaVersion": "1.0.0",
+  "project": "DROPi Tycoon",
+  "authorityIssue": 723,
+  "parentPolicy": "09_Development/AI_Project_Memory/AUTONOMOUS_AGENT_POLICY.json",
+  "mode": "PILOT",
+  "githubIsCanonical": true,
+  "pilotMaxConcurrentIssues": 1,
+  "scheduledIssueQueue": [723],
+  "schedule": "hourly",
+  "implementationAgentWritablePaths": [
+    "09_Development/AutonomousAgents/runtime/**"
+  ],
+  "controlPlaneProtectedPaths": [
+    ".github/workflows/autonomous-agent-governance.yml",
+    ".github/workflows/dt00-autonomous-pilot.yml",
+    "09_Development/AUTONOMOUS_MULTI_AGENT_OPERATION.md",
+    "09_Development/AI_Project_Memory/AUTONOMOUS_AGENT_POLICY.json",
+    "09_Development/AutonomousAgents/evaluate-merge-gate.mjs",
+    "09_Development/AutonomousAgents/evaluate-merge-gate.test.mjs",
+    "09_Development/AutonomousAgents/runtime-pilot.json",
+    "09_Development/AutonomousAgents/schemas/**"
+  ],
+  "requiredSecretNames": ["OPENAI_API_KEY"],
+  "missingRequiredSecretState": "UNKNOWN",
+  "independentAuditRequired": true,
+  "exactHeadRequired": true,
+  "postMergeVerificationRequired": true,
+  "ownerReportLanguage": "ro",
+  "notes": [
+    "This file narrows the initial pilot below the canonical maximum concurrency; it does not expand policy authority.",
+    "The implementation agent may not modify its own control-plane, policy, merge evaluator, audit schema or runtime pilot configuration.",
+    "Issue 730 remains dependent on the authenticated runtime and is not part of the initial scheduled queue."
+  ]
+}
