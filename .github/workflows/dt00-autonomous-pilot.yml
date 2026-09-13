@@ -25,7 +25,7 @@ jobs:
   execute-bounded-pilot:
     name: Execute bounded pilot
     runs-on: ubuntu-latest
-    timeout-minutes: 55
+    timeout-minutes: 60
 
     steps:
       - name: Checkout canonical main without persisted GitHub credentials
@@ -42,6 +42,7 @@ jobs:
 
       - name: Verify existing deterministic governance before dispatch
         run: |
+          set -euo pipefail
           node --test 09_Development/AutonomousAgents/evaluate-merge-gate.test.mjs
           node 09_Development/AI_Project_Memory/validate-memory.mjs
 
@@ -50,6 +51,7 @@ jobs:
         env:
           REQUESTED_ISSUE: ${{ github.event_name == 'workflow_dispatch' && inputs.issue_number || '' }}
         run: |
+          set -euo pipefail
           node <<'NODE'
           const fs = require('fs')
           const policy = JSON.parse(fs.readFileSync('09_Development/AI_Project_Memory/AUTONOMOUS_AGENT_POLICY.json', 'utf8'))
@@ -58,35 +60,19 @@ jobs:
           const issue = requested ? Number(requested) : Number(pilot.scheduledIssueQueue?.[0])
           if (!Number.isInteger(issue)) throw new Error('No valid pilot Issue is configured')
           if (!pilot.scheduledIssueQueue.includes(issue)) throw new Error(`Issue #${issue} is outside the bounded pilot queue`)
+          if (pilot.pilotMaxConcurrentIssues !== 1) throw new Error('Pilot concurrency must remain exactly 1')
           fs.appendFileSync(process.env.GITHUB_OUTPUT, `automation_enabled=${policy.automation_enabled === true}\n`)
           fs.appendFileSync(process.env.GITHUB_OUTPUT, `issue_number=${issue}\n`)
           fs.appendFileSync(process.env.GITHUB_OUTPUT, `max_attempts=${Number(policy.limits?.maxImplementationAttemptsPerIssue ?? 0)}\n`)
           NODE
 
-      - name: Detect OpenAI runtime credential without exposing it
-        id: credential
-        env:
-          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
-        run: |
-          if [ -n "$OPENAI_API_KEY" ]; then
-            echo 'credential_ready=true' >> "$GITHUB_OUTPUT"
-          else
-            echo 'credential_ready=false' >> "$GITHUB_OUTPUT"
-          fi
-
-      - name: Fail closed when OpenAI authentication evidence is missing
-        if: steps.policy.outputs.automation_enabled == 'true' && steps.credential.outputs.credential_ready != 'true'
-        run: |
-          echo '::error::OPENAI_API_KEY is absent. Authentication evidence is UNKNOWN; autonomous execution is blocked.'
-          exit 1
-
       - name: Stop cleanly when emergency stop is engaged
         if: steps.policy.outputs.automation_enabled != 'true'
         run: echo 'automation_enabled=false; no Issue will be dispatched.'
 
-      - name: Select Issue, prevent duplicate claims, enforce retry limit, and write trusted task envelope
+      - name: Resolve bounded pilot state, resume durable work, or prepare one implementation attempt
         id: select
-        if: steps.policy.outputs.automation_enabled == 'true' && steps.credential.outputs.credential_ready == 'true'
+        if: steps.policy.outputs.automation_enabled == 'true'
         uses: actions/github-script@v7
         env:
           ISSUE_NUMBER: ${{ steps.policy.outputs.issue_number }}
@@ -101,28 +87,41 @@ jobs:
 
             const { data: issue } = await github.rest.issues.get({ owner, repo, issue_number: issueNumber })
             const labels = (issue.labels || []).map((label) => typeof label === 'string' ? label : label.name).filter(Boolean)
+            const comments = await github.paginate(github.rest.issues.listComments, { owner, repo, issue_number: issueNumber, per_page: 100 })
 
             if (issue.state !== 'open') {
-              core.setOutput('eligible', 'false')
+              core.setOutput('mode', 'idle')
               core.setOutput('reason', 'ISSUE_NOT_OPEN')
               return
             }
             if (!labels.includes('automation')) {
-              core.setOutput('eligible', 'false')
+              core.setOutput('mode', 'idle')
               core.setOutput('reason', 'AUTOMATION_LABEL_MISSING')
+              return
+            }
+            if (comments.some((comment) => (comment.body || '').includes('<!-- DT00-PILOT-VALIDATED -->'))) {
+              core.setOutput('mode', 'idle')
+              core.setOutput('reason', 'PILOT_ALREADY_VALIDATED')
               return
             }
 
             const openPrs = await github.paginate(github.rest.pulls.list, { owner, repo, state: 'open', per_page: 100 })
             const branchPrefix = `dt00/auto-${issueNumber}-`
-            const duplicate = openPrs.find((pr) => pr.head?.ref?.startsWith(branchPrefix))
-            if (duplicate) {
-              core.setOutput('eligible', 'false')
-              core.setOutput('reason', `ACTIVE_PR_${duplicate.number}`)
+            const matches = openPrs.filter((pr) => pr.head?.ref?.startsWith(branchPrefix))
+            if (matches.length > 1) {
+              core.setFailed('Multiple active DT-00 pilot PRs detected; duplicate execution must fail closed.')
+              return
+            }
+            if (matches.length === 1) {
+              const pr = matches[0]
+              core.setOutput('mode', 'resume')
+              core.setOutput('reason', `ACTIVE_PR_${pr.number}`)
+              core.setOutput('resume_pr_number', String(pr.number))
+              core.setOutput('resume_branch', pr.head.ref)
+              core.setOutput('resume_head_sha', pr.head.sha)
               return
             }
 
-            const comments = await github.paginate(github.rest.issues.listComments, { owner, repo, issue_number: issueNumber, per_page: 100 })
             let attemptsSinceSuccess = 0
             for (const comment of comments) {
               const body = comment.body || ''
@@ -140,7 +139,7 @@ jobs:
                   body: `${marker}\nDT-00 runtime: BLOCKED — limita canonică de ${maxAttempts} tentative consecutive a fost atinsă. Nu mai pornesc o nouă implementare pentru acest Issue până la intervenție guvernată.`
                 })
               }
-              core.setOutput('eligible', 'false')
+              core.setOutput('mode', 'idle')
               core.setOutput('reason', 'RETRY_LIMIT_REACHED')
               return
             }
@@ -173,19 +172,38 @@ jobs:
               body: `<!-- DT00-AUTO-ATTEMPT -->\nDT-00 pilot a revendicat o tentativă bounded pentru acest Issue. Run: ${context.serverUrl}/${owner}/${repo}/actions/runs/${context.runId}`
             })
 
-            core.setOutput('eligible', 'true')
+            core.setOutput('mode', 'implement')
             core.setOutput('reason', 'ELIGIBLE')
             core.setOutput('issue_title', issue.title)
 
+      - name: Detect OpenAI runtime credential without exposing it
+        id: credential
+        if: steps.select.outputs.mode == 'implement' || steps.select.outputs.mode == 'resume'
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+        run: |
+          set -euo pipefail
+          if [ -n "${OPENAI_API_KEY:-}" ]; then
+            echo 'credential_ready=true' >> "$GITHUB_OUTPUT"
+          else
+            echo 'credential_ready=false' >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Fail closed when OpenAI authentication evidence is missing
+        if: (steps.select.outputs.mode == 'implement' || steps.select.outputs.mode == 'resume') && steps.credential.outputs.credential_ready != 'true'
+        run: |
+          echo '::error::OPENAI_API_KEY is absent. Authentication evidence is UNKNOWN; autonomous execution is blocked.'
+          exit 1
+
       - name: Create isolated unprivileged Codex implementation user
-        if: steps.select.outputs.eligible == 'true'
+        if: steps.select.outputs.mode == 'implement' && steps.credential.outputs.credential_ready == 'true'
         run: |
           sudo useradd --create-home --shell /bin/bash codexagent
           sudo chown -R codexagent:codexagent "$GITHUB_WORKSPACE"
 
       - name: Run bounded Codex implementation agent
         id: implement
-        if: steps.select.outputs.eligible == 'true'
+        if: steps.select.outputs.mode == 'implement' && steps.credential.outputs.credential_ready == 'true'
         uses: openai/codex-action@v1
         with:
           openai-api-key: ${{ secrets.OPENAI_API_KEY }}
@@ -196,15 +214,18 @@ jobs:
           output-file: '.dt00/implementation-result.json'
           output-schema-file: '09_Development/AutonomousAgents/schemas/implementation-result.schema.json'
           effort: 'medium'
+          allow-bots: true
+          allow-bot-users: 'github-actions[bot]'
 
       - name: Restore runner ownership after isolated implementation
-        if: steps.select.outputs.eligible == 'true' && always()
+        if: steps.select.outputs.mode == 'implement' && always()
         run: sudo chown -R "$(id -u):$(id -g)" "$GITHUB_WORKSPACE"
 
       - name: Validate implementation result and changed-path boundary
         id: validate
-        if: steps.select.outputs.eligible == 'true'
+        if: steps.select.outputs.mode == 'implement'
         run: |
+          set -euo pipefail
           test -s .dt00/implementation-result.json
           cp .dt00/implementation-result.json /tmp/dt00-implementation-result.json
 
@@ -252,7 +273,7 @@ jobs:
           echo 'reason=READY' >> "$GITHUB_OUTPUT"
 
       - name: Preserve implementation evidence artifact
-        if: steps.select.outputs.eligible == 'true' && always()
+        if: steps.select.outputs.mode == 'implement' && always()
         uses: actions/upload-artifact@v4
         with:
           name: dt00-implementation-${{ steps.policy.outputs.issue_number }}-${{ github.run_id }}
@@ -261,12 +282,13 @@ jobs:
           retention-days: 30
 
       - name: Persist fail-closed implementation result to Issue
-        if: steps.select.outputs.eligible == 'true' && steps.validate.outputs.ready != 'true'
+        if: steps.select.outputs.mode == 'implement' && steps.validate.outputs.ready != 'true'
         env:
           GH_TOKEN: ${{ github.token }}
           ISSUE_NUMBER: ${{ steps.policy.outputs.issue_number }}
           REASON: ${{ steps.validate.outputs.reason }}
         run: |
+          set -euo pipefail
           SUMMARY="$(jq -r '.summary // "No structured summary available"' /tmp/dt00-implementation-result.json 2>/dev/null || true)"
           {
             echo '<!-- DT00-AUTO-IMPLEMENTATION-BLOCKED -->'
@@ -280,11 +302,12 @@ jobs:
 
       - name: Create deterministic branch and push validated implementation
         id: push
-        if: steps.validate.outputs.ready == 'true'
+        if: steps.select.outputs.mode == 'implement' && steps.validate.outputs.ready == 'true'
         env:
           GH_TOKEN: ${{ github.token }}
           ISSUE_NUMBER: ${{ steps.policy.outputs.issue_number }}
         run: |
+          set -euo pipefail
           BRANCH="dt00/auto-${ISSUE_NUMBER}-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}"
           git checkout -b "$BRANCH"
           git config user.name 'DT-00 Autonomous Runtime'
@@ -297,15 +320,16 @@ jobs:
           echo "branch=$BRANCH" >> "$GITHUB_OUTPUT"
           echo "head_sha=$HEAD_SHA" >> "$GITHUB_OUTPUT"
 
-      - name: Open governed PR for independent audit
+      - name: Open governed PR for explicit independent audit
         id: pr
-        if: steps.validate.outputs.ready == 'true'
+        if: steps.select.outputs.mode == 'implement' && steps.validate.outputs.ready == 'true'
         env:
           GH_TOKEN: ${{ github.token }}
           ISSUE_NUMBER: ${{ steps.policy.outputs.issue_number }}
           BRANCH: ${{ steps.push.outputs.branch }}
           HEAD_SHA: ${{ steps.push.outputs.head_sha }}
         run: |
+          set -euo pipefail
           cat > /tmp/dt00-pr-body.md <<EOF
           Automated bounded pilot execution for Issue #${ISSUE_NUMBER}.
 
@@ -313,7 +337,7 @@ jobs:
           - implementation head: \`${HEAD_SHA}\`
           - writable scope enforced: \`09_Development/AutonomousAgents/runtime/**\`
           - control-plane modification by implementation agent: forbidden
-          - independent exact-head audit: REQUIRED
+          - explicit independent exact-head audit dispatch: REQUIRED
           - deterministic merge gate: REQUIRED
           - post-merge exact-main verification: REQUIRED
 
@@ -326,59 +350,156 @@ jobs:
           echo "number=$PR_NUMBER" >> "$GITHUB_OUTPUT"
           echo "url=$PR_URL" >> "$GITHUB_OUTPUT"
 
-      - name: Wait for repository checks including independent audit
-        if: steps.validate.outputs.ready == 'true'
+      - name: Resolve active PR context for new or resumed work
+        id: active
+        if: steps.select.outputs.mode == 'resume' || (steps.select.outputs.mode == 'implement' && steps.validate.outputs.ready == 'true')
+        env:
+          GH_TOKEN: ${{ github.token }}
+          MODE: ${{ steps.select.outputs.mode }}
+          RESUME_PR: ${{ steps.select.outputs.resume_pr_number }}
+          NEW_PR: ${{ steps.pr.outputs.number }}
+        run: |
+          set -euo pipefail
+          if [ "$MODE" = 'resume' ]; then PR_NUMBER="$RESUME_PR"; else PR_NUMBER="$NEW_PR"; fi
+          test -n "$PR_NUMBER"
+
+          PR_JSON="$(gh api "repos/$GITHUB_REPOSITORY/pulls/$PR_NUMBER")"
+          BRANCH="$(jq -r '.head.ref' <<<"$PR_JSON")"
+          HEAD_SHA="$(jq -r '.head.sha' <<<"$PR_JSON")"
+          test "$(jq -r '.state' <<<"$PR_JSON")" = 'open'
+
+          MAIN_SHA="$(gh api "repos/$GITHUB_REPOSITORY/commits/main" --jq '.sha')"
+          MERGE_BASE="$(gh api "repos/$GITHUB_REPOSITORY/compare/${MAIN_SHA}...${HEAD_SHA}" --jq '.merge_base_commit.sha')"
+          if [ "$MERGE_BASE" != "$MAIN_SHA" ]; then
+            gh api -X PUT "repos/$GITHUB_REPOSITORY/pulls/$PR_NUMBER/update-branch" -f expected_head_sha="$HEAD_SHA" >/tmp/dt00-update-branch.json
+            RECONCILED=false
+            for _ in $(seq 1 20); do
+              sleep 3
+              PR_JSON="$(gh api "repos/$GITHUB_REPOSITORY/pulls/$PR_NUMBER")"
+              HEAD_SHA="$(jq -r '.head.sha' <<<"$PR_JSON")"
+              MAIN_SHA="$(gh api "repos/$GITHUB_REPOSITORY/commits/main" --jq '.sha')"
+              MERGE_BASE="$(gh api "repos/$GITHUB_REPOSITORY/compare/${MAIN_SHA}...${HEAD_SHA}" --jq '.merge_base_commit.sha')"
+              if [ "$MERGE_BASE" = "$MAIN_SHA" ]; then RECONCILED=true; break; fi
+            done
+            if [ "$RECONCILED" != 'true' ]; then
+              echo '::error::Could not reconcile autonomous PR with current main.'
+              exit 1
+            fi
+          fi
+
+          gh api --paginate "repos/$GITHUB_REPOSITORY/pulls/$PR_NUMBER/files?per_page=100" --jq '.[].filename' >/tmp/dt00-pr-files.txt
+          while IFS= read -r path; do
+            case "$path" in
+              09_Development/AutonomousAgents/runtime/*) ;;
+              *) echo "::error::Autonomous PR contains protected path: $path"; exit 1 ;;
+            esac
+          done </tmp/dt00-pr-files.txt
+
+          echo "pr_number=$PR_NUMBER" >> "$GITHUB_OUTPUT"
+          echo "branch=$BRANCH" >> "$GITHUB_OUTPUT"
+          echo "head_sha=$HEAD_SHA" >> "$GITHUB_OUTPUT"
+          echo "base_sha=$MAIN_SHA" >> "$GITHUB_OUTPUT"
+
+      - name: Explicitly dispatch exact-head governance and independent audit
+        id: dispatch_audit
+        if: steps.active.outputs.pr_number != ''
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PR_NUMBER: ${{ steps.active.outputs.pr_number }}
+          BRANCH: ${{ steps.active.outputs.branch }}
+          HEAD_SHA: ${{ steps.active.outputs.head_sha }}
+          BASE_SHA: ${{ steps.active.outputs.base_sha }}
+        run: |
+          set -euo pipefail
+          gh workflow run autonomous-agent-governance.yml \
+            --repo "$GITHUB_REPOSITORY" \
+            --ref "$BRANCH" \
+            -f audit_pr_number="$PR_NUMBER" \
+            -f audit_head_sha="$HEAD_SHA" \
+            -f audit_base_sha="$BASE_SHA"
+
+      - name: Wait for exact-head governance checks
+        id: checks
+        if: steps.active.outputs.pr_number != ''
         timeout-minutes: 25
         env:
           GH_TOKEN: ${{ github.token }}
-          PR_NUMBER: ${{ steps.pr.outputs.number }}
+          PR_NUMBER: ${{ steps.active.outputs.pr_number }}
         run: |
-          FOUND=0
+          set -euo pipefail
+          FOUND=false
           for _ in $(seq 1 60); do
-            COUNT="$(gh pr checks "$PR_NUMBER" --repo "$GITHUB_REPOSITORY" --json name 2>/dev/null | jq 'length' 2>/dev/null || echo 0)"
-            if [ "$COUNT" -gt 0 ]; then
-              FOUND=1
-              break
-            fi
+            gh pr checks "$PR_NUMBER" --repo "$GITHUB_REPOSITORY" --json name,bucket >/tmp/dt00-checks.json 2>/dev/null || true
+            VALIDATE_COUNT="$(jq '[.[] | select(.name == "Validate autonomous-agent contract")] | length' /tmp/dt00-checks.json 2>/dev/null || echo 0)"
+            AUDIT_COUNT="$(jq '[.[] | select(.name == "Independent runtime audit")] | length' /tmp/dt00-checks.json 2>/dev/null || echo 0)"
+            if [ "$VALIDATE_COUNT" -ge 1 ] && [ "$AUDIT_COUNT" -ge 1 ]; then FOUND=true; break; fi
             sleep 10
           done
-          if [ "$FOUND" -ne 1 ]; then
-            echo '::error::No PR checks registered; required_ci=UNKNOWN.'
+          if [ "$FOUND" != 'true' ]; then
+            echo '::error::Expected exact-head governance/audit checks never appeared; required_ci=UNKNOWN.'
             exit 1
           fi
-          gh pr checks "$PR_NUMBER" --repo "$GITHUB_REPOSITORY" --watch --interval 10
 
-      - name: Build exact-head evidence and evaluate canonical merge gate
-        id: gate
-        if: steps.validate.outputs.ready == 'true'
+          set +e
+          gh pr checks "$PR_NUMBER" --repo "$GITHUB_REPOSITORY" --watch --interval 10
+          WATCH_RC=$?
+          set -e
+          gh pr checks "$PR_NUMBER" --repo "$GITHUB_REPOSITORY" --json name,bucket >/tmp/dt00-checks-final.json
+          VALIDATE_PASS="$(jq '[.[] | select(.name == "Validate autonomous-agent contract" and .bucket == "pass")] | length' /tmp/dt00-checks-final.json)"
+          AUDIT_PASS="$(jq '[.[] | select(.name == "Independent runtime audit" and .bucket == "pass")] | length' /tmp/dt00-checks-final.json)"
+
+          if [ "$WATCH_RC" -eq 0 ] && [ "$VALIDATE_PASS" -ge 1 ] && [ "$AUDIT_PASS" -ge 1 ]; then
+            echo 'pass=true' >> "$GITHUB_OUTPUT"
+          else
+            echo 'pass=false' >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Close failed audited PR for governed rework
+        if: steps.active.outputs.pr_number != '' && steps.checks.outputs.pass != 'true'
         env:
           GH_TOKEN: ${{ github.token }}
           ISSUE_NUMBER: ${{ steps.policy.outputs.issue_number }}
-          PR_NUMBER: ${{ steps.pr.outputs.number }}
-          EXPECTED_HEAD: ${{ steps.push.outputs.head_sha }}
+          PR_NUMBER: ${{ steps.active.outputs.pr_number }}
+          HEAD_SHA: ${{ steps.active.outputs.head_sha }}
         run: |
+          set -euo pipefail
+          gh issue comment "$ISSUE_NUMBER" --repo "$GITHUB_REPOSITORY" --body "DT-00 pilot: \`REWORK\` — exact-head governance/audit nu a produs \`PASS\` pentru PR #${PR_NUMBER}, head \`${HEAD_SHA}\`. PR-ul este închis; următoarea execuție poate consuma următoarea tentativă bounded. <!-- DT00-AUTO-REWORK -->"
+          gh pr close "$PR_NUMBER" --repo "$GITHUB_REPOSITORY" --delete-branch || gh pr close "$PR_NUMBER" --repo "$GITHUB_REPOSITORY"
+
+      - name: Build exact-head evidence and evaluate canonical merge gate
+        id: gate
+        if: steps.active.outputs.pr_number != '' && steps.checks.outputs.pass == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          ISSUE_NUMBER: ${{ steps.policy.outputs.issue_number }}
+          PR_NUMBER: ${{ steps.active.outputs.pr_number }}
+          EXPECTED_HEAD: ${{ steps.active.outputs.head_sha }}
+          EXPECTED_BASE: ${{ steps.active.outputs.base_sha }}
+        run: |
+          set -euo pipefail
           PR_JSON="$(gh api "repos/$GITHUB_REPOSITORY/pulls/$PR_NUMBER")"
           FINAL_HEAD="$(jq -r '.head.sha' <<<"$PR_JSON")"
-          BASE_SHA="$(jq -r '.base.sha' <<<"$PR_JSON")"
           CURRENT_MAIN="$(gh api "repos/$GITHUB_REPOSITORY/commits/main" --jq '.sha')"
-
           test "$FINAL_HEAD" = "$EXPECTED_HEAD"
-          if [ "$BASE_SHA" != "$CURRENT_MAIN" ]; then
-            echo '::error::main moved after implementation; canonical_main_reconciled=UNKNOWN.'
-            exit 1
-          fi
+          test "$CURRENT_MAIN" = "$EXPECTED_BASE"
 
-          AUDIT_PASS="$(gh pr checks "$PR_NUMBER" --repo "$GITHUB_REPOSITORY" --json name,bucket --jq '[.[] | select(.name == "Independent runtime audit" and .bucket == "pass")] | length')"
-          if [ "$AUDIT_PASS" -ne 1 ]; then
-            echo '::error::Independent runtime audit did not PASS.'
-            exit 1
-          fi
+          MERGE_BASE="$(gh api "repos/$GITHUB_REPOSITORY/compare/${CURRENT_MAIN}...${FINAL_HEAD}" --jq '.merge_base_commit.sha')"
+          test "$MERGE_BASE" = "$CURRENT_MAIN"
 
-          MERGEABLE="$(jq -r '.mergeable' <<<"$PR_JSON")"
-          if [ "$MERGEABLE" != 'true' ]; then
-            echo '::error::PR is not mergeable.'
-            exit 1
-          fi
+          MERGEABLE='null'
+          for _ in $(seq 1 10); do
+            PR_JSON="$(gh api "repos/$GITHUB_REPOSITORY/pulls/$PR_NUMBER")"
+            MERGEABLE="$(jq -r '.mergeable' <<<"$PR_JSON")"
+            [ "$MERGEABLE" != 'null' ] && break
+            sleep 2
+          done
+          test "$MERGEABLE" = 'true'
+
+          gh pr checks "$PR_NUMBER" --repo "$GITHUB_REPOSITORY" --json name,bucket >/tmp/dt00-checks-gate.json
+          VALIDATE_PASS="$(jq '[.[] | select(.name == "Validate autonomous-agent contract" and .bucket == "pass")] | length' /tmp/dt00-checks-gate.json)"
+          AUDIT_PASS="$(jq '[.[] | select(.name == "Independent runtime audit" and .bucket == "pass")] | length' /tmp/dt00-checks-gate.json)"
+          test "$VALIDATE_PASS" -ge 1
+          test "$AUDIT_PASS" -ge 1
 
           cat > /tmp/dt00-merge-evidence.json <<EOF
           {
@@ -412,18 +533,20 @@ jobs:
 
           node 09_Development/AutonomousAgents/evaluate-merge-gate.mjs /tmp/dt00-merge-evidence.json
           echo "final_head=$FINAL_HEAD" >> "$GITHUB_OUTPUT"
-          echo "base_sha=$BASE_SHA" >> "$GITHUB_OUTPUT"
 
-      - name: Merge only after deterministic gate PASS
+      - name: Merge only the exact audited head after deterministic gate PASS
         id: merge
-        if: steps.validate.outputs.ready == 'true' && steps.gate.outcome == 'success'
+        if: steps.gate.outcome == 'success'
         env:
           GH_TOKEN: ${{ github.token }}
-          PR_NUMBER: ${{ steps.pr.outputs.number }}
+          PR_NUMBER: ${{ steps.active.outputs.pr_number }}
+          FINAL_HEAD: ${{ steps.gate.outputs.final_head }}
         run: |
-          gh pr merge "$PR_NUMBER" --repo "$GITHUB_REPOSITORY" --squash --delete-branch
-          MERGE_SHA="$(gh api "repos/$GITHUB_REPOSITORY/pulls/$PR_NUMBER" --jq '.merge_commit_sha')"
-          test -n "$MERGE_SHA"
+          set -euo pipefail
+          gh api -X PUT "repos/$GITHUB_REPOSITORY/pulls/$PR_NUMBER/merge" -f sha="$FINAL_HEAD" -f merge_method='squash' >/tmp/dt00-merge.json
+          test "$(jq -r '.merged' /tmp/dt00-merge.json)" = 'true'
+          MERGE_SHA="$(jq -r '.sha' /tmp/dt00-merge.json)"
+          [[ "$MERGE_SHA" =~ ^[0-9a-f]{40}$ ]]
           echo "merge_sha=$MERGE_SHA" >> "$GITHUB_OUTPUT"
 
       - name: Verify exact post-merge main locally
@@ -431,6 +554,7 @@ jobs:
         env:
           EXPECTED_MERGE_SHA: ${{ steps.merge.outputs.merge_sha }}
         run: |
+          set -euo pipefail
           git fetch origin main
           git checkout --detach origin/main
           EXACT_MAIN="$(git rev-parse HEAD)"
@@ -445,6 +569,7 @@ jobs:
           GH_TOKEN: ${{ github.token }}
           EXPECTED_MERGE_SHA: ${{ steps.merge.outputs.merge_sha }}
         run: |
+          set -euo pipefail
           gh workflow run autonomous-agent-governance.yml --repo "$GITHUB_REPOSITORY" --ref main
           RUN_ID=''
           for _ in $(seq 1 30); do
@@ -459,25 +584,27 @@ jobs:
           gh run watch "$RUN_ID" --repo "$GITHUB_REPOSITORY" --exit-status
           echo "run_id=$RUN_ID" >> "$GITHUB_OUTPUT"
 
-      - name: Persist successful Romanian owner report and reset retry sequence
+      - name: Persist successful Romanian pilot report and stop further pilot spend
         if: steps.exact_main_ci.outcome == 'success'
         env:
           GH_TOKEN: ${{ github.token }}
           ISSUE_NUMBER: ${{ steps.policy.outputs.issue_number }}
-          PR_NUMBER: ${{ steps.pr.outputs.number }}
+          PR_NUMBER: ${{ steps.active.outputs.pr_number }}
           MERGE_SHA: ${{ steps.merge.outputs.merge_sha }}
           EXACT_MAIN_RUN: ${{ steps.exact_main_ci.outputs.run_id }}
         run: |
+          set -euo pipefail
           cat > /tmp/dt00-success.md <<EOF
           <!-- DT00-AUTO-SUCCESS -->
-          DT-00 pilot automat: PASS pentru această iterație.
+          <!-- DT00-PILOT-VALIDATED -->
+          DT-00 pilot automat: \`PASS\`.
 
-          - PR #${PR_NUMBER}: merged după CI + audit independent exact-head + merge gate determinist;
+          - PR #${PR_NUMBER}: merged numai după audit independent exact-head + deterministic governance + merge gate;
           - noul \`main\`: \`${MERGE_SHA}\`;
-          - verificare locală post-merge: PASS;
-          - exact-main \`Autonomous Agent Governance\`: PASS (run ${EXACT_MAIN_RUN});
+          - verificare locală post-merge: \`PASS\`;
+          - exact-main \`Autonomous Agent Governance\`: \`PASS\` (run ${EXACT_MAIN_RUN});
           - control-plane-ul nu a fost modificat de agentul de implementare;
-          - următoarea tentativă pentru acest Issue pornește cu contorul de retry resetat.
+          - pilotul se oprește după această validare și NU mai consumă apeluri OpenAI programate până când coada este extinsă printr-o schimbare guvernată.
 
           Run orchestrator: ${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}
           EOF
@@ -488,9 +615,10 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
           SOURCE_ISSUE: ${{ steps.policy.outputs.issue_number }}
-          PR_NUMBER: ${{ steps.pr.outputs.number }}
+          PR_NUMBER: ${{ steps.active.outputs.pr_number }}
           MERGE_SHA: ${{ steps.merge.outputs.merge_sha }}
         run: |
+          set -euo pipefail
           cat > /tmp/dt00-corrective.md <<EOF
           Parent autonomous mission: #723
           Source Issue: #${SOURCE_ISSUE}
