@@ -1,4 +1,4 @@
-import { DirectionalLight, EngineStore, Mesh, StandardMaterial } from '@babylonjs/core'
+import { DirectionalLight, EngineStore, Mesh, ShadowGenerator, StandardMaterial } from '@babylonjs/core'
 
 const ISSUE = 720
 
@@ -45,7 +45,7 @@ const trimShadowCost = (): void => {
   const sun = scene.getLightByName('sun')
   if (!(sun instanceof DirectionalLight)) return
   const generator = sun.getShadowGenerator()
-  if (!generator) return
+  if (!(generator instanceof ShadowGenerator)) return
 
   generator.useBlurExponentialShadowMap = false
   generator.usePoissonSampling = true
