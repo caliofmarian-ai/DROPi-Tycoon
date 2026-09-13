@@ -2,6 +2,7 @@
 // Keep it explicit: the tree-shaken facade otherwise builds but fails on its first frame.
 import '@babylonjs/core/Collisions/collisionCoordinator'
 
+export { Node } from '@babylonjs/core/node'
 export { AbstractMesh } from '@babylonjs/core/Meshes/abstractMesh'
 export { Mesh } from '@babylonjs/core/Meshes/mesh'
 export { MeshBuilder } from '@babylonjs/core/Meshes/meshBuilder'
@@ -11,6 +12,8 @@ export { Color3, Color4 } from '@babylonjs/core/Maths/math.color'
 export { Engine } from '@babylonjs/core/Engines/engine'
 export { EngineStore } from '@babylonjs/core/Engines/engineStore'
 export { Scene } from '@babylonjs/core/scene'
+export { SceneLoader } from '@babylonjs/core/Loading/sceneLoader'
+export { AnimationGroup } from '@babylonjs/core/Animations/animationGroup'
 export { ArcRotateCamera } from '@babylonjs/core/Cameras/arcRotateCamera'
 export { HemisphericLight } from '@babylonjs/core/Lights/hemisphericLight'
 export { DirectionalLight } from '@babylonjs/core/Lights/directionalLight'
