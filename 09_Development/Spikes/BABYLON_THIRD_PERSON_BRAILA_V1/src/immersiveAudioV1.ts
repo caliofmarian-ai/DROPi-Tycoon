@@ -1,4 +1,4 @@
-import { EngineStore, Vector3 } from '@babylonjs/core'
+import { EngineStore } from '@babylonjs/core'
 
 const ISSUE = 722
 
@@ -18,13 +18,13 @@ declare global {
 }
 
 const buses: Record<AudioBusName, number> = {
-  master: 0.72,
-  music: 0.35,
-  ambience: 0.34,
-  sfx: 0.58,
-  vehicles: 0.28,
-  voices: 0.7,
-  ui: 0.48,
+  master: 0.9,
+  music: 0.34,
+  ambience: 0.64,
+  sfx: 0.8,
+  vehicles: 0.48,
+  voices: 0.82,
+  ui: 0.62,
 }
 
 let context: AudioContext | null = null
@@ -33,8 +33,11 @@ let muted = false
 let started = false
 let birdTimer: number | null = null
 let lastStepAt = 0
-let lastHeroPosition: Vector3 | null = null
+let lastHeroX: number | null = null
+let lastHeroZ: number | null = null
 let vehiclePanner: PannerNode | null = null
+let footstepNoise: AudioBuffer | null = null
+let lastSpatialUpdateAt = 0
 
 const dbSafe = (value: number): number => Math.max(0.0001, Math.min(1, value))
 
@@ -45,7 +48,15 @@ const updateDebug = (): void => {
 const createBusGraph = (audio: AudioContext): void => {
   const master = audio.createGain()
   master.gain.value = buses.master
-  master.connect(audio.destination)
+
+  const limiter = audio.createDynamicsCompressor()
+  limiter.threshold.value = -8
+  limiter.knee.value = 10
+  limiter.ratio.value = 6
+  limiter.attack.value = 0.003
+  limiter.release.value = 0.18
+
+  master.connect(limiter).connect(audio.destination)
   gains.master = master
 
   ;(['music', 'ambience', 'sfx', 'vehicles', 'voices', 'ui'] as const).forEach(name => {
@@ -73,10 +84,10 @@ const startCityAmbience = (audio: AudioContext): void => {
   noise.loop = true
   const lowpass = audio.createBiquadFilter()
   lowpass.type = 'lowpass'
-  lowpass.frequency.value = 620
+  lowpass.frequency.value = 680
   lowpass.Q.value = 0.35
   const noiseGain = audio.createGain()
-  noiseGain.gain.value = 0.075
+  noiseGain.gain.value = 0.14
   noise.connect(lowpass).connect(noiseGain).connect(ambienceBus)
   noise.start()
 
@@ -88,7 +99,7 @@ const startCityAmbience = (audio: AudioContext): void => {
   windFilter.frequency.value = 1450
   windFilter.Q.value = 0.22
   const windGain = audio.createGain()
-  windGain.gain.value = 0.018
+  windGain.gain.value = 0.035
   wind.connect(windFilter).connect(windGain).connect(ambienceBus)
   wind.start()
 
@@ -97,7 +108,7 @@ const startCityAmbience = (audio: AudioContext): void => {
     osc.type = index === 0 ? 'sine' : 'triangle'
     osc.frequency.value = frequency
     const gain = audio.createGain()
-    gain.gain.value = index === 0 ? 0.018 : 0.008
+    gain.gain.value = index === 0 ? 0.03 : 0.015
     osc.connect(gain).connect(ambienceBus)
     osc.start()
   })
@@ -119,7 +130,7 @@ const chirp = (): void => {
   osc.frequency.exponentialRampToValueAtTime(2600 + Math.random() * 600, now + 0.09)
   osc.frequency.exponentialRampToValueAtTime(1500 + Math.random() * 300, now + 0.22)
   gain.gain.setValueAtTime(0.0001, now)
-  gain.gain.exponentialRampToValueAtTime(0.035, now + 0.025)
+  gain.gain.exponentialRampToValueAtTime(0.055, now + 0.025)
   gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.25)
   osc.connect(filter).connect(gain).connect(ambienceBus)
   osc.start(now)
@@ -138,19 +149,19 @@ const scheduleBirds = (): void => {
   schedule()
 }
 
-const footstep = (): void => {
-  if (!context || context.state !== 'running' || muted) return
+const footstep = (onRoad: boolean): void => {
+  if (!context || context.state !== 'running' || muted || !footstepNoise) return
   const sfxBus = gains.sfx
   if (!sfxBus) return
   const now = context.currentTime
   const source = context.createBufferSource()
-  source.buffer = createNoiseBuffer(context, 0.06)
+  source.buffer = footstepNoise
   const filter = context.createBiquadFilter()
   filter.type = 'lowpass'
-  filter.frequency.value = 430
+  filter.frequency.value = onRoad ? 390 : 610
   const gain = context.createGain()
   gain.gain.setValueAtTime(0.0001, now)
-  gain.gain.exponentialRampToValueAtTime(0.11, now + 0.006)
+  gain.gain.exponentialRampToValueAtTime(onRoad ? 0.2 : 0.17, now + 0.006)
   gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.055)
   source.connect(filter).connect(gain).connect(sfxBus)
   source.start(now)
@@ -168,7 +179,7 @@ const uiClick = (accent = 1): void => {
   osc.frequency.setValueAtTime(410 * accent, now)
   osc.frequency.exponentialRampToValueAtTime(620 * accent, now + 0.045)
   gain.gain.setValueAtTime(0.0001, now)
-  gain.gain.exponentialRampToValueAtTime(0.065, now + 0.008)
+  gain.gain.exponentialRampToValueAtTime(0.1, now + 0.008)
   gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.09)
   osc.connect(gain).connect(uiBus)
   osc.start(now)
@@ -186,7 +197,7 @@ const startVehicleEmitter = (audio: AudioContext): void => {
   filter.frequency.value = 185
   filter.Q.value = 0.55
   const gain = audio.createGain()
-  gain.gain.value = 0.018
+  gain.gain.value = 0.035
   const panner = audio.createPanner()
   panner.panningModel = 'HRTF'
   panner.distanceModel = 'inverse'
@@ -200,6 +211,10 @@ const startVehicleEmitter = (audio: AudioContext): void => {
 
 const updateSpatialAudio = (): void => {
   if (!context || !vehiclePanner) return
+  const now = performance.now()
+  if (now - lastSpatialUpdateAt < 66) return
+  lastSpatialUpdateAt = now
+
   const scene = EngineStore.LastCreatedScene
   const camera = scene?.activeCamera
   const car = scene?.getTransformNodeByName('car-1')
@@ -221,17 +236,24 @@ const updateFootsteps = (): void => {
   const hero = scene?.getTransformNodeByName('hero')
   if (!hero || !context || context.state !== 'running') return
 
-  const current = hero.position.clone()
-  if (!lastHeroPosition) {
-    lastHeroPosition = current
+  const x = hero.position.x
+  const z = hero.position.z
+  if (lastHeroX === null || lastHeroZ === null) {
+    lastHeroX = x
+    lastHeroZ = z
     return
   }
-  const moved = Vector3.Distance(current, lastHeroPosition)
-  lastHeroPosition.copyFrom(current)
+
+  const dx = x - lastHeroX
+  const dz = z - lastHeroZ
+  lastHeroX = x
+  lastHeroZ = z
+  const movedSq = dx * dx + dz * dz
   const now = performance.now()
-  if (moved > 0.008 && now - lastStepAt > 390) {
+  if (movedSq > 0.000064 && now - lastStepAt > 385) {
     lastStepAt = now
-    footstep()
+    const onRoad = Math.abs(z) < 6 || (x > 2 && x < 14)
+    footstep(onRoad)
   }
 }
 
@@ -276,6 +298,7 @@ const createAudioToggle = (): void => {
 const ensureStarted = async (): Promise<void> => {
   if (!context) {
     context = new AudioContext({ latencyHint: 'interactive' })
+    footstepNoise = createNoiseBuffer(context, 0.07)
     createBusGraph(context)
     startCityAmbience(context)
     startVehicleEmitter(context)
@@ -310,6 +333,7 @@ const dispose = (): void => {
   birdTimer = null
   void context?.close()
   context = null
+  footstepNoise = null
   started = false
   updateDebug()
 }
