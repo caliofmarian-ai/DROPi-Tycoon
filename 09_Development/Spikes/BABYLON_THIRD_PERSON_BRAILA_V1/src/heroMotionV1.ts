@@ -2,6 +2,12 @@ import { EngineStore, Mesh, MeshBuilder, TransformNode, Vector3 } from '@babylon
 
 const ISSUE = 725
 
+type RiggedHeroState = {
+  loaded: boolean
+  fallback: boolean
+  animation: string
+}
+
 const smooth = (current: number, target: number, rate: number, dt: number): number => {
   const t = 1 - Math.exp(-rate * dt)
   return current + (target - current) * t
@@ -26,6 +32,19 @@ const boot = (): void => {
     return
   }
   if (scene.metadata?.dropiHeroMotionV1) return
+
+  const preferRigged = Boolean((window as unknown as { __DROPiPreferRiggedHero?: boolean }).__DROPiPreferRiggedHero)
+  if (preferRigged) {
+    const rigged = (window as unknown as { __DROPiRiggedHeroV1?: RiggedHeroState }).__DROPiRiggedHeroV1
+    if (!rigged || (!rigged.loaded && rigged.animation !== 'FALLBACK_PROCEDURAL')) {
+      window.requestAnimationFrame(boot)
+      return
+    }
+    if (rigged.loaded && !rigged.fallback) {
+      scene.metadata = { ...(scene.metadata ?? {}), dropiHeroMotionSuppressedByP5: true }
+      return
+    }
+  }
 
   const leftArm = scene.getMeshByName('realism-v2-hero-arm--1')
   const rightArm = scene.getMeshByName('realism-v2-hero-arm-1')
@@ -53,15 +72,15 @@ const boot = (): void => {
     return
   }
 
-  // Build a lightweight articulated presentation rig while preserving the
-  // authoritative hero TransformNode used by movement/collision/game state.
-  // Local +Z remains the visual hero front, matching #731.
-  const shoulderL = joint(hero, 'hero-motion-shoulder-l', new Vector3(-.31, 1.38, 0))
-  const shoulderR = joint(hero, 'hero-motion-shoulder-r', new Vector3(.31, 1.38, 0))
+  const presentationRoot = scene.getTransformNodeByName('hero-visual-ground-root')
+  const motionRoot = presentationRoot instanceof TransformNode ? presentationRoot : hero
+
+  const shoulderL = joint(motionRoot, 'hero-motion-shoulder-l', new Vector3(-.31, 1.38, 0))
+  const shoulderR = joint(motionRoot, 'hero-motion-shoulder-r', new Vector3(.31, 1.38, 0))
   const elbowL = joint(shoulderL, 'hero-motion-elbow-l', new Vector3(0, -.34, 0))
   const elbowR = joint(shoulderR, 'hero-motion-elbow-r', new Vector3(0, -.34, 0))
-  const hipL = joint(hero, 'hero-motion-hip-l', new Vector3(-.135, .72, 0))
-  const hipR = joint(hero, 'hero-motion-hip-r', new Vector3(.135, .72, 0))
+  const hipL = joint(motionRoot, 'hero-motion-hip-l', new Vector3(-.135, .72, 0))
+  const hipR = joint(motionRoot, 'hero-motion-hip-r', new Vector3(.135, .72, 0))
   const kneeL = joint(hipL, 'hero-motion-knee-l', new Vector3(0, -.36, 0))
   const kneeR = joint(hipR, 'hero-motion-knee-r', new Vector3(0, -.36, 0))
 
