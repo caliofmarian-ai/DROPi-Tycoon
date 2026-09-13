@@ -92,7 +92,6 @@ const startCityAmbience = (audio: AudioContext): void => {
   wind.connect(windFilter).connect(windGain).connect(ambienceBus)
   wind.start()
 
-  // Distant traffic bed: quiet low-frequency movement rather than a constant loud engine.
   ;[52, 79].forEach((frequency, index) => {
     const osc = audio.createOscillator()
     osc.type = index === 0 ? 'sine' : 'triangle'
@@ -209,13 +208,9 @@ const updateSpatialAudio = (): void => {
   const cp = camera.position
   const carPos = car.getAbsolutePosition()
   const listener = context.listener
-  if ('positionX' in listener) {
-    listener.positionX.value = cp.x
-    listener.positionY.value = cp.y
-    listener.positionZ.value = cp.z
-  } else {
-    listener.setPosition(cp.x, cp.y, cp.z)
-  }
+  listener.positionX.value = cp.x
+  listener.positionY.value = cp.y
+  listener.positionZ.value = cp.z
   vehiclePanner.positionX.value = carPos.x
   vehiclePanner.positionY.value = carPos.y
   vehiclePanner.positionZ.value = carPos.z
