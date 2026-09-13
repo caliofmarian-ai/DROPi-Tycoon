@@ -12,14 +12,18 @@ type CoherenceStatus = {
   worstFacingDot: number | null
 }
 
+type NaturalControlsProbeView = {
+  getJoystick(): { x: number; y: number; magnitude: number }
+}
+
 declare global {
   interface Window {
-    __DROPiNaturalControls?: {
-      getJoystick(): { x: number; y: number; magnitude: number }
-    }
     __DROPiCoherenceProbe?: CoherenceStatus
   }
 }
+
+const getNaturalControls = (): NaturalControlsProbeView | undefined =>
+  (window as Window & { __DROPiNaturalControls?: NaturalControlsProbeView }).__DROPiNaturalControls
 
 const boxesIntersect = (a: Mesh, b: Mesh): boolean => {
   a.computeWorldMatrix(true)
@@ -108,7 +112,7 @@ const boot = (): void => {
     facingSamples += 1
     if (facingSamples >= 8) status.facing = facingDot >= 0.72 ? 'PASS' : 'FAIL'
 
-    const joystick = window.__DROPiNaturalControls?.getJoystick()
+    const joystick = getNaturalControls()?.getJoystick()
     if (joystick && joystick.magnitude >= 0.45) {
       const target = camera.getTarget()
       const forward = target.subtract(camera.position)
