@@ -1,0 +1,41 @@
+name: DT-00 Event Wakeup
+
+on:
+  workflow_dispatch:
+  issues:
+    types: [opened, reopened, labeled, unlabeled, closed]
+  pull_request:
+    branches: [main]
+    types: [closed]
+  workflow_run:
+    workflows:
+      - DROPi Tycoon Prototype CI
+      - DROPi Tycoon Mobile Shell CI
+      - Production Docker Runtime Smoke
+      - Autonomous Agent Governance
+    types: [completed]
+  deployment_status:
+
+permissions:
+  contents: read
+  actions: write
+
+concurrency:
+  group: dt00-event-wakeup
+  cancel-in-progress: false
+
+jobs:
+  wake-controller:
+    name: Wake DT-00 controller immediately
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    steps:
+      - name: Dispatch continuation without model usage
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          gh workflow run dt00-autonomous-pilot.yml \
+            --repo "$GITHUB_REPOSITORY" \
+            --ref main
+          echo "DT-00 continuation dispatched from event: $GITHUB_EVENT_NAME"
