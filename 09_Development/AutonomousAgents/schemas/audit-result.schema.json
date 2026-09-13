@@ -1,0 +1,58 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "DT-00 independent audit result",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "decision",
+    "exact_head_sha",
+    "summary",
+    "findings",
+    "required_evidence_missing",
+    "prohibited_action_detected",
+    "hard_stop"
+  ],
+  "properties": {
+    "decision": {
+      "type": "string",
+      "enum": ["PASS", "FAIL", "UNKNOWN"]
+    },
+    "exact_head_sha": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{40}$"
+    },
+    "summary": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 4000
+    },
+    "findings": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["severity", "message"],
+        "properties": {
+          "severity": {
+            "type": "string",
+            "enum": ["BLOCKER", "MAJOR", "MINOR", "INFO"]
+          },
+          "message": { "type": "string", "minLength": 1, "maxLength": 2000 }
+        }
+      },
+      "maxItems": 100
+    },
+    "required_evidence_missing": {
+      "type": "array",
+      "items": { "type": "string", "minLength": 1, "maxLength": 1000 },
+      "maxItems": 50
+    },
+    "prohibited_action_detected": {
+      "type": "boolean"
+    },
+    "hard_stop": {
+      "type": ["string", "null"],
+      "maxLength": 1000
+    }
+  }
+}
