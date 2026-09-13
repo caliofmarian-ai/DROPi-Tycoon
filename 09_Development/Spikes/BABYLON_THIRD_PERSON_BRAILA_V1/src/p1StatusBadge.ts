@@ -47,3 +47,5 @@ const render = (): void => {
 }
 
 render()
+
+export {}
