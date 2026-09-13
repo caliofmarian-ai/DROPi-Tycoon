@@ -8,14 +8,15 @@
   },
   "scripts": {
     "dev": "npm run setup:p1 && npm run setup:p2 && npm run setup:p3 && npm run setup:p4 && vite --host 0.0.0.0",
-    "build": "npm run setup:p1 && npm run setup:p2 && npm run setup:p3 && npm run setup:p4 && npm run verify:runtime-registrations && tsc --noEmit && vite build",
+    "build": "npm run setup:p1 && npm run setup:p2 && npm run setup:p3 && npm run setup:p4 && npm run verify:runtime-registrations && tsc --noEmit && npm run verify:presentation && vite build",
     "preview": "vite preview --host 0.0.0.0",
     "typecheck": "npm run setup:p1 && npm run setup:p2 && npm run setup:p3 && npm run setup:p4 && tsc --noEmit",
     "setup:p1": "node scripts/setupP1RiggedHero.mjs",
     "setup:p2": "node scripts/setupP2AuthoredEnvironment.mjs",
     "setup:p3": "node scripts/setupP3AuthoredBlocks.mjs",
     "setup:p4": "node scripts/setupP4AuthoredStreetLayer.mjs",
-    "verify:runtime-registrations": "node scripts/verifyBabylonRuntimeRegistrations.mjs"
+    "verify:runtime-registrations": "node scripts/verifyBabylonRuntimeRegistrations.mjs",
+    "verify:presentation": "node scripts/verifyPresentationRegression.mjs"
   },
   "dependencies": {
     "@babylonjs/core": "9.26.0"
