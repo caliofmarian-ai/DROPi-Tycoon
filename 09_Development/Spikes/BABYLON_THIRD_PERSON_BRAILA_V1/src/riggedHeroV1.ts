@@ -145,8 +145,6 @@ const cloneLocomotion = async (
     cloned.set(group.name, copy)
   }
 
-  // The source animation rig is only a transfer carrier. Disable it after
-  // retargeting so it never appears as a second character in the world.
   source.meshes.forEach(mesh => mesh.setEnabled(false))
   source.transformNodes.forEach(node => node.setEnabled(false))
   return cloned
@@ -160,6 +158,8 @@ const startAnimationDriver = (
   if (!scene) return
   let active: AnimationGroup | null = null
   let activeName = ''
+  let moving = false
+  let smoothedRatio = 0.56
 
   const play = (name: string, speedRatio: number): void => {
     const next = groups.get(name) ?? groups.get('Idle_Loop')
@@ -176,20 +176,30 @@ const startAnimationDriver = (
     publish(state)
   }
 
-  play('Idle_Loop', 1)
+  play('Idle_Loop', 0.92)
   scene.onBeforeRenderObservable.add(() => {
-    const speed = getControls()?.getSpeed?.() ?? 0
-    if (speed < 0.16) {
-      play('Idle_Loop', 1)
+    const dt = Math.min(scene.getEngine().getDeltaTime() / 1000, 0.05)
+    const currentSpeed = getControls()?.getSpeed?.() ?? 0
+
+    if (moving) {
+      if (currentSpeed < 0.10) moving = false
+    } else if (currentSpeed > 0.24) {
+      moving = true
+    }
+
+    if (!moving) {
+      play('Idle_Loop', 0.92)
       return
     }
-    if (speed > 3.6 && groups.has('Sprint_Loop')) {
-      play('Sprint_Loop', 0.78 + Math.min(0.28, (speed - 3.6) * 0.18))
-      return
-    }
-    // The available audited library exposes forward jog rather than a dedicated
-    // walk clip. Slow the no-root-motion jog for ordinary courier traversal.
-    play('Jog_Fwd_Loop', 0.55 + Math.min(0.38, speed / 7.5))
+
+    // P5 deliberately does not enter Sprint_Loop during ordinary courier travel.
+    // The available audited library has no dedicated walk clip, so Jog_Fwd_Loop
+    // is used as a slow no-root-motion walk proxy. Hysteresis plus smoothed playback
+    // removes the previous rapid idle/jog switches and sprint-like leg cadence.
+    const desiredRatio = 0.46 + Math.min(0.30, currentSpeed * 0.065)
+    const blend = 1 - Math.exp(-8 * dt)
+    smoothedRatio += (desiredRatio - smoothedRatio) * blend
+    play('Jog_Fwd_Loop', smoothedRatio)
   })
 }
 
@@ -222,11 +232,6 @@ const boot = async (): Promise<void> => {
     soleLocalY: SOLE_LOCAL_Y_M,
   }
   publish(state)
-
-  // P1 owns the visible hero presentation as soon as loading begins. Hiding the
-  // procedural presentation before the async glTF imports prevents a one-frame
-  // or multi-second old-hero flash. The snapshot lets us restore the exact prior
-  // fallback state if the rigged asset or animation transfer fails.
   hideProceduralHero()
 
   try {
@@ -237,8 +242,6 @@ const boot = async (): Promise<void> => {
     importedRoot.parent = visualRoot
     importedRoot.name = 'p1-rigged-hero-root'
     importedRoot.rotationQuaternion = null
-    // Quaternius characters face -Z in their authored frame. DROPi #731 defines
-    // visible hero front as local +Z, so the adapter owns this single 180° turn.
     importedRoot.rotation.y = Math.PI
 
     const visibleMeshes = result.meshes.filter(mesh => mesh.getTotalVertices() > 0)
@@ -258,9 +261,6 @@ const boot = async (): Promise<void> => {
       throw new Error('Required P1 locomotion clips did not retarget to the character rig')
     }
 
-    // Re-run after async loading to catch any late-created procedural limb mesh.
-    // In particular, heroMotionV1 creates forearm/shin meshes with hero-motion-*
-    // names that previously remained visible beside the rigged character.
     hideProceduralHero()
     addRiggedShadowCasters(visibleMeshes)
 
