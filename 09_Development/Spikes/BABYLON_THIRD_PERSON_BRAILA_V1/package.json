@@ -7,12 +7,13 @@
     "node": ">=22.12.0 <23"
   },
   "scripts": {
-    "dev": "npm run setup:p1 && npm run setup:p2 && vite --host 0.0.0.0",
-    "build": "npm run setup:p1 && npm run setup:p2 && npm run verify:runtime-registrations && tsc --noEmit && vite build",
+    "dev": "npm run setup:p1 && npm run setup:p2 && npm run setup:p3 && vite --host 0.0.0.0",
+    "build": "npm run setup:p1 && npm run setup:p2 && npm run setup:p3 && npm run verify:runtime-registrations && tsc --noEmit && vite build",
     "preview": "vite preview --host 0.0.0.0",
-    "typecheck": "npm run setup:p1 && npm run setup:p2 && tsc --noEmit",
+    "typecheck": "npm run setup:p1 && npm run setup:p2 && npm run setup:p3 && tsc --noEmit",
     "setup:p1": "node scripts/setupP1RiggedHero.mjs",
     "setup:p2": "node scripts/setupP2AuthoredEnvironment.mjs",
+    "setup:p3": "node scripts/setupP3AuthoredBlocks.mjs",
     "verify:runtime-registrations": "node scripts/verifyBabylonRuntimeRegistrations.mjs"
   },
   "dependencies": {
