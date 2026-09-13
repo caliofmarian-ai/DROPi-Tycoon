@@ -8,6 +8,8 @@
   "pilotMaxConcurrentIssues": 1,
   "scheduledIssueQueue": [723],
   "schedule": "hourly",
+  "stopAfterFirstPilotPass": true,
+  "pilotSuccessMarker": "<!-- DT00-PILOT-VALIDATED -->",
   "implementationAgentWritablePaths": [
     "09_Development/AutonomousAgents/runtime/**"
   ],
@@ -30,6 +32,7 @@
   "notes": [
     "This file narrows the initial pilot below the canonical maximum concurrency; it does not expand policy authority.",
     "The implementation agent may not modify its own control-plane, policy, merge evaluator, audit schema or runtime pilot configuration.",
+    "The hourly scheduler stops dispatching after the first fully verified pilot PASS marker until a later governed queue expansion.",
     "Issue 730 remains dependent on the authenticated runtime and is not part of the initial scheduled queue."
   ]
 }
