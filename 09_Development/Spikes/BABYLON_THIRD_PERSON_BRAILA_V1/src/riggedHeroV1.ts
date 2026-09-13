@@ -53,9 +53,9 @@ const worldBounds = (meshes: AbstractMesh[]): { minY: number; maxY: number } => 
   return { minY, maxY }
 }
 
-const hideProceduralHero = (): void => {
-  const scene = EngineStore.LastCreatedScene
-  if (!scene) return
+const proceduralVisibilitySnapshot = new Map<AbstractMesh, boolean>()
+
+const isProceduralHeroPresentation = (mesh: AbstractMesh): boolean => {
   const exact = new Set([
     'hero-torso',
     'hero-head',
@@ -64,14 +64,27 @@ const hideProceduralHero = (): void => {
     'hero-arm-l',
     'hero-arm-r',
   ])
+  return (
+    exact.has(mesh.name) ||
+    mesh.name.startsWith('realism-v2-hero-') ||
+    mesh.name.startsWith('target-hero-') ||
+    mesh.name.startsWith('hero-motion-')
+  )
+}
+
+const hideProceduralHero = (): void => {
+  const scene = EngineStore.LastCreatedScene
+  if (!scene) return
   for (const mesh of scene.meshes) {
-    if (
-      exact.has(mesh.name) ||
-      mesh.name.startsWith('realism-v2-hero-') ||
-      mesh.name.startsWith('target-hero-')
-    ) {
-      mesh.setEnabled(false)
-    }
+    if (!isProceduralHeroPresentation(mesh)) continue
+    if (!proceduralVisibilitySnapshot.has(mesh)) proceduralVisibilitySnapshot.set(mesh, mesh.isEnabled())
+    mesh.setEnabled(false)
+  }
+}
+
+const restoreProceduralHero = (): void => {
+  for (const [mesh, wasEnabled] of proceduralVisibilitySnapshot.entries()) {
+    if (!mesh.isDisposed()) mesh.setEnabled(wasEnabled)
   }
 }
 
@@ -204,11 +217,17 @@ const boot = async (): Promise<void> => {
     heightM: null,
     meshCount: 0,
     skeletonCount: 0,
-    animation: 'FALLBACK_PROCEDURAL',
+    animation: 'LOADING_RIGGED',
     assetMode: 'PINNED_BUILD_TIME_CANDIDATE',
     soleLocalY: SOLE_LOCAL_Y_M,
   }
   publish(state)
+
+  // P1 owns the visible hero presentation as soon as loading begins. Hiding the
+  // procedural presentation before the async glTF imports prevents a one-frame
+  // or multi-second old-hero flash. The snapshot lets us restore the exact prior
+  // fallback state if the rigged asset or animation transfer fails.
+  hideProceduralHero()
 
   try {
     const result = await SceneLoader.ImportMeshAsync('', ASSET_ROOT, CHARACTER_FILE, scene)
@@ -239,6 +258,9 @@ const boot = async (): Promise<void> => {
       throw new Error('Required P1 locomotion clips did not retarget to the character rig')
     }
 
+    // Re-run after async loading to catch any late-created procedural limb mesh.
+    // In particular, heroMotionV1 creates forearm/shin meshes with hero-motion-*
+    // names that previously remained visible beside the rigged character.
     hideProceduralHero()
     addRiggedShadowCasters(visibleMeshes)
 
@@ -253,12 +275,13 @@ const boot = async (): Promise<void> => {
 
     scene.metadata = { ...(scene.metadata ?? {}), dropiRiggedHeroV1: true }
   } catch (error) {
+    restoreProceduralHero()
     state.error = error instanceof Error ? error.message : String(error)
     state.loaded = false
     state.fallback = true
     state.animation = 'FALLBACK_PROCEDURAL'
     publish(state)
-    console.warn('P1 rigged hero unavailable; keeping governed procedural fallback.', error)
+    console.warn('P1 rigged hero unavailable; restoring governed procedural fallback.', error)
     scene.metadata = { ...(scene.metadata ?? {}), dropiRiggedHeroV1: false }
   } finally {
     loading = false
