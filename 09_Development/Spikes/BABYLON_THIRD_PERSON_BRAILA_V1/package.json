@@ -8,9 +8,10 @@
   },
   "scripts": {
     "dev": "vite --host 0.0.0.0",
-    "build": "tsc --noEmit && vite build",
+    "build": "npm run verify:runtime-registrations && tsc --noEmit && vite build",
     "preview": "vite preview --host 0.0.0.0",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "verify:runtime-registrations": "node scripts/verifyBabylonRuntimeRegistrations.mjs"
   },
   "dependencies": {
     "@babylonjs/core": "9.26.0"

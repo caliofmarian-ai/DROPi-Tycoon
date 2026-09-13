@@ -58,6 +58,20 @@ html, body {
   font-size: 12px;
 }
 
+html[data-renderer-state="failed"] #hud {
+  border-color: rgba(255, 104, 104, .78);
+  background: rgba(45, 5, 12, .92);
+}
+
+html[data-renderer-state="failed"] #telemetry {
+  color: #ffd1d1;
+  font-weight: 700;
+}
+
+#controls button:disabled {
+  opacity: .42;
+}
+
 #controls {
   position: fixed;
   inset: 0;

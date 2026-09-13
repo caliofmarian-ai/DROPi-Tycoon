@@ -8,6 +8,13 @@ Truth classification:
 
 `NON-AUTHORITATIVE TECHNICAL SPIKE — NOT AUTHENTIC GAMEPLAY`
 
+Rejected device build:
+
+`364d1e2f0dd15d4721efc0f4f1d49042effa62d3` is `STALE` and must not be used
+for visual evaluation. Owner Android evidence proved that its renderer stopped
+before the first frame. Install only a newer exact-head artifact whose workflow
+completed successfully.
+
 ## Install on Android
 
 1. Open the latest successful `Babylon Third-Person Brăila Spike` run attached

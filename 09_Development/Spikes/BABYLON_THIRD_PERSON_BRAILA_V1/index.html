@@ -33,6 +33,29 @@
 
     <div id="orientation-hint">Rotate to landscape for the intended Android evaluation.</div>
     <div id="truth">TECHNICAL GRAYBOX · NOT AUTHENTIC GAMEPLAY · NO ECONOMY SETTLEMENT</div>
+    <script>
+      (() => {
+        const showPreModuleFailure = (stage, error) => {
+          const message = String(error?.message || error || 'Unknown module startup error')
+            .replace(/\s+/g, ' ')
+            .trim()
+            .slice(0, 240)
+          document.documentElement.dataset.rendererState = 'failed'
+          const objective = document.querySelector('#objective')
+          const telemetry = document.querySelector('#telemetry')
+          if (objective) objective.textContent = 'Renderer startup failed — send this screen to DT-00.'
+          if (telemetry) telemetry.textContent = `FAIL · ${stage} · ${message}`
+          for (const button of document.querySelectorAll('#controls button')) button.disabled = true
+        }
+
+        window.addEventListener('error', event => {
+          showPreModuleFailure('module/window.error', event.error || event.message)
+        })
+        window.addEventListener('unhandledrejection', event => {
+          showPreModuleFailure('module/unhandledrejection', event.reason)
+        })
+      })()
+    </script>
     <script type="module" src="/src/main.ts"></script>
   </body>
 </html>

@@ -1,3 +1,7 @@
+// ArcRotateCamera collision support is registered through this Babylon side effect.
+// Keep it explicit: the tree-shaken facade otherwise builds but fails on its first frame.
+import '@babylonjs/core/Collisions/collisionCoordinator'
+
 export { AbstractMesh } from '@babylonjs/core/Meshes/abstractMesh'
 export { Mesh } from '@babylonjs/core/Meshes/mesh'
 export { MeshBuilder } from '@babylonjs/core/Meshes/meshBuilder'

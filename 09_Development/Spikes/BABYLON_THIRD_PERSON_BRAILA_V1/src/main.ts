@@ -33,6 +33,11 @@ declare global {
     ReactNativeWebView?: {
       postMessage(message: string): void
     }
+    __DROPiBabylonSpikeFailure?: {
+      buildSha: string
+      stage: string
+      message: string
+    }
   }
 
   interface WindowEventMap {
@@ -52,11 +57,55 @@ const telemetryEl = requireElement<HTMLElement>('#telemetry')
 const interactButton = requireElement<HTMLButtonElement>('#interact')
 const recenterButton = requireElement<HTMLButtonElement>('#recenter')
 
-const engine = new Engine(canvas, true, { stencil: true, preserveDrawingBuffer: false })
 const MAX_RENDER_DPR = 1.5
 const BUILD_SHA = import.meta.env.VITE_COMMIT_SHA || 'LOCAL'
 const NATIVE_BACK_EVENT = 'dropi:native-back'
 const NATIVE_EXIT_GAME_MESSAGE = 'dropi:exit-game'
+const FIRST_FRAME_TIMEOUT_MS = 15_000
+let rendererFailed = false
+let firstFrameRendered = false
+
+const summarizeError = (error: unknown): string => {
+  const raw = error instanceof Error
+    ? `${error.name}: ${error.message}`
+    : String(error)
+  return raw.replace(/\s+/g, ' ').trim().slice(0, 240) || 'Unknown renderer error'
+}
+
+const reportRendererFailure = (stage: string, error: unknown): void => {
+  if (rendererFailed) return
+  rendererFailed = true
+
+  const message = summarizeError(error)
+  document.documentElement.dataset.rendererState = 'failed'
+  objectiveEl.textContent = 'Renderer startup failed — send this screen to DT-00.'
+  telemetryEl.textContent = `FAIL · build ${BUILD_SHA.slice(0, 8)} · ${stage} · ${message}`
+  for (const button of document.querySelectorAll<HTMLButtonElement>('#controls button')) {
+    button.disabled = true
+  }
+  window.__DROPiBabylonSpikeFailure = { buildSha: BUILD_SHA, stage, message }
+  console.error(`[DROPi Babylon spike] ${stage}: ${message}`, error)
+}
+
+window.addEventListener('error', event => {
+  reportRendererFailure('window.error', event.error ?? new Error(event.message))
+})
+window.addEventListener('unhandledrejection', event => {
+  reportRendererFailure('unhandledrejection', event.reason)
+})
+canvas.addEventListener('webglcontextlost', event => {
+  event.preventDefault()
+  reportRendererFailure('webglcontextlost', new Error('The Android WebView lost its WebGL context.'))
+})
+
+telemetryEl.textContent = `build ${BUILD_SHA.slice(0, 8)} · renderer starting`
+const engine = new Engine(canvas, true, { stencil: true, preserveDrawingBuffer: false })
+const firstFrameTimeout = window.setTimeout(() => {
+  reportRendererFailure(
+    'first-frame-timeout',
+    new Error(`No frame rendered within ${FIRST_FRAME_TIMEOUT_MS / 1000} seconds.`),
+  )
+}, FIRST_FRAME_TIMEOUT_MS)
 
 const resizeRenderer = (): void => {
   const deviceDpr = Math.max(1, window.devicePixelRatio || 1)
@@ -72,6 +121,7 @@ resizeRenderer()
 const scene = new Scene(engine)
 scene.clearColor = new Color4(0.58, 0.76, 0.86, 1)
 scene.collisionsEnabled = true
+void scene.collisionCoordinator
 scene.fogMode = Scene.FOGMODE_EXP2
 scene.fogDensity = 0.0035
 scene.fogColor = new Color3(0.58, 0.76, 0.86)
@@ -545,6 +595,7 @@ function updateObjective(): void {
 }
 
 function tryInteract(): void {
+  if (rendererFailed) return
   if (phase > 2) {
     phase = 0
     parcel.setEnabled(false)
@@ -727,7 +778,24 @@ scene.onBeforeRenderObservable.add(() => {
 })
 
 updateObjective()
-engine.runRenderLoop(() => scene.render())
+const renderFrame = (): void => {
+  if (rendererFailed) return
+
+  try {
+    scene.render()
+    if (!firstFrameRendered) {
+      firstFrameRendered = true
+      window.clearTimeout(firstFrameTimeout)
+      document.documentElement.dataset.rendererState = 'ready'
+      telemetryEl.textContent = `build ${BUILD_SHA.slice(0, 8)} · renderer active · WebGL ${engine.webGLVersion}`
+    }
+  } catch (error) {
+    reportRendererFailure('scene.render', error)
+    engine.stopRenderLoop(renderFrame)
+  }
+}
+
+engine.runRenderLoop(renderFrame)
 window.addEventListener('resize', scheduleResize, { passive: true })
 window.addEventListener('orientationchange', scheduleResize, { passive: true })
 window.visualViewport?.addEventListener('resize', scheduleResize, { passive: true })

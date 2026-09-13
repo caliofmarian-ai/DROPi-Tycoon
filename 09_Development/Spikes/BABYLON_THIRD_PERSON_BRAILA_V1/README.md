@@ -41,6 +41,20 @@ Camera collision/clipping is implemented for this spike, but its truth status is
 capability; it must be exercised beside building corners and façades on the
 owner's Android device before any production promotion.
 
+## Resolved Android startup finding
+
+Owner evidence rejected build
+`364d1e2f0dd15d4721efc0f4f1d49042effa62d3` as `FAIL`: the HTML controls
+loaded, but the canvas remained blank at `Starting renderer…`. The tree-shaken
+Babylon facade had omitted the side-effect registration required by
+`scene.collisionCoordinator`, so the first frame threw before rendering.
+
+The facade now imports the pinned Babylon collision coordinator registration,
+the build verifies that registration contract, and the runtime exposes any
+future startup/first-frame exception directly in the HUD instead of leaving a
+silent blank canvas. The rejected artifact is `STALE` and must not be used for
+further visual evaluation.
+
 ## What this does NOT prove
 
 - production art quality;
