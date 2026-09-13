@@ -45,6 +45,7 @@
   "controlPlaneProtectedPaths": [
     ".github/workflows/autonomous-agent-governance.yml",
     ".github/workflows/dt00-autonomous-pilot.yml",
+    ".github/workflows/dt00-event-wakeup.yml",
     "09_Development/AUTONOMOUS_MULTI_AGENT_OPERATION.md",
     "09_Development/AI_Project_Memory/AUTONOMOUS_AGENT_POLICY.json",
     "09_Development/AutonomousAgents/evaluate-merge-gate.mjs",
@@ -64,6 +65,7 @@
     "The implementation attempt limit is per Issue, not a time throttle; rework may continue immediately while remaining bounded.",
     "The initial pilot uses GPT-5.6 Luna at low effort for both implementation and audit to minimize API cost.",
     "Independent AI audit is explicit-dispatch only and must run after deterministic evidence passes, never automatically on every pull_request update.",
+    "The event wakeup workflow is protected control-plane and cannot be modified by an implementation agent.",
     "The implementation agent may not modify its own control-plane, policy, merge evaluator, audit schema or runtime pilot configuration.",
     "Issue 730 remains dependent on the authenticated runtime and is not part of the initial scheduled queue."
   ]
