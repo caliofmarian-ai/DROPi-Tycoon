@@ -18,10 +18,18 @@ const makeJoint = (
   const joint = new TransformNode(name, scene)
   joint.parent = hero
   joint.position.set(x, y, 0)
+
+  // These meshes are already direct hero children. Preserve their hero-local
+  // coordinates when re-parenting under the anatomical joint. The previous
+  // implementation subtracted world positions from hero positions without
+  // applying the inverse hero rotation, which twisted offsets whenever the
+  // hero was rotated and could make a forward gait read as backwards.
   meshes.forEach(mesh => {
-    const world = mesh.getAbsolutePosition().clone()
+    const heroLocalPosition = mesh.position.clone()
+    const heroLocalRotation = mesh.rotation.clone()
     mesh.parent = joint
-    mesh.position.copyFrom(world.subtract(hero.getAbsolutePosition()).subtract(joint.position))
+    mesh.position.copyFrom(heroLocalPosition.subtract(joint.position))
+    mesh.rotation.copyFrom(heroLocalRotation)
   })
   return joint
 }
@@ -61,8 +69,6 @@ const boot = (): void => {
     return
   }
 
-  // Re-parent limbs around approximate anatomical pivots so rotations read as
-  // shoulder/hip articulation rather than rigid cylinders spinning in place.
   const armL = makeJoint(hero, 'hero-motion-shoulder-l', -0.31, 1.38, [leftArm, leftHand])
   const armR = makeJoint(hero, 'hero-motion-shoulder-r', 0.31, 1.38, [rightArm, rightHand])
   const legL = makeJoint(hero, 'hero-motion-hip-l', -0.135, 0.72, [leftLeg, leftFoot])
@@ -109,27 +115,31 @@ const boot = (): void => {
     const stepLiftR = moving ? Math.max(0, Math.sin(gaitPhase + Math.PI)) : 0
     const settle = moving ? 1 : 0
 
-    const legSwing = 0.52 * speed01 * settle
-    const armSwing = (carry ? 0.12 : 0.42) * speed01 * settle
-    const carryPitch = carry ? -0.52 : 0
+    const legSwing = 0.48 * speed01 * settle
+    const armSwing = (carry ? 0.10 : 0.36) * speed01 * settle
+    const carryPitch = carry ? -0.42 : 0
 
+    // Local +Z is the visual front of the hero (parcel in front, backpack at -Z).
+    // A positive X rotation of the shoulder/hip moves the lower limb toward +Z.
     legL.rotation.x = stride * legSwing
     legR.rotation.x = -stride * legSwing
     armL.rotation.x = carryPitch - stride * armSwing
     armR.rotation.x = carryPitch + stride * armSwing
 
-    // Natural-ish foot lift/plant illusion without changing authoritative hero Y.
-    leftFoot.position.y = -0.64 + stepLiftL * 0.055 * speed01
-    rightFoot.position.y = -0.64 + stepLiftR * 0.055 * speed01
-    leftFoot.rotation.x = -stride * 0.10 * speed01
-    rightFoot.rotation.x = stride * 0.10 * speed01
+    leftFoot.position.y = -0.64 + stepLiftL * 0.052 * speed01
+    rightFoot.position.y = -0.64 + stepLiftR * 0.052 * speed01
+    leftFoot.rotation.x = -stride * 0.08 * speed01
+    rightFoot.rotation.x = stride * 0.08 * speed01
 
-    const bob = moving ? Math.abs(Math.sin(gaitPhase * 2)) * 0.018 * speed01 : Math.sin(performance.now() * 0.0017) * 0.004
-    const counter = moving ? Math.sin(gaitPhase) * 0.045 * speed01 : 0
-    const turnLean = Math.max(-0.08, Math.min(0.08, turnVelocity * 0.018))
+    const bob = moving
+      ? Math.abs(Math.sin(gaitPhase * 2)) * 0.016 * speed01
+      : Math.sin(performance.now() * 0.0017) * 0.004
+    const counter = moving ? Math.sin(gaitPhase) * 0.04 * speed01 : 0
+    const turnLean = Math.max(-0.07, Math.min(0.07, turnVelocity * 0.016))
 
     torso.position.y = base.torsoY + bob
-    torso.position.z = base.torsoZ + (moving ? Math.cos(gaitPhase * 2) * 0.008 * speed01 : 0)
+    torso.position.z = base.torsoZ + (moving ? Math.cos(gaitPhase * 2) * 0.006 * speed01 : 0)
+    torso.rotation.x = moving ? 0.045 * speed01 : 0
     torso.rotation.y = counter
     torso.rotation.z = turnLean
     head.position.y = base.headY + bob * 0.72
@@ -137,8 +147,6 @@ const boot = (): void => {
     backpack.position.y = base.packY + bob * 0.86
     backpack.rotation.z = turnLean * 0.45
 
-    // Small stance response while turning from rest so the body does not read
-    // as a rigid column rotating around its center.
     if (!moving) {
       const turnPose = Math.max(-0.16, Math.min(0.16, turnVelocity * 0.035))
       legL.rotation.z = -turnPose * 0.18
@@ -156,7 +164,7 @@ const boot = (): void => {
   scene.metadata = { ...(scene.metadata ?? {}), dropiHeroMotionV1: true }
   ;(window as Window & { __DROPiHeroMotionV1?: { issue: number; mode: string } }).__DROPiHeroMotionV1 = {
     issue: ISSUE,
-    mode: 'velocity-driven-articulated-gait',
+    mode: 'velocity-driven-articulated-gait-local-space-fixed',
   }
 }
 
