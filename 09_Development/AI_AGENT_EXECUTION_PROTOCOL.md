@@ -2,11 +2,11 @@
 
 Document: AI_AGENT_EXECUTION_PROTOCOL.md
 Project: DROPi Tycoon
-Version: 1.4.0
+Version: 1.5.0
 Status: AI Development Operations
 Author: Marian Caliof & OpenAI
 Language: English
-Last Updated: 2026-09-10
+Last Updated: 2026-09-13
 
 ---
 
@@ -16,27 +16,35 @@ Last Updated: 2026-09-10
 
 This document defines how AI development agents operate during the creation of DROPi Tycoon.
 
-The goal is to create a controlled workflow where AI agents collaborate while maintaining project consistency.
+The goal is to create a controlled workflow where AI agents collaborate while maintaining project consistency and may execute eligible work unattended under the autonomous operating policy.
+
+The autonomous execution authority is defined by:
+
+`09_Development/AUTONOMOUS_MULTI_AGENT_OPERATION.md`
+
+and its machine-readable gate contract:
+
+`09_Development/AI_Project_Memory/AUTONOMOUS_AGENT_POLICY.json`
 
 ---
 
 # Operating Principle
 
-AI agents are production assistants.
-
-They do not replace project direction.
+AI agents are production assistants operating under repository-backed authority and Project Owner direction.
 
 The human role remains:
 
 - Vision owner
-- Final decision maker
-- Quality controller
+- Final authority for strategic product decisions and exceptional hard stops
+- Recipient/reviewer of autonomous execution reports
+
+Routine authorized implementation, testing, independent audit, merge, corrective action and Issue closure do not require the Project Owner to manually operate every step.
 
 ---
 
 # Agent Execution Order
 
-Agents must operate in the following sequence:
+Agents must operate in the following sequence when those roles are applicable to the task:
 
 ```
 Architecture Agent
@@ -51,12 +59,18 @@ Implementation Agent
 
 ↓
 
-Testing Agent
+Testing / Independent Audit Agent
 
 ↓
 
 Documentation Agent
+
+↓
+
+DT-00 Merge / Post-Merge Verification
 ```
+
+DT-00 may run independent non-conflicting lanes concurrently when ownership and write sets are reconciled.
 
 ---
 
@@ -120,22 +134,27 @@ Historical GDevelop, Web-First, or other superseded implementation reports must 
 
 ---
 
-# 4. Testing Agent
+# 4. Testing / Independent Audit Agent
 
 ## Mission
 
-Verify functionality and player experience.
+Verify functionality, player experience, acceptance criteria and merge evidence independently from the implementation author where required.
 
 ## Responsibilities
 
 - Test features
 - Identify problems
 - Verify requirements
-- Suggest improvements
+- Inspect the exact implementation head
+- Inspect required CI and runtime/visual evidence
+- Return `PASS`, `FAIL`, or `UNKNOWN`
+- Require rework when evidence or implementation is insufficient
 
 ## Output
 
-Testing report.
+Testing/audit report and machine-consumable gate result.
+
+An implementing agent must not be the sole independent auditor of its own merge.
 
 ---
 
@@ -164,18 +183,20 @@ Agents must communicate through:
 - Documentation
 - Defined outputs
 - Clear decisions
+- GitHub Issues / PRs / checks / durable handoffs
 
 Avoid:
 
 - Hidden assumptions
 - Unrecorded changes
 - Conflicting implementations
+- promoting `UNKNOWN` to fact without evidence
 
 ---
 
 # DT-00 Orchestration Authority
 
-`DT-00 — CENTRAL ORCHESTRATOR` owns live-state reconciliation, dependency/merge ordering, cross-lane collision control, independent exact-head audit, merge execution and post-merge verification.
+`DT-00 — CENTRAL ORCHESTRATOR` owns live-state reconciliation, dependency/merge ordering, cross-lane collision control, independent exact-head audit, merge execution, post-merge verification and unattended queue operation.
 
 DT-00 may:
 
@@ -183,17 +204,42 @@ DT-00 may:
 - assign a concrete bounded task to the specialist that owns the domain;
 - keep unrelated specialists in `HOLD` rather than creating parallel work without a current dependency need;
 - close proven duplicate or superseded PRs with an evidence-backed explanation;
-- merge routine non-visible work already authorized by the Project Owner after canonical review and exact-head gates pass.
+- claim eligible Issues and dispatch specialists while the Project Owner is offline;
+- require rework after failed CI/audit/evidence;
+- merge routine and player-visible work already authorized by existing canon/Owner direction after the applicable exact-head gates pass;
+- close Issues proven complete;
+- fix forward or revert regressions attributable to an autonomous merge;
+- report completed/failed/blocked work to the Project Owner after execution.
 
-Specialists must not self-merge or enable auto-merge. Their READY statement is input to DT-00 audit, not merge authority.
+Specialists must not unilaterally lower gates or treat their own READY statement as sufficient merge authority. Automated merge is authorized only through the DT-00 governed merge gate. A specialist may participate in a runtime that lands its work after an independent audit and required gates pass.
 
-A player-visible runtime change requires the applicable owner/device acceptance and must not be merged only because automated checks are green.
+Player-visible runtime changes do not universally require manual Android/device acceptance by Marian before merge. They require the applicable player-visible evidence defined by `09_Development/AUTONOMOUS_MULTI_AGENT_OPERATION.md` and an independent audit on the exact final head.
 
-After any merge, DT-00 must verify the new exact `main`, applicable exact-main workflows and deployment/runtime evidence. A regression attributable to that merge must be corrected before the work is reported as complete.
+Where GitHub native auto-merge is unavailable or disabled, DT-00 may execute the merge immediately after the same deterministic gate passes.
+
+After any merge, DT-00 must verify the new exact `main`, applicable exact-main workflows and deployment/runtime evidence. A regression attributable to that merge must be corrected or reverted before the task is reported as operationally complete, unless the corrective task is explicitly persisted as `BLOCKED` with evidence.
 
 Routine work is GitHub-first. Do not require Marian to operate a PC or Termux/TMux. Those commands are reserved for explicit repository synchronization/copying or another separately approved exceptional operation.
 
 External Figma, Canva, Runway and Higgsfield tooling is governed by `09_Development/AI_Project_Memory/AUTHORIZED_TOOLING.md`; it does not expand domain ownership or create parallel code/project authority.
+
+---
+
+# Autonomous Unattended Operation
+
+When `automation_enabled=true` in `09_Development/AI_Project_Memory/AUTONOMOUS_AGENT_POLICY.json`, DT-00 may operate the eligible queue unattended.
+
+The unattended lifecycle is:
+
+`ELIGIBLE -> CLAIMED -> RUNNING -> AUDIT -> MERGE_READY -> MERGED -> POST_MERGE_VERIFY -> DONE`
+
+Failure paths include:
+
+`REWORK`, `BLOCKED`, and `OWNER_OR_EXTERNAL_AUTHORITY_REQUIRED`.
+
+The runtime must not create duplicate execution for the same claimed Issue.
+
+The runtime must respect concurrency, retry, audit and emergency-stop controls from the machine-readable policy.
 
 ---
 
@@ -204,6 +250,8 @@ For significant AI tasks, agents must follow:
 `09_Development/AI_REPORTING_PROTOCOL.md`
 
 A significant task is not operationally complete until the required persistent report is created or updated according to that protocol.
+
+Autonomous execution additionally requires an Owner-facing summary in Romanian covering executed/merged/closed/failed/blocked work for the reporting window.
 
 ---
 
@@ -219,7 +267,7 @@ For every significant session:
 
 `NO DURABLE HANDOFF = SESSION NOT OPERATIONALLY COMPLETE`
 
-Before a significant session is considered closed, paused, superseded, READY, HOLD, or handed off, the repository-backed handoff must preserve at least:
+Before a significant session is considered closed, paused, superseded, READY, HOLD, merged, DONE, BLOCKED or handed off, the repository-backed handoff must preserve at least:
 
 - agent identity;
 - ownership boundary;
@@ -233,7 +281,7 @@ Before a significant session is considered closed, paused, superseded, READY, HO
 - unresolved `UNKNOWN`s;
 - blockers/dependencies;
 - exact-head CI state where relevant;
-- currently forbidden actions;
+- currently forbidden actions/hard stops;
 - next safe action;
 - canonical/report references.
 
@@ -252,13 +300,13 @@ Current operational files live under:
 
 `09_Development/AI_Project_Memory/`
 
-Live GitHub remains authoritative for mutable GitHub state. Before implementation, READY, audit, merge, or lifecycle mutation, agents must re-read current `main`, Issue/PR state, branch/head, mergeability, and exact-head CI as applicable. Persisted state must be reconciled as `CURRENT`, `STALE`, `CONTRADICTORY`, or `UNKNOWN`.
+Live GitHub remains authoritative for mutable GitHub state. Before implementation, READY, audit, merge, lifecycle mutation or Issue closure, agents must re-read current `main`, Issue/PR state, branch/head, mergeability, and exact-head CI as applicable. Persisted state must be reconciled as `CURRENT`, `STALE`, `CONTRADICTORY`, or `UNKNOWN`.
 
 Raw or hidden model chain-of-thought is out of scope. Persist useful engineering conclusions, evidence, decisions, appropriate rationale, constraints, rejected assumptions, ownership, blockers, `UNKNOWN`s, status, and next safe action only.
 
 DT ownership and orchestration assigned by DT-00 take precedence over generic execution-role wording when the repository contains a current DT handoff. No agent may silently take another DT lane's authority.
 
-No self-merge or auto-merge is authorized by this memory protocol.
+Unilateral specialist self-merge remains forbidden. DT-00 governed automated merge is authorized when `AUTONOMOUS_AGENT_POLICY.json` is enabled and all required exact-head gates are `PASS`.
 
 The memory validator may be run with:
 
@@ -288,16 +336,23 @@ Expected Output
 Validation Method
 ```
 
+For autonomous execution, the Issue should also expose enough acceptance criteria to determine a finite gate outcome without interactive supervision.
+
 ---
 
 # Change Approval Rules
 
-AI agents must request approval before:
+Routine implementation and evolution already covered by existing Project Owner directives, Issues and canonical architecture are authorized for autonomous execution and merge.
 
-- Changing game vision
-- Adding major systems
-- Modifying architecture
-- Expanding MVP scope
+Separate Project Owner authority is required before an agent may intentionally:
+
+- change the game vision itself;
+- create a materially new business model not covered by an Owner directive;
+- incur materially new/unbounded real-money spend;
+- execute a legal/commercial commitment requiring external authority;
+- perform an irreversible destructive operation when a recoverable alternative exists.
+
+Adding or modifying implementation architecture is not automatically a hard stop when it is the smallest safe implementation of an already-authorized objective, but the change must be recorded, independently audited and remain consistent with canonical architecture authority.
 
 ---
 
@@ -337,23 +392,23 @@ Agents must not assume that:
 - adding an Expo/React Native shell means rewriting Phaser gameplay in React Native;
 - fixed browser dimensions or one hardcoded camera zoom are acceptable for all Android devices;
 - a native-shell migration authorizes changes to gameplay, economy, employees, reviews, or other domain rules;
-- Vehicle Fleet PR #288 should resume before the Android application/camera foundation receives Project Owner acceptance.
+- Vehicle Fleet PR #288 should resume before the Android application/camera foundation receives Project Owner acceptance where that old dependency has not been superseded by newer canonical evidence.
 
 If the required canonical platform documents disagree, the agent must surface the contradiction before implementation rather than choosing one silently.
+
+For autonomous player-visible work, the independent-audit and visual/runtime evidence rules in `AUTONOMOUS_MULTI_AGENT_OPERATION.md` determine whether the work may merge without manual device acceptance.
 
 ---
 
 # Error Handling
 
-If an agent detects:
+If an agent detects missing information, conflicting documents or unclear requirements, it must first exhaust deterministic repository bootstrap, current handoffs, relevant Owner Directives, live GitHub evidence and canonical authority.
 
-- Missing information
-- Conflicting documents
-- Unclear requirements
+If the ambiguity can be resolved by existing authority/evidence, the agent proceeds and records the rationale.
 
-It must stop and request clarification.
+If the ambiguity affects a required merge gate and cannot be resolved, the gate remains `UNKNOWN`; the task becomes `BLOCKED` or `OWNER_OR_EXTERNAL_AUTHORITY_REQUIRED` as appropriate. Unrelated eligible work continues.
 
-For missing project-continuity context covered by Issue #683, the agent must first exhaust the deterministic repository bootstrap, current handoff, referenced live GitHub state, and relevant canonical authority. It must not require the Project Owner to manually reconstruct context that the persistent-memory protocol is required to preserve. Unresolved evidence remains `UNKNOWN`.
+For missing project-continuity context covered by Issue #683, the agent must not require the Project Owner to manually reconstruct context that the persistent-memory protocol is required to preserve.
 
 ---
 
@@ -361,9 +416,10 @@ For missing project-continuity context covered by Issue #683, the agent must fir
 
 Each important AI-generated change should have:
 
-- Version number
+- Version number or traceable Git commit
 - Description
 - Test result
+- Issue/PR evidence where applicable
 
 ---
 
@@ -374,12 +430,14 @@ Agents must prioritize:
 - Core gameplay
 - Stability
 - Simplicity
+- Evidence-backed autonomous progress
 
 Agents must avoid:
 
 - Feature inflation
 - Premature optimization
 - Unnecessary complexity
+- creating work merely to keep agents busy
 
 ---
 
@@ -391,19 +449,27 @@ Vision
 
 ↓
 
-Design
+Canonical Issues / Objectives
 
 ↓
 
-Implementation
+Autonomous Orchestration
 
 ↓
 
-Testing
+Design / Implementation
 
 ↓
 
-Playable Prototype
+Testing / Independent Audit
+
+↓
+
+Governed Merge / Post-Merge Verification
+
+↓
+
+Playable Prototype + Owner Report
 
 ---
 
@@ -411,9 +477,11 @@ Playable Prototype
 
 AI agents build according to the vision and current canonical architecture.
 
-They do not create a different game and they do not revive superseded platform assumptions without Project Owner approval.
+They do not create a different game and they do not revive superseded platform assumptions without Project Owner authority.
 
-For operational continuity, they also consume and maintain the repository-backed Persistent AI Project Memory defined by `09_Development/AI_Project_Memory/BOOTSTRAP.md`; this operational layer does not replace canonical domain authority.
+For operational continuity, they consume and maintain the repository-backed Persistent AI Project Memory defined by `09_Development/AI_Project_Memory/BOOTSTRAP.md`; this operational layer does not replace canonical domain authority.
+
+The unattended runtime is governed by `09_Development/AUTONOMOUS_MULTI_AGENT_OPERATION.md` and `09_Development/AI_Project_Memory/AUTONOMOUS_AGENT_POLICY.json`.
 
 ---
 

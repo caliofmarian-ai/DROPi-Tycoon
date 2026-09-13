@@ -1,0 +1,36 @@
+name: Autonomous Agent Governance
+
+on:
+  pull_request:
+    paths:
+      - '09_Development/AUTONOMOUS_MULTI_AGENT_OPERATION.md'
+      - '09_Development/AI_AGENT_EXECUTION_PROTOCOL.md'
+      - '09_Development/AI_Project_Memory/AUTONOMOUS_AGENT_POLICY.json'
+      - '09_Development/AutonomousAgents/**'
+      - '.github/workflows/autonomous-agent-governance.yml'
+  push:
+    branches: [main]
+    paths:
+      - '09_Development/AUTONOMOUS_MULTI_AGENT_OPERATION.md'
+      - '09_Development/AI_AGENT_EXECUTION_PROTOCOL.md'
+      - '09_Development/AI_Project_Memory/AUTONOMOUS_AGENT_POLICY.json'
+      - '09_Development/AutonomousAgents/**'
+      - '.github/workflows/autonomous-agent-governance.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate-autonomous-agent-contract:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Validate policy JSON
+        run: |
+          node -e "const fs=require('fs'); const p=JSON.parse(fs.readFileSync('09_Development/AI_Project_Memory/AUTONOMOUS_AGENT_POLICY.json','utf8')); if(p.automation_enabled!==true) throw new Error('automation_enabled must be explicit'); if(!Array.isArray(p.requiredMergeGates)||!p.requiredMergeGates.length) throw new Error('requiredMergeGates missing'); console.log('policy schema basic validation PASS')"
+
+      - name: Test fail-closed merge gate
+        run: node --test 09_Development/AutonomousAgents/evaluate-merge-gate.test.mjs
