@@ -2,8 +2,8 @@ import { EngineStore, Mesh, TransformNode } from '@babylonjs/core'
 
 const ISSUE = 725
 const BASE_FOOT_SOLE_Y = 0.02
-const SOLE_CLEARANCE_M = 0.012
-const HARD_CLEARANCE_M = 0.004
+const SOLE_CLEARANCE_M = 0.028
+const HARD_CLEARANCE_M = 0.012
 
 type GroundSurface = {
   minX: number
@@ -40,7 +40,7 @@ const isWalkableSurface = (mesh: Mesh): boolean =>
 const boot = (): void => {
   const scene = EngineStore.LastCreatedScene
   const hero = scene?.getTransformNodeByName('hero')
-  if (!scene || !(hero instanceof TransformNode) || !scene.metadata?.dropiHeroMotionV1 || !scene.metadata?.dropiVisualTargetJumpV1) {
+  if (!scene || !(hero instanceof TransformNode) || !scene.metadata?.dropiVisualTargetJumpV1) {
     window.requestAnimationFrame(boot)
     return
   }
@@ -72,6 +72,14 @@ const boot = (): void => {
     scene.getMeshByName('realism-v2-hero-head'),
     scene.getMeshByName('realism-v2-hero-hair'),
     scene.getMeshByName('realism-v2-hero-backpack'),
+    scene.getMeshByName('realism-v2-hero-arm--1'),
+    scene.getMeshByName('realism-v2-hero-arm-1'),
+    scene.getMeshByName('realism-v2-hero-hand--1'),
+    scene.getMeshByName('realism-v2-hero-hand-1'),
+    scene.getMeshByName('realism-v2-hero-leg--1'),
+    scene.getMeshByName('realism-v2-hero-leg-1'),
+    scene.getMeshByName('realism-v2-hero-foot--1'),
+    scene.getMeshByName('realism-v2-hero-foot-1'),
     scene.getMeshByName('hero-parcel'),
     scene.getMeshByName('target-hero-neck'),
     scene.getMeshByName('target-hero-jacket-panel'),
@@ -122,16 +130,13 @@ const boot = (): void => {
     const groundY = surfaceYAt(hero.position.x, hero.position.z)
     const rigged = riggedGrounding()
 
-    // Once the P1 skinned hero is live, ground the authored rig by its calibrated
-    // sole plane. Do not keep driving the whole body from the hidden procedural
-    // feet because their old gait proxy would reintroduce artificial vertical bob.
     if (rigged?.loaded) {
       const heroBaseY = hero.getAbsolutePosition().y
       const targetLift = groundY + SOLE_CLEARANCE_M - heroBaseY - rigged.soleLocalY
       if (targetLift > visualRoot.position.y) {
         visualRoot.position.y = targetLift
       } else {
-        const t = 1 - Math.exp(-10 * dt)
+        const t = 1 - Math.exp(-12 * dt)
         visualRoot.position.y += (targetLift - visualRoot.position.y) * t
       }
 
@@ -141,7 +146,7 @@ const boot = (): void => {
       debug.surfaceY = groundY
       debug.visualLiftY = visualRoot.position.y
       debug.minFootClearance = heroBaseY + visualRoot.position.y + rigged.soleLocalY - groundY
-      debug.status = debug.minFootClearance >= -0.002 ? 'PASS' : 'FAIL'
+      debug.status = debug.minFootClearance >= HARD_CLEARANCE_M - 0.002 ? 'PASS' : 'FAIL'
       debug.visualAuthority = 'RIGGED_SOLE'
       publish()
       return
@@ -178,7 +183,7 @@ const boot = (): void => {
     debug.surfaceY = groundY
     debug.visualLiftY = visualRoot.position.y
     debug.minFootClearance = clearance
-    debug.status = clearance >= -0.002 ? 'PASS' : 'FAIL'
+    debug.status = clearance >= HARD_CLEARANCE_M - 0.002 ? 'PASS' : 'FAIL'
     debug.visualAuthority = 'PROCEDURAL_PROXY'
     publish()
   })
