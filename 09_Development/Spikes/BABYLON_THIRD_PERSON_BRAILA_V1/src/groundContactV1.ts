@@ -31,7 +31,7 @@ const isWalkableSurface = (mesh: Mesh): boolean =>
 const boot = (): void => {
   const scene = EngineStore.LastCreatedScene
   const hero = scene?.getTransformNodeByName('hero')
-  if (!scene || !(hero instanceof TransformNode) || !scene.metadata?.dropiHeroMotionV1) {
+  if (!scene || !(hero instanceof TransformNode) || !scene.metadata?.dropiHeroMotionV1 || !scene.metadata?.dropiVisualTargetJumpV1) {
     window.requestAnimationFrame(boot)
     return
   }
@@ -64,6 +64,10 @@ const boot = (): void => {
     scene.getMeshByName('realism-v2-hero-hair'),
     scene.getMeshByName('realism-v2-hero-backpack'),
     scene.getMeshByName('hero-parcel'),
+    scene.getMeshByName('target-hero-neck'),
+    scene.getMeshByName('target-hero-jacket-panel'),
+    scene.getMeshByName('target-hero-strap-l'),
+    scene.getMeshByName('target-hero-strap-r'),
   ].forEach(mesh => reparentIfDirectHeroChild(mesh))
 
   const surfaces: GroundSurface[] = scene.meshes
