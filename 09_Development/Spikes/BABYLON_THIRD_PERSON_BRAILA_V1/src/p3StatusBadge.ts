@@ -1,17 +1,26 @@
-type P3Status = {
+type P3ShellStatus = {
   loaded: boolean
   fallback: boolean
   authoredShells: number
-  sourceModels: number
-  hiddenProceduralDetails: number
   error?: string
 }
 
-const p3State = (): P3Status | undefined =>
-  (window as unknown as { __DROPiAuthoredBlocksV1?: P3Status }).__DROPiAuthoredBlocksV1
+type P3StreetStatus = {
+  loaded: boolean
+  fallback: boolean
+  authoredVehicles: number
+  authoredTrees: number
+  error?: string
+}
+
+const p3ShellState = (): P3ShellStatus | undefined =>
+  (window as unknown as { __DROPiAuthoredBlocksV1?: P3ShellStatus }).__DROPiAuthoredBlocksV1
+
+const p3StreetState = (): P3StreetStatus | undefined =>
+  (window as unknown as { __DROPiAuthoredStreetLifeV1?: P3StreetStatus }).__DROPiAuthoredStreetLifeV1
 
 const p3Badge = document.createElement('div')
-p3Badge.id = 'dropi-p3-authored-shells-status'
+p3Badge.id = 'dropi-p3-quality-family-status'
 Object.assign(p3Badge.style, {
   position: 'fixed',
   right: '12px',
@@ -29,18 +38,20 @@ Object.assign(p3Badge.style, {
 document.body.append(p3Badge)
 
 const renderP3Badge = (): void => {
-  const current = p3State()
-  if (!current) {
-    p3Badge.textContent = 'P3 AUTHORED SHELLS · LOADING'
-    p3Badge.style.color = '#ffe5a6'
-  } else if (current.loaded && !current.fallback) {
-    p3Badge.textContent = `P3 AUTHORED SHELLS · ACTIVE · ${current.authoredShells} BLDG`
-    p3Badge.style.color = '#baf2c5'
-  } else if (current.error) {
-    p3Badge.textContent = 'P3 AUTHORED SHELLS · FALLBACK'
+  const shells = p3ShellState()
+  const street = p3StreetState()
+  const hardError = shells?.error || street?.error
+
+  if (hardError) {
+    p3Badge.textContent = 'P3 QUALITY FAMILY · FALLBACK'
     p3Badge.style.color = '#ffb5b5'
+  } else if (shells?.loaded && !shells.fallback && street?.loaded && !street.fallback) {
+    p3Badge.textContent = `P3 QUALITY FAMILY · ACTIVE · ${shells.authoredShells} BLDG · ${street.authoredVehicles} CARS · ${street.authoredTrees} TREES`
+    p3Badge.style.color = '#baf2c5'
   } else {
-    p3Badge.textContent = 'P3 AUTHORED SHELLS · LOADING'
+    const shellText = shells?.loaded ? `${shells.authoredShells} BLDG` : 'SHELLS…'
+    const streetText = street?.loaded ? `${street.authoredVehicles} CARS · ${street.authoredTrees} TREES` : 'STREET…'
+    p3Badge.textContent = `P3 QUALITY FAMILY · LOADING · ${shellText} · ${streetText}`
     p3Badge.style.color = '#ffe5a6'
   }
   window.requestAnimationFrame(renderP3Badge)
