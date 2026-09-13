@@ -20,7 +20,16 @@ type GroundContactDebug = {
   surfaceY: number
   visualLiftY: number
   minFootClearance: number
+  visualAuthority: 'PROCEDURAL_PROXY' | 'RIGGED_SOLE'
 }
+
+type RiggedGroundingState = {
+  loaded: boolean
+  soleLocalY: number
+}
+
+const riggedGrounding = (): RiggedGroundingState | undefined =>
+  (window as unknown as { __DROPiRiggedHeroV1?: RiggedGroundingState }).__DROPiRiggedHeroV1
 
 const isWalkableSurface = (mesh: Mesh): boolean =>
   mesh.name === 'ground' ||
@@ -100,6 +109,7 @@ const boot = (): void => {
     surfaceY: 0,
     visualLiftY: 0,
     minFootClearance: Number.POSITIVE_INFINITY,
+    visualAuthority: 'PROCEDURAL_PROXY',
   }
 
   const publish = (): void => {
@@ -110,8 +120,34 @@ const boot = (): void => {
   scene.onBeforeRenderObservable.add(() => {
     const dt = Math.min(scene.getEngine().getDeltaTime() / 1000, 0.05)
     const groundY = surfaceYAt(hero.position.x, hero.position.z)
-    const targetLift = groundY + SOLE_CLEARANCE_M - BASE_FOOT_SOLE_Y
+    const rigged = riggedGrounding()
 
+    // Once the P1 skinned hero is live, ground the authored rig by its calibrated
+    // sole plane. Do not keep driving the whole body from the hidden procedural
+    // feet because their old gait proxy would reintroduce artificial vertical bob.
+    if (rigged?.loaded) {
+      const heroBaseY = hero.getAbsolutePosition().y
+      const targetLift = groundY + SOLE_CLEARANCE_M - heroBaseY - rigged.soleLocalY
+      if (targetLift > visualRoot.position.y) {
+        visualRoot.position.y = targetLift
+      } else {
+        const t = 1 - Math.exp(-10 * dt)
+        visualRoot.position.y += (targetLift - visualRoot.position.y) * t
+      }
+
+      const clearance = heroBaseY + visualRoot.position.y + rigged.soleLocalY - groundY
+      if (clearance < HARD_CLEARANCE_M) visualRoot.position.y += HARD_CLEARANCE_M - clearance
+
+      debug.surfaceY = groundY
+      debug.visualLiftY = visualRoot.position.y
+      debug.minFootClearance = heroBaseY + visualRoot.position.y + rigged.soleLocalY - groundY
+      debug.status = debug.minFootClearance >= -0.002 ? 'PASS' : 'FAIL'
+      debug.visualAuthority = 'RIGGED_SOLE'
+      publish()
+      return
+    }
+
+    const targetLift = groundY + SOLE_CLEARANCE_M - BASE_FOOT_SOLE_Y
     if (targetLift > visualRoot.position.y) {
       visualRoot.position.y = targetLift
     } else {
@@ -143,6 +179,7 @@ const boot = (): void => {
     debug.visualLiftY = visualRoot.position.y
     debug.minFootClearance = clearance
     debug.status = clearance >= -0.002 ? 'PASS' : 'FAIL'
+    debug.visualAuthority = 'PROCEDURAL_PROXY'
     publish()
   })
 
