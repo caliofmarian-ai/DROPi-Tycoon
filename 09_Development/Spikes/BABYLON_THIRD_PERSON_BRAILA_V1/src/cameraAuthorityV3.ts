@@ -4,6 +4,10 @@ import { EngineStore } from '@babylonjs/core/Engines/engineStore'
 const CAMERA_ISSUE = 717
 const CAMERA_MAX_RADIUS_M = 11
 const CAMERA_MIN_RADIUS_M = 3.1
+const CAMERA_MIN_BETA = 0.42
+const CAMERA_MAX_BETA = 1.52
+const CAMERA_HORIZONTAL_SENSIBILITY = 720
+const CAMERA_VERTICAL_SENSIBILITY = 900
 const RECENTER_BETA = 1.17
 const RECENTER_RESPONSE = 10
 
@@ -70,7 +74,7 @@ const addCameraHelp = (): void => {
 
   const help = document.createElement('div')
   help.id = 'dropi-camera-authority-help'
-  help.textContent = 'DRAG WORLD = FREE LOOK · VIEW STAYS · RECENTER ONLY WHEN YOU ASK'
+  help.textContent = 'DRAG WORLD = FAST FREE LOOK · VIEW STAYS · RECENTER ONLY WHEN YOU ASK'
   document.body.append(help)
 }
 
@@ -89,9 +93,11 @@ const boot = (): void => {
   const camera = activeCamera
   camera.lowerRadiusLimit = CAMERA_MIN_RADIUS_M
   camera.upperRadiusLimit = CAMERA_MAX_RADIUS_M
-  camera.angularSensibilityX = 1125
-  camera.angularSensibilityY = 1450
-  camera.inertia = 0.62
+  camera.lowerBetaLimit = CAMERA_MIN_BETA
+  camera.upperBetaLimit = CAMERA_MAX_BETA
+  camera.angularSensibilityX = CAMERA_HORIZONTAL_SENSIBILITY
+  camera.angularSensibilityY = CAMERA_VERTICAL_SENSIBILITY
+  camera.inertia = 0.55
 
   let lockedAlpha = camera.alpha
   let lockedBeta = camera.beta
