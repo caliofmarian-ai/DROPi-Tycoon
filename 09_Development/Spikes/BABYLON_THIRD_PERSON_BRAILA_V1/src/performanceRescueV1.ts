@@ -37,6 +37,24 @@ const reduceDrawCalls = (): void => {
   mergeStaticMeshes('v2-plinths', meshes().filter(mesh => mesh.name.startsWith('realism-v2-plinth-')))
   mergeStaticMeshes('v2-cornices', meshes().filter(mesh => mesh.name.startsWith('realism-v2-cornice-')))
   mergeStaticMeshes('v2-entry-surrounds', meshes().filter(mesh => mesh.name.startsWith('realism-v2-entry-surround-')))
+
+  mergeStaticMeshes(
+    'target-facade-trim',
+    meshes().filter(mesh =>
+      (mesh.name.startsWith('target-facade-band-') || mesh.name.startsWith('target-facade-pilaster-')) &&
+      mesh.material?.name === 'target-facade-trim',
+    ),
+  )
+  mergeStaticMeshes(
+    'target-parapets-light',
+    meshes().filter(mesh => mesh.name.startsWith('target-parapet-') && mesh.material?.name === 'target-facade-trim'),
+  )
+  mergeStaticMeshes(
+    'target-parapets-dark',
+    meshes().filter(mesh => mesh.name.startsWith('target-parapet-') && mesh.material?.name === 'target-facade-dark-trim'),
+  )
+  mergeStaticMeshes('target-shopfronts', meshes().filter(mesh => mesh.name.startsWith('target-shopfront-')))
+  mergeStaticMeshes('target-shop-awnings', meshes().filter(mesh => mesh.name.startsWith('target-shop-awning-')))
 }
 
 const trimShadowCost = (): void => {
@@ -58,6 +76,8 @@ const trimShadowCost = (): void => {
     const name = mesh.name
     return (
       name.startsWith('realism-v2-hero-') ||
+      name.startsWith('hero-motion-') ||
+      name.startsWith('target-hero-') ||
       name === 'hero-parcel' ||
       name === 'dropi-hq' ||
       name === 'maras-market' ||
@@ -114,7 +134,7 @@ const addBadge = (): void => {
 
 const boot = (): void => {
   const scene = EngineStore.LastCreatedScene
-  if (!scene || !scene.metadata?.dropiRealismV2) {
+  if (!scene || !scene.metadata?.dropiRealismV2 || !scene.metadata?.dropiVisualTargetJumpV1) {
     window.requestAnimationFrame(boot)
     return
   }
