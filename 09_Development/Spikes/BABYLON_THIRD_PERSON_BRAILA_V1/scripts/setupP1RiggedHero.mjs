@@ -6,6 +6,7 @@ import path from 'node:path'
 const ROOT = process.cwd()
 const OUT = path.join(ROOT, 'public', 'assets', 'characters', 'p1')
 const npmCommand = process.platform === 'win32' ? 'npm.cmd' : 'npm'
+const REQUIRED_CLIPS = ['Idle_Loop', 'Jog_Fwd_Loop', 'Sprint_Loop']
 
 const npmPackages = [
   {
@@ -114,6 +115,51 @@ const installPinnedBabylonLoader = async () => {
   }
 }
 
+const parseGlbJson = bytes => {
+  if (bytes.length < 20) throw new Error('Animation GLB is too small')
+  if (bytes.readUInt32LE(0) !== 0x46546c67) throw new Error('Animation source is not a GLB')
+  if (bytes.readUInt32LE(4) !== 2) throw new Error('Animation GLB must use glTF 2.0')
+  const declaredLength = bytes.readUInt32LE(8)
+  if (declaredLength !== bytes.length) throw new Error(`GLB length mismatch ${declaredLength} != ${bytes.length}`)
+  const chunkLength = bytes.readUInt32LE(12)
+  const chunkType = bytes.readUInt32LE(16)
+  if (chunkType !== 0x4e4f534a) throw new Error('First GLB chunk is not JSON')
+  const jsonText = bytes.subarray(20, 20 + chunkLength).toString('utf8').replace(/\u0000+$/g, '').trim()
+  return JSON.parse(jsonText)
+}
+
+const validateRigCompatibility = (characterGltf, animationGltf) => {
+  const characterNodeNames = new Set(
+    (characterGltf.nodes ?? []).map(node => node.name).filter(name => typeof name === 'string' && name.length > 0),
+  )
+  const animationsByName = new Map((animationGltf.animations ?? []).map(animation => [animation.name, animation]))
+  const stats = {}
+
+  for (const clipName of REQUIRED_CLIPS) {
+    const animation = animationsByName.get(clipName)
+    if (!animation) throw new Error(`Required P1 clip missing from animation GLB: ${clipName}`)
+    const targetNames = new Set()
+    for (const channel of animation.channels ?? []) {
+      const nodeIndex = channel.target?.node
+      const nodeName = typeof nodeIndex === 'number' ? animationGltf.nodes?.[nodeIndex]?.name : undefined
+      if (typeof nodeName === 'string' && nodeName.length > 0) targetNames.add(nodeName)
+    }
+    const matched = [...targetNames].filter(name => characterNodeNames.has(name))
+    const ratio = targetNames.size === 0 ? 0 : matched.length / targetNames.size
+    if (targetNames.size < 20 || ratio < 0.8) {
+      throw new Error(
+        `Rig mismatch for ${clipName}: matched ${matched.length}/${targetNames.size} animation targets to character nodes`,
+      )
+    }
+    stats[clipName] = {
+      animationTargets: targetNames.size,
+      exactCharacterNodeMatches: matched.length,
+      exactMatchRatio: Number(ratio.toFixed(4)),
+    }
+  }
+  return stats
+}
+
 const makeMobileCharacterDerivative = sourceBytes => {
   const gltf = JSON.parse(sourceBytes.toString('utf8'))
 
@@ -148,7 +194,7 @@ const makeMobileCharacterDerivative = sourceBytes => {
     }
   }
 
-  return Buffer.from(`${JSON.stringify(gltf, null, 2)}\n`, 'utf8')
+  return { gltf, bytes: Buffer.from(`${JSON.stringify(gltf, null, 2)}\n`, 'utf8') }
 }
 
 await mkdir(OUT, { recursive: true })
@@ -157,8 +203,11 @@ await installPinnedBabylonLoader()
 const fetched = {}
 for (const [key, source] of Object.entries(sources)) fetched[key] = await fetchVerified(source)
 
-const derivativeGltf = makeMobileCharacterDerivative(fetched.characterGltf)
-await writeFile(path.join(OUT, sources.characterGltf.filename), derivativeGltf)
+const originalCharacterGltf = JSON.parse(fetched.characterGltf.toString('utf8'))
+const animationGltf = parseGlbJson(fetched.animations)
+const rigCompatibility = validateRigCompatibility(originalCharacterGltf, animationGltf)
+const derivative = makeMobileCharacterDerivative(fetched.characterGltf)
+await writeFile(path.join(OUT, sources.characterGltf.filename), derivative.bytes)
 
 for (const key of [
   'characterBin',
@@ -180,6 +229,7 @@ const provenance = {
     animationDerivativeMirror: 'Seyamalam/blood-league-kickoff@aa02a4e6d8337a0604d2da131bcbbeb1f01badf0',
   },
   npmRuntime: npmPackages,
+  rigCompatibility,
   sources: Object.fromEntries(
     Object.entries(sources).map(([key, source]) => [
       key,
@@ -193,11 +243,12 @@ const provenance = {
   ),
   derivatives: {
     [sources.characterGltf.filename]: {
-      sha256: sha256(derivativeGltf),
+      sha256: sha256(derivative.bytes),
       transformation: 'Removed mobile-expensive normal/roughness image dependencies; retained hair/eye/body base-colour maps; preserved rig, skin, geometry and node identities.',
     },
   },
 }
 await writeFile(path.join(OUT, 'PROVENANCE.json'), `${JSON.stringify(provenance, null, 2)}\n`)
 
+console.log('P1 rig compatibility:', JSON.stringify(rigCompatibility))
 console.log(`P1 rigged hero candidate prepared at ${path.relative(ROOT, OUT)}`)
