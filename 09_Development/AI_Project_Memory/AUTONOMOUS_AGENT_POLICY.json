@@ -1,0 +1,86 @@
+{
+  "schemaVersion": "1.0.0",
+  "project": "DROPi Tycoon",
+  "owner": "Marian / caliofmarian-ai",
+  "authorityIssue": 723,
+  "authorizationDate": "2026-09-13",
+  "automation_enabled": true,
+  "mode": "UNATTENDED_AUTONOMOUS",
+  "githubIsCanonical": true,
+  "limits": {
+    "maxConcurrentIssues": 3,
+    "maxParallelSubagentsPerIssue": 3,
+    "maxImplementationAttemptsPerIssue": 3,
+    "transientRetryBackoff": "EXPONENTIAL"
+  },
+  "issueStates": [
+    "ELIGIBLE",
+    "CLAIMED",
+    "RUNNING",
+    "AUDIT",
+    "REWORK",
+    "MERGE_READY",
+    "MERGED",
+    "POST_MERGE_VERIFY",
+    "DONE",
+    "BLOCKED",
+    "OWNER_OR_EXTERNAL_AUTHORITY_REQUIRED"
+  ],
+  "requiredMergeGates": [
+    "scope_authorized",
+    "ownership_reconciled",
+    "canonical_main_reconciled",
+    "exact_head_identified",
+    "required_tests",
+    "required_ci",
+    "independent_audit",
+    "mergeability"
+  ],
+  "conditionalMergeGates": {
+    "playerVisible": ["player_visible_evidence"],
+    "deploymentAffecting": ["deployment_or_build_evidence"],
+    "persistenceAffecting": ["persistence_compatibility_evidence"],
+    "legalCommercialClaimAffecting": ["legal_claim_evidence"]
+  },
+  "gateValues": ["PASS", "FAIL", "UNKNOWN", "NOT_APPLICABLE"],
+  "mergeRules": {
+    "onlyPassSatisfiesRequiredGate": true,
+    "unknownBlocksRequiredGate": true,
+    "implementerCannotBeSoleAuditor": true,
+    "exactFinalHeadRequired": true,
+    "ownerPerMergeApprovalRequired": false,
+    "manualAndroidOwnerAcceptanceUniversallyRequired": false,
+    "nativeGitHubAutoMergeRequired": false,
+    "orchestratorMayMergeAfterGatePass": true
+  },
+  "postMerge": {
+    "required": true,
+    "verifyExactMain": true,
+    "fixForwardOrRevertAuthorized": true,
+    "ownerApprovalForRoutineCorrectiveActionRequired": false
+  },
+  "hardStops": [
+    "UNBOUNDED_OR_NEW_REAL_MONEY_SPEND",
+    "PAYMENT_OR_FINANCIAL_TRANSFER_WITHOUT_SEPARATE_AUTHORITY",
+    "PAID_AD_SPEND_WITHOUT_SEPARATE_AUTHORITY",
+    "REAL_MONEY_MARKETPLACE_EXECUTION_WITHOUT_SEPARATE_AUTHORITY",
+    "SIGN_LEGAL_CONTRACT_OR_DECLARE_EXTERNAL_APPROVAL",
+    "PUBLISH_KNOWN_UNKNOWN_OR_LEGALLY_UNCLEARED_CLAIM",
+    "IRREVERSIBLE_DESTRUCTIVE_ACTION_WITH_RECOVERABLE_ALTERNATIVE",
+    "SECRET_EXFILTRATION_OR_SECURITY_BOUNDARY_WEAKENING",
+    "UNAUTHORIZED_PRODUCT_VISION_OR_BUSINESS_MODEL_CHANGE"
+  ],
+  "ownerReporting": {
+    "language": "ro",
+    "includeExecutedIssues": true,
+    "includeOpenedPrs": true,
+    "includeMergedPrs": true,
+    "includeClosedIssues": true,
+    "includeRetriesAndFailures": true,
+    "includeBlockedAndUnknown": true,
+    "includeCurrentMainSha": true,
+    "includeRuntimeDeploymentStateWhenRelevant": true,
+    "includeCostUsageWhenAvailable": true,
+    "includeNextEligibleQueue": true
+  }
+}
