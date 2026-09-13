@@ -1,37 +1,21 @@
-import { EngineStore, Mesh, TransformNode, Vector3 } from '@babylonjs/core'
+import { EngineStore, Mesh, MeshBuilder, TransformNode, Vector3 } from '@babylonjs/core'
 
 const ISSUE = 725
 
-const moveTowards = (current: number, target: number, rate: number, dt: number): number => {
+const smooth = (current: number, target: number, rate: number, dt: number): number => {
   const t = 1 - Math.exp(-rate * dt)
   return current + (target - current) * t
 }
 
-const makeJoint = (
-  hero: TransformNode,
+const joint = (
+  parent: TransformNode,
   name: string,
-  x: number,
-  y: number,
-  meshes: Mesh[],
+  position: Vector3,
 ): TransformNode => {
-  const scene = hero.getScene()
-  const joint = new TransformNode(name, scene)
-  joint.parent = hero
-  joint.position.set(x, y, 0)
-
-  // These meshes are already direct hero children. Preserve their hero-local
-  // coordinates when re-parenting under the anatomical joint. The previous
-  // implementation subtracted world positions from hero positions without
-  // applying the inverse hero rotation, which twisted offsets whenever the
-  // hero was rotated and could make a forward gait read as backwards.
-  meshes.forEach(mesh => {
-    const heroLocalPosition = mesh.position.clone()
-    const heroLocalRotation = mesh.rotation.clone()
-    mesh.parent = joint
-    mesh.position.copyFrom(heroLocalPosition.subtract(joint.position))
-    mesh.rotation.copyFrom(heroLocalRotation)
-  })
-  return joint
+  const node = new TransformNode(name, parent.getScene())
+  node.parent = parent
+  node.position.copyFrom(position)
+  return node
 }
 
 const boot = (): void => {
@@ -69,10 +53,81 @@ const boot = (): void => {
     return
   }
 
-  const armL = makeJoint(hero, 'hero-motion-shoulder-l', -0.31, 1.38, [leftArm, leftHand])
-  const armR = makeJoint(hero, 'hero-motion-shoulder-r', 0.31, 1.38, [rightArm, rightHand])
-  const legL = makeJoint(hero, 'hero-motion-hip-l', -0.135, 0.72, [leftLeg, leftFoot])
-  const legR = makeJoint(hero, 'hero-motion-hip-r', 0.135, 0.72, [rightLeg, rightFoot])
+  // Build a lightweight articulated presentation rig while preserving the
+  // authoritative hero TransformNode used by movement/collision/game state.
+  // Local +Z remains the visual hero front, matching #731.
+  const shoulderL = joint(hero, 'hero-motion-shoulder-l', new Vector3(-.31, 1.38, 0))
+  const shoulderR = joint(hero, 'hero-motion-shoulder-r', new Vector3(.31, 1.38, 0))
+  const elbowL = joint(shoulderL, 'hero-motion-elbow-l', new Vector3(0, -.34, 0))
+  const elbowR = joint(shoulderR, 'hero-motion-elbow-r', new Vector3(0, -.34, 0))
+  const hipL = joint(hero, 'hero-motion-hip-l', new Vector3(-.135, .72, 0))
+  const hipR = joint(hero, 'hero-motion-hip-r', new Vector3(.135, .72, 0))
+  const kneeL = joint(hipL, 'hero-motion-knee-l', new Vector3(0, -.36, 0))
+  const kneeR = joint(hipR, 'hero-motion-knee-r', new Vector3(0, -.36, 0))
+
+  leftArm.parent = shoulderL
+  leftArm.position.set(0, -.17, 0)
+  leftArm.scaling.y = .52
+  leftArm.rotation.set(0, 0, -.045)
+  rightArm.parent = shoulderR
+  rightArm.position.set(0, -.17, 0)
+  rightArm.scaling.y = .52
+  rightArm.rotation.set(0, 0, .045)
+
+  const forearmL = MeshBuilder.CreateCylinder('hero-motion-forearm-l', {
+    height: .33,
+    diameter: .13,
+    tessellation: 12,
+  }, scene)
+  forearmL.parent = elbowL
+  forearmL.position.set(0, -.165, 0)
+  forearmL.material = leftArm.material
+
+  const forearmR = MeshBuilder.CreateCylinder('hero-motion-forearm-r', {
+    height: .33,
+    diameter: .13,
+    tessellation: 12,
+  }, scene)
+  forearmR.parent = elbowR
+  forearmR.position.set(0, -.165, 0)
+  forearmR.material = rightArm.material
+
+  leftHand.parent = elbowL
+  leftHand.position.set(0, -.36, 0)
+  rightHand.parent = elbowR
+  rightHand.position.set(0, -.36, 0)
+
+  leftLeg.parent = hipL
+  leftLeg.position.set(0, -.18, 0)
+  leftLeg.scaling.y = .52
+  leftLeg.rotation.set(0, 0, 0)
+  rightLeg.parent = hipR
+  rightLeg.position.set(0, -.18, 0)
+  rightLeg.scaling.y = .52
+  rightLeg.rotation.set(0, 0, 0)
+
+  const shinL = MeshBuilder.CreateCylinder('hero-motion-shin-l', {
+    height: .34,
+    diameter: .16,
+    tessellation: 12,
+  }, scene)
+  shinL.parent = kneeL
+  shinL.position.set(0, -.17, 0)
+  shinL.material = leftLeg.material
+
+  const shinR = MeshBuilder.CreateCylinder('hero-motion-shin-r', {
+    height: .34,
+    diameter: .16,
+    tessellation: 12,
+  }, scene)
+  shinR.parent = kneeR
+  shinR.position.set(0, -.17, 0)
+  shinR.material = rightLeg.material
+
+  leftFoot.parent = kneeL
+  leftFoot.position.set(0, -.37, .075)
+  rightFoot.parent = kneeR
+  rightFoot.position.set(0, -.37, .075)
 
   const base = {
     torsoY: torso.position.y,
@@ -87,84 +142,91 @@ const boot = (): void => {
   let smoothedSpeed = 0
   let turnVelocity = 0
   let gaitPhase = 0
+  let idleClock = 0
 
   scene.onBeforeRenderObservable.add(() => {
-    const dt = Math.min(scene.getEngine().getDeltaTime() / 1000, 0.05)
+    const dt = Math.min(scene.getEngine().getDeltaTime() / 1000, .05)
     if (dt <= 0) return
+    idleClock += dt
 
     const displacement = Vector3.Distance(hero.position, previousPosition)
     const rawSpeed = displacement / dt
     previousPosition.copyFrom(hero.position)
-    smoothedSpeed = moveTowards(smoothedSpeed, rawSpeed, 8.5, dt)
+    smoothedSpeed = smooth(smoothedSpeed, rawSpeed, 9.5, dt)
 
     const headingDelta = Math.atan2(
       Math.sin(hero.rotation.y - previousHeading),
       Math.cos(hero.rotation.y - previousHeading),
     )
     previousHeading = hero.rotation.y
-    turnVelocity = moveTowards(turnVelocity, headingDelta / dt, 9, dt)
+    turnVelocity = smooth(turnVelocity, headingDelta / dt, 10, dt)
 
-    const moving = smoothedSpeed > 0.08
-    const speed01 = Math.min(1, smoothedSpeed / 2.4)
-    const cycleHz = 1.45 + speed01 * 0.75
+    const moving = smoothedSpeed > .075
+    const speed01 = Math.min(1, smoothedSpeed / 2.65)
+    const cycleHz = 1.28 + speed01 * .72
     if (moving) gaitPhase += dt * Math.PI * 2 * cycleHz
 
     const carry = Boolean(parcel?.isEnabled())
     const stride = moving ? Math.sin(gaitPhase) : 0
-    const stepLiftL = moving ? Math.max(0, Math.sin(gaitPhase)) : 0
-    const stepLiftR = moving ? Math.max(0, Math.sin(gaitPhase + Math.PI)) : 0
-    const settle = moving ? 1 : 0
+    const opposite = -stride
+    const strideAmplitude = .40 * speed01
+    const armAmplitude = (carry ? .11 : .34) * speed01
 
-    const legSwing = 0.48 * speed01 * settle
-    const armSwing = (carry ? 0.10 : 0.36) * speed01 * settle
-    const carryPitch = carry ? -0.42 : 0
+    const kneeBendL = moving ? Math.max(0, -stride) * .54 * speed01 : 0
+    const kneeBendR = moving ? Math.max(0, -opposite) * .54 * speed01 : 0
+    const elbowBendL = carry ? .46 : .12 + Math.max(0, stride) * .12 * speed01
+    const elbowBendR = carry ? .46 : .12 + Math.max(0, opposite) * .12 * speed01
 
-    // Local +Z is the visual front of the hero (parcel in front, backpack at -Z).
-    // A positive X rotation of the shoulder/hip moves the lower limb toward +Z.
-    legL.rotation.x = stride * legSwing
-    legR.rotation.x = -stride * legSwing
-    armL.rotation.x = carryPitch - stride * armSwing
-    armR.rotation.x = carryPitch + stride * armSwing
+    const carryPitch = carry ? -.27 : 0
+    shoulderL.rotation.x = smooth(shoulderL.rotation.x, carryPitch - stride * armAmplitude, 13, dt)
+    shoulderR.rotation.x = smooth(shoulderR.rotation.x, carryPitch + stride * armAmplitude, 13, dt)
+    elbowL.rotation.x = smooth(elbowL.rotation.x, elbowBendL, 15, dt)
+    elbowR.rotation.x = smooth(elbowR.rotation.x, elbowBendR, 15, dt)
 
-    leftFoot.position.y = -0.64 + stepLiftL * 0.052 * speed01
-    rightFoot.position.y = -0.64 + stepLiftR * 0.052 * speed01
-    leftFoot.rotation.x = -stride * 0.08 * speed01
-    rightFoot.rotation.x = stride * 0.08 * speed01
+    hipL.rotation.x = smooth(hipL.rotation.x, stride * strideAmplitude, 14, dt)
+    hipR.rotation.x = smooth(hipR.rotation.x, opposite * strideAmplitude, 14, dt)
+    kneeL.rotation.x = smooth(kneeL.rotation.x, kneeBendL, 15, dt)
+    kneeR.rotation.x = smooth(kneeR.rotation.x, kneeBendR, 15, dt)
+
+    const footRollL = moving ? -stride * .10 * speed01 - kneeBendL * .20 : 0
+    const footRollR = moving ? -opposite * .10 * speed01 - kneeBendR * .20 : 0
+    leftFoot.rotation.x = smooth(leftFoot.rotation.x, footRollL, 16, dt)
+    rightFoot.rotation.x = smooth(rightFoot.rotation.x, footRollR, 16, dt)
 
     const bob = moving
-      ? Math.abs(Math.sin(gaitPhase * 2)) * 0.016 * speed01
-      : Math.sin(performance.now() * 0.0017) * 0.004
-    const counter = moving ? Math.sin(gaitPhase) * 0.04 * speed01 : 0
-    const turnLean = Math.max(-0.07, Math.min(0.07, turnVelocity * 0.016))
+      ? Math.abs(Math.sin(gaitPhase * 2)) * .014 * speed01
+      : Math.sin(idleClock * 1.7) * .0035
+    const counter = moving ? Math.sin(gaitPhase) * .036 * speed01 : Math.sin(idleClock * .7) * .008
+    const turnLean = Math.max(-.065, Math.min(.065, turnVelocity * .015))
 
     torso.position.y = base.torsoY + bob
-    torso.position.z = base.torsoZ + (moving ? Math.cos(gaitPhase * 2) * 0.006 * speed01 : 0)
-    torso.rotation.x = moving ? 0.045 * speed01 : 0
-    torso.rotation.y = counter
-    torso.rotation.z = turnLean
-    head.position.y = base.headY + bob * 0.72
-    hair.position.y = base.hairY + bob * 0.72
-    backpack.position.y = base.packY + bob * 0.86
-    backpack.rotation.z = turnLean * 0.45
+    torso.position.z = base.torsoZ + (moving ? Math.cos(gaitPhase * 2) * .005 * speed01 : 0)
+    torso.rotation.x = smooth(torso.rotation.x, moving ? .035 * speed01 : 0, 9, dt)
+    torso.rotation.y = smooth(torso.rotation.y, counter, 10, dt)
+    torso.rotation.z = smooth(torso.rotation.z, turnLean, 11, dt)
+    head.position.y = base.headY + bob * .70
+    hair.position.y = base.hairY + bob * .70
+    backpack.position.y = base.packY + bob * .82
+    backpack.rotation.z = smooth(backpack.rotation.z, turnLean * .38, 10, dt)
 
     if (!moving) {
-      const turnPose = Math.max(-0.16, Math.min(0.16, turnVelocity * 0.035))
-      legL.rotation.z = -turnPose * 0.18
-      legR.rotation.z = turnPose * 0.18
-      armL.rotation.z = -0.08 - turnPose * 0.12
-      armR.rotation.z = 0.08 - turnPose * 0.12
+      const turnPose = Math.max(-.14, Math.min(.14, turnVelocity * .032))
+      hipL.rotation.z = smooth(hipL.rotation.z, -turnPose * .15, 10, dt)
+      hipR.rotation.z = smooth(hipR.rotation.z, turnPose * .15, 10, dt)
+      shoulderL.rotation.z = smooth(shoulderL.rotation.z, -.055 - turnPose * .10, 10, dt)
+      shoulderR.rotation.z = smooth(shoulderR.rotation.z, .055 - turnPose * .10, 10, dt)
     } else {
-      legL.rotation.z = 0
-      legR.rotation.z = 0
-      armL.rotation.z = -0.08
-      armR.rotation.z = 0.08
+      hipL.rotation.z = smooth(hipL.rotation.z, 0, 12, dt)
+      hipR.rotation.z = smooth(hipR.rotation.z, 0, 12, dt)
+      shoulderL.rotation.z = smooth(shoulderL.rotation.z, -.045, 12, dt)
+      shoulderR.rotation.z = smooth(shoulderR.rotation.z, .045, 12, dt)
     }
   })
 
   scene.metadata = { ...(scene.metadata ?? {}), dropiHeroMotionV1: true }
   ;(window as Window & { __DROPiHeroMotionV1?: { issue: number; mode: string } }).__DROPiHeroMotionV1 = {
     issue: ISSUE,
-    mode: 'velocity-driven-articulated-gait-local-space-fixed',
+    mode: 'velocity-driven-four-joint-gait-local-forward',
   }
 }
 
