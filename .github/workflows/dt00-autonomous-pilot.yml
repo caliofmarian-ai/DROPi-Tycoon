@@ -195,12 +195,6 @@ jobs:
           echo '::error::OPENAI_API_KEY is absent. Authentication evidence is UNKNOWN; autonomous execution is blocked.'
           exit 1
 
-      - name: Create isolated unprivileged Codex implementation user
-        if: steps.select.outputs.mode == 'implement' && steps.credential.outputs.credential_ready == 'true'
-        run: |
-          sudo useradd --create-home --shell /bin/bash codexagent
-          sudo chown -R codexagent:codexagent "$GITHUB_WORKSPACE"
-
       - name: Run bounded Codex implementation agent
         id: implement
         if: steps.select.outputs.mode == 'implement' && steps.credential.outputs.credential_ready == 'true'
@@ -208,18 +202,12 @@ jobs:
         with:
           openai-api-key: ${{ secrets.OPENAI_API_KEY }}
           permission-profile: ':workspace'
-          safety-strategy: 'unprivileged-user'
-          codex-user: 'codexagent'
           prompt-file: '.dt00/task.md'
           output-file: '.dt00/implementation-result.json'
           output-schema-file: '09_Development/AutonomousAgents/schemas/implementation-result.schema.json'
           effort: 'medium'
           allow-bots: true
           allow-bot-users: 'github-actions[bot]'
-
-      - name: Restore runner ownership after isolated implementation
-        if: steps.select.outputs.mode == 'implement' && always()
-        run: sudo chown -R "$(id -u):$(id -g)" "$GITHUB_WORKSPACE"
 
       - name: Validate implementation result and changed-path boundary
         id: validate
