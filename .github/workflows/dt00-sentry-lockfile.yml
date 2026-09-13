@@ -1,0 +1,42 @@
+name: DT-00 Sentry lockfile refresh
+
+on:
+  push:
+    branches:
+      - dt00/sentry-web-observability
+
+permissions:
+  contents: write
+
+jobs:
+  refresh-lockfile:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout branch
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22.12.0
+          cache: npm
+          cache-dependency-path: game-web/package-lock.json
+
+      - name: Refresh package lock
+        working-directory: game-web
+        run: npm install --package-lock-only --ignore-scripts
+
+      - name: Commit lockfile
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add game-web/package-lock.json
+          if git diff --cached --quiet; then
+            echo "Lockfile already current"
+            exit 0
+          fi
+          git commit -m "Refresh lockfile for Sentry browser SDK"
+          git push origin HEAD:${GITHUB_REF_NAME}
