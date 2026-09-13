@@ -144,7 +144,7 @@ jobs:
           permission-profile: ':read-only'
           safety-strategy: 'unprivileged-user'
           codex-user: 'codexaudit'
-          output-file: '.dt00-audit-result.json'
+          output-file: '/tmp/dt00-audit-result.json'
           output-schema-file: '09_Development/AutonomousAgents/schemas/audit-result.schema.json'
           effort: 'high'
           allow-bots: true
@@ -183,12 +183,12 @@ jobs:
       - name: Validate independent audit result fail-closed
         run: |
           set -euo pipefail
-          test -s .dt00-audit-result.json
-          DECISION="$(jq -r '.decision' .dt00-audit-result.json)"
-          AUDITED_HEAD="$(jq -r '.exact_head_sha' .dt00-audit-result.json)"
-          MISSING="$(jq '.required_evidence_missing | length' .dt00-audit-result.json)"
-          PROHIBITED="$(jq -r '.prohibited_action_detected' .dt00-audit-result.json)"
-          HARD_STOP="$(jq -r '.hard_stop // empty' .dt00-audit-result.json)"
+          test -s /tmp/dt00-audit-result.json
+          DECISION="$(jq -r '.decision' /tmp/dt00-audit-result.json)"
+          AUDITED_HEAD="$(jq -r '.exact_head_sha' /tmp/dt00-audit-result.json)"
+          MISSING="$(jq '.required_evidence_missing | length' /tmp/dt00-audit-result.json)"
+          PROHIBITED="$(jq -r '.prohibited_action_detected' /tmp/dt00-audit-result.json)"
+          HARD_STOP="$(jq -r '.hard_stop // empty' /tmp/dt00-audit-result.json)"
 
           test "$AUDITED_HEAD" = "$TARGET_HEAD"
           test "$DECISION" = 'PASS'
@@ -201,6 +201,6 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: dt00-independent-audit-${{ env.TARGET_PR }}-${{ env.TARGET_HEAD }}
-          path: .dt00-audit-result.json
+          path: /tmp/dt00-audit-result.json
           if-no-files-found: warn
           retention-days: 30
