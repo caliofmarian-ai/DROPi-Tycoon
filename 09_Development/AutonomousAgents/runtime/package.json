@@ -1,0 +1,16 @@
+{
+  "name": "dropi-dt00-autonomous-runtime",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "start": "node src/runtime.mjs",
+    "test": "node --test test/*.test.mjs"
+  },
+  "dependencies": {
+    "openai": "7.15.0"
+  }
+}
