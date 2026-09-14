@@ -1,0 +1,80 @@
+name: Sentry PR733 One-Time Production Verification
+
+# Branch-only execution adapter: connector has no workflow_dispatch action.
+# Production code is checked out at the independently audited MERGED commit.
+# Railway deployment c48a679f-959c-417c-9d63-cac93ffe99d3 was verified SUCCESS
+# for that exact commit before this explicit push. Never merge this adapter.
+on:
+  push:
+    branches: ['verify/sentry-pr733-production-once']
+    paths: ['.github/workflows/sentry-pr733-once.yml']
+
+permissions:
+  contents: read
+  pull-requests: read
+
+concurrency:
+  group: sentry-production-browser-smoke
+  cancel-in-progress: false
+
+jobs:
+  controlled-browser-event:
+    if: github.ref == 'refs/heads/verify/sentry-pr733-production-once'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      DROPI_EXPECTED_COMMIT: 7bec720a2463dbf4b4ac40d775e7942a5e1740a8
+      DROPI_SENTRY_SMOKE_MARKER: DROPi-SENTRY-SMOKE-733-${{ github.run_id }}-${{ github.run_attempt }}
+      DROPI_SENTRY_SMOKE_OUTPUT: ${{ github.workspace }}/artifacts/sentry
+    steps:
+      - name: Checkout audited merged production code
+        uses: actions/checkout@v7
+        with:
+          ref: 7bec720a2463dbf4b4ac40d775e7942a5e1740a8
+          persist-credentials: false
+      - name: Set up Node
+        uses: actions/setup-node@v7
+        with:
+          node-version: 22.12.0
+      - name: Require PR733 merge before any production event
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          node --input-type=module <<'JS'
+          const response = await fetch(`https://api.github.com/repos/${process.env.GITHUB_REPOSITORY}/pulls/733`, {
+            headers: { Authorization: `Bearer ${process.env.GH_TOKEN}`, Accept: 'application/vnd.github+json' }
+          });
+          if (!response.ok) throw new Error('Cannot verify PR733');
+          const pr = await response.json();
+          if (!pr.merged || pr.merge_commit_sha !== process.env.DROPI_EXPECTED_COMMIT) {
+            throw new Error('Merged commit mismatch');
+          }
+          console.log('Merged commit verified. Railway exact deployment separately verified by orchestrator.');
+          JS
+      - name: Prepare isolated browser runner
+        shell: bash
+        run: |
+          set -euo pipefail
+          RUNNER="$RUNNER_TEMP/dropi-sentry-smoke"
+          mkdir -p "$RUNNER"
+          cp game-web/scripts/sentry-production-smoke.mjs "$RUNNER/smoke.mjs"
+          cd "$RUNNER"
+          npm init -y >/dev/null
+          npm install --ignore-scripts --no-audit --no-fund playwright@1.55.0
+          echo "DROPI_SMOKE_RUNNER=$RUNNER" >> "$GITHUB_ENV"
+          npx playwright install --with-deps chromium
+      - name: Generate one synthetic browser error and observe transport
+        shell: bash
+        run: |
+          set -euo pipefail
+          cd "$DROPI_SMOKE_RUNNER"
+          node smoke.mjs
+      - name: Publish bounded evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: sentry-browser-smoke-${{ github.run_id }}-${{ github.run_attempt }}
+          path: artifacts/sentry/sentry-browser-smoke.json
+          if-no-files-found: warn
+          retention-days: 14
