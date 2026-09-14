@@ -10,7 +10,7 @@ const sourcePath = 'assets/models/quaternius_downtown_city'
 const prefix = `https://raw.githubusercontent.com/${repo}/${commit}/${sourcePath}/`
 const hash = bytes => createHash('sha256').update(bytes).digest('hex')
 const blob = bytes => createHash('sha1').update(Buffer.from(`blob ${bytes.length}\0`)).update(bytes).digest('hex')
-const manifest = { status: 'CANDIDATE_NOT_RELEASE_CLEARED', inheritedLicense: 'Quaternius Downtown City MegaKit / existing pinned QUATERNIUS_LICENSE.txt', sourceCommit: `${repo}@${commit}`, textures: [], derivatives: [], omitted: [], maxTextureSide: 1024, maxUniqueTextures: 10 }
+const manifest = { status: 'CANDIDATE_NOT_RELEASE_CLEARED', inheritedLicense: 'Quaternius Downtown City MegaKit / existing pinned QUATERNIUS_LICENSE.txt', sourceCommit: `${repo}@${commit}`, textures: [], derivatives: [], omitted: [], maxTextureSide: 1024, maxUniqueTextures: 10, pathPolicy: 'GLTF_ROOT_LOCAL_NO_PARENT_TRAVERSAL' }
 const cached = new Map()
 const fetchBytes = async url => {
   const response = await fetch(url, { signal: AbortSignal.timeout(45000) })
@@ -36,16 +36,14 @@ const texture = async filename => {
   if (bytes.readUInt32BE(0) !== 0x89504e47) throw new Error(`Not a PNG: ${filename}`)
   const width = bytes.readUInt32BE(16), height = bytes.readUInt32BE(20)
   if (Math.max(width, height) > manifest.maxTextureSide) { manifest.omitted.push({ filename, width, height, reason: 'TEXTURE_DIMENSION_BUDGET' }); cached.set(filename, null); return null }
-  // glTF loader prefixes image URIs with the asset root. A root-absolute path
-  // was concatenated twice; use a portable sibling-relative reference instead.
-  const uri = existing ? `../p2/${filename}` : `../restored/${filename}`
-  const publicUri = existing ? `/assets/environment/p2/${filename}` : `/assets/environment/restored/${filename}`
-  if (!existing) await writeFile(path.join(shared, filename), bytes)
-  manifest.textures.push({ filename, uri, publicUri, width, height, sourceBlobSha1: sha, sha256: hash(bytes), source: `${prefix}${filename}`, reusedP2: existing })
-  cached.set(filename, uri); return uri
+  const uri = `textures/${filename}`
+  await writeFile(path.join(shared, filename), bytes)
+  manifest.textures.push({ filename, uri, width, height, sourceBlobSha1: sha, sha256: hash(bytes), source: `${prefix}${filename}`, reusedVerifiedP2Bytes: existing })
+  cached.set(filename, { uri, bytes }); return cached.get(filename)
 }
 for (const stage of ['p3', 'p4']) {
   const dir = path.join(base, stage)
+  await mkdir(path.join(dir, 'textures'), { recursive: true })
   const provenance = JSON.parse(await readFile(path.join(dir, 'PROVENANCE.json'), 'utf8'))
   for (const source of Object.values(provenance.sources)) {
     if (!source.filename?.endsWith('.gltf') || !source.url?.startsWith(prefix)) continue
@@ -63,11 +61,12 @@ for (const stage of ['p3', 'p4']) {
       const sourceImage = sourceTexture && original.images?.[sourceTexture.source]
       if (!sourceImage?.uri) continue
       const name = decodeURIComponent(sourceImage.uri).split('/').at(-1)
-      const uri = await texture(name)
-      if (!uri) continue
-      const resolvedImage = path.resolve(dir, uri)
-      if (!resolvedImage.startsWith(`${base}${path.sep}`)) throw new Error('Restored texture escaped bundled environment')
-      await readFile(resolvedImage)
+      const image = await texture(name)
+      if (!image) continue
+      // Keep Babylon URI validation intact. Store verified bytes below the
+      // model root; neither absolute-path concatenation nor ../ is required.
+      const { uri, bytes } = image
+      await writeFile(path.join(dir, uri), bytes)
       let imageIndex = images.findIndex(image => image.uri === uri)
       if (imageIndex < 0) { imageIndex = images.length; images.push({ uri, mimeType: 'image/png', name }) }
       const textureIndex = textures.length
@@ -85,9 +84,9 @@ for (const stage of ['p3', 'p4']) {
       model.samplers = [{ magFilter: 9729, minFilter: 9987, wrapS: 10497, wrapT: 10497 }]
       const after = Buffer.from(`${JSON.stringify(model, null, 2)}\n`)
       await writeFile(filename, after)
-      const transformation = 'Restored verified original base-colour atlas references and UV texture transforms with shared <=1024px textures and verified sibling-relative URIs. Geometry, buffer, node hierarchy and material slots unchanged.'
+      const transformation = 'Restored verified original base-colour atlases and UV texture transforms, <=1024px images under each glTF root. Geometry, buffer, node hierarchy and material slots unchanged. Shared within each stage; verified duplicate bytes across stages are explicit.'
       const previous = provenance.derivatives?.[source.filename]
-      ;(provenance.derivatives ??= {})[source.filename] = { ...previous, sha256: hash(after), previousDerivativeSha256: hash(before), transformation, restoredMaterials: restored, finalTextureManifest: '../restored/PROVENANCE.json' }
+      ;(provenance.derivatives ??= {})[source.filename] = { ...previous, sha256: hash(after), previousDerivativeSha256: hash(before), transformation, restoredMaterials: restored, finalTextureManifest: '/assets/environment/restored/PROVENANCE.json' }
       manifest.derivatives.push({ stage, filename: source.filename, sha256: hash(after), restoredMaterials: restored, materialCount: model.materials.length })
     }
   }
@@ -95,4 +94,4 @@ for (const stage of ['p3', 'p4']) {
 }
 if (!manifest.derivatives.some(item => item.stage === 'p3') || !manifest.derivatives.some(item => item.stage === 'p4')) throw new Error('No real texture restoration for one of P3/P4; do not claim a material pass')
 await writeFile(path.join(shared, 'PROVENANCE.json'), `${JSON.stringify(manifest, null, 2)}\n`)
-console.log(`Restored ${manifest.derivatives.length} authored models and ${manifest.textures.length} shared atlas textures; ${manifest.omitted.length} explicit budget omissions. No Runway target acceptance.`)
+console.log(`Restored ${manifest.derivatives.length} authored models and ${manifest.textures.length} unique verified atlases; ${manifest.omitted.length} explicit budget omissions. No Runway target acceptance.`)
