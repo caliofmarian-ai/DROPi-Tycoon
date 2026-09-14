@@ -1,0 +1,46 @@
+{
+  "schemaVersion": 1,
+  "authority": "DT-19 — ART ASSET PIPELINE / PRODUCTION LIBRARY",
+  "authorityIssue": 742,
+  "parentIssue": 409,
+  "inventoryRef": "08_Assets/Production/asset-inventory.v1.json",
+  "generationPolicyRef": "08_Assets/Production/DEMAND_DRIVEN_GENERATION_POLICY.md",
+  "legalQualificationAuthority": "DT-13",
+  "releaseAndroidAuthority": "DT-14",
+  "libraryIngestionOwner": "#413",
+  "requestClassifications": [
+    "TEST_ONLY_NON_PRODUCTION",
+    "CANDIDATE_GENERATION_REQUEST"
+  ],
+  "permittedAutomaticLifecycleCeiling": "CANDIDATE",
+  "automaticPromotionForbidden": [
+    "APPROVED_SOURCE",
+    "PRODUCTION_READY",
+    "RUNTIME_INTEGRATED",
+    "ANDROID_VERIFIED"
+  ],
+  "requiredRequestSections": [
+    "requestId",
+    "issue",
+    "classification",
+    "semanticFamily",
+    "generationReason",
+    "inventoryAudit",
+    "provenance",
+    "budget",
+    "parameters"
+  ],
+  "failClosedRules": [
+    "generationReason must describe a concrete missing executable capability",
+    "inventoryAudit.checked must be true",
+    "inventoryAudit.inventoryRef must equal the canonical inventory path",
+    "inventoryAudit.missingCapability must be non-empty",
+    "provenance.generator must be Blender",
+    "provenance.sourceType must be PROCEDURAL_PRIMITIVES or a later explicitly governed source type",
+    "externalInputs must be an array and every external input requires explicit provenance in a later governed contract",
+    "triangle and material budgets must be positive bounded integers",
+    "collision proxy requirement must be explicit",
+    "test-only requests may not claim a production lifecycle state"
+  ],
+  "proofFixtureRule": "The initial CI fixture is generated outside the repository working tree and uploaded only as workflow evidence. It is not a canonical production asset."
+}

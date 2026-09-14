@@ -1,0 +1,78 @@
+name: DT-19 Blender Asset Factory
+
+on:
+  pull_request:
+    paths:
+      - '08_Assets/Production/BlenderFactory/**'
+      - '08_Assets/Production/asset-inventory.v1.json'
+      - '08_Assets/Production/Tools/verify_asset_inventory.mjs'
+      - '.github/workflows/dt19-asset-factory.yml'
+  push:
+    branches: [main]
+    paths:
+      - '08_Assets/Production/BlenderFactory/**'
+      - '08_Assets/Production/asset-inventory.v1.json'
+      - '08_Assets/Production/Tools/verify_asset_inventory.mjs'
+      - '.github/workflows/dt19-asset-factory.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate-and-generate-proof:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      REQUEST: 08_Assets/Production/BlenderFactory/requests/ci-proof-building.request.json
+      FACTORY: 08_Assets/Production/BlenderFactory/tools/asset_factory.py
+      GENERATOR: 08_Assets/Production/BlenderFactory/tools/blender_generate_asset.py
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Verify canonical DT-19 asset inventory
+        run: node 08_Assets/Production/Tools/verify_asset_inventory.mjs
+
+      - name: Run factory unit tests
+        run: python3 -m unittest 08_Assets/Production/BlenderFactory/tools/test_asset_factory.py
+
+      - name: Validate proof request before generator install
+        run: python3 "$FACTORY" preflight --request "$REQUEST"
+
+      - name: Install Blender headless runtime
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends blender python3-numpy
+          blender --version
+          blender --background --python-exit-code 1 --python-expr "import numpy; print('Blender numpy', numpy.__version__)"
+
+      - name: Generate deterministic CI-only GLB
+        run: |
+          OUT="$RUNNER_TEMP/dropi-dt19-proof"
+          mkdir -p "$OUT"
+          blender --background --python-exit-code 1 --python "$GENERATOR" -- \
+            --request "$REQUEST" \
+            --out-dir "$OUT"
+          test -s "$OUT/ci-proof-building.glb"
+          test -s "$OUT/ci-proof-building.report.json"
+          echo "DROPi asset proof output: $OUT"
+          ls -lh "$OUT"
+
+      - name: Validate generated GLB and report
+        run: |
+          OUT="$RUNNER_TEMP/dropi-dt19-proof"
+          python3 "$FACTORY" postflight \
+            --request "$REQUEST" \
+            --report "$OUT/ci-proof-building.report.json" \
+            --glb "$OUT/ci-proof-building.glb"
+
+      - name: Upload CI-only proof evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: dt19-blender-ci-proof
+          path: |
+            ${{ runner.temp }}/dropi-dt19-proof/ci-proof-building.glb
+            ${{ runner.temp }}/dropi-dt19-proof/ci-proof-building.report.json
+          if-no-files-found: error
+          retention-days: 7
