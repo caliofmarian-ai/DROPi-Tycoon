@@ -45,7 +45,6 @@ const boundsOf = (meshes: AbstractMesh[]): { min: Vector3; max: Vector3 } => {
 
 /** Complete native rig clone. Geometry/materials shared; skeleton/pose independent. */
 export const createPedestrian = (scene: Scene, container: AssetContainer, spec: PedestrianSpec, name: string, heightM: number): HumanInstance => {
-  // A geometry-free Mesh preserves the existing P5 ground-probe root contract.
   const root = new Mesh(name, scene)
   const normalization = new TransformNode(`${name}/normalization`, scene)
   normalization.parent = root
@@ -141,20 +140,23 @@ const boot = async (): Promise<void> => {
         const human = humans[index]!, p = anchor.getAbsolutePosition(), old = previous[index]!
         const dx = p.x - old.x, dz = p.z - old.z, speed = planarSpeed(dx, dz, dt)
         old.copyFrom(p)
-        human.root.position.set(p.x, ground(p.x, p.z) + 0.008, p.z)
+        human.root.position.x = p.x; human.root.position.z = p.z
+        if (!human.root.metadata?.dropiContactOwner) human.root.position.y = ground(p.x, p.z) + 0.008
         if (speed > 0.06) {
           const desired = Math.atan2(dx, dz)
           const delta = Math.atan2(Math.sin(desired - human.root.rotation.y), Math.cos(desired - human.root.rotation.y))
           human.root.rotation.y += delta * (1 - Math.exp(-16 * Math.min(dt, 0.1)))
         }
         human.mixer.update(speed, dt)
-        let requiredLift = 0
-        for (const marker of human.soles) {
-          marker.computeWorldMatrix(true)
-          const sole = marker.getAbsolutePosition()
-          requiredLift = Math.max(requiredLift, ground(sole.x, sole.z) + 0.006 - sole.y)
+        if (!human.root.metadata?.dropiContactOwner) {
+          let requiredLift = 0
+          for (const marker of human.soles) {
+            marker.computeWorldMatrix(true)
+            const sole = marker.getAbsolutePosition()
+            requiredLift = Math.max(requiredLift, ground(sole.x, sole.z) + 0.006 - sole.y)
+          }
+          human.root.position.y += requiredLift
         }
-        human.root.position.y += requiredLift
         anchor.isVisible = false
       })
     })

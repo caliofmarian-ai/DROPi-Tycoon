@@ -1,4 +1,6 @@
 import './style.css'
+import { createResolutionOwner } from './renderResolution'
+import { HERO_WALK_SPEED_MPS } from './authoredWalk'
 import {
   AbstractMesh,
   ArcRotateCamera,
@@ -57,7 +59,6 @@ const telemetryEl = requireElement<HTMLElement>('#telemetry')
 const interactButton = requireElement<HTMLButtonElement>('#interact')
 const recenterButton = requireElement<HTMLButtonElement>('#recenter')
 
-const MAX_RENDER_DPR = 1.5
 const BUILD_SHA = import.meta.env.VITE_COMMIT_SHA || 'LOCAL'
 const NATIVE_BACK_EVENT = 'dropi:native-back'
 const NATIVE_EXIT_GAME_MESSAGE = 'dropi:exit-game'
@@ -107,11 +108,7 @@ const firstFrameTimeout = window.setTimeout(() => {
   )
 }, FIRST_FRAME_TIMEOUT_MS)
 
-const resizeRenderer = (): void => {
-  const deviceDpr = Math.max(1, window.devicePixelRatio || 1)
-  engine.setHardwareScalingLevel(deviceDpr / Math.min(deviceDpr, MAX_RENDER_DPR))
-  engine.resize()
-}
+const resizeRenderer = createResolutionOwner(engine, canvas).resize
 
 const scheduleResize = (): void => {
   window.requestAnimationFrame(() => window.requestAnimationFrame(resizeRenderer))
@@ -703,7 +700,7 @@ scene.onBeforeRenderObservable.add(() => {
   const move = (input.forward ? 1 : 0) - (input.back ? 1 : 0)
 
   hero.rotation.y += turn * 2.05 * dt
-  const targetSpeed = move > 0 ? 4.25 : move < 0 ? -2.75 : 0
+  const targetSpeed = move > 0 ? HERO_WALK_SPEED_MPS : move < 0 ? -HERO_WALK_SPEED_MPS * .6 : 0
   const acceleration = move === 0 ? 11.5 : 8.5
   currentSpeed = moveTowards(currentSpeed, targetSpeed, acceleration * dt)
 
