@@ -67,6 +67,15 @@ jobs:
       - name: Strict TypeScript and Vite build
         run: npm run build
 
+      - name: Upload rendered regression evidence even on failure
+        if: ${{ always() && hashFiles('09_Development/Spikes/BABYLON_THIRD_PERSON_BRAILA_V1/dist/evidence/verification.json') != '' }}
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: dropi-babylon-rendered-evidence-${{ github.event.pull_request.head.sha || github.sha }}
+          path: 09_Development/Spikes/BABYLON_THIRD_PERSON_BRAILA_V1/dist/evidence
+          if-no-files-found: error
+          retention-days: 14
+
       - name: Reject disabled spike type checking
         run: |
           if grep -Eq '"noCheck"[[:space:]]*:[[:space:]]*true' tsconfig.json; then
@@ -105,7 +114,7 @@ jobs:
             sleep 1
           done
           curl -fsS http://127.0.0.1:4173/ | grep -q "DROPi TYCOON"
-          echo 'Static preview serves correctly. CI visual WebGL capture is intentionally not used as acceptance evidence.'
+          echo 'Static preview serves correctly. Software WebGL regression is not Android visual acceptance.'
 
       - name: Upload exact static spike build
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
