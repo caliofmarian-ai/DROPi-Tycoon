@@ -6,7 +6,7 @@
   "engines": { "node": ">=22.12.0 <23" },
   "scripts": {
     "dev": "npm run setup:p1 && npm run setup:humans && npm run setup:p2 && npm run setup:p3 && npm run setup:p4 && npm run setup:surfaces && vite --host 0.0.0.0",
-    "build": "npm run setup:p1 && npm run setup:humans && npm run setup:p2 && npm run setup:p3 && npm run setup:p4 && npm run setup:surfaces && npm run verify:runtime-registrations && tsc --noEmit && npm run verify:presentation && npm run verify:humans && npm run verify:next && vite build && npm run verify:rendered",
+    "build": "npm run setup:p1 && npm run setup:humans && npm run setup:p2 && npm run setup:p3 && npm run setup:p4 && npm run setup:surfaces && npm run verify:runtime-registrations && tsc --noEmit && npm run verify:presentation && npm run verify:humans && npm run verify:next && npm run verify:camera && vite build && npm run verify:rendered",
     "preview": "vite preview --host 0.0.0.0",
     "typecheck": "npm run setup:p1 && npm run setup:humans && npm run setup:p2 && npm run setup:p3 && npm run setup:p4 && tsc --noEmit",
     "setup:p1": "node scripts/setupP1RiggedHero.mjs",
@@ -19,6 +19,7 @@
     "verify:presentation": "node scripts/verifyPresentationRegression.mjs",
     "verify:humans": "node scripts/verifyHumanMotion.mjs",
     "verify:next": "node scripts/verifyNextApk.mjs",
+    "verify:camera": "node scripts/verifyCameraOcclusion.mjs",
     "verify:rendered": "node scripts/verifyRenderedEvaluation.mjs"
   },
   "dependencies": { "@babylonjs/core": "9.26.0" },
