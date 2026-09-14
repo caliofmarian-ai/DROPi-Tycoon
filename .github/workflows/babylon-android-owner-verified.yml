@@ -44,7 +44,7 @@ jobs:
           ACTUAL_SHA="$(git rev-parse HEAD)"
           test "$ACTUAL_SHA" = "$DROPI_HEAD_SHA"
           echo "DROPI_CHECKOUT_SHA=$ACTUAL_SHA" >> "$GITHUB_ENV"
-          echo "DROPI_STAGE_ROOT=$RUNNER_TEMP/dropi-owner-android-$DROPI_RUN_ID-$DROPI_RUN_ATTEMPT" >> "$GITHUB_ENV"
+          echo "DROPI_STAGE_ROOT=$RUNNER_TEMP/dropi-babylon-android-evaluation-$DROPI_RUN_ID-$DROPI_RUN_ATTEMPT" >> "$GITHUB_ENV"
           echo "DROPI_APK_OUTPUT=$RUNNER_TEMP/dropi-babylon-android-eval-$DROPI_HEAD_SHA" >> "$GITHUB_ENV"
 
       - name: Setup Node 22.13.0
