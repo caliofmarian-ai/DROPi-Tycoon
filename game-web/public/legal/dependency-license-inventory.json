@@ -1,14 +1,77 @@
 {
   "schemaVersion": 1,
-  "auditDate": "2026-09-09",
-  "baselineCommit": "65413103c7ae4e1951ac63aacc8e1232643e0bd0",
+  "auditDate": "2026-09-13",
+  "baselineCommit": "1a75cd7ad34397237a32b5dbee950a7e055fe37f",
   "component": "game-web",
   "sourceLockfile": {
     "path": "game-web/package-lock.json",
-    "gitBlobSha": "29c7efc9b5e9b642e37eb4606757596584e2b38f"
+    "gitBlobSha": "455e9196cf16ab673fbfd244550246bf775c237e"
   },
   "scope": "exact game-web production npm dependency closure only; Android/mobile shell closure is tracked separately by commercial-release-evidence.json and remains blocked pending game-mobile/package-lock.json",
   "packages": [
+    {
+      "name": "@sentry/browser",
+      "version": "10.74.0",
+      "license": "MIT",
+      "relationship": "direct",
+      "resolved": "https://registry.npmjs.org/@sentry/browser/-/browser-10.74.0.tgz",
+      "licenseSource": "https://github.com/getsentry/sentry-javascript/blob/develop/LICENSE",
+      "noticeSection": "Sentry JavaScript SDK 10.74.0"
+    },
+    {
+      "name": "@sentry/browser-utils",
+      "version": "10.74.0",
+      "license": "MIT",
+      "relationship": "transitive via @sentry/browser",
+      "resolved": "https://registry.npmjs.org/@sentry/browser-utils/-/browser-utils-10.74.0.tgz",
+      "licenseSource": "https://github.com/getsentry/sentry-javascript/blob/develop/LICENSE",
+      "noticeSection": "Sentry JavaScript SDK 10.74.0"
+    },
+    {
+      "name": "@sentry/conventions",
+      "version": "0.16.0",
+      "license": "MIT",
+      "relationship": "transitive via @sentry/browser",
+      "resolved": "https://registry.npmjs.org/@sentry/conventions/-/conventions-0.16.0.tgz",
+      "licenseSource": "https://github.com/getsentry/sentry-javascript/blob/develop/LICENSE",
+      "noticeSection": "Sentry JavaScript SDK 10.74.0"
+    },
+    {
+      "name": "@sentry/core",
+      "version": "10.74.0",
+      "license": "MIT",
+      "relationship": "transitive via @sentry/browser",
+      "resolved": "https://registry.npmjs.org/@sentry/core/-/core-10.74.0.tgz",
+      "licenseSource": "https://github.com/getsentry/sentry-javascript/blob/develop/LICENSE",
+      "noticeSection": "Sentry JavaScript SDK 10.74.0"
+    },
+    {
+      "name": "@sentry/feedback",
+      "version": "10.74.0",
+      "license": "MIT",
+      "relationship": "transitive via @sentry/browser; package presence does not mean the feedback product is enabled",
+      "resolved": "https://registry.npmjs.org/@sentry/feedback/-/feedback-10.74.0.tgz",
+      "licenseSource": "https://github.com/getsentry/sentry-javascript/blob/develop/LICENSE",
+      "noticeSection": "Sentry JavaScript SDK 10.74.0"
+    },
+    {
+      "name": "@sentry/replay",
+      "version": "10.74.0",
+      "license": "MIT",
+      "relationship": "transitive via @sentry/browser; package presence does not mean Session Replay is enabled",
+      "resolved": "https://registry.npmjs.org/@sentry/replay/-/replay-10.74.0.tgz",
+      "licenseSource": "https://github.com/getsentry/sentry-javascript/blob/develop/LICENSE",
+      "noticeSection": "Sentry JavaScript SDK 10.74.0"
+    },
+    {
+      "name": "@sentry/replay-canvas",
+      "version": "10.74.0",
+      "license": "MIT",
+      "relationship": "transitive via @sentry/browser; package presence does not mean canvas replay is enabled",
+      "resolved": "https://registry.npmjs.org/@sentry/replay-canvas/-/replay-canvas-10.74.0.tgz",
+      "licenseSource": "https://github.com/getsentry/sentry-javascript/blob/develop/LICENSE",
+      "noticeSection": "Sentry JavaScript SDK 10.74.0"
+    },
     {
       "name": "phaser",
       "version": "3.90.0",

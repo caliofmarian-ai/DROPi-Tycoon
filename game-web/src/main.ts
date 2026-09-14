@@ -1,9 +1,12 @@
 import Phaser from 'phaser'
 import { createGameConfig } from './config/gameConfig'
+import { initBrowserObservability } from './observability/sentry'
 import {
   DROPi_NATIVE_BACK_EVENT,
   resolveNativeBackTarget,
 } from './platform/nativeBackNavigation'
+
+initBrowserObservability()
 
 const root = document.querySelector<HTMLDivElement>('#app')
 
