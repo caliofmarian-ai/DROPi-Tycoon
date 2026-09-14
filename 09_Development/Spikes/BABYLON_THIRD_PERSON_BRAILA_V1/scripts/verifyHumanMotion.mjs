@@ -8,7 +8,11 @@ import '@babylonjs/loaders/glTF/index.js'
 
 const tempWalk = path.resolve(`.walk-check-${process.pid}.mjs`)
 const tempPeople = path.resolve(`.people-check-${process.pid}.mjs`)
+// Vite resolves extensionless TS dependencies; Node ESM requires explicit files.
+// Only import specifiers are adapted here. Production functions are unchanged.
 const compile = text => ts.transpileModule(text, { compilerOptions: { target: ts.ScriptTarget.ES2022, module: ts.ModuleKind.ES2022 } }).outputText
+  .replaceAll("'@babylonjs/core/Maths/math.vector'", "'@babylonjs/core/Maths/math.vector.js'")
+  .replaceAll("'@babylonjs/loaders/glTF'", "'@babylonjs/loaders/glTF/index.js'")
 await writeFile(tempWalk, compile(await readFile('src/authoredWalk.ts', 'utf8')))
 await writeFile(tempPeople, compile(await readFile('src/authoredPedestrians.ts', 'utf8')).replace("'./authoredWalk'", `'./${path.basename(tempWalk)}'`))
 const { HERO_WALK_SPEED_MPS, nextWalkState, planarSpeed } = await import(pathToFileURL(tempWalk).href)
