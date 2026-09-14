@@ -11,6 +11,10 @@ RUN npm ci
 
 # Copy the rest of the source and build the application.
 COPY . .
+# Railway supplies configured variables as Docker build arguments. Vite reads
+# this public ingestion DSN at build time, not from the production server env.
+# Never declare SENTRY_AUTH_TOKEN here or expose it through a VITE_ variable.
+ARG VITE_SENTRY_DSN
 RUN npm run build
 
 # ---- Production stage ----
