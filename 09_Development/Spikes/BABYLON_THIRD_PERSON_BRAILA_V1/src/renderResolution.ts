@@ -13,17 +13,22 @@ export const nextResolution = (state: ResolutionState, meanMs: number, p95Ms: nu
   if (meanMs < 24 && p95Ms < 32) return { density: Math.min(1.35, state.density + .05), lastChange: nowSeconds, overloaded: false }
   return { ...state, overloaded: meanMs > 38 }
 }
-
-/** main.ts delegates resize here. No second module patches engine sizing methods. */
+export const frameBudget = (samples: number[]): { meanMs: number; p95Ms: number } | null => {
+  const values = samples.filter(ms => Number.isFinite(ms) && ms > 0)
+  if (values.length < 4 || values.reduce((sum, ms) => sum + ms, 0) < 2000) return null
+  const sorted = [...values].sort((a, b) => a - b)
+  return { meanMs: values.reduce((sum, ms) => sum + ms, 0) / values.length, p95Ms: sorted[Math.min(sorted.length-1, Math.floor(sorted.length*.95))]! }
+}
+/** main.ts owns sizing through this delegate, not competing method patches. */
 export const createResolutionOwner = (engine: Engine, canvas: HTMLCanvasElement): { resize(): void } => {
   let state: ResolutionState = { density: 1.25, lastChange: performance.now() / 1000, overloaded: false }
-  let plan: ResolutionPlan | null = null
+  let plan: ResolutionPlan | null = null, budget: ReturnType<typeof frameBudget> = null
   const samples: number[] = []
-  let lastSampleTime = performance.now()
+  let lastSampleTime = performance.now(), skipAfterHidden = false
   const publish = (): void => {
     ;(window as unknown as { __DROPiRenderQuality?: unknown }).__DROPiRenderQuality = {
-      mode: 'ADAPTIVE_PIXEL_BUDGET', ...state, ...plan,
-      actualWidth: engine.getRenderWidth(), actualHeight: engine.getRenderHeight(),
+      mode: 'ADAPTIVE_PIXEL_BUDGET', ...state, ...plan, ...budget,
+      actualWidth: engine.getRenderWidth(), actualHeight: engine.getRenderHeight(), sampleCount: samples.length,
       physicalDeviceAcceptance: 'UNKNOWN',
     }
   }
@@ -31,26 +36,26 @@ export const createResolutionOwner = (engine: Engine, canvas: HTMLCanvasElement)
     const rect = canvas.getBoundingClientRect()
     if (rect.width <= 0 || rect.height <= 0) return
     plan = resolutionPlan(rect.width, rect.height, Math.max(1, window.devicePixelRatio || 1), state.density)
-    // Babylon scales CSS canvas dimensions by 1/scalingLevel. The old dpr/limit
-    // expression applied the device ratio twice and shrank the render buffer.
-    engine.setHardwareScalingLevel(plan.scalingLevel)
-    engine.resize(); publish()
+    engine.setHardwareScalingLevel(plan.scalingLevel); engine.resize(); publish()
   }
+  const visibility = (): void => { if (document.hidden) { samples.length = 0; skipAfterHidden = true } }
+  document.addEventListener('visibilitychange', visibility)
   const observer = engine.onEndFrameObservable.add(() => {
-    if (document.hidden) { samples.length = 0; return }
+    if (document.hidden) { samples.length = 0; skipAfterHidden = true; return }
+    if (skipAfterHidden) { skipAfterHidden = false; return }
     const ms = engine.getDeltaTime()
-    if (ms > 0 && ms < 250) samples.push(ms)
+    // Slow visible frames are evidence of overload. Filtering out >=250ms made
+    // a one-FPS scene falsely report no overload and prevented any adaptation.
+    if (Number.isFinite(ms) && ms > 0) samples.push(ms)
     if (samples.length > 180) samples.shift()
-    if (performance.now() - lastSampleTime < 2000 || samples.length < 60) return
-    const mean = samples.reduce((sum, sample) => sum + sample, 0) / samples.length
-    const sorted = [...samples].sort((a, b) => a - b)
-    const p95 = sorted[Math.min(sorted.length - 1, Math.floor(sorted.length * .95))]!
-    const next = nextResolution(state, mean, p95, performance.now() / 1000)
+    if (performance.now() - lastSampleTime < 2000) return
+    budget = frameBudget(samples)
+    if (!budget) return
+    const next = nextResolution(state, budget.meanMs, budget.p95Ms, performance.now() / 1000)
     const changed = Math.abs(next.density - state.density) > .001
-    state = next; lastSampleTime = performance.now()
-    if (changed) resize()
-    else publish()
+    state = { ...next, overloaded: budget.meanMs > 38 }; lastSampleTime = performance.now()
+    if (changed) resize(); else publish()
   })
-  engine.onDisposeObservable.addOnce(() => engine.onEndFrameObservable.remove(observer))
+  engine.onDisposeObservable.addOnce(() => { engine.onEndFrameObservable.remove(observer); document.removeEventListener('visibilitychange', visibility) })
   return { resize }
 }

@@ -3,12 +3,17 @@ import type { AnimationGroup } from '@babylonjs/core/Animations/animationGroup'
 export const HERO_WALK_SPEED_MPS = 1.65
 export const WALK_REFERENCE_MPS = 1.4
 export type WalkState = { moving: boolean; weight: number; ratio: number }
+/** Bounded collision substeps; never catch up more than 250ms after a stall. */
+export const movementSteps = (seconds: number, suspended = false): number[] => {
+  if (suspended || !Number.isFinite(seconds) || seconds <= 0 || seconds > 2) return []
+  const budget = Math.min(seconds, .25), count = Math.max(1, Math.ceil(budget / .05))
+  return Array.from({ length: count }, () => budget / count)
+}
 export const nextWalkState = (state: WalkState, speed: number, dt: number): WalkState => {
   const s = Number.isFinite(speed) ? Math.max(0, speed) : 0
   const step = Number.isFinite(dt) ? Math.max(0, Math.min(dt, .1)) : 0
-  // Input dead-zone and collision resolution already remove stationary noise.
-  // A slow *rendered* frame must not label a visibly moving actor as idle just
-  // because its real-time speed dropped below the previous 0.13m/s threshold.
+  // Preserve 82fbacaf's small actual-motion hysteresis. A slow visible frame is
+  // overload, not an idle state; no requested-speed inflation is used.
   const moving = state.moving ? s >= .005 : s > .01
   const targetWeight = moving ? 1 : 0
   const weight = state.weight + (targetWeight - state.weight) * (1 - Math.exp(-18 * step))
@@ -17,10 +22,8 @@ export const nextWalkState = (state: WalkState, speed: number, dt: number): Walk
 export const planarSpeed = (dx: number, dz: number, seconds: number): number => {
   if (![dx, dz, seconds].every(Number.isFinite) || seconds <= 0 || seconds > 2) return 0
   const distance = Math.hypot(dx, dz)
-  // A >250ms frame is overload, not necessarily a pause: the existing movement
-  // writer still advances the actor. Keep actual distance/time so animation
-  // phase matches that displacement instead of switching to idle and sliding.
-  // Long suspension and relocation remain distinct from ordinary traversal.
+  // Preserve real distance/time through visible overloaded frames; suspension
+  // and relocations remain separate from ordinary traversal.
   return distance > 2 ? 0 : distance / seconds
 }
 export const createWalkMixer = (idle: AnimationGroup, walk: AnimationGroup): {
