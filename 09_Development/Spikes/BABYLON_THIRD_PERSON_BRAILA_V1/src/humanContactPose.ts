@@ -5,7 +5,7 @@ export type SurfaceHeight = (x: number, z: number) => number
 export type ContactReport = {
   minFootClearanceM: number; leftFootClearanceM: number; rightFootClearanceM: number
   handErrorM: number | null; carry: boolean; plantedFeet: number; feetVerticesChecked: number
-  status: 'PASS' | 'FAIL'; failures: string[]
+  status: 'PASS' | 'FAIL'; failures: string[]; releasedPlants: number
 }
 type FootData = { mesh: AbstractMesh; positions: number[]; indices: number[]; weights: number[]; sides: number[] }
 export class SkinFeetProbe {
@@ -59,6 +59,30 @@ export class SkinFeetProbe {
   }
 }
 
+/** A stale support lock is optional, not permission to stretch or break a leg. */
+export const tryFootPlant = (
+  upper: TransformNode, lower: TransformNode, foot: TransformNode, tip: TransformNode,
+  target: Vector3, pole: Vector3,
+): { planted: boolean; errorM: number } => {
+  const rollback = new PoseRestore()
+  for (const joint of [upper, lower, foot]) rollback.save(joint)
+  try {
+    const result = solveTwoBone(upper, lower, tip, target, pole)
+    if (!Number.isFinite(result.errorM)) throw new Error('Non-finite support solve')
+    if (!result.reached || result.clamped) {
+      rollback.restore()
+      for (const joint of [upper, lower, foot, tip]) joint.computeWorldMatrix(true)
+      return { planted: false, errorM: result.errorM }
+    }
+    foot.setAbsolutePosition(target); foot.computeWorldMatrix(true)
+    return { planted: true, errorM: result.errorM }
+  } catch (error) {
+    rollback.restore()
+    for (const joint of [upper, lower, foot, tip]) joint.computeWorldMatrix(true)
+    throw error
+  }
+}
+
 type Leg = { upper: TransformNode; lower: TransformNode; foot: TransformNode; tip: TransformNode; lock: Vector3 | null; side: number }
 type Arm = { upper: TransformNode; lower: TransformNode; wrist: TransformNode; palm: TransformNode; forward: Vector3; normal: Vector3; side: number }
 export class HumanContactPose {
@@ -100,14 +124,17 @@ export class HumanContactPose {
   restore(): void { this.restorePose.restore() }
   clearPlants(): void { for (const leg of this.legs) leg.lock = null }
   apply(dt: number, speed: number): ContactReport {
+    if (!Number.isFinite(dt) || !Number.isFinite(speed)) throw new Error('Invalid contact frame inputs')
     const failures: string[] = []
+    let releasedPlants = 0
     this.base.computeWorldMatrix(true)
     const position = this.base.getAbsolutePosition().clone()
     const forward = Vector3.TransformNormal(Vector3.Forward(), this.root.computeWorldMatrix(true)).normalize()
     const heading = Math.atan2(forward.x, forward.z)
     const turned = this.previousHeading === null ? false : Math.abs(Math.atan2(Math.sin(heading - this.previousHeading), Math.cos(heading - this.previousHeading))) > .3
     const relocated = this.previousPosition !== null && Vector3.Distance(position, this.previousPosition) > .5
-    if (dt > .2 || dt <= 0 || turned || relocated) this.clearPlants()
+    const continuous = dt > 0 && dt <= .2 && !turned && !relocated
+    if (!continuous) this.clearPlants()
     this.previousHeading = heading; this.previousPosition = position.clone()
     position.y = this.surface(position.x, position.z) + .006
     this.base.setAbsolutePosition(position); this.base.computeWorldMatrix(true)
@@ -121,23 +148,26 @@ export class HumanContactPose {
       leg.foot.computeWorldMatrix(true)
       const native = leg.foot.getAbsolutePosition().clone()
       const clearance = index === 0 ? feet.left : feet.right, other = index === 0 ? feet.right : feet.left
-      if (leg.lock && (clearance > other + .065 || Math.hypot(leg.lock.x - native.x, leg.lock.z - native.z) > .16 || turned || relocated)) leg.lock = null
-      if (!leg.lock && clearance <= .022 && (speed > .08 || Math.abs(clearance - other) < .025)) leg.lock = native.clone()
+      if (leg.lock && (clearance > other + .065 || Math.hypot(leg.lock.x - native.x, leg.lock.z - native.z) > .16 || !continuous)) leg.lock = null
+      // Do not clear and immediately re-acquire a support lock in the very same
+      // skipped/relocated frame. Resume planting on the next continuous pose.
+      if (continuous && !leg.lock && clearance <= .022 && (speed > .08 || Math.abs(clearance - other) < .025)) leg.lock = native.clone()
       if (!leg.lock) continue
       for (const joint of [leg.upper, leg.lower, leg.foot]) this.restorePose.save(joint)
       leg.tip.position.copyFrom(Vector3.TransformCoordinates(native, Matrix.Invert(leg.lower.computeWorldMatrix(true))))
       const target = native.clone(); target.x = leg.lock.x; target.z = leg.lock.z
       const pole = Vector3.TransformCoordinates(new Vector3(leg.side * .13, .55, .65), this.root.computeWorldMatrix(true))
-      const solved = solveTwoBone(leg.upper, leg.lower, leg.tip, target, pole)
-      if (!solved.reached) { leg.lock = null; failures.push('FOOT_REACH_LIMIT'); continue }
-      leg.foot.setAbsolutePosition(target); leg.foot.computeWorldMatrix(true)
+      const solved = tryFootPlant(leg.upper, leg.lower, leg.foot, leg.tip, target, pole)
+      if (!solved.planted) { leg.lock = null; releasedPlants += 1 }
     }
+    // Always measure real skinned shoes after planting or rollback. Releasing an
+    // unreachable optional lock is NOT a ground-clearance success by itself.
     feet = this.probe.read(this.surface)
     const requestedCorrection = Math.max(0, .006 - Math.min(feet.left, feet.right)), correction = Math.min(.15, requestedCorrection)
     if (requestedCorrection > .15) failures.push('RESIDUAL_GROUND_PENETRATION')
     if (correction > 0) {
       position.y += correction; this.base.setAbsolutePosition(position); this.base.computeWorldMatrix(true)
-      feet = { ...feet, left: feet.left + correction, right: feet.right + correction }
+      feet = this.probe.read(this.surface)
     }
     let handErrorM: number | null = null
     const carrying = Boolean(this.parcel?.isEnabled())
@@ -151,8 +181,6 @@ export class HumanContactPose {
       })
       const reach = Math.min(...arms.map(arm => arm.reach))
       const shoulders = arms.reduce((sum, arm) => sum.addInPlace(arm.upper), Vector3.Zero()).scale(1 / arms.length)
-      // The carried box follows the actual shoulder/torso envelope, rather than
-      // requiring every walking pose to reach a fixed, overly distant world anchor.
       const center = new Vector3(0, shoulders.y - reach * .52, Math.max(.23, shoulders.z + reach * .60))
       parcel.parent = this.root; parcel.position.copyFrom(center); parcel.rotationQuaternion = null; parcel.rotation.set(0, 0, 0)
       const bounds = parcel.getBoundingInfo().boundingBox, localSize = bounds.maximum.subtract(bounds.minimum)
@@ -175,10 +203,10 @@ export class HumanContactPose {
         }
         handErrorM = Math.max(handErrorM, errorM)
       }
-      if (handErrorM > .025) failures.push('HAND_SOCKET_GAP')
+      if (!Number.isFinite(handErrorM) || handErrorM > .025) failures.push('HAND_SOCKET_GAP')
     }
     if (Math.min(feet.left, feet.right) < -.002) failures.push('FOOT_PENETRATION')
-    return { minFootClearanceM: Math.min(feet.left, feet.right), leftFootClearanceM: feet.left, rightFootClearanceM: feet.right, handErrorM, carry: carrying, plantedFeet: this.legs.filter(leg => leg.lock).length, feetVerticesChecked: feet.vertices, status: failures.length ? 'FAIL' : 'PASS', failures }
+    return { minFootClearanceM: Math.min(feet.left, feet.right), leftFootClearanceM: feet.left, rightFootClearanceM: feet.right, handErrorM, carry: carrying, plantedFeet: this.legs.filter(leg => leg.lock).length, feetVerticesChecked: feet.vertices, releasedPlants, status: failures.length ? 'FAIL' : 'PASS', failures }
   }
   dispose(): void { this.restore(); this.legs.forEach(leg => leg.tip.dispose()); this.arms.forEach(arm => arm.palm.dispose()) }
 }
