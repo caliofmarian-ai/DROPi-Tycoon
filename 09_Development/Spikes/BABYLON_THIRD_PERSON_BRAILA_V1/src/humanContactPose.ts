@@ -10,6 +10,9 @@ export type ContactReport = {
 type FootData = { mesh: AbstractMesh; positions: number[]; indices: number[]; weights: number[]; sides: number[] }
 export class SkinFeetProbe {
   readonly data: FootData[]
+  private readonly skeletons: NonNullable<AbstractMesh['skeleton']>[]
+  private readonly skinned = Vector3.Zero()
+  private readonly world = Vector3.Zero()
   constructor(meshes: AbstractMesh[]) {
     this.data = meshes.filter(mesh => mesh.skeleton && /feet|shoe/i.test(mesh.name)).map(mesh => {
       const positions = mesh.getVerticesData(VertexBuffer.PositionKind)
@@ -27,13 +30,18 @@ export class SkinFeetProbe {
       return { mesh, positions: Array.from(positions), indices: Array.from(indices), weights: Array.from(weights), sides }
     })
     if (!this.data.length) throw new Error('No actual skinned shoe geometry found')
+    // Rig membership is fixed for this probe's lifetime, not rebuilt on every
+    // foot/curb/IK measurement. Matrices themselves are still refreshed per read.
+    this.skeletons = [...new Set(this.data.map(item => item.mesh.skeleton!))]
   }
   read(surface: SurfaceHeight): { left: number; right: number; vertices: number } {
     let left = Infinity, right = Infinity, vertices = 0
-    for (const skeleton of new Set(this.data.map(item => item.mesh.skeleton!))) skeleton.prepare(true)
-    const skinned = Vector3.Zero(), world = Vector3.Zero()
+    for (const skeleton of this.skeletons) skeleton.prepare(true)
+    const { skinned, world } = this
     for (const { mesh, positions, indices, weights, sides } of this.data) {
-      mesh.computeWorldMatrix(true)
+      // A read is a single pose snapshot. Querying getWorldMatrix for EVERY shoe
+      // vertex needlessly repeats transform/hierarchy checks on all nine rigs.
+      const worldMatrix = mesh.computeWorldMatrix(true)
       const matrices = mesh.skeleton!.getTransformMatrices(mesh)
       for (let vertex = 0; vertex < positions.length / 3; vertex += 1) {
         const x = positions[vertex * 3]!, y = positions[vertex * 3 + 1]!, z = positions[vertex * 3 + 2]!
@@ -47,7 +55,7 @@ export class SkinFeetProbe {
           pz += weight * (x * matrices[offset + 2]! + y * matrices[offset + 6]! + z * matrices[offset + 10]! + matrices[offset + 14]!)
         }
         skinned.set(px, py, pz)
-        Vector3.TransformCoordinatesToRef(skinned, mesh.getWorldMatrix(), world)
+        Vector3.TransformCoordinatesToRef(skinned, worldMatrix, world)
         const clearance = world.y - surface(world.x, world.z)
         if (sides[vertex] === -1) left = Math.min(left, clearance)
         else right = Math.min(right, clearance)

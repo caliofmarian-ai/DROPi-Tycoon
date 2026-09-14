@@ -5,6 +5,8 @@
   "type": "module",
   "engines": { "node": ">=22.12.0 <23" },
   "scripts": {
+    "prebuild": "npm run verify:mobile-performance",
+    "verify:mobile-performance": "node scripts/verifyMobilePerformance.mjs",
     "dev": "npm run setup:p1 && npm run setup:humans && npm run setup:p2 && npm run setup:p3 && npm run setup:p4 && npm run setup:surfaces && npm run setup:wear && vite --host 0.0.0.0",
     "build": "npm run setup:p1 && npm run setup:humans && npm run setup:p2 && npm run setup:p3 && npm run setup:p4 && npm run setup:surfaces && npm run setup:wear && npm run verify:runtime-registrations && tsc --noEmit && npm run verify:presentation && npm run verify:humans && npm run verify:next && npm run verify:camera && npm run verify:timing && npm run verify:frame-safety && npm run verify:contact-lifecycle && npm run verify:idle-support && npm run verify:coherence && vite build && npm run verify:rendered",
     "preview": "vite preview --host 0.0.0.0",

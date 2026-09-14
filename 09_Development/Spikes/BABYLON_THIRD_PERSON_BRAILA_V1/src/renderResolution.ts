@@ -1,5 +1,11 @@
 import type { Engine } from '@babylonjs/core/Engines/engine'
 
+export const TARGET_FPS = 60
+const FRAME_MS = 1000 / TARGET_FPS
+const MIN_DENSITY = .95, MAX_DENSITY = 1.35
+const DOWN_COOLDOWN_S = 6, UP_COOLDOWN_S = 12
+const isOverBudget = (meanMs: number, p95Ms: number): boolean => meanMs > FRAME_MS * 1.1 || p95Ms > FRAME_MS * 1.5
+
 export type ResolutionPlan = { width: number; height: number; density: number; scalingLevel: number }
 export const resolutionPlan = (width: number, height: number, deviceDpr: number, density = 1.25): ResolutionPlan => {
   if (![width, height, deviceDpr, density].every(Number.isFinite) || Math.min(width, height, deviceDpr, density) <= 0) throw new Error('Invalid render resolution inputs')
@@ -8,52 +14,75 @@ export const resolutionPlan = (width: number, height: number, deviceDpr: number,
 }
 export type ResolutionState = { density: number; lastChange: number; overloaded: boolean }
 export const nextResolution = (state: ResolutionState, meanMs: number, p95Ms: number, nowSeconds: number): ResolutionState => {
-  if (![meanMs, p95Ms, nowSeconds].every(Number.isFinite) || nowSeconds - state.lastChange < 6) return state
-  if (meanMs > 38 && p95Ms > 48) return { density: Math.max(.95, state.density - .1), lastChange: nowSeconds, overloaded: true }
-  if (meanMs < 24 && p95Ms < 32) return { density: Math.min(1.35, state.density + .05), lastChange: nowSeconds, overloaded: false }
-  return { ...state, overloaded: meanMs > 38 }
+  if (![state.density, state.lastChange, meanMs, p95Ms, nowSeconds].every(Number.isFinite) || Math.min(state.density, meanMs, p95Ms) <= 0 || nowSeconds - state.lastChange < DOWN_COOLDOWN_S) return state
+  const overloaded = isOverBudget(meanMs, p95Ms)
+  let density = state.density
+  if (overloaded) density = Math.max(MIN_DENSITY, state.density - .1)
+  // A 60 Hz display normally reports ~16.7 ms. Allow bounded scheduling jitter,
+  // but NEVER increase pixel load at 45/30 FPS as the old 24/32 ms gate did.
+  else if (nowSeconds - state.lastChange >= UP_COOLDOWN_S && meanMs <= FRAME_MS + .25 && p95Ms <= FRAME_MS + 1.5) density = Math.min(MAX_DENSITY, state.density + .05)
+  return { density, lastChange: Math.abs(density - state.density) > .001 ? nowSeconds : state.lastChange, overloaded }
 }
-export const frameBudget = (samples: number[]): { meanMs: number; p95Ms: number } | null => {
+export type FrameBudget = { meanMs: number; p95Ms: number; p99Ms: number; worstMs: number; overBudgetPercent: number }
+export const frameBudget = (samples: number[]): FrameBudget | null => {
   const values = samples.filter(ms => Number.isFinite(ms) && ms > 0)
-  if (values.length < 4 || values.reduce((sum, ms) => sum + ms, 0) < 2000) return null
+  const total = values.reduce((sum, ms) => sum + ms, 0)
+  if (values.length < 4 || total < 2000) return null
   const sorted = [...values].sort((a, b) => a - b)
-  return { meanMs: values.reduce((sum, ms) => sum + ms, 0) / values.length, p95Ms: sorted[Math.min(sorted.length-1, Math.floor(sorted.length*.95))]! }
+  const percentile = (p: number): number => sorted[Math.min(sorted.length - 1, Math.floor(sorted.length * p))]!
+  return { meanMs: total / values.length, p95Ms: percentile(.95), p99Ms: percentile(.99), worstMs: sorted[sorted.length - 1]!, overBudgetPercent: values.filter(ms => ms > FRAME_MS * 1.1).length / values.length * 100 }
 }
 /** main.ts owns sizing through this delegate, not competing method patches. */
 export const createResolutionOwner = (engine: Engine, canvas: HTMLCanvasElement): { resize(): void } => {
   let state: ResolutionState = { density: 1.25, lastChange: performance.now() / 1000, overloaded: false }
-  let plan: ResolutionPlan | null = null, budget: ReturnType<typeof frameBudget> = null
+  let plan: ResolutionPlan | null = null, budget: FrameBudget | null = null
   const samples: number[] = []
-  let lastSampleTime = performance.now(), skipAfterHidden = false
+  let lastSampleTime = performance.now(), skipAfterHidden = false, sampleCount = 0
   const publish = (): void => {
     ;(window as unknown as { __DROPiRenderQuality?: unknown }).__DROPiRenderQuality = {
-      mode: 'ADAPTIVE_PIXEL_BUDGET', ...state, ...plan, ...budget,
-      actualWidth: engine.getRenderWidth(), actualHeight: engine.getRenderHeight(), sampleCount: samples.length,
+      mode: 'ADAPTIVE_PIXEL_BUDGET', targetFps: TARGET_FPS, ...state, ...plan, ...budget,
+      actualWidth: engine.getRenderWidth(), actualHeight: engine.getRenderHeight(), sampleCount,
       physicalDeviceAcceptance: 'UNKNOWN',
     }
   }
   const resize = (): void => {
     const rect = canvas.getBoundingClientRect()
     if (rect.width <= 0 || rect.height <= 0) return
-    plan = resolutionPlan(rect.width, rect.height, Math.max(1, window.devicePixelRatio || 1), state.density)
-    engine.setHardwareScalingLevel(plan.scalingLevel); engine.resize(); publish()
+    const next = resolutionPlan(rect.width, rect.height, Math.max(1, window.devicePixelRatio || 1), state.density)
+    const changed = !plan || next.width !== plan.width || next.height !== plan.height || Math.abs(next.scalingLevel - plan.scalingLevel) > .0001
+    plan = next
+    if (changed) {
+      // setHardwareScalingLevel already resizes Babylon's drawing buffer.
+      // Avoid two resizes, and avoid rebuilding it for duplicate viewport events.
+      if (Math.abs(engine.getHardwareScalingLevel() - plan.scalingLevel) > .0001) engine.setHardwareScalingLevel(plan.scalingLevel)
+      else engine.resize()
+    }
+    publish()
   }
-  const visibility = (): void => { if (document.hidden) { samples.length = 0; skipAfterHidden = true } }
+  const visibility = (): void => {
+    samples.length = 0; budget = null; sampleCount = 0
+    skipAfterHidden = true; lastSampleTime = performance.now()
+    publish()
+  }
   document.addEventListener('visibilitychange', visibility)
   const observer = engine.onEndFrameObservable.add(() => {
     if (document.hidden) { samples.length = 0; skipAfterHidden = true; return }
-    if (skipAfterHidden) { skipAfterHidden = false; return }
+    if (skipAfterHidden) { skipAfterHidden = false; lastSampleTime = performance.now(); return }
     const ms = engine.getDeltaTime()
-    // Slow visible frames are evidence of overload. Filtering out >=250ms made
-    // a one-FPS scene falsely report no overload and prevented any adaptation.
+    // Keep slow VISIBLE frames, including >=250 ms; suspension is excluded above.
     if (Number.isFinite(ms) && ms > 0) samples.push(ms)
     if (samples.length > 180) samples.shift()
-    if (performance.now() - lastSampleTime < 2000) return
+    const now = performance.now()
+    if (now - lastSampleTime < 2000) return
     budget = frameBudget(samples)
     if (!budget) return
-    const next = nextResolution(state, budget.meanMs, budget.p95Ms, performance.now() / 1000)
+    sampleCount = samples.length
+    const next = nextResolution(state, budget.meanMs, budget.p95Ms, now / 1000)
     const changed = Math.abs(next.density - state.density) > .001
-    state = { ...next, overloaded: budget.meanMs > 38 }; lastSampleTime = performance.now()
+    state = { ...next, overloaded: isOverBudget(budget.meanMs, budget.p95Ms) }; lastSampleTime = now
+    // Independent windows: old slow frames must not trigger repeated downscales
+    // after recovery, nor old fast frames an upscale after a scene becomes slow.
+    samples.length = 0
     if (changed) resize(); else publish()
   })
   engine.onDisposeObservable.addOnce(() => { engine.onEndFrameObservable.remove(observer); document.removeEventListener('visibilitychange', visibility) })
