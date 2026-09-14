@@ -13,9 +13,19 @@ const blob = bytes => createHash('sha1').update(Buffer.from(`blob ${bytes.length
 const manifest = { status: 'CANDIDATE_NOT_RELEASE_CLEARED', inheritedLicense: 'Quaternius Downtown City MegaKit / existing pinned QUATERNIUS_LICENSE.txt', sourceCommit: `${repo}@${commit}`, textures: [], derivatives: [], omitted: [], maxTextureSide: 1024, maxUniqueTextures: 10, pathPolicy: 'GLTF_ROOT_LOCAL_NO_PARENT_TRAVERSAL' }
 const cached = new Map()
 const fetchBytes = async url => {
-  const response = await fetch(url, { signal: AbortSignal.timeout(45000) })
-  if (!response.ok) throw new Error(`Material restoration HTTP ${response.status}: ${url}`)
-  return Buffer.from(await response.arrayBuffer())
+  let lastError
+  for (let attempt = 1; attempt <= 3; attempt += 1) {
+    try {
+      const response = await fetch(url, { signal: AbortSignal.timeout(45000) })
+      if (response.ok) return Buffer.from(await response.arrayBuffer())
+      lastError = new Error(`Material restoration HTTP ${response.status}: ${url}`)
+      if (![429, 500, 502, 503, 504].includes(response.status)) break
+    } catch (error) {
+      lastError = error
+    }
+    if (attempt < 3) await new Promise(resolve => setTimeout(resolve, attempt * 1500))
+  }
+  throw lastError
 }
 await mkdir(shared, { recursive: true })
 const texture = async filename => {
@@ -27,11 +37,13 @@ const texture = async filename => {
     bytes = await readFile(path.join(base, 'p2', filename)); sha = blob(bytes)
   } else {
     if (manifest.textures.length >= manifest.maxUniqueTextures) { manifest.omitted.push({ filename, reason: 'UNIQUE_TEXTURE_BUDGET' }); cached.set(filename, null); return null }
-    const url = `https://api.github.com/repos/${repo}/contents/${sourcePath}/${filename}?ref=${commit}`
-    const metadata = JSON.parse((await fetchBytes(url)).toString('utf8'))
-    if (metadata.type !== 'file' || metadata.path !== `${sourcePath}/${filename}` || !/^[a-f0-9]{40}$/.test(metadata.sha) || metadata.size > 8 * 1024 * 1024) throw new Error(`Invalid immutable texture metadata: ${filename}`)
-    sha = metadata.sha; bytes = await fetchBytes(`${prefix}${filename}`)
-    if (blob(bytes) !== sha || bytes.length !== metadata.size) throw new Error(`Texture blob mismatch: ${filename}`)
+    // The raw URL is pinned to a full immutable commit SHA, so a second
+    // unauthenticated GitHub Contents API request is unnecessary and made CI
+    // depend on a low external API rate limit. Record the actual Git blob SHA
+    // from the pinned bytes instead; provenance still remains content-addressed.
+    bytes = await fetchBytes(`${prefix}${filename}`)
+    if (bytes.length > 8 * 1024 * 1024) throw new Error(`Texture size budget exceeded: ${filename}`)
+    sha = blob(bytes)
   }
   if (bytes.readUInt32BE(0) !== 0x89504e47) throw new Error(`Not a PNG: ${filename}`)
   const width = bytes.readUInt32BE(16), height = bytes.readUInt32BE(20)

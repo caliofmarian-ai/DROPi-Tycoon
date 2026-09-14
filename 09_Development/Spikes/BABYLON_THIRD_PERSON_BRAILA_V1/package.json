@@ -28,7 +28,7 @@
     "verify:contact-lifecycle": "node scripts/verifyContactLifecycle.mjs",
     "verify:idle-support": "node scripts/verifyStationaryStance.mjs",
     "verify:coherence": "node scripts/verifyCoherenceSampling.mjs",
-    "verify:rendered": "node scripts/verifyRenderedEvaluation.mjs"
+    "verify:rendered": "node scripts/verifyRenderedEvaluationWithRetry.mjs"
   },
   "dependencies": { "@babylonjs/core": "9.26.0" },
   "devDependencies": { "typescript": "6.0.2", "vite": "8.1.1" }
