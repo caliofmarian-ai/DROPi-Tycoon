@@ -12,11 +12,17 @@ permissions:
   contents: read
 
 env:
+  DROPI_TRIGGER_EVENT: ${{ github.event_name }}
+  DROPI_TRIGGER_REF: ${{ github.ref }}
+  DROPI_TRIGGER_SHA: ${{ github.sha }}
+  DROPI_PR_NUMBER: ${{ github.event.pull_request.number || 'NOT_APPLICABLE' }}
+  DROPI_BASE_SHA: ${{ github.event.pull_request.base.sha || 'NOT_APPLICABLE' }}
   DROPI_HEAD_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
   DROPI_RUN_ID: ${{ github.run_id }}
   DROPI_RUN_ATTEMPT: ${{ github.run_attempt }}
   DROPI_ANDROID_VERSION_CODE: ${{ github.run_number }}
   DROPI_PACKAGE_ID: com.dropi.tycoon.babyloneval
+  VITE_COMMIT_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
 
 jobs:
   android-owner-installability:
