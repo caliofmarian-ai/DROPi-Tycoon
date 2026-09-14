@@ -151,12 +151,17 @@ jobs:
           AVDMANAGER="$ANDROID_HOME/cmdline-tools/latest/bin/avdmanager"
           ADB="$ANDROID_HOME/platform-tools/adb"
           EMULATOR="$ANDROID_HOME/emulator/emulator"
+          export ANDROID_AVD_HOME="$RUNNER_TEMP/dropi-android-avd"
+          export ANDROID_USER_HOME="$RUNNER_TEMP/dropi-android-user"
+          mkdir -p "$ANDROID_AVD_HOME" "$ANDROID_USER_HOME"
           if [ ! -x "$SDKMANAGER" ]; then SDKMANAGER="$(command -v sdkmanager)"; fi
           if [ ! -x "$AVDMANAGER" ]; then AVDMANAGER="$(command -v avdmanager)"; fi
           test -x "$ADB"
           yes | "$SDKMANAGER" --licenses >/dev/null 2>&1 || true
           "$SDKMANAGER" 'platform-tools' 'emulator' 'system-images;android-35;google_apis;x86_64'
           printf 'no\n' | "$AVDMANAGER" create avd --force --name dropi_owner_ci --package 'system-images;android-35;google_apis;x86_64'
+          test -f "$ANDROID_AVD_HOME/dropi_owner_ci.ini"
+          "$EMULATOR" -list-avds | grep -Fxq 'dropi_owner_ci'
           test -x "$EMULATOR"
           if [ -e /dev/kvm ]; then
             sudo chmod 666 /dev/kvm
@@ -220,12 +225,24 @@ jobs:
           "$ADB" install -r "$DROPI_EMULATOR_APK" | tee "$RUNNER_TEMP/dropi-adb-install.txt"
           grep -Fxq 'Success' "$RUNNER_TEMP/dropi-adb-install.txt"
           "$ADB" shell pm path "$DROPI_PACKAGE_ID" | grep -F "package:"
+          "$ADB" logcat -c
           "$ADB" shell monkey -p "$DROPI_PACKAGE_ID" -c android.intent.category.LAUNCHER 1
           sleep 8
-          "$ADB" shell pidof "$DROPI_PACKAGE_ID"
+          APP_PID="$("$ADB" shell pidof "$DROPI_PACKAGE_ID" | tr -d '\r')"
+          test -n "$APP_PID"
+          "$ADB" shell dumpsys activity activities | grep -F "$DROPI_PACKAGE_ID" | head -n 5
+          sleep 7
+          STABLE_PID="$("$ADB" shell pidof "$DROPI_PACKAGE_ID" | tr -d '\r')"
+          test "$STABLE_PID" = "$APP_PID"
+          "$ADB" logcat --pid="$APP_PID" -d -v threadtime > "$RUNNER_TEMP/dropi-app-logcat.txt" || true
+          if grep -Fq 'FATAL EXCEPTION' "$RUNNER_TEMP/dropi-app-logcat.txt"; then
+            cat "$RUNNER_TEMP/dropi-app-logcat.txt" >&2
+            exit 1
+          fi
           "$ADB" shell dumpsys package "$DROPI_PACKAGE_ID" | grep -m1 'versionCode='
           echo 'DROPI_EMULATOR_INSTALL=PASS' >> "$GITHUB_ENV"
           echo 'DROPI_EMULATOR_LAUNCH=PASS' >> "$GITHUB_ENV"
+          echo 'DROPI_EMULATOR_STABLE_15S=PASS' >> "$GITHUB_ENV"
           echo "DROPI_EMULATOR_ABI=$DEVICE_ABI" >> "$GITHUB_ENV"
 
       - name: Build ARM64 owner test APK
@@ -264,6 +281,7 @@ jobs:
             echo "emulator_abi=$DROPI_EMULATOR_ABI"
             echo "architecture_matched_emulator_preflight_install=$DROPI_EMULATOR_INSTALL"
             echo "architecture_matched_emulator_preflight_launch=$DROPI_EMULATOR_LAUNCH"
+            echo "architecture_matched_emulator_stable_15s=$DROPI_EMULATOR_STABLE_15S"
             echo "emulator_preflight_bytes=$DROPI_EMULATOR_APK_SIZE"
             echo 'final_abi=arm64-v8a'
             echo 'final_arm64_physical_install=UNKNOWN_UNTIL_OWNER_DEVICE_TEST'
@@ -271,6 +289,7 @@ jobs:
             echo 'zipalign_16kb=PASS'
             echo "owner_arm64_bytes=$DROPI_ARM64_SIZE"
           } > "$DROPI_APK_OUTPUT/owner-installability-evidence.txt"
+          cp "$RUNNER_TEMP/dropi-app-logcat.txt" "$DROPI_APK_OUTPUT/emulator-app-logcat.txt"
           cd "$DROPI_APK_OUTPUT"
           sha256sum -c SHA256SUMS.txt
           cat owner-installability-evidence.txt
