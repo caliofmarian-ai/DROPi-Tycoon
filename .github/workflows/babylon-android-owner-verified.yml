@@ -72,6 +72,11 @@ jobs:
           test -n "$ANDROID_HOME"
           test -x "$ANDROID_HOME/platform-tools/adb"
 
+      - name: Verify Android AVD discovery regression contract
+        working-directory: 09_Development/Spikes/BABYLON_THIRD_PERSON_BRAILA_V1
+        shell: bash
+        run: node --test scripts/verifyAndroidOwnerAvd.test.mjs
+
       - name: Build exact tested static Babylon payload
         working-directory: 09_Development/Spikes/BABYLON_THIRD_PERSON_BRAILA_V1
         shell: bash
@@ -151,18 +156,12 @@ jobs:
           AVDMANAGER="$ANDROID_HOME/cmdline-tools/latest/bin/avdmanager"
           ADB="$ANDROID_HOME/platform-tools/adb"
           EMULATOR="$ANDROID_HOME/emulator/emulator"
-          export ANDROID_AVD_HOME="$RUNNER_TEMP/dropi-android-avd"
-          export ANDROID_USER_HOME="$RUNNER_TEMP/dropi-android-user"
-          mkdir -p "$ANDROID_AVD_HOME" "$ANDROID_USER_HOME"
           if [ ! -x "$SDKMANAGER" ]; then SDKMANAGER="$(command -v sdkmanager)"; fi
           if [ ! -x "$AVDMANAGER" ]; then AVDMANAGER="$(command -v avdmanager)"; fi
           test -x "$ADB"
           yes | "$SDKMANAGER" --licenses >/dev/null 2>&1 || true
           "$SDKMANAGER" 'platform-tools' 'emulator' 'system-images;android-35;google_apis;x86_64'
-          printf 'no\n' | "$AVDMANAGER" create avd --force --name dropi_owner_ci --package 'system-images;android-35;google_apis;x86_64'
-          test -f "$ANDROID_AVD_HOME/dropi_owner_ci.ini"
-          "$EMULATOR" -list-avds | grep -Fxq 'dropi_owner_ci'
-          test -x "$EMULATOR"
+          source 09_Development/Spikes/BABYLON_THIRD_PERSON_BRAILA_V1/scripts/prepareAndroidOwnerAvd.sh
           if [ -e /dev/kvm ]; then
             sudo chmod 666 /dev/kvm
             ls -l /dev/kvm
@@ -230,16 +229,16 @@ jobs:
           sleep 8
           APP_PID="$("$ADB" shell pidof "$DROPI_PACKAGE_ID" | tr -d '\r')"
           test -n "$APP_PID"
-          "$ADB" shell dumpsys activity activities | grep -F "$DROPI_PACKAGE_ID" | head -n 5
+          "$ADB" shell dumpsys activity activities | grep -F "$DROPI_PACKAGE_ID" | sed -n '1,5p'
           sleep 7
           STABLE_PID="$("$ADB" shell pidof "$DROPI_PACKAGE_ID" | tr -d '\r')"
           test "$STABLE_PID" = "$APP_PID"
-          "$ADB" logcat --pid="$APP_PID" -d -v threadtime > "$RUNNER_TEMP/dropi-app-logcat.txt" || true
+          "$ADB" logcat --pid="$APP_PID" -d -v threadtime > "$RUNNER_TEMP/dropi-app-logcat.txt"
           if grep -Fq 'FATAL EXCEPTION' "$RUNNER_TEMP/dropi-app-logcat.txt"; then
             cat "$RUNNER_TEMP/dropi-app-logcat.txt" >&2
             exit 1
           fi
-          "$ADB" shell dumpsys package "$DROPI_PACKAGE_ID" | grep -m1 'versionCode='
+          "$ADB" shell dumpsys package "$DROPI_PACKAGE_ID" | grep -F 'versionCode=' | sed -n '1p'
           echo 'DROPI_EMULATOR_INSTALL=PASS' >> "$GITHUB_ENV"
           echo 'DROPI_EMULATOR_LAUNCH=PASS' >> "$GITHUB_ENV"
           echo 'DROPI_EMULATOR_STABLE_15S=PASS' >> "$GITHUB_ENV"
@@ -302,3 +301,16 @@ jobs:
           if-no-files-found: error
           compression-level: 0
           retention-days: 14
+
+      - name: Preserve emulator failure diagnostics
+        if: failure()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: dropi-babylon-installability-failure-${{ github.event.pull_request.head.sha || github.sha }}
+          path: |
+            ${{ runner.temp }}/dropi-emulator.log
+            ${{ runner.temp }}/dropi-avd-list.txt
+            ${{ runner.temp }}/dropi-adb-install.txt
+            ${{ runner.temp }}/dropi-app-logcat.txt
+          if-no-files-found: warn
+          retention-days: 7
