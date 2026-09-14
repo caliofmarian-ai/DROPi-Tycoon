@@ -1,10 +1,10 @@
 import { createHash } from 'node:crypto'
 import { mkdir, writeFile } from 'node:fs/promises'
 import path from 'node:path'
+import { Matrix, Quaternion, Vector3 } from '@babylonjs/core'
 
 const out = path.resolve('public/assets/characters/human-motion')
-const mirror = 'RRG314/WorldExplorer3D'
-const commit = 'b5a6a32448fcaa7c5e079ccb78d9d6030de29a00'
+const mirror = 'RRG314/WorldExplorer3D', commit = 'b5a6a32448fcaa7c5e079ccb78d9d6030de29a00'
 const base = `https://raw.githubusercontent.com/${mirror}/${commit}/app/assets/models/characters`
 const sources = [
   { id: 'casualMale', file: 'casual-man.glb', url: `${base}/city-explorer-v1.glb`, sha256: '0dba57f454956ca5886a2d72e6c5a65f6dc9d45987dc3d47bfe419ff0d0b82b4', bytes: 1558208, author: 'Quaternius', title: 'Ultimate Modular Men / Casual Hoodie', licenseSource: 'https://quaternius.com/packs/ultimatemodularcharacters.html' },
@@ -61,32 +61,53 @@ const chooseClip = (json, kind) => {
   return candidates[0]
 }
 const validateClip = (json, clip) => {
-  const names = new Set(), rotated = new Set(), parents = new Map()
-  json.nodes.forEach((node, parent) => (node.children ?? []).forEach(child => parents.set(child, parent)))
+  const names = new Set(), rotated = new Set()
   for (const channel of clip.channels ?? []) {
-    const nodeIndex = channel.target?.node, node = json.nodes[nodeIndex]
+    const node = json.nodes[channel.target?.node]
     if (!node?.name) throw new Error(`Unnamed animation target in ${clip.name}`)
     names.add(node.name)
     if (channel.target.path === 'rotation') rotated.add(node.name)
-    if (channel.target.path === 'translation' && /^(root|armature)$/i.test(node.name)) {
-      throw new Error(`${clip.name}: root translation requires a no-root-motion derivative`)
-    }
+    if (channel.target.path === 'translation' && /^(root|armature)$/i.test(node.name)) throw new Error(`${clip.name}: root translation requires a no-root-motion derivative`)
   }
   if (rotated.size < 8) throw new Error(`${clip.name}: not a skeletal locomotion clip`)
   return [...names]
 }
-const footRoles = json => {
+const addFootReferences = json => {
   const jointNames = [...new Set((json.skins ?? []).flatMap(skin => skin.joints.map(index => json.nodes[index].name)))]
   console.log('Native joint names:', jointNames.join(', '))
-  const aliases = {
-    leftFoot: ['footl', 'leftfoot', 'footleft'], rightFoot: ['footr', 'rightfoot', 'footright'],
-    leftToe: ['balll', 'toel', 'toesl', 'lefttoebase', 'lefttoe'], rightToe: ['ballr', 'toer', 'toesr', 'righttoebase', 'righttoe'],
-  }
-  return Object.fromEntries(Object.entries(aliases).map(([role, keys]) => {
-    const matches = jointNames.filter(name => keys.some(key => normalize(name).endsWith(key)))
+  const roles = Object.fromEntries(Object.entries({ leftFoot: ['footl', 'leftfoot', 'footleft'], rightFoot: ['footr', 'rightfoot', 'footright'] }).map(([role, aliases]) => {
+    const matches = jointNames.filter(name => aliases.some(key => normalize(name).endsWith(key)))
     if (matches.length !== 1) throw new Error(`Ambiguous/missing ${role}: ${jointNames.join(', ')}`)
     return [role, matches[0]]
   }))
+  const parents = new Map(), cache = new Map()
+  json.nodes.forEach((node, parent) => (node.children ?? []).forEach(child => parents.set(child, parent)))
+  const world = index => {
+    if (cache.has(index)) return cache.get(index)
+    const node = json.nodes[index]
+    const local = node.matrix ? Matrix.FromArray(node.matrix) : Matrix.Compose(Vector3.FromArray(node.scale ?? [1, 1, 1]), Quaternion.FromArray(node.rotation ?? [0, 0, 0, 1]), Vector3.FromArray(node.translation ?? [0, 0, 0]))
+    const result = parents.has(index) ? local.multiply(world(parents.get(index))) : local
+    cache.set(index, result); return result
+  }
+  const left = json.nodes.findIndex(node => node.name === roles.leftFoot), right = json.nodes.findIndex(node => node.name === roles.rightFoot)
+  const leftPosition = Vector3.TransformCoordinates(Vector3.Zero(), world(left)), rightPosition = Vector3.TransformCoordinates(Vector3.Zero(), world(right))
+  const offset = Math.max(0.01, Vector3.Distance(leftPosition, rightPosition) * 0.5)
+  // The pack has no deforming toe joints. PT.L/PT.R remain untouched. These
+  // are explicitly virtual, non-skin foot references built from the pinned
+  // source +Z forward / +Y up contract; no skeletal joint is misclassified.
+  for (const [role, index, side] of [['leftToe', left, 'L'], ['rightToe', right, 'R']]) {
+    const name = `DROPi_Toe_Reference_${side}`
+    if (json.nodes.some(node => node.name === name)) throw new Error('Duplicate foot reference name')
+    const footWorld = world(index)
+    if (Math.abs(footWorld.determinant()) < 1e-12) throw new Error('Singular foot frame')
+    const position = Vector3.TransformCoordinates(Vector3.Zero(), footWorld).add(new Vector3(0, 0, offset))
+    const translation = Vector3.TransformCoordinates(position, Matrix.Invert(footWorld)).asArray()
+    const child = json.nodes.length
+    json.nodes.push({ name, translation, extras: { dropiVirtualFootReference: true, notDeformingToeJoint: true } })
+    ;(json.nodes[index].children ??= []).push(child)
+    roles[role] = name
+  }
+  return roles
 }
 await mkdir(out, { recursive: true })
 const manifest = { status: 'CANDIDATE_NOT_RELEASE_CLEARED', hero: null, pedestrians: [], sources: [], rigCompatibility: 'NATIVE_CLIPS_ON_ORIGINAL_RIG_NO_CROSS_RIG_RETARGET' }
@@ -96,16 +117,16 @@ for (const source of sources) {
   console.log(`${source.id} original clips:`, (json.animations ?? []).map(animation => animation.name).join(', '))
   const walk = chooseClip(json, 'walk'), idle = chooseClip(json, 'idle')
   const targets = validateClip(json, walk); validateClip(json, idle)
-  const roles = footRoles(json), originalWalk = walk.name, originalIdle = idle.name
+  const roles = addFootReferences(json), originalWalk = walk.name, originalIdle = idle.name
   json.animations = [{ ...idle, name: 'Idle_Loop' }, { ...walk, name: 'Walk_Loop' }]
-  const spec = { file: source.file, idle: 'Idle_Loop', walk: 'Walk_Loop', originalWalk, originalIdle, roles, skeletons: json.skins.length, targetCount: targets.length, nativeRig: true }
+  const spec = { file: source.file, idle: 'Idle_Loop', walk: 'Walk_Loop', originalWalk, originalIdle, roles, skeletons: json.skins.length, targetCount: targets.length, nativeRig: true, sourceForwardAxis: 'z', sourceUpAxis: 'y', virtualToeReferences: true, frameEvidence: `https://github.com/${mirror}/blob/${commit}/app/js/assets/model-asset-catalog.js` }
   manifest.pedestrians.push(spec)
   if (source.id === 'casualMale') manifest.hero = { ...spec, clothing: 'AUTHORED_CASUAL_HOODIE', targetHeightM: 1.78 }
   const derivative = repack(model)
   await writeFile(path.join(out, source.file), derivative)
-  manifest.sources.push({ ...source, upstreamLicense: 'CC0-1.0', qualification: 'CANDIDATE_NOT_RELEASE_CLEARED', derivativeSha256: digest(derivative), transformation: 'Retained complete authored clothing, body, materials, native rig and hierarchy. Kept native idle/walk clips only; animation values and binary buffer unchanged. No cross-rig retarget or jog relabeling.' })
+  manifest.sources.push({ ...source, upstreamLicense: 'CC0-1.0', qualification: 'CANDIDATE_NOT_RELEASE_CLEARED', derivativeSha256: digest(derivative), transformation: 'Preserved body/clothing geometry, native skin and animations, materials and binary buffer. Kept native idle/walk only; added two non-deforming virtual foot references using the pinned source frame. No cross-rig transfer, PT-joint reinterpretation or jog relabeling.' })
   console.log(`${source.id}: verified ${originalWalk}; targets=${targets.length}; output=${derivative.length} bytes`)
 }
 await writeFile(path.join(out, 'MANIFEST.json'), `${JSON.stringify(manifest, null, 2)}\n`)
-await writeFile(path.join(out, 'PROVENANCE.json'), `${JSON.stringify({ ...manifest, evidenceDate: '2026-09-14', mirrorAttribution: `https://github.com/${mirror}/blob/${commit}/app/assets/models/ATTRIBUTION.md`, notes: 'Primary author pages declare CC0 for upstream packs. Mirror derivatives remain candidates pending project legal/asset acceptance. No Runway target-match or production clearance claim. UAL2 transfer candidate was rejected for incompatible rest rotations; it is not used.' }, null, 2)}\n`)
+await writeFile(path.join(out, 'PROVENANCE.json'), `${JSON.stringify({ ...manifest, evidenceDate: '2026-09-14', mirrorAttribution: `https://github.com/${mirror}/blob/${commit}/app/assets/models/ATTRIBUTION.md`, notes: 'Primary author pages declare CC0 for upstream packs. Mirror derivatives remain candidates pending project legal/asset acceptance. No Runway target-match or production clearance. UAL2 transfer was rejected for incompatible rest rotations and is not used.' }, null, 2)}\n`)
 console.log('Native authored human asset preparation complete; visual acceptance remains UNKNOWN.')
