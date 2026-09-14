@@ -6,7 +6,7 @@
   "engines": { "node": ">=22.12.0 <23" },
   "scripts": {
     "dev": "npm run setup:p1 && npm run setup:humans && npm run setup:p2 && npm run setup:p3 && npm run setup:p4 && npm run setup:surfaces && npm run setup:wear && vite --host 0.0.0.0",
-    "build": "npm run setup:p1 && npm run setup:humans && npm run setup:p2 && npm run setup:p3 && npm run setup:p4 && npm run setup:surfaces && npm run setup:wear && npm run verify:runtime-registrations && tsc --noEmit && npm run verify:presentation && npm run verify:humans && npm run verify:next && npm run verify:camera && npm run verify:timing && npm run verify:frame-safety && npm run verify:contact-lifecycle && vite build && npm run verify:rendered",
+    "build": "npm run setup:p1 && npm run setup:humans && npm run setup:p2 && npm run setup:p3 && npm run setup:p4 && npm run setup:surfaces && npm run setup:wear && npm run verify:runtime-registrations && tsc --noEmit && npm run verify:presentation && npm run verify:humans && npm run verify:next && npm run verify:camera && npm run verify:timing && npm run verify:frame-safety && npm run verify:contact-lifecycle && npm run verify:idle-support && vite build && npm run verify:rendered",
     "preview": "vite preview --host 0.0.0.0",
     "typecheck": "npm run setup:p1 && npm run setup:humans && npm run setup:p2 && npm run setup:p3 && npm run setup:p4 && tsc --noEmit",
     "setup:p1": "node scripts/setupP1RiggedHero.mjs",
@@ -24,6 +24,7 @@
     "verify:timing": "node scripts/verifyFrameTiming.mjs",
     "verify:frame-safety": "node scripts/verifyFrameSafety.mjs",
     "verify:contact-lifecycle": "node scripts/verifyContactLifecycle.mjs",
+    "verify:idle-support": "node scripts/verifyStationaryStance.mjs",
     "verify:rendered": "node scripts/verifyRenderedEvaluation.mjs"
   },
   "dependencies": { "@babylonjs/core": "9.26.0" },

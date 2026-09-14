@@ -1,13 +1,14 @@
 import { EngineStore, Mesh, TransformNode } from '@babylonjs/core'
 import { HumanContactPose } from './humanContactPose'
-import type { ContactReport } from './humanContactPose'
+import { StationaryStance } from './stationaryStance'
+import type { StanceReport } from './stationaryStance'
 import { surfaceSampler } from './authoredPedestrians'
 import { planarSpeed } from './authoredWalk'
 
-export type ActorContactFailure = { actor: string; position: { x: number; y: number; z: number }; speed: number; dt: number; report: ContactReport }
+export type ActorContactFailure = { actor: string; position: { x: number; y: number; z: number }; speed: number; dt: number; report: StanceReport }
 export type ContactRuntimeState = {
   status: 'LOADING' | 'ACTIVE' | 'FAIL'; mechanicalStatus: 'UNKNOWN' | 'PASS' | 'FAIL'
-  humanCount: number; hero: ContactReport | null; worstFootClearanceM: number | null
+  humanCount: number; hero: StanceReport | null; worstFootClearanceM: number | null
   poseCostMs: number; error: string; visualAcceptance: 'UNKNOWN'
   sampleId: number; renderedSampleId: number; sampledAtMs: number
   actorFailures: ActorContactFailure[]
@@ -39,6 +40,7 @@ const boot = (): void => {
       const ground = surfaceSampler(scene)
       poses.push(new HumanContactPose(heroRoot, visualRoot, ground, parcel))
       for (const root of npcRoots as Mesh[]) poses.push(new HumanContactPose(root, root, ground))
+      const stances = poses.map(pose => new StationaryStance(pose))
       const previous = poses.map(pose => pose.base.getAbsolutePosition().clone())
       let pending = true, previousPlants = 0
       const restoreObserver = scene.onBeforeAnimationsObservable.add(() => poses.forEach(pose => pose.restore()))
@@ -54,7 +56,9 @@ const boot = (): void => {
             const p = pose.base.getAbsolutePosition(), old = previous[index]!
             const speed = planarSpeed(p.x - old.x, p.z - old.z, dt)
             old.copyFrom(p)
-            const report = pose.apply(dt, speed)
+            // One contact owner: native motion/plant/carry, then stationary
+            // split-height support, then the completed rendered sample.
+            const report = stances[index]!.apply(dt, speed, pose.apply(dt, speed))
             if (report.status !== 'PASS') failed.push({ actor: pose.root.name, position: { x: p.x, y: p.y, z: p.z }, speed, dt, report })
             return report
           })
@@ -64,9 +68,6 @@ const boot = (): void => {
           state.actorFailures = failed
           state.poseCostMs = performance.now() - startedAt
           state.sampleId += 1; state.sampledAtMs = performance.now()
-          // Retain the first bounded failure sample even if a later pose passes.
-          // Aggregate FAIL must identify the responsible NPC, not hide it behind
-          // a healthy hero report or later recovery.
           if (failed.length && !state.firstFailedSample) state.firstFailedSample = { sampleId: state.sampleId, actors: failed }
           const controls = (window as unknown as { __DROPiNaturalControls?: { getSpeed(): number } }).__DROPiNaturalControls
           if (state.hero.plantedFeet > previousPlants && (controls?.getSpeed() ?? 0) > .08) window.dispatchEvent(new Event('dropi:foot-contact'))
