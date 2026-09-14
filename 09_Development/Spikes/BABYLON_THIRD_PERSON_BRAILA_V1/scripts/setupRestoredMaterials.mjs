@@ -21,7 +21,6 @@ await mkdir(shared, { recursive: true })
 const texture = async filename => {
   if (cached.has(filename)) return cached.get(filename)
   if (!/^T_[A-Za-z0-9_]+\.png$/.test(filename)) { manifest.omitted.push({ filename, reason: 'UNSUPPORTED_IMAGE_IDENTITY' }); cached.set(filename, null); return null }
-  // Reuse P2 atlases under the same URL, so repeated facades share one GPU texture.
   const existing = ['T_RedBrick_BaseColor.png', 'T_Trim_BaseColor.png', 'T_MetalConcrete_BaseColor.png'].includes(filename)
   let bytes, sha
   if (existing) {
@@ -37,9 +36,12 @@ const texture = async filename => {
   if (bytes.readUInt32BE(0) !== 0x89504e47) throw new Error(`Not a PNG: ${filename}`)
   const width = bytes.readUInt32BE(16), height = bytes.readUInt32BE(20)
   if (Math.max(width, height) > manifest.maxTextureSide) { manifest.omitted.push({ filename, width, height, reason: 'TEXTURE_DIMENSION_BUDGET' }); cached.set(filename, null); return null }
-  const uri = existing ? `/assets/environment/p2/${filename}` : `/assets/environment/restored/${filename}`
+  // glTF loader prefixes image URIs with the asset root. A root-absolute path
+  // was concatenated twice; use a portable sibling-relative reference instead.
+  const uri = existing ? `../p2/${filename}` : `../restored/${filename}`
+  const publicUri = existing ? `/assets/environment/p2/${filename}` : `/assets/environment/restored/${filename}`
   if (!existing) await writeFile(path.join(shared, filename), bytes)
-  manifest.textures.push({ filename, uri, width, height, sourceBlobSha1: sha, sha256: hash(bytes), source: `${prefix}${filename}`, reusedP2: existing })
+  manifest.textures.push({ filename, uri, publicUri, width, height, sourceBlobSha1: sha, sha256: hash(bytes), source: `${prefix}${filename}`, reusedP2: existing })
   cached.set(filename, uri); return uri
 }
 for (const stage of ['p3', 'p4']) {
@@ -63,6 +65,9 @@ for (const stage of ['p3', 'p4']) {
       const name = decodeURIComponent(sourceImage.uri).split('/').at(-1)
       const uri = await texture(name)
       if (!uri) continue
+      const resolvedImage = path.resolve(dir, uri)
+      if (!resolvedImage.startsWith(`${base}${path.sep}`)) throw new Error('Restored texture escaped bundled environment')
+      await readFile(resolvedImage)
       let imageIndex = images.findIndex(image => image.uri === uri)
       if (imageIndex < 0) { imageIndex = images.length; images.push({ uri, mimeType: 'image/png', name }) }
       const textureIndex = textures.length
@@ -72,7 +77,6 @@ for (const stage of ['p3', 'p4']) {
       pbr.baseColorFactor = sourceMaterial.pbrMetallicRoughness.baseColorFactor ?? [1, 1, 1, 1]
       if (sourceMaterial.alphaMode) material.alphaMode = sourceMaterial.alphaMode
       if (sourceMaterial.alphaCutoff !== undefined) material.alphaCutoff = sourceMaterial.alphaCutoff
-      // Glass/interior cutouts must preserve original transparency semantics.
       if (sourceMaterial.doubleSided !== undefined) material.doubleSided = sourceMaterial.doubleSided
       restored += 1
     }
@@ -81,7 +85,7 @@ for (const stage of ['p3', 'p4']) {
       model.samplers = [{ magFilter: 9729, minFilter: 9987, wrapS: 10497, wrapT: 10497 }]
       const after = Buffer.from(`${JSON.stringify(model, null, 2)}\n`)
       await writeFile(filename, after)
-      const transformation = 'Restored verified original base-colour atlas references and UV texture transforms with shared <=1024px textures. Geometry, buffer, node hierarchy and material slots unchanged.'
+      const transformation = 'Restored verified original base-colour atlas references and UV texture transforms with shared <=1024px textures and verified sibling-relative URIs. Geometry, buffer, node hierarchy and material slots unchanged.'
       const previous = provenance.derivatives?.[source.filename]
       ;(provenance.derivatives ??= {})[source.filename] = { ...previous, sha256: hash(after), previousDerivativeSha256: hash(before), transformation, restoredMaterials: restored, finalTextureManifest: '../restored/PROVENANCE.json' }
       manifest.derivatives.push({ stage, filename: source.filename, sha256: hash(after), restoredMaterials: restored, materialCount: model.materials.length })
