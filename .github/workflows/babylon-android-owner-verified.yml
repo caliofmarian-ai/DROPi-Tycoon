@@ -141,43 +141,77 @@ jobs:
           set -euo pipefail
           SDKMANAGER="$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager"
           AVDMANAGER="$ANDROID_HOME/cmdline-tools/latest/bin/avdmanager"
+          ADB="$ANDROID_HOME/platform-tools/adb"
+          EMULATOR="$ANDROID_HOME/emulator/emulator"
           if [ ! -x "$SDKMANAGER" ]; then SDKMANAGER="$(command -v sdkmanager)"; fi
           if [ ! -x "$AVDMANAGER" ]; then AVDMANAGER="$(command -v avdmanager)"; fi
+          test -x "$ADB"
           yes | "$SDKMANAGER" --licenses >/dev/null 2>&1 || true
           "$SDKMANAGER" 'platform-tools' 'emulator' 'system-images;android-35;google_apis;x86_64'
-          echo no | "$AVDMANAGER" create avd --force --name dropi_owner_ci --package 'system-images;android-35;google_apis;x86_64'
-          sudo chmod 666 /dev/kvm 2>/dev/null || true
-          "$ANDROID_HOME/emulator/emulator" \
+          printf 'no\n' | "$AVDMANAGER" create avd --force --name dropi_owner_ci --package 'system-images;android-35;google_apis;x86_64'
+          test -x "$EMULATOR"
+          if [ -e /dev/kvm ]; then
+            sudo chmod 666 /dev/kvm
+            ls -l /dev/kvm
+          fi
+          "$EMULATOR" -accel-check || true
+          "$ADB" start-server
+          "$EMULATOR" \
             -avd dropi_owner_ci \
-            -no-window -no-audio -no-boot-anim -no-snapshot -wipe-data \
+            -no-window -no-audio -no-boot-anim -no-snapshot -wipe-data -no-metrics \
             -gpu swiftshader_indirect -accel auto \
             > "$RUNNER_TEMP/dropi-emulator.log" 2>&1 &
           EMULATOR_PID=$!
           cleanup() {
-            "$ANDROID_HOME/platform-tools/adb" emu kill >/dev/null 2>&1 || true
+            "$ADB" emu kill >/dev/null 2>&1 || true
             kill "$EMULATOR_PID" >/dev/null 2>&1 || true
           }
           trap cleanup EXIT
-          timeout 180 "$ANDROID_HOME/platform-tools/adb" wait-for-device
+          DEVICE_READY=0
+          for _ in $(seq 1 180); do
+            if ! kill -0 "$EMULATOR_PID" >/dev/null 2>&1; then
+              echo 'Android emulator exited before ADB became ready.' >&2
+              cat "$RUNNER_TEMP/dropi-emulator.log" >&2
+              exit 1
+            fi
+            if "$ADB" get-state 2>/dev/null | grep -Fxq 'device'; then
+              DEVICE_READY=1
+              break
+            fi
+            sleep 2
+          done
+          if [ "$DEVICE_READY" != '1' ]; then
+            echo 'Timed out waiting for Android emulator ADB device.' >&2
+            "$ADB" devices -l >&2 || true
+            cat "$RUNNER_TEMP/dropi-emulator.log" >&2
+            exit 1
+          fi
           BOOTED=0
-          for _ in $(seq 1 120); do
-            if [ "$("$ANDROID_HOME/platform-tools/adb" shell getprop sys.boot_completed 2>/dev/null | tr -d '\r')" = '1' ]; then
+          for _ in $(seq 1 180); do
+            if ! kill -0 "$EMULATOR_PID" >/dev/null 2>&1; then
+              echo 'Android emulator exited before boot completed.' >&2
+              cat "$RUNNER_TEMP/dropi-emulator.log" >&2
+              exit 1
+            fi
+            if [ "$("$ADB" shell getprop sys.boot_completed 2>/dev/null | tr -d '\r')" = '1' ]; then
               BOOTED=1
               break
             fi
             sleep 2
           done
           if [ "$BOOTED" != '1' ]; then
-            cat "$RUNNER_TEMP/dropi-emulator.log"
+            echo 'Timed out waiting for Android boot completion.' >&2
+            "$ADB" devices -l >&2 || true
+            cat "$RUNNER_TEMP/dropi-emulator.log" >&2
             exit 1
           fi
-          "$ANDROID_HOME/platform-tools/adb" install -r "$DROPI_UNIVERSAL_APK" | tee "$RUNNER_TEMP/dropi-adb-install.txt"
+          "$ADB" install -r "$DROPI_UNIVERSAL_APK" | tee "$RUNNER_TEMP/dropi-adb-install.txt"
           grep -Fxq 'Success' "$RUNNER_TEMP/dropi-adb-install.txt"
-          "$ANDROID_HOME/platform-tools/adb" shell pm path "$DROPI_PACKAGE_ID" | grep -F "package:"
-          "$ANDROID_HOME/platform-tools/adb" shell monkey -p "$DROPI_PACKAGE_ID" -c android.intent.category.LAUNCHER 1
+          "$ADB" shell pm path "$DROPI_PACKAGE_ID" | grep -F "package:"
+          "$ADB" shell monkey -p "$DROPI_PACKAGE_ID" -c android.intent.category.LAUNCHER 1
           sleep 8
-          "$ANDROID_HOME/platform-tools/adb" shell pidof "$DROPI_PACKAGE_ID"
-          "$ANDROID_HOME/platform-tools/adb" shell dumpsys package "$DROPI_PACKAGE_ID" | grep -m1 'versionCode='
+          "$ADB" shell pidof "$DROPI_PACKAGE_ID"
+          "$ADB" shell dumpsys package "$DROPI_PACKAGE_ID" | grep -m1 'versionCode='
           echo 'DROPI_EMULATOR_INSTALL=PASS' >> "$GITHUB_ENV"
           echo 'DROPI_EMULATOR_LAUNCH=PASS' >> "$GITHUB_ENV"
 
