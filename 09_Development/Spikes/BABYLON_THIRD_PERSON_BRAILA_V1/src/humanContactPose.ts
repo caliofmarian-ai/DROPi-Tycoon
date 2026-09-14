@@ -35,6 +35,9 @@ export class SkinFeetProbe {
     for (const { mesh, positions, indices, weights, sides } of this.data) {
       mesh.computeWorldMatrix(true)
       const matrices = mesh.skeleton!.getTransformMatrices(mesh)
+      // The mesh transform is invariant within this scan. Resolve it once, not
+      // once per shoe vertex. Each subsequent IK/stance scan still reads anew.
+      const worldMatrix = mesh.getWorldMatrix()
       for (let vertex = 0; vertex < positions.length / 3; vertex += 1) {
         const x = positions[vertex * 3]!, y = positions[vertex * 3 + 1]!, z = positions[vertex * 3 + 2]!
         let px = 0, py = 0, pz = 0
@@ -47,7 +50,7 @@ export class SkinFeetProbe {
           pz += weight * (x * matrices[offset + 2]! + y * matrices[offset + 6]! + z * matrices[offset + 10]! + matrices[offset + 14]!)
         }
         skinned.set(px, py, pz)
-        Vector3.TransformCoordinatesToRef(skinned, mesh.getWorldMatrix(), world)
+        Vector3.TransformCoordinatesToRef(skinned, worldMatrix, world)
         const clearance = world.y - surface(world.x, world.z)
         if (sides[vertex] === -1) left = Math.min(left, clearance)
         else right = Math.min(right, clearance)
@@ -93,7 +96,7 @@ export class HumanContactPose {
   private previousHeading: number | null = null
   private previousPosition: Vector3 | null = null
   constructor(readonly root: Mesh, readonly base: TransformNode, readonly surface: SurfaceHeight, readonly parcel?: Mesh) {
-    const nodes = root.getDescendants(false).filter((node): node is TransformNode => node instanceof TransformNode)
+    const nodes = root.getDescendants(false).filter((node): node is TransformNode => node instanceof TransformNode => false)
     const node = (name: string): TransformNode => {
       const matches = nodes.filter(candidate => candidate.name.endsWith(`/${name}`))
       if (matches.length !== 1) throw new Error(`Contact adapter requires exact joint ${name}; found ${matches.length}`)
