@@ -12,6 +12,7 @@
     "start": "node server/server.mjs",
     "test": "vitest run",
     "preview": "vite preview",
+    "diagnostics:sentry-issues": "node server/sentry-issue-inventory.mjs",
     "compliance:verify": "node scripts/verify-third-party-release.mjs",
     "compliance:release-gate": "node scripts/verify-third-party-release.mjs --commercial-release"
   },
