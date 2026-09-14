@@ -1,9 +1,9 @@
 # DT-19 Autonomous Blender Asset Factory
 
-Issue: #742  
-Parent: #409  
-Governance: #411  
-Inventory/dedup authority: #414  
+Issue: #742
+Parent: #409
+Governance: #411
+Inventory/dedup authority: #414
 Existing Library ingestion owner: #413
 
 ## Purpose
