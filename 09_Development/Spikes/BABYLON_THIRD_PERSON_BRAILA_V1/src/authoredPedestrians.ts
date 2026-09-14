@@ -5,10 +5,32 @@ import '@babylonjs/loaders/glTF'
 import { createWalkMixer, planarSpeed } from './authoredWalk'
 
 export type FootRoles = { leftFoot: string; rightFoot: string; leftToe: string; rightToe: string }
-export type PedestrianSpec = { file: string; idle: string; walk: string; roles: FootRoles }
+export type PedestrianSpec = { file: string; idle: string; walk: string; roles: FootRoles; originalWalk: string; nativeRig: boolean }
 export type HumanInstance = {
-  root: TransformNode; entries: InstantiatedEntries; meshes: AbstractMesh[]
+  root: Mesh; entries: InstantiatedEntries; meshes: AbstractMesh[]
   soles: TransformNode[]; mixer: ReturnType<typeof createWalkMixer>; dispose(): void
+}
+export type HumanAssets = { containers: AssetContainer[]; pedestrians: PedestrianSpec[]; hero: PedestrianSpec }
+const ASSET_ROOT = '/assets/characters/human-motion/'
+const sharedAssets = new WeakMap<Scene, Promise<HumanAssets>>()
+export const loadHumanAssets = (scene: Scene): Promise<HumanAssets> => {
+  const existing = sharedAssets.get(scene)
+  if (existing) return existing
+  const loading = (async (): Promise<HumanAssets> => {
+    const containers: AssetContainer[] = []
+    try {
+      const response = await fetch(`${ASSET_ROOT}MANIFEST.json`, { signal: AbortSignal.timeout(45000) })
+      if (!response.ok) throw new Error(`Humanoid manifest HTTP ${response.status}`)
+      const manifest = await response.json() as { pedestrians: PedestrianSpec[]; hero: PedestrianSpec }
+      if (manifest.pedestrians?.length !== 2 || !manifest.hero?.nativeRig || !/^walk/i.test(manifest.hero.originalWalk)) throw new Error('Verified native walking character manifest required')
+      for (const spec of manifest.pedestrians) containers.push(await SceneLoader.LoadAssetContainerAsync(ASSET_ROOT, spec.file, scene))
+      if (scene.isDisposed) throw new Error('Scene disposed while loading shared humans')
+      scene.onDisposeObservable.addOnce(() => { containers.forEach(container => container.dispose()); sharedAssets.delete(scene) })
+      return { containers, pedestrians: manifest.pedestrians, hero: manifest.hero }
+    } catch (error) { containers.forEach(container => container.dispose()); throw error }
+  })()
+  sharedAssets.set(scene, loading)
+  return loading
 }
 const boundsOf = (meshes: AbstractMesh[]): { min: Vector3; max: Vector3 } => {
   const min = new Vector3(Infinity, Infinity, Infinity), max = new Vector3(-Infinity, -Infinity, -Infinity)
@@ -21,9 +43,10 @@ const boundsOf = (meshes: AbstractMesh[]): { min: Vector3; max: Vector3 } => {
   return { min, max }
 }
 
-/** Full rig clone: geometry/materials shared, skeleton and pose independent. */
+/** Complete native rig clone. Geometry/materials shared; skeleton/pose independent. */
 export const createPedestrian = (scene: Scene, container: AssetContainer, spec: PedestrianSpec, name: string, heightM: number): HumanInstance => {
-  const root = new TransformNode(name, scene)
+  // A geometry-free Mesh preserves the existing P5 ground-probe root contract.
+  const root = new Mesh(name, scene)
   const normalization = new TransformNode(`${name}/normalization`, scene)
   normalization.parent = root
   const entries = container.instantiateModelsToScene(source => `${name}/${source}`, false, { doNotInstantiate: true })
@@ -41,7 +64,6 @@ export const createPedestrian = (scene: Scene, container: AssetContainer, spec: 
     }
     const lf = find(spec.roles.leftFoot), rf = find(spec.roles.rightFoot), lt = find(spec.roles.leftToe), rt = find(spec.roles.rightToe)
     ;[lf, rf, lt, rt].forEach(node => node.computeWorldMatrix(true))
-    // Infer forward from the actual foot-to-toe frame, not another guessed +Z/-Z.
     const forward = lt.getAbsolutePosition().subtract(lf.getAbsolutePosition()).add(rt.getAbsolutePosition().subtract(rf.getAbsolutePosition()))
     forward.y = 0
     if (forward.lengthSquared() < 0.00001) throw new Error(`${name}: foot frame cannot establish visual forward`)
@@ -62,12 +84,13 @@ export const createPedestrian = (scene: Scene, container: AssetContainer, spec: 
     })
     for (const mesh of meshes) {
       mesh.checkCollisions = false; mesh.isPickable = false; mesh.receiveShadows = false
-      mesh.metadata = { ...(mesh.metadata ?? {}), dropiAuthoredPedestrian: true }
+      mesh.metadata = { ...(mesh.metadata ?? {}), dropiAuthoredHuman: true }
     }
     const idle = entries.animationGroups.find(group => group.name === `${name}/${spec.idle}`)
     const walk = entries.animationGroups.find(group => group.name === `${name}/${spec.walk}`)
-    if (!idle || !walk) throw new Error(`${name}: missing authored idle/walk`)
+    if (!idle || !walk) throw new Error(`${name}: missing native authored idle/walk`)
     const mixer = createWalkMixer(idle, walk)
+    root.isPickable = false; root.checkCollisions = false
     return { root, entries, meshes, soles, mixer, dispose: () => { mixer.stop(); entries.dispose(); root.dispose() } }
   } catch (error) { entries.dispose(); root.dispose(); throw error }
 }
@@ -86,7 +109,6 @@ export const surfaceSampler = (scene: Scene): ((x: number, z: number) => number)
   }
 }
 
-const ASSET_ROOT = '/assets/characters/human-motion/'
 let started = false
 const boot = async (): Promise<void> => {
   const scene = EngineStore.LastCreatedScene
@@ -94,30 +116,24 @@ const boot = async (): Promise<void> => {
   if (started) return
   started = true
   const anchors = scene.meshes.filter((mesh): mesh is Mesh => mesh instanceof Mesh && /^npc-\d+$/.test(mesh.name)).sort((a, b) => a.name.localeCompare(b.name))
-  const state = { status: 'LOADING', expected: anchors.length, visibleHumans: 0, capsuleFallbacks: anchors.length, error: '', visualAcceptance: 'UNKNOWN' }
+  const state = { status: 'LOADING', expected: anchors.length, visibleHumans: 0, capsuleFallbacks: 0, error: '', visualAcceptance: 'UNKNOWN' }
   const publish = (): void => { (window as unknown as { __DROPiHumanoidPedestrians?: typeof state }).__DROPiHumanoidPedestrians = { ...state } }
+  const humans: HumanInstance[] = [], visibility = anchors.map(anchor => anchor.isVisible)
+  anchors.forEach(anchor => { anchor.isVisible = false })
   publish()
-  const assets: AssetContainer[] = [], humans: HumanInstance[] = []
-  const visibility = anchors.map(anchor => anchor.isVisible)
   try {
     if (anchors.length !== 8) throw new Error(`Expected 8 existing NPC roots; found ${anchors.length}`)
-    const response = await fetch(`${ASSET_ROOT}MANIFEST.json`, { signal: AbortSignal.timeout(45000) })
-    if (!response.ok) throw new Error(`Humanoid manifest HTTP ${response.status}`)
-    const manifest = await response.json() as { pedestrians: PedestrianSpec[] }
-    if (manifest.pedestrians.length !== 2) throw new Error('Expected two governed pedestrian variants')
-    for (const spec of manifest.pedestrians) assets.push(await SceneLoader.LoadAssetContainerAsync(ASSET_ROOT, spec.file, scene))
+    const assets = await loadHumanAssets(scene)
     if (scene.isDisposed) throw new Error('Scene disposed while loading humans')
     const ground = surfaceSampler(scene)
     anchors.forEach((anchor, index) => {
-      const human = createPedestrian(scene, assets[index % 2]!, manifest.pedestrians[index % 2]!, `npc-human-${index}`, index % 2 ? 1.68 : 1.76)
+      const human = createPedestrian(scene, assets.containers[index % 2]!, assets.pedestrians[index % 2]!, `npc-human-${index}`, index % 2 ? 1.68 : 1.76)
       humans.push(human)
       const p = anchor.getAbsolutePosition()
       human.root.position.set(p.x, ground(p.x, p.z) + 0.008, p.z)
       human.root.rotation.y = anchor.rotation.y
       human.root.metadata = { simulationAuthority: anchor.name, presentationOnly: true }
     })
-    // Atomic swap only after every complete skeleton successfully mounted.
-    anchors.forEach(anchor => { anchor.isVisible = false })
     const previous = anchors.map(anchor => anchor.getAbsolutePosition().clone())
     const observer = scene.onBeforeRenderObservable.add(() => {
       const dt = scene.getEngine().getDeltaTime() / 1000
@@ -142,16 +158,15 @@ const boot = async (): Promise<void> => {
         anchor.isVisible = false
       })
     })
-    scene.onDisposeObservable.addOnce(() => { scene.onBeforeRenderObservable.remove(observer); humans.forEach(human => human.dispose()); assets.forEach(asset => asset.dispose()) })
+    scene.onDisposeObservable.addOnce(() => { scene.onBeforeRenderObservable.remove(observer); humans.forEach(human => human.dispose()) })
     state.status = 'ACTIVE'; state.visibleHumans = humans.length; state.capsuleFallbacks = 0
     scene.metadata = { ...(scene.metadata ?? {}), dropiHumanoidPedestrians: true }
   } catch (error) {
-    humans.forEach(human => human.dispose()); assets.forEach(asset => asset.dispose())
+    humans.forEach(human => human.dispose())
     anchors.forEach((anchor, index) => { if (!anchor.isDisposed()) anchor.isVisible = visibility[index] ?? true })
-    state.status = 'FAIL'; state.error = error instanceof Error ? error.message : String(error)
+    state.status = 'FAIL'; state.capsuleFallbacks = anchors.length; state.error = error instanceof Error ? error.message : String(error)
     console.warn('Authored pedestrian load failed; explicit capsule fallback, not acceptance.', error)
   }
   publish()
 }
-// Tests import the mounting helper without starting the browser integration.
 if (typeof window !== 'undefined' && typeof document !== 'undefined') void boot()

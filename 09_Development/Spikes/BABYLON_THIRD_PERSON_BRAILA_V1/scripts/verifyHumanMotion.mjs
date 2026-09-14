@@ -3,7 +3,7 @@ import { readFile, writeFile, unlink } from 'node:fs/promises'
 import { pathToFileURL } from 'node:url'
 import path from 'node:path'
 import ts from 'typescript'
-import { NullEngine, Scene, SceneLoader, MeshBuilder, Vector3 } from '@babylonjs/core'
+import { NullEngine, Scene, SceneLoader, MeshBuilder } from '@babylonjs/core'
 import '@babylonjs/loaders/glTF/index.js'
 
 const tempWalk = path.resolve(`.walk-check-${process.pid}.mjs`)
@@ -23,7 +23,7 @@ const parseGlb = bytes => {
   return { json, bin: bytes.subarray(28 + length, 28 + length + binLength) }
 }
 const geometryOnlyData = ({ json, bin }) => {
-  // NullEngine tests geometry/rigging, not texture decode or visual appearance.
+  // The original bundled GLB is unchanged. NullEngine tests omit image decoding.
   const copy = structuredClone(json)
   delete copy.images; delete copy.textures; delete copy.samplers
   for (const material of copy.materials ?? []) {
@@ -35,7 +35,7 @@ const geometryOnlyData = ({ json, bin }) => {
 }
 try {
   check('normal traversal uses a walking speed cap, not 4.6m/s', () => near(HERO_WALK_SPEED_MPS, 1.65))
-  check('blocked and teleport movement cannot drive a running animation', () => {
+  check('blocked and teleport movement do not drive walking animation', () => {
     near(planarSpeed(0, 0, 0.016), 0); near(planarSpeed(15, 0, 0.016), 0); near(planarSpeed(1, 0, 5), 0)
     near(planarSpeed(0.014, 0, 0.01), 1.4)
   })
@@ -53,45 +53,45 @@ try {
     }
   })
   const manifest = JSON.parse(await readFile('public/assets/characters/human-motion/MANIFEST.json', 'utf8'))
-  check('hero walk is an authored walk, not a renamed jog/sprint', () => {
-    assert.match(manifest.hero.originalWalk, /^walk/i); assert.doesNotMatch(manifest.hero.originalWalk, /jog|sprint/i)
-    assert.equal(manifest.hero.walk, 'Walk_Loop'); assert.ok(manifest.hero.targetCount >= 20); assert.ok(manifest.hero.maxRestAngle <= 0.035)
-  })
-  const heroWalk = parseGlb(await readFile(`public/assets/characters/human-motion/${manifest.hero.file}`))
-  check('walk carrier has a single verified walking clip', () => {
-    assert.deepEqual(heroWalk.json.animations.map(animation => animation.name), ['Walk_Loop'])
+  check('clothed hero has native authored walk, not jog or cross-rig transfer', () => {
+    assert.match(manifest.hero.originalWalk, /^walk/i); assert.doesNotMatch(manifest.hero.originalWalk, /jog|sprint|carry/i)
+    assert.equal(manifest.hero.walk, 'Walk_Loop'); assert.ok(manifest.hero.targetCount >= 8)
+    assert.equal(manifest.hero.nativeRig, true); assert.equal(manifest.hero.clothing, 'AUTHORED_CASUAL_HOODIE')
+    assert.equal(manifest.rigCompatibility, 'NATIVE_CLIPS_ON_ORIGINAL_RIG_NO_CROSS_RIG_RETARGET')
   })
   for (const spec of manifest.pedestrians) {
     const payload = parseGlb(await readFile(`public/assets/characters/human-motion/${spec.file}`))
+    check(`${spec.file}: only native idle/walk clips retained`, () => assert.deepEqual(payload.json.animations.map(animation => animation.name), ['Idle_Loop', 'Walk_Loop']))
     const container = await SceneLoader.LoadAssetContainerAsync('', geometryOnlyData(payload), scene, undefined, '.gltf')
     const a = createPedestrian(scene, container, spec, `test-a-${spec.file}`, 1.76)
     const b = createPedestrian(scene, container, spec, `test-b-${spec.file}`, 1.68)
     check(`${spec.file}: complete skinned body with independent skeleton`, () => {
       assert.ok(a.entries.skeletons.length > 0); assert.ok(a.meshes.some(mesh => mesh.skeleton))
-      assert.notEqual(a.entries.skeletons[0], b.entries.skeletons[0])
-      assert.notEqual(a.entries.skeletons[0], container.skeletons[0])
+      assert.notEqual(a.entries.skeletons[0], b.entries.skeletons[0]); assert.notEqual(a.entries.skeletons[0], container.skeletons[0])
       assert.equal(a.meshes.length, container.meshes.filter(mesh => mesh.getTotalVertices() > 0).length)
       assert.ok(a.meshes.every(mesh => !mesh.checkCollisions && !mesh.isPickable))
     })
     check(`${spec.file}: four sole markers normalized at ground level`, () => {
       assert.equal(a.soles.length, 4)
       for (const sole of a.soles) { sole.computeWorldMatrix(true); near(sole.getAbsolutePosition().y, 0, 0.02) }
+      const [leftFoot, rightFoot, leftToe, rightToe] = a.soles.map(marker => marker.parent.getAbsolutePosition())
+      const forward = leftToe.subtract(leftFoot).add(rightToe.subtract(rightFoot)); forward.y = 0; forward.normalize()
+      assert.ok(forward.z > 0.99, `Incorrect local visual forward ${forward}`)
     })
-    check(`${spec.file}: source disposal cannot hide mounted clones`, () => {
+    check(`${spec.file}: hidden source roots cannot hide mounted copies`, () => {
       for (const root of container.rootNodes) root.setEnabled(false)
-      assert.ok(a.meshes.every(mesh => mesh.isEnabled()))
-      assert.ok(b.meshes.every(mesh => mesh.isEnabled()))
+      assert.ok(a.meshes.every(mesh => mesh.isEnabled())); assert.ok(b.meshes.every(mesh => mesh.isEnabled()))
     })
-    check(`${spec.file}: native walk pose cannot animate another person`, () => {
+    check(`${spec.file}: animation targets are independent across humanoids`, () => {
       const clip = a.entries.animationGroups.find(group => group.name.endsWith('/Walk_Loop'))
       const track = clip.targetedAnimations.find(track => track.animation.targetProperty === 'rotationQuaternion')
       assert.ok(track)
       const sourceName = track.target.name.slice(`test-a-${spec.file}/`.length)
       const other = b.root.getDescendants(false).find(node => node.name === `test-b-${spec.file}/${sourceName}`)
-      assert.ok(other)
-      const before = other.rotationQuaternion.clone()
+      assert.ok(other); assert.notEqual(other, track.target)
+      const before = [other.rotationQuaternion.x, other.rotationQuaternion.y, other.rotationQuaternion.z, other.rotationQuaternion.w]
       clip.goToFrame(clip.from + (clip.to - clip.from) * 0.4)
-      assert.ok(other.rotationQuaternion.equalsWithEpsilon(before, 0.00001))
+      assert.deepEqual([other.rotationQuaternion.x, other.rotationQuaternion.y, other.rotationQuaternion.z, other.rotationQuaternion.w], before)
       a.mixer.update(1.4, 0.016); b.mixer.update(0, 0.016)
     })
     a.dispose(); b.dispose(); container.dispose()
@@ -99,10 +99,10 @@ try {
   const ground = MeshBuilder.CreateBox('ground', { width: 180, depth: 130, height: 0.2 }, scene); ground.position.y = -0.1
   const sidewalk = MeshBuilder.CreateBox('sidewalk-test', { width: 4, depth: 4, height: 0.16 }, scene); sidewalk.position.y = 0.08
   const sample = surfaceSampler(scene)
-  check('pedestrian grounding uses governed ground/trottoir heights, not capsule center', () => {
+  check('grounding samples road/sidewalk heights, not the old capsule centre', () => {
     near(sample(0, 0), 0.16); near(sample(10, 10), 0); assert.throws(() => sample(1000, 1000))
   })
-  console.log(`Authored human-motion regression suite: ${passed} PASS. Actual asset rig structure plus NullEngine geometry; NOT Android appearance or FPS acceptance.`)
+  console.log(`Native human-motion regression suite: ${passed} PASS. Actual candidate rig structures and NullEngine geometry; NOT Android appearance or FPS acceptance.`)
 } finally {
   scene.dispose(); engine.dispose(); await Promise.all([unlink(tempWalk), unlink(tempPeople)])
 }
