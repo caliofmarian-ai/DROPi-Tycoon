@@ -1,291 +1,153 @@
-import {
-  AbstractMesh,
-  AnimationGroup,
-  DirectionalLight,
-  EngineStore,
-  Node,
-  SceneLoader,
-  ShadowGenerator,
-  TransformNode,
-} from '@babylonjs/core'
+import { AbstractMesh, AnimationGroup, DirectionalLight, EngineStore, Node, SceneLoader, ShadowGenerator, TransformNode, Vector3 } from '@babylonjs/core'
+import type { AssetContainer } from '@babylonjs/core/assetContainer'
 import '@babylonjs/loaders/glTF'
+import { createWalkMixer, planarSpeed } from './authoredWalk'
 
-const ISSUE = 726
-const MOTION_ISSUE = 725
 const ASSET_ROOT = '/assets/characters/p1/'
-const CHARACTER_FILE = 'Regular_Male_FullBody.gltf'
-const ANIMATION_FILE = 'universal-animation-library.glb'
+const WALK_ROOT = '/assets/characters/human-motion/'
 const TARGET_HEIGHT_M = 1.78
 const SOLE_LOCAL_Y_M = 0.018
 
 type RiggedHeroDebug = {
-  issue: number
-  motionIssue: number
-  loaded: boolean
-  fallback: boolean
-  heightM: number | null
-  meshCount: number
-  skeletonCount: number
-  animation: string
-  assetMode: 'PINNED_BUILD_TIME_CANDIDATE'
-  soleLocalY: number
-  error?: string
+  issue: number; motionIssue: number; loaded: boolean; fallback: boolean
+  heightM: number | null; meshCount: number; skeletonCount: number; animation: string
+  assetMode: 'PINNED_BUILD_TIME_CANDIDATE'; soleLocalY: number
+  gait?: 'AUTHORED_WALK'; measuredSpeed?: number; walkWeight?: number; error?: string
 }
-
-const getControls = (): { getSpeed?: () => number } | undefined =>
-  (window as unknown as { __DROPiNaturalControls?: { getSpeed?: () => number } }).__DROPiNaturalControls
-
+type WalkManifest = { hero: { file: string; walk: string; originalWalk: string; targetCount: number; restTranslations: Record<string, { source: number[]; target: number[] }> } }
 const publish = (state: RiggedHeroDebug): void => {
   ;(window as unknown as { __DROPiRiggedHeroV1?: RiggedHeroDebug }).__DROPiRiggedHeroV1 = { ...state }
 }
-
 const worldBounds = (meshes: AbstractMesh[]): { minY: number; maxY: number } => {
-  let minY = Number.POSITIVE_INFINITY
-  let maxY = Number.NEGATIVE_INFINITY
+  let minY = Infinity, maxY = -Infinity
   for (const mesh of meshes) {
     if (mesh.getTotalVertices() <= 0) continue
     mesh.computeWorldMatrix(true)
-    const box = mesh.getBoundingInfo().boundingBox
-    minY = Math.min(minY, box.minimumWorld.y)
-    maxY = Math.max(maxY, box.maximumWorld.y)
+    const b = mesh.getBoundingInfo().boundingBox
+    minY = Math.min(minY, b.minimumWorld.y); maxY = Math.max(maxY, b.maximumWorld.y)
   }
-  if (!Number.isFinite(minY) || !Number.isFinite(maxY)) return { minY: 0, maxY: 1 }
+  if (!Number.isFinite(minY) || !Number.isFinite(maxY) || maxY - minY < 0.01) throw new Error('Invalid rigged hero bounds')
   return { minY, maxY }
 }
-
-const proceduralVisibilitySnapshot = new Map<AbstractMesh, boolean>()
-
-const isProceduralHeroPresentation = (mesh: AbstractMesh): boolean => {
-  const exact = new Set([
-    'hero-torso',
-    'hero-head',
-    'hero-leg-l',
-    'hero-leg-r',
-    'hero-arm-l',
-    'hero-arm-r',
-  ])
-  return (
-    exact.has(mesh.name) ||
-    mesh.name.startsWith('realism-v2-hero-') ||
-    mesh.name.startsWith('target-hero-') ||
-    mesh.name.startsWith('hero-motion-')
-  )
-}
-
+const legacy = (mesh: AbstractMesh): boolean =>
+  ['hero-torso', 'hero-head', 'hero-leg-l', 'hero-leg-r', 'hero-arm-l', 'hero-arm-r'].includes(mesh.name) ||
+  mesh.name.startsWith('realism-v2-hero-') || mesh.name.startsWith('target-hero-') || mesh.name.startsWith('hero-motion-')
+const proceduralVisibility = new Map<AbstractMesh, boolean>()
 const hideProceduralHero = (): void => {
   const scene = EngineStore.LastCreatedScene
   if (!scene) return
-  for (const mesh of scene.meshes) {
-    if (!isProceduralHeroPresentation(mesh)) continue
-    if (!proceduralVisibilitySnapshot.has(mesh)) proceduralVisibilitySnapshot.set(mesh, mesh.isEnabled())
+  for (const mesh of scene.meshes) if (legacy(mesh)) {
+    if (!proceduralVisibility.has(mesh)) proceduralVisibility.set(mesh, mesh.isEnabled())
     mesh.setEnabled(false)
   }
 }
-
 const restoreProceduralHero = (): void => {
-  for (const [mesh, wasEnabled] of proceduralVisibilitySnapshot.entries()) {
-    if (!mesh.isDisposed()) mesh.setEnabled(wasEnabled)
-  }
+  for (const [mesh, enabled] of proceduralVisibility) if (!mesh.isDisposed()) mesh.setEnabled(enabled)
 }
 
-const addRiggedShadowCasters = (meshes: AbstractMesh[]): void => {
-  const scene = EngineStore.LastCreatedScene
-  const sun = scene?.getLightByName('sun')
-  if (!(sun instanceof DirectionalLight)) return
-  const shadowGenerator = sun.getShadowGenerator()
-  if (!(shadowGenerator instanceof ShadowGenerator)) return
-  for (const mesh of meshes) {
-    if (mesh.getTotalVertices() <= 0) continue
-    shadowGenerator.addShadowCaster(mesh, false)
-    mesh.receiveShadows = false
+const retargetGroup = (source: AnimationGroup, targetMap: Map<string, Node>, translations?: WalkManifest['hero']['restTranslations']): AnimationGroup => {
+  const resolve = (oldTarget: Node): Node => {
+    const name = oldTarget.name.split('|').at(-1) ?? oldTarget.name
+    const target = targetMap.get(name)
+    if (!target) throw new Error(`Unmapped ${source.name} target: ${name}`)
+    return target
   }
-}
-
-const buildTargetMap = (
-  transformNodes: TransformNode[],
-  meshes: AbstractMesh[],
-  skeletons: ReturnType<typeof SceneLoader.ImportMeshAsync> extends Promise<infer R>
-    ? R extends { skeletons: infer S } ? S : never
-    : never,
-): Map<string, Node> => {
-  const targets = new Map<string, Node>()
-  const add = (node: Node): void => {
-    if (!node.name || targets.has(node.name)) return
-    targets.set(node.name, node)
-  }
-  transformNodes.forEach(add)
-  meshes.forEach(add)
-  for (const skeleton of skeletons) {
-    for (const bone of skeleton.bones) {
-      const node = bone.getTransformNode()
-      if (node) add(node)
-    }
-  }
-  return targets
-}
-
-const cloneLocomotion = async (
-  targetMap: Map<string, Node>,
-): Promise<Map<string, AnimationGroup>> => {
-  const scene = EngineStore.LastCreatedScene
-  if (!scene) return new Map()
-  const source = await SceneLoader.ImportMeshAsync('', ASSET_ROOT, ANIMATION_FILE, scene)
-  const selected = new Set(['Idle_Loop', 'Jog_Fwd_Loop', 'Sprint_Loop'])
-  const cloned = new Map<string, AnimationGroup>()
-
-  for (const group of source.animationGroups) {
-    group.stop()
-    if (!selected.has(group.name)) continue
-    const copy = group.clone(`dropi-hero-${group.name}`, oldTarget => {
-      const direct = targetMap.get(oldTarget.name)
-      if (direct) return direct
-      const shortName = oldTarget.name.includes('|') ? oldTarget.name.split('|').at(-1) : oldTarget.name
-      return shortName ? targetMap.get(shortName) ?? null : null
+  source.targetedAnimations.forEach(track => resolve(track.target as Node))
+  const result = source.clone(`dropi-hero-${source.name}`, resolve, true)
+  if (result.targetedAnimations.length !== source.targetedAnimations.length) { result.dispose(); throw new Error('Incomplete animation retarget') }
+  if (translations) for (const track of result.targetedAnimations) {
+    if (track.animation.targetProperty !== 'position') continue
+    const name = (track.target as Node).name, rest = translations[name]
+    if (!rest) continue
+    const delta = Vector3.FromArray(rest.target).subtract(Vector3.FromArray(rest.source))
+    const keys = track.animation.getKeys().map(key => {
+      if (!(key.value instanceof Vector3)) throw new Error(`Unsupported translation key for ${name}`)
+      const value = key.value.add(delta)
+      // The simulation root remains the only horizontal travel authority.
+      if (/^(root|armature)$/i.test(name)) { value.x = rest.target[0]!; value.z = rest.target[2]! }
+      return { ...key, value }
     })
-    cloned.set(group.name, copy)
+    track.animation.setKeys(keys)
   }
-
-  source.meshes.forEach(mesh => mesh.setEnabled(false))
-  source.transformNodes.forEach(node => node.setEnabled(false))
-  return cloned
+  return result
 }
 
-const startAnimationDriver = (
-  groups: Map<string, AnimationGroup>,
-  state: RiggedHeroDebug,
-): void => {
-  const scene = EngineStore.LastCreatedScene
-  if (!scene) return
-  let active: AnimationGroup | null = null
-  let activeName = ''
-  let moving = false
-  let smoothedRatio = 0.56
-
-  const play = (name: string, speedRatio: number): void => {
-    const next = groups.get(name) ?? groups.get('Idle_Loop')
-    if (!next) return
-    if (active !== next) {
-      active?.stop()
-      next.start(true, speedRatio)
-      active = next
-      activeName = name
-    } else {
-      next.speedRatio = speedRatio
-    }
-    state.animation = activeName
-    publish(state)
-  }
-
-  play('Idle_Loop', 0.92)
-  scene.onBeforeRenderObservable.add(() => {
-    const dt = Math.min(scene.getEngine().getDeltaTime() / 1000, 0.05)
-    const currentSpeed = getControls()?.getSpeed?.() ?? 0
-
-    if (moving) {
-      if (currentSpeed < 0.10) moving = false
-    } else if (currentSpeed > 0.24) {
-      moving = true
-    }
-
-    if (!moving) {
-      play('Idle_Loop', 0.92)
-      return
-    }
-
-    // P5 deliberately does not enter Sprint_Loop during ordinary courier travel.
-    // The available audited library has no dedicated walk clip, so Jog_Fwd_Loop
-    // is used as a slow no-root-motion walk proxy. Hysteresis plus smoothed playback
-    // removes the previous rapid idle/jog switches and sprint-like leg cadence.
-    const desiredRatio = 0.46 + Math.min(0.30, currentSpeed * 0.065)
-    const blend = 1 - Math.exp(-8 * dt)
-    smoothedRatio += (desiredRatio - smoothedRatio) * blend
-    play('Jog_Fwd_Loop', smoothedRatio)
-  })
-}
-
-let loading = false
-
+let started = false
 const boot = async (): Promise<void> => {
   const scene = EngineStore.LastCreatedScene
-  const hero = scene?.getTransformNodeByName('hero')
-  const visualRoot = scene?.getTransformNodeByName('hero-visual-ground-root')
-  if (
-    !scene || !(hero instanceof TransformNode) || !(visualRoot instanceof TransformNode) ||
-    !scene.metadata?.dropiGroundContactV1
-  ) {
-    window.requestAnimationFrame(() => void boot())
-    return
+  const hero = scene?.getTransformNodeByName('hero'), visualRoot = scene?.getTransformNodeByName('hero-visual-ground-root')
+  if (!scene || !(hero instanceof TransformNode) || !(visualRoot instanceof TransformNode) || !scene.metadata?.dropiGroundContactV1) {
+    window.requestAnimationFrame(() => void boot()); return
   }
-  if (scene.metadata?.dropiRiggedHeroV1 || loading) return
-  loading = true
-
-  const state: RiggedHeroDebug = {
-    issue: ISSUE,
-    motionIssue: MOTION_ISSUE,
-    loaded: false,
-    fallback: true,
-    heightM: null,
-    meshCount: 0,
-    skeletonCount: 0,
-    animation: 'LOADING_RIGGED',
-    assetMode: 'PINNED_BUILD_TIME_CANDIDATE',
-    soleLocalY: SOLE_LOCAL_Y_M,
-  }
-  publish(state)
-  hideProceduralHero()
-
+  if (started) return
+  started = true
+  const state: RiggedHeroDebug = { issue: 726, motionIssue: 725, loaded: false, fallback: true, heightM: null, meshCount: 0, skeletonCount: 0, animation: 'LOADING_RIGGED', assetMode: 'PINNED_BUILD_TIME_CANDIDATE', soleLocalY: SOLE_LOCAL_Y_M }
+  publish(state); hideProceduralHero()
+  const carriers: AssetContainer[] = [], clones: AnimationGroup[] = []
+  let result: Awaited<ReturnType<typeof SceneLoader.ImportMeshAsync>> | undefined
   try {
-    const result = await SceneLoader.ImportMeshAsync('', ASSET_ROOT, CHARACTER_FILE, scene)
+    const response = await fetch(`${WALK_ROOT}MANIFEST.json`, { signal: AbortSignal.timeout(45000) })
+    if (!response.ok) throw new Error(`Walk manifest HTTP ${response.status}`)
+    const manifest = await response.json() as WalkManifest
+    if (!manifest.hero || manifest.hero.walk !== 'Walk_Loop' || !/^walk/i.test(manifest.hero.originalWalk)) throw new Error('Verified authored walk manifest required; no jog proxy fallback')
+    result = await SceneLoader.ImportMeshAsync('', ASSET_ROOT, 'Regular_Male_FullBody.gltf', scene)
     const importedRoot = result.meshes[0]
     if (!(importedRoot instanceof AbstractMesh)) throw new Error('Imported character has no root mesh')
-
-    importedRoot.parent = visualRoot
-    importedRoot.name = 'p1-rigged-hero-root'
-    importedRoot.rotationQuaternion = null
-    importedRoot.rotation.y = Math.PI
-
+    importedRoot.setEnabled(false)
+    importedRoot.parent = visualRoot; importedRoot.name = 'p1-rigged-hero-root'
+    // Preserve the accepted #731 adapter. Do not change controls/camera handedness.
+    importedRoot.rotationQuaternion = null; importedRoot.rotation.y = Math.PI
     const visibleMeshes = result.meshes.filter(mesh => mesh.getTotalVertices() > 0)
     let bounds = worldBounds(visibleMeshes)
-    const sourceHeight = Math.max(0.01, bounds.maxY - bounds.minY)
-    const scale = TARGET_HEIGHT_M / sourceHeight
-    importedRoot.scaling.scaleInPlace(scale)
-
+    importedRoot.scaling.scaleInPlace(TARGET_HEIGHT_M / (bounds.maxY - bounds.minY))
     bounds = worldBounds(visibleMeshes)
-    const visualRootY = visualRoot.getAbsolutePosition().y
-    importedRoot.position.y += visualRootY + SOLE_LOCAL_Y_M - bounds.minY
+    importedRoot.position.y += visualRoot.getAbsolutePosition().y + SOLE_LOCAL_Y_M - bounds.minY
     bounds = worldBounds(visibleMeshes)
-
-    const targetMap = buildTargetMap(result.transformNodes, result.meshes, result.skeletons)
-    const animationGroups = await cloneLocomotion(targetMap)
-    if (!animationGroups.has('Idle_Loop') || !animationGroups.has('Jog_Fwd_Loop')) {
-      throw new Error('Required P1 locomotion clips did not retarget to the character rig')
+    const targets = new Map<string, Node>()
+    for (const node of [...result.transformNodes, ...result.meshes]) if (node.name && !targets.has(node.name)) targets.set(node.name, node)
+    for (const skeleton of result.skeletons) for (const bone of skeleton.bones) {
+      const node = bone.getTransformNode(); if (node && !targets.has(node.name)) targets.set(node.name, node)
     }
-
+    carriers.push(await SceneLoader.LoadAssetContainerAsync(ASSET_ROOT, 'universal-animation-library.glb', scene))
+    carriers.push(await SceneLoader.LoadAssetContainerAsync(WALK_ROOT, manifest.hero.file, scene))
+    const idleSource = carriers[0]!.animationGroups.find(group => group.name === 'Idle_Loop')
+    const walkSource = carriers[1]!.animationGroups.find(group => group.name === manifest.hero.walk)
+    if (!idleSource || !walkSource) throw new Error('Authored Idle_Loop / Walk_Loop missing')
+    const idle = retargetGroup(idleSource, targets); clones.push(idle)
+    const walk = retargetGroup(walkSource, targets, manifest.hero.restTranslations); clones.push(walk)
+    carriers.forEach(carrier => carrier.dispose()); carriers.length = 0
+    if (scene.isDisposed) throw new Error('Scene disposed during humanoid import')
     hideProceduralHero()
-    addRiggedShadowCasters(visibleMeshes)
-
-    state.loaded = true
-    state.fallback = false
-    state.heightM = Number((bounds.maxY - bounds.minY).toFixed(3))
-    state.meshCount = visibleMeshes.length
-    state.skeletonCount = result.skeletons.length
-    state.animation = 'Idle_Loop'
-    publish(state)
-    startAnimationDriver(animationGroups, state)
-
+    const sun = scene.getLightByName('sun'), generator = sun instanceof DirectionalLight ? sun.getShadowGenerator() : null
+    if (generator instanceof ShadowGenerator) for (const mesh of visibleMeshes) { generator.addShadowCaster(mesh, false); mesh.receiveShadows = false }
+    const mixer = createWalkMixer(idle, walk)
+    importedRoot.setEnabled(true)
+    state.loaded = true; state.fallback = false; state.heightM = Number((bounds.maxY - bounds.minY).toFixed(3))
+    state.meshCount = visibleMeshes.length; state.skeletonCount = result.skeletons.length; state.animation = 'Idle_Loop'; state.gait = 'AUTHORED_WALK'
+    const previous = hero.position.clone()
+    const observer = scene.onBeforeRenderObservable.add(() => {
+      const dt = scene.getEngine().getDeltaTime() / 1000
+      const speed = planarSpeed(hero.position.x - previous.x, hero.position.z - previous.z, dt)
+      previous.copyFrom(hero.position)
+      const gait = mixer.update(speed, dt)
+      state.animation = gait.moving ? 'Walk_Loop' : 'Idle_Loop'; state.measuredSpeed = speed; state.walkWeight = gait.weight
+      publish(state)
+    })
+    scene.onDisposeObservable.addOnce(() => { scene.onBeforeRenderObservable.remove(observer); mixer.stop(); clones.forEach(group => group.dispose()) })
     scene.metadata = { ...(scene.metadata ?? {}), dropiRiggedHeroV1: true }
+    publish(state)
   } catch (error) {
+    // A late animation failure must not leave a second, half-loaded character.
+    clones.forEach(group => group.dispose()); carriers.forEach(carrier => carrier.dispose())
+    result?.animationGroups.forEach(group => group.dispose())
+    result?.meshes.forEach(mesh => { if (!mesh.isDisposed()) mesh.dispose() })
+    result?.transformNodes.forEach(node => { if (!node.isDisposed()) node.dispose() })
+    result?.skeletons.forEach(skeleton => skeleton.dispose())
     restoreProceduralHero()
     state.error = error instanceof Error ? error.message : String(error)
-    state.loaded = false
-    state.fallback = true
-    state.animation = 'FALLBACK_PROCEDURAL'
-    publish(state)
-    console.warn('P1 rigged hero unavailable; restoring governed procedural fallback.', error)
+    state.loaded = false; state.fallback = true; state.animation = 'FALLBACK_PROCEDURAL'
     scene.metadata = { ...(scene.metadata ?? {}), dropiRiggedHeroV1: false }
-  } finally {
-    loading = false
+    publish(state); console.warn('Authored walking hero failed; explicit procedural fallback.', error)
   }
 }
-
 void boot()

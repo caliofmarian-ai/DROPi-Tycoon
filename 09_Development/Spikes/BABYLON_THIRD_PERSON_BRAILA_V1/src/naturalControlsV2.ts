@@ -1,11 +1,12 @@
 import { ArcRotateCamera } from '@babylonjs/core/Cameras/arcRotateCamera'
 import { EngineStore } from '@babylonjs/core/Engines/engineStore'
 import { Vector3 } from '@babylonjs/core/Maths/math.vector'
+import { HERO_WALK_SPEED_MPS } from './authoredWalk'
 
 const CONTROL_ISSUE = 715
 const NAV_ISSUE = 716
 const HERO_RADIUS_M = 0.42
-const MAX_SPEED_MPS = 4.6
+const MAX_SPEED_MPS = HERO_WALK_SPEED_MPS
 const JOYSTICK_DEAD_ZONE = 0.12
 const ACCELERATION_MPS2 = 11.5
 const DECELERATION_MPS2 = 17
@@ -354,6 +355,7 @@ const boot = (): void => {
   const parcel = scene.getMeshByName('hero-parcel')
 
   let currentSpeed = 0
+  let measuredSpeed = 0
   let walkPhase = 0
   let lastTravelDirection = new Vector3(0, 0, -1)
 
@@ -452,6 +454,9 @@ const boot = (): void => {
       movedDistance = moveHeroWithSlide(lastTravelDirection.scale(currentSpeed * dt))
       if (movedDistance < 0.001 && currentSpeed > 0.4) currentSpeed *= 0.42
     }
+    // Report actual post-collision travel, not requested velocity. Footsteps and
+    // animation must stop when the hero is pushing against an obstacle.
+    measuredSpeed = rawFrameMs > 0 && rawFrameMs < 250 ? movedDistance / (rawFrameMs / 1000) : 0
 
     if (movedDistance > 0.0001) {
       walkPhase += movedDistance * 5.2
@@ -479,7 +484,7 @@ const boot = (): void => {
       y: joystick.state.y,
       magnitude: joystick.state.magnitude,
     }),
-    getSpeed: () => currentSpeed,
+    getSpeed: () => measuredSpeed,
     getCameraRadius: () => camera.radius,
   }
 }
