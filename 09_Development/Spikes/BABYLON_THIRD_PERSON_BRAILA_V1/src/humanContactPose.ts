@@ -96,7 +96,7 @@ export class HumanContactPose {
   private previousHeading: number | null = null
   private previousPosition: Vector3 | null = null
   constructor(readonly root: Mesh, readonly base: TransformNode, readonly surface: SurfaceHeight, readonly parcel?: Mesh) {
-    const nodes = root.getDescendants(false).filter((node): node is TransformNode => node instanceof TransformNode => false)
+    const nodes = root.getDescendants(false).filter((node): node is TransformNode => node instanceof TransformNode)
     const node = (name: string): TransformNode => {
       const matches = nodes.filter(candidate => candidate.name.endsWith(`/${name}`))
       if (matches.length !== 1) throw new Error(`Contact adapter requires exact joint ${name}; found ${matches.length}`)
