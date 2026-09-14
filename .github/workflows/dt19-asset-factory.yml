@@ -43,16 +43,19 @@ jobs:
       - name: Install Blender headless runtime
         run: |
           sudo apt-get update
-          sudo apt-get install -y --no-install-recommends blender
+          sudo apt-get install -y --no-install-recommends blender python3-numpy
           blender --version
+          blender --background --python-exit-code 1 --python-expr "import numpy; print('Blender numpy', numpy.__version__)"
 
       - name: Generate deterministic CI-only GLB
         run: |
           OUT="$RUNNER_TEMP/dropi-dt19-proof"
           mkdir -p "$OUT"
-          blender --background --python "$GENERATOR" -- \
+          blender --background --python-exit-code 1 --python "$GENERATOR" -- \
             --request "$REQUEST" \
             --out-dir "$OUT"
+          test -s "$OUT/ci-proof-building.glb"
+          test -s "$OUT/ci-proof-building.report.json"
           echo "DROPi asset proof output: $OUT"
           ls -lh "$OUT"
 
