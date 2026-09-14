@@ -11,10 +11,15 @@ RUN npm ci
 
 # Copy the rest of the source and build the application.
 COPY . .
-# Railway supplies configured variables as Docker build arguments. Vite reads
-# this public ingestion DSN at build time, not from the production server env.
+# Railway supplies configured variables and Git/deployment metadata as Docker
+# build arguments. Vite reads only the explicitly public values below at build
+# time. The commit SHA and deployment UUID are non-secret correlation metadata.
 # Never declare SENTRY_AUTH_TOKEN here or expose it through a VITE_ variable.
 ARG VITE_SENTRY_DSN
+ARG RAILWAY_GIT_COMMIT_SHA
+ARG RAILWAY_DEPLOYMENT_ID
+ENV VITE_SENTRY_RELEASE=$RAILWAY_GIT_COMMIT_SHA
+ENV VITE_SENTRY_DIST=$RAILWAY_DEPLOYMENT_ID
 RUN npm run build
 
 # ---- Production stage ----
