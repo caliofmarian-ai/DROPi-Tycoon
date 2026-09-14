@@ -1,0 +1,231 @@
+name: Babylon Android Owner Installability Gate
+
+on:
+  pull_request:
+    paths:
+      - '09_Development/Spikes/BABYLON_THIRD_PERSON_BRAILA_V1/**'
+      - 'game-mobile/**'
+      - '.github/workflows/babylon-android-owner-verified.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+env:
+  DROPI_HEAD_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
+  DROPI_RUN_ID: ${{ github.run_id }}
+  DROPI_RUN_ATTEMPT: ${{ github.run_attempt }}
+  DROPI_ANDROID_VERSION_CODE: ${{ github.run_number }}
+  DROPI_PACKAGE_ID: com.dropi.tycoon.babyloneval
+
+jobs:
+  android-owner-installability:
+    name: Android owner installability gate
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+
+    steps:
+      - name: Checkout exact source head
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          persist-credentials: false
+
+      - name: Verify exact checkout identity
+        shell: bash
+        run: |
+          set -euo pipefail
+          ACTUAL_SHA="$(git rev-parse HEAD)"
+          test "$ACTUAL_SHA" = "$DROPI_HEAD_SHA"
+          echo "DROPI_CHECKOUT_SHA=$ACTUAL_SHA" >> "$GITHUB_ENV"
+          echo "DROPI_STAGE_ROOT=$RUNNER_TEMP/dropi-owner-android-$DROPI_RUN_ID-$DROPI_RUN_ATTEMPT" >> "$GITHUB_ENV"
+          echo "DROPI_APK_OUTPUT=$RUNNER_TEMP/dropi-babylon-android-eval-$DROPI_HEAD_SHA" >> "$GITHUB_ENV"
+
+      - name: Setup Node 22.13.0
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: 22.13.0
+          cache: npm
+          cache-dependency-path: |
+            09_Development/Spikes/BABYLON_THIRD_PERSON_BRAILA_V1/package-lock.json
+            game-mobile/package-lock.json
+
+      - name: Setup Java 17
+        uses: actions/setup-java@cf277c60eb25467037889841efdb72551f06f6c3 # v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Verify pinned toolchain
+        shell: bash
+        run: |
+          set -euo pipefail
+          node --version | grep -Fx 'v22.13.0'
+          npm --version | grep -Fx '10.9.2'
+          java -version
+          test -n "$ANDROID_HOME"
+          test -x "$ANDROID_HOME/platform-tools/adb"
+
+      - name: Build exact tested static Babylon payload
+        working-directory: 09_Development/Spikes/BABYLON_THIRD_PERSON_BRAILA_V1
+        shell: bash
+        run: |
+          set -euo pipefail
+          npm ci --ignore-scripts --no-audit --no-fund
+          npm run build
+          node scripts/writeAndroidRuntimeManifest.mjs
+          grep -R -F -q "$DROPI_HEAD_SHA" dist/assets
+          grep -F -q '"productionEligible": false' dist/dropi-runtime-manifest.json
+          grep -F -q '"authenticGameplay": false' dist/dropi-runtime-manifest.json
+
+      - name: Prepare isolated Android evaluation stage
+        shell: bash
+        run: |
+          set -euo pipefail
+          node 09_Development/Spikes/BABYLON_THIRD_PERSON_BRAILA_V1/scripts/prepareAndroidEvaluationStage.mjs \
+            "$GITHUB_WORKSPACE/game-mobile" \
+            "$GITHUB_WORKSPACE/09_Development/Spikes/BABYLON_THIRD_PERSON_BRAILA_V1/dist" \
+            "$DROPI_STAGE_ROOT"
+          cd "$DROPI_STAGE_ROOT/game-mobile"
+          npm ci --no-audit --no-fund
+          EXPO_PUBLIC_DROPITYCOON_RUNTIME_MODE=bundled npm run typecheck
+          CI=1 NODE_ENV=production EXPO_PUBLIC_DROPITYCOON_RUNTIME_MODE=bundled \
+            ./node_modules/.bin/expo prebuild --platform android --clean --no-install
+          grep -F -q "applicationId 'com.dropi.tycoon.babyloneval'" android/app/build.gradle
+          grep -F -q "versionCode $DROPI_ANDROID_VERSION_CODE" android/app/build.gradle
+          grep -F -q '<string name="app_name">DROPi Babylon Eval</string>' android/app/src/main/res/values/strings.xml
+          test -f android/app/src/main/assets/dropi-game/index.html
+          cmp \
+            "$GITHUB_WORKSPACE/09_Development/Spikes/BABYLON_THIRD_PERSON_BRAILA_V1/dist/dropi-runtime-manifest.json" \
+            android/app/src/main/assets/dropi-game/dropi-runtime-manifest.json
+
+      - name: Build universal preflight APK
+        shell: bash
+        run: |
+          set -euo pipefail
+          cd "$DROPI_STAGE_ROOT/game-mobile/android"
+          CI=1 NODE_ENV=production EXPO_PUBLIC_DROPITYCOON_RUNTIME_MODE=bundled \
+            ./gradlew --no-daemon --stacktrace :app:assembleRelease
+          UNIVERSAL_APK="$DROPI_STAGE_ROOT/game-mobile/android/app/build/outputs/apk/release/app-release.apk"
+          test -s "$UNIVERSAL_APK"
+          cp "$UNIVERSAL_APK" "$RUNNER_TEMP/dropi-universal-preflight.apk"
+          echo "DROPI_UNIVERSAL_APK=$RUNNER_TEMP/dropi-universal-preflight.apk" >> "$GITHUB_ENV"
+          echo "DROPI_UNIVERSAL_SIZE=$(stat -c%s "$UNIVERSAL_APK")" >> "$GITHUB_ENV"
+
+      - name: Verify universal APK structure, signature and 16 KB alignment
+        shell: bash
+        run: |
+          set -euo pipefail
+          BUILD_TOOLS_VERSION="$(ls "$ANDROID_HOME/build-tools" | sort -V | tail -n1)"
+          BUILD_TOOLS="$ANDROID_HOME/build-tools/$BUILD_TOOLS_VERSION"
+          test -x "$BUILD_TOOLS/apksigner"
+          test -x "$BUILD_TOOLS/zipalign"
+          test -x "$BUILD_TOOLS/aapt"
+          unzip -t "$DROPI_UNIVERSAL_APK"
+          unzip -Z1 "$DROPI_UNIVERSAL_APK" | grep -Fx 'assets/dropi-game/index.html'
+          unzip -Z1 "$DROPI_UNIVERSAL_APK" | grep -Fx 'assets/dropi-game/dropi-runtime-manifest.json'
+          "$BUILD_TOOLS/apksigner" verify --verbose --print-certs "$DROPI_UNIVERSAL_APK"
+          "$BUILD_TOOLS/zipalign" -c -P 16 -v 4 "$DROPI_UNIVERSAL_APK"
+          "$BUILD_TOOLS/aapt" dump badging "$DROPI_UNIVERSAL_APK" | grep -F "package: name='$DROPI_PACKAGE_ID'"
+          echo "DROPI_BUILD_TOOLS=$BUILD_TOOLS" >> "$GITHUB_ENV"
+
+      - name: Install and launch universal APK on clean Android emulator
+        shell: bash
+        run: |
+          set -euo pipefail
+          SDKMANAGER="$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager"
+          AVDMANAGER="$ANDROID_HOME/cmdline-tools/latest/bin/avdmanager"
+          if [ ! -x "$SDKMANAGER" ]; then SDKMANAGER="$(command -v sdkmanager)"; fi
+          if [ ! -x "$AVDMANAGER" ]; then AVDMANAGER="$(command -v avdmanager)"; fi
+          yes | "$SDKMANAGER" --licenses >/dev/null 2>&1 || true
+          "$SDKMANAGER" 'platform-tools' 'emulator' 'system-images;android-35;google_apis;x86_64'
+          echo no | "$AVDMANAGER" create avd --force --name dropi_owner_ci --package 'system-images;android-35;google_apis;x86_64'
+          sudo chmod 666 /dev/kvm 2>/dev/null || true
+          "$ANDROID_HOME/emulator/emulator" \
+            -avd dropi_owner_ci \
+            -no-window -no-audio -no-boot-anim -no-snapshot -wipe-data \
+            -gpu swiftshader_indirect -accel auto \
+            > "$RUNNER_TEMP/dropi-emulator.log" 2>&1 &
+          EMULATOR_PID=$!
+          cleanup() {
+            "$ANDROID_HOME/platform-tools/adb" emu kill >/dev/null 2>&1 || true
+            kill "$EMULATOR_PID" >/dev/null 2>&1 || true
+          }
+          trap cleanup EXIT
+          timeout 180 "$ANDROID_HOME/platform-tools/adb" wait-for-device
+          BOOTED=0
+          for _ in $(seq 1 120); do
+            if [ "$("$ANDROID_HOME/platform-tools/adb" shell getprop sys.boot_completed 2>/dev/null | tr -d '\r')" = '1' ]; then
+              BOOTED=1
+              break
+            fi
+            sleep 2
+          done
+          if [ "$BOOTED" != '1' ]; then
+            cat "$RUNNER_TEMP/dropi-emulator.log"
+            exit 1
+          fi
+          "$ANDROID_HOME/platform-tools/adb" install -r "$DROPI_UNIVERSAL_APK" | tee "$RUNNER_TEMP/dropi-adb-install.txt"
+          grep -Fxq 'Success' "$RUNNER_TEMP/dropi-adb-install.txt"
+          "$ANDROID_HOME/platform-tools/adb" shell pm path "$DROPI_PACKAGE_ID" | grep -F "package:"
+          "$ANDROID_HOME/platform-tools/adb" shell monkey -p "$DROPI_PACKAGE_ID" -c android.intent.category.LAUNCHER 1
+          sleep 8
+          "$ANDROID_HOME/platform-tools/adb" shell pidof "$DROPI_PACKAGE_ID"
+          "$ANDROID_HOME/platform-tools/adb" shell dumpsys package "$DROPI_PACKAGE_ID" | grep -m1 'versionCode='
+          echo 'DROPI_EMULATOR_INSTALL=PASS' >> "$GITHUB_ENV"
+          echo 'DROPI_EMULATOR_LAUNCH=PASS' >> "$GITHUB_ENV"
+
+      - name: Build smaller ARM64 owner APK
+        shell: bash
+        run: |
+          set -euo pipefail
+          cd "$DROPI_STAGE_ROOT/game-mobile/android"
+          CI=1 NODE_ENV=production EXPO_PUBLIC_DROPITYCOON_RUNTIME_MODE=bundled \
+            ./gradlew --no-daemon --stacktrace clean :app:assembleRelease -PreactNativeArchitectures=arm64-v8a
+          APK_PATH="$DROPI_STAGE_ROOT/game-mobile/android/app/build/outputs/apk/release/app-release.apk"
+          test -s "$APK_PATH"
+          ARM64_SIZE="$(stat -c%s "$APK_PATH")"
+          test "$ARM64_SIZE" -lt "$DROPI_UNIVERSAL_SIZE"
+          ABI_LIST="$(unzip -Z1 "$APK_PATH" | sed -n 's#^lib/\([^/]*\)/.*#\1#p' | sort -u | paste -sd, -)"
+          test "$ABI_LIST" = 'arm64-v8a'
+          "$DROPI_BUILD_TOOLS/apksigner" verify --verbose --print-certs "$APK_PATH"
+          "$DROPI_BUILD_TOOLS/zipalign" -c -P 16 -v 4 "$APK_PATH"
+          "$DROPI_BUILD_TOOLS/aapt" dump badging "$APK_PATH" | grep -F "package: name='$DROPI_PACKAGE_ID'"
+          unzip -t "$APK_PATH"
+          echo "DROPI_ARM64_APK=$APK_PATH" >> "$GITHUB_ENV"
+          echo "DROPI_ARM64_SIZE=$ARM64_SIZE" >> "$GITHUB_ENV"
+
+      - name: Attest owner APK and record installability evidence
+        shell: bash
+        run: |
+          set -euo pipefail
+          node 09_Development/Spikes/BABYLON_THIRD_PERSON_BRAILA_V1/scripts/attestAndroidEvaluationApk.mjs \
+            "$DROPI_ARM64_APK" \
+            "$DROPI_STAGE_ROOT" \
+            "$DROPI_APK_OUTPUT"
+          cp 09_Development/Spikes/BABYLON_THIRD_PERSON_BRAILA_V1/INSTALL_ANDROID_EVALUATION_APK.md "$DROPI_APK_OUTPUT/"
+          {
+            echo 'classification=INTERNAL OWNER EVALUATION ONLY'
+            echo "head_sha=$DROPI_HEAD_SHA"
+            echo 'emulator_api=35'
+            echo "emulator_install=$DROPI_EMULATOR_INSTALL"
+            echo "emulator_launch=$DROPI_EMULATOR_LAUNCH"
+            echo 'final_abi=arm64-v8a'
+            echo 'apk_signature_v2_or_newer=PASS'
+            echo 'zipalign_16kb=PASS'
+            echo "universal_preflight_bytes=$DROPI_UNIVERSAL_SIZE"
+            echo "owner_arm64_bytes=$DROPI_ARM64_SIZE"
+            echo "size_reduction_bytes=$((DROPI_UNIVERSAL_SIZE - DROPI_ARM64_SIZE))"
+          } > "$DROPI_APK_OUTPUT/owner-installability-evidence.txt"
+          cd "$DROPI_APK_OUTPUT"
+          sha256sum -c SHA256SUMS.txt
+          cat owner-installability-evidence.txt
+
+      - name: Upload owner-verified ARM64 APK and evidence
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: dropi-babylon-owner-verified-${{ github.event.pull_request.head.sha || github.sha }}
+          path: ${{ runner.temp }}/dropi-babylon-android-eval-${{ github.event.pull_request.head.sha || github.sha }}
+          if-no-files-found: error
+          compression-level: 0
+          retention-days: 14
