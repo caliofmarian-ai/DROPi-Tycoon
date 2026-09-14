@@ -1,5 +1,5 @@
 import { AbstractMesh, Matrix, Mesh, TransformNode, Vector3, VertexBuffer } from '@babylonjs/core'
-import { aimJoint, orientPalm, PoseRestore, solveTwoBone } from './contactKinematics'
+import { orientPalm, PoseRestore, solveTwoBone } from './contactKinematics'
 
 export type SurfaceHeight = (x: number, z: number) => number
 export type ContactReport = {
@@ -9,7 +9,7 @@ export type ContactReport = {
 }
 type FootData = { mesh: AbstractMesh; positions: number[]; indices: number[]; weights: number[]; sides: number[] }
 
-/** Checks the actual skinned shoe vertices, not a constant sole offset or the hidden old body. */
+/** Checks actual skinned shoe vertices, not a sole offset or hidden old body. */
 export class SkinFeetProbe {
   readonly data: FootData[]
   constructor(meshes: AbstractMesh[]) {
@@ -32,11 +32,9 @@ export class SkinFeetProbe {
   }
   read(surface: SurfaceHeight): { left: number; right: number; vertices: number } {
     let left = Infinity, right = Infinity, vertices = 0
-    const skeletons = new Set(this.data.map(item => item.mesh.skeleton!))
-    for (const skeleton of skeletons) skeleton.prepare(true)
+    for (const skeleton of new Set(this.data.map(item => item.mesh.skeleton!))) skeleton.prepare(true)
     const skinned = Vector3.Zero(), world = Vector3.Zero()
-    for (const item of this.data) {
-      const { mesh, positions, indices, weights } = item
+    for (const { mesh, positions, indices, weights, sides } of this.data) {
       mesh.computeWorldMatrix(true)
       const matrices = mesh.skeleton!.getTransformMatrices(mesh)
       for (let vertex = 0; vertex < positions.length / 3; vertex += 1) {
@@ -53,7 +51,7 @@ export class SkinFeetProbe {
         skinned.set(px, py, pz)
         Vector3.TransformCoordinatesToRef(skinned, mesh.getWorldMatrix(), world)
         const clearance = world.y - surface(world.x, world.z)
-        if (item.sides[vertex] === -1) left = Math.min(left, clearance)
+        if (sides[vertex] === -1) left = Math.min(left, clearance)
         else right = Math.min(right, clearance)
         vertices += 1
       }
@@ -65,7 +63,6 @@ export class SkinFeetProbe {
 
 type Leg = { upper: TransformNode; lower: TransformNode; foot: TransformNode; tip: TransformNode; lock: Vector3 | null; side: number }
 type Arm = { upper: TransformNode; lower: TransformNode; wrist: TransformNode; palm: TransformNode; forward: Vector3; normal: Vector3; side: number }
-
 export class HumanContactPose {
   readonly restorePose = new PoseRestore()
   readonly probe: SkinFeetProbe
@@ -85,8 +82,7 @@ export class HumanContactPose {
     this.legs = ['L', 'R'].map(side => {
       const upper = node(`UpperLeg.${side}`), lower = node(`LowerLeg.${side}`), foot = node(`Foot.${side}`)
       const tip = new TransformNode(`${root.name}/contact-ankle-${side}`, root.getScene()); tip.parent = lower
-      // Foot bones in this native rig are siblings of Body, not lower-leg children.
-      // A non-deforming FK endpoint joins the analytical chain without reparenting bones.
+      foot.computeWorldMatrix(true)
       tip.position.copyFrom(Vector3.TransformCoordinates(foot.getAbsolutePosition(), Matrix.Invert(lower.computeWorldMatrix(true))))
       return { upper, lower, foot, tip, lock: null, side: Math.sign(pointInRoot(foot).x) || (side === 'L' ? -1 : 1) }
     })
@@ -115,25 +111,24 @@ export class HumanContactPose {
     const relocated = this.previousPosition !== null && Vector3.Distance(position, this.previousPosition) > .5
     if (dt > .2 || dt <= 0 || turned || relocated) this.clearPlants()
     this.previousHeading = heading; this.previousPosition = position.clone()
-    // A single deterministic base placement replaces competing P0/P5 whole-body clamps.
     position.y = this.surface(position.x, position.z) + .006
     this.base.setAbsolutePosition(position); this.base.computeWorldMatrix(true)
     let feet = this.probe.read(this.surface)
-    const lift = Math.max(0, .006 - Math.min(feet.left, feet.right))
-    if (lift > .3) failures.push('EXCESSIVE_GROUND_CORRECTION')
-    position.y += Math.min(.3, lift)
+    const requestedLift = Math.max(0, .006 - Math.min(feet.left, feet.right)), appliedLift = Math.min(.3, requestedLift)
+    if (requestedLift > .3) failures.push('EXCESSIVE_GROUND_CORRECTION')
+    position.y += appliedLift
     this.base.setAbsolutePosition(position); this.base.computeWorldMatrix(true)
-    feet = this.probe.read(this.surface)
+    // A pure world-Y translation changes every sampled clearance by exactly dy.
+    // Do not repeat full skinning when neither skin pose nor x/z changed.
+    feet = { ...feet, left: feet.left + appliedLift, right: feet.right + appliedLift }
     for (const [index, leg] of this.legs.entries()) {
       leg.foot.computeWorldMatrix(true)
       const native = leg.foot.getAbsolutePosition().clone()
-      const clearance = index === 0 ? feet.left : feet.right
-      const other = index === 0 ? feet.right : feet.left
+      const clearance = index === 0 ? feet.left : feet.right, other = index === 0 ? feet.right : feet.left
       if (leg.lock && (clearance > other + .065 || Math.hypot(leg.lock.x - native.x, leg.lock.z - native.z) > .16 || turned || relocated)) leg.lock = null
       if (!leg.lock && clearance <= .022 && (speed > .08 || Math.abs(clearance - other) < .025)) leg.lock = native.clone()
       if (!leg.lock) continue
       for (const joint of [leg.upper, leg.lower, leg.foot]) this.restorePose.save(joint)
-      // Preserve the native ankle chain length in this frame; no bone scaling.
       leg.tip.position.copyFrom(Vector3.TransformCoordinates(native, Matrix.Invert(leg.lower.computeWorldMatrix(true))))
       const target = native.clone(); target.x = leg.lock.x; target.z = leg.lock.z
       const pole = Vector3.TransformCoordinates(new Vector3(leg.side * .13, .55, .65), this.root.computeWorldMatrix(true))
@@ -142,22 +137,19 @@ export class HumanContactPose {
       leg.foot.setAbsolutePosition(target); leg.foot.computeWorldMatrix(true)
     }
     feet = this.probe.read(this.surface)
-    const remainingLift = Math.max(0, .006 - Math.min(feet.left, feet.right))
-    if (remainingLift > 0) {
-      position.y += Math.min(.15, remainingLift)
-      this.base.setAbsolutePosition(position); this.base.computeWorldMatrix(true)
-      if (remainingLift > .15) failures.push('RESIDUAL_GROUND_PENETRATION')
+    const requestedCorrection = Math.max(0, .006 - Math.min(feet.left, feet.right)), correction = Math.min(.15, requestedCorrection)
+    if (requestedCorrection > .15) failures.push('RESIDUAL_GROUND_PENETRATION')
+    if (correction > 0) {
+      position.y += correction; this.base.setAbsolutePosition(position); this.base.computeWorldMatrix(true)
+      feet = { ...feet, left: feet.left + correction, right: feet.right + correction }
     }
     let handErrorM: number | null = null
     const carrying = Boolean(this.parcel?.isEnabled())
     if (carrying && this.parcel) {
       const parcel = this.parcel
-      parcel.parent = this.root
-      parcel.position.set(0, 1.09, .30); parcel.rotationQuaternion = null; parcel.rotation.set(0, 0, 0)
-      const bounds = parcel.getBoundingInfo().boundingBox
-      const localSize = bounds.maximum.subtract(bounds.minimum)
-      parcel.scaling.set(.36 / localSize.x, .24 / localSize.y, .24 / localSize.z)
-      parcel.computeWorldMatrix(true)
+      parcel.parent = this.root; parcel.position.set(0, 1.09, .30); parcel.rotationQuaternion = null; parcel.rotation.set(0, 0, 0)
+      const bounds = parcel.getBoundingInfo().boundingBox, localSize = bounds.maximum.subtract(bounds.minimum)
+      parcel.scaling.set(.36 / localSize.x, .24 / localSize.y, .24 / localSize.z); parcel.computeWorldMatrix(true)
       handErrorM = 0
       const rootMatrix = this.root.computeWorldMatrix(true)
       for (const arm of this.arms) {
@@ -166,23 +158,23 @@ export class HumanContactPose {
         const direction = Vector3.TransformNormal(Vector3.Forward(), rootMatrix).normalize()
         const inward = Vector3.TransformNormal(new Vector3(-arm.side, 0, 0), rootMatrix).normalize()
         const pole = Vector3.TransformCoordinates(new Vector3(arm.side * .55, 1.02, -.03), rootMatrix)
-        for (let iteration = 0; iteration < 3; iteration += 1) {
+        let errorM = Infinity
+        for (let iteration = 0; iteration < 10 && errorM > .001; iteration += 1) {
           orientPalm(arm.wrist, arm.forward, arm.normal, direction, inward)
           const offset = Vector3.TransformNormal(arm.palm.position, arm.wrist.getWorldMatrix())
           solveTwoBone(arm.upper, arm.lower, arm.wrist, grip.subtract(offset), pole)
+          // The forearm changed the wrist's parent frame. Reorient before
+          // measuring the palm, then iterate the coupled offset if necessary.
+          orientPalm(arm.wrist, arm.forward, arm.normal, direction, inward)
+          arm.palm.computeWorldMatrix(true)
+          errorM = Vector3.Distance(arm.palm.getAbsolutePosition(), grip)
         }
-        orientPalm(arm.wrist, arm.forward, arm.normal, direction, inward)
-        arm.palm.computeWorldMatrix(true)
-        handErrorM = Math.max(handErrorM, Vector3.Distance(arm.palm.getAbsolutePosition(), grip))
+        handErrorM = Math.max(handErrorM, errorM)
       }
       if (handErrorM > .025) failures.push('HAND_SOCKET_GAP')
     }
-    feet = this.probe.read(this.surface)
     if (Math.min(feet.left, feet.right) < -.002) failures.push('FOOT_PENETRATION')
     return { minFootClearanceM: Math.min(feet.left, feet.right), leftFootClearanceM: feet.left, rightFootClearanceM: feet.right, handErrorM, carry: carrying, plantedFeet: this.legs.filter(leg => leg.lock).length, feetVerticesChecked: feet.vertices, status: failures.length ? 'FAIL' : 'PASS', failures }
   }
-  dispose(): void {
-    this.restore()
-    this.legs.forEach(leg => leg.tip.dispose()); this.arms.forEach(arm => arm.palm.dispose())
-  }
+  dispose(): void { this.restore(); this.legs.forEach(leg => leg.tip.dispose()); this.arms.forEach(arm => arm.palm.dispose()) }
 }
