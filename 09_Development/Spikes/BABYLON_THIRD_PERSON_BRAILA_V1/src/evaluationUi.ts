@@ -24,6 +24,7 @@ style.textContent = `
   html[data-diagnostics="closed"] #dropi-next-turn { top:12px !important; min-width:70px !important; font-size:10px !important; padding:6px !important; }
   #dropi-diagnostics-toggle { position:fixed; left:10px; top:100px; z-index:35; border:1px solid rgba(205,230,240,.4); background:rgba(5,20,30,.8); color:#eaf4f7; border-radius:7px; padding:8px 10px; font:600 9px/1.2 system-ui; }
   #dropi-check-summary { position:fixed; left:10px; top:136px; z-index:34; max-width:230px; padding:4px 6px; background:rgba(5,20,30,.65); color:#e9dba4; font:500 8px/1.3 system-ui; pointer-events:none; }
+  html[data-diagnostics="open"] #dropi-check-summary { max-width:min(420px,62vw); }
   html[data-diagnostics="open"] #dropi-camera-authority-help { position:fixed; bottom:30px; left:30%; padding:5px; background:#102331; color:white; font:500 9px/1.3 system-ui; }
 `
 document.head.append(style)
@@ -41,6 +42,7 @@ const summary = document.createElement('div'); summary.id = 'dropi-check-summary
 const started = performance.now()
 let ready = false, failed = false
 const globals = (): Record<string, any> => window as unknown as Record<string, any>
+const finite = (value: unknown): value is number => typeof value === 'number' && Number.isFinite(value)
 const timer = window.setInterval(() => {
   const g = globals(), contact = g.__DROPiContactRuntime
   const checks = [
@@ -64,7 +66,13 @@ const timer = window.setInterval(() => {
   }
   const mechanical = contact?.mechanicalStatus ?? 'UNKNOWN', resolution = g.__DROPiRenderQuality
   const sha = g.__DROPiBabylonSpike?.buildSha?.slice(0, 8) ?? '…'
-  summary.textContent = `EVAL ${sha} · CONTACT ${mechanical}${resolution?.overloaded ? ' · FRAME BUDGET EXCEEDED' : ''}`
+  const hasFrameBudget = finite(resolution?.meanMs) && finite(resolution?.p95Ms) && finite(resolution?.p99Ms) && finite(resolution?.maxMs)
+  const frameText = hasFrameBudget
+    ? ` · FPS ${(1000 / resolution.meanMs).toFixed(0)} · P95 ${resolution.p95Ms.toFixed(1)} · P99 ${resolution.p99Ms.toFixed(1)} · MAX ${resolution.maxMs.toFixed(0)} ms`
+    : ''
+  const poseText = finite(contact?.poseCostMs) ? ` · POSE ${contact.poseCostMs.toFixed(1)} ms` : ''
+  const densityText = finite(resolution?.density) ? ` · Q ${resolution.density.toFixed(2)}` : ''
+  summary.textContent = `EVAL ${sha} · CONTACT ${mechanical}${frameText}${poseText}${densityText}${resolution?.overloaded ? ' · FRAME BUDGET EXCEEDED' : ''}`
   summary.style.color = mechanical === 'FAIL' || failed ? '#ffb6ac' : '#e9dba4'
   g.__DROPiEvaluationReadiness = { status: failed ? 'FAIL' : ready ? 'READY' : 'LOADING', checks: Object.fromEntries(checks), error: failures[0] ?? '', visualAcceptance: 'UNKNOWN' }
 }, 250)
