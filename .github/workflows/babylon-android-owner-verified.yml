@@ -45,6 +45,7 @@ jobs:
           test "$ACTUAL_SHA" = "$DROPI_HEAD_SHA"
           echo "DROPI_CHECKOUT_SHA=$ACTUAL_SHA" >> "$GITHUB_ENV"
           echo "DROPI_STAGE_ROOT=$RUNNER_TEMP/dropi-babylon-android-evaluation-$DROPI_RUN_ID-$DROPI_RUN_ATTEMPT" >> "$GITHUB_ENV"
+          echo "DROPI_ARM64_STAGE_ROOT=$RUNNER_TEMP/dropi-babylon-android-evaluation-arm64-$DROPI_RUN_ID-$DROPI_RUN_ATTEMPT" >> "$GITHUB_ENV"
           echo "DROPI_APK_OUTPUT=$RUNNER_TEMP/dropi-babylon-android-eval-$DROPI_HEAD_SHA" >> "$GITHUB_ENV"
 
       - name: Setup Node 22.13.0
@@ -75,7 +76,7 @@ jobs:
       - name: Verify Android AVD discovery regression contract
         working-directory: 09_Development/Spikes/BABYLON_THIRD_PERSON_BRAILA_V1
         shell: bash
-        run: node --test scripts/verifyAndroidOwnerAvd.test.mjs
+        run: node --test scripts/verifyAndroidOwnerAvd.test.mjs scripts/verifyAndroidOwnerAbiIsolation.test.mjs
 
       - name: Build exact tested static Babylon payload
         working-directory: 09_Development/Spikes/BABYLON_THIRD_PERSON_BRAILA_V1
@@ -244,14 +245,41 @@ jobs:
           echo 'DROPI_EMULATOR_STABLE_15S=PASS' >> "$GITHUB_ENV"
           echo "DROPI_EMULATOR_ABI=$DEVICE_ABI" >> "$GITHUB_ENV"
 
+      - name: Prepare independent ARM64 evaluation stage
+        shell: bash
+        run: |
+          set -euo pipefail
+          # Do not run Gradle clean on the tested x86_64 project. React Native's
+          # native clean can consume codegen directories deleted by other clean tasks.
+          # Recreate the same exact-head payload in a fresh project and node_modules.
+          test "$DROPI_ARM64_STAGE_ROOT" != "$DROPI_STAGE_ROOT"
+          test ! -e "$DROPI_ARM64_STAGE_ROOT"
+          node 09_Development/Spikes/BABYLON_THIRD_PERSON_BRAILA_V1/scripts/prepareAndroidEvaluationStage.mjs \
+            "$GITHUB_WORKSPACE/game-mobile" \
+            "$GITHUB_WORKSPACE/09_Development/Spikes/BABYLON_THIRD_PERSON_BRAILA_V1/dist" \
+            "$DROPI_ARM64_STAGE_ROOT"
+          cd "$DROPI_ARM64_STAGE_ROOT/game-mobile"
+          npm ci --no-audit --no-fund
+          EXPO_PUBLIC_DROPITYCOON_RUNTIME_MODE=bundled npm run typecheck
+          CI=1 NODE_ENV=production EXPO_PUBLIC_DROPITYCOON_RUNTIME_MODE=bundled \
+            ./node_modules/.bin/expo prebuild --platform android --clean --no-install
+          grep -F -q "applicationId 'com.dropi.tycoon.babyloneval'" android/app/build.gradle
+          grep -F -q "versionCode $DROPI_ANDROID_VERSION_CODE" android/app/build.gradle
+          grep -F -q '<string name="app_name">DROPi Babylon Eval</string>' android/app/src/main/res/values/strings.xml
+          test -f android/app/src/main/assets/dropi-game/index.html
+          cmp \
+            "$GITHUB_WORKSPACE/09_Development/Spikes/BABYLON_THIRD_PERSON_BRAILA_V1/dist/dropi-runtime-manifest.json" \
+            android/app/src/main/assets/dropi-game/dropi-runtime-manifest.json
+          cmp "$DROPI_STAGE_ROOT/evaluation-stage.json" "$DROPI_ARM64_STAGE_ROOT/evaluation-stage.json"
+
       - name: Build ARM64 owner test APK
         shell: bash
         run: |
           set -euo pipefail
-          cd "$DROPI_STAGE_ROOT/game-mobile/android"
+          cd "$DROPI_ARM64_STAGE_ROOT/game-mobile/android"
           CI=1 NODE_ENV=production EXPO_PUBLIC_DROPITYCOON_RUNTIME_MODE=bundled \
-            ./gradlew --no-daemon --stacktrace clean :app:assembleRelease -PreactNativeArchitectures=arm64-v8a
-          APK_PATH="$DROPI_STAGE_ROOT/game-mobile/android/app/build/outputs/apk/release/app-release.apk"
+            ./gradlew --no-daemon --stacktrace :app:assembleRelease -PreactNativeArchitectures=arm64-v8a
+          APK_PATH="$DROPI_ARM64_STAGE_ROOT/game-mobile/android/app/build/outputs/apk/release/app-release.apk"
           test -s "$APK_PATH"
           ARM64_SIZE="$(stat -c%s "$APK_PATH")"
           ABI_LIST="$(unzip -Z1 "$APK_PATH" | sed -n 's#^lib/\([^/]*\)/.*#\1#p' | sort -u | paste -sd, -)"
@@ -270,7 +298,7 @@ jobs:
           set -euo pipefail
           node 09_Development/Spikes/BABYLON_THIRD_PERSON_BRAILA_V1/scripts/attestAndroidEvaluationApk.mjs \
             "$DROPI_ARM64_APK" \
-            "$DROPI_STAGE_ROOT" \
+            "$DROPI_ARM64_STAGE_ROOT" \
             "$DROPI_APK_OUTPUT"
           cp 09_Development/Spikes/BABYLON_THIRD_PERSON_BRAILA_V1/INSTALL_ANDROID_EVALUATION_APK.md "$DROPI_APK_OUTPUT/"
           {
