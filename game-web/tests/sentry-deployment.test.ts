@@ -16,11 +16,19 @@ const event = { eventID: eventId, projectID: '123', metadata: { value: marker },
 const response = (data: unknown, status = 200) => ({ ok: status === 200, status, json: async () => data })
 
 describe('Sentry deployment boundary', () => {
-  it('declares the public DSN before Vite builds inside the Docker builder stage', () => {
+  it('declares public Sentry/build metadata before Vite builds without exposing the auth token', () => {
     const dockerfile = readFileSync(new URL('../Dockerfile', import.meta.url), 'utf8')
     const builder = dockerfile.split(' AS builder')[1].split('# ---- Production stage ----')[0]
-    expect(builder.indexOf('ARG VITE_SENTRY_DSN')).toBeGreaterThanOrEqual(0)
-    expect(builder.indexOf('ARG VITE_SENTRY_DSN')).toBeLessThan(builder.indexOf('RUN npm run build'))
+    for (const declaration of [
+      'ARG VITE_SENTRY_DSN',
+      'ARG RAILWAY_GIT_COMMIT_SHA',
+      'ARG RAILWAY_DEPLOYMENT_ID',
+      'ENV VITE_SENTRY_RELEASE=$RAILWAY_GIT_COMMIT_SHA',
+      'ENV VITE_SENTRY_DIST=$RAILWAY_DEPLOYMENT_ID',
+    ]) {
+      expect(builder.indexOf(declaration)).toBeGreaterThanOrEqual(0)
+      expect(builder.indexOf(declaration)).toBeLessThan(builder.indexOf('RUN npm run build'))
+    }
     expect(dockerfile).not.toMatch(/^\s*(?:ARG|ENV)\s+(?:VITE_)?SENTRY_AUTH_TOKEN/m)
   })
 
