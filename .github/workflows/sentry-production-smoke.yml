@@ -1,0 +1,76 @@
+name: Sentry Production Browser Smoke
+
+on:
+  workflow_dispatch:
+    inputs:
+      expected_commit:
+        description: 'Verified Railway deployment commit (merge commit of PR 733)'
+        required: true
+        type: string
+
+permissions:
+  contents: read
+  pull-requests: read
+
+concurrency:
+  group: sentry-production-browser-smoke
+  cancel-in-progress: false
+
+jobs:
+  controlled-browser-event:
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      DROPI_EXPECTED_COMMIT: ${{ inputs.expected_commit }}
+      DROPI_SENTRY_SMOKE_MARKER: DROPi-SENTRY-SMOKE-733-${{ github.run_id }}-${{ github.run_attempt }}
+      DROPI_SENTRY_SMOKE_OUTPUT: ${{ github.workspace }}/artifacts/sentry
+    steps:
+      - name: Checkout canonical main
+        uses: actions/checkout@v7
+      - name: Set up Node
+        uses: actions/setup-node@v7
+        with:
+          node-version: 22.12.0
+      - name: Require governed merge before any production event
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          node --input-type=module <<'JS'
+          const sha = process.env.DROPI_EXPECTED_COMMIT;
+          if (!/^[a-f0-9]{40}$/i.test(sha)) throw new Error('Invalid expected commit');
+          const response = await fetch(`https://api.github.com/repos/${process.env.GITHUB_REPOSITORY}/pulls/733`, {
+            headers: { Authorization: `Bearer ${process.env.GH_TOKEN}`, Accept: 'application/vnd.github+json' }
+          });
+          if (!response.ok) throw new Error('Cannot verify PR 733');
+          const pr = await response.json();
+          if (!pr.merged || pr.merge_commit_sha !== sha) throw new Error('Expected commit is not PR 733 merge commit');
+          console.log('PR 733 merge reference verified; Railway deployment must be independently verified by operator.');
+          JS
+      - name: Prepare isolated browser runner
+        shell: bash
+        run: |
+          set -euo pipefail
+          RUNNER="$RUNNER_TEMP/dropi-sentry-smoke"
+          mkdir -p "$RUNNER"
+          cp game-web/scripts/sentry-production-smoke.mjs "$RUNNER/smoke.mjs"
+          cd "$RUNNER"
+          npm init -y >/dev/null
+          npm install --ignore-scripts --no-audit --no-fund playwright@1.55.0
+          echo "DROPI_SMOKE_RUNNER=$RUNNER" >> "$GITHUB_ENV"
+          npx playwright install --with-deps chromium
+      - name: Generate exactly one synthetic browser error and observe transport
+        shell: bash
+        run: |
+          set -euo pipefail
+          cd "$DROPI_SMOKE_RUNNER"
+          node smoke.mjs
+      - name: Publish bounded evidence (no raw envelopes or secrets)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: sentry-browser-smoke-${{ github.run_id }}-${{ github.run_attempt }}
+          path: artifacts/sentry/sentry-browser-smoke.json
+          if-no-files-found: warn
+          retention-days: 14
