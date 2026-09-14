@@ -8,8 +8,6 @@ export type ContactReport = {
   status: 'PASS' | 'FAIL'; failures: string[]
 }
 type FootData = { mesh: AbstractMesh; positions: number[]; indices: number[]; weights: number[]; sides: number[] }
-
-/** Checks actual skinned shoe vertices, not a sole offset or hidden old body. */
 export class SkinFeetProbe {
   readonly data: FootData[]
   constructor(meshes: AbstractMesh[]) {
@@ -118,8 +116,6 @@ export class HumanContactPose {
     if (requestedLift > .3) failures.push('EXCESSIVE_GROUND_CORRECTION')
     position.y += appliedLift
     this.base.setAbsolutePosition(position); this.base.computeWorldMatrix(true)
-    // A pure world-Y translation changes every sampled clearance by exactly dy.
-    // Do not repeat full skinning when neither skin pose nor x/z changed.
     feet = { ...feet, left: feet.left + appliedLift, right: feet.right + appliedLift }
     for (const [index, leg] of this.legs.entries()) {
       leg.foot.computeWorldMatrix(true)
@@ -147,24 +143,32 @@ export class HumanContactPose {
     const carrying = Boolean(this.parcel?.isEnabled())
     if (carrying && this.parcel) {
       const parcel = this.parcel
-      parcel.parent = this.root; parcel.position.set(0, 1.09, .30); parcel.rotationQuaternion = null; parcel.rotation.set(0, 0, 0)
+      const rootMatrix = this.root.computeWorldMatrix(true), inverseRoot = Matrix.Invert(rootMatrix)
+      const arms = this.arms.map(arm => {
+        const local = (node: TransformNode): Vector3 => Vector3.TransformCoordinates(node.computeWorldMatrix(true).getTranslation(), inverseRoot)
+        const upper = local(arm.upper), lower = local(arm.lower), wrist = local(arm.wrist)
+        return { upper, reach: Vector3.Distance(upper, lower) + Vector3.Distance(lower, wrist) }
+      })
+      const reach = Math.min(...arms.map(arm => arm.reach))
+      const shoulders = arms.reduce((sum, arm) => sum.addInPlace(arm.upper), Vector3.Zero()).scale(1 / arms.length)
+      // The carried box follows the actual shoulder/torso envelope, rather than
+      // requiring every walking pose to reach a fixed, overly distant world anchor.
+      const center = new Vector3(0, shoulders.y - reach * .52, Math.max(.23, shoulders.z + reach * .60))
+      parcel.parent = this.root; parcel.position.copyFrom(center); parcel.rotationQuaternion = null; parcel.rotation.set(0, 0, 0)
       const bounds = parcel.getBoundingInfo().boundingBox, localSize = bounds.maximum.subtract(bounds.minimum)
       parcel.scaling.set(.36 / localSize.x, .24 / localSize.y, .24 / localSize.z); parcel.computeWorldMatrix(true)
       handErrorM = 0
-      const rootMatrix = this.root.computeWorldMatrix(true)
       for (const arm of this.arms) {
         for (const joint of [arm.upper, arm.lower, arm.wrist]) this.restorePose.save(joint)
-        const grip = Vector3.TransformCoordinates(new Vector3(arm.side * .183, 1.09, .30), rootMatrix)
+        const grip = Vector3.TransformCoordinates(new Vector3(arm.side * .183, center.y, center.z), rootMatrix)
         const direction = Vector3.TransformNormal(Vector3.Forward(), rootMatrix).normalize()
         const inward = Vector3.TransformNormal(new Vector3(-arm.side, 0, 0), rootMatrix).normalize()
-        const pole = Vector3.TransformCoordinates(new Vector3(arm.side * .55, 1.02, -.03), rootMatrix)
+        const pole = Vector3.TransformCoordinates(new Vector3(arm.side * .55, center.y - .05, center.z - .35), rootMatrix)
         let errorM = Infinity
         for (let iteration = 0; iteration < 10 && errorM > .001; iteration += 1) {
           orientPalm(arm.wrist, arm.forward, arm.normal, direction, inward)
           const offset = Vector3.TransformNormal(arm.palm.position, arm.wrist.getWorldMatrix())
           solveTwoBone(arm.upper, arm.lower, arm.wrist, grip.subtract(offset), pole)
-          // The forearm changed the wrist's parent frame. Reorient before
-          // measuring the palm, then iterate the coupled offset if necessary.
           orientPalm(arm.wrist, arm.forward, arm.normal, direction, inward)
           arm.palm.computeWorldMatrix(true)
           errorM = Vector3.Distance(arm.palm.getAbsolutePosition(), grip)
