@@ -4,11 +4,14 @@ import type { ContactReport } from './humanContactPose'
 import { surfaceSampler } from './authoredPedestrians'
 import { planarSpeed } from './authoredWalk'
 
+export type ActorContactFailure = { actor: string; position: { x: number; y: number; z: number }; speed: number; dt: number; report: ContactReport }
 export type ContactRuntimeState = {
   status: 'LOADING' | 'ACTIVE' | 'FAIL'; mechanicalStatus: 'UNKNOWN' | 'PASS' | 'FAIL'
   humanCount: number; hero: ContactReport | null; worstFootClearanceM: number | null
   poseCostMs: number; error: string; visualAcceptance: 'UNKNOWN'
   sampleId: number; renderedSampleId: number; sampledAtMs: number
+  actorFailures: ActorContactFailure[]
+  firstFailedSample: { sampleId: number; actors: ActorContactFailure[] } | null
 }
 let started = false
 const boot = (): void => {
@@ -16,7 +19,7 @@ const boot = (): void => {
   if (!scene) { window.setTimeout(boot, 100); return }
   if (started) return
   started = true
-  const state: ContactRuntimeState = { status: 'LOADING', mechanicalStatus: 'UNKNOWN', humanCount: 0, hero: null, worstFootClearanceM: null, poseCostMs: 0, error: '', visualAcceptance: 'UNKNOWN', sampleId: 0, renderedSampleId: 0, sampledAtMs: 0 }
+  const state: ContactRuntimeState = { status: 'LOADING', mechanicalStatus: 'UNKNOWN', humanCount: 0, hero: null, worstFootClearanceM: null, poseCostMs: 0, error: '', visualAcceptance: 'UNKNOWN', sampleId: 0, renderedSampleId: 0, sampledAtMs: 0, actorFailures: [], firstFailedSample: null }
   const publish = (): void => { (window as unknown as { __DROPiContactRuntime?: ContactRuntimeState }).__DROPiContactRuntime = { ...state } }
   publish()
   const start = performance.now()
@@ -40,24 +43,31 @@ const boot = (): void => {
       let pending = true, previousPlants = 0
       const restoreObserver = scene.onBeforeAnimationsObservable.add(() => poses.forEach(pose => pose.restore()))
       const frameObserver = scene.onBeforeRenderObservable.add(() => { pending = true })
-      // Apply after native animations and movement, before the skin is rendered.
       const applyObserver = scene.onBeforeActiveMeshesEvaluationObservable.add(() => {
         if (!pending || state.status === 'FAIL') return
         pending = false
         const startedAt = performance.now()
         try {
           const dt = scene.getEngine().getDeltaTime() / 1000
+          const failed: ActorContactFailure[] = []
           const reports = poses.map((pose, index) => {
             const p = pose.base.getAbsolutePosition(), old = previous[index]!
             const speed = planarSpeed(p.x - old.x, p.z - old.z, dt)
             old.copyFrom(p)
-            return pose.apply(dt, speed)
+            const report = pose.apply(dt, speed)
+            if (report.status !== 'PASS') failed.push({ actor: pose.root.name, position: { x: p.x, y: p.y, z: p.z }, speed, dt, report })
+            return report
           })
           state.hero = reports[0]!
           state.worstFootClearanceM = Math.min(...reports.map(report => report.minFootClearanceM))
           state.mechanicalStatus = reports.every(report => report.status === 'PASS') ? 'PASS' : 'FAIL'
+          state.actorFailures = failed
           state.poseCostMs = performance.now() - startedAt
           state.sampleId += 1; state.sampledAtMs = performance.now()
+          // Retain the first bounded failure sample even if a later pose passes.
+          // Aggregate FAIL must identify the responsible NPC, not hide it behind
+          // a healthy hero report or later recovery.
+          if (failed.length && !state.firstFailedSample) state.firstFailedSample = { sampleId: state.sampleId, actors: failed }
           const controls = (window as unknown as { __DROPiNaturalControls?: { getSpeed(): number } }).__DROPiNaturalControls
           if (state.hero.plantedFeet > previousPlants && (controls?.getSpeed() ?? 0) > .08) window.dispatchEvent(new Event('dropi:foot-contact'))
           previousPlants = state.hero.plantedFeet
@@ -71,9 +81,6 @@ const boot = (): void => {
           poses.forEach(pose => { pose.restore(); pose.clearPlants() }); publish()
         }
       })
-      // A 200ms wall-clock throttle could show pre-pickup telemetry after the
-      // mission had enabled the parcel. Publish once per *completed* pose frame,
-      // with a monotonic sample identity. DOM diagnostics can throttle separately.
       const completeObserver = scene.onAfterRenderObservable.add(() => {
         if (state.status !== 'ACTIVE' || state.sampleId <= state.renderedSampleId) return
         state.renderedSampleId = state.sampleId
