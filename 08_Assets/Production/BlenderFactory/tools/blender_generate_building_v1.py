@@ -363,7 +363,7 @@ def main() -> int:
         background.inputs["Strength"].default_value = 0.55
 
     preview = request.get("preview", {})
-    bpy.context.scene.render.engine = "BLENDER_EEVEE_NEXT"
+    bpy.context.scene.render.engine = "BLENDER_EEVEE"
     bpy.context.scene.render.resolution_x = int(preview.get("width", 512))
     bpy.context.scene.render.resolution_y = int(preview.get("height", 512))
     bpy.context.scene.render.resolution_percentage = 100
