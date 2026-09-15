@@ -2,7 +2,6 @@ import bpy
 import hashlib
 import importlib
 import json
-import math
 import os
 import random
 import sys
@@ -11,6 +10,7 @@ from mathutils import Vector
 
 OUT = Path(os.environ.get("DROPI_HUMAN_OUT", "/tmp/dropi-human-fidelity"))
 OUT.mkdir(parents=True, exist_ok=True)
+ASSET_ROOT = Path(os.environ["DROPI_MAKEHUMAN_ASSET_ROOT"]).resolve()
 
 MPFB_COMMIT = os.environ.get("DROPI_MPFB_COMMIT", "UNKNOWN")
 SYSTEM_ASSET_SHA256 = os.environ.get("DROPI_MAKEHUMAN_ASSET_SHA256", "UNKNOWN")
@@ -28,7 +28,6 @@ def dynamic_import(suffix, symbol):
 
 HumanService = dynamic_import("mpfb.services.humanservice", "HumanService")
 TargetService = dynamic_import("mpfb.services.targetservice", "TargetService")
-AssetService = dynamic_import("mpfb.services.assetservice", "AssetService")
 ObjectService = dynamic_import("mpfb.services.objectservice", "ObjectService")
 ExportService = dynamic_import("mpfb.services.exportservice", "ExportService")
 LocationService = dynamic_import("mpfb.services.locationservice", "LocationService")
@@ -59,6 +58,30 @@ IDENTITIES = [
         "assets": [("eyes", "high-poly.mhclo", "Eyes"), ("eyebrows", "eyebrow002.mhclo", "Eyebrows"), ("eyelashes", "eyelashes01.mhclo", "Eyelashes"), ("teeth", "teeth_base.mhclo", "Teeth"), ("hair", "short01.mhclo", "Hair"), ("clothes", "male_casualsuit04.mhclo", "Clothes"), ("clothes", "shoes02.mhclo", "Clothes")],
     },
 ]
+
+
+def sha256_file(path):
+    digest = hashlib.sha256()
+    with open(path, "rb") as handle:
+        for chunk in iter(lambda: handle.read(1024 * 1024), b""):
+            digest.update(chunk)
+    return digest.hexdigest()
+
+
+def resolve_asset_path(subdir, filename):
+    root = ASSET_ROOT / subdir
+    if not root.is_dir():
+        raise RuntimeError(f"MakeHuman asset category missing: {subdir}")
+    direct = root / filename
+    if direct.exists():
+        return str(direct.resolve())
+    matches = sorted(path for path in root.rglob(filename) if path.is_file())
+    if len(matches) != 1:
+        raise RuntimeError(
+            f"Expected exactly one MakeHuman asset {subdir}/{filename}; found {len(matches)}: "
+            + ", ".join(str(path.relative_to(ASSET_ROOT)) for path in matches[:8])
+        )
+    return str(matches[0].resolve())
 
 
 def reset_scene():
@@ -105,8 +128,7 @@ def apply_face_identity(basemesh, seed):
                 candidates.append((category.get("name", "unnamed"), negative, positive))
         rng.shuffle(candidates)
         for category_name, negative, positive in candidates[:2]:
-            sign = -1 if rng.random() < 0.5 else 1
-            target_name = positive if sign > 0 else negative
+            target_name = positive if rng.random() >= 0.5 else negative
             target_path = resolve_target_path(section_name, target_name)
             if not target_path:
                 continue
@@ -117,17 +139,12 @@ def apply_face_identity(basemesh, seed):
 
 
 def add_asset(basemesh, subdir, filename, asset_type):
-    asset_path = AssetService.find_asset_absolute_path(filename, asset_subdir=subdir)
-    if asset_path is None:
-        raise RuntimeError(f"Required MakeHuman system asset missing: {subdir}/{filename}")
+    asset_path = resolve_asset_path(subdir, filename)
     return HumanService.add_mhclo_asset(asset_path, basemesh, asset_type=asset_type, material_type="GAMEENGINE")
 
 
 def set_skin(basemesh, filename):
-    skin_path = AssetService.find_asset_absolute_path(filename, asset_subdir="skins")
-    if skin_path is None:
-        raise RuntimeError(f"Required skin missing: {filename}")
-    HumanService.set_character_skin(skin_path, basemesh, skin_type="GAMEENGINE")
+    HumanService.set_character_skin(resolve_asset_path("skins", filename), basemesh, skin_type="GAMEENGINE")
 
 
 def hierarchy_objects(root):
@@ -159,8 +176,7 @@ def bounds_for(objects):
 
 
 def look_at(obj, target):
-    direction = target - obj.location
-    obj.rotation_euler = direction.to_track_quat("-Z", "Y").to_euler()
+    obj.rotation_euler = (target - obj.location).to_track_quat("-Z", "Y").to_euler()
 
 
 def make_material(name, color, roughness):
@@ -178,13 +194,9 @@ def setup_preview_scene(character_objects, front_sign, preview_name):
     center = (mins + maxs) * 0.5
     height = max(maxs.z - mins.z, 0.1)
 
-    floor = bpy.data.objects.new("preview-floor", bpy.data.meshes.new("preview-floor-mesh"))
-    bpy.context.collection.objects.link(floor)
-    bpy.context.view_layer.objects.active = floor
-    floor.select_set(True)
-    bpy.ops.object.select_all(action="DESELECT")
     bpy.ops.mesh.primitive_plane_add(size=height * 4.0, location=(center.x, center.y, mins.z - 0.005))
     floor = bpy.context.active_object
+    floor.name = "preview-floor"
     floor.data.materials.append(make_material("preview-floor-material", (0.12, 0.135, 0.15), 0.9))
 
     world = bpy.context.scene.world
@@ -222,7 +234,6 @@ def setup_preview_scene(character_objects, front_sign, preview_name):
     scene.camera = camera
     camera_data.lens = 58
 
-    # Full body
     camera.location = center + Vector((height * 0.10, front_sign * height * 1.55, height * 0.05))
     look_at(camera, center + Vector((0, 0, height * 0.02)))
     scene.render.resolution_x = 720
@@ -230,7 +241,6 @@ def setup_preview_scene(character_objects, front_sign, preview_name):
     scene.render.filepath = str(OUT / f"{preview_name}-full.png")
     bpy.ops.render.render(write_still=True)
 
-    # Face / upper body close-up
     face_target = Vector((center.x, center.y, mins.z + height * 0.82))
     camera.location = face_target + Vector((height * 0.04, front_sign * height * 0.50, height * 0.015))
     camera_data.lens = 72
@@ -259,14 +269,6 @@ def mesh_stats(objects):
     return {"meshObjects": mesh_objects, "vertices": vertices, "triangles": triangles, "materials": len(materials)}
 
 
-def sha256_file(path):
-    digest = hashlib.sha256()
-    with open(path, "rb") as handle:
-        for chunk in iter(lambda: handle.read(1024 * 1024), b""):
-            digest.update(chunk)
-    return digest.hexdigest()
-
-
 def export_character(basemesh, identity_id):
     export_root = ExportService.create_character_copy(basemesh, name_suffix="_export")
     export_basemesh = ObjectService.find_object_of_type_amongst_nearest_relatives(export_root, "Basemesh")
@@ -277,15 +279,7 @@ def export_character(basemesh, identity_id):
         obj.select_set(True)
     bpy.context.view_layer.objects.active = export_root
     output = OUT / f"{identity_id}.glb"
-    bpy.ops.export_scene.gltf(
-        filepath=str(output),
-        export_format="GLB",
-        use_selection=True,
-        export_animations=False,
-        export_apply=True,
-        export_yup=True,
-        export_materials="EXPORT",
-    )
+    bpy.ops.export_scene.gltf(filepath=str(output), export_format="GLB", use_selection=True, export_animations=False, export_apply=True, export_yup=True, export_materials="EXPORT")
     return output, mesh_stats(export_objects)
 
 
@@ -304,11 +298,7 @@ def build_identity(config):
 
     original_objects = hierarchy_objects(basemesh)
     original_stats = mesh_stats(original_objects)
-
-    # MakeHuman's local forward orientation may differ across export paths. Preserve
-    # two opposite face previews until integration establishes the runtime forward axis.
     setup_preview_scene(original_objects, 1.0, f"{config['id']}-a")
-    # Remove preview lights/camera/floor, keep character.
     for obj in list(bpy.context.scene.objects):
         if obj.name.startswith("preview-") or obj.name in {"key", "fill", "rim"}:
             bpy.data.objects.remove(obj, do_unlink=True)
