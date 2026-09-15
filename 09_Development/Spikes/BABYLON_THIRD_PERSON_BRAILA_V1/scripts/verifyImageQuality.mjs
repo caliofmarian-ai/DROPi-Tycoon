@@ -77,15 +77,19 @@ try {
     assert.equal(nextResolution({...state,density:2},14,16,100,range).density,2)
   })
   if (!process.argv.includes('--pure-only')) {
-    const { NullEngine,Scene,MeshBuilder,PBRMaterial,VertexData,DirectionalLight,ShadowGenerator,Vector3 } = await import('@babylonjs/core')
+    const { NullEngine,Scene,MeshBuilder,PBRMaterial,VertexData,DirectionalLight,HemisphericLight,ShadowGenerator,Vector3,Color3,Color4 } = await import('@babylonjs/core')
     const { installImageQuality } = await import(compile('imageQualityPresentation'))
     const engine=new NullEngine(),scene=new Scene(engine),m=new PBRMaterial('source',scene)
+    scene.clearColor=new Color4(.1,.2,.3,1);scene.fogColor=new Color3(.2,.3,.4);scene.fogDensity=.004
     const light = new DirectionalLight('test-sun', new Vector3(-1,-1,.3), scene), shadow = new ShadowGenerator(256, light)
+    const ambient = new HemisphericLight('test-ambient', new Vector3(0,1,0), scene)
+    light.intensity=.9;light.diffuse=new Color3(.9,.9,.9);ambient.intensity=.7;ambient.diffuse=new Color3(.8,.85,.9);ambient.groundColor=new Color3(.2,.25,.2)
     const oldShadow = { size: shadow.mapSize, filter: shadow.filter, quality: shadow.filteringQuality }
     const source=MeshBuilder.CreateBox('synthetic-locality', {width:18,height:14,depth:12},scene);source.position.y=7;source.material=m;source.checkCollisions=true
     const roof=MeshBuilder.CreateBox('synthetic-roof',{width:18.3,height:.35,depth:12.3},scene);roof.position.y=14.17;roof.material=m
-    const binding={id:'test-only/quality',buildings:[{source,roof,color:'#c9b89e',roofColor:'#84624e',roofRise:2,roofShape:'hip',family:'plaster'}],exposure:1,contrast:1.03,shadowMapSize:2048}
-    const before={meshes:scene.meshes.length,materials:scene.materials.length,textures:scene.textures.length,vertices:[...source.getVerticesData('position')],config:{toneMappingEnabled:scene.imageProcessingConfiguration.toneMappingEnabled,toneMappingType:scene.imageProcessingConfiguration.toneMappingType,exposure:scene.imageProcessingConfiguration.exposure,contrast:scene.imageProcessingConfiguration.contrast}}
+    const atmosphere={sunName:'test-sun',ambientName:'test-ambient',sunIntensity:1.25,ambientIntensity:.55,sunColor:'#fff0d8',ambientColor:'#dbe9f3',groundColor:'#56635d',clearColor:'#91b9cf',fogColor:'#9fc0d0',fogDensity:.0025}
+    const binding={id:'test-only/quality',buildings:[{source,roof,color:'#c9b89e',roofColor:'#84624e',roofRise:2,roofShape:'hip',family:'plaster'}],exposure:1,contrast:1.03,shadowMapSize:2048,atmosphere}
+    const before={meshes:scene.meshes.length,materials:scene.materials.length,textures:scene.textures.length,vertices:[...source.getVerticesData('position')],config:{toneMappingEnabled:scene.imageProcessingConfiguration.toneMappingEnabled,toneMappingType:scene.imageProcessingConfiguration.toneMappingType,exposure:scene.imageProcessingConfiguration.exposure,contrast:scene.imageProcessingConfiguration.contrast},sun:{intensity:light.intensity,diffuse:light.diffuse.clone()},ambient:{intensity:ambient.intensity,diffuse:ambient.diffuse.clone(),ground:ambient.groundColor.clone()},clear:scene.clearColor.clone(),fog:scene.fogColor.clone(),fogDensity:scene.fogDensity}
     // PBR source warms the scene-owned shared BRDF texture before the snapshot.
     // That cache belongs to the scene and must not be disposed with our presentation.
     const sharedTextures = scene.textures.filter(texture => texture !== shadow.getShadowMap())
@@ -101,16 +105,26 @@ try {
       handle=installImageQuality(scene,binding);assert.equal(handle.replacedBuildings,1);assert.equal(handle.textures,6);assert.equal(source.isVisible,false);assert.equal(source.isEnabled(),true);assert.equal(source.checkCollisions,true);assert.equal(source.material,m);assert.deepEqual([...source.getVerticesData('position')],before.vertices)
       assert.ok(scene.meshes.filter(x=>x.metadata?.dropiImageQuality).every(x=>!x.checkCollisions&&!x.isPickable))
     })
-    check('shadow pixel budget is hardware bounded and filtering selected',()=>{assert.equal(shadow.mapSize,Math.min(2048,engine.getCaps().maxTextureSize||1024));assert.equal(shadow.filteringQuality,ShadowGenerator.QUALITY_MEDIUM)})
+    check('filmic daylight changes only the bound scene lights and atmosphere',()=>{
+      assert.equal(light.intensity,atmosphere.sunIntensity);assert.equal(ambient.intensity,atmosphere.ambientIntensity);assert.equal(scene.fogDensity,atmosphere.fogDensity)
+      assert.deepEqual(light.diffuse.asArray(),Color3.FromHexString(atmosphere.sunColor).asArray())
+      assert.deepEqual(ambient.diffuse.asArray(),Color3.FromHexString(atmosphere.ambientColor).asArray())
+      assert.deepEqual(ambient.groundColor.asArray(),Color3.FromHexString(atmosphere.groundColor).asArray())
+      assert.deepEqual(scene.fogColor.asArray(),Color3.FromHexString(atmosphere.fogColor).asArray())
+    })
+    check('shadow pixel budget is hardware bounded and high filtering selected',()=>{assert.equal(shadow.mapSize,Math.min(2048,engine.getCaps().maxTextureSize||1024));assert.equal(shadow.filteringQuality,ShadowGenerator.QUALITY_HIGH)})
     check('same scene is idempotent and palette change needs disposal',()=>{assert.equal(installImageQuality(scene,binding),handle);assert.throws(()=>installImageQuality(scene,{...binding,id:'other'}))})
-    check('disposal restores sources and color processing without leaks',()=>{
+    check('disposal restores sources, lights and color processing without leaks',()=>{
       handle.dispose();handle.dispose();assert.equal(source.isVisible,true);assert.equal(roof.isVisible,true);assert.equal(scene.meshes.length,before.meshes);assert.equal(scene.materials.length,before.materials);assert.equal(scene.textures.length,before.textures,scene.textures.map(t=>t.name).join(','));assert.ok(sharedTextures.every(t=>scene.textures.includes(t)))
       assert.equal(shadow.mapSize,oldShadow.size);assert.equal(shadow.filter,oldShadow.filter);assert.equal(shadow.filteringQuality,oldShadow.quality)
+      assert.equal(light.intensity,before.sun.intensity);assert.deepEqual(light.diffuse.asArray(),before.sun.diffuse.asArray());assert.equal(ambient.intensity,before.ambient.intensity);assert.deepEqual(ambient.diffuse.asArray(),before.ambient.diffuse.asArray());assert.deepEqual(ambient.groundColor.asArray(),before.ambient.ground.asArray());assert.deepEqual(scene.clearColor.asArray(),before.clear.asArray());assert.deepEqual(scene.fogColor.asArray(),before.fog.asArray());assert.equal(scene.fogDensity,before.fogDensity)
       for(const [k,v]of Object.entries(before.config))assert.equal(scene.imageProcessingConfiguration[k],v)
     })
-    check('duplicate and missing bindings fail before presentation mutation',()=>{
+    check('duplicate, missing and invalid atmosphere bindings fail before mutation',()=>{
       assert.throws(()=>installImageQuality(scene,{...binding,buildings:[binding.buildings[0],binding.buildings[0]]}));assert.equal(source.isVisible,true)
       assert.throws(()=>installImageQuality(scene,{...binding,buildings:[]}));assert.equal(scene.meshes.length,before.meshes)
+      assert.throws(()=>installImageQuality(scene,{...binding,atmosphere:{...atmosphere,sunName:'missing'}}));assert.equal(scene.meshes.length,before.meshes)
+      assert.throws(()=>installImageQuality(scene,{...binding,atmosphere:{...atmosphere,fogDensity:9}}));assert.equal(scene.meshes.length,before.meshes)
     })
     check('fresh install and scene-owned cleanup work',()=>{installImageQuality(scene,binding);scene.dispose();assert.throws(()=>installImageQuality(scene,binding));engine.dispose()})
   }
