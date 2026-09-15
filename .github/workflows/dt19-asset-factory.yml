@@ -22,11 +22,14 @@ permissions:
 jobs:
   validate-and-generate-proof:
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 20
     env:
       REQUEST: 08_Assets/Production/BlenderFactory/requests/ci-proof-building.request.json
       FACTORY: 08_Assets/Production/BlenderFactory/tools/asset_factory.py
       GENERATOR: 08_Assets/Production/BlenderFactory/tools/blender_generate_asset.py
+      BUILDING_REQUEST: 08_Assets/Production/BlenderFactory/requests/ci-building-detail-v1.request.json
+      BUILDING_GENERATOR: 08_Assets/Production/BlenderFactory/tools/blender_generate_building_v1.py
+      PREVIEW_VALIDATOR: 08_Assets/Production/BlenderFactory/tools/validate_preview_png.py
 
     steps:
       - uses: actions/checkout@v4
@@ -37,8 +40,14 @@ jobs:
       - name: Run factory unit tests
         run: python3 -m unittest 08_Assets/Production/BlenderFactory/tools/test_asset_factory.py
 
+      - name: Run building v1 request tests
+        run: python3 -m unittest 08_Assets/Production/BlenderFactory/tools/test_building_v1_request.py
+
       - name: Validate proof request before generator install
         run: python3 "$FACTORY" preflight --request "$REQUEST"
+
+      - name: Validate detailed building request before generator install
+        run: python3 "$FACTORY" preflight --request "$BUILDING_REQUEST"
 
       - name: Install Blender headless runtime
         run: |
@@ -56,7 +65,6 @@ jobs:
             --out-dir "$OUT"
           test -s "$OUT/ci-proof-building.glb"
           test -s "$OUT/ci-proof-building.report.json"
-          echo "DROPi asset proof output: $OUT"
           ls -lh "$OUT"
 
       - name: Validate generated GLB and report
@@ -74,5 +82,43 @@ jobs:
           path: |
             ${{ runner.temp }}/dropi-dt19-proof/ci-proof-building.glb
             ${{ runner.temp }}/dropi-dt19-proof/ci-proof-building.report.json
+          if-no-files-found: error
+          retention-days: 7
+
+      - name: Generate detailed building v1 and preview
+        run: |
+          OUT="$RUNNER_TEMP/dropi-dt19-building-v1"
+          mkdir -p "$OUT"
+          blender --background --python-exit-code 1 --python "$BUILDING_GENERATOR" -- \
+            --request "$BUILDING_REQUEST" \
+            --out-dir "$OUT"
+          test -s "$OUT/ci-building-detail-v1.glb"
+          test -s "$OUT/ci-building-detail-v1.report.json"
+          test -s "$OUT/ci-building-detail-v1.preview.png"
+          ls -lh "$OUT"
+
+      - name: Validate detailed building GLB and report
+        run: |
+          OUT="$RUNNER_TEMP/dropi-dt19-building-v1"
+          python3 "$FACTORY" postflight \
+            --request "$BUILDING_REQUEST" \
+            --report "$OUT/ci-building-detail-v1.report.json" \
+            --glb "$OUT/ci-building-detail-v1.glb"
+
+      - name: Validate detailed building preview PNG
+        run: |
+          OUT="$RUNNER_TEMP/dropi-dt19-building-v1"
+          python3 "$PREVIEW_VALIDATOR" \
+            --png "$OUT/ci-building-detail-v1.preview.png" \
+            --request "$BUILDING_REQUEST"
+
+      - name: Upload detailed building v1 visual evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: dt19-building-v1-preview-proof
+          path: |
+            ${{ runner.temp }}/dropi-dt19-building-v1/ci-building-detail-v1.glb
+            ${{ runner.temp }}/dropi-dt19-building-v1/ci-building-detail-v1.report.json
+            ${{ runner.temp }}/dropi-dt19-building-v1/ci-building-detail-v1.preview.png
           if-no-files-found: error
           retention-days: 7
