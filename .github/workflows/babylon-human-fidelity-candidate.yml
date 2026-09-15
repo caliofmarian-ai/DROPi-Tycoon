@@ -6,6 +6,7 @@ on:
       - '09_Development/Spikes/BABYLON_THIRD_PERSON_BRAILA_V1/scripts/generateMakeHumanFidelityCandidates.py'
       - '09_Development/Spikes/BABYLON_THIRD_PERSON_BRAILA_V1/scripts/configureMpfbAssetRoot.py'
       - '09_Development/Spikes/BABYLON_THIRD_PERSON_BRAILA_V1/scripts/assessHumanAnimationCompatibility.py'
+      - '09_Development/Spikes/BABYLON_THIRD_PERSON_BRAILA_V1/scripts/renderHumanFidelityReview.py'
       - '.github/workflows/babylon-human-fidelity-candidate.yml'
   workflow_dispatch:
 
@@ -184,6 +185,15 @@ jobs:
             "$DROPI_HUMAN_OUT/animation-rig-compatibility.json"
           test -s "$DROPI_HUMAN_OUT/animation-rig-compatibility.json"
 
+      - name: Render neutral human fidelity review frames
+        shell: bash
+        run: |
+          set -euo pipefail
+          "$DROPI_BLENDER" --background \
+            --python 09_Development/Spikes/BABYLON_THIRD_PERSON_BRAILA_V1/scripts/renderHumanFidelityReview.py \
+            | tee "$DROPI_HUMAN_OUT/review-render.log"
+          test -s "$DROPI_HUMAN_OUT/human-fidelity-review-render.json"
+
       - name: Validate generated human evidence
         shell: bash
         run: |
@@ -207,17 +217,21 @@ jobs:
               assert hashlib.sha256(data).hexdigest() == entry['glb']['sha256']
               assert len(data) > 500_000, path
               for framing in ('full', 'face'):
-                  image = root / f"{entry['identity']}-{framing}.png"
-                  assert image.exists() and image.stat().st_size > 25_000, image
-                  png = image.read_bytes()
-                  assert png[:8] == b'\x89PNG\r\n\x1a\n'
-                  width, height = struct.unpack('>II', png[16:24])
-                  assert min(width, height) >= 600, (image, width, height)
+                  for prefix in ('', 'review-'):
+                      image = root / f"{prefix}{entry['identity']}-{framing}.png"
+                      assert image.exists() and image.stat().st_size > 25_000, image
+                      png = image.read_bytes()
+                      assert png[:8] == b'\x89PNG\r\n\x1a\n'
+                      width, height = struct.unpack('>II', png[16:24])
+                      assert min(width, height) >= 600, (image, width, height)
           compatibility = json.loads((root / 'animation-rig-compatibility.json').read_text())
           assert compatibility['classification'] in {
               'DIRECT_NATIVE_CLIP_TRANSFER_RENDER_PROOF_ALLOWED',
               'RETARGET_REQUIRED_BEFORE_RUNTIME_INTEGRATION',
           }
+          review = json.loads((root / 'human-fidelity-review-render.json').read_text())
+          assert review['status'] == 'REVIEW_RENDER_ONLY_NOT_RUNTIME_ACCEPTANCE'
+          assert [entry['identity'] for entry in review['identities']] == ids
           print(json.dumps({
               'status': 'PASS',
               'identities': ids,
@@ -226,6 +240,7 @@ jobs:
               'animationCompatibility': compatibility['classification'],
               'animationJointOverlap': compatibility['sourceJointOverlap'],
               'restRotationMaxDeg': compatibility['keyRestRotationMaxDeg'],
+              'neutralReviewRenders': 'PASS',
           }, indent=2))
           PY
           sha256sum "$DROPI_HUMAN_OUT"/*.glb "$DROPI_HUMAN_OUT"/*.png > "$DROPI_HUMAN_OUT/SHA256SUMS.txt"
