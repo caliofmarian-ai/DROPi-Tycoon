@@ -172,7 +172,7 @@ jobs:
           cp app/build/outputs/apk/release/app-release.apk "$RUNNER_TEMP/dropi-update-probe.apk"
           "$DROPI_BUILD_TOOLS/aapt" dump badging "$RUNNER_TEMP/dropi-update-probe.apk" | grep -F "versionCode='$DROPI_UPGRADE_PROBE_VERSION'"
           for APK in "$DROPI_EMULATOR_APK" "$RUNNER_TEMP/dropi-update-probe.apk"; do
-            CERT="$("$DROPI_BUILD_TOOLS/apksigner" verify --print-certs "$APK" | sed -n 's/^Signer #1 certificate SHA-256 digest: //p')"
+            CERT="$("$DROPI_BUILD_TOOLS/apksigner" verify --verbose --print-certs "$APK" | node "$GITHUB_WORKSPACE/09_Development/Spikes/BABYLON_THIRD_PERSON_BRAILA_V1/scripts/evaluationReleaseIdentity.mjs" --parse-signer)"
             test "$CERT" = "$DROPI_REFERENCE_SIGNER"
           done
           echo "DROPI_UPDATE_PROBE_APK=$RUNNER_TEMP/dropi-update-probe.apk" >> "$GITHUB_ENV"
@@ -320,7 +320,7 @@ jobs:
           ABI_LIST="$(unzip -Z1 "$APK_PATH" | sed -n 's#^lib/\([^/]*\)/.*#\1#p' | sort -u | paste -sd, -)"
           test "$ABI_LIST" = 'arm64-v8a'
           "$DROPI_BUILD_TOOLS/apksigner" verify --verbose --print-certs "$APK_PATH"
-          CERT="$("$DROPI_BUILD_TOOLS/apksigner" verify --print-certs "$APK_PATH" | sed -n 's/^Signer #1 certificate SHA-256 digest: //p')"
+          CERT="$("$DROPI_BUILD_TOOLS/apksigner" verify --verbose --print-certs "$APK_PATH" | node "$GITHUB_WORKSPACE/09_Development/Spikes/BABYLON_THIRD_PERSON_BRAILA_V1/scripts/evaluationReleaseIdentity.mjs" --parse-signer)"
           test "$CERT" = "$DROPI_REFERENCE_SIGNER"
           "$DROPI_BUILD_TOOLS/zipalign" -c -P 16 -v 4 "$APK_PATH"
           "$DROPI_BUILD_TOOLS/aapt" dump badging "$APK_PATH" | grep -F "package: name='$DROPI_PACKAGE_ID'"
