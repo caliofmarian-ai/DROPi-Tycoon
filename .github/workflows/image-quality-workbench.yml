@@ -1,0 +1,54 @@
+name: Temporary Image Quality Workbench
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/image-quality-workbench.yml'
+permissions:
+  contents: read
+jobs:
+  export:
+    if: github.event.pull_request.head.ref == 'visual/high-clarity-materials-v2'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          persist-credentials: false
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+        with:
+          node-version: 22.13.0
+      - name: Prepare existing lockfile and pinned evaluation assets
+        working-directory: 09_Development/Spikes/BABYLON_THIRD_PERSON_BRAILA_V1
+        shell: bash
+        run: |
+          set -euo pipefail
+          npm ci --ignore-scripts --no-audit --no-fund
+          npm run setup:p1
+          npm run setup:humans
+          npm run setup:p2
+          npm run setup:p3
+          npm run setup:p4
+          npm run setup:surfaces
+          npm run setup:wear
+      - name: Export only repository evaluation source and prepared dependencies
+        shell: bash
+        env:
+          EXPECTED_HEAD: ${{ github.event.pull_request.head.sha }}
+        run: |
+          set -euo pipefail
+          test "$(git rev-parse HEAD)" = "$EXPECTED_HEAD"
+          mkdir -p "$RUNNER_TEMP/quality-workbench"
+          printf '%s\n' "$EXPECTED_HEAD" > "$RUNNER_TEMP/quality-workbench/source-sha.txt"
+          tar -czf "$RUNNER_TEMP/quality-workbench/evaluation-workbench.tar.gz" \
+            09_Development/Spikes/BABYLON_THIRD_PERSON_BRAILA_V1 \
+            .github/workflows/babylon-android-owner-verified.yml
+          cd "$RUNNER_TEMP/quality-workbench"
+          sha256sum evaluation-workbench.tar.gz > SHA256SUMS.txt
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: image-quality-workbench-${{ github.event.pull_request.head.sha }}
+          path: ${{ runner.temp }}/quality-workbench
+          if-no-files-found: error
+          retention-days: 1
+          compression-level: 0
