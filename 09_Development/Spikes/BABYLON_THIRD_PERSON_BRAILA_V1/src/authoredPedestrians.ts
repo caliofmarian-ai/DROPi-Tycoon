@@ -3,6 +3,7 @@ import type { AssetContainer, InstantiatedEntries } from '@babylonjs/core/assetC
 import { Matrix } from '@babylonjs/core/Maths/math.vector'
 import '@babylonjs/loaders/glTF'
 import { createWalkMixer, planarSpeed } from './authoredWalk'
+import { createWalkableSurfaceIndex } from './walkableSurfaceIndex'
 
 export type FootRoles = { leftFoot: string; rightFoot: string; leftToe: string; rightToe: string }
 export type PedestrianSpec = { file: string; idle: string; walk: string; roles: FootRoles; originalWalk: string; nativeRig: boolean }
@@ -100,12 +101,7 @@ export const surfaceSampler = (scene: Scene): ((x: number, z: number) => number)
     const b = mesh.getBoundingInfo().boundingBox
     return { min: b.minimumWorld.clone(), max: b.maximumWorld.clone() }
   })
-  return (x, z) => {
-    let top = -Infinity
-    for (const b of surfaces) if (x >= b.min.x && x <= b.max.x && z >= b.min.z && z <= b.max.z) top = Math.max(top, b.max.y)
-    if (!Number.isFinite(top)) throw new Error('Humanoid left governed walkable surfaces')
-    return top
-  }
+  return createWalkableSurfaceIndex(surfaces)
 }
 
 let started = false
