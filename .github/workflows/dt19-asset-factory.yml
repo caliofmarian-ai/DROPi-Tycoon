@@ -30,6 +30,7 @@ jobs:
       BUILDING_REQUEST: 08_Assets/Production/BlenderFactory/requests/ci-building-detail-v1.request.json
       BUILDING_GENERATOR: 08_Assets/Production/BlenderFactory/tools/blender_generate_building_v1.py
       PREVIEW_VALIDATOR: 08_Assets/Production/BlenderFactory/tools/validate_preview_png.py
+      LIBGL_ALWAYS_SOFTWARE: '1'
 
     steps:
       - uses: actions/checkout@v4
@@ -52,7 +53,7 @@ jobs:
       - name: Install Blender headless runtime
         run: |
           sudo apt-get update
-          sudo apt-get install -y --no-install-recommends blender python3-numpy
+          sudo apt-get install -y --no-install-recommends blender python3-numpy libegl1 libgl1-mesa-dri
           blender --version
           blender --background --python-exit-code 1 --python-expr "import numpy; print('Blender numpy', numpy.__version__)"
 
