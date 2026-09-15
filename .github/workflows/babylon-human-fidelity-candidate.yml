@@ -48,10 +48,13 @@ jobs:
         run: |
           set -euo pipefail
           cd "$RUNNER_TEMP"
-          curl --fail --location --retry 4 --retry-all-errors --output blender.tar.xz "$BLENDER_URL"
+          ARCHIVE="blender-$BLENDER_VERSION-linux-x64.tar.xz"
+          curl --fail --location --retry 4 --retry-all-errors --output "$ARCHIVE" "$BLENDER_URL"
           curl --fail --location --retry 4 --retry-all-errors --output blender.sha256 "$BLENDER_SHA_URL"
-          grep "blender-$BLENDER_VERSION-linux-x64.tar.xz" blender.sha256 | sha256sum -c -
-          tar -xf blender.tar.xz
+          grep -F " $ARCHIVE" blender.sha256 > blender.expected.sha256
+          test -s blender.expected.sha256
+          sha256sum -c blender.expected.sha256
+          tar -xf "$ARCHIVE"
           BLENDER="$RUNNER_TEMP/blender-$BLENDER_VERSION-linux-x64/blender"
           test -x "$BLENDER"
           "$BLENDER" --version | sed -n '1,2p'
