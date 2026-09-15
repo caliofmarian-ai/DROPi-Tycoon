@@ -1,5 +1,6 @@
 import { DirectionalLight, EngineStore, Mesh, ShadowGenerator, StandardMaterial } from '@babylonjs/core'
 import { allPresentationStagesSettled } from './completeAssetPresentation'
+import { applyBrailaCityVisuals } from './brailaCityVisuals'
 
 const ISSUE = 720
 const mergeStaticMeshes = (label: string, meshes: Mesh[]): void => {
@@ -83,6 +84,8 @@ const boot = (): void => {
     window.setTimeout(boot, 100); return
   }
   if (scene.metadata?.dropiPerformanceRescueV1) return
+  // Consume explicit source anchors before the legacy static merger can remove them.
+  applyBrailaCityVisuals(scene)
   scene.metadata = { ...(scene.metadata ?? {}), dropiPerformanceRescueV1: true }
   reduceDrawCalls(); trimShadowCost(); freezeStaticScene(); addBadge()
 }
