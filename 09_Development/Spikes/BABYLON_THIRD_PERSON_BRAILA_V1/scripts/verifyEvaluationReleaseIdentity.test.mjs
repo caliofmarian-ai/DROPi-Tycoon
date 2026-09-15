@@ -6,13 +6,15 @@ import path from 'node:path'
 import { spawnSync } from 'node:child_process'
 import { fileURLToPath } from 'node:url'
 import { release, validateRelease, prepareProbe, parseSignerSha256 } from './evaluationReleaseIdentity.mjs'
-test('explicit evaluation release supersedes both observed legacy counters',()=>{
-  assert.ok(release.versionCode > 16)
-  assert.equal(release.referenceInstalledVersionCode,15)
+test('explicit evaluation release advances beyond the approved owner APK',()=>{
+  assert.equal(release.versionCode,2026091502)
+  assert.equal(release.referenceInstalledVersionCode,2026091501)
+  assert.equal(release.upgradeProbeVersionCode,2026091501)
+  assert.equal(release.referenceInstalledApkSha256,'9445cd00a0508055fea53a0ae3445c17f8924f879cafe9d1ee61070c8ab361a8')
   assert.equal(release.referenceSignerSha256,'fac61745dc0903786fb9ede62a962b399f7348f0bb6f899b8332667591033b9c')
 })
 test('reject invalid, downgraded or misbound release identities',()=>{
-  for (const change of [{versionCode:15},{versionCode:16},{versionCode:2100000001},{versionCode:NaN},{packageId:'com.dropi.tycoon'},{referenceSignerSha256:'UNKNOWN'},{upgradeProbeVersionCode:14}]) assert.throws(()=>validateRelease({...release,...change}))
+  for (const change of [{versionCode:2026091501},{versionCode:16},{versionCode:2100000001},{versionCode:NaN},{packageId:'com.dropi.tycoon'},{referenceSignerSha256:'UNKNOWN'},{upgradeProbeVersionCode:16}]) assert.throws(()=>validateRelease({...release,...change}))
 })
 test('upgrade fixture changes only version and restores exact bytes',()=>{
   const root=mkdtempSync(path.join(tmpdir(),'dropi-upgrade-'))
