@@ -1,0 +1,65 @@
+{
+  "schemaVersion": 1,
+  "requestId": "ci-building-fidelity-v2-lod0",
+  "issue": 751,
+  "classification": "TEST_ONLY_NON_PRODUCTION",
+  "semanticFamily": "procedural-building-fidelity-v2",
+  "recipe": "building_fidelity_v2",
+  "lodProfile": "LOD0",
+  "generationReason": "Prove that the DT-19 Blender factory can add real facade depth, recessed glazing, bounded mullions and roof-edge detail while remaining inside an explicit hero/street mobile-oriented geometry budget.",
+  "inventoryAudit": {
+    "checked": true,
+    "inventoryRef": "08_Assets/Production/asset-inventory.v1.json",
+    "checkedFamilies": ["SRC-20260907-006"],
+    "missingCapability": "The canonical factory has no governed LOD0 building recipe with recessed openings, controlled glass variation and bounded roof/eave depth.",
+    "reuseDecision": "This CI-only fixture extends the procedural test recipe and does not replace or duplicate an approved production source asset."
+  },
+  "provenance": {
+    "generator": "Blender",
+    "sourceType": "PROCEDURAL_PRIMITIVES",
+    "externalInputs": [],
+    "commercialStatus": "NOT_EVALUATED_TEST_ONLY",
+    "legalQualificationAuthority": "DT-13"
+  },
+  "budget": {
+    "maxTriangles": 8000,
+    "maxMaterials": 8,
+    "requireCollisionProxy": true,
+    "maxGlbBytes": 6291456
+  },
+  "preview": {
+    "width": 1024,
+    "height": 1024,
+    "maxPngBytes": 2097152
+  },
+  "parameters": {
+    "width": 12.0,
+    "depth": 8.0,
+    "floorHeight": 3.2,
+    "floors": 3,
+    "frontBays": 4,
+    "sideBays": 3,
+    "windowWidth": 1.45,
+    "windowHeight": 1.65,
+    "windowBottom": 0.9,
+    "frameThickness": 0.12,
+    "trimDepth": 0.12,
+    "windowRecess": 0.18,
+    "revealThickness": 0.10,
+    "mullionWidth": 0.055,
+    "roofHeight": 1.8,
+    "roofOverhang": 0.35,
+    "fasciaHeight": 0.22,
+    "gutterRadius": 0.075,
+    "downpipeRadius": 0.055,
+    "bodyBevel": 0.10,
+    "detailBevel": 0.025,
+    "bodyTextureSize": 128,
+    "bodyColor": [0.58, 0.43, 0.30, 1.0],
+    "trimColor": [0.86, 0.78, 0.65, 1.0],
+    "glassColor": [0.10, 0.22, 0.30, 1.0],
+    "roofColor": [0.28, 0.08, 0.045, 1.0],
+    "metalColor": [0.10, 0.11, 0.12, 1.0],
+    "doorColor": [0.16, 0.07, 0.035, 1.0]
+  }
+}
