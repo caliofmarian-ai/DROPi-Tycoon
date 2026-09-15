@@ -139,8 +139,12 @@ def apply_face_identity(basemesh, seed):
 
 
 def add_asset(basemesh, subdir, filename, asset_type):
-    asset_path = resolve_asset_path(subdir, filename)
-    return HumanService.add_mhclo_asset(asset_path, basemesh, asset_type=asset_type, material_type="GAMEENGINE")
+    return HumanService.add_mhclo_asset(
+        resolve_asset_path(subdir, filename),
+        basemesh,
+        asset_type=asset_type,
+        material_type="GAMEENGINE",
+    )
 
 
 def set_skin(basemesh, filename):
@@ -161,7 +165,7 @@ def hierarchy_objects(root):
     return ordered
 
 
-def bounds_for(objects):
+def bounds_for(objects, require_mesh=True):
     corners = []
     for obj in objects:
         if obj.type != "MESH" or not obj.visible_get():
@@ -169,10 +173,26 @@ def bounds_for(objects):
         for corner in obj.bound_box:
             corners.append(obj.matrix_world @ Vector(corner))
     if not corners:
-        raise RuntimeError("No mesh bounds found for character")
+        if require_mesh:
+            raise RuntimeError("No mesh bounds found")
+        return None
     mins = Vector((min(v.x for v in corners), min(v.y for v in corners), min(v.z for v in corners)))
     maxs = Vector((max(v.x for v in corners), max(v.y for v in corners), max(v.z for v in corners)))
     return mins, maxs
+
+
+def infer_front_sign(basemesh):
+    body_bounds = bounds_for([basemesh])
+    body_center_y = (body_bounds[0].y + body_bounds[1].y) * 0.5
+    eyes = ObjectService.find_object_of_type_amongst_nearest_relatives(basemesh, "Eyes")
+    if eyes is None:
+        raise RuntimeError("Cannot infer character front: Eyes asset is missing")
+    eye_bounds = bounds_for(hierarchy_objects(eyes))
+    eye_center_y = (eye_bounds[0].y + eye_bounds[1].y) * 0.5
+    delta = eye_center_y - body_center_y
+    if abs(delta) < 0.001:
+        raise RuntimeError(f"Cannot infer character front: eye/body Y delta too small ({delta})")
+    return 1.0 if delta > 0 else -1.0
 
 
 def look_at(obj, target):
@@ -215,7 +235,6 @@ def setup_preview_scene(character_objects, front_sign, preview_name):
         bpy.context.collection.objects.link(light)
         light.location = location
         look_at(light, center)
-        return light
 
     area("key", center + Vector((height * 0.8, front_sign * height * 1.2, height * 0.8)), 1150, height * 0.8, (1.0, 0.88, 0.78))
     area("fill", center + Vector((-height * 0.9, front_sign * height * 0.8, height * 0.35)), 650, height * 0.65, (0.72, 0.83, 1.0))
@@ -225,6 +244,7 @@ def setup_preview_scene(character_objects, front_sign, preview_name):
     scene.render.engine = "BLENDER_EEVEE_NEXT"
     scene.render.resolution_percentage = 100
     scene.render.image_settings.file_format = "PNG"
+    scene.render.image_settings.color_mode = "RGB"
     scene.render.film_transparent = False
     scene.view_settings.look = "AgX - Medium High Contrast"
 
@@ -236,8 +256,8 @@ def setup_preview_scene(character_objects, front_sign, preview_name):
 
     camera.location = center + Vector((height * 0.10, front_sign * height * 1.55, height * 0.05))
     look_at(camera, center + Vector((0, 0, height * 0.02)))
-    scene.render.resolution_x = 720
-    scene.render.resolution_y = 1080
+    scene.render.resolution_x = 600
+    scene.render.resolution_y = 900
     scene.render.filepath = str(OUT / f"{preview_name}-full.png")
     bpy.ops.render.render(write_still=True)
 
@@ -245,8 +265,8 @@ def setup_preview_scene(character_objects, front_sign, preview_name):
     camera.location = face_target + Vector((height * 0.04, front_sign * height * 0.50, height * 0.015))
     camera_data.lens = 72
     look_at(camera, face_target)
-    scene.render.resolution_x = 900
-    scene.render.resolution_y = 900
+    scene.render.resolution_x = 768
+    scene.render.resolution_y = 768
     scene.render.filepath = str(OUT / f"{preview_name}-face.png")
     bpy.ops.render.render(write_still=True)
 
@@ -272,14 +292,30 @@ def mesh_stats(objects):
 def export_character(basemesh, identity_id):
     export_root = ExportService.create_character_copy(basemesh, name_suffix="_export")
     export_basemesh = ObjectService.find_object_of_type_amongst_nearest_relatives(export_root, "Basemesh")
-    ExportService.bake_modifiers_remove_helpers(export_basemesh, bake_masks=True, bake_subdiv=False, remove_helpers=True, also_proxy=True)
+    if export_basemesh is None:
+        raise RuntimeError("Export copy is missing its Basemesh")
+    ExportService.bake_modifiers_remove_helpers(
+        export_basemesh,
+        bake_masks=True,
+        bake_subdiv=False,
+        remove_helpers=True,
+        also_proxy=True,
+    )
     bpy.ops.object.select_all(action="DESELECT")
     export_objects = hierarchy_objects(export_root)
     for obj in export_objects:
         obj.select_set(True)
     bpy.context.view_layer.objects.active = export_root
     output = OUT / f"{identity_id}.glb"
-    bpy.ops.export_scene.gltf(filepath=str(output), export_format="GLB", use_selection=True, export_animations=False, export_apply=True, export_yup=True, export_materials="EXPORT")
+    bpy.ops.export_scene.gltf(
+        filepath=str(output),
+        export_format="GLB",
+        use_selection=True,
+        export_animations=False,
+        export_apply=True,
+        export_yup=True,
+        export_materials="EXPORT",
+    )
     return output, mesh_stats(export_objects)
 
 
@@ -298,12 +334,8 @@ def build_identity(config):
 
     original_objects = hierarchy_objects(basemesh)
     original_stats = mesh_stats(original_objects)
-    setup_preview_scene(original_objects, 1.0, f"{config['id']}-a")
-    for obj in list(bpy.context.scene.objects):
-        if obj.name.startswith("preview-") or obj.name in {"key", "fill", "rim"}:
-            bpy.data.objects.remove(obj, do_unlink=True)
-    setup_preview_scene(original_objects, -1.0, f"{config['id']}-b")
-
+    front_sign = infer_front_sign(basemesh)
+    setup_preview_scene(original_objects, front_sign, config["id"])
     glb_path, export_stats = export_character(basemesh, config["id"])
     return {
         "identity": config["id"],
@@ -311,6 +343,7 @@ def build_identity(config):
         "skin": config["skin"],
         "equippedAssets": equipped,
         "facialTargets": facial_targets,
+        "previewFrontSignY": front_sign,
         "sourceStats": original_stats,
         "exportStats": export_stats,
         "glb": {"file": glb_path.name, "bytes": glb_path.stat().st_size, "sha256": sha256_file(glb_path)},
