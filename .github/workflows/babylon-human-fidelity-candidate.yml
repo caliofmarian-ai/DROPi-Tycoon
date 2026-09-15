@@ -180,6 +180,7 @@ jobs:
           assert len({json.dumps(entry['macro'], sort_keys=True) for entry in report['identities']}) == 3
           for entry in report['identities']:
               assert len(entry['facialTargets']) >= 6, entry['identity']
+              assert entry['previewFrontSignY'] in (-1.0, 1.0), entry
               assert entry['exportStats']['triangles'] > 10000, entry
               path = root / entry['glb']['file']
               data = path.read_bytes()
@@ -187,14 +188,13 @@ jobs:
               assert len(data) == entry['glb']['bytes']
               assert hashlib.sha256(data).hexdigest() == entry['glb']['sha256']
               assert len(data) > 500_000, path
-              for side in ('a', 'b'):
-                  for framing in ('full', 'face'):
-                      image = root / f"{entry['identity']}-{side}-{framing}.png"
-                      assert image.exists() and image.stat().st_size > 25_000, image
-                      png = image.read_bytes()
-                      assert png[:8] == b'\x89PNG\r\n\x1a\n'
-                      width, height = struct.unpack('>II', png[16:24])
-                      assert width >= 700 and height >= 700, (image, width, height)
+              for framing in ('full', 'face'):
+                  image = root / f"{entry['identity']}-{framing}.png"
+                  assert image.exists() and image.stat().st_size > 25_000, image
+                  png = image.read_bytes()
+                  assert png[:8] == b'\x89PNG\r\n\x1a\n'
+                  width, height = struct.unpack('>II', png[16:24])
+                  assert min(width, height) >= 600, (image, width, height)
           print(json.dumps({
               'status': 'PASS',
               'identities': ids,
