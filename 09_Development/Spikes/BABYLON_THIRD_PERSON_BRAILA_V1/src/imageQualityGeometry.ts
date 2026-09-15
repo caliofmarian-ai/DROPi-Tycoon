@@ -13,7 +13,7 @@ const polygon = (out: QualityGeometry, points: readonly Point[], tile: number, p
     out.positions.push(...p)
     out.uvs.push((alongX ? p[0] : p[2]) / tile, (projection === 'roof' ? (alongX ? p[2] : p[0]) : p[1]) / tile)
   }
-  for (let i = 1; i < points.length - 1; i++) out.indices.push(offset, offset + i, offset + i + 1)
+  for (let i = 1; i < points.length - 1; i++) out.indices.push(offset, offset + i + 1, offset + i)
 }
 /** Chamfered, not voxel, envelope inside the unchanged original collision mass. */
 export const bevelledEnvelope = (width: number, depth: number, height: number, bevel: number, tile = 2): QualityGeometry => {
