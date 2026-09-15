@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict'
 import { readFile, writeFile } from 'node:fs/promises'
 const report=JSON.parse(await readFile('dist/evidence/verification.json','utf8'))
-assert.equal(report.status,'PASS');assert.equal(report.errors.length,0)
+assert.equal(report.status,'PASS');assert.equal(report.errors.length,0);assert.equal(report.gpuErrors.length,0)
 assert.equal(report.classification,'DESKTOP_SOFTWARE_WEBGL_REGRESSION_NOT_ANDROID_ACCEPTANCE')
 const expected=process.env.VITE_COMMIT_SHA??process.env.GITHUB_SHA??'LOCAL'
 assert.equal(report.sourceSha,expected)

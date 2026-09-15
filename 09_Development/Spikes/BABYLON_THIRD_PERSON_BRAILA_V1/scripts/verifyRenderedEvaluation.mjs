@@ -12,7 +12,7 @@ if(!chromePath)throw new Error('Rendered gate requires runner Chromium')
 const dist=path.resolve('dist'),evidenceDir=path.join(dist,'evidence')
 await mkdir(evidenceDir,{recursive:true})
 const profile=await mkdtemp(path.join(tmpdir(),'dropi-browser-'))
-const evidence={classification:'DESKTOP_SOFTWARE_WEBGL_REGRESSION_NOT_ANDROID_ACCEPTANCE',sourceSha:process.env.VITE_COMMIT_SHA??process.env.GITHUB_SHA??'LOCAL',browser:chromePath,status:'RUNNING',frames:[],errors:[],tests:[]}
+const evidence={classification:'DESKTOP_SOFTWARE_WEBGL_REGRESSION_NOT_ANDROID_ACCEPTANCE',sourceSha:process.env.VITE_COMMIT_SHA??process.env.GITHUB_SHA??'LOCAL',browser:chromePath,status:'RUNNING',frames:[],errors:[],gpuErrors:[],tests:[]}
 const mime={'.html':'text/html','.js':'text/javascript','.css':'text/css','.json':'application/json','.png':'image/png','.jpg':'image/jpeg','.gltf':'model/gltf+json','.glb':'model/gltf-binary'}
 const server=createServer(async(req,res)=>{
   try{
@@ -46,6 +46,7 @@ assert.equal(fresh({sampleId:4,renderedSampleId:4},4),false);assert.equal(fresh(
 evidence.tests.push('repeated/unfinished/missing pose samples rejected')
 const healthy=s=>{
   assert.equal(evidence.errors.length,0,'Uncaught browser exceptions')
+  assert.equal(evidence.gpuErrors.length,0,`GPU/shader errors: ${JSON.stringify(evidence.gpuErrors)}`)
   if(s.rendererFailure||s.ready?.status==='FAIL'||s.cityVisuals?.status==='FAIL'||s.contact?.status==='FAIL'||s.contact?.error||s.contact?.mechanicalStatus==='FAIL'||s.camera?.occlusion==='FAIL')throw new Error(`Runtime failure: ${JSON.stringify(s)}`)
 }
 const waitForPose=async(label,predicate,after=-1,timeoutMs=30000)=>{
@@ -79,8 +80,12 @@ try{
   socket.addEventListener('message',event=>{
     const m=JSON.parse(event.data)
     if(m.id){const task=pending.get(m.id);if(!task)return;pending.delete(m.id);if(m.error)task.reject(new Error(JSON.stringify(m.error)));else task.resolve(m.result)}else if(m.method==='Runtime.exceptionThrown')evidence.errors.push(m.params.exceptionDetails)
+    else if(m.method==='Log.entryAdded'||m.method==='Runtime.consoleAPICalled'){
+      const text=m.params.entry?.text??m.params.args?.map(a=>a.value??a.description??'').join(' ')??''
+      if(/GL_INVALID_OPERATION|GL_INVALID_ENUM|GL_INVALID_VALUE|GL_OUT_OF_MEMORY|INVALID_FRAMEBUFFER_OPERATION|Error compiling effect|Error linking program/i.test(text)&&evidence.gpuErrors.length<40)evidence.gpuErrors.push(text)
+    }
   })
-  await send('Page.enable');await send('Runtime.enable');await send('Emulation.setDeviceMetricsOverride',{width:960,height:432,deviceScaleFactor:2.25,mobile:true});await send('Emulation.setTouchEmulationEnabled',{enabled:true,maxTouchPoints:1});await send('Page.navigate',{url})
+  await send('Page.enable');await send('Runtime.enable');await send('Log.enable');await send('Emulation.setDeviceMetricsOverride',{width:960,height:432,deviceScaleFactor:2.25,mobile:true});await send('Emulation.setTouchEmulationEnabled',{enabled:true,maxTouchPoints:1});await send('Page.navigate',{url})
   let state=await waitForPose('complete startup',s=>s.ready?.status==='READY'&&s.contact?.status==='ACTIVE'&&s.cityVisuals?.status==='ACTIVE',-1,100000)
   evidence.tests.push('complete scene/8 pedestrians/materials/rendered contact/city recipe READY')
   state=await frame('01-city-start','Real compiled renderer at 960x432 CSS viewport; software WebGL only');healthy(state)

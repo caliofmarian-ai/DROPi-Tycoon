@@ -48,7 +48,7 @@ export async function installWorldQuality(scene: Scene): Promise<void> {
     if(removed)return;removed=true
     for(const [mesh,material]of priorMaterials)if(!mesh.isDisposed())mesh.material=material
     for(const [mesh,visible]of hidden)if(!mesh.isDisposed())mesh.isVisible=visible
-    restoreTransforms.forEach(restore=>restore())
+    restoreTransforms.reverse().forEach(restore=>restore())
     owned.forEach(mesh=>{if(!mesh.isDisposed())mesh.dispose(false,false)})
     mats.forEach(material=>material.dispose(false,false));textures.forEach(texture=>texture.dispose())
     installations.delete(scene)
@@ -139,7 +139,19 @@ export async function installWorldQuality(scene: Scene): Promise<void> {
     state.originalColliderBoundsPreserved=true
     state.ownedTextures=textures.size;state.ownedMeshes=owned.length
     if(state.buildings!==10||state.ownedMeshes>40||state.ownedTextures>15)throw new Error('Quality sector resource budget exceeded')
+    // Legacy StandardMaterial instances were frozen for the previous Poisson
+    // shadow sampler. Refresh their shader variants before switching to PCF;
+    // retaining the old sampler variant can make the ground/road paint disappear.
+    const frozenMaterials=scene.materials.filter(material=>material.isFrozen)
+    frozenMaterials.forEach(material=>material.unfreeze())
+    restoreTransforms.push(()=>{if(!scene.isDisposed)frozenMaterials.forEach(material=>material.freeze())})
     configureQualityLighting(scene,state,owned,mats,restoreTransforms)
+    await new Promise<void>((resolve,reject)=>{
+      const timeout=window.setTimeout(()=>reject(new Error('Quality shader readiness timeout')),30000)
+      scene.whenReadyAsync().then(()=>{clearTimeout(timeout);resolve()},error=>{clearTimeout(timeout);reject(error)})
+    })
+    if(scene.isDisposed||removed)throw new Error('Scene disposed while preparing quality shaders')
+    frozenMaterials.forEach(material=>material.freeze())
     state.ownedMeshes=owned.length
     bindQualityControl(scene,state,publish)
     for(const material of cache.values())material.freeze()
