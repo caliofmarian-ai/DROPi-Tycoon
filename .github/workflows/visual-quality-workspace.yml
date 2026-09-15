@@ -20,14 +20,16 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/quality-workspace"
+          git archive --format=tar HEAD | gzip > "$RUNNER_TEMP/quality-workspace/source.tar.gz"
+          git rev-parse HEAD > "$RUNNER_TEMP/quality-workspace/SOURCE_SHA.txt"
           cd 09_Development/Spikes/BABYLON_THIRD_PERSON_BRAILA_V1
           npm ci --ignore-scripts --no-audit --no-fund
-          git rev-parse HEAD > SOURCE_SHA.txt
-          tar --exclude='.env' --exclude='.env.*' -czf "$RUNNER_TEMP/visual-quality-workspace.tar.gz" src scripts public package.json package-lock.json tsconfig.json vite.config.ts index.html node_modules SOURCE_SHA.txt
+          tar -czf "$RUNNER_TEMP/quality-workspace/dependencies.tar.gz" node_modules
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         with:
           name: visual-quality-workspace-${{ github.sha }}
-          path: ${{ runner.temp }}/visual-quality-workspace.tar.gz
+          path: ${{ runner.temp }}/quality-workspace/
           retention-days: 3
           if-no-files-found: error
           compression-level: 0
