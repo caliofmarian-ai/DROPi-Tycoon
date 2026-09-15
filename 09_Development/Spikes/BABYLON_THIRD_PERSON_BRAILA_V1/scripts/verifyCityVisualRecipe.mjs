@@ -91,6 +91,9 @@ try {
     const { installCityVisuals } = await import(compile('cityVisualPresentation'))
     const engine = new NullEngine()
     const scene = new Scene(engine)
+    // Warm Babylon's scene-owned PBR BRDF cache before resource snapshots so
+    // recipe disposal is measured against stable scene infrastructure.
+    new PBRMaterial('scene-shared-brdf-warm', scene)
     // Account for the engine-owned lazy default before taking resource snapshots.
     // It is not owned by the visual recipe and must never be disposed with it.
     const originalMaterial = scene.defaultMaterial
