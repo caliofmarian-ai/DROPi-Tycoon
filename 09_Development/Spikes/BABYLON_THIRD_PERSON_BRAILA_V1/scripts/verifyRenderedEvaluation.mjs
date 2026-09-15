@@ -92,7 +92,7 @@ try{
   evidence.tests.push({initialVisiblePixels:firstVisible,initialViewResult:firstVisible?'VISIBLE_FIRST_CAPTURE':'BLANK_FIRST_CAPTURE_RECHECKED',finalNonblank:evidence.frames.at(-1).pixels.nonblank})
   assert.equal(evidence.frames.at(-1).pixels.nonblank,true,'Initial 3D view remained blank across three preserved captures')
   assert.equal(state.resolution.resizePhase,'BEGIN_FRAME_ONLY','Resize must be applied before drawing the scene')
-  assert.equal(state.cityVisuals.facades,3);assert.equal(state.cityVisuals.surfaces,7);assert.equal(state.cityVisuals.textures,2)
+  assert.equal(state.cityVisuals.facades,3);assert.equal(state.cityVisuals.surfaces,7);assert.equal(state.cityVisuals.textures,6)
   assert.ok(state.cityVisuals.drawMeshes<=22&&state.cityVisuals.materials<=9,'City visual resource budget exceeded')
   evidence.tests.push({cityVisualRecipe:state.cityVisuals})
   assert.equal(state.imageQuality.status,'ACTIVE');assert.equal(state.imageQuality.buildings,10)
