@@ -174,7 +174,7 @@ function configureQualityLighting(scene:Scene,state:QualityState,owned:Mesh[],ma
   const originalShadow=shadows instanceof ShadowGenerator?{size:shadows.mapSize,pcf:shadows.usePercentageCloserFiltering,bias:shadows.bias,normalBias:shadows.normalBias,frustum:sun.shadowFrustumSize,auto:sun.autoUpdateExtends,min:sun.shadowMinZ,max:sun.shadowMaxZ}:null
   if(shadows instanceof ShadowGenerator){
     shadows.mapSize=Math.min(1536,scene.getEngine().getCaps().maxTextureSize);shadows.usePercentageCloserFiltering=true
-    shadows.filteringQuality=ShadowGenerator.QUALITY_MEDIUM;shadows.bias=.00025;shadows.normalBias=.02;shadows.frustumEdgeFalloff=.12
+    shadows.filteringQuality=ShadowGenerator.QUALITY_LOW;shadows.bias=.00025;shadows.normalBias=.02;shadows.frustumEdgeFalloff=.12
     sun.shadowFrustumSize=state.shadowFrustumMeters;sun.autoUpdateExtends=false;sun.shadowMinZ=1;sun.shadowMaxZ=160
     state.shadowMapSize=shadows.mapSize
   }
