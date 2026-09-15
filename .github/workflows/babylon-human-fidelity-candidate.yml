@@ -60,6 +60,14 @@ jobs:
           "$BLENDER" --version | sed -n '1,2p'
           echo "DROPI_BLENDER=$BLENDER" >> "$GITHUB_ENV"
 
+      - name: Install Blender headless EGL runtime
+        shell: bash
+        run: |
+          set -euo pipefail
+          sudo apt-get update -qq
+          sudo apt-get install -y --no-install-recommends libegl1 libgl1
+          ldconfig -p | grep -F 'libEGL.so.1'
+
       - name: Fetch exact MPFB source and build extension package
         shell: bash
         run: |
@@ -108,11 +116,6 @@ jobs:
           test -d "$ASSET_ROOT/hair"
           test -d "$ASSET_ROOT/clothes"
 
-          # The official pack groups each asset inside a named subdirectory while
-          # MPFB's headless AssetService lookup used by this proof resolves a
-          # direct filename under the category root. Expose the immutable pack
-          # files through symlinks only in runner-temp. Keep each companion OBJ,
-          # MHMAT and texture beside its MHCLO/MHMAT so relative references work.
           for category in skins eyes eyebrows eyelashes teeth hair clothes; do
             CATEGORY_ROOT="$ASSET_ROOT/$category"
             test -d "$CATEGORY_ROOT" || continue
@@ -161,8 +164,6 @@ jobs:
           "$DROPI_BLENDER" --background \
             --python 09_Development/Spikes/BABYLON_THIRD_PERSON_BRAILA_V1/scripts/generateMakeHumanFidelityCandidates.py \
             | tee "$DROPI_HUMAN_OUT/generation.log"
-          # Blender can return zero after a script exception in background mode,
-          # therefore the proof is fail-closed on its explicit completion record.
           test -s "$DROPI_HUMAN_OUT/human-fidelity-report.json"
 
       - name: Validate generated human evidence
