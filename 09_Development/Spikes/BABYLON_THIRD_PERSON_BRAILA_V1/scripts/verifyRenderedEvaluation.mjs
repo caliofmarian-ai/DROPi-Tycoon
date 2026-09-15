@@ -62,6 +62,10 @@ const frame=async(name,note)=>{
   const entry={name,note,sampleRange:[before.contact?.renderedSampleId,state.contact?.renderedSampleId],state}
   evidence.frames.push(entry)
   entry.pixels=await capturedPixels(image.data)
+  // Preserve the failed image before rejecting it. Initial startup has its own
+  // bounded unchanged-view sequence below; later delivery checkpoints must not
+  // silently pass with a cleared buffer (observed at 03-carry on 0fdd0e14).
+  if(!name.startsWith('01-city-start')&&name!=='failure')assert.equal(entry.pixels.nonblank,true,`${name}: central 3D view is blank`)
   return state
 }
 try{
@@ -87,6 +91,7 @@ try{
   }
   evidence.tests.push({initialVisiblePixels:firstVisible,initialViewResult:firstVisible?'VISIBLE_FIRST_CAPTURE':'BLANK_FIRST_CAPTURE_RECHECKED',finalNonblank:evidence.frames.at(-1).pixels.nonblank})
   assert.equal(evidence.frames.at(-1).pixels.nonblank,true,'Initial 3D view remained blank across three preserved captures')
+  assert.equal(state.resolution.resizePhase,'BEGIN_FRAME_ONLY','Resize must be applied before drawing the scene')
   assert.equal(state.cityVisuals.facades,3);assert.equal(state.cityVisuals.surfaces,7);assert.equal(state.cityVisuals.textures,2)
   assert.ok(state.cityVisuals.drawMeshes<=22&&state.cityVisuals.materials<=9,'City visual resource budget exceeded')
   evidence.tests.push({cityVisualRecipe:state.cityVisuals})
@@ -129,6 +134,6 @@ try{
   await moveTo(34,-30);await interact(3,false);await frame('05-handoff','Mission handoff releases grip')
   await interact(0,false);state=await frame('06-restart','Restart releases parcel and retained hand grip');healthy(state);assert.equal(state.contact.hero.carry,false)
   evidence.tests.push('handoff/restart release carry after fresh completed poses');evidence.status='PASS'
-  console.log('Rendered regression PASS: active city recipe, nonblank initial scene, wheels/glass/no ghosts, pickup/grip, four real touch directions/stops, handoff/restart. SOFTWARE WEBGL ONLY; NOT Android acceptance.')
+  console.log('Rendered regression PASS: active city recipe, nonblank delivery checkpoints, wheels/glass/no ghosts, pickup/grip, four real touch directions/stops, handoff/restart. SOFTWARE WEBGL ONLY; NOT Android acceptance.')
 }catch(error){evidence.status='FAIL';evidence.error=error instanceof Error?error.stack:String(error);if(socket?.readyState===WebSocket.OPEN){try{await frame('failure','Failure evidence, not accepted preview')}catch{}}console.error(JSON.stringify(evidence,null,2));throw error}
 finally{await writeFile(path.join(evidenceDir,'verification.json'),`${JSON.stringify(evidence,null,2)}\n`);socket?.close();browser.kill('SIGTERM');server.close();await wait(250);await rm(profile,{recursive:true,force:true}).catch(()=>{})}
