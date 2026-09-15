@@ -48,20 +48,37 @@ check('existing pixel ceiling, DPR and sizing validation remain intact', () => {
 // Actual owner lifecycle with an explicit deterministic clock and Engine/DOM
 // adapters. No fake FPS results are asserted as physical-device evidence.
 const original = { performance: globalThis.performance, window: globalThis.window, document: globalThis.document }
-let now = 0, delta = 0, resizes = 0
+let now = 0, delta = 0, resizes = 0, phase = 'OUTSIDE_FRAME', visibleBuffer = true, cssWidth = 800
+const resizePhases = []
 const observable = () => {
   const callbacks = new Set()
   return { callbacks, add(fn) { callbacks.add(fn); return fn }, addOnce(fn) { callbacks.add(fn); return fn }, remove(fn) { callbacks.delete(fn) }, notify() { for (const fn of callbacks) fn() } }
 }
-const end = observable(), dispose = observable(), listeners = new Map()
-const engine = { onEndFrameObservable: end, onDisposeObservable: dispose, getDeltaTime: () => delta, getRenderWidth: () => 1000, getRenderHeight: () => 500, setHardwareScalingLevel() {}, resize() { resizes++ } }
-const frame = ms => { delta = ms; now += ms; end.notify() }
+const begin = observable(), end = observable(), dispose = observable(), listeners = new Map()
+const engine = {
+  onBeginFrameObservable: begin, onEndFrameObservable: end, onDisposeObservable: dispose,
+  getDeltaTime: () => delta, getRenderWidth: () => 1000, getRenderHeight: () => 500,
+  setHardwareScalingLevel() { resizePhases.push(phase); visibleBuffer = false },
+  resize() { resizePhases.push(phase); resizes++; visibleBuffer = false },
+}
+const frame = ms => {
+  delta = ms; now += ms; phase = 'BEGIN_FRAME'; begin.notify()
+  phase = 'SCENE_RENDER'; visibleBuffer = true
+  phase = 'END_FRAME'; end.notify(); phase = 'PRESENT'
+  assert.equal(visibleBuffer, true, 'Buffer cleared after the scene was rendered')
+  phase = 'OUTSIDE_FRAME'
+}
 try {
   Object.defineProperty(globalThis, 'performance', { configurable: true, value: { now: () => now } })
   globalThis.window = { devicePixelRatio: 2 }
   globalThis.document = { hidden: false, addEventListener: (name, fn) => listeners.set(name, fn), removeEventListener: name => listeners.delete(name) }
-  const owner = createResolutionOwner(engine, { getBoundingClientRect: () => ({ width: 800, height: 400 }) })
-  owner.resize()
+  const owner = createResolutionOwner(engine, { getBoundingClientRect: () => ({ width: cssWidth, height: 400 }) })
+  check('outside-frame resize requests coalesce without clearing the visible buffer', () => {
+    owner.resize(); owner.resize(); owner.resize()
+    assert.equal(resizes, 0); assert.equal(visibleBuffer, true)
+    frame(1000 / 120); assert.equal(resizes, 1)
+    assert.deepEqual(resizePhases, ['BEGIN_FRAME', 'BEGIN_FRAME'])
+  })
   check('120-Hz devices publish a real two-second budget', () => {
     for (let i = 0; i < 250; i++) frame(1000 / 120)
     assert.ok(window.__DROPiRenderQuality.sampleCount >= 240)
@@ -75,14 +92,33 @@ try {
     assert.equal(window.__DROPiRenderQuality.meanMs, 1000)
     assert.equal(window.__DROPiRenderQuality.overloaded, true)
   })
-  check('resizing discards old-workload samples and disposed owner removes listeners', () => {
-    owner.resize()
+  check('adaptive downscale is queued until the next beginning, never after rendering', () => {
+    assert.equal(window.__DROPiRenderQuality.resizePending, true)
     const before = resizes
-    for (let i = 0; i < 121; i++) frame(1000 / 60)
+    assert.ok(resizePhases.every(value => value === 'BEGIN_FRAME'))
+    frame(16); assert.equal(resizes, before + 1)
+    assert.equal(window.__DROPiRenderQuality.resizePending, false)
+    assert.equal(window.__DROPiRenderQuality.resizePhase, 'BEGIN_FRAME_ONLY')
+  })
+  check('resizing discards old-workload samples without inventing performance acceptance', () => {
+    owner.resize(); frame(1000 / 60)
+    const before = resizes
+    for (let i = 0; i < 125; i++) frame(1000 / 60)
     assert.ok(window.__DROPiRenderQuality.meanMs < 17)
     assert.equal(window.__DROPiRenderQuality.overloaded, false)
     assert.equal(resizes, before)
-    dispose.notify(); assert.equal(end.callbacks.size, 0); assert.equal(listeners.size, 0)
+  })
+  check('zero-size and hidden views defer pending work until a drawable frame', () => {
+    const before = resizes
+    cssWidth = 0; owner.resize(); frame(16); assert.equal(resizes, before)
+    cssWidth = 800; document.hidden = true; frame(16); assert.equal(resizes, before)
+    document.hidden = false; frame(16); assert.equal(resizes, before + 1)
+  })
+  check('disposed owner removes both frame observers and cannot resize later', () => {
+    owner.resize(); const before = resizes
+    dispose.notify(); owner.resize(); frame(16)
+    assert.equal(resizes, before); assert.equal(begin.callbacks.size, 0)
+    assert.equal(end.callbacks.size, 0); assert.equal(listeners.size, 0)
   })
 } finally {
   Object.defineProperty(globalThis, 'performance', { configurable: true, value: original.performance })
