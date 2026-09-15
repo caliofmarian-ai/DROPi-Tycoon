@@ -1,0 +1,56 @@
+{
+  "schemaVersion": 1,
+  "requestId": "ci-building-detail-v1",
+  "issue": 748,
+  "classification": "TEST_ONLY_NON_PRODUCTION",
+  "semanticFamily": "procedural-building-facade-v1",
+  "recipe": "building_facade_v1",
+  "generationReason": "Prove that the DT-19 Blender factory can generate a deterministic multi-part building with readable facade detail and a bounded visual preview instead of a cube-only technical proof.",
+  "inventoryAudit": {
+    "checked": true,
+    "inventoryRef": "08_Assets/Production/asset-inventory.v1.json",
+    "checkedFamilies": [
+      "SRC-20260907-006"
+    ],
+    "missingCapability": "The canonical repository has no governed parameterized Blender generator that produces a detailed building facade plus preview evidence.",
+    "reuseDecision": "This test fixture uses only Blender procedural primitives and does not replace or duplicate an approved production source asset."
+  },
+  "provenance": {
+    "generator": "Blender",
+    "sourceType": "PROCEDURAL_PRIMITIVES",
+    "externalInputs": [],
+    "commercialStatus": "NOT_EVALUATED_TEST_ONLY",
+    "legalQualificationAuthority": "DT-13"
+  },
+  "budget": {
+    "maxTriangles": 2500,
+    "maxMaterials": 8,
+    "requireCollisionProxy": true,
+    "maxGlbBytes": 2097152
+  },
+  "preview": {
+    "width": 512,
+    "height": 512,
+    "maxPngBytes": 2097152
+  },
+  "parameters": {
+    "width": 12.0,
+    "depth": 8.0,
+    "floorHeight": 3.2,
+    "floors": 3,
+    "frontBays": 4,
+    "sideBays": 3,
+    "windowWidth": 1.45,
+    "windowHeight": 1.65,
+    "windowBottom": 0.9,
+    "frameThickness": 0.12,
+    "trimDepth": 0.12,
+    "roofHeight": 1.8,
+    "roofOverhang": 0.35,
+    "bodyColor": [0.58, 0.43, 0.30, 1.0],
+    "trimColor": [0.86, 0.78, 0.65, 1.0],
+    "glassColor": [0.12, 0.24, 0.32, 1.0],
+    "roofColor": [0.28, 0.08, 0.045, 1.0],
+    "doorColor": [0.16, 0.07, 0.035, 1.0]
+  }
+}
