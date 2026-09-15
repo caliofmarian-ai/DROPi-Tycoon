@@ -4,7 +4,7 @@ import { bevelledEnvelope, materialPixels, roofEnvelope } from './imageQualityGe
 import type { QualityGeometry, RoofShape, SurfaceFamily } from './imageQualityGeometry'
 
 export type QualityBuilding = { source: Mesh; roof: Mesh; color: string; roofColor: string; roofShape: RoofShape; roofRise: number; family: 'stone' | 'plaster' }
-export type ImageQualityBinding = { id: string; buildings: readonly QualityBuilding[]; exposure: number; contrast: number }
+export type ImageQualityBinding = { id: string; buildings: readonly QualityBuilding[]; exposure: number; contrast: number; shadowMapSize?: 1024 | 2048 }
 export type ImageQualityHandle = { id: string; replacedBuildings: number; triangles: number; textures: number; dispose(): void }
 const active = new WeakMap<Scene, ImageQualityHandle>()
 /** Reversible presentation only. Imported complete models, colliders and windows are not rewritten. */
@@ -13,6 +13,7 @@ export const installImageQuality = (scene: Scene, binding: ImageQualityBinding):
   const previous = active.get(scene)
   if (previous) { if (previous.id !== binding.id) throw new Error('Quality binding already installed'); return previous }
   if (!binding.id || !binding.buildings.length || binding.buildings.length > 16 || !Number.isFinite(binding.exposure) || binding.exposure < .5 || binding.exposure > 1.5 || !Number.isFinite(binding.contrast) || binding.contrast < .8 || binding.contrast > 1.2) throw new Error('Invalid bounded quality binding')
+  if (binding.shadowMapSize !== undefined && ![1024, 2048].includes(binding.shadowMapSize)) throw new Error('Unsupported shadow pixel budget')
   const seen = new Set<Mesh>()
   const plans = binding.buildings.map(spec => {
     if (!/^#[0-9a-f]{6}$/i.test(spec.color) || !/^#[0-9a-f]{6}$/i.test(spec.roofColor) || !['stone','plaster'].includes(spec.family)) throw new Error('Explicit valid material palette required')
@@ -33,12 +34,19 @@ export const installImageQuality = (scene: Scene, binding: ImageQualityBinding):
   const old = { toneMappingEnabled: config.toneMappingEnabled, toneMappingType: config.toneMappingType, exposure: config.exposure, contrast: config.contrast }
   const anisotropy = Math.min(8, scene.getEngine().getCaps().maxAnisotropy || 1)
   const shadowGenerators = scene.lights.map(light => light.getShadowGenerator()).filter((g): g is ShadowGenerator => g instanceof ShadowGenerator)
+  const shadowState = shadowGenerators.map(generator => ({ generator, mapSize: generator.mapSize, filter: generator.filter, filteringQuality: generator.filteringQuality }))
+  let shadowsChanged = false
   let committed = false, disposed = false
   const cleanup = (): void => {
     for (const [source, visible] of hidden) if (!source.isDisposed()) source.isVisible = visible
     meshes.forEach(mesh => { shadowGenerators.forEach(g => g.removeShadowCaster(mesh)); if (!mesh.isDisposed()) mesh.dispose(false, false) })
     materials.forEach(material => material.dispose(false, false)); textures.forEach(texture => texture.dispose())
     if (committed) Object.assign(config, old)
+    if (shadowsChanged && !scene.isDisposed) for (const snapshot of shadowState) {
+      if (!snapshot.generator.getShadowMap()) continue
+      snapshot.generator.filter = snapshot.filter; snapshot.generator.filteringQuality = snapshot.filteringQuality
+      snapshot.generator.mapSize = snapshot.mapSize
+    }
     hidden.clear(); meshes.length = 0; materials.clear(); textures.length = 0; sets.clear()
   }
   const textureSet = (family: SurfaceFamily) => {
@@ -83,6 +91,16 @@ export const installImageQuality = (scene: Scene, binding: ImageQualityBinding):
     committed = true
     config.toneMappingEnabled = true; config.toneMappingType = ImageProcessingConfiguration.TONEMAPPING_ACES
     config.exposure = binding.exposure; config.contrast = binding.contrast
+    if (binding.shadowMapSize !== undefined) {
+      shadowsChanged = true
+      const maxSize = scene.getEngine().getCaps().maxTextureSize || 1024
+      for (const generator of shadowGenerators) {
+        generator.mapSize = Math.min(binding.shadowMapSize, maxSize)
+        // Babylon falls back to Poisson filtering where WebGL2 PCF is unavailable.
+        generator.usePercentageCloserFiltering = true
+        generator.filteringQuality = ShadowGenerator.QUALITY_MEDIUM
+      }
+    }
     // Do not freeze before the first ready render: shader variants must include final scene lights.
     const handle: ImageQualityHandle = { id: binding.id, replacedBuildings: plans.length, triangles, textures: textures.length, dispose: () => {
       if (disposed) return; disposed = true; cleanup(); active.delete(scene); scene.onDisposeObservable.remove(observer)

@@ -24,7 +24,7 @@ export const applyBrailaImageQuality = (scene: Scene): void => {
       if (!(source instanceof Mesh) || !(roof instanceof Mesh)) throw new Error(`Missing explicit quality source ${profile.name}`)
       return { source, roof, color: profile.color, roofColor: profile.roofColor, roofRise: profile.rise, roofShape: profile.shape, family: profile.family }
     })
-    const handle = installImageQuality(scene, { id: state.id, buildings, exposure: 1.0, contrast: 1.03 })
+    const handle = installImageQuality(scene, { id: state.id, buildings, exposure: 1.0, contrast: 1.03, shadowMapSize: 2048 })
     state.status = 'ACTIVE'; state.buildings = handle.replacedBuildings; state.triangles = handle.triangles; state.textures = handle.textures
     if (typeof document !== 'undefined') document.dispatchEvent(new CustomEvent('dropi:render-clarity', { detail: 'high' }))
   } catch (error) {

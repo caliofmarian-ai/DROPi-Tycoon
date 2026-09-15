@@ -38,6 +38,15 @@ try {
     assert.notDeepEqual(a.positions,b.positions)
     for (const g of [a,b]) { assert.equal(g.uvs.length,g.positions.length/3*2); assert.ok(g.indices.every(i=>i>=0 && i<g.positions.length/3)); assert.ok(g.indices.length/3<30) }
   })
+  check('side walls, bevels and gable ends never collapse texture coordinates', () => {
+    for (const g of [bevelledEnvelope(18,12,14,.16), roofEnvelope(18,12,2,'hip'), roofEnvelope(18,12,2,'gable')]) {
+      for (let i=0;i<g.indices.length;i+=3) {
+        const [a,b,c]=g.indices.slice(i,i+3).map(n=>g.uvs.slice(n*2,n*2+2))
+        const area=(b[0]-a[0])*(c[1]-a[1])-(c[0]-a[0])*(b[1]-a[1])
+        assert.ok(Number.isFinite(area)&&Math.abs(area)>1e-8, 'Nonzero-area physical face needs nonzero-area UVs')
+      }
+    }
+  })
   check('malformed or unbounded dimensions fail closed', () => {
     for (const args of [[NaN,12,14,.16],[18,12,14,9],[0,12,14,.16],[1000,12,14,.16]]) assert.throws(()=>bevelledEnvelope(...args))
     assert.throws(()=>roofEnvelope(18,12,2,'unknown')); assert.throws(()=>roofEnvelope(18,12,20,'hip'))
@@ -68,16 +77,19 @@ try {
     assert.equal(nextResolution({...state,density:2},14,16,100,range).density,2)
   })
   if (!process.argv.includes('--pure-only')) {
-    const { NullEngine,Scene,MeshBuilder,PBRMaterial,VertexData } = await import('@babylonjs/core')
+    const { NullEngine,Scene,MeshBuilder,PBRMaterial,VertexData,DirectionalLight,ShadowGenerator,Vector3 } = await import('@babylonjs/core')
     const { installImageQuality } = await import(compile('imageQualityPresentation'))
     const engine=new NullEngine(),scene=new Scene(engine),m=new PBRMaterial('source',scene)
+    const light = new DirectionalLight('test-sun', new Vector3(-1,-1,.3), scene), shadow = new ShadowGenerator(256, light)
+    const oldShadow = { size: shadow.mapSize, filter: shadow.filter, quality: shadow.filteringQuality }
     const source=MeshBuilder.CreateBox('synthetic-locality', {width:18,height:14,depth:12},scene);source.position.y=7;source.material=m;source.checkCollisions=true
     const roof=MeshBuilder.CreateBox('synthetic-roof',{width:18.3,height:.35,depth:12.3},scene);roof.position.y=14.17;roof.material=m
-    const binding={id:'test-only/quality',buildings:[{source,roof,color:'#c9b89e',roofColor:'#84624e',roofRise:2,roofShape:'hip',family:'plaster'}],exposure:1,contrast:1.03}
+    const binding={id:'test-only/quality',buildings:[{source,roof,color:'#c9b89e',roofColor:'#84624e',roofRise:2,roofShape:'hip',family:'plaster'}],exposure:1,contrast:1.03,shadowMapSize:2048}
     const before={meshes:scene.meshes.length,materials:scene.materials.length,textures:scene.textures.length,vertices:[...source.getVerticesData('position')],config:{toneMappingEnabled:scene.imageProcessingConfiguration.toneMappingEnabled,toneMappingType:scene.imageProcessingConfiguration.toneMappingType,exposure:scene.imageProcessingConfiguration.exposure,contrast:scene.imageProcessingConfiguration.contrast}}
     // PBR source warms the scene-owned shared BRDF texture before the snapshot.
     // That cache belongs to the scene and must not be disposed with our presentation.
-    const sharedTextures = [...scene.textures]
+    const sharedTextures = scene.textures.filter(texture => texture !== shadow.getShadowMap())
+    // The shadow render target is deliberately recreated at another size; its owner and counts must survive, not the old target identity.
     check('real Babylon normals face outwards for envelope and both roofs',()=>{
       for (const [g,cy] of [[bevelledEnvelope(18,12,14,.16),7],[roofEnvelope(18,12,2,'hip'),.5],[roofEnvelope(18,12,2,'gable'),.5]]) {
         const normals=[]; VertexData.ComputeNormals(g.positions,g.indices,normals)
@@ -89,9 +101,11 @@ try {
       handle=installImageQuality(scene,binding);assert.equal(handle.replacedBuildings,1);assert.equal(handle.textures,6);assert.equal(source.isVisible,false);assert.equal(source.isEnabled(),true);assert.equal(source.checkCollisions,true);assert.equal(source.material,m);assert.deepEqual([...source.getVerticesData('position')],before.vertices)
       assert.ok(scene.meshes.filter(x=>x.metadata?.dropiImageQuality).every(x=>!x.checkCollisions&&!x.isPickable))
     })
+    check('shadow pixel budget is hardware bounded and filtering selected',()=>{assert.equal(shadow.mapSize,Math.min(2048,engine.getCaps().maxTextureSize||1024));assert.equal(shadow.filteringQuality,ShadowGenerator.QUALITY_MEDIUM)})
     check('same scene is idempotent and palette change needs disposal',()=>{assert.equal(installImageQuality(scene,binding),handle);assert.throws(()=>installImageQuality(scene,{...binding,id:'other'}))})
     check('disposal restores sources and color processing without leaks',()=>{
       handle.dispose();handle.dispose();assert.equal(source.isVisible,true);assert.equal(roof.isVisible,true);assert.equal(scene.meshes.length,before.meshes);assert.equal(scene.materials.length,before.materials);assert.equal(scene.textures.length,before.textures,scene.textures.map(t=>t.name).join(','));assert.ok(sharedTextures.every(t=>scene.textures.includes(t)))
+      assert.equal(shadow.mapSize,oldShadow.size);assert.equal(shadow.filter,oldShadow.filter);assert.equal(shadow.filteringQuality,oldShadow.quality)
       for(const [k,v]of Object.entries(before.config))assert.equal(scene.imageProcessingConfiguration[k],v)
     })
     check('duplicate and missing bindings fail before presentation mutation',()=>{

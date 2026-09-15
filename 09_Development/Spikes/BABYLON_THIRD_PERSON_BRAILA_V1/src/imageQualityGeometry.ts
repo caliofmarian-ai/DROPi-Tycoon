@@ -7,11 +7,35 @@ const positive = (...values: number[]): void => {
 }
 const polygon = (out: QualityGeometry, points: readonly Point[], tile: number, projection: 'wall' | 'roof' = 'wall'): void => {
   const offset = out.positions.length / 3
-  const dx = points[1]![0] - points[0]![0], dz = points[1]![2] - points[0]![2]
-  const alongX = Math.abs(dx) >= Math.abs(dz)
+  // Derive a real in-plane UV basis. The first edge is vertical for walls;
+  // choosing a world axis from it collapses side-wall / gable UVs to a line.
+  let along: number[] = [1, 0, 0], longest = -1
+  for (let i = 0; i < points.length; i++) {
+    const a = points[i]!, b = points[(i + 1) % points.length]!
+    const edge = [b[0]-a[0], b[1]-a[1], b[2]-a[2]]
+    const length = Math.hypot(...edge)
+    if (Math.abs(edge[1]!) < 1e-8 && length > longest) { along = edge; longest = length }
+  }
+  if (longest <= 1e-8) throw new Error('Quality polygon requires a horizontal texture anchor')
+  along = along.map(value => value / longest)
+  if (along[0]! < -1e-8 || (Math.abs(along[0]!) < 1e-8 && along[2]! < 0)) along = along.map(value => -value)
+  let vertical: number[] = [0, 1, 0]
+  if (projection === 'roof') {
+    let best = 0
+    for (const point of points.slice(1)) {
+      const edge = point.map((value, i) => value - points[0]![i]!)
+      const dot = edge.reduce((sum, value, i) => sum + value * along[i]!, 0)
+      const orthogonal = edge.map((value, i) => value - dot * along[i]!)
+      const length = Math.hypot(...orthogonal)
+      if (length > best) { best = length; vertical = orthogonal.map(value => value / length) }
+    }
+    if (best <= 1e-8) throw new Error('Degenerate quality polygon')
+    if (vertical[1]! < -1e-8 || (Math.abs(vertical[1]!) < 1e-8 && vertical[2]! < 0)) vertical = vertical.map(value => -value)
+  }
   for (const p of points) {
     out.positions.push(...p)
-    out.uvs.push((alongX ? p[0] : p[2]) / tile, (projection === 'roof' ? (alongX ? p[2] : p[0]) : p[1]) / tile)
+    out.uvs.push(p.reduce((sum, value, i) => sum + value * along[i]!, 0) / tile,
+      p.reduce((sum, value, i) => sum + value * vertical[i]!, 0) / tile)
   }
   for (let i = 1; i < points.length - 1; i++) out.indices.push(offset, offset + i + 1, offset + i)
 }
