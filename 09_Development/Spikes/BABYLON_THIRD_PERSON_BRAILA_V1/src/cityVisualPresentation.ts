@@ -74,9 +74,10 @@ export const installCityVisuals = (scene: Scene, bindings: CityVisualBindings): 
         const mesh = MeshBuilder.CreateBox(`city-visual/${spec.id}`, { width: spec.size[0], height: spec.size[1], depth: spec.size[2] }, scene)
         ownedMeshes.push(mesh)
         mesh.position.copyFromFloats(...spec.center); mesh.rotation.y = spec.yaw
-        mesh.material = material(spec.finish, binding.kit.palette[spec.finish], spec.finish === 'glass')
+        const detailMaterial = material(spec.finish, binding.kit.palette[spec.finish], spec.finish === 'glass')
+        mesh.material = detailMaterial
         mesh.computeWorldMatrix(true)
-        const group = groups.get(mesh.material) ?? []; group.push(mesh); groups.set(mesh.material, group)
+        const group = groups.get(detailMaterial) ?? []; group.push(mesh); groups.set(detailMaterial, group)
       }
       // One small group per facade/material; never merge a city or different gameplay entities.
       for (const [m, group] of groups) {
