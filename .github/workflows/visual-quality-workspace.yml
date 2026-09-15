@@ -25,6 +25,7 @@ jobs:
           git rev-parse HEAD > "$RUNNER_TEMP/quality-workspace/SOURCE_SHA.txt"
           cd 09_Development/Spikes/BABYLON_THIRD_PERSON_BRAILA_V1
           npm ci --ignore-scripts --no-audit --no-fund
+          npm run setup:p1
           tar -czf "$RUNNER_TEMP/quality-workspace/dependencies.tar.gz" node_modules
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         with:
