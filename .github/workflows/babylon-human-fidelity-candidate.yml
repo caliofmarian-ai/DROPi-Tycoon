@@ -5,6 +5,7 @@ on:
     paths:
       - '09_Development/Spikes/BABYLON_THIRD_PERSON_BRAILA_V1/scripts/generateMakeHumanFidelityCandidates.py'
       - '09_Development/Spikes/BABYLON_THIRD_PERSON_BRAILA_V1/scripts/configureMpfbAssetRoot.py'
+      - '09_Development/Spikes/BABYLON_THIRD_PERSON_BRAILA_V1/scripts/assessHumanAnimationCompatibility.py'
       - '.github/workflows/babylon-human-fidelity-candidate.yml'
   workflow_dispatch:
 
@@ -17,6 +18,9 @@ env:
   BLENDER_URL: 'https://download.blender.org/release/Blender4.5/blender-4.5.13-linux-x64.tar.xz'
   BLENDER_SHA_URL: 'https://download.blender.org/release/Blender4.5/blender-4.5.13.sha256'
   MAKEHUMAN_ASSET_URL: 'https://files2.makehumancommunity.org/asset_packs/makehuman_system_assets/makehuman_system_assets_cc0.zip'
+  DROPI_NATIVE_ANIMATION_SOURCE_URL: 'https://raw.githubusercontent.com/RRG314/WorldExplorer3D/b5a6a32448fcaa7c5e079ccb78d9d6030de29a00/app/assets/models/characters/city-explorer-v1.glb'
+  DROPI_NATIVE_ANIMATION_SOURCE_SHA256: '0dba57f454956ca5886a2d72e6c5a65f6dc9d45987dc3d47bfe419ff0d0b82b4'
+  DROPI_NATIVE_ANIMATION_SOURCE_BYTES: '1558208'
 
 jobs:
   generate-human-fidelity-candidates:
@@ -166,6 +170,20 @@ jobs:
             | tee "$DROPI_HUMAN_OUT/generation.log"
           test -s "$DROPI_HUMAN_OUT/human-fidelity-report.json"
 
+      - name: Classify compatibility with proven native animation rig
+        shell: bash
+        run: |
+          set -euo pipefail
+          SOURCE="$RUNNER_TEMP/dropi-native-casual-animation-source.glb"
+          curl --fail --location --retry 4 --retry-all-errors --output "$SOURCE" "$DROPI_NATIVE_ANIMATION_SOURCE_URL"
+          test "$(stat -c%s "$SOURCE")" = "$DROPI_NATIVE_ANIMATION_SOURCE_BYTES"
+          echo "$DROPI_NATIVE_ANIMATION_SOURCE_SHA256  $SOURCE" | sha256sum -c -
+          python3 09_Development/Spikes/BABYLON_THIRD_PERSON_BRAILA_V1/scripts/assessHumanAnimationCompatibility.py \
+            "$DROPI_HUMAN_OUT/hero-courier-v1.glb" \
+            "$SOURCE" \
+            "$DROPI_HUMAN_OUT/animation-rig-compatibility.json"
+          test -s "$DROPI_HUMAN_OUT/animation-rig-compatibility.json"
+
       - name: Validate generated human evidence
         shell: bash
         run: |
@@ -195,11 +213,19 @@ jobs:
                   assert png[:8] == b'\x89PNG\r\n\x1a\n'
                   width, height = struct.unpack('>II', png[16:24])
                   assert min(width, height) >= 600, (image, width, height)
+          compatibility = json.loads((root / 'animation-rig-compatibility.json').read_text())
+          assert compatibility['classification'] in {
+              'DIRECT_NATIVE_CLIP_TRANSFER_RENDER_PROOF_ALLOWED',
+              'RETARGET_REQUIRED_BEFORE_RUNTIME_INTEGRATION',
+          }
           print(json.dumps({
               'status': 'PASS',
               'identities': ids,
               'triangles': {entry['identity']: entry['exportStats']['triangles'] for entry in report['identities']},
               'glbBytes': {entry['identity']: entry['glb']['bytes'] for entry in report['identities']},
+              'animationCompatibility': compatibility['classification'],
+              'animationJointOverlap': compatibility['sourceJointOverlap'],
+              'restRotationMaxDeg': compatibility['keyRestRotationMaxDeg'],
           }, indent=2))
           PY
           sha256sum "$DROPI_HUMAN_OUT"/*.glb "$DROPI_HUMAN_OUT"/*.png > "$DROPI_HUMAN_OUT/SHA256SUMS.txt"
