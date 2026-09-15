@@ -90,7 +90,10 @@ try {
       const visual = scene.getMeshByName('city-visual/surface/authoritative-sidewalk')
       assert.equal(visual.checkCollisions, false); assert.equal(visual.isPickable, false)
       assert.notDeepEqual([...visual.getVerticesData('uv')], before.uvs)
-      assert.deepEqual([...visual.getVerticesData('position')], before.positions)
+      // Babylon geometry cloning materializes GPU float32 data. Keep exact
+      // source checks above; compare the clone to the exact float32 conversion,
+      // not a blanket tolerance that could conceal displaced geometry.
+      assert.deepEqual([...visual.getVerticesData('position')], before.positions.map(Math.fround))
     })
     check('same-scene repeat is idempotent; different recipe requires disposal', () => {
       const n = scene.meshes.length
