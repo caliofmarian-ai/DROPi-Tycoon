@@ -9,6 +9,7 @@ style.textContent = `
   #dropi-loading-screen button { padding:10px 20px; border:1px solid #84b7ce; background:#1d4960; color:white; border-radius:8px; }
   html[data-evaluation="ready"] #dropi-loading-screen { display:none; }
   html:not([data-evaluation="ready"]) #controls { pointer-events:none; }
+  html[data-diagnostics="closed"] #dropi-check-summary,
   html[data-diagnostics="closed"] #telemetry,
   html[data-diagnostics="closed"] [id^="dropi-p1-"], html[data-diagnostics="closed"] [id^="dropi-p2-"], html[data-diagnostics="closed"] [id^="dropi-p3-"], html[data-diagnostics="closed"] [id^="dropi-p4-"], html[data-diagnostics="closed"] [id^="dropi-p5-"],
   html[data-diagnostics="closed"] [id^="dropi-realism-"], html[data-diagnostics="closed"] #dropi-perf-rescue-v1,
@@ -53,9 +54,10 @@ const timer = window.setInterval(() => {
     ['Vehicles / vegetation', Boolean(g.__DROPiAuthoredStreetLifeV1?.loaded)],
     ['Street surfaces', Boolean(g.__DROPiAuthoredStreetLayerV1?.loaded)],
     ['Materials', g.__DROPiSurfaceFinish?.status === 'ACTIVE'],
+    ['Image quality', g.__DROPiWorldQualityV2?.status === 'ACTIVE'],
     ['Contact controller', contact?.status === 'ACTIVE' && contact.renderedSampleId > 0 && contact.mechanicalStatus === 'PASS'],
   ] as const
-  const failures = [g.__DROPiBabylonSpikeFailure?.message, g.__DROPiRiggedHeroV1?.error, g.__DROPiHumanoidPedestrians?.error, g.__DROPiAuthoredEnvironmentV1?.error, g.__DROPiAuthoredBlocksV1?.error, g.__DROPiAuthoredStreetLifeV1?.error, g.__DROPiAuthoredStreetLayerV1?.error, g.__DROPiSurfaceFinish?.error, contact?.status === 'FAIL' ? contact.error || 'Contact controller failed' : ''].filter(Boolean)
+  const failures = [g.__DROPiBabylonSpikeFailure?.message, g.__DROPiRiggedHeroV1?.error, g.__DROPiHumanoidPedestrians?.error, g.__DROPiAuthoredEnvironmentV1?.error, g.__DROPiAuthoredBlocksV1?.error, g.__DROPiAuthoredStreetLifeV1?.error, g.__DROPiAuthoredStreetLayerV1?.error, g.__DROPiSurfaceFinish?.error, g.__DROPiWorldQualityV2?.error, contact?.status === 'FAIL' ? contact.error || 'Contact controller failed' : ''].filter(Boolean)
   const complete = checks.every(([, ok]) => ok)
   if (failures.length || (!ready && performance.now() - started > 75000)) {
     failed = true; ready = false; root.dataset.evaluation = 'failed'; retry.hidden = false
@@ -74,6 +76,6 @@ const timer = window.setInterval(() => {
   const densityText = finite(resolution?.density) ? ` · Q ${resolution.density.toFixed(2)}` : ''
   summary.textContent = `EVAL ${sha} · CONTACT ${mechanical}${frameText}${poseText}${densityText}${resolution?.overloaded ? ' · FRAME BUDGET EXCEEDED' : ''}`
   summary.style.color = mechanical === 'FAIL' || failed ? '#ffb6ac' : '#e9dba4'
-  g.__DROPiEvaluationReadiness = { status: failed ? 'FAIL' : ready ? 'READY' : 'LOADING', checks: Object.fromEntries(checks), error: failures[0] ?? '', visualAcceptance: 'UNKNOWN' }
+  g.__DROPiEvaluationReadiness = { status: failed ? 'FAIL' : ready ? 'READY' : 'LOADING', checks: Object.fromEntries(checks), quality: g.__DROPiWorldQualityV2 ?? null, error: failures[0] ?? '', visualAcceptance: 'UNKNOWN' }
 }, 250)
 window.addEventListener('pagehide', () => window.clearInterval(timer), { once: true })

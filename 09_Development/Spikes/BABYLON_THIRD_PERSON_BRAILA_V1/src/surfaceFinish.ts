@@ -86,7 +86,7 @@ const boot = (): void => {
           if (hero && shadowMap) shadowMap.renderList = scene.meshes.filter(mesh => {
             if (!mesh.isEnabled() || !mesh.isVisible || mesh.getTotalVertices() <= 0) return false
             if (mesh.skeleton) return !mesh.name.startsWith('npc-human-') || Vector3.DistanceSquared(mesh.getBoundingInfo().boundingBox.centerWorld, hero.position) < 28 * 28
-            return (mesh.name.startsWith('p3-car-') || mesh.name.startsWith('p3-shell-') || ['dropi-hq', 'maras-market', 'customer-block', 'hero-parcel'].includes(mesh.name)) && Vector3.DistanceSquared(mesh.getBoundingInfo().boundingBox.centerWorld, hero.position) < 70 * 70
+            return (mesh.metadata?.dropiQualityCaster === true || mesh.name.startsWith('p3-car-') || mesh.name.startsWith('p3-shell-') || ['dropi-hq', 'maras-market', 'customer-block', 'hero-parcel'].includes(mesh.name)) && Vector3.DistanceSquared(mesh.getBoundingInfo().boundingBox.centerWorld, hero.position) < 70 * 70
           })
         }
         publish()
