@@ -34,11 +34,12 @@ class BuildingV1RequestTests(unittest.TestCase):
         self.assertLessEqual(params["sideBays"], 6)
         self.assertLessEqual(budget["maxTriangles"], 5000)
         self.assertLessEqual(budget["maxMaterials"], 8)
+        self.assertLessEqual(params["bodyTextureSize"], 256)
 
-    def test_preview_budget_is_bounded(self):
+    def test_preview_budget_is_bounded_high_resolution(self):
         preview = self.request["preview"]
-        self.assertEqual(preview["width"], 512)
-        self.assertEqual(preview["height"], 512)
+        self.assertEqual(preview["width"], 1024)
+        self.assertEqual(preview["height"], 1024)
         self.assertLessEqual(preview["maxPngBytes"], 2097152)
 
 
