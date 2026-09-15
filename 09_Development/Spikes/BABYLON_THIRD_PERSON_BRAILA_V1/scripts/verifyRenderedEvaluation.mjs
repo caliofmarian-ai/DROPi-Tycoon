@@ -40,13 +40,13 @@ const evaluate=async expression=>{
   if(r.exceptionDetails)throw new Error(r.exceptionDetails.exception?.description??r.exceptionDetails.text)
   return r.result?.value
 }
-const snapshot=()=>evaluate(`(()=>({ready:window.__DROPiEvaluationReadiness,contact:window.__DROPiContactRuntime,hero:window.__DROPiRiggedHeroV1,humans:window.__DROPiHumanoidPedestrians,resolution:window.__DROPiRenderQuality,camera:window.__DROPiCameraAuthorityV3?.getState(),surfaces:window.__DROPiSurfaceFinish,cityVisuals:window.__DROPiCityVisualRecipe,streetLife:window.__DROPiAuthoredStreetLifeV1,blocks:window.__DROPiAuthoredBlocksV1,streets:window.__DROPiAuthoredStreetLayerV1,rendererFailure:window.__DROPiBabylonSpikeFailure,buildSha:window.__DROPiBabylonSpike?.buildSha,phase:window.__DROPiBabylonSpike?.getPhase(),position:globalThis.__dropiTestScene?(()=>{const p=__dropiTestScene.getTransformNodeByName('hero').position;return{x:p.x,y:p.y,z:p.z}})():null}))()`)
+const snapshot=()=>evaluate(`(()=>({ready:window.__DROPiEvaluationReadiness,contact:window.__DROPiContactRuntime,hero:window.__DROPiRiggedHeroV1,humans:window.__DROPiHumanoidPedestrians,resolution:window.__DROPiRenderQuality,camera:window.__DROPiCameraAuthorityV3?.getState(),surfaces:window.__DROPiSurfaceFinish,cityVisuals:window.__DROPiCityVisualRecipe,imageQuality:window.__DROPiImageQuality,streetLife:window.__DROPiAuthoredStreetLifeV1,blocks:window.__DROPiAuthoredBlocksV1,streets:window.__DROPiAuthoredStreetLayerV1,rendererFailure:window.__DROPiBabylonSpikeFailure,buildSha:window.__DROPiBabylonSpike?.buildSha,phase:window.__DROPiBabylonSpike?.getPhase(),position:globalThis.__dropiTestScene?(()=>{const p=__dropiTestScene.getTransformNodeByName('hero').position;return{x:p.x,y:p.y,z:p.z}})():null}))()`)
 const fresh=(c,after)=>Number.isInteger(c?.sampleId)&&c.sampleId>after&&c.renderedSampleId===c.sampleId
 assert.equal(fresh({sampleId:4,renderedSampleId:4},4),false);assert.equal(fresh({sampleId:5,renderedSampleId:4},4),false);assert.equal(fresh({sampleId:5,renderedSampleId:5},4),true);assert.equal(fresh({sampleId:NaN,renderedSampleId:NaN},4),false)
 evidence.tests.push('repeated/unfinished/missing pose samples rejected')
 const healthy=s=>{
   assert.equal(evidence.errors.length,0,'Uncaught browser exceptions')
-  if(s.rendererFailure||s.ready?.status==='FAIL'||s.cityVisuals?.status==='FAIL'||s.contact?.status==='FAIL'||s.contact?.error||s.contact?.mechanicalStatus==='FAIL'||s.camera?.occlusion==='FAIL')throw new Error(`Runtime failure: ${JSON.stringify(s)}`)
+  if(s.rendererFailure||s.ready?.status==='FAIL'||s.cityVisuals?.status==='FAIL'||s.imageQuality?.status==='FAIL'||s.contact?.status==='FAIL'||s.contact?.error||s.contact?.mechanicalStatus==='FAIL'||s.camera?.occlusion==='FAIL')throw new Error(`Runtime failure: ${JSON.stringify(s)}`)
 }
 const waitForPose=async(label,predicate,after=-1,timeoutMs=30000)=>{
   const deadline=Date.now()+timeoutMs;let last,observed=after,matching=0
@@ -81,7 +81,7 @@ try{
     if(m.id){const task=pending.get(m.id);if(!task)return;pending.delete(m.id);if(m.error)task.reject(new Error(JSON.stringify(m.error)));else task.resolve(m.result)}else if(m.method==='Runtime.exceptionThrown')evidence.errors.push(m.params.exceptionDetails)
   })
   await send('Page.enable');await send('Runtime.enable');await send('Emulation.setDeviceMetricsOverride',{width:960,height:432,deviceScaleFactor:2.25,mobile:true});await send('Emulation.setTouchEmulationEnabled',{enabled:true,maxTouchPoints:1});await send('Page.navigate',{url})
-  let state=await waitForPose('complete startup',s=>s.ready?.status==='READY'&&s.contact?.status==='ACTIVE'&&s.cityVisuals?.status==='ACTIVE',-1,100000)
+  let state=await waitForPose('complete startup',s=>s.ready?.status==='READY'&&s.contact?.status==='ACTIVE'&&s.cityVisuals?.status==='ACTIVE'&&s.imageQuality?.status==='ACTIVE',-1,100000)
   evidence.tests.push('complete scene/8 pedestrians/materials/rendered contact/city recipe READY')
   state=await frame('01-city-start','Real compiled renderer at 960x432 CSS viewport; software WebGL only');healthy(state)
   const firstVisible=evidence.frames.at(-1).pixels.nonblank
@@ -95,10 +95,20 @@ try{
   assert.equal(state.cityVisuals.facades,3);assert.equal(state.cityVisuals.surfaces,7);assert.equal(state.cityVisuals.textures,2)
   assert.ok(state.cityVisuals.drawMeshes<=22&&state.cityVisuals.materials<=9,'City visual resource budget exceeded')
   evidence.tests.push({cityVisualRecipe:state.cityVisuals})
+  assert.equal(state.imageQuality.status,'ACTIVE');assert.equal(state.imageQuality.buildings,10)
+  assert.equal(state.imageQuality.textures,9);assert.ok(state.imageQuality.triangles<=720)
+  assert.equal(state.resolution.profile,'HIGH_CLARITY')
+  assert.equal(state.resolution.pixelBudget,2_073_600)
+  assert.ok(state.resolution.actualWidth>=1440&&state.resolution.actualHeight>=648,'High-clarity output not active')
+  evidence.tests.push({imageQuality:state.imageQuality,actualRenderPixels:state.resolution.actualWidth*state.resolution.actualHeight})
   assert.equal(state.humans.visibleHumans,8);assert.equal(state.streetLife.authoredVehicles,3);assert.equal(state.streets.loaded,true);assert.ok(state.resolution.actualWidth>=900&&state.resolution.actualHeight>=400,'Below clarity floor')
   const chunk=(await readdir(path.join(dist,'assets'))).find(n=>/^engineStore-.*\.js$/.test(n))
   if(!chunk)throw new Error('Missing engineStore inspection module')
   await evaluate(`(async()=>{const m=await import('/assets/${chunk}'),store=Object.values(m).find(v=>typeof v==='function'&&'LastCreatedScene'in v);if(!store?.LastCreatedScene)throw new Error('No scene');globalThis.__dropiTestScene=store.LastCreatedScene})()`)
+  const qualityMeshes=await evaluate(`(()=>{const s=__dropiTestScene;return s.meshes.filter(m=>m.metadata?.dropiImageQuality).map(m=>({name:m.name,visible:m.isVisible&&m.isEnabled(),ready:m.material?.isReady(m),pbr:m.material?.getClassName(),vertices:m.getTotalVertices(),normalTexture:m.material?.bumpTexture?.name}))})()`)
+  assert.equal(qualityMeshes.length,20)
+  assert.ok(qualityMeshes.every(m=>m.visible&&m.ready&&m.pbr==='PBRMaterial'&&m.vertices>0&&m.normalTexture),'Quality geometry or PBR shader not actually ready')
+  evidence.tests.push({qualityMeshes})
   const assembly=await evaluate(`(()=>{const s=__dropiTestScene;return{cars:['car-1','car-2','car-3'].map(name=>({name,visibleParts:s.getTransformNodeByName(name).getChildMeshes(false).filter(m=>m.isEnabled()&&m.isVisible&&m.getTotalVertices()>0).map(m=>({name:m.name,material:m.material?.name}))})),ghostCount:s.meshes.filter(m=>m.isEnabled()&&m.isVisible&&(/^npc-\\d+$/.test(m.name)||m.name.startsWith('hero-motion-'))).length}})()`)
   for(const c of assembly.cars){assert.ok(c.visibleParts.some(p=>/wheel/i.test(p.name)),`${c.name}: wheels`);assert.ok(c.visibleParts.some(p=>/window/i.test(p.material)),`${c.name}: glass`)}assert.equal(assembly.ghostCount,0);evidence.tests.push({completeAssemblies:assembly})
   const moveTo=async(x,z)=>{

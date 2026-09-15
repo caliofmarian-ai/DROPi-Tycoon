@@ -20,7 +20,6 @@ env:
   DROPI_HEAD_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
   DROPI_RUN_ID: ${{ github.run_id }}
   DROPI_RUN_ATTEMPT: ${{ github.run_attempt }}
-  DROPI_ANDROID_VERSION_CODE: ${{ github.run_number }}
   DROPI_PACKAGE_ID: com.dropi.tycoon.babyloneval
   VITE_COMMIT_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
 
@@ -73,10 +72,19 @@ jobs:
           test -n "$ANDROID_HOME"
           test -x "$ANDROID_HOME/platform-tools/adb"
 
+      - name: Resolve explicit owner release and verified signing identity
+        shell: bash
+        run: |
+          set -euo pipefail
+          IDENTITY=09_Development/Spikes/BABYLON_THIRD_PERSON_BRAILA_V1/scripts/evaluationReleaseIdentity.mjs
+          echo "DROPI_ANDROID_VERSION_CODE=$(node "$IDENTITY")" >> "$GITHUB_ENV"
+          echo "DROPI_UPGRADE_PROBE_VERSION=$(node "$IDENTITY" --probe)" >> "$GITHUB_ENV"
+          echo "DROPI_REFERENCE_SIGNER=$(node "$IDENTITY" --signer)" >> "$GITHUB_ENV"
+
       - name: Verify Android AVD discovery regression contract
         working-directory: 09_Development/Spikes/BABYLON_THIRD_PERSON_BRAILA_V1
         shell: bash
-        run: node --test scripts/verifyAndroidOwnerAvd.test.mjs scripts/verifyAndroidOwnerAbiIsolation.test.mjs
+        run: node --test scripts/verifyAndroidOwnerAvd.test.mjs scripts/verifyAndroidOwnerAbiIsolation.test.mjs scripts/verifyEvaluationReleaseIdentity.test.mjs
 
       - name: Build exact tested static Babylon payload
         working-directory: 09_Development/Spikes/BABYLON_THIRD_PERSON_BRAILA_V1
@@ -148,6 +156,26 @@ jobs:
           "$DROPI_BUILD_TOOLS/zipalign" -c -P 16 -v 4 "$DROPI_EMULATOR_APK"
           "$DROPI_BUILD_TOOLS/aapt" dump badging "$DROPI_EMULATOR_APK" | grep -F "package: name='$DROPI_PACKAGE_ID'"
           "$DROPI_BUILD_TOOLS/aapt" dump badging "$DROPI_EMULATOR_APK" | grep -Fx "native-code: 'x86_64'"
+
+      - name: Prepare lower-version update probe without altering the candidate
+        shell: bash
+        run: |
+          set -euo pipefail
+          IDENTITY="$GITHUB_WORKSPACE/09_Development/Spikes/BABYLON_THIRD_PERSON_BRAILA_V1/scripts/evaluationReleaseIdentity.mjs"
+          GRADLE_FILE="$DROPI_STAGE_ROOT/game-mobile/android/app/build.gradle"
+          node "$IDENTITY" prepare "$GRADLE_FILE"
+          restore_probe() { node "$IDENTITY" restore "$GRADLE_FILE"; }
+          trap restore_probe EXIT
+          cd "$DROPI_STAGE_ROOT/game-mobile/android"
+          CI=1 NODE_ENV=production EXPO_PUBLIC_DROPITYCOON_RUNTIME_MODE=bundled \
+            ./gradlew --no-daemon --stacktrace :app:assembleRelease -PreactNativeArchitectures=x86_64
+          cp app/build/outputs/apk/release/app-release.apk "$RUNNER_TEMP/dropi-update-probe.apk"
+          "$DROPI_BUILD_TOOLS/aapt" dump badging "$RUNNER_TEMP/dropi-update-probe.apk" | grep -F "versionCode='$DROPI_UPGRADE_PROBE_VERSION'"
+          for APK in "$DROPI_EMULATOR_APK" "$RUNNER_TEMP/dropi-update-probe.apk"; do
+            CERT="$("$DROPI_BUILD_TOOLS/apksigner" verify --print-certs "$APK" | sed -n 's/^Signer #1 certificate SHA-256 digest: //p')"
+            test "$CERT" = "$DROPI_REFERENCE_SIGNER"
+          done
+          echo "DROPI_UPDATE_PROBE_APK=$RUNNER_TEMP/dropi-update-probe.apk" >> "$GITHUB_ENV"
 
       - name: Install and launch x86_64 preflight on clean Android emulator
         shell: bash
@@ -222,8 +250,15 @@ jobs:
           DEVICE_ABILIST="$("$ADB" shell getprop ro.product.cpu.abilist | tr -d '\r')"
           echo "Android emulator ABI: $DEVICE_ABI ($DEVICE_ABILIST)"
           test "$DEVICE_ABI" = 'x86_64'
+          # The fixture is current payload with the observed legacy version 16.
+          # It proves Android update mechanics/signing, not migration of old saves.
+          "$ADB" install "$DROPI_UPDATE_PROBE_APK" | tee "$RUNNER_TEMP/dropi-probe-install.txt"
+          grep -Fxq 'Success' "$RUNNER_TEMP/dropi-probe-install.txt"
+          "$ADB" shell dumpsys package "$DROPI_PACKAGE_ID" | grep -F "versionCode=$DROPI_UPGRADE_PROBE_VERSION "
           "$ADB" install -r "$DROPI_EMULATOR_APK" | tee "$RUNNER_TEMP/dropi-adb-install.txt"
           grep -Fxq 'Success' "$RUNNER_TEMP/dropi-adb-install.txt"
+          "$ADB" shell dumpsys package "$DROPI_PACKAGE_ID" | grep -F "versionCode=$DROPI_ANDROID_VERSION_CODE "
+          echo 'DROPI_EMULATOR_UPDATE_PROBE=PASS' >> "$GITHUB_ENV"
           "$ADB" shell pm path "$DROPI_PACKAGE_ID" | grep -F "package:"
           "$ADB" logcat -c
           "$ADB" shell monkey -p "$DROPI_PACKAGE_ID" -c android.intent.category.LAUNCHER 1
@@ -285,6 +320,8 @@ jobs:
           ABI_LIST="$(unzip -Z1 "$APK_PATH" | sed -n 's#^lib/\([^/]*\)/.*#\1#p' | sort -u | paste -sd, -)"
           test "$ABI_LIST" = 'arm64-v8a'
           "$DROPI_BUILD_TOOLS/apksigner" verify --verbose --print-certs "$APK_PATH"
+          CERT="$("$DROPI_BUILD_TOOLS/apksigner" verify --print-certs "$APK_PATH" | sed -n 's/^Signer #1 certificate SHA-256 digest: //p')"
+          test "$CERT" = "$DROPI_REFERENCE_SIGNER"
           "$DROPI_BUILD_TOOLS/zipalign" -c -P 16 -v 4 "$APK_PATH"
           "$DROPI_BUILD_TOOLS/aapt" dump badging "$APK_PATH" | grep -F "package: name='$DROPI_PACKAGE_ID'"
           "$DROPI_BUILD_TOOLS/aapt" dump badging "$APK_PATH" | grep -Fx "native-code: 'arm64-v8a'"
@@ -310,6 +347,11 @@ jobs:
             echo "architecture_matched_emulator_preflight_launch=$DROPI_EMULATOR_LAUNCH"
             echo "architecture_matched_emulator_stable_15s=$DROPI_EMULATOR_STABLE_15S"
             echo "emulator_preflight_bytes=$DROPI_EMULATOR_APK_SIZE"
+            echo "candidate_version_code=$DROPI_ANDROID_VERSION_CODE"
+            echo "lower_version_probe=$DROPI_UPGRADE_PROBE_VERSION"
+            echo "emulator_update_mechanics=$DROPI_EMULATOR_UPDATE_PROBE"
+            echo 'exact_old_payload_save_migration=UNKNOWN_NOT_TESTED_BY_VERSION_FIXTURE'
+            echo "verified_previous_signer_sha256=$DROPI_REFERENCE_SIGNER"
             echo 'final_abi=arm64-v8a'
             echo 'final_arm64_physical_install=UNKNOWN_UNTIL_OWNER_DEVICE_TEST'
             echo 'apk_signature_v2_or_newer=PASS'
