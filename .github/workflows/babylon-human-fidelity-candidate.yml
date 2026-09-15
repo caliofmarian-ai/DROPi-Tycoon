@@ -1,0 +1,176 @@
+name: Babylon Human Fidelity Candidate
+
+on:
+  pull_request:
+    paths:
+      - '09_Development/Spikes/BABYLON_THIRD_PERSON_BRAILA_V1/scripts/generateMakeHumanFidelityCandidates.py'
+      - '09_Development/Spikes/BABYLON_THIRD_PERSON_BRAILA_V1/scripts/configureMpfbAssetRoot.py'
+      - '.github/workflows/babylon-human-fidelity-candidate.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+env:
+  BLENDER_VERSION: '4.5.13'
+  MPFB_COMMIT: '437dd513888a92399d1d3200d2e80859fae55abc'
+  BLENDER_URL: 'https://download.blender.org/release/Blender4.5/blender-4.5.13-linux-x64.tar.xz'
+  BLENDER_SHA_URL: 'https://download.blender.org/release/Blender4.5/blender-4.5.13.sha256'
+  MAKEHUMAN_ASSET_URL: 'https://files2.makehumancommunity.org/asset_packs/makehuman_system_assets/makehuman_system_assets_cc0.zip'
+
+jobs:
+  generate-human-fidelity-candidates:
+    name: Generate governed human fidelity candidates
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+
+    steps:
+      - name: Checkout exact source head
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          persist-credentials: false
+
+      - name: Verify exact checkout identity
+        shell: bash
+        run: |
+          set -euo pipefail
+          EXPECTED='${{ github.event.pull_request.head.sha || github.sha }}'
+          ACTUAL="$(git rev-parse HEAD)"
+          test "$ACTUAL" = "$EXPECTED"
+          echo "DROPI_HUMAN_HEAD=$ACTUAL" >> "$GITHUB_ENV"
+          echo "HOME=$RUNNER_TEMP/dropi-blender-home" >> "$GITHUB_ENV"
+          echo "DROPI_HUMAN_OUT=$RUNNER_TEMP/dropi-human-fidelity-$ACTUAL" >> "$GITHUB_ENV"
+          mkdir -p "$RUNNER_TEMP/dropi-blender-home" "$RUNNER_TEMP/dropi-human-fidelity-$ACTUAL"
+
+      - name: Download and verify pinned Blender
+        shell: bash
+        run: |
+          set -euo pipefail
+          cd "$RUNNER_TEMP"
+          curl --fail --location --retry 4 --retry-all-errors --output blender.tar.xz "$BLENDER_URL"
+          curl --fail --location --retry 4 --retry-all-errors --output blender.sha256 "$BLENDER_SHA_URL"
+          grep "blender-$BLENDER_VERSION-linux-x64.tar.xz" blender.sha256 | sha256sum -c -
+          tar -xf blender.tar.xz
+          BLENDER="$RUNNER_TEMP/blender-$BLENDER_VERSION-linux-x64/blender"
+          test -x "$BLENDER"
+          "$BLENDER" --version | sed -n '1,2p'
+          echo "DROPI_BLENDER=$BLENDER" >> "$GITHUB_ENV"
+
+      - name: Fetch exact MPFB source and build extension package
+        shell: bash
+        run: |
+          set -euo pipefail
+          MPFB_DIR="$RUNNER_TEMP/mpfb2"
+          git init -q "$MPFB_DIR"
+          git -C "$MPFB_DIR" remote add origin https://github.com/makehumancommunity/mpfb2.git
+          git -C "$MPFB_DIR" fetch --depth 1 origin "$MPFB_COMMIT"
+          git -C "$MPFB_DIR" checkout -q FETCH_HEAD
+          test "$(git -C "$MPFB_DIR" rev-parse HEAD)" = "$MPFB_COMMIT"
+          "$DROPI_BLENDER" --command extension build \
+            --source-dir "$MPFB_DIR/src/mpfb" \
+            --output-filepath "$RUNNER_TEMP/mpfb-$MPFB_COMMIT.zip" \
+            --valid-tags=""
+          test -s "$RUNNER_TEMP/mpfb-$MPFB_COMMIT.zip"
+          cp "$MPFB_DIR/LICENSE.md" "$DROPI_HUMAN_OUT/MPFB-LICENSE.md"
+          cp "$MPFB_DIR/LICENSE.ASSETS.md" "$DROPI_HUMAN_OUT/MPFB-ASSET-LICENSE.md"
+
+      - name: Install and enable MPFB in isolated Blender profile
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/dropi-blender-extensions"
+          "$DROPI_BLENDER" --command extension repo-add dropi_human \
+            --name 'DROPi isolated human candidate repo' \
+            --directory "$RUNNER_TEMP/dropi-blender-extensions" \
+            --clear-all
+          "$DROPI_BLENDER" --command extension install-file -r dropi_human -e "$RUNNER_TEMP/mpfb-$MPFB_COMMIT.zip"
+          "$DROPI_BLENDER" --command extension list | tee "$DROPI_HUMAN_OUT/blender-extension-list.txt"
+          grep -i -q 'mpfb' "$DROPI_HUMAN_OUT/blender-extension-list.txt"
+
+      - name: Download MakeHuman CC0 system asset pack
+        shell: bash
+        run: |
+          set -euo pipefail
+          PACK="$RUNNER_TEMP/makehuman_system_assets_cc0.zip"
+          ASSET_UNPACK="$RUNNER_TEMP/makehuman-system-assets"
+          curl --fail --location --retry 4 --retry-all-errors --output "$PACK" "$MAKEHUMAN_ASSET_URL"
+          ASSET_SHA="$(sha256sum "$PACK" | awk '{print $1}')"
+          unzip -q "$PACK" -d "$ASSET_UNPACK"
+          PACK_META="$(find "$ASSET_UNPACK" -type f -path '*/packs/makehuman_system_assets.json' -print -quit)"
+          test -n "$PACK_META"
+          ASSET_ROOT="$(dirname "$(dirname "$PACK_META")")"
+          test -d "$ASSET_ROOT/skins"
+          test -d "$ASSET_ROOT/eyes"
+          test -d "$ASSET_ROOT/hair"
+          test -d "$ASSET_ROOT/clothes"
+          echo "DROPI_MAKEHUMAN_ASSET_SHA256=$ASSET_SHA" >> "$GITHUB_ENV"
+          echo "DROPI_MAKEHUMAN_ASSET_ROOT=$ASSET_ROOT" >> "$GITHUB_ENV"
+          {
+            echo "MakeHuman system assets source: $MAKEHUMAN_ASSET_URL"
+            echo "Downloaded SHA-256: $ASSET_SHA"
+            echo 'Declared source family: MakeHuman system assets / CC0 candidate; exact release qualification remains DT-13 authority.'
+          } > "$DROPI_HUMAN_OUT/makehuman-system-assets-source.txt"
+
+      - name: Configure MPFB asset root
+        shell: bash
+        run: |
+          set -euo pipefail
+          "$DROPI_BLENDER" --background \
+            --python 09_Development/Spikes/BABYLON_THIRD_PERSON_BRAILA_V1/scripts/configureMpfbAssetRoot.py
+
+      - name: Generate three distinct rigged human candidates
+        shell: bash
+        run: |
+          set -euo pipefail
+          export DROPI_MPFB_COMMIT="$MPFB_COMMIT"
+          "$DROPI_BLENDER" --background \
+            --python 09_Development/Spikes/BABYLON_THIRD_PERSON_BRAILA_V1/scripts/generateMakeHumanFidelityCandidates.py \
+            | tee "$DROPI_HUMAN_OUT/generation.log"
+
+      - name: Validate generated human evidence
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import hashlib, json, os, pathlib, struct
+          root = pathlib.Path(os.environ['DROPI_HUMAN_OUT'])
+          report = json.loads((root / 'human-fidelity-report.json').read_text())
+          assert report['status'] == 'CANDIDATE_NOT_RELEASE_CLEARED'
+          ids = [entry['identity'] for entry in report['identities']]
+          assert ids == ['hero-courier-v1', 'specialist-logistics-v1', 'specialist-technical-v1']
+          assert len({json.dumps(entry['macro'], sort_keys=True) for entry in report['identities']}) == 3
+          for entry in report['identities']:
+              assert len(entry['facialTargets']) >= 6, entry['identity']
+              assert entry['exportStats']['triangles'] > 10000, entry
+              path = root / entry['glb']['file']
+              data = path.read_bytes()
+              assert data[:4] == b'glTF', path
+              assert len(data) == entry['glb']['bytes']
+              assert hashlib.sha256(data).hexdigest() == entry['glb']['sha256']
+              assert len(data) > 500_000, path
+              for side in ('a', 'b'):
+                  for framing in ('full', 'face'):
+                      image = root / f"{entry['identity']}-{side}-{framing}.png"
+                      assert image.exists() and image.stat().st_size > 25_000, image
+                      png = image.read_bytes()
+                      assert png[:8] == b'\x89PNG\r\n\x1a\n'
+                      width, height = struct.unpack('>II', png[16:24])
+                      assert width >= 700 and height >= 700, (image, width, height)
+          print(json.dumps({
+              'status': 'PASS',
+              'identities': ids,
+              'triangles': {entry['identity']: entry['exportStats']['triangles'] for entry in report['identities']},
+              'glbBytes': {entry['identity']: entry['glb']['bytes'] for entry in report['identities']},
+          }, indent=2))
+          PY
+          sha256sum "$DROPI_HUMAN_OUT"/*.glb "$DROPI_HUMAN_OUT"/*.png > "$DROPI_HUMAN_OUT/SHA256SUMS.txt"
+
+      - name: Upload human fidelity candidate evidence
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: dropi-human-fidelity-${{ github.event.pull_request.head.sha || github.sha }}
+          path: ${{ runner.temp }}/dropi-human-fidelity-${{ github.event.pull_request.head.sha || github.sha }}
+          if-no-files-found: error
+          compression-level: 6
+          retention-days: 14
