@@ -1,12 +1,19 @@
-import { Color3, ImageProcessingConfiguration, Material, Mesh, PBRMaterial, Scene, ShadowGenerator, Texture, VertexData } from '@babylonjs/core'
+import { Color3, Color4, DirectionalLight, HemisphericLight, ImageProcessingConfiguration, Material, Mesh, PBRMaterial, Scene, ShadowGenerator, Texture, VertexData } from '@babylonjs/core'
 import { RawTexture } from '@babylonjs/core/Materials/Textures/rawTexture'
 import { bevelledEnvelope, materialPixels, roofEnvelope } from './imageQualityGeometry'
 import type { QualityGeometry, RoofShape, SurfaceFamily } from './imageQualityGeometry'
 
 export type QualityBuilding = { source: Mesh; roof: Mesh; color: string; roofColor: string; roofShape: RoofShape; roofRise: number; family: 'stone' | 'plaster' }
-export type ImageQualityBinding = { id: string; buildings: readonly QualityBuilding[]; exposure: number; contrast: number; shadowMapSize?: 1024 | 2048 }
+export type ImageQualityAtmosphere = {
+  sunName: string; ambientName: string
+  sunIntensity: number; ambientIntensity: number
+  sunColor: string; ambientColor: string; groundColor: string
+  clearColor: string; fogColor: string; fogDensity: number
+}
+export type ImageQualityBinding = { id: string; buildings: readonly QualityBuilding[]; exposure: number; contrast: number; shadowMapSize?: 1024 | 2048; atmosphere?: ImageQualityAtmosphere }
 export type ImageQualityHandle = { id: string; replacedBuildings: number; triangles: number; textures: number; dispose(): void }
 const active = new WeakMap<Scene, ImageQualityHandle>()
+const hex = (value: string): boolean => /^#[0-9a-f]{6}$/i.test(value)
 /** Reversible presentation only. Imported complete models, colliders and windows are not rewritten. */
 export const installImageQuality = (scene: Scene, binding: ImageQualityBinding): ImageQualityHandle => {
   if (scene.isDisposed) throw new Error('Disposed quality scene')
@@ -14,6 +21,10 @@ export const installImageQuality = (scene: Scene, binding: ImageQualityBinding):
   if (previous) { if (previous.id !== binding.id) throw new Error('Quality binding already installed'); return previous }
   if (!binding.id || !binding.buildings.length || binding.buildings.length > 16 || !Number.isFinite(binding.exposure) || binding.exposure < .5 || binding.exposure > 1.5 || !Number.isFinite(binding.contrast) || binding.contrast < .8 || binding.contrast > 1.2) throw new Error('Invalid bounded quality binding')
   if (binding.shadowMapSize !== undefined && ![1024, 2048].includes(binding.shadowMapSize)) throw new Error('Unsupported shadow pixel budget')
+  if (binding.atmosphere) {
+    const a = binding.atmosphere
+    if (!a.sunName || !a.ambientName || ![a.sunIntensity,a.ambientIntensity,a.fogDensity].every(Number.isFinite) || a.sunIntensity < .2 || a.sunIntensity > 2 || a.ambientIntensity < .1 || a.ambientIntensity > 1.5 || a.fogDensity < 0 || a.fogDensity > .02 || ![a.sunColor,a.ambientColor,a.groundColor,a.clearColor,a.fogColor].every(hex)) throw new Error('Invalid bounded filmic atmosphere')
+  }
   const seen = new Set<Mesh>()
   const plans = binding.buildings.map(spec => {
     if (!/^#[0-9a-f]{6}$/i.test(spec.color) || !/^#[0-9a-f]{6}$/i.test(spec.roofColor) || !['stone','plaster'].includes(spec.family)) throw new Error('Explicit valid material palette required')
@@ -28,6 +39,15 @@ export const installImageQuality = (scene: Scene, binding: ImageQualityBinding):
       roofGeometry: roofEnvelope(r.maximumWorld.x - r.minimumWorld.x, r.maximumWorld.z - r.minimumWorld.z, spec.roofRise, spec.roofShape),
     }
   })
+  const atmosphere = binding.atmosphere
+  const sun = atmosphere ? scene.getLightByName(atmosphere.sunName) : null
+  const ambient = atmosphere ? scene.getLightByName(atmosphere.ambientName) : null
+  if (atmosphere && (!(sun instanceof DirectionalLight) || !(ambient instanceof HemisphericLight))) throw new Error('Explicit filmic lights are missing or wrong type')
+  const lightState = atmosphere && sun instanceof DirectionalLight && ambient instanceof HemisphericLight ? {
+    sun, ambient, sunIntensity: sun.intensity, ambientIntensity: ambient.intensity,
+    sunDiffuse: sun.diffuse.clone(), ambientDiffuse: ambient.diffuse.clone(), groundColor: ambient.groundColor.clone(),
+    clearColor: scene.clearColor.clone(), fogColor: scene.fogColor.clone(), fogDensity: scene.fogDensity,
+  } : null
   const meshes: Mesh[] = [], textures: RawTexture[] = [], materials = new Map<string, PBRMaterial>(), sets = new Map<SurfaceFamily, { color: RawTexture; normal: RawTexture; orm: RawTexture }>()
   const hidden = new Map<Mesh, boolean>()
   const config = scene.imageProcessingConfiguration
@@ -42,6 +62,11 @@ export const installImageQuality = (scene: Scene, binding: ImageQualityBinding):
     meshes.forEach(mesh => { shadowGenerators.forEach(g => g.removeShadowCaster(mesh)); if (!mesh.isDisposed()) mesh.dispose(false, false) })
     materials.forEach(material => material.dispose(false, false)); textures.forEach(texture => texture.dispose())
     if (committed) Object.assign(config, old)
+    if (committed && lightState) {
+      lightState.sun.intensity = lightState.sunIntensity; lightState.ambient.intensity = lightState.ambientIntensity
+      lightState.sun.diffuse.copyFrom(lightState.sunDiffuse); lightState.ambient.diffuse.copyFrom(lightState.ambientDiffuse); lightState.ambient.groundColor.copyFrom(lightState.groundColor)
+      scene.clearColor.copyFrom(lightState.clearColor); scene.fogColor.copyFrom(lightState.fogColor); scene.fogDensity = lightState.fogDensity
+    }
     if (shadowsChanged && !scene.isDisposed) for (const snapshot of shadowState) {
       if (!snapshot.generator.getShadowMap()) continue
       snapshot.generator.filter = snapshot.filter; snapshot.generator.filteringQuality = snapshot.filteringQuality
@@ -69,7 +94,7 @@ export const installImageQuality = (scene: Scene, binding: ImageQualityBinding):
     m.metallic = 0; m.roughness = 1; m.bumpTexture = maps.normal; m.metallicTexture = maps.orm
     m.useRoughnessFromMetallicTextureAlpha = false; m.useRoughnessFromMetallicTextureGreen = true; m.useMetallnessFromMetallicTextureBlue = true
     m.enableSpecularAntiAliasing = true; m.forceIrradianceInFragment = true
-    m.environmentIntensity = .8; m.backFaceCulling = true; m.transparencyMode = Material.MATERIAL_OPAQUE
+    m.environmentIntensity = .82; m.backFaceCulling = true; m.transparencyMode = Material.MATERIAL_OPAQUE
     return m
   }
   const meshFrom = (name: string, geometry: QualityGeometry, m: PBRMaterial, x: number, y: number, z: number): Mesh => {
@@ -91,14 +116,20 @@ export const installImageQuality = (scene: Scene, binding: ImageQualityBinding):
     committed = true
     config.toneMappingEnabled = true; config.toneMappingType = ImageProcessingConfiguration.TONEMAPPING_ACES
     config.exposure = binding.exposure; config.contrast = binding.contrast
+    if (atmosphere && lightState) {
+      lightState.sun.intensity = atmosphere.sunIntensity; lightState.ambient.intensity = atmosphere.ambientIntensity
+      lightState.sun.diffuse = Color3.FromHexString(atmosphere.sunColor); lightState.ambient.diffuse = Color3.FromHexString(atmosphere.ambientColor); lightState.ambient.groundColor = Color3.FromHexString(atmosphere.groundColor)
+      const clear = Color3.FromHexString(atmosphere.clearColor); scene.clearColor = new Color4(clear.r, clear.g, clear.b, 1)
+      scene.fogColor = Color3.FromHexString(atmosphere.fogColor); scene.fogDensity = atmosphere.fogDensity
+    }
     if (binding.shadowMapSize !== undefined) {
       shadowsChanged = true
       const maxSize = scene.getEngine().getCaps().maxTextureSize || 1024
       for (const generator of shadowGenerators) {
         generator.mapSize = Math.min(binding.shadowMapSize, maxSize)
-        // Babylon falls back to Poisson filtering where WebGL2 PCF is unavailable.
+        // Babylon falls back where WebGL2 PCF is unavailable; high quality remains bounded to this one existing generator.
         generator.usePercentageCloserFiltering = true
-        generator.filteringQuality = ShadowGenerator.QUALITY_MEDIUM
+        generator.filteringQuality = ShadowGenerator.QUALITY_HIGH
       }
     }
     // Do not freeze before the first ready render: shader variants must include final scene lights.

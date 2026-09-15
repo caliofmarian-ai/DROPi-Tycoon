@@ -11,11 +11,15 @@ const compile = name => {
   const input = readFileSync(new URL(`../src/${name}.ts`, import.meta.url), 'utf8')
   const output = ts.transpileModule(input, { compilerOptions: { target: ts.ScriptTarget.ES2022, module: ts.ModuleKind.ES2022 } }).outputText
     .replaceAll("'./cityVisualRecipe'", "'./cityVisualRecipe.mjs'")
+    .replaceAll("'./filmicSurface'", "'./filmicSurface.mjs'")
     .replaceAll("'@babylonjs/core/Materials/Textures/rawTexture'", "'@babylonjs/core/Materials/Textures/rawTexture.js'")
   const target = path.join(temp, `${name}.mjs`); writeFileSync(target, output); return pathToFileURL(target).href
 }
 try {
-  const { compileFacade, facadePoint, surfacePixels, validateVisualKit } = await import(compile('cityVisualRecipe'))
+  const recipeUrl = compile('cityVisualRecipe')
+  const filmicUrl = compile('filmicSurface')
+  const { compileFacade, facadePoint, surfacePixels, validateVisualKit } = await import(recipeUrl)
+  const { filmicSurfacePixels } = await import(filmicUrl)
   const kit = { id: 'test-only/stone', revision: 1, seed: 18, palette: { stone: '#8f938e', trim: '#e0d7c5', metal: '#3e5057', glass: '#436374', accent: '#008cb5' }, pavingColor: '#bcb5a5', asphaltColor: '#393e40', pavingTileMeters: 2, frameWidth: .1, windowWidth: 1.5, windowHeight: 1.55 }
   const facade = { id: 'test-only/anchor', origin: [9, .16, 12], yaw: 0, width: 14, height: 9, windows: [[-4, 2.1], [0, 2.1], [4, 2.1], [-4, 5.1], [0, 5.1], [4, 5.1]], door: { x: 0, width: 1.35, height: 2.35 } }
   check('deterministic geometry without input mutation', () => {
@@ -27,6 +31,7 @@ try {
     const other = { ...kit, id: 'test-only/dark-metal', revision: 2, seed: 91, palette: { ...kit.palette, trim: '#364655', glass: '#786454' }, frameWidth: .06, windowWidth: 1.2, windowHeight: 1.9, pavingTileMeters: 4 }
     assert.notDeepEqual(compileFacade(other, { ...facade, yaw: Math.PI / 2 }), compileFacade(kit, facade))
     assert.notDeepEqual(surfacePixels(other, 'paving'), surfacePixels(kit, 'paving'))
+    assert.notDeepEqual(filmicSurfacePixels(other, 'asphalt').normal, filmicSurfacePixels(kit, 'asphalt').normal)
   })
   check('four facade orientations retain physical dimensions', () => {
     for (const yaw of [0, Math.PI / 2, Math.PI, -Math.PI / 2]) {
@@ -58,6 +63,19 @@ try {
       assert.ok(new Set(pixels).size > 15)
     }
   })
+  check('PBR companion maps are deterministic, bounded and materially non-flat', () => {
+    for (const family of ['paving', 'asphalt']) {
+      const a = filmicSurfacePixels(kit, family), b = filmicSurfacePixels(kit, family)
+      assert.deepEqual(a, b)
+      for (const map of [a.color, a.normal, a.orm]) assert.equal(map.length, 256 * 256 * 4)
+      assert.ok(new Set(a.normal).size > 12)
+      assert.ok(new Set(a.orm).size > 8)
+      for (let i = 3; i < a.normal.length; i += 4) {
+        assert.equal(a.normal[i], 255); assert.equal(a.orm[i], 255)
+        assert.equal(a.orm[i - 1], 0)
+      }
+    }
+  })
   check('invalid kit cannot silently use the reference city', () => {
     for (const bad of [null, { ...kit, id: '' }, { ...kit, revision: 0 }, { ...kit, palette: {} }, { ...kit, pavingTileMeters: NaN }, { ...kit, frameWidth: 9 }]) assert.throws(() => validateVisualKit(bad))
   })
@@ -69,10 +87,13 @@ try {
     assert.throws(() => surfacePixels(kit, 'unknown'))
   })
   if (!process.argv.includes('--pure-only')) {
-    const { NullEngine, Scene, MeshBuilder } = await import('@babylonjs/core')
+    const { NullEngine, Scene, MeshBuilder, PBRMaterial } = await import('@babylonjs/core')
     const { installCityVisuals } = await import(compile('cityVisualPresentation'))
     const engine = new NullEngine()
     const scene = new Scene(engine)
+    // Warm Babylon's scene-owned PBR BRDF cache before resource snapshots so
+    // recipe disposal is measured against stable scene infrastructure.
+    new PBRMaterial('scene-shared-brdf-warm', scene)
     // Account for the engine-owned lazy default before taking resource snapshots.
     // It is not owned by the visual recipe and must never be disposed with it.
     const originalMaterial = scene.defaultMaterial
@@ -90,9 +111,11 @@ try {
       assert.deepEqual([...floor.getVerticesData('position')], before.positions)
       assert.deepEqual([...floor.getVerticesData('uv')], before.uvs)
       assert.deepEqual(floor.position.asArray(), before.position)
-      assert.equal(handle.textureCount, 1); assert.ok(handle.drawMeshes <= 6)
+      assert.equal(handle.textureCount, 3); assert.ok(handle.drawMeshes <= 6)
       const visual = scene.getMeshByName('city-visual/surface/authoritative-sidewalk')
       assert.equal(visual.checkCollisions, false); assert.equal(visual.isPickable, false)
+      assert.ok(visual.material instanceof PBRMaterial)
+      assert.ok(visual.material.albedoTexture && visual.material.bumpTexture && visual.material.metallicTexture)
       assert.notDeepEqual([...visual.getVerticesData('uv')], before.uvs)
       // Babylon geometry cloning materializes GPU float32 data. Keep exact
       // source checks above; compare the clone to the exact float32 conversion,

@@ -1,7 +1,8 @@
-import { Color3, Mesh, MeshBuilder, Scene, StandardMaterial, Texture, Vector3 } from '@babylonjs/core'
+import { Color3, Mesh, MeshBuilder, PBRMaterial, Scene, StandardMaterial, Texture, Vector3 } from '@babylonjs/core'
 import { RawTexture } from '@babylonjs/core/Materials/Textures/rawTexture'
-import { compileFacade, surfacePixels, validateVisualKit } from './cityVisualRecipe'
+import { compileFacade, validateVisualKit } from './cityVisualRecipe'
 import type { FacadeInput, VisualKit } from './cityVisualRecipe'
+import { filmicSurfacePixels } from './filmicSurface'
 
 export type CityVisualBindings = {
   id: string
@@ -40,7 +41,7 @@ export const installCityVisuals = (scene: Scene, bindings: CityVisualBindings): 
     if (!['paving', 'asphalt'].includes(binding.family)) throw new Error('Unknown surface finish')
     if (!binding.mesh.getVerticesData('position') || !binding.mesh.getVerticesData('normal')) throw new Error('Surface projection requires positions and normals')
   }
-  const ownedMeshes: Mesh[] = [], materials = new Map<string, StandardMaterial>(), textures = new Map<string, RawTexture>()
+  const ownedMeshes: Mesh[] = [], materials = new Map<string, StandardMaterial>(), surfaceMaterials = new Map<string, PBRMaterial>(), textures = new Map<string, RawTexture>()
   const hidden = new Map<Mesh, boolean>()
   const material = (key: string, color: string, gloss = false): StandardMaterial => {
     const cacheKey = `${key}/${color}`
@@ -64,8 +65,9 @@ export const installCityVisuals = (scene: Scene, bindings: CityVisualBindings): 
     for (const [mesh, visible] of hidden) if (!mesh.isDisposed()) mesh.isVisible = visible
     for (const mesh of ownedMeshes) if (!mesh.isDisposed()) mesh.dispose(false, false)
     for (const m of materials.values()) m.dispose(false, false)
+    for (const m of surfaceMaterials.values()) m.dispose(false, false)
     for (const t of textures.values()) t.dispose()
-    hidden.clear(); ownedMeshes.length = 0; materials.clear(); textures.clear()
+    hidden.clear(); ownedMeshes.length = 0; materials.clear(); surfaceMaterials.clear(); textures.clear()
   }
   try {
     for (const { binding, boxes } of plans) {
@@ -109,14 +111,36 @@ export const installCityVisuals = (scene: Scene, bindings: CityVisualBindings): 
       mesh.setVerticesData('uv', uvs, false)
       const color = family === 'paving' ? kit.pavingColor : kit.asphaltColor
       const key = `${family}/${kit.seed}/${color}`
-      let texture = textures.get(key)
-      if (!texture) {
-        texture = RawTexture.CreateRGBATexture(surfacePixels(kit, family), 256, 256, scene, true, false, Texture.TRILINEAR_SAMPLINGMODE)
-        texture.name = `city-visual/${key}`; texture.gammaSpace = true
-        texture.wrapU = Texture.WRAP_ADDRESSMODE; texture.wrapV = Texture.WRAP_ADDRESSMODE
-        texture.anisotropicFilteringLevel = 4; textures.set(key, texture)
+      const pixels = filmicSurfacePixels(kit, family)
+      const texture = (kind: 'albedo' | 'normal' | 'orm', data: Uint8Array, gamma: boolean): RawTexture => {
+        const cacheKey = `${key}/${kind}`
+        let result = textures.get(cacheKey)
+        if (!result) {
+          result = RawTexture.CreateRGBATexture(data, 256, 256, scene, true, false, Texture.TRILINEAR_SAMPLINGMODE)
+          result.name = `city-visual/${cacheKey}`; result.gammaSpace = gamma
+          result.wrapU = Texture.WRAP_ADDRESSMODE; result.wrapV = Texture.WRAP_ADDRESSMODE
+          result.anisotropicFilteringLevel = Math.min(8, scene.getEngine().getCaps().maxAnisotropy || 1)
+          textures.set(cacheKey, result)
+        }
+        return result
       }
-      const m = material(key, '#ffffff'); m.diffuseTexture = texture; mesh.material = m
+      let surfaceMaterial = surfaceMaterials.get(key)
+      if (!surfaceMaterial) {
+        surfaceMaterial = new PBRMaterial(`city-visual/pbr/${key}`, scene)
+        surfaceMaterial.albedoColor = Color3.White()
+        surfaceMaterial.albedoTexture = texture('albedo', pixels.color, true)
+        surfaceMaterial.bumpTexture = texture('normal', pixels.normal, false)
+        surfaceMaterial.metallicTexture = texture('orm', pixels.orm, false)
+        surfaceMaterial.metallic = 0; surfaceMaterial.roughness = 1
+        surfaceMaterial.useRoughnessFromMetallicTextureAlpha = false
+        surfaceMaterial.useRoughnessFromMetallicTextureGreen = true
+        surfaceMaterial.useMetallnessFromMetallicTextureBlue = true
+        surfaceMaterial.enableSpecularAntiAliasing = true
+        surfaceMaterial.forceIrradianceInFragment = true
+        surfaceMaterial.environmentIntensity = .72
+        surfaceMaterials.set(key, surfaceMaterial)
+      }
+      mesh.material = surfaceMaterial
       finishMesh(mesh)
     }
     // Commit only after every binding, texture and replacement was constructed successfully.
@@ -126,7 +150,7 @@ export const installCityVisuals = (scene: Scene, bindings: CityVisualBindings): 
     const handle: CityVisualHandle = {
       id: bindings.id, detailBoxes: plans.reduce((n, p) => n + p.boxes.length, 0),
       drawMeshes: ownedMeshes.filter(mesh => !mesh.isDisposed()).length,
-      textureCount: textures.size, materialCount: materials.size,
+      textureCount: textures.size, materialCount: materials.size + surfaceMaterials.size,
       dispose: () => {
         if (disposed) return
         disposed = true; cleanup(); installations.delete(scene)
