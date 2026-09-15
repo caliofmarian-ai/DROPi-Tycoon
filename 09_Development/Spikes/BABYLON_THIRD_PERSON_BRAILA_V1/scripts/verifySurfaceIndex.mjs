@@ -3,7 +3,10 @@ import { readFile } from 'node:fs/promises'
 import { performance } from 'node:perf_hooks'
 import ts from 'typescript'
 
-const source = await readFile(new URL('../src/walkableSurfaceIndex.ts', import.meta.url), 'utf8')
+const adapter = await readFile(new URL('../src/authoredPedestrians.ts', import.meta.url), 'utf8')
+const startIndex = adapter.indexOf('/** Exact acceleration of the existing immutable'), endIndex = adapter.indexOf('export type FootRoles =', startIndex)
+assert.ok(startIndex >= 0 && endIndex > startIndex, 'Production index could not be located')
+const source = adapter.slice(startIndex, endIndex)
 const compile = text => ts.transpileModule(text, { compilerOptions: { target: ts.ScriptTarget.ES2022, module: ts.ModuleKind.ES2022 } }).outputText
 const { createWalkableSurfaceIndex } = await import(`data:text/javascript;base64,${Buffer.from(compile(source)).toString('base64')}`)
 const box = (x0, x1, z0, z1, top) => ({ min: { x: x0, z: z0 }, max: { x: x1, y: top, z: z1 } })
@@ -96,8 +99,7 @@ for (const [name, mutate] of mutations) {
 }
 
 // Verify the real scene adapter still owns selection and takes the same snapshot.
-const adapter = await readFile(new URL('../src/authoredPedestrians.ts', import.meta.url), 'utf8')
-assert.match(adapter, /import \{ createWalkableSurfaceIndex \} from '\.\/walkableSurfaceIndex'/)
+assert.match(adapter, /return createWalkableSurfaceIndex\(surfaces\)/)
 const begin = adapter.indexOf('export const surfaceSampler ='), end = adapter.indexOf('\nlet started =', begin)
 assert.ok(begin >= 0 && end > begin)
 const sampler = new Function('Mesh', 'createWalkableSurfaceIndex', `${compile(adapter.slice(begin, end).replace('export const', 'const'))}\nreturn surfaceSampler;`)
