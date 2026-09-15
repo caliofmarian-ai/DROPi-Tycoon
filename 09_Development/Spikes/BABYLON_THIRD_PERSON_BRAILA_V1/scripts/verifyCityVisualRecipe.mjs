@@ -73,9 +73,13 @@ try {
     const { installCityVisuals } = await import(compile('cityVisualPresentation'))
     const engine = new NullEngine()
     const scene = new Scene(engine)
+    // Account for the engine-owned lazy default before taking resource snapshots.
+    // It is not owned by the visual recipe and must never be disposed with it.
+    const originalMaterial = scene.defaultMaterial
     const floor = MeshBuilder.CreateBox('authoritative-sidewalk', { width: 12, depth: 4, height: .16 }, scene)
     floor.position.set(1, .08, 2); floor.checkCollisions = true
     const window = MeshBuilder.CreateBox('old-window', { width: 1.2, height: 1.1, depth: .08 }, scene)
+    floor.material = originalMaterial; window.material = originalMaterial
     const binding = { id: 'test-only/sector', facades: [{ kit, anchor: facade, replaceWindows: [window] }], surfaces: [{ kit, mesh: floor, family: 'paving' }] }
     const before = { meshes: scene.meshes.length, materials: scene.materials.length, textures: scene.textures.length, positions: [...floor.getVerticesData('position')], uvs: [...floor.getVerticesData('uv')], position: floor.position.asArray() }
     let handle
@@ -104,7 +108,9 @@ try {
       handle.dispose(); handle.dispose()
       assert.equal(floor.isVisible, true); assert.equal(window.isVisible, true)
       assert.equal(scene.meshes.length, before.meshes)
-      assert.equal(scene.materials.length, before.materials)
+      assert.equal(scene.materials.length, before.materials, scene.materials.map(m => m.name).join(','))
+      assert.equal(floor.material, originalMaterial); assert.equal(window.material, originalMaterial)
+      assert.ok(scene.materials.includes(originalMaterial))
       assert.equal(scene.textures.length, before.textures)
     })
     check('missing or duplicate source fails before any visual mutation', () => {
