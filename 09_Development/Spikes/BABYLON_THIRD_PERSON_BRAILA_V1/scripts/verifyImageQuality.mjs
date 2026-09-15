@@ -26,7 +26,8 @@ try {
     for (let i=0;i<g.indices.length;i+=3) {
       const p=g.indices.slice(i,i+3).map(n=>g.positions.slice(n*3,n*3+3))
       const a=p[1].map((v,j)=>v-p[0][j]), b=p[2].map((v,j)=>v-p[0][j])
-      const n=[a[1]*b[2]-a[2]*b[1],a[2]*b[0]-a[0]*b[2],a[0]*b[1]-a[1]*b[0]]
+      // Babylon's default left-handed winding uses (p0-p1) cross (p2-p1).
+      const n=[b[1]*a[2]-b[2]*a[1],b[2]*a[0]-b[0]*a[2],b[0]*a[1]-b[1]*a[0]]
       assert.ok(Math.hypot(...n)>1e-7)
       const c=[0,1,2].map(j=>(p[0][j]+p[1][j]+p[2][j])/3-(j===1?7:0))
       assert.ok(n.reduce((s,v,j)=>s+v*c[j],0)>0)
@@ -67,13 +68,22 @@ try {
     assert.equal(nextResolution({...state,density:2},14,16,100,range).density,2)
   })
   if (!process.argv.includes('--pure-only')) {
-    const { NullEngine,Scene,MeshBuilder,StandardMaterial } = await import('@babylonjs/core')
+    const { NullEngine,Scene,MeshBuilder,PBRMaterial,VertexData } = await import('@babylonjs/core')
     const { installImageQuality } = await import(compile('imageQualityPresentation'))
-    const engine=new NullEngine(),scene=new Scene(engine),m=new StandardMaterial('source',scene)
+    const engine=new NullEngine(),scene=new Scene(engine),m=new PBRMaterial('source',scene)
     const source=MeshBuilder.CreateBox('synthetic-locality', {width:18,height:14,depth:12},scene);source.position.y=7;source.material=m;source.checkCollisions=true
     const roof=MeshBuilder.CreateBox('synthetic-roof',{width:18.3,height:.35,depth:12.3},scene);roof.position.y=14.17;roof.material=m
     const binding={id:'test-only/quality',buildings:[{source,roof,color:'#c9b89e',roofColor:'#84624e',roofRise:2,roofShape:'hip',family:'plaster'}],exposure:1,contrast:1.03}
     const before={meshes:scene.meshes.length,materials:scene.materials.length,textures:scene.textures.length,vertices:[...source.getVerticesData('position')],config:{toneMappingEnabled:scene.imageProcessingConfiguration.toneMappingEnabled,toneMappingType:scene.imageProcessingConfiguration.toneMappingType,exposure:scene.imageProcessingConfiguration.exposure,contrast:scene.imageProcessingConfiguration.contrast}}
+    // PBR source warms the scene-owned shared BRDF texture before the snapshot.
+    // That cache belongs to the scene and must not be disposed with our presentation.
+    const sharedTextures = [...scene.textures]
+    check('real Babylon normals face outwards for envelope and both roofs',()=>{
+      for (const [g,cy] of [[bevelledEnvelope(18,12,14,.16),7],[roofEnvelope(18,12,2,'hip'),.5],[roofEnvelope(18,12,2,'gable'),.5]]) {
+        const normals=[]; VertexData.ComputeNormals(g.positions,g.indices,normals)
+        for(let i=0;i<g.positions.length;i+=3) assert.ok(normals[i]*g.positions[i]+normals[i+1]*(g.positions[i+1]-cy)+normals[i+2]*g.positions[i+2]>0)
+      }
+    })
     let handle
     check('actual PBR installation does not mutate collider or source geometry',()=>{
       handle=installImageQuality(scene,binding);assert.equal(handle.replacedBuildings,1);assert.equal(handle.textures,6);assert.equal(source.isVisible,false);assert.equal(source.isEnabled(),true);assert.equal(source.checkCollisions,true);assert.equal(source.material,m);assert.deepEqual([...source.getVerticesData('position')],before.vertices)
@@ -81,7 +91,7 @@ try {
     })
     check('same scene is idempotent and palette change needs disposal',()=>{assert.equal(installImageQuality(scene,binding),handle);assert.throws(()=>installImageQuality(scene,{...binding,id:'other'}))})
     check('disposal restores sources and color processing without leaks',()=>{
-      handle.dispose();handle.dispose();assert.equal(source.isVisible,true);assert.equal(roof.isVisible,true);assert.equal(scene.meshes.length,before.meshes);assert.equal(scene.materials.length,before.materials);assert.equal(scene.textures.length,before.textures)
+      handle.dispose();handle.dispose();assert.equal(source.isVisible,true);assert.equal(roof.isVisible,true);assert.equal(scene.meshes.length,before.meshes);assert.equal(scene.materials.length,before.materials);assert.equal(scene.textures.length,before.textures,scene.textures.map(t=>t.name).join(','));assert.ok(sharedTextures.every(t=>scene.textures.includes(t)))
       for(const [k,v]of Object.entries(before.config))assert.equal(scene.imageProcessingConfiguration[k],v)
     })
     check('duplicate and missing bindings fail before presentation mutation',()=>{
