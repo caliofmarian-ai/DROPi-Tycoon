@@ -1,0 +1,65 @@
+{
+  "schemaVersion": 1,
+  "requestId": "ci-building-fidelity-v2-lod1",
+  "issue": 751,
+  "classification": "TEST_ONLY_NON_PRODUCTION",
+  "semanticFamily": "procedural-building-fidelity-v2",
+  "recipe": "building_fidelity_v2",
+  "lodProfile": "LOD1",
+  "generationReason": "Prove that the DT-19 Blender factory can generate a cheaper explicit LOD1 companion that preserves readable facade depth and silhouette while remaining below a strict four-thousand-triangle budget.",
+  "inventoryAudit": {
+    "checked": true,
+    "inventoryRef": "08_Assets/Production/asset-inventory.v1.json",
+    "checkedFamilies": ["SRC-20260907-006"],
+    "missingCapability": "The canonical factory has no governed paired LOD1 companion for the high-fidelity procedural building recipe.",
+    "reuseDecision": "This CI-only LOD1 fixture is generated from the same governed procedural family and does not replace or duplicate an approved production source asset."
+  },
+  "provenance": {
+    "generator": "Blender",
+    "sourceType": "PROCEDURAL_PRIMITIVES",
+    "externalInputs": [],
+    "commercialStatus": "NOT_EVALUATED_TEST_ONLY",
+    "legalQualificationAuthority": "DT-13"
+  },
+  "budget": {
+    "maxTriangles": 4000,
+    "maxMaterials": 8,
+    "requireCollisionProxy": true,
+    "maxGlbBytes": 4194304
+  },
+  "preview": {
+    "width": 1024,
+    "height": 1024,
+    "maxPngBytes": 2097152
+  },
+  "parameters": {
+    "width": 12.0,
+    "depth": 8.0,
+    "floorHeight": 3.2,
+    "floors": 3,
+    "frontBays": 4,
+    "sideBays": 3,
+    "windowWidth": 1.45,
+    "windowHeight": 1.65,
+    "windowBottom": 0.9,
+    "frameThickness": 0.12,
+    "trimDepth": 0.12,
+    "windowRecess": 0.12,
+    "revealThickness": 0.08,
+    "mullionWidth": 0.0,
+    "roofHeight": 1.8,
+    "roofOverhang": 0.35,
+    "fasciaHeight": 0.18,
+    "gutterRadius": 0.0,
+    "downpipeRadius": 0.0,
+    "bodyBevel": 0.08,
+    "detailBevel": 0.02,
+    "bodyTextureSize": 128,
+    "bodyColor": [0.58, 0.43, 0.30, 1.0],
+    "trimColor": [0.86, 0.78, 0.65, 1.0],
+    "glassColor": [0.10, 0.22, 0.30, 1.0],
+    "roofColor": [0.28, 0.08, 0.045, 1.0],
+    "metalColor": [0.10, 0.11, 0.12, 1.0],
+    "doorColor": [0.16, 0.07, 0.035, 1.0]
+  }
+}
