@@ -1,4 +1,5 @@
 import { Mesh, Scene } from '@babylonjs/core'
+import { applyBrailaImageQuality } from './brailaImageQuality'
 import { installCityVisuals } from './cityVisualPresentation'
 import type { CityVisualBindings } from './cityVisualPresentation'
 import type { VisualKit } from './cityVisualRecipe'
@@ -69,4 +70,5 @@ export const applyBrailaCityVisuals = (scene: Scene): void => {
   }
   scene.metadata = { ...(scene.metadata ?? {}), dropiCityVisualRecipe: state, dropiCityVisualRecipeSettled: true }
   if (typeof window !== 'undefined') (window as unknown as { __DROPiCityVisualRecipe: typeof state }).__DROPiCityVisualRecipe = { ...state }
+  if (state.status === 'ACTIVE') applyBrailaImageQuality(scene)
 }
