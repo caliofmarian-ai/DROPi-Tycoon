@@ -1,0 +1,5 @@
+DROPi Tycoon Babylon Brăila spike signage acceptance marker
+classification=NON-AUTHORITATIVE TECHNICAL SPIKE — NOT AUTHENTIC GAMEPLAY
+owner_device_finding=mirrored façade signage
+required_fix=street-facing world text reads left-to-right
+scope=all sign-plane-* meshes
