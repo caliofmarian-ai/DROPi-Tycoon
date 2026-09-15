@@ -22,13 +22,16 @@ permissions:
 jobs:
   validate-and-generate-proof:
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 30
     env:
       REQUEST: 08_Assets/Production/BlenderFactory/requests/ci-proof-building.request.json
       FACTORY: 08_Assets/Production/BlenderFactory/tools/asset_factory.py
       GENERATOR: 08_Assets/Production/BlenderFactory/tools/blender_generate_asset.py
       BUILDING_REQUEST: 08_Assets/Production/BlenderFactory/requests/ci-building-detail-v1.request.json
       BUILDING_GENERATOR: 08_Assets/Production/BlenderFactory/tools/blender_generate_building_v1.py
+      V2_LOD0_REQUEST: 08_Assets/Production/BlenderFactory/requests/ci-building-fidelity-v2-lod0.request.json
+      V2_LOD1_REQUEST: 08_Assets/Production/BlenderFactory/requests/ci-building-fidelity-v2-lod1.request.json
+      V2_GENERATOR: 08_Assets/Production/BlenderFactory/tools/blender_generate_building_v2.py
       PREVIEW_VALIDATOR: 08_Assets/Production/BlenderFactory/tools/validate_preview_png.py
       LIBGL_ALWAYS_SOFTWARE: '1'
 
@@ -44,11 +47,19 @@ jobs:
       - name: Run building v1 request tests
         run: python3 -m unittest 08_Assets/Production/BlenderFactory/tools/test_building_v1_request.py
 
+      - name: Run building V2 LOD request tests
+        run: python3 -m unittest 08_Assets/Production/BlenderFactory/tools/test_building_v2_requests.py
+
       - name: Validate proof request before generator install
         run: python3 "$FACTORY" preflight --request "$REQUEST"
 
       - name: Validate detailed building request before generator install
         run: python3 "$FACTORY" preflight --request "$BUILDING_REQUEST"
+
+      - name: Validate V2 LOD requests before generator install
+        run: |
+          python3 "$FACTORY" preflight --request "$V2_LOD0_REQUEST"
+          python3 "$FACTORY" preflight --request "$V2_LOD1_REQUEST"
 
       - name: Install Blender headless runtime
         run: |
@@ -121,5 +132,65 @@ jobs:
             ${{ runner.temp }}/dropi-dt19-building-v1/ci-building-detail-v1.glb
             ${{ runner.temp }}/dropi-dt19-building-v1/ci-building-detail-v1.report.json
             ${{ runner.temp }}/dropi-dt19-building-v1/ci-building-detail-v1.preview.png
+          if-no-files-found: error
+          retention-days: 7
+
+      - name: Generate building fidelity V2 LOD0
+        run: |
+          OUT="$RUNNER_TEMP/dropi-dt19-building-v2-lod0"
+          mkdir -p "$OUT"
+          blender --background --python-exit-code 1 --python "$V2_GENERATOR" -- \
+            --request "$V2_LOD0_REQUEST" \
+            --out-dir "$OUT"
+          test -s "$OUT/ci-building-fidelity-v2-lod0.glb"
+          test -s "$OUT/ci-building-fidelity-v2-lod0.report.json"
+          test -s "$OUT/ci-building-fidelity-v2-lod0.preview.png"
+          ls -lh "$OUT"
+
+      - name: Validate building fidelity V2 LOD0
+        run: |
+          OUT="$RUNNER_TEMP/dropi-dt19-building-v2-lod0"
+          python3 "$FACTORY" postflight \
+            --request "$V2_LOD0_REQUEST" \
+            --report "$OUT/ci-building-fidelity-v2-lod0.report.json" \
+            --glb "$OUT/ci-building-fidelity-v2-lod0.glb"
+          python3 "$PREVIEW_VALIDATOR" \
+            --png "$OUT/ci-building-fidelity-v2-lod0.preview.png" \
+            --request "$V2_LOD0_REQUEST"
+
+      - name: Generate building fidelity V2 LOD1
+        run: |
+          OUT="$RUNNER_TEMP/dropi-dt19-building-v2-lod1"
+          mkdir -p "$OUT"
+          blender --background --python-exit-code 1 --python "$V2_GENERATOR" -- \
+            --request "$V2_LOD1_REQUEST" \
+            --out-dir "$OUT"
+          test -s "$OUT/ci-building-fidelity-v2-lod1.glb"
+          test -s "$OUT/ci-building-fidelity-v2-lod1.report.json"
+          test -s "$OUT/ci-building-fidelity-v2-lod1.preview.png"
+          ls -lh "$OUT"
+
+      - name: Validate building fidelity V2 LOD1
+        run: |
+          OUT="$RUNNER_TEMP/dropi-dt19-building-v2-lod1"
+          python3 "$FACTORY" postflight \
+            --request "$V2_LOD1_REQUEST" \
+            --report "$OUT/ci-building-fidelity-v2-lod1.report.json" \
+            --glb "$OUT/ci-building-fidelity-v2-lod1.glb"
+          python3 "$PREVIEW_VALIDATOR" \
+            --png "$OUT/ci-building-fidelity-v2-lod1.preview.png" \
+            --request "$V2_LOD1_REQUEST"
+
+      - name: Upload building fidelity V2 LOD evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: dt19-building-v2-lod-proof
+          path: |
+            ${{ runner.temp }}/dropi-dt19-building-v2-lod0/ci-building-fidelity-v2-lod0.glb
+            ${{ runner.temp }}/dropi-dt19-building-v2-lod0/ci-building-fidelity-v2-lod0.report.json
+            ${{ runner.temp }}/dropi-dt19-building-v2-lod0/ci-building-fidelity-v2-lod0.preview.png
+            ${{ runner.temp }}/dropi-dt19-building-v2-lod1/ci-building-fidelity-v2-lod1.glb
+            ${{ runner.temp }}/dropi-dt19-building-v2-lod1/ci-building-fidelity-v2-lod1.report.json
+            ${{ runner.temp }}/dropi-dt19-building-v2-lod1/ci-building-fidelity-v2-lod1.preview.png
           if-no-files-found: error
           retention-days: 7
