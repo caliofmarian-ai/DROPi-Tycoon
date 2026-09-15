@@ -37,30 +37,38 @@ export const createResolutionOwner = (engine: Engine, canvas: HTMLCanvasElement)
   let state: ResolutionState = { density: 1.25, lastChange: performance.now() / 1000, overloaded: false }
   let plan: ResolutionPlan | null = null, budget: ReturnType<typeof frameBudget> = null
   const samples: number[] = []
-  let lastSampleTime = performance.now(), skipAfterHidden = false
+  let lastSampleTime = performance.now(), skipAfterHidden = false, skipAfterResize = false
+  let resizePending = false, disposed = false
   const publish = (): void => {
     ;(window as unknown as { __DROPiRenderQuality?: unknown }).__DROPiRenderQuality = {
       mode: 'ADAPTIVE_PIXEL_BUDGET', targetFps: 60, ...state, ...plan, ...budget,
       actualWidth: engine.getRenderWidth(), actualHeight: engine.getRenderHeight(), sampleCount: samples.length,
-      physicalDeviceAcceptance: 'UNKNOWN',
+      resizePhase: 'BEGIN_FRAME_ONLY', resizePending, physicalDeviceAcceptance: 'UNKNOWN',
     }
   }
   const resetWindow = (): void => { samples.length = 0; lastSampleTime = performance.now() }
-  const resize = (): void => {
+  const resize = (): void => { if (!disposed) resizePending = true }
+  const beginObserver = engine.onBeginFrameObservable.add(() => {
+    if (disposed || document.hidden || !resizePending) return
     const rect = canvas.getBoundingClientRect()
     if (rect.width <= 0 || rect.height <= 0) return
+    resizePending = false
     plan = resolutionPlan(rect.width, rect.height, Math.max(1, window.devicePixelRatio || 1), state.density)
-    engine.setHardwareScalingLevel(plan.scalingLevel); engine.resize(); publish()
-    // Measurements from the previous pixel workload cannot govern a new size.
-    resetWindow()
-  }
+    // Resizing clears the drawing buffer. Never do this after a completed frame:
+    // the normal scene render must redraw the new buffer in this same frame.
+    engine.setHardwareScalingLevel(plan.scalingLevel); engine.resize()
+    // The first delta straddles the old workload and cannot govern the new size.
+    resetWindow(); skipAfterResize = true; publish()
+  })
   const visibility = (): void => {
-    resetWindow(); budget = null; skipAfterHidden = true; publish()
+    resetWindow(); budget = null; skipAfterHidden = true
+    if (!document.hidden) resize()
+    publish()
   }
   document.addEventListener('visibilitychange', visibility)
   const observer = engine.onEndFrameObservable.add(() => {
     if (document.hidden) { resetWindow(); skipAfterHidden = true; return }
-    if (skipAfterHidden) { skipAfterHidden = false; resetWindow(); return }
+    if (skipAfterHidden || skipAfterResize) { skipAfterHidden = false; skipAfterResize = false; resetWindow(); return }
     const ms = engine.getDeltaTime()
     // Keep slow visible frames: discarding them hides the actual failure.
     if (Number.isFinite(ms) && ms > 0) samples.push(ms)
@@ -72,8 +80,12 @@ export const createResolutionOwner = (engine: Engine, canvas: HTMLCanvasElement)
     const next = nextResolution(state, budget.meanMs, budget.p95Ms, performance.now() / 1000)
     const changed = Math.abs(next.density - state.density) > .001
     state = { ...next, overloaded: exceedsFrameBudget(budget.meanMs, budget.p95Ms) }
-    if (changed) resize(); else { publish(); resetWindow() }
+    if (changed) { resize(); publish() } else { publish(); resetWindow() }
   })
-  engine.onDisposeObservable.addOnce(() => { engine.onEndFrameObservable.remove(observer); document.removeEventListener('visibilitychange', visibility) })
+  engine.onDisposeObservable.addOnce(() => {
+    disposed = true; resizePending = false
+    engine.onBeginFrameObservable.remove(beginObserver); engine.onEndFrameObservable.remove(observer)
+    document.removeEventListener('visibilitychange', visibility)
+  })
   return { resize }
 }
