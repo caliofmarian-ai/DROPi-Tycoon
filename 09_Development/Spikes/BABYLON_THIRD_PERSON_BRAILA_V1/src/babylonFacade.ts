@@ -22,3 +22,9 @@ export { ShadowGenerator } from '@babylonjs/core/Lights/Shadows/shadowGenerator'
 export { StandardMaterial } from '@babylonjs/core/Materials/standardMaterial'
 export { DynamicTexture } from '@babylonjs/core/Materials/Textures/dynamicTexture'
 export { Texture } from '@babylonjs/core/Materials/Textures/texture'
+
+// Explicit quality renderer exports, without reintroducing the whole core barrel.
+export { ImageProcessingConfiguration } from '@babylonjs/core/Materials/imageProcessingConfiguration'
+export { Material } from '@babylonjs/core/Materials/material'
+export { PBRMaterial } from '@babylonjs/core/Materials/PBR/pbrMaterial'
+export { VertexData } from '@babylonjs/core/Meshes/mesh.vertexData'
