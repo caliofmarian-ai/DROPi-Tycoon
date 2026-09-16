@@ -2,6 +2,7 @@ import {
   AbstractMesh,
   Axis,
   Color3,
+  DirectionalLight,
   EngineStore,
   Material,
   Mesh,
@@ -58,7 +59,7 @@ const meshBounds = (meshes: AbstractMesh[]): { min: Vector3; max: Vector3 } => {
 }
 
 const triangleCount = (meshes: AbstractMesh[]): number => meshes.reduce((sum, mesh) => {
-  const indices = mesh.getIndices()
+  const indices = mesh instanceof Mesh ? mesh.getIndices() : null
   return sum + (indices ? Math.floor(indices.length / 3) : Math.floor(mesh.getTotalVertices() / 3))
 }, 0)
 
@@ -260,7 +261,7 @@ const boot = async (): Promise<void> => {
     hideLegacyPresentation(scene)
 
     const sun = scene.getLightByName('sun')
-    const shadowGenerator = sun?.getShadowGenerator()
+    const shadowGenerator = sun instanceof DirectionalLight ? sun.getShadowGenerator() : null
     if (shadowGenerator instanceof ShadowGenerator) {
       for (const mesh of heroInstance.meshes) shadowGenerator.addShadowCaster(mesh, false)
     }
