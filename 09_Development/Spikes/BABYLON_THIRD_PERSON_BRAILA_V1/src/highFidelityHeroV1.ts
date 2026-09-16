@@ -98,15 +98,27 @@ const normalizeMaterials = (meshes: AbstractMesh[]): void => {
 }
 
 const hideLegacyPresentation = (scene: Scene): void => {
+  // The old rig remains enabled as temporary contact/carry authority until the
+  // high-fidelity rig has its own validated IK/retarget layer. Only its pixels
+  // are suppressed, so mission pickup/handoff and existing mechanical probes
+  // keep running while the player sees the new human.
   const oldRoot = scene.getTransformNodeByName(LEGACY_ROOT) ?? scene.getMeshByName(LEGACY_ROOT)
-  oldRoot?.setEnabled(false)
+  if (oldRoot) {
+    for (const mesh of oldRoot.getChildMeshes(false)) {
+      mesh.visibility = 0
+      mesh.isPickable = false
+    }
+  }
   for (const mesh of scene.meshes) {
     if (
       ['hero-torso', 'hero-head', 'hero-leg-l', 'hero-leg-r', 'hero-arm-l', 'hero-arm-r'].includes(mesh.name) ||
       mesh.name.startsWith('realism-v2-hero-') ||
       mesh.name.startsWith('target-hero-') ||
       mesh.name.startsWith('hero-motion-')
-    ) mesh.setEnabled(false)
+    ) {
+      mesh.visibility = 0
+      mesh.isPickable = false
+    }
   }
 }
 
