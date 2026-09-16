@@ -33,6 +33,7 @@ const browser = spawn(chromePath, [
   '--headless=new', '--no-sandbox', '--disable-dev-shm-usage', '--use-gl=angle', '--use-angle=swiftshader',
   '--enable-unsafe-swiftshader', '--remote-debugging-port=0', `--user-data-dir=${profile}`, 'about:blank',
 ], { stdio: ['ignore', 'ignore', 'pipe'] })
+const browserExited = new Promise(resolve => browser.once('exit', resolve))
 let stderr = ''
 browser.stderr.on('data', data => { stderr = `${stderr}${data}`.slice(-8000) })
 const wait = ms => new Promise(resolve => setTimeout(resolve, ms))
@@ -149,7 +150,16 @@ try {
 } finally {
   await writeFile(path.join(evidenceDir, 'high-fidelity-hero-runtime.json'), `${JSON.stringify(evidence, null, 2)}\n`)
   try { socket?.close() } catch {}
-  browser.kill('SIGTERM')
-  server.close()
-  await rm(profile, { recursive: true, force: true })
+  if (browser.exitCode === null) browser.kill('SIGTERM')
+  await Promise.race([browserExited, wait(5000)])
+  if (browser.exitCode === null) {
+    browser.kill('SIGKILL')
+    await Promise.race([browserExited, wait(2000)])
+  }
+  await new Promise(resolve => server.close(resolve))
+  try {
+    await rm(profile, { recursive: true, force: true, maxRetries: 6, retryDelay: 150 })
+  } catch (cleanupError) {
+    console.warn(`Non-fatal high-fidelity proof profile cleanup warning: ${cleanupError instanceof Error ? cleanupError.message : String(cleanupError)}`)
+  }
 }
