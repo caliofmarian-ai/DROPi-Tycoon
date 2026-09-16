@@ -14,7 +14,15 @@ permissions:
   actions: read
 
 env:
+  DROPI_TRIGGER_EVENT: ${{ github.event_name }}
+  DROPI_TRIGGER_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
+  DROPI_TRIGGER_REF: ${{ github.event.pull_request.head.ref || github.ref }}
+  DROPI_PR_NUMBER: ${{ github.event.pull_request.number || '0' }}
+  DROPI_BASE_SHA: ${{ github.event.pull_request.base.sha || 'NOT_APPLICABLE' }}
   DROPI_HEAD_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
+  DROPI_CHECKOUT_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
+  DROPI_RUN_ID: ${{ github.run_id }}
+  DROPI_RUN_ATTEMPT: ${{ github.run_attempt }}
   DROPI_PACKAGE_ID: com.dropi.tycoon.babyloneval
   DROPI_ANDROID_VERSION_CODE: '2026091601'
   VITE_COMMIT_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
@@ -41,6 +49,7 @@ jobs:
           set -euo pipefail
           ACTUAL="$(git rev-parse HEAD)"
           test "$ACTUAL" = "$DROPI_HEAD_SHA"
+          test "$ACTUAL" = "$DROPI_CHECKOUT_SHA"
           echo "DROPI_STAGE_ROOT=$RUNNER_TEMP/dropi-highfi-owner-$GITHUB_RUN_ID-$GITHUB_RUN_ATTEMPT" >> "$GITHUB_ENV"
           echo "DROPI_APK_OUTPUT=$RUNNER_TEMP/dropi-highfi-owner-out-$DROPI_HEAD_SHA" >> "$GITHUB_ENV"
 
@@ -167,9 +176,9 @@ jobs:
           unzip -Z1 "$APK" | grep -Fx 'assets/dropi-game/assets/characters/high-fidelity/hero-courier-v1.glb'
           mkdir -p "$DROPI_APK_OUTPUT"
           cp "$APK" "$DROPI_APK_OUTPUT/DROPi-Babylon-HighFi-${DROPI_HEAD_SHA:0:8}.apk"
-          cp 09_Development/Spikes/BABYLON_THIRD_PERSON_BRAILA_V1/dist/evidence/high-fidelity-hero-runtime.json "$DROPI_APK_OUTPUT/"
-          cp 09_Development/Spikes/BABYLON_THIRD_PERSON_BRAILA_V1/dist/evidence/high-fidelity-hero-runtime.png "$DROPI_APK_OUTPUT/"
-          cp 09_Development/Spikes/BABYLON_THIRD_PERSON_BRAILA_V1/dist/evidence/high-fidelity-hero-close.png "$DROPI_APK_OUTPUT/"
+          cp "$GITHUB_WORKSPACE/09_Development/Spikes/BABYLON_THIRD_PERSON_BRAILA_V1/dist/evidence/high-fidelity-hero-runtime.json" "$DROPI_APK_OUTPUT/"
+          cp "$GITHUB_WORKSPACE/09_Development/Spikes/BABYLON_THIRD_PERSON_BRAILA_V1/dist/evidence/high-fidelity-hero-runtime.png" "$DROPI_APK_OUTPUT/"
+          cp "$GITHUB_WORKSPACE/09_Development/Spikes/BABYLON_THIRD_PERSON_BRAILA_V1/dist/evidence/high-fidelity-hero-close.png" "$DROPI_APK_OUTPUT/"
           cd "$DROPI_APK_OUTPUT"
           sha256sum * > SHA256SUMS.txt
           cat > OWNER-EVIDENCE.txt <<EOF
