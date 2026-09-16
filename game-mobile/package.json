@@ -22,7 +22,7 @@
   "dependencies": {
     "@dr.pogodin/react-native-fs": "2.40.1",
     "@dr.pogodin/react-native-static-server": "0.27.1",
-    "expo": "~57.0.22",
+    "expo": "~57.0.23",
     "expo-dev-client": "~57.0.19",
     "expo-screen-orientation": "~57.0.2",
     "expo-status-bar": "~57.0.1",
