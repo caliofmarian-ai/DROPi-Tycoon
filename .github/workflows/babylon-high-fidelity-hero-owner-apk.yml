@@ -1,0 +1,198 @@
+name: Babylon High-Fidelity Hero Owner APK
+
+on:
+  pull_request:
+    paths:
+      - '09_Development/Spikes/BABYLON_THIRD_PERSON_BRAILA_V1/src/highFidelityHeroV1.ts'
+      - '09_Development/Spikes/BABYLON_THIRD_PERSON_BRAILA_V1/index.html'
+      - '09_Development/Spikes/BABYLON_THIRD_PERSON_BRAILA_V1/scripts/verifyHighFidelityHeroRuntime.mjs'
+      - '.github/workflows/babylon-high-fidelity-hero-owner-apk.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  actions: read
+
+env:
+  DROPI_HEAD_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
+  DROPI_PACKAGE_ID: com.dropi.tycoon.babyloneval
+  DROPI_ANDROID_VERSION_CODE: '2026091601'
+  VITE_COMMIT_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
+  DROPI_HUMAN_ARTIFACT_ID: '10421009515'
+  DROPI_HUMAN_ARTIFACT_ZIP_SHA256: '93034fb997c70166885f0ea41c7f5f1477fd9385f5fe94da69a62ea704b1e9cd'
+  DROPI_HIGH_FIDELITY_HERO_SHA256: '1c2af858570d9d92886cbaa2bd1a2e9e838e7458f7078a4f7299d9aaa2703424'
+
+jobs:
+  high-fidelity-owner-apk:
+    name: High-fidelity hero in-game owner APK
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+
+    steps:
+      - name: Checkout exact source head
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          persist-credentials: false
+
+      - name: Verify exact checkout identity
+        shell: bash
+        run: |
+          set -euo pipefail
+          ACTUAL="$(git rev-parse HEAD)"
+          test "$ACTUAL" = "$DROPI_HEAD_SHA"
+          echo "DROPI_STAGE_ROOT=$RUNNER_TEMP/dropi-highfi-owner-$GITHUB_RUN_ID-$GITHUB_RUN_ATTEMPT" >> "$GITHUB_ENV"
+          echo "DROPI_APK_OUTPUT=$RUNNER_TEMP/dropi-highfi-owner-out-$DROPI_HEAD_SHA" >> "$GITHUB_ENV"
+
+      - name: Setup Node 22.13.0
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: 22.13.0
+          cache: npm
+          cache-dependency-path: |
+            09_Development/Spikes/BABYLON_THIRD_PERSON_BRAILA_V1/package-lock.json
+            game-mobile/package-lock.json
+
+      - name: Setup Java 17
+        uses: actions/setup-java@cf277c60eb25467037889841efdb72551f06f6c3 # v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Materialize exact governed hero candidate into Vite public assets
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          ZIP="$RUNNER_TEMP/dropi-human-fidelity.zip"
+          API="https://api.github.com/repos/${GITHUB_REPOSITORY}/actions/artifacts/${DROPI_HUMAN_ARTIFACT_ID}/zip"
+          curl --fail --location --retry 4 --retry-all-errors \
+            -H "Authorization: Bearer $GH_TOKEN" \
+            -H 'Accept: application/vnd.github+json' \
+            -H 'X-GitHub-Api-Version: 2022-11-28' \
+            "$API" -o "$ZIP"
+          echo "$DROPI_HUMAN_ARTIFACT_ZIP_SHA256  $ZIP" | sha256sum -c -
+          unzip -l "$ZIP" | grep -F 'hero-courier-v1.glb'
+          TARGET="09_Development/Spikes/BABYLON_THIRD_PERSON_BRAILA_V1/public/assets/characters/high-fidelity"
+          mkdir -p "$TARGET"
+          unzip -p "$ZIP" hero-courier-v1.glb > "$TARGET/hero-courier-v1.glb"
+          echo "$DROPI_HIGH_FIDELITY_HERO_SHA256  $TARGET/hero-courier-v1.glb" | sha256sum -c -
+          test "$(stat -c%s "$TARGET/hero-courier-v1.glb")" -gt 20000000
+          printf '%s\n' \
+            'classification=INTERNAL EVALUATION CANDIDATE; NOT RELEASE CLEARED' \
+            'identity=hero-courier-v1' \
+            "candidate_sha256=$DROPI_HIGH_FIDELITY_HERO_SHA256" \
+            "source_artifact_id=$DROPI_HUMAN_ARTIFACT_ID" \
+            'source_head=56de0c7798ceb1a021fe2a29898926849e0dc3c5' \
+            > "$TARGET/PROVENANCE.txt"
+
+      - name: Build exact-head Babylon runtime with high-fidelity hero
+        working-directory: 09_Development/Spikes/BABYLON_THIRD_PERSON_BRAILA_V1
+        shell: bash
+        run: |
+          set -euo pipefail
+          npm ci --ignore-scripts --no-audit --no-fund
+          npm run build
+          test -s dist/assets/characters/high-fidelity/hero-courier-v1.glb
+          echo "$DROPI_HIGH_FIDELITY_HERO_SHA256  dist/assets/characters/high-fidelity/hero-courier-v1.glb" | sha256sum -c -
+          grep -R -F -q 'hero-courier-v1.glb' dist/assets
+          node scripts/verifyHighFidelityHeroRuntime.mjs
+          grep -F -q '"status": "PASS"' dist/evidence/high-fidelity-hero-runtime.json
+          grep -F -q '"loaded": true' dist/evidence/high-fidelity-hero-runtime.json
+          node scripts/writeAndroidRuntimeManifest.mjs
+          grep -F -q "\"headSha\": \"$DROPI_HEAD_SHA\"" dist/dropi-runtime-manifest.json
+          grep -F -q '"productionEligible": false' dist/dropi-runtime-manifest.json
+
+      - name: Upload rendered high-fidelity proof
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: dropi-high-fidelity-rendered-${{ github.event.pull_request.head.sha || github.sha }}
+          path: |
+            09_Development/Spikes/BABYLON_THIRD_PERSON_BRAILA_V1/dist/evidence/high-fidelity-hero-runtime.json
+            09_Development/Spikes/BABYLON_THIRD_PERSON_BRAILA_V1/dist/evidence/high-fidelity-hero-runtime.png
+            09_Development/Spikes/BABYLON_THIRD_PERSON_BRAILA_V1/dist/evidence/high-fidelity-hero-close.png
+          if-no-files-found: error
+          retention-days: 14
+
+      - name: Prepare isolated Android evaluation stage
+        shell: bash
+        run: |
+          set -euo pipefail
+          node 09_Development/Spikes/BABYLON_THIRD_PERSON_BRAILA_V1/scripts/prepareAndroidEvaluationStage.mjs \
+            "$GITHUB_WORKSPACE/game-mobile" \
+            "$GITHUB_WORKSPACE/09_Development/Spikes/BABYLON_THIRD_PERSON_BRAILA_V1/dist" \
+            "$DROPI_STAGE_ROOT"
+          cd "$DROPI_STAGE_ROOT/game-mobile"
+          npm ci --no-audit --no-fund
+          EXPO_PUBLIC_DROPITYCOON_RUNTIME_MODE=bundled npm run typecheck
+          CI=1 NODE_ENV=production EXPO_PUBLIC_DROPITYCOON_RUNTIME_MODE=bundled \
+            ./node_modules/.bin/expo prebuild --platform android --clean --no-install
+          grep -F -q "applicationId 'com.dropi.tycoon.babyloneval'" android/app/build.gradle
+          grep -F -q "versionCode $DROPI_ANDROID_VERSION_CODE" android/app/build.gradle
+          test -f android/app/src/main/assets/dropi-game/assets/characters/high-fidelity/hero-courier-v1.glb
+          echo "$DROPI_HIGH_FIDELITY_HERO_SHA256  android/app/src/main/assets/dropi-game/assets/characters/high-fidelity/hero-courier-v1.glb" | sha256sum -c -
+
+      - name: Resolve Android build tools and signing identity
+        shell: bash
+        run: |
+          set -euo pipefail
+          BUILD_TOOLS_VERSION="$(ls "$ANDROID_HOME/build-tools" | sort -V | tail -n1)"
+          BUILD_TOOLS="$ANDROID_HOME/build-tools/$BUILD_TOOLS_VERSION"
+          test -x "$BUILD_TOOLS/apksigner"
+          test -x "$BUILD_TOOLS/zipalign"
+          test -x "$BUILD_TOOLS/aapt"
+          echo "DROPI_BUILD_TOOLS=$BUILD_TOOLS" >> "$GITHUB_ENV"
+          IDENTITY="$GITHUB_WORKSPACE/09_Development/Spikes/BABYLON_THIRD_PERSON_BRAILA_V1/scripts/evaluationReleaseIdentity.mjs"
+          echo "DROPI_REFERENCE_SIGNER=$(node "$IDENTITY" --signer)" >> "$GITHUB_ENV"
+
+      - name: Build ARM64 high-fidelity owner APK
+        shell: bash
+        run: |
+          set -euo pipefail
+          cd "$DROPI_STAGE_ROOT/game-mobile/android"
+          CI=1 NODE_ENV=production EXPO_PUBLIC_DROPITYCOON_RUNTIME_MODE=bundled \
+            ./gradlew --no-daemon --stacktrace :app:assembleRelease -PreactNativeArchitectures=arm64-v8a
+          APK="$DROPI_STAGE_ROOT/game-mobile/android/app/build/outputs/apk/release/app-release.apk"
+          test -s "$APK"
+          ABI_LIST="$(unzip -Z1 "$APK" | sed -n 's#^lib/\([^/]*\)/.*#\1#p' | sort -u | paste -sd, -)"
+          test "$ABI_LIST" = 'arm64-v8a'
+          "$DROPI_BUILD_TOOLS/apksigner" verify --verbose --print-certs "$APK"
+          CERT="$("$DROPI_BUILD_TOOLS/apksigner" verify --verbose --print-certs "$APK" | node "$GITHUB_WORKSPACE/09_Development/Spikes/BABYLON_THIRD_PERSON_BRAILA_V1/scripts/evaluationReleaseIdentity.mjs" --parse-signer)"
+          test "$CERT" = "$DROPI_REFERENCE_SIGNER"
+          "$DROPI_BUILD_TOOLS/zipalign" -c -P 16 -v 4 "$APK"
+          "$DROPI_BUILD_TOOLS/aapt" dump badging "$APK" | grep -F "package: name='$DROPI_PACKAGE_ID' versionCode='$DROPI_ANDROID_VERSION_CODE'"
+          "$DROPI_BUILD_TOOLS/aapt" dump badging "$APK" | grep -Fx "native-code: 'arm64-v8a'"
+          unzip -t "$APK"
+          unzip -Z1 "$APK" | grep -Fx 'assets/dropi-game/assets/characters/high-fidelity/hero-courier-v1.glb'
+          mkdir -p "$DROPI_APK_OUTPUT"
+          cp "$APK" "$DROPI_APK_OUTPUT/DROPi-Babylon-HighFi-${DROPI_HEAD_SHA:0:8}.apk"
+          cp 09_Development/Spikes/BABYLON_THIRD_PERSON_BRAILA_V1/dist/evidence/high-fidelity-hero-runtime.json "$DROPI_APK_OUTPUT/"
+          cp 09_Development/Spikes/BABYLON_THIRD_PERSON_BRAILA_V1/dist/evidence/high-fidelity-hero-runtime.png "$DROPI_APK_OUTPUT/"
+          cp 09_Development/Spikes/BABYLON_THIRD_PERSON_BRAILA_V1/dist/evidence/high-fidelity-hero-close.png "$DROPI_APK_OUTPUT/"
+          cd "$DROPI_APK_OUTPUT"
+          sha256sum * > SHA256SUMS.txt
+          cat > OWNER-EVIDENCE.txt <<EOF
+          classification=INTERNAL OWNER EVALUATION ONLY
+          head_sha=$DROPI_HEAD_SHA
+          high_fidelity_hero=hero-courier-v1
+          high_fidelity_hero_sha256=$DROPI_HIGH_FIDELITY_HERO_SHA256
+          rendered_runtime_loaded=PASS
+          rendered_runtime_triangle_floor=PASS
+          final_abi=arm64-v8a
+          version_code=$DROPI_ANDROID_VERSION_CODE
+          signer_sha256=$DROPI_REFERENCE_SIGNER
+          apk_signature=PASS
+          zipalign_16kb=PASS
+          physical_phone_visual_acceptance=UNKNOWN_UNTIL_OWNER_DEVICE_TEST
+          EOF
+          cat OWNER-EVIDENCE.txt
+
+      - name: Upload high-fidelity owner APK
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: dropi-babylon-high-fidelity-owner-${{ github.event.pull_request.head.sha || github.sha }}
+          path: ${{ runner.temp }}/dropi-highfi-owner-out-${{ github.event.pull_request.head.sha || github.sha }}
+          if-no-files-found: error
+          compression-level: 0
+          retention-days: 14
