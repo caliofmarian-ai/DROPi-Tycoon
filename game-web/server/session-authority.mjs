@@ -1,3 +1,5 @@
+import { createHash } from 'node:crypto'
+
 const MAX_BODY_BYTES = 8 * 1024
 const MAX_AGGREGATES = 32
 const MAX_COMMANDS = 512
@@ -5,6 +7,14 @@ const MAX_ID_LENGTH = 96
 const MAX_DISPLAY_NAME_LENGTH = 48
 
 const ID_PATTERN = /^[A-Za-z0-9:_\-.]+$/
+const AUTHENTICATED_COMMAND_KEYS = new Set(['commandId', 'commandType', 'expectedRevision', 'payload'])
+const CLIENT_IDENTITY_KEYS = new Set([
+  'accountId',
+  'actorId',
+  'aggregateId',
+  'ownerActorId',
+  'profileAggregateId',
+])
 
 const sendJson = (response, status, payload) => {
   const body = JSON.stringify(payload)
@@ -263,16 +273,184 @@ const validateCommandEnvelope = body => {
   return validateDisplayName(body.payload.displayName) !== null
 }
 
+const validateAuthenticatedCommandEnvelope = body => {
+  if (!isRecord(body)) return { ok: false, code: 'INVALID_COMMAND_ENVELOPE' }
+  if (Object.keys(body).some(key => CLIENT_IDENTITY_KEYS.has(key))) {
+    return { ok: false, code: 'CLIENT_IDENTITY_CLAIMS_FORBIDDEN' }
+  }
+  if (Object.keys(body).some(key => !AUTHENTICATED_COMMAND_KEYS.has(key))) {
+    return { ok: false, code: 'INVALID_COMMAND_ENVELOPE' }
+  }
+  if (!validOpaqueId(body.commandId) || !isSafeRevision(body.expectedRevision)) {
+    return { ok: false, code: 'INVALID_COMMAND_ENVELOPE' }
+  }
+  if (body.commandType !== 'CreatePublicProfile' && body.commandType !== 'SetDisplayName') {
+    return { ok: false, code: 'INVALID_COMMAND_ENVELOPE' }
+  }
+  if (!isRecord(body.payload)) return { ok: false, code: 'INVALID_COMMAND_ENVELOPE' }
+  const keys = Object.keys(body.payload)
+  if (keys.length !== 1 || keys[0] !== 'displayName' || validateDisplayName(body.payload.displayName) === null) {
+    return { ok: false, code: 'INVALID_COMMAND_ENVELOPE' }
+  }
+  return { ok: true }
+}
+
 const pathSegments = requestUrl => {
   const pathname = new URL(requestUrl ?? '/', 'http://authority.local').pathname
   return pathname.split('/').filter(Boolean).map(segment => decodeURIComponent(segment))
 }
 
-export const handleSessionAuthorityRequest = async (request, response, registry) => {
+const normalizeAuthenticatedContext = value => {
+  if (!isRecord(value)) return null
+  if (!validOpaqueId(value.accountId) || !validOpaqueId(value.actorId) || !validOpaqueId(value.profileAggregateId)) return null
+  return {
+    accountId: value.accountId,
+    actorId: value.actorId,
+    profileAggregateId: value.profileAggregateId,
+  }
+}
+
+const resolveAuthenticatedContext = async (request, resolver) => {
+  if (typeof resolver !== 'function') {
+    return { ok: false, status: 503, code: 'AUTHENTICATION_NOT_CONFIGURED' }
+  }
+
+  let resolved
+  try {
+    resolved = await resolver(request)
+  } catch {
+    return { ok: false, status: 503, code: 'AUTHENTICATION_UNAVAILABLE' }
+  }
+
+  if (resolved === undefined || resolved === null) {
+    return { ok: false, status: 401, code: 'AUTHENTICATION_REQUIRED' }
+  }
+
+  const context = normalizeAuthenticatedContext(resolved)
+  if (!context) return { ok: false, status: 500, code: 'INVALID_AUTHENTICATED_CONTEXT' }
+  return { ok: true, value: context }
+}
+
+const scopedCommandId = (accountId, clientCommandId) => {
+  const digest = createHash('sha256')
+    .update(accountId)
+    .update('\u001f')
+    .update(clientCommandId)
+    .digest('hex')
+    .slice(0, 40)
+  return `AUTH:command:${digest}`
+}
+
+const projectClientCommandId = (result, clientCommandId) => {
+  if (!isRecord(result)) return result
+  const projected = structuredClone(result)
+  if (isRecord(projected.receipt)) projected.receipt.commandId = clientCommandId
+  if (isRecord(projected.event)) projected.event.commandId = clientCommandId
+  return projected
+}
+
+const authenticatedStatus = (registry, authenticateRequest) => ({
+  authority: registry.authority ?? 'server-process',
+  durability: registry.durability,
+  scope: 'authenticated-public-profile-boundary',
+  persistent: registry.persistent ?? false,
+  authentication: typeof authenticateRequest === 'function'
+    ? 'external-server-resolver'
+    : 'required-unavailable',
+  profileLookup: 'self-only',
+  clientIdentityClaims: false,
+})
+
+const handleAuthenticatedAuthorityRequest = async (request, response, registry, authenticateRequest, segments) => {
+  if (request.method === 'GET' && segments.length === 3 && segments[2] === 'status') {
+    sendJson(response, 200, authenticatedStatus(registry, authenticateRequest))
+    return true
+  }
+
+  const auth = await resolveAuthenticatedContext(request, authenticateRequest)
+  if (!auth.ok) {
+    sendJson(response, auth.status, { error: auth.code })
+    return true
+  }
+  const context = auth.value
+
+  if (request.method === 'GET' && segments.length === 4 && segments[2] === 'profiles') {
+    if (segments[3] !== 'me') {
+      sendJson(response, 404, { error: 'PROFILE_LOOKUP_NOT_AVAILABLE' })
+      return true
+    }
+    const profile = await registry.getProfile(context.profileAggregateId)
+    if (!profile) {
+      sendJson(response, 404, { error: 'PROFILE_NOT_FOUND' })
+      return true
+    }
+    sendJson(response, 200, profile)
+    return true
+  }
+
+  if (request.method === 'GET' && segments.length === 4 && segments[2] === 'receipts') {
+    const clientCommandId = segments[3]
+    if (!validOpaqueId(clientCommandId)) {
+      sendJson(response, 400, { error: 'INVALID_COMMAND_ID' })
+      return true
+    }
+    const receipt = await registry.getReceipt(scopedCommandId(context.accountId, clientCommandId))
+    if (!receipt || receipt.aggregateId !== context.profileAggregateId) {
+      sendJson(response, 404, { error: 'RECEIPT_NOT_FOUND' })
+      return true
+    }
+    sendJson(response, 200, { ...receipt, commandId: clientCommandId })
+    return true
+  }
+
+  if (request.method === 'POST' && segments.length === 3 && segments[2] === 'commands') {
+    const body = await readJsonBody(request)
+    const validation = validateAuthenticatedCommandEnvelope(body)
+    if (!validation.ok) {
+      sendJson(response, 400, { error: validation.code })
+      return true
+    }
+
+    const command = {
+      commandId: scopedCommandId(context.accountId, body.commandId),
+      actorId: context.actorId,
+      aggregateId: context.profileAggregateId,
+      commandType: body.commandType,
+      expectedRevision: body.expectedRevision,
+      payload: body.payload,
+    }
+    const result = await registry.execute(command)
+    if (result.kind === 'conflict') {
+      sendJson(response, 409, { error: result.code })
+      return true
+    }
+    if (result.kind === 'capacity') {
+      sendJson(response, 503, { error: result.code })
+      return true
+    }
+    sendJson(response, 200, projectClientCommandId(result, body.commandId))
+    return true
+  }
+
+  sendJson(response, 405, { error: 'METHOD_OR_ROUTE_NOT_ALLOWED' })
+  return true
+}
+
+export const handleSessionAuthorityRequest = async (request, response, registry, options = {}) => {
   const segments = pathSegments(request.url)
   if (segments[0] !== 'api' || segments[1] !== 'authority') return false
 
   try {
+    if (options.requireAuthentication === true) {
+      return await handleAuthenticatedAuthorityRequest(
+        request,
+        response,
+        registry,
+        options.authenticateRequest,
+        segments,
+      )
+    }
+
     if (request.method === 'GET' && segments.length === 3 && segments[2] === 'status') {
       sendJson(response, 200, {
         authority: registry.authority ?? 'server-process',

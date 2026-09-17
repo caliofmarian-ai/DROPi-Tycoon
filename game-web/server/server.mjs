@@ -57,7 +57,9 @@ const sendFile = async (filePath, response) => {
 }
 
 const server = createServer(async (request, response) => {
-  if (await handleSessionAuthorityRequest(request, response, authorityRegistry)) return
+  if (await handleSessionAuthorityRequest(request, response, authorityRegistry, {
+    requireAuthentication: true,
+  })) return
 
   const requestUrl = request.url ?? '/'
   const safePath = normalize(requestUrl.split('?')[0]).replace(/^(\.\.[/\\])+/, '')
@@ -103,9 +105,9 @@ process.once('SIGINT', () => {
 server.listen(port, host, () => {
   console.log(`DROPi Tycoon web runtime listening on http://${host}:${port}`)
   if (authorityRegistry.persistent) {
-    console.log('PostgreSQL authority prototype enabled at /api/authority/* (durable public-profile scope; production authentication not configured).')
+    console.log('PostgreSQL authority store initialized; /api/authority/* profile reads/writes are blocked until an authenticated server resolver is configured.')
   } else {
-    console.log('Session authority prototype enabled at /api/authority/* (non-durable, unauthenticated public-profile scope only).')
+    console.log('Session authority prototype enabled at /api/authority/status only; profile reads/writes are blocked until an authenticated server resolver is configured.')
   }
   if (worldInstanceRuntime) {
     console.log('World Instance B2 runtime adapter initialized internally (no public routes; authenticated server identity context required before durable bindings can be created).')
