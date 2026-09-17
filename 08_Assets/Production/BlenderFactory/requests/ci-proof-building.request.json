@@ -1,0 +1,49 @@
+{
+  "schemaVersion": 1,
+  "requestId": "ci-proof-building",
+  "issue": 742,
+  "classification": "TEST_ONLY_NON_PRODUCTION",
+  "semanticFamily": "pipeline-proof-procedural-building",
+  "generationReason": "Prove that the DT-19 server/CI pipeline can generate and validate a deterministic GLB with Blender headless before any production asset automation is authorized.",
+  "inventoryAudit": {
+    "checked": true,
+    "inventoryRef": "08_Assets/Production/asset-inventory.v1.json",
+    "checkedFamilies": [
+      "SRC-20260907-006"
+    ],
+    "missingCapability": "A deterministic CI-only Blender headless generation proof does not exist in the canonical repository.",
+    "reuseDecision": "No production visual source is required because this output is a technical pipeline fixture made only from Blender primitives."
+  },
+  "provenance": {
+    "generator": "Blender",
+    "sourceType": "PROCEDURAL_PRIMITIVES",
+    "externalInputs": [],
+    "commercialStatus": "NOT_EVALUATED_TEST_ONLY",
+    "legalQualificationAuthority": "DT-13"
+  },
+  "budget": {
+    "maxTriangles": 500,
+    "maxMaterials": 4,
+    "requireCollisionProxy": true,
+    "maxGlbBytes": 1048576
+  },
+  "parameters": {
+    "width": 8.0,
+    "depth": 6.0,
+    "floorHeight": 3.0,
+    "floors": 2,
+    "roofHeight": 1.2,
+    "bodyColor": [
+      0.55,
+      0.42,
+      0.3,
+      1.0
+    ],
+    "roofColor": [
+      0.22,
+      0.12,
+      0.08,
+      1.0
+    ]
+  }
+}
