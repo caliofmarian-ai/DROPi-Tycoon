@@ -9,6 +9,7 @@ import { GlobalMapScene } from '../scenes/GlobalMapScene'
 import { HQInteriorScene } from '../scenes/HQInteriorScene'
 import { ApprovedAssetMainMenuScene } from '../scenes/ApprovedAssetMainMenuScene'
 import { MarketplaceInteriorScene } from '../scenes/MarketplaceInteriorScene'
+import { MariaShopInteriorScene } from '../scenes/MariaShopInteriorScene'
 import { VehicleFleetScene } from '../scenes/VehicleFleetScene'
 import { COLORS } from '../ui/theme'
 
@@ -33,6 +34,7 @@ export const createGameConfig = (parent: string): Phaser.Types.Core.GameConfig =
     GlobalMapScene,
     HQInteriorScene,
     MarketplaceInteriorScene,
+    MariaShopInteriorScene,
     CompanyManagementScene,
     EmployeeManagementScene,
     FinancialReportScene,
