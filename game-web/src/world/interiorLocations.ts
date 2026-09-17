@@ -1,7 +1,7 @@
 import { WORLD_CITY_NAME } from './worldLayout'
 import type { ActiveTransport } from '../types/game'
 
-export type InteriorLocationId = 'hq' | 'marketplace'
+export type InteriorLocationId = 'hq' | 'marketplace' | 'maria-shop'
 export type InteriorInteractionId =
   | 'exit'
   | 'fleet'
@@ -11,6 +11,7 @@ export type InteriorInteractionId =
   | 'staging'
   | 'market-stalls'
   | 'player-listings'
+  | 'maria-counter'
 
 export interface InteriorPoint { x: number; y: number }
 export interface InteriorRect extends InteriorPoint { width: number; height: number }
@@ -87,9 +88,35 @@ export const MARKETPLACE_INTERIOR: InteriorLocationDefinition = {
   ],
 }
 
+/**
+ * Brăila-only opening interior. `CanalPickup` remains the physical city route point;
+ * this room is presentation/collision space behind that door and does not create cargo authority.
+ */
+export const MARIA_SHOP_INTERIOR: InteriorLocationDefinition = {
+  id: 'maria-shop',
+  title: 'MAGAZINUL MARIEI',
+  subtitle: 'Greengrocer · local produce · Brăila',
+  width: INTERIOR_WIDTH,
+  height: INTERIOR_HEIGHT,
+  spawn: { x: 600, y: 620 },
+  interactions: [
+    interaction('exit', `Exit to ${WORLD_CITY_NAME}`, 600, 662, 54),
+    interaction('maria-counter', 'Talk to Maria', 600, 255, 86),
+  ],
+  obstacles: [
+    { x: 600, y: 34, width: 1120, height: 46 },
+    { x: 34, y: 360, width: 46, height: 640 },
+    { x: 1166, y: 360, width: 46, height: 640 },
+    { x: 600, y: 325, width: 420, height: 54 },
+    { x: 250, y: 270, width: 180, height: 120 },
+    { x: 950, y: 270, width: 180, height: 120 },
+  ],
+}
+
 export const INTERIOR_LOCATIONS: Readonly<Record<InteriorLocationId, InteriorLocationDefinition>> = {
   hq: HQ_INTERIOR,
   marketplace: MARKETPLACE_INTERIOR,
+  'maria-shop': MARIA_SHOP_INTERIOR,
 }
 
 const finitePoint = (point: InteriorPoint): boolean => Number.isFinite(point.x) && Number.isFinite(point.y)
