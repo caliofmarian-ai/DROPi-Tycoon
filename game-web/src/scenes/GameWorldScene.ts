@@ -8,10 +8,10 @@ import {
   ACTIVE_TRANSPORT_LABELS, availableActiveTransports, nextActiveTransport, resolveActiveTransport,
 } from '../systems/activeTransportSystem'
 import { TRANSPORT_PROFILES } from '../systems/urbanLogistics'
-import { getUrbanObjective, performUrbanInteraction } from '../systems/urbanInteractions'
+import { getUrbanObjective, performUrbanInteraction, type UrbanObjective } from '../systems/urbanInteractions'
 import type { ActiveTransport, CompanyState, WorldState } from '../types/game'
 import { NarrativePresentationOverlay } from '../ui/NarrativePresentation'
-import { UrbanHUD, isUrbanHUDPoint } from '../ui/UrbanHUD'
+import { UrbanHUD, isUrbanHUDPoint, urbanHUDLayout } from '../ui/UrbanHUD'
 import { UrbanCameraPan, cameraScrollFromDrag } from '../ui/UrbanCameraPan'
 import { UrbanZoomGesture } from '../ui/urbanZoom'
 import { cityFitZoom, clamp } from '../world/semanticMapCamera'
@@ -22,9 +22,28 @@ import {
   URBAN_HQ, URBAN_MARKETPLACE, inInteractionRange, moveUrbanPlayer, movementFacing, repairUrbanPosition,
   type UrbanFacing,
 } from '../world/urbanWorld'
-import { WORLD_HEIGHT, WORLD_WIDTH } from '../world/worldLayout'
+import { WORLD_CITY_NAME, WORLD_HEIGHT, WORLD_WIDTH } from '../world/worldLayout'
 import { CityGroundDetail } from '../world/cityGroundDetail'
 import { AmbientCity } from '../world/ambientCity'
+import {
+  chooseRecoveryHeroPresentation,
+  deliverRecoveryMariaTest,
+  ensureRecoveryOpeningRuntime,
+  enterRecoveryMariaShop,
+  recoveryMariaWorldPoint,
+  recoveryOpeningObjective,
+  recoveryOpeningStatusText,
+  startRecoveryWorkSearch,
+} from '../missions/recoveryOpeningRuntime'
+import { RECOVERY_OPENING_MISSION_IDS } from '../missions/recoveryOpeningAuthoredRegistry'
+import {
+  RECOVERY_AUTHORED_REFS,
+  buildRecoveryPrologueSequence,
+} from '../narrative/recoveryOpeningV2'
+import {
+  buildRecoveryPresentationSelectionSequence,
+  heroPresentationSexFromChoiceResult,
+} from '../narrative/recoveryOpeningSelection'
 
 const HUD_REFRESH_MS = 150
 const AMBIENT_UPDATE_MS = 33
@@ -49,6 +68,9 @@ export class GameWorldScene extends Phaser.Scene {
   private parkedBicycle: Phaser.GameObjects.Graphics | null = null
   private fixedUiLayer!: Phaser.GameObjects.Layer
   private fixedUiCamera!: Phaser.Cameras.Scene2D.Camera
+  private recoveryHudGate?: Phaser.GameObjects.Container
+  private recoveryHudStatus?: Phaser.GameObjects.Text
+  private recoveryHudBlockers: Phaser.GameObjects.Rectangle[] = []
   private keys: Record<string, Phaser.Input.Keyboard.Key> = {}
   private lastHudUpdate = 0
   private ambientUpdateAccumulator = 0
@@ -122,7 +144,8 @@ export class GameWorldScene extends Phaser.Scene {
       recenter: () => this.recenterCamera(),
       worldMap: () => this.openGlobalMap(),
     })
-    // Created after ordinary HUD overlays so authoritative story signals can present above the existing UI.
+    this.createRecoveryHudGate()
+    // Created after ordinary HUD overlays and the no-phone gate so story presentation stays topmost.
     this.narrative = new NarrativePresentationOverlay(this, this.fixedUiLayer)
     this.input.addPointer(Math.max(0, 4 - this.input.manager.pointers.length))
     this.keys = (this.input.keyboard?.addKeys('W,A,S,D,UP,DOWN,LEFT,RIGHT,E,T,ESC') ?? {}) as typeof this.keys
@@ -148,7 +171,9 @@ export class GameWorldScene extends Phaser.Scene {
     this.facing = 'down'
     this.refreshPresentation()
     this.applyMapReturnView()
-    this.hud.notify('Joystick / WASD to move · Drag the city to explore · ⌖ returns to courier')
+    if (!this.presentRecoveryOpeningIfNeeded()) {
+      this.hud.notify('Joystick / WASD to move · Drag the city to explore · ⌖ returns to courier')
+    }
   }
 
   update(time: number, delta: number): void {
@@ -197,6 +222,58 @@ export class GameWorldScene extends Phaser.Scene {
 
   private onAction(): void {
     if (this.isModalOpen()) return
+
+    const session = getOrCreateGameSession()
+    const recovery = ensureRecoveryOpeningRuntime(session)
+    if (recovery.active) {
+      const mariaPoint = recoveryMariaWorldPoint()
+      const nearMaria = mariaPoint ? inInteractionRange(this.worldState.player, mariaPoint) : false
+      if (nearMaria && ['search-work', 'maria-dialogue', 'return-maria'].includes(recovery.phase)) {
+        if (recovery.phase === 'search-work') {
+          const entered = enterRecoveryMariaShop(session)
+          if (!entered.changed || entered.phase !== 'maria-dialogue') {
+            this.hud.notify(`Maria's shop is not ready yet: ${entered.reason ?? 'mission authority blocked'}.`)
+            return
+          }
+        }
+        this.worldState = session.world
+        this.companyState = session.company
+        this.persist('progression-changed')
+        this.enterInterior('MariaShopInterior')
+        return
+      }
+
+      if (recovery.phase === 'deliver-first') {
+        const deliveryObjective = getUrbanObjective(this.worldState)
+        const distance = Math.hypot(
+          deliveryObjective.point.x - this.worldState.player.x,
+          deliveryObjective.point.y - this.worldState.player.y,
+        )
+        const delivered = deliverRecoveryMariaTest(session, distance)
+        if (!delivered.changed) {
+          this.hud.notify(delivered.reason === 'recovery-delivery-not-in-range'
+            ? 'Bring Maria\'s parcel to the marked recipient first.'
+            : `Delivery cannot complete yet: ${delivered.reason ?? 'authority not ready'}.`)
+          return
+        }
+        this.worldState = session.world
+        this.companyState = session.company
+        this.persist('progression-changed')
+        getAudioController().play('delivery-success')
+        this.refreshPresentation()
+        this.hud.notify('Delivery complete. No fake company money was created. Return to Maria and report back.')
+        return
+      }
+
+      if (recovery.phase === 'trial-ready') {
+        this.hud.notify("Maria's five-delivery trial is unlocked. The next recovery slice will materialize those governed jobs.")
+        return
+      }
+
+      this.hud.notify('Keep following the recovery objective. You do not have a company, vehicle or phone yet.')
+      return
+    }
+
     if (inInteractionRange(this.worldState.player, URBAN_HQ)) {
       this.enterInterior('HQInterior')
       return
@@ -216,7 +293,7 @@ export class GameWorldScene extends Phaser.Scene {
 
   private isModalOpen(): boolean { return this.hud.isMenuOpen() || (this.narrative?.isOpen() ?? false) }
 
-  private enterInterior(scene: 'HQInterior' | 'MarketplaceInterior'): void {
+  private enterInterior(scene: 'HQInterior' | 'MarketplaceInterior' | 'MariaShopInterior'): void {
     this.clearInput()
     this.persist('progression-changed')
     this.scene.launch(scene)
@@ -225,6 +302,10 @@ export class GameWorldScene extends Phaser.Scene {
 
   private switchTransport(): void {
     if (this.isModalOpen()) return
+    if (ensureRecoveryOpeningRuntime(getOrCreateGameSession()).active) {
+      this.hud.notify('You are still rebuilding on foot. Vehicles unlock later through legitimate ownership.')
+      return
+    }
     if (!inInteractionRange(this.worldState.player, URBAN_HQ)) {
       this.hud.notify('Change transport at the HQ Fleet Bay.')
       return
@@ -243,16 +324,42 @@ export class GameWorldScene extends Phaser.Scene {
     this.refreshPresentation()
   }
 
+  private currentObjective(): UrbanObjective {
+    const session = getOrCreateGameSession()
+    const recovery = ensureRecoveryOpeningRuntime(session)
+    const authored = recoveryOpeningObjective(session)
+    if (authored) return authored
+    if (recovery.active) {
+      const mariaPoint = recoveryMariaWorldPoint()
+      if (mariaPoint && recovery.phase === 'maria-dialogue') {
+        return { point: mariaPoint, title: 'Talk to Maria at the counter', action: 'Enter shop' }
+      }
+      if (mariaPoint && recovery.phase === 'trial-ready') {
+        return { point: mariaPoint, title: "Maria's five-delivery trial is ready", action: 'Continue with Maria' }
+      }
+      if (recovery.phase === 'choose-presentation') {
+        return { point: { x: this.worldState.player.x, y: this.worldState.player.y }, title: 'Choose your hero', action: 'Continue story' }
+      }
+      if (recovery.phase === 'prologue') {
+        return { point: { x: this.worldState.player.x, y: this.worldState.player.y }, title: 'Get up and keep going', action: 'Continue story' }
+      }
+    }
+    return getUrbanObjective(this.worldState)
+  }
+
   private refreshPresentation(): void {
-    const objective = getUrbanObjective(this.worldState)
+    const objective = this.currentObjective()
+    const session = getOrCreateGameSession()
+    const recovery = ensureRecoveryOpeningRuntime(session)
     this.objectiveMarker.setPosition(objective.point.x, objective.point.y)
     const pickup = pickupPointForOrder(this.worldState.activeOrder)
     this.parcel.setPosition(pickup.x, pickup.y).setVisible(this.worldState.activeOrder.status === 'Accepted')
     const transport = this.worldState.urban!.activeTransport
     this.playerVisual.setState(PLAYER_VISUAL_BY_TRANSPORT[transport])
-    this.parkedBicycle?.setVisible(transport !== 'bicycle')
+    this.parkedBicycle?.setVisible(!recovery.active && transport !== 'bicycle')
     this.playerVisual.setCarrying(this.worldState.player.carryingPackage)
     this.hud.update(this.worldState, this.companyState, objective, this.cameras.main.worldView)
+    this.updateRecoveryHudGate(recoveryOpeningStatusText(session))
   }
 
   private persist(event: 'delivery-completed' | 'progression-changed' | 'settings-changed'): boolean {
@@ -262,7 +369,11 @@ export class GameWorldScene extends Phaser.Scene {
   }
 
   private saveProgress(): void {
-    this.hud.notify(this.persist('progression-changed') ? 'Company + preferences saved. Loading starts a fresh job at HQ.' : 'Storage unavailable. Progress remains in this session.')
+    const recoveryActive = ensureRecoveryOpeningRuntime(getOrCreateGameSession()).active
+    const saved = this.persist('progression-changed')
+    this.hud.notify(saved
+      ? recoveryActive ? 'Recovery progress saved.' : 'Company + preferences saved. Loading starts a fresh job at HQ.'
+      : 'Storage unavailable. Progress remains in this session.')
   }
 
   private toggleAudio(): void {
@@ -275,6 +386,10 @@ export class GameWorldScene extends Phaser.Scene {
 
   private openGlobalMap(focus?: string): void {
     if (this.isModalOpen()) return
+    if (ensureRecoveryOpeningRuntime(getOrCreateGameSession()).active) {
+      this.hud.notify('No GPS yet. Your first phone is an earned personal asset later in the recovery story.')
+      return
+    }
     this.clearInput()
     this.syncRuntimeSession()
     this.scene.launch('GlobalMap', { focus })
@@ -295,6 +410,126 @@ export class GameWorldScene extends Phaser.Scene {
   private getWorldVisualSignature(company: CompanyState): string {
     const ownsBicycle = resolveActiveTransport(company, 'bicycle') === 'bicycle' ? 1 : 0
     return `${company.level}:${company.employees.length}:${ownsBicycle}`
+  }
+
+  private presentRecoveryOpeningIfNeeded(): boolean {
+    if (this.narrative?.isOpen()) return true
+    const session = getOrCreateGameSession()
+    const recovery = ensureRecoveryOpeningRuntime(session)
+    if (!recovery.active) return false
+
+    const riseAuthority = {
+      missionId: RECOVERY_OPENING_MISSION_IDS.riseAndSearch,
+      authoredRef: RECOVERY_AUTHORED_REFS.rise,
+    }
+
+    if (recovery.phase === 'choose-presentation') {
+      return this.narrative.present(
+        buildRecoveryPresentationSelectionSequence(WORLD_CITY_NAME, riseAuthority),
+        {
+          onChoice: choice => {
+            const sex = heroPresentationSexFromChoiceResult(choice.resultRef)
+            if (!sex) return
+            const live = getOrCreateGameSession()
+            const selected = chooseRecoveryHeroPresentation(live, sex)
+            if (!selected.changed) return
+            this.worldState = live.world
+            this.companyState = live.company
+            this.persist('progression-changed')
+            this.refreshPresentation()
+          },
+          onComplete: () => { this.presentRecoveryOpeningIfNeeded() },
+        },
+      )
+    }
+
+    if (recovery.phase === 'prologue' && recovery.selectedSex) {
+      return this.narrative.present(
+        buildRecoveryPrologueSequence(recovery.selectedSex, WORLD_CITY_NAME, riseAuthority),
+        {
+          onComplete: () => {
+            const live = getOrCreateGameSession()
+            const started = startRecoveryWorkSearch(live)
+            if (!started.changed) {
+              this.hud.notify(`Recovery opening could not start: ${started.reason ?? 'mission authority blocked'}.`)
+              return
+            }
+            this.worldState = live.world
+            this.companyState = live.company
+            this.persist('progression-changed')
+            this.refreshPresentation()
+            this.hud.notify('Walk the streets and look for legitimate work. You have no phone, vehicle or company yet.')
+          },
+        },
+      )
+    }
+
+    return false
+  }
+
+  private createRecoveryHudGate(): void {
+    const layout = urbanHUDLayout(this.scale.width, this.scale.height)
+    const { width } = this.scale
+    const gate = this.add.container(0, 0).setVisible(false)
+    const elements: Phaser.GameObjects.GameObject[] = []
+
+    const statusWidth = Math.min(Math.max(210, width - (layout.portrait ? 28 : 410)), 470)
+    const statusY = layout.portrait ? 55 : 22
+    const statusBackground = this.add.rectangle(width / 2, statusY, statusWidth, 28, 0x073354, 0.98)
+      .setStrokeStyle(2, COLORS.gold, 0.8)
+    this.recoveryHudStatus = this.add.text(width / 2, statusY, '', {
+      fontFamily: 'Arial, sans-serif', fontSize: '11px', fontStyle: 'bold', color: '#ffffff',
+      align: 'center',
+    }).setOrigin(0.5)
+    elements.push(statusBackground, this.recoveryHudStatus)
+
+    const phone = layout.phone
+    const phoneBlocker = this.add.rectangle(phone.x, phone.y, phone.width, Math.max(44, phone.height), 0x122b3d, 1)
+      .setStrokeStyle(2, 0x6f8794).setInteractive({ useHandCursor: true })
+      .on('pointerdown', () => this.hud.notify('No phone yet. Earn and buy the first handset later in the recovery story.'))
+    const phoneLabel = this.add.text(phone.x, phone.y, 'NO PHONE', {
+      fontFamily: 'Arial, sans-serif', fontSize: '10px', fontStyle: 'bold', color: '#d7e0e5',
+    }).setOrigin(0.5)
+    elements.push(phoneBlocker, phoneLabel)
+
+    const map = layout.minimap
+    const mapBlocker = this.add.rectangle(
+      map.x + map.width / 2,
+      map.y + map.height / 2 + 8,
+      map.width + 10,
+      map.height + 34,
+      0x122b3d,
+      0.98,
+    ).setStrokeStyle(2, 0x6f8794).setInteractive({ useHandCursor: true })
+      .on('pointerdown', () => this.hud.notify('No GPS yet. Learn the nearby streets and landmarks on foot.'))
+    const mapLabel = this.add.text(map.x + map.width / 2, map.y + map.height / 2 + 2, 'NO GPS\nLEARN THE STREETS', {
+      fontFamily: 'Arial, sans-serif', fontSize: '9px', fontStyle: 'bold', color: '#d7e0e5', align: 'center',
+    }).setOrigin(0.5)
+    elements.push(mapBlocker, mapLabel)
+
+    const zoom = layout.zoom
+    const worldMapBlocker = this.add.rectangle(zoom.x, zoom.y + 48, 112, 44, 0x122b3d, 1)
+      .setStrokeStyle(2, 0x6f8794).setInteractive({ useHandCursor: true })
+      .on('pointerdown', () => this.hud.notify('World map is locked until the phone and later network progression are earned.'))
+    const worldMapLabel = this.add.text(zoom.x, zoom.y + 48, 'MAP LOCKED', {
+      fontFamily: 'Arial, sans-serif', fontSize: '9px', fontStyle: 'bold', color: '#d7e0e5',
+    }).setOrigin(0.5)
+    elements.push(worldMapBlocker, worldMapLabel)
+
+    gate.add(elements)
+    this.fixedUiLayer.add(gate)
+    this.recoveryHudGate = gate
+    this.recoveryHudBlockers = [phoneBlocker, mapBlocker, worldMapBlocker]
+    this.updateRecoveryHudGate(null)
+  }
+
+  private updateRecoveryHudGate(statusText: string | null): void {
+    const active = statusText !== null
+    this.recoveryHudGate?.setVisible(active)
+    this.recoveryHudStatus?.setText(statusText ?? '')
+    this.recoveryHudBlockers.forEach(blocker => {
+      if (blocker.input) blocker.input.enabled = active
+    })
   }
 
   private readonly unlockAudio = (): void => { getAudioController().unlock() }
@@ -439,6 +674,8 @@ export class GameWorldScene extends Phaser.Scene {
     this.clearInput()
     this.recenterCamera(false)
     this.applyMapReturnView()
+    this.refreshPresentation()
+    this.presentRecoveryOpeningIfNeeded()
   }
 
   private applyMapReturnView(): void {
@@ -453,6 +690,9 @@ export class GameWorldScene extends Phaser.Scene {
     this.clearInput()
     this.resizeRestartTimer?.remove()
     this.resizeRestartTimer = undefined
+    this.recoveryHudGate?.destroy(true)
+    this.recoveryHudGate = undefined
+    this.recoveryHudBlockers = []
     this.narrative.destroy()
     this.hud.destroy()
     this.scale.off(Phaser.Scale.Events.RESIZE, this.handleResize)
