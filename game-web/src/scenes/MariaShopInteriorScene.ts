@@ -7,6 +7,7 @@ import {
   completeRecoveryMariaReturn,
   ensureRecoveryOpeningRuntime,
 } from '../missions/recoveryOpeningRuntime'
+import { RECOVERY_OPENING_MISSION_IDS } from '../missions/recoveryOpeningAuthoredRegistry'
 import {
   RECOVERY_AUTHORED_REFS,
   RECOVERY_LINE_COPY,
@@ -21,7 +22,6 @@ import {
 import { CITY_COLORS, COLORS } from '../ui/theme'
 import {
   INTERIOR_LOCATIONS,
-  isInteriorWalkable,
   moveInteriorPlayer,
   nearestInteriorInteraction,
   type InteriorPoint,
@@ -40,7 +40,6 @@ export class MariaShopInteriorScene extends Phaser.Scene {
   private readonly joystick = new AnalogJoystickInput()
   private padHit!: Phaser.GameObjects.Rectangle
   private padKnob!: Phaser.GameObjects.Arc
-  private actionHit!: Phaser.GameObjects.Rectangle
   private prompt!: Phaser.GameObjects.Text
   private toast!: Phaser.GameObjects.Text
   private toastTimer?: Phaser.Time.TimerEvent
@@ -188,7 +187,7 @@ export class MariaShopInteriorScene extends Phaser.Scene {
       .setScrollFactor(0).setDepth(103).setInteractive({ useHandCursor: true })
       .on('pointerdown', this.pressPad)
 
-    this.actionHit = this.add.rectangle(width - 88, height - 62, 140, 50, 0xffffff, 0.001)
+    this.add.rectangle(width - 88, height - 62, 140, 50, 0xffffff, 0.001)
       .setScrollFactor(0).setDepth(103).setInteractive({ useHandCursor: true }).on('pointerdown', () => this.onAction())
     this.add.rectangle(width - 88, height - 62, 140, 50, COLORS.surfaceRaised, 0.96)
       .setStrokeStyle(2, COLORS.accent).setScrollFactor(0).setDepth(101)
@@ -269,7 +268,7 @@ export class MariaShopInteriorScene extends Phaser.Scene {
         shopLabel: "Maria's Greengrocer",
         mariaActorId: 'maria-ionescu',
         returnMission: {
-          missionId: result.bindings ? 'mission:recovery:origin:maria-return' : 'mission:recovery:origin:maria-return',
+          missionId: RECOVERY_OPENING_MISSION_IDS.mariaReturn,
           authoredRef: RECOVERY_AUTHORED_REFS.firstReturn,
         },
         foodRewardAuthorityConfirmed: false,
