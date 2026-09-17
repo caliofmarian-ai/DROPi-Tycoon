@@ -99,6 +99,7 @@ describe('urban physical delivery scene', () => {
     world.player.carryingPackage = true
     world.player.currentOrder = world.activeOrder.orderId
     world.activeOrder.status = 'PickedUp'
+    replaceGameSession(world, company)
     const key = { justDown: true }
     const marker = { setPosition: vi.fn() }
     const parcel = { setPosition: () => parcel, setVisible: vi.fn() }
