@@ -19,8 +19,8 @@ describe('STAB-001 Android game-world lifecycle hardening', () => {
     expect(gameWorldSource).not.toContain('private readonly handleResize = (): void => {\n    this.syncRuntimeSession()\n    this.scene.restart()')
   })
 
-  it('keeps the expensive GameWorld resident while the owner enters physical HQ management', () => {
-    expect(gameWorldSource).toContain("private enterInterior(scene: 'HQInterior' | 'MarketplaceInterior')")
+  it('keeps the expensive GameWorld resident while the owner enters physical interiors', () => {
+    expect(gameWorldSource).toContain("private enterInterior(scene: 'HQInterior' | 'MarketplaceInterior' | 'MariaShopInterior')")
     expect(gameWorldSource).toContain('this.scene.launch(scene)')
     expect(gameWorldSource).toContain('this.scene.sleep()')
     expect(companySource).toContain('HQ_MANAGEMENT_RETURN_SCENE')
