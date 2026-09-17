@@ -101,7 +101,8 @@ export const MARIA_SHOP_INTERIOR: InteriorLocationDefinition = {
   spawn: { x: 600, y: 620 },
   interactions: [
     interaction('exit', `Exit to ${WORLD_CITY_NAME}`, 600, 662, 54),
-    interaction('maria-counter', 'Talk to Maria', 600, 255, 86),
+    // Customer-side interaction point: the solid counter remains between Maria and the hero.
+    interaction('maria-counter', 'Talk to Maria', 600, 390, 82),
   ],
   obstacles: [
     { x: 600, y: 34, width: 1120, height: 46 },
