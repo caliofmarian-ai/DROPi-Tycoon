@@ -257,15 +257,18 @@ describe('issue #554 visual storytelling presentation', () => {
     expect(narrativeSource).toContain('this.root.destroy(true)')
   })
 
-  it('does not auto-fire narrative from screen-open or economy heuristics', () => {
+  it('keeps legacy heuristic narrative disabled while recovery presentation is mission-state gated', () => {
     const worldSource = source('../src/scenes/GameWorldScene.ts')
 
     expect(worldSource).not.toContain('FIRST_SHIFT_OPENING_SEQUENCE')
     expect(worldSource).not.toContain('FIRST_DELIVERY_CONSEQUENCE_SEQUENCE')
     expect(worldSource).not.toContain('OPENING_NARRATIVE_SEEN')
     expect(worldSource).not.toContain('presentOpeningNarrative')
-    expect(worldSource).not.toContain('this.narrative.present(')
     expect(worldSource).not.toContain('firstSettledDelivery')
+    expect(worldSource).toContain('ensureRecoveryOpeningRuntime(session)')
+    expect(worldSource).toContain("recovery.phase === 'choose-presentation'")
+    expect(worldSource).toContain("recovery.phase === 'prologue' && recovery.selectedSex")
+    expect(worldSource).toContain('this.narrative.present(')
   })
 
   it('keeps narrative presentation outside mission/economy authority and never restarts a scene', () => {
