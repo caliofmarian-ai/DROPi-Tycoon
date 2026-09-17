@@ -1,3 +1,4 @@
+import { readFileSync } from 'node:fs'
 import { describe, expect, it } from 'vitest'
 import { startNewGameSession } from '../src/state/gameSession'
 import type { GameSessionState } from '../src/types/game'
@@ -12,6 +13,9 @@ import {
   recoveryOpeningStatusText,
   startRecoveryWorkSearch,
 } from '../src/missions/recoveryOpeningRuntime'
+import { INTERIOR_LOCATIONS, isInteriorWalkable, nearestInteriorInteraction } from '../src/world/interiorLocations'
+
+const sceneSource = readFileSync(new URL('../src/scenes/GameWorldScene.ts', import.meta.url), 'utf8')
 
 const advanceToMaria = (sex: 'Male' | 'Female' = 'Male') => {
   const session = startNewGameSession()
@@ -93,6 +97,22 @@ describe('recovery opening runtime vertical slice', () => {
     expect(snapshot.selectedSex).toBe('Female')
     expect(snapshot.phase).toBe('deliver-first')
     expect(restored.world.player.carryingPackage).toBe(true)
+  })
+
+  it('keeps Maria counter reachable from the customer side of the solid counter', () => {
+    const shop = INTERIOR_LOCATIONS['maria-shop']
+    const customerSide = { x: 600, y: 390 }
+    expect(isInteriorWalkable(shop, customerSide)).toBe(true)
+    expect(nearestInteriorInteraction(shop, customerSide)?.id).toBe('maria-counter')
+  })
+
+  it('wires recovery actions into GameWorld before legacy HQ/Mara settlement paths', () => {
+    expect(sceneSource).toContain('presentRecoveryOpeningIfNeeded()')
+    expect(sceneSource).toContain("this.enterInterior('MariaShopInterior')")
+    expect(sceneSource).toContain('deliverRecoveryMariaTest(session, distance)')
+    expect(sceneSource).toContain('No GPS yet')
+    expect(sceneSource).toContain('NO PHONE')
+    expect(sceneSource.indexOf('if (recovery.active)')).toBeLessThan(sceneSource.indexOf('if (inInteractionRange(this.worldState.player, URBAN_HQ))'))
   })
 
   it('does not rewrite an unrelated existing mission resume into the recovery campaign', () => {
