@@ -13,6 +13,10 @@ export const RECOVERY_OPENING_MISSION_IDS = Object.freeze({
   supplierIntroduction: 'mission:recovery:origin:supplier-introduction',
 })
 
+export const RECOVERY_OPENING_CHOICE_IDS = Object.freeze({
+  heroPresentationSex: 'choice:recovery:hero-presentation-sex',
+})
+
 export const RECOVERY_OPENING_SIGNALS = Object.freeze({
   searchStarted: 'recovery-opening:search-started',
   enteredMariaShop: 'recovery-opening:entered-maria-shop',
@@ -80,8 +84,20 @@ const riseAndSearchMission = (bindings: RecoveryOpeningAuthoredBindings): Missio
   label: 'Get Up and Look for Work',
   prerequisites: [{ kind: 'worldFlag', flagId: bindings.freshRecoveryOpeningFlagId }],
   availability: 'Prerequisites',
-  startStageId: 'rise',
+  startStageId: 'choose-presentation',
   stages: [
+    {
+      stageId: 'choose-presentation',
+      label: 'Choose hero presentation',
+      objectives: [{
+        objectiveId: 'choose-hero-presentation-sex',
+        kind: 'choice',
+        choiceId: RECOVERY_OPENING_CHOICE_IDS.heroPresentationSex,
+        options: ['Male', 'Female'],
+        label: 'Choose Male or Female presentation',
+      }],
+      next: { stageId: 'rise' },
+    },
     {
       stageId: 'rise',
       label: 'Get up and decide to keep going',
