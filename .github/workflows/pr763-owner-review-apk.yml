@@ -1,0 +1,129 @@
+name: PR763 Exact-Head Android Owner Review APK
+
+on:
+  pull_request:
+    branches:
+      - story/recovery-opening-runtime-v1
+    paths:
+      - ".github/workflows/pr763-owner-review-apk.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+env:
+  TARGET_SHA: b7d803516c35d93a4ade2f6f36a6366dbd4c313a
+  EXPO_PUBLIC_DROPITYCOON_RUNTIME_MODE: bundled
+  EAS_BUILD_PROFILE: production
+  CI: "1"
+
+jobs:
+  build-owner-review-apk:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+
+    steps:
+      - name: Checkout exact recovery runtime head
+        uses: actions/checkout@v7
+        with:
+          ref: ${{ env.TARGET_SHA }}
+          fetch-depth: 1
+
+      - name: Assert exact source commit
+        run: |
+          test "$(git rev-parse HEAD)" = "$TARGET_SHA"
+          echo "Exact source: $(git rev-parse HEAD)"
+
+      - name: Setup Node 22.13
+        uses: actions/setup-node@v7
+        with:
+          node-version: 22.13.0
+          cache: npm
+          cache-dependency-path: |
+            game-mobile/package-lock.json
+            game-web/package-lock.json
+
+      - name: Setup Java 17
+        uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: "17"
+
+      - name: Install mobile dependencies and prepare exact bundled Phaser runtime
+        working-directory: game-mobile
+        run: |
+          npm ci
+          npm run runtime:prepare
+          npm run runtime:validate
+          npm run typecheck
+
+      - name: Generate native Android project
+        working-directory: game-mobile
+        run: npx expo prebuild --platform android --clean --no-install
+
+      - name: Isolate owner-review package identity
+        working-directory: game-mobile
+        run: |
+          node <<'NODE'
+          const fs = require('node:fs')
+          const gradlePath = 'android/app/build.gradle'
+          let gradle = fs.readFileSync(gradlePath, 'utf8')
+          gradle = gradle.replace(/applicationId\s+["']com\.dropi\.tycoon["']/, 'applicationId "com.dropi.tycoon.pr763review"')
+          gradle = gradle.replace(/versionCode\s+\d+/, 'versionCode 76301')
+          gradle = gradle.replace(/versionName\s+["'][^"']+["']/, 'versionName "0.0.0-pr763-b7d8035"')
+          if (!gradle.includes('applicationId "com.dropi.tycoon.pr763review"')) {
+            throw new Error('Could not isolate PR763 owner-review applicationId')
+          }
+          fs.writeFileSync(gradlePath, gradle)
+
+          const stringsPath = 'android/app/src/main/res/values/strings.xml'
+          let strings = fs.readFileSync(stringsPath, 'utf8')
+          strings = strings.replace(/<string name="app_name">[^<]*<\/string>/, '<string name="app_name">DROPi Tycoon PR763 Review</string>')
+          fs.writeFileSync(stringsPath, strings)
+          NODE
+
+      - name: Build installable Android debug APK
+        working-directory: game-mobile/android
+        run: ./gradlew assembleDebug --no-daemon --stacktrace
+
+      - name: Attest APK, signer, identity and bundled runtime
+        working-directory: game-mobile
+        run: |
+          set -euo pipefail
+          APK="android/app/build/outputs/apk/debug/app-debug.apk"
+          test -f "$APK"
+
+          BUILD_TOOLS="$(ls -1 "$ANDROID_HOME/build-tools" | sort -V | tail -1)"
+          AAPT="$ANDROID_HOME/build-tools/$BUILD_TOOLS/aapt"
+          APKSIGNER="$ANDROID_HOME/build-tools/$BUILD_TOOLS/apksigner"
+
+          mkdir -p owner-review-evidence
+          OUT="owner-review-evidence/DROPi-Tycoon-PR763-b7d8035.apk"
+          cp "$APK" "$OUT"
+
+          sha256sum "$OUT" | tee owner-review-evidence/APK_SHA256.txt
+          "$AAPT" dump badging "$OUT" | tee owner-review-evidence/APK_BADGING.txt
+          "$APKSIGNER" verify --print-certs "$OUT" | tee owner-review-evidence/APK_SIGNER.txt
+          unzip -p "$OUT" assets/dropi-game/dropi-runtime-manifest.json | tee owner-review-evidence/BUNDLED_RUNTIME_MANIFEST.json
+
+          grep -q "package: name='com.dropi.tycoon.pr763review'" owner-review-evidence/APK_BADGING.txt
+          grep -q "versionCode='76301'" owner-review-evidence/APK_BADGING.txt
+
+          cat > owner-review-evidence/BUILD_ATTESTATION.txt <<EOF
+          purpose=NON_RELEASE_OWNER_REVIEW
+          canonical_release=false
+          gameplay_source_sha=$TARGET_SHA
+          expected_pr=763
+          expected_package=com.dropi.tycoon.pr763review
+          expected_version_code=76301
+          signing=ANDROID_DEBUG_KEY_FOR_INTERNAL_OWNER_REVIEW
+          runtime_mode=bundled
+          EOF
+
+      - name: Upload exact-head owner-review evidence
+        uses: actions/upload-artifact@v6
+        with:
+          name: dropi-tycoon-pr763-owner-review-b7d8035
+          path: game-mobile/owner-review-evidence/
+          if-no-files-found: error
+          retention-days: 14
