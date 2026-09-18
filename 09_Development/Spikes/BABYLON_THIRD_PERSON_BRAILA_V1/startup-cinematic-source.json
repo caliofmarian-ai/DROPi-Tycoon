@@ -1,0 +1,21 @@
+{
+  "schemaVersion": 1,
+  "issue": 769,
+  "classification": "CINEMATIC / NON-GAMEPLAY — INTERNAL OWNER REVIEW CANDIDATE",
+  "purpose": "startup-loading-world-presentation",
+  "higgsfieldJobId": "e1c02ff1-1fb5-49bd-876a-56dff4d8f7c2",
+  "sourceUrl": "https://d8j0ntlcm91z4.cloudfront.net/user_3JCeOwtDa203yO6LGJxCX8lkQgM/hf_20260918_170930_e1c02ff1-1fb5-49bd-876a-56dff4d8f7c2.mp4",
+  "sha256": "b4603c5ef0b33247fe64a09b15a1076b8ef9d403ae493eaea1832f63ba278a6f",
+  "media": {
+    "durationSeconds": 10.055,
+    "codec": "h264",
+    "audioCodec": "aac",
+    "width": 1280,
+    "height": 720,
+    "fps": 24,
+    "bytes": 5290203
+  },
+  "ownerVisualAcceptance": "PENDING",
+  "runtimeIntegrated": false,
+  "releaseCleared": false
+}
