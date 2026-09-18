@@ -1,0 +1,40 @@
+{
+  "schemaVersion": 1,
+  "issue": 759,
+  "classification": "CINEMATIC / NON-GAMEPLAY — INTERNAL OWNER REVIEW CANDIDATES",
+  "beatId": "beat:recovery:origin:rise",
+  "canonicalFactId": "fact:recovery:prologue-seen",
+  "candidates": {
+    "male": {
+      "heroPresentationId": "hero-sex:male",
+      "jobId": "cc89a846-58eb-4ce9-b8b6-f2a3d54ae749",
+      "sourceUrl": "https://d8j0ntlcm91z4.cloudfront.net/user_3JCeOwtDa203yO6LGJxCX8lkQgM/hf_20260918_161108_cc89a846-58eb-4ce9-b8b6-f2a3d54ae749.mp4",
+      "sha256": "630d7dab15b798874a877d5965f63e0bf0aabf1adb7493091f92b9ea482135f3",
+      "bytes": 5233202,
+      "durationSeconds": 15.093,
+      "width": 1280,
+      "height": 720,
+      "fps": 24,
+      "videoCodec": "h264",
+      "audioCodec": "aac",
+      "automatedReview": "CANDIDATE_PASS_OWNER_VISUAL_REVIEW_PENDING"
+    },
+    "female": {
+      "heroPresentationId": "hero-sex:female",
+      "jobId": "40211013-63f4-4c51-a26d-a9e9598d9e4d",
+      "sourceUrl": "https://d8j0ntlcm91z4.cloudfront.net/user_3JCeOwtDa203yO6LGJxCX8lkQgM/hf_20260918_163150_40211013-63f4-4c51-a26d-a9e9598d9e4d.mp4",
+      "sha256": "3f9ed3221f6d38c5a5bfe0d0873631b4907ddef5b91d028ece897e7730a4256e",
+      "bytes": 4217089,
+      "durationSeconds": 15.07,
+      "width": 1280,
+      "height": 720,
+      "fps": 24,
+      "videoCodec": "h264",
+      "audioCodec": "aac",
+      "automatedReview": "CANDIDATE_PASS_OWNER_VISUAL_REVIEW_PENDING"
+    }
+  },
+  "runtimeIntegrated": false,
+  "ownerVisualAcceptance": "PENDING",
+  "releaseCleared": false
+}
