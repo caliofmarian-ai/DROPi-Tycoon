@@ -116,6 +116,7 @@ expo.android = {
   ...expo.android,
   package: EVALUATION_PACKAGE,
   versionCode: androidVersionCode,
+  allowBackup: false,
 }
 
 if (expo.extra?.eas) {
