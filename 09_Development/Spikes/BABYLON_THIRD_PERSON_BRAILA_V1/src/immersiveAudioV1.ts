@@ -8,6 +8,7 @@ type AudioDebug = {
   issue: number
   started: boolean
   muted: boolean
+  cinematicActive: boolean
   buses: Record<AudioBusName, number>
 }
 
@@ -30,6 +31,7 @@ const buses: Record<AudioBusName, number> = {
 let context: AudioContext | null = null
 let gains: Partial<Record<AudioBusName, GainNode>> = {}
 let muted = false
+let cinematicActive = document.documentElement.dataset.cinematicAudio === 'active'
 let started = false
 let birdTimer: number | null = null
 let lastStepAt = 0
@@ -42,8 +44,24 @@ let lastSpatialUpdateAt = 0
 const dbSafe = (value: number): number => Math.max(0.0001, Math.min(1, value))
 
 const updateDebug = (): void => {
-  window.__DROPiAudioV1 = { issue: ISSUE, started, muted, buses: { ...buses } }
+  window.__DROPiAudioV1 = { issue: ISSUE, started, muted, cinematicActive, buses: { ...buses } }
 }
+
+const applyMasterMix = (timeConstant = 0.08): void => {
+  const master = gains.master
+  if (!master || !context) return
+  const target = muted || cinematicActive ? 0.0001 : dbSafe(buses.master)
+  master.gain.cancelScheduledValues(context.currentTime)
+  master.gain.setTargetAtTime(target, context.currentTime, timeConstant)
+}
+
+window.addEventListener('dropi:cinematic-audio-state', event => {
+  const detail = (event as CustomEvent<{ active?: boolean }>).detail
+  cinematicActive = detail?.active === true
+  document.documentElement.dataset.cinematicAudio = cinematicActive ? 'active' : 'gameplay'
+  applyMasterMix(cinematicActive ? 0.045 : 0.22)
+  updateDebug()
+})
 
 const createBusGraph = (audio: AudioContext): void => {
   const master = audio.createGain()
@@ -284,9 +302,7 @@ const createAudioToggle = (): void => {
     void ensureStarted().then(() => {
       muted = !muted
       const master = gains.master
-      if (master && context) {
-        master.gain.setTargetAtTime(muted ? 0.0001 : dbSafe(buses.master), context.currentTime, 0.035)
-      }
+      if (master && context) applyMasterMix(0.035)
       button.textContent = muted ? 'AUDIO OFF' : 'AUDIO ON'
       if (!muted) uiClick(1.05)
       updateDebug()
@@ -300,6 +316,7 @@ const ensureStarted = async (): Promise<void> => {
     context = new AudioContext({ latencyHint: 'interactive' })
     footstepNoise = createNoiseBuffer(context, 0.07)
     createBusGraph(context)
+    applyMasterMix(0.02)
     startCityAmbience(context)
     startVehicleEmitter(context)
     scheduleBirds()
