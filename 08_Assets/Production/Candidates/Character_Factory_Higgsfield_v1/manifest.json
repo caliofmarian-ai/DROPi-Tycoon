@@ -16,8 +16,15 @@
     "startingRevision": 0,
     "plan": "plus",
     "creditsBefore": 955,
-    "creditsAfter": 935.5,
-    "batchCredits": 19.5
+    "creditsAfter": 879,
+    "batchCredits": 76,
+    "creditAccounting": {
+      "startingObserved": 955,
+      "endingObserved": 879,
+      "totalObservedSpend": 76,
+      "initialThreeTurnaroundObservedSpend": 19.5,
+      "laterSingleViewPerJobCost": "UNKNOWN_NOT_INFERRED"
+    }
   },
   "generation": {
     "requestedModelId": "gpt_image_2",
@@ -41,7 +48,21 @@
       "generationJobId": "9600ebb1-c68e-420d-baa0-334e5acfaa41",
       "resultUrl": "https://d8j0ntlcm91z4.cloudfront.net/user_3JCeOwtDa203yO6LGJxCX8lkQgM/hf_20260918_141043_9600ebb1-c68e-420d-baa0-334e5acfaa41.png",
       "sha256": null,
-      "review": "VISUAL_REVIEW_PENDING"
+      "review": "VISUAL_REVIEW_PENDING",
+      "dedicatedFrontReference": {
+        "generationJobId": "9838b0cb-5efc-4107-9d6f-7e8f5a465e93",
+        "resultUrl": "https://d8j0ntlcm91z4.cloudfront.net/user_3JCeOwtDa203yO6LGJxCX8lkQgM/hf_20260918_145933_9838b0cb-5efc-4107-9d6f-7e8f5a465e93.png",
+        "observedDimensions": [
+          1744,
+          2336
+        ],
+        "requestedResolution": "2k",
+        "quality": "high",
+        "view": "orthographic-front-a-pose",
+        "review": "VISUAL_REVIEW_PENDING",
+        "runtimeIntegrated": false,
+        "releaseCleared": false
+      }
     },
     {
       "role": "female-recovery-hero",
@@ -51,7 +72,21 @@
       "generationJobId": "86fc23f8-bb5a-40d4-a663-ccd47ef76606",
       "resultUrl": "https://d8j0ntlcm91z4.cloudfront.net/user_3JCeOwtDa203yO6LGJxCX8lkQgM/hf_20260918_141043_86fc23f8-bb5a-40d4-a663-ccd47ef76606.png",
       "sha256": null,
-      "review": "VISUAL_REVIEW_PENDING"
+      "review": "VISUAL_REVIEW_PENDING",
+      "dedicatedFrontReference": {
+        "generationJobId": "a61d5178-ed93-429a-a380-04f4b5745c75",
+        "resultUrl": "https://d8j0ntlcm91z4.cloudfront.net/user_3JCeOwtDa203yO6LGJxCX8lkQgM/hf_20260918_145933_a61d5178-ed93-429a-a380-04f4b5745c75.png",
+        "observedDimensions": [
+          1744,
+          2336
+        ],
+        "requestedResolution": "2k",
+        "quality": "high",
+        "view": "orthographic-front-a-pose",
+        "review": "VISUAL_REVIEW_PENDING",
+        "runtimeIntegrated": false,
+        "releaseCleared": false
+      }
     },
     {
       "role": "maria-ionescu",
