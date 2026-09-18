@@ -133,3 +133,22 @@ A separate Maria reference was generated after the four-view sheet to provide a 
 - release clearance: `FALSE`
 
 This image is an input candidate only. Completion of the generation job does not establish anatomy quality, rig suitability, commercial clearance or production acceptance.
+
+
+## Dedicated hero single-view reconstruction references
+
+Two additional clean single-view inputs were generated for image-to-3D reconstruction:
+
+| Role | Job | Dimensions | View | Status |
+|---|---|---:|---|---|
+| Male recovery hero | `9838b0cb-5efc-4107-9d6f-7e8f5a465e93` | `1744×2336` | orthographic front A-pose | `VISUAL_REVIEW_PENDING` |
+| Female recovery hero | `a61d5178-ed93-429a-a380-04f4b5745c75` | `1744×2336` | orthographic front A-pose | `VISUAL_REVIEW_PENDING` |
+
+Result URLs:
+- male: `https://d8j0ntlcm91z4.cloudfront.net/user_3JCeOwtDa203yO6LGJxCX8lkQgM/hf_20260918_145933_9838b0cb-5efc-4107-9d6f-7e8f5a465e93.png`
+- female: `https://d8j0ntlcm91z4.cloudfront.net/user_3JCeOwtDa203yO6LGJxCX8lkQgM/hf_20260918_145933_a61d5178-ed93-429a-a380-04f4b5745c75.png`
+
+Observed Higgsfield balance after all Character Factory v1 image jobs in this record: `879` credits.
+Observed total spend from the `955` starting balance: `76` credits.
+
+The exact per-job split of the later dedicated single-view generations is not inferred from the balance delta; only the observed aggregate is recorded.
