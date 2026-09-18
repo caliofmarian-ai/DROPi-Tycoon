@@ -61,7 +61,21 @@
       "generationJobId": "5cb887e3-1473-4920-9ff0-a60ea56370a9",
       "resultUrl": "https://d8j0ntlcm91z4.cloudfront.net/user_3JCeOwtDa203yO6LGJxCX8lkQgM/hf_20260918_141043_5cb887e3-1473-4920-9ff0-a60ea56370a9.png",
       "sha256": null,
-      "review": "VISUAL_REVIEW_PENDING"
+      "review": "VISUAL_REVIEW_PENDING",
+      "dedicatedFrontReference": {
+        "generationJobId": "1c7f0c3e-e89d-4979-96f8-269ff4020f93",
+        "resultUrl": "https://d8j0ntlcm91z4.cloudfront.net/user_3JCeOwtDa203yO6LGJxCX8lkQgM/hf_20260918_145708_1c7f0c3e-e89d-4979-96f8-269ff4020f93.png",
+        "observedDimensions": [
+          1744,
+          2336
+        ],
+        "requestedResolution": "2k",
+        "quality": "high",
+        "view": "orthographic-front-a-pose",
+        "review": "VISUAL_REVIEW_PENDING",
+        "runtimeIntegrated": false,
+        "releaseCleared": false
+      }
     }
   ],
   "known3dCatalog": [
