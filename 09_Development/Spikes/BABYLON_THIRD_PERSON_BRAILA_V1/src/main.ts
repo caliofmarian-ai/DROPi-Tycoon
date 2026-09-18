@@ -286,16 +286,8 @@ const createBuilding = (
   return building
 }
 
-createBuilding(
-  'dropi-hq',
-  29, 15, 18, 12, 14, buildingMaterials[4],
-  RECOVERY_OWNER_EVAL ? undefined : { text: 'DROPi HQ', accent: '#009fd4' },
-)
-createBuilding(
-  'maras-market',
-  -27, -13, 14, 10, 9, buildingMaterials[0],
-  RECOVERY_OWNER_EVAL ? undefined : { text: "MARA'S MARKET", accent: '#c98425' },
-)
+createBuilding('dropi-hq', 29, 15, 18, 12, 14, buildingMaterials[4], RECOVERY_OWNER_EVAL ? undefined : { text: 'DROPi HQ', accent: '#009fd4' })
+createBuilding('maras-market', -27, -13, 14, 10, 9, buildingMaterials[0], RECOVERY_OWNER_EVAL ? undefined : { text: "MARA'S MARKET", accent: '#c98425' })
 createBuilding('customer-block', 34, -23, 17, 12, 16, buildingMaterials[2], { text: 'RESIDENCES', accent: '#52765a' })
 
 const genericBuildings: Array<[number, number, number, number, number]> = [
