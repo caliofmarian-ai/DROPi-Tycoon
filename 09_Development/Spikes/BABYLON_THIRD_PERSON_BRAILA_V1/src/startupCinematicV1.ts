@@ -127,6 +127,12 @@ if (!requested) {
       background: #071522;
       color: #f4fbff;
       font-family: system-ui, sans-serif;
+      opacity: 1;
+      transition: opacity .65s ease;
+    }
+    #dropi-startup-cinematic.handoff {
+      opacity: 0;
+      pointer-events: none;
     }
     #dropi-startup-cinematic video {
       width: 100%;
@@ -246,9 +252,12 @@ if (!requested) {
     writeSeen()
     video.pause()
     setCinematicAudio(false)
-    overlay.remove()
-    installReplayButton()
+    overlay.classList.add('handoff')
     publish()
+    window.setTimeout(() => {
+      overlay.remove()
+      installReplayButton()
+    }, 680)
   }
 
   const attemptPlay = async (): Promise<void> => {
