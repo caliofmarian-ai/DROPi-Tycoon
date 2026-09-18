@@ -69,7 +69,7 @@ export const LOCALITY_ANDROID_PRESENTATION_BUDGET = Object.freeze({
 const BASELINE_LABEL_RULES: Readonly<Record<LocalityLabelRole, LocalityLabelRule>> = Object.freeze({
   district: { levels: ['City', 'District'], priority: 90, fixedScreenSize: true, gap: 7 },
   street: { levels: ['District', 'Area', 'Hero'], priority: 70, fixedScreenSize: true, gap: 5 },
-  landmark: { levels: ['Area', 'Hero'], priority: 110, fixedScreenSize: true, gap: 7 },
+  landmark: { levels: ['District', 'Area', 'Hero'], priority: 110, fixedScreenSize: true, gap: 7 },
   storefront: { levels: ['Area', 'Hero'], priority: 82, fixedScreenSize: true, gap: 5 },
   interaction: { levels: ['Hero'], priority: 120, fixedScreenSize: true, gap: 7 },
   // `route` is a label attached to route information supplied by another authority. It neither

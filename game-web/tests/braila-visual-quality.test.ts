@@ -15,6 +15,7 @@ describe('Brăila player-facing semantic labels', () => {
     expect(isBrailaLabelVisibleAtLevel('district', 'Hero')).toBe(false)
     expect(isBrailaLabelVisibleAtLevel('street', 'District')).toBe(true)
     expect(isBrailaLabelVisibleAtLevel('street', 'Area')).toBe(true)
+    expect(isBrailaLabelVisibleAtLevel('landmark', 'District')).toBe(true)
     expect(isBrailaLabelVisibleAtLevel('landmark', 'Area')).toBe(true)
     expect(isBrailaLabelVisibleAtLevel('interaction', 'Area')).toBe(false)
     expect(isBrailaLabelVisibleAtLevel('interaction', 'Hero')).toBe(true)
@@ -58,6 +59,16 @@ describe('Brăila player-facing semantic labels', () => {
       { id: 'street-clear', role: 'street', box: { left: 500, top: 180, right: 590, bottom: 202 } },
     ]
     expect(selectBrailaScreenLabels(candidates, 'Area', viewport)).toEqual(['hq', 'street-clear'])
+  })
+
+  it('allows a district-scale landmark while preserving collision priority', () => {
+    const viewport = { left: 0, top: 0, width: 900, height: 500 }
+    const samePlace = { left: 410, top: 230, right: 490, bottom: 250 }
+    const candidates: BrailaScreenLabelCandidate[] = [
+      { id: 'street', role: 'street', box: samePlace },
+      { id: 'landmark', role: 'landmark', box: samePlace },
+    ]
+    expect(selectBrailaScreenLabels(candidates, 'District', viewport)).toEqual(['landmark'])
   })
 
   it('keeps the runtime city canonical as Brăila and does not reintroduce Cedar City', () => {
