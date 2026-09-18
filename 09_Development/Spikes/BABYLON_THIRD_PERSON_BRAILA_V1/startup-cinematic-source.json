@@ -17,5 +17,17 @@
   },
   "ownerVisualAcceptance": "PENDING",
   "runtimeIntegrated": false,
-  "releaseCleared": false
+  "releaseCleared": false,
+  "automatedSceneAnalysis": {
+    "id": "23435a6f-adae-4635-abd8-732461005804",
+    "status": "PASS",
+    "findings": [
+      "street-level European urban opening with pedestrians and bicycle",
+      "no identifiable protagonist",
+      "no phone, HQ, mission UI or story-state implication detected",
+      "flat city and wide river visible in final panorama",
+      "generic passenger ship present; not treated as geographic authority"
+    ]
+  },
+  "candidateStatus": "CANDIDATE_PASS_OWNER_VISUAL_REVIEW_PENDING"
 }
