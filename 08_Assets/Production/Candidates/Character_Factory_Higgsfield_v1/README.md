@@ -113,3 +113,23 @@ This record is production lineage only.
 - A visually approved candidate is not automatically commercial-cleared.
 - Unknown hashes/terms/evidence remain unknown.
 - No file in this batch is activated in runtime.
+
+
+## Dedicated Maria single-view reconstruction reference
+
+A separate Maria reference was generated after the four-view sheet to provide a cleaner single-image input for image-to-3D systems that perform better with one unobstructed frontal subject.
+
+- identity element: `dropi-maria-ionescu`
+- element ID: `a47c0a75-adde-4e8e-8d64-c212f9463568`
+- generation job: `1c7f0c3e-e89d-4979-96f8-269ff4020f93`
+- requested model: `gpt_image_2`
+- returned backend metadata: `videotape-alpha`
+- output dimensions: `1744×2336`
+- requested quality: `2K / high`
+- composition: single full-body orthographic front A-pose
+- result URL: `https://d8j0ntlcm91z4.cloudfront.net/user_3JCeOwtDa203yO6LGJxCX8lkQgM/hf_20260918_145708_1c7f0c3e-e89d-4979-96f8-269ff4020f93.png`
+- status: `VISUAL_REVIEW_PENDING`
+- runtime integration: `FALSE`
+- release clearance: `FALSE`
+
+This image is an input candidate only. Completion of the generation job does not establish anatomy quality, rig suitability, commercial clearance or production acceptance.
