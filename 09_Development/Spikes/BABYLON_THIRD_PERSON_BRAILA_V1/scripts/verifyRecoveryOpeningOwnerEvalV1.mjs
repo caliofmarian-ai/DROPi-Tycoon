@@ -2,10 +2,11 @@ import assert from 'node:assert/strict'
 import { createHash } from 'node:crypto'
 import { readFile } from 'node:fs/promises'
 
-const [main, navigation, recovery, surfaceFinish, stage, config, male, female] = await Promise.all([
+const [main, navigation, recovery, immersiveAudio, surfaceFinish, stage, config, male, female] = await Promise.all([
   readFile('src/main.ts', 'utf8'),
   readFile('src/navigationAssist.ts', 'utf8'),
   readFile('src/recoveryOpeningOwnerEvalV1.ts', 'utf8'),
+  readFile('src/immersiveAudioV1.ts', 'utf8'),
   readFile('src/surfaceFinish.ts', 'utf8'),
   readFile('scripts/prepareAndroidEvaluationStage.mjs', 'utf8'),
   readFile('recovery-film1-sources.json', 'utf8').then(JSON.parse),
@@ -32,6 +33,14 @@ assert.match(recovery, /hero-sex:female|data-hero="female"/)
 assert.match(recovery, /RECOVERY · ON FOOT · NO PHONE · NO GPS/)
 assert.match(recovery, /Story Film 1 · Recovery Awakening/)
 assert.match(recovery, /SKIP FILM/)
+assert.match(recovery, /REPLAY STORY FILM/)
+assert.match(recovery, /CHANGE HERO \(EVAL\)/)
+assert.match(recovery, /dropi:cinematic-audio-state/)
+assert.match(recovery, /classList\.add\('handoff'\)/)
+assert.match(immersiveAudio, /cinematicActive/)
+assert.match(immersiveAudio, /dropi:cinematic-audio-state/)
+assert.match(immersiveAudio, /applyMasterMix/)
+assert.match(stage, /allowBackup: false/)
 assert.match(recovery, /dropi:story:recovery-rise:v1:/)
 assert.match(recovery, /dropi:recovery-work-search-start/)
 assert.match(recovery, /Walk the streets and look for work opportunities\./)
