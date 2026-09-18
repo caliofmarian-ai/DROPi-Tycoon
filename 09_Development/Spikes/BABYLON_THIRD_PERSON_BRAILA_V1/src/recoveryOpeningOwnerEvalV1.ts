@@ -155,6 +155,12 @@ if (requested) {
       display: none;
       overflow: hidden;
       background: #050b0f;
+      opacity: 1;
+      transition: opacity .75s ease;
+    }
+    #dropi-recovery-film.handoff {
+      opacity: 0;
+      pointer-events: none;
     }
     #dropi-recovery-film video {
       width: 100%;
@@ -297,15 +303,25 @@ if (requested) {
     state.phase = 'WORK_SEARCH'
     state.filmSeen = true
     choice.style.display = 'none'
-    film.style.display = 'none'
     video.pause()
     setCinematicAudio(false)
-    statusBadge.hidden = false
-    evalControls.style.display = 'flex'
     document.documentElement.dataset.recoveryOpening = 'work-search'
     updateObjective()
     window.dispatchEvent(new CustomEvent('dropi:recovery-work-search-start'))
     publish()
+
+    if (film.style.display !== 'none') {
+      film.classList.add('handoff')
+      window.setTimeout(() => {
+        film.style.display = 'none'
+        film.classList.remove('handoff')
+        statusBadge.hidden = false
+        evalControls.style.display = 'flex'
+      }, 780)
+    } else {
+      statusBadge.hidden = false
+      evalControls.style.display = 'flex'
+    }
   }
 
   const playFilm = async (hero: HeroPresentation, replay = false): Promise<void> => {
@@ -364,6 +380,7 @@ if (requested) {
     statusBadge.hidden = true
     film.style.display = 'none'
     state.phase = 'CHOOSE_PRESENTATION'
+    setCinematicAudio(true)
     choice.style.display = 'flex'
     publish()
   })
@@ -389,6 +406,7 @@ if (requested) {
     }
 
     state.phase = 'CHOOSE_PRESENTATION'
+    setCinematicAudio(true)
     choice.style.display = 'flex'
     publish()
   }, 200)
