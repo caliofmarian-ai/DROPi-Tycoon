@@ -1,0 +1,82 @@
+{
+  "schemaVersion": 1,
+  "familyId": "character-factory-higgsfield-v1",
+  "status": "CANDIDATE_VISUAL_REVIEW_PENDING",
+  "runtimeIntegrated": false,
+  "releaseCleared": false,
+  "coordinates": [
+    755,
+    725,
+    758,
+    757
+  ],
+  "higgsfield": {
+    "projectName": "DROPi Character Factory Pilot",
+    "projectId": "18502cee-a5fe-4b65-adc4-6aef58e48009",
+    "startingRevision": 0,
+    "plan": "plus",
+    "creditsBefore": 955,
+    "creditsAfter": 935.5,
+    "batchCredits": 19.5
+  },
+  "generation": {
+    "requestedModelId": "gpt_image_2",
+    "provider": "OpenAI via Higgsfield",
+    "backendModelMetadata": "videotape-alpha",
+    "requestedResolution": "2k",
+    "observedDimensions": [
+      2048,
+      1360
+    ],
+    "quality": "high",
+    "aspectRatio": "3:2",
+    "purpose": "rig-friendly A-pose multi-view turnaround"
+  },
+  "candidates": [
+    {
+      "role": "male-recovery-hero",
+      "elementName": "dropi-hero-male-recovery",
+      "elementId": "fd9cf0ec-e103-46b5-a263-13b461bdf1d3",
+      "referenceJobId": "ab000048-cff7-4147-a248-b2efada0a345",
+      "generationJobId": "9600ebb1-c68e-420d-baa0-334e5acfaa41",
+      "resultUrl": "https://d8j0ntlcm91z4.cloudfront.net/user_3JCeOwtDa203yO6LGJxCX8lkQgM/hf_20260918_141043_9600ebb1-c68e-420d-baa0-334e5acfaa41.png",
+      "sha256": null,
+      "review": "VISUAL_REVIEW_PENDING"
+    },
+    {
+      "role": "female-recovery-hero",
+      "elementName": "dropi-hero-female-recovery",
+      "elementId": "3a2ebb82-3c27-4269-942d-3b43f30c6d5a",
+      "referenceJobId": "6b597391-09cc-4790-bc4d-bad9aa14684f",
+      "generationJobId": "86fc23f8-bb5a-40d4-a663-ccd47ef76606",
+      "resultUrl": "https://d8j0ntlcm91z4.cloudfront.net/user_3JCeOwtDa203yO6LGJxCX8lkQgM/hf_20260918_141043_86fc23f8-bb5a-40d4-a663-ccd47ef76606.png",
+      "sha256": null,
+      "review": "VISUAL_REVIEW_PENDING"
+    },
+    {
+      "role": "maria-ionescu",
+      "elementName": "dropi-maria-ionescu",
+      "elementId": "a47c0a75-adde-4e8e-8d64-c212f9463568",
+      "referenceJobId": "8c2773be-1f26-427f-9045-5431048f005b",
+      "generationJobId": "5cb887e3-1473-4920-9ff0-a60ea56370a9",
+      "resultUrl": "https://d8j0ntlcm91z4.cloudfront.net/user_3JCeOwtDa203yO6LGJxCX8lkQgM/hf_20260918_141043_5cb887e3-1473-4920-9ff0-a60ea56370a9.png",
+      "sha256": null,
+      "review": "VISUAL_REVIEW_PENDING"
+    }
+  ],
+  "known3dCatalog": [
+    "meshy_v7_image_to_3d",
+    "multi_image_to_3d",
+    "3d_rigging",
+    "sam_3_3d_body",
+    "tripo_h3_1_image_to_3d",
+    "tripo_h3_1_multiview_to_3d",
+    "hunyuan3d_v3_image_to_3d"
+  ],
+  "blocker": "DIRECT_3D_SUBMIT_NOT_EXPOSED_BY_CONNECTED_MCP",
+  "notes": [
+    "Do not claim GLB generation from this batch.",
+    "Do not activate assets in runtime before visual, rig, LOD, Android and legal gates.",
+    "sha256 remains null until source files are ingested into a hashable controlled store."
+  ]
+}
