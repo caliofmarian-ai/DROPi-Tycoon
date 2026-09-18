@@ -41,6 +41,11 @@ const FILMS: Record<HeroPresentation, string> = {
 const PRESENTATION_KEY = 'dropi:presentation:recovery-hero-sex:v1'
 const seenKey = (hero: HeroPresentation): string => `dropi:story:recovery-rise:v1:${hero}`
 
+const setCinematicAudio = (active: boolean): void => {
+  document.documentElement.dataset.cinematicAudio = active ? 'active' : 'gameplay'
+  window.dispatchEvent(new CustomEvent('dropi:cinematic-audio-state', { detail: { active } }))
+}
+
 const readStorage = (key: string): string | null => {
   try {
     return window.localStorage.getItem(key)
@@ -238,6 +243,41 @@ if (requested) {
   statusBadge.hidden = true
   document.body.append(statusBadge)
 
+  const evalControls = document.createElement('div')
+  evalControls.id = 'dropi-recovery-eval-controls'
+  Object.assign(evalControls.style, {
+    position: 'fixed',
+    right: '12px',
+    top: '88px',
+    zIndex: '38',
+    display: 'none',
+    gap: '7px',
+    flexDirection: 'column',
+  } satisfies Partial<CSSStyleDeclaration>)
+
+  const replayFilmButton = document.createElement('button')
+  replayFilmButton.type = 'button'
+  replayFilmButton.textContent = 'REPLAY STORY FILM'
+  const changeHeroButton = document.createElement('button')
+  changeHeroButton.type = 'button'
+  changeHeroButton.textContent = 'CHANGE HERO (EVAL)'
+
+  for (const button of [replayFilmButton, changeHeroButton]) {
+    Object.assign(button.style, {
+      minHeight: '34px',
+      padding: '7px 10px',
+      borderRadius: '9px',
+      border: '1px solid rgba(246,205,98,.45)',
+      background: 'rgba(5,20,30,.82)',
+      color: '#f8d773',
+      font: '800 9px/1 system-ui',
+      letterSpacing: '.04em',
+    } satisfies Partial<CSSStyleDeclaration>)
+  }
+
+  evalControls.append(replayFilmButton, changeHeroButton)
+  document.body.append(evalControls)
+
   const startupFinished = (): boolean => {
     const startup = sharedRuntime.__DROPiStartupCinematicV1?.status
     return !startup || ['BYPASSED', 'SKIPPED_SEEN', 'DISMISSED'].includes(startup)
@@ -259,28 +299,33 @@ if (requested) {
     choice.style.display = 'none'
     film.style.display = 'none'
     video.pause()
+    setCinematicAudio(false)
     statusBadge.hidden = false
+    evalControls.style.display = 'flex'
     document.documentElement.dataset.recoveryOpening = 'work-search'
     updateObjective()
     window.dispatchEvent(new CustomEvent('dropi:recovery-work-search-start'))
     publish()
   }
 
-  const playFilm = async (hero: HeroPresentation): Promise<void> => {
+  const playFilm = async (hero: HeroPresentation, replay = false): Promise<void> => {
     state.heroPresentation = hero
     state.filmSrc = FILMS[hero]
     state.filmSeen = readStorage(seenKey(hero)) === '1'
     writeStorage(PRESENTATION_KEY, hero)
     choice.style.display = 'none'
 
-    if (state.filmSeen && !forceReplay) {
+    if (state.filmSeen && !forceReplay && !replay) {
       startWorkSearch()
       return
     }
 
     state.phase = 'PLAYING_FILM_1'
+    evalControls.style.display = 'none'
+    statusBadge.hidden = true
     film.style.display = 'block'
     video.src = FILMS[hero]
+    setCinematicAudio(true)
     publish()
 
     try {
@@ -305,6 +350,22 @@ if (requested) {
       playButton.hidden = true
       filmStatus.textContent = 'Story Film 1 · Recovery Awakening'
     }).catch(() => undefined)
+  })
+
+  replayFilmButton.addEventListener('click', () => {
+    if (!state.heroPresentation) return
+    void playFilm(state.heroPresentation, true)
+  })
+
+  changeHeroButton.addEventListener('click', () => {
+    video.pause()
+    setCinematicAudio(false)
+    evalControls.style.display = 'none'
+    statusBadge.hidden = true
+    film.style.display = 'none'
+    state.phase = 'CHOOSE_PRESENTATION'
+    choice.style.display = 'flex'
+    publish()
   })
 
   skipButton.addEventListener('click', startWorkSearch)
