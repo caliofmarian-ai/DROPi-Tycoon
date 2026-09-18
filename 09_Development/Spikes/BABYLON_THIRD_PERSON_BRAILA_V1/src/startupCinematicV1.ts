@@ -35,6 +35,39 @@ const ISSUE = 769 as const
 const VIDEO_SRC = '/assets/cinematics/startup-world-presentation-v1.mp4'
 const SEEN_KEY = 'dropi:presentation:startup-world-film:v1'
 
+const setCinematicAudio = (active: boolean): void => {
+  document.documentElement.dataset.cinematicAudio = active ? 'active' : 'gameplay'
+  window.dispatchEvent(new CustomEvent('dropi:cinematic-audio-state', { detail: { active } }))
+}
+
+const installReplayButton = (): void => {
+  if (document.querySelector('#dropi-replay-startup-film')) return
+  const button = document.createElement('button')
+  button.id = 'dropi-replay-startup-film'
+  button.type = 'button'
+  button.textContent = 'REPLAY INTRO'
+  Object.assign(button.style, {
+    position: 'fixed',
+    right: '12px',
+    top: '46px',
+    zIndex: '38',
+    minHeight: '34px',
+    padding: '7px 11px',
+    borderRadius: '9px',
+    border: '1px solid rgba(210,239,251,.46)',
+    background: 'rgba(7,36,52,.82)',
+    color: '#eefaff',
+    font: '800 9px/1 system-ui',
+    letterSpacing: '.05em',
+  } satisfies Partial<CSSStyleDeclaration>)
+  button.addEventListener('click', () => {
+    const next = new URL(window.location.href)
+    next.searchParams.set('startupCinematic', 'force')
+    window.location.href = next.toString()
+  })
+  document.body.append(button)
+}
+
 const query = new URLSearchParams(window.location.search)
 const mode = query.get('startupCinematic')
 const requested = mode === '1' || mode === 'force'
@@ -81,6 +114,7 @@ if (!requested) {
   publish()
 } else if (seenAtStart && !forceReplay) {
   state.status = 'SKIPPED_SEEN'
+  installReplayButton()
   publish()
 } else {
   const style = document.createElement('style')
@@ -211,11 +245,14 @@ if (!requested) {
     state.status = 'DISMISSED'
     writeSeen()
     video.pause()
+    setCinematicAudio(false)
     overlay.remove()
+    installReplayButton()
     publish()
   }
 
   const attemptPlay = async (): Promise<void> => {
+    setCinematicAudio(true)
     try {
       await video.play()
       playButton.hidden = true
@@ -269,6 +306,7 @@ if (!requested) {
     if (state.gameReadiness === 'FAIL') {
       window.clearInterval(readinessTimer)
       video.pause()
+      setCinematicAudio(false)
       overlay.remove()
       publish()
       return
