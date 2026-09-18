@@ -10,6 +10,9 @@ const videoBytes = await readFile('public/assets/cinematics/startup-world-presen
 
 assert.match(index, /startupCinematicV1\.ts/)
 assert.match(source, /CONTINUE TO GAME/)
+assert.match(source, /REPLAY INTRO/)
+assert.match(source, /dropi:cinematic-audio-state/)
+assert.match(source, /classList\.add\('handoff'\)/)
 assert.match(source, /__DROPiEvaluationReadiness/)
 assert.match(source, /READY_TO_CONTINUE/)
 assert.match(source, /VIDEO_UNAVAILABLE/)
