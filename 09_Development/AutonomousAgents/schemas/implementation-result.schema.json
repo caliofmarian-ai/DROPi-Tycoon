@@ -1,0 +1,53 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "DT-00 autonomous implementation result",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "status",
+    "summary",
+    "changed_paths",
+    "tests",
+    "unknowns",
+    "hard_stop_detected"
+  ],
+  "properties": {
+    "status": {
+      "type": "string",
+      "enum": ["READY", "BLOCKED", "FAIL"]
+    },
+    "summary": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 4000
+    },
+    "changed_paths": {
+      "type": "array",
+      "items": { "type": "string", "minLength": 1 },
+      "uniqueItems": true,
+      "maxItems": 100
+    },
+    "tests": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["name", "status", "evidence"],
+        "properties": {
+          "name": { "type": "string", "minLength": 1, "maxLength": 300 },
+          "status": { "type": "string", "enum": ["PASS", "FAIL", "UNKNOWN"] },
+          "evidence": { "type": "string", "maxLength": 2000 }
+        }
+      },
+      "maxItems": 50
+    },
+    "unknowns": {
+      "type": "array",
+      "items": { "type": "string", "minLength": 1, "maxLength": 1000 },
+      "maxItems": 50
+    },
+    "hard_stop_detected": {
+      "type": "boolean"
+    }
+  }
+}
