@@ -2,10 +2,11 @@ import assert from 'node:assert/strict'
 import { createHash } from 'node:crypto'
 import { readFile } from 'node:fs/promises'
 
-const [main, navigation, recovery, stage, config, male, female] = await Promise.all([
+const [main, navigation, recovery, surfaceFinish, stage, config, male, female] = await Promise.all([
   readFile('src/main.ts', 'utf8'),
   readFile('src/navigationAssist.ts', 'utf8'),
   readFile('src/recoveryOpeningOwnerEvalV1.ts', 'utf8'),
+  readFile('src/surfaceFinish.ts', 'utf8'),
   readFile('scripts/prepareAndroidEvaluationStage.mjs', 'utf8'),
   readFile('recovery-film1-sources.json', 'utf8').then(JSON.parse),
   readFile('public/assets/cinematics/recovery-awakening-male-v1.mp4'),
