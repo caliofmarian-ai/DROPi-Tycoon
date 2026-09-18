@@ -1,9 +1,12 @@
 import assert from 'node:assert/strict'
+import { createHash } from 'node:crypto'
 import { readFile } from 'node:fs/promises'
 
 const index = await readFile('index.html', 'utf8')
 const source = await readFile('src/startupCinematicV1.ts', 'utf8')
 const stage = await readFile('scripts/prepareAndroidEvaluationStage.mjs', 'utf8')
+const sourceConfig = JSON.parse(await readFile('startup-cinematic-source.json', 'utf8'))
+const videoBytes = await readFile('public/assets/cinematics/startup-world-presentation-v1.mp4')
 
 assert.match(index, /startupCinematicV1\.ts/)
 assert.match(source, /CONTINUE TO GAME/)
