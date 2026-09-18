@@ -287,12 +287,12 @@ const createBuilding = (
 }
 
 createBuilding(
-  RECOVERY_OWNER_EVAL ? 'recovery-neutral-commercial-block' : 'dropi-hq',
+  'dropi-hq',
   29, 15, 18, 12, 14, buildingMaterials[4],
   RECOVERY_OWNER_EVAL ? undefined : { text: 'DROPi HQ', accent: '#009fd4' },
 )
 createBuilding(
-  RECOVERY_OWNER_EVAL ? 'recovery-maria-shop-shell' : 'maras-market',
+  'maras-market',
   -27, -13, 14, 10, 9, buildingMaterials[0],
   RECOVERY_OWNER_EVAL ? undefined : { text: "MARA'S MARKET", accent: '#c98425' },
 )
