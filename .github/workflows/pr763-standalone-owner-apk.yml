@@ -1,0 +1,178 @@
+name: PR763 Standalone Android Owner APK
+
+on:
+  pull_request:
+    branches:
+      - story/recovery-opening-runtime-v1
+    paths:
+      - ".github/workflows/pr763-standalone-owner-apk.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+env:
+  TARGET_SHA: b7d803516c35d93a4ade2f6f36a6366dbd4c313a
+  EXPO_PUBLIC_DROPITYCOON_RUNTIME_MODE: bundled
+  EAS_BUILD_PROFILE: production
+  CI: "1"
+
+jobs:
+  build-standalone-owner-apk:
+    runs-on: ubuntu-latest
+    timeout-minutes: 50
+
+    steps:
+      - name: Checkout exact recovery runtime head
+        uses: actions/checkout@v7
+        with:
+          ref: ${{ env.TARGET_SHA }}
+          fetch-depth: 1
+
+      - name: Assert exact gameplay source
+        run: |
+          test "$(git rev-parse HEAD)" = "$TARGET_SHA"
+          echo "Exact gameplay source: $(git rev-parse HEAD)"
+
+      - name: Setup Node 22.13
+        uses: actions/setup-node@v7
+        with:
+          node-version: 22.13.0
+          cache: npm
+          cache-dependency-path: |
+            game-mobile/package-lock.json
+            game-web/package-lock.json
+
+      - name: Setup Java 17
+        uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: "17"
+
+      - name: Install and validate bundled runtime
+        working-directory: game-mobile
+        run: |
+          npm ci
+          npm run runtime:prepare
+          npm run runtime:validate
+          npm run typecheck
+
+      - name: Remove Expo Dev Client from standalone build workspace
+        working-directory: game-mobile
+        run: |
+          npm uninstall expo-dev-client --no-package-lock --ignore-scripts
+          if test -d node_modules/expo-dev-client; then
+            echo "expo-dev-client still present" >&2
+            exit 1
+          fi
+          node -e "const p=require('./package.json'); if(p.dependencies && p.dependencies['expo-dev-client']) process.exit(1)"
+
+      - name: Generate native Android project without Dev Launcher
+        working-directory: game-mobile
+        run: npx expo prebuild --platform android --clean --no-install
+
+      - name: Isolate standalone owner-review package and release signing
+        working-directory: game-mobile
+        run: |
+          node <<'NODE'
+          const fs = require('node:fs')
+          const gradlePath = 'android/app/build.gradle'
+          let gradle = fs.readFileSync(gradlePath, 'utf8')
+
+          gradle = gradle.replace(
+            /applicationId\s+["']com\.dropi\.tycoon["']/,
+            'applicationId "com.dropi.tycoon.pr763standalone"',
+          )
+          gradle = gradle.replace(/versionCode\s+\d+/, 'versionCode 76302')
+          gradle = gradle.replace(
+            /versionName\s+["'][^"']+["']/,
+            'versionName "0.0.0-pr763-standalone-b7d8035"',
+          )
+
+          if (!gradle.includes('applicationId "com.dropi.tycoon.pr763standalone"')) {
+            throw new Error('Could not isolate standalone owner package')
+          }
+
+          // Internal owner-review only: force release variant to use the generated debug key
+          // so Gradle can produce an installable release-mode APK without production secrets.
+          if (/release\s*\{/.test(gradle)) {
+            gradle = gradle.replace(
+              /release\s*\{/,
+              'release {\n            signingConfig signingConfigs.debug',
+            )
+          } else {
+            throw new Error('Release build type not found')
+          }
+          fs.writeFileSync(gradlePath, gradle)
+
+          const stringsPath = 'android/app/src/main/res/values/strings.xml'
+          let strings = fs.readFileSync(stringsPath, 'utf8')
+          strings = strings.replace(
+            /<string name="app_name">[^<]*<\/string>/,
+            '<string name="app_name">DROPi Tycoon PR763 Standalone</string>',
+          )
+          fs.writeFileSync(stringsPath, strings)
+          NODE
+
+      - name: Assert generated native project contains no Expo Dev Launcher dependency
+        working-directory: game-mobile
+        run: |
+          if grep -R -n -E "expo-dev-client|expo\.modules\.devlauncher|expo-dev-launcher" android package.json 2>/dev/null; then
+            echo "Dev Launcher residue detected before build" >&2
+            exit 1
+          fi
+
+      - name: Build release-mode standalone APK
+        working-directory: game-mobile/android
+        run: ./gradlew assembleRelease --no-daemon --stacktrace
+
+      - name: Attest standalone APK
+        working-directory: game-mobile
+        run: |
+          set -euo pipefail
+          APK="android/app/build/outputs/apk/release/app-release.apk"
+          test -f "$APK"
+
+          BUILD_TOOLS="$(ls -1 "$ANDROID_HOME/build-tools" | sort -V | tail -1)"
+          AAPT="$ANDROID_HOME/build-tools/$BUILD_TOOLS/aapt"
+          APKSIGNER="$ANDROID_HOME/build-tools/$BUILD_TOOLS/apksigner"
+
+          mkdir -p standalone-owner-evidence
+          OUT="standalone-owner-evidence/DROPi-Tycoon-PR763-Standalone-b7d8035.apk"
+          cp "$APK" "$OUT"
+
+          sha256sum "$OUT" | tee standalone-owner-evidence/APK_SHA256.txt
+          "$AAPT" dump badging "$OUT" | tee standalone-owner-evidence/APK_BADGING.txt
+          "$AAPT" dump xmltree "$OUT" AndroidManifest.xml | tee standalone-owner-evidence/ANDROID_MANIFEST_TREE.txt
+          "$APKSIGNER" verify --print-certs "$OUT" | tee standalone-owner-evidence/APK_SIGNER.txt
+          unzip -p "$OUT" assets/dropi-game/dropi-runtime-manifest.json | tee standalone-owner-evidence/BUNDLED_RUNTIME_MANIFEST.json
+
+          grep -q "package: name='com.dropi.tycoon.pr763standalone'" standalone-owner-evidence/APK_BADGING.txt
+          grep -q "versionCode='76302'" standalone-owner-evidence/APK_BADGING.txt
+          grep -q "launchable-activity:" standalone-owner-evidence/APK_BADGING.txt
+
+          if grep -qiE "devlauncher|expo\.modules\.devlauncher" standalone-owner-evidence/ANDROID_MANIFEST_TREE.txt; then
+            echo "Expo Dev Launcher found in final APK manifest" >&2
+            exit 1
+          fi
+
+          cat > standalone-owner-evidence/BUILD_ATTESTATION.txt <<EOF
+          purpose=NONRELEASE_STANDALONE_OWNER_REVIEW
+          canonical_release=false
+          gameplay_source_sha=$TARGET_SHA
+          expected_pr=763
+          expected_package=com.dropi.tycoon.pr763standalone
+          expected_version_code=76302
+          build_variant=release
+          signing=ANDROID_DEBUG_KEY_FOR_INTERNAL_OWNER_REVIEW
+          expo_dev_client_removed=true
+          runtime_mode=bundled
+          EOF
+
+      - name: Upload standalone owner-review APK and evidence
+        uses: actions/upload-artifact@v6
+        with:
+          name: dropi-tycoon-pr763-standalone-b7d8035
+          path: game-mobile/standalone-owner-evidence/
+          if-no-files-found: error
+          retention-days: 14
