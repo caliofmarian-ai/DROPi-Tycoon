@@ -23,12 +23,6 @@ declare global {
       onFoot: true
       objective: string
     }
-    __DROPiStartupCinematicV1?: {
-      status?: string
-    }
-    __DROPiEvaluationReadiness?: {
-      status?: 'LOADING' | 'READY' | 'FAIL'
-    }
   }
 }
 
@@ -78,6 +72,11 @@ const state: NonNullable<Window['__DROPiRecoveryOpeningOwnerEvalV1']> = {
   noGps: true,
   onFoot: true,
   objective: OBJECTIVE,
+}
+
+const sharedRuntime = window as unknown as {
+  __DROPiStartupCinematicV1?: { status?: string }
+  __DROPiEvaluationReadiness?: { status?: 'LOADING' | 'READY' | 'FAIL' }
 }
 
 const publish = (): void => {
@@ -240,11 +239,11 @@ if (requested) {
   document.body.append(statusBadge)
 
   const startupFinished = (): boolean => {
-    const startup = window.__DROPiStartupCinematicV1?.status
+    const startup = sharedRuntime.__DROPiStartupCinematicV1?.status
     return !startup || ['BYPASSED', 'SKIPPED_SEEN', 'DISMISSED'].includes(startup)
   }
 
-  const cityReady = (): boolean => window.__DROPiEvaluationReadiness?.status === 'READY'
+  const cityReady = (): boolean => sharedRuntime.__DROPiEvaluationReadiness?.status === 'READY'
 
   const updateObjective = (): void => {
     const objective = document.querySelector<HTMLElement>('#objective')
