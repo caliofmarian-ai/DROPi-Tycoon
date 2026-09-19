@@ -2,32 +2,43 @@
   "schemaVersion": 1,
   "issue": 769,
   "classification": "CINEMATIC / NON-GAMEPLAY — INTERNAL OWNER REVIEW CANDIDATE",
-  "purpose": "startup-loading-world-presentation",
-  "higgsfieldJobId": "e1c02ff1-1fb5-49bd-876a-56dff4d8f7c2",
-  "sourceUrl": "https://d8j0ntlcm91z4.cloudfront.net/user_3JCeOwtDa203yO6LGJxCX8lkQgM/hf_20260918_170930_e1c02ff1-1fb5-49bd-876a-56dff4d8f7c2.mp4",
-  "sha256": "b4603c5ef0b33247fe64a09b15a1076b8ef9d403ae493eaea1832f63ba278a6f",
+  "purpose": "startup-loading-game-introduction-v4",
+  "higgsfieldJobId": null,
+  "sourceUrl": "https://d2ol7oe51mr4n9.cloudfront.net/user_3JCeOwtDa203yO6LGJxCX8lkQgM/c2aaaa73-22f0-4b87-ab50-5f6fdb219a91.mp4",
+  "sha256": "66adbb14824bfe9a13b81e462484af8dea573cf6b7220088e454c39320210bfa",
   "media": {
-    "durationSeconds": 10.055,
+    "durationSeconds": 86.5,
     "codec": "h264",
     "audioCodec": "aac",
     "width": 1280,
     "height": 720,
     "fps": 24,
-    "bytes": 5290203
+    "bytes": 36402622
   },
   "ownerVisualAcceptance": "PENDING",
   "runtimeIntegrated": false,
   "releaseCleared": false,
   "automatedSceneAnalysis": {
-    "id": "23435a6f-adae-4635-abd8-732461005804",
+    "id": "6d271a83-934d-41cb-81bc-353aed5fba6d",
     "status": "PASS",
     "findings": [
-      "street-level European urban opening with pedestrians and bicycle",
-      "no identifiable protagonist",
-      "no phone, HQ, mission UI or story-state implication detected",
-      "flat city and wide river visible in final panorama",
-      "generic passenger ship present; not treated as geographic authority"
+      "86.5-second game-introduction arc: local city work -> bicycle/vehicle -> contract/company -> port/rail/logistics -> delivery -> global network",
+      "spoken brand name removed to avoid TTS mispronunciation; deterministic title overlay carries DROPi TYCOON",
+      "narration transcript reaches 'Your story starts small. Your work leaves a mark.'",
+      "non-chronological progression promise; not treated as current-story inventory or phone ownership"
     ]
   },
-  "candidateStatus": "CANDIDATE_PASS_OWNER_VISUAL_REVIEW_PENDING"
+  "candidateStatus": "CANDIDATE_PASS_OWNER_VISUAL_REVIEW_PENDING_V4",
+  "sourceMediaId": "c2aaaa73-22f0-4b87-ab50-5f6fdb219a91",
+  "narration": {
+    "provider": "Runway connected workspace",
+    "taskId": "1d3e3266-bd34-49ec-abec-4df7eb0a8cff",
+    "durationSeconds": 85.36,
+    "delivery": "expressive narration; brand name intentionally not spoken"
+  },
+  "score": {
+    "provider": "Runway connected workspace",
+    "taskId": "be9b4c4d-0e4b-4dbe-9aef-dc2da696877f",
+    "delivery": "instrumental cinematic score mixed below narration"
+  }
 }
