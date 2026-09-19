@@ -119,6 +119,11 @@ if (!requested) {
   state.status = 'SKIPPED_SEEN'
   installReplayButton()
   publish()
+  window.setTimeout(() => {
+    window.dispatchEvent(new CustomEvent('dropi:startup-cinematic-dismissed', {
+      detail: { status: state.status, issue: ISSUE },
+    }))
+  }, 0)
 } else {
   const style = document.createElement('style')
   style.textContent = `
@@ -257,6 +262,9 @@ if (!requested) {
     setCinematicAudio(false)
     overlay.classList.add('handoff')
     publish()
+    window.dispatchEvent(new CustomEvent('dropi:startup-cinematic-dismissed', {
+      detail: { status: state.status, issue: ISSUE },
+    }))
     window.setTimeout(() => {
       overlay.remove()
       installReplayButton()
