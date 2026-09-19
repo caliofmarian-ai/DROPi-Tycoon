@@ -61,8 +61,13 @@ const recenterButton = requireElement<HTMLButtonElement>('#recenter')
 
 const BUILD_SHA = import.meta.env.VITE_COMMIT_SHA || 'LOCAL'
 const runtimeQuery = new URLSearchParams(window.location.search)
+const OWNER_EVAL_LOOPBACK =
+  window.location.hostname === '127.0.0.1' &&
+  window.location.port === '17832'
 const RECOVERY_OWNER_EVAL =
-  runtimeQuery.get('recoveryOpening') === '1' || runtimeQuery.get('recoveryOpening') === 'force'
+  OWNER_EVAL_LOOPBACK ||
+  runtimeQuery.get('recoveryOpening') === '1' ||
+  runtimeQuery.get('recoveryOpening') === 'force'
 const NATIVE_BACK_EVENT = 'dropi:native-back'
 const NATIVE_EXIT_GAME_MESSAGE = 'dropi:exit-game'
 const FIRST_FRAME_TIMEOUT_MS = 15_000
