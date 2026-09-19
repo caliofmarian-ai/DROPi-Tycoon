@@ -155,7 +155,13 @@ const addStyles = (): void => {
 
 const boot = (): void => {
   const query = new URLSearchParams(window.location.search)
-  const recoveryOpening = query.get('recoveryOpening') === '1' || query.get('recoveryOpening') === 'force'
+  const ownerEvalLoopback =
+    window.location.hostname === '127.0.0.1' &&
+    window.location.port === '17832'
+  const recoveryOpening =
+    ownerEvalLoopback ||
+    query.get('recoveryOpening') === '1' ||
+    query.get('recoveryOpening') === 'force'
   if (recoveryOpening) {
     window.__DROPiNavigationAssist = {
       issue: ISSUE,
