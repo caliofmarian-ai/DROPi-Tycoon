@@ -313,8 +313,19 @@ jobs:
           wait_for_ui_text 'CONTINUE TO GAME' 40
           tap_ui_text 'CONTINUE TO GAME'
           wait_for_ui_text 'CONTINUE AS GUEST' 10
+          tap_ui_text 'CONTINUE AS GUEST'
+          wait_for_ui_text 'MALE' 10
+          wait_for_ui_text 'FEMALE' 10
+          tap_ui_text 'FEMALE'
+          wait_for_ui_text 'SKIP FILM' 10
+          tap_ui_text 'SKIP FILM'
+          wait_for_ui_text 'RECOVERY · ON FOOT · NO PHONE · NO GPS' 10
+          wait_for_ui_text 'Walk the streets and look for work opportunities.' 10
           echo 'DROPI_OWNER_FLOW_STARTUP_CINEMATIC=PASS' >> "$GITHUB_ENV"
           echo 'DROPI_OWNER_FLOW_GUEST_ACCESS=PASS' >> "$GITHUB_ENV"
+          echo 'DROPI_OWNER_FLOW_HERO_CHOICE=PASS' >> "$GITHUB_ENV"
+          echo 'DROPI_OWNER_FLOW_STORY_FILM=PASS' >> "$GITHUB_ENV"
+          echo 'DROPI_OWNER_FLOW_RECOVERY_GAMEPLAY=PASS' >> "$GITHUB_ENV"
 
           sleep 7
           STABLE_PID="$("$ADB" shell pidof "$DROPI_PACKAGE_ID" | tr -d '\r')"
@@ -402,6 +413,9 @@ jobs:
             echo "emulator_update_mechanics=$DROPI_EMULATOR_UPDATE_PROBE"
             echo "owner_flow_startup_cinematic=$DROPI_OWNER_FLOW_STARTUP_CINEMATIC"
             echo "owner_flow_guest_access=$DROPI_OWNER_FLOW_GUEST_ACCESS"
+            echo "owner_flow_hero_choice=$DROPI_OWNER_FLOW_HERO_CHOICE"
+            echo "owner_flow_story_film=$DROPI_OWNER_FLOW_STORY_FILM"
+            echo "owner_flow_recovery_gameplay=$DROPI_OWNER_FLOW_RECOVERY_GAMEPLAY"
             echo 'exact_old_payload_save_migration=UNKNOWN_NOT_TESTED_BY_VERSION_FIXTURE'
             echo "verified_previous_signer_sha256=$DROPI_REFERENCE_SIGNER"
             echo 'final_abi=arm64-v8a'
