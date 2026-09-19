@@ -7,34 +7,28 @@
   "candidates": {
     "male": {
       "heroPresentationId": "hero-sex:male",
-      "sourceMediaId": "a489e49b-8698-4e9f-9bce-3999e2db24af",
-      "sourceUrl": "https://d2ol7oe51mr4n9.cloudfront.net/user_3JCeOwtDa203yO6LGJxCX8lkQgM/a489e49b-8698-4e9f-9bce-3999e2db24af.mp4",
-      "sha256": "70c9634e2c6c5de1e6bc68581de8815d467d919fa9ef1d325212306b1cb8c6c5",
-      "bytes": 14336447,
-      "durationSeconds": 47.375,
+      "sourceMediaId": "67332fa5-e072-47fe-b963-4d77b6953a8f",
+      "sourceUrl": "https://d2ol7oe51mr4n9.cloudfront.net/user_3JCeOwtDa203yO6LGJxCX8lkQgM/67332fa5-e072-47fe-b963-4d77b6953a8f.mp4",
+      "sha256": "a5d96a0df5e76f676ed09db50f0bcbd9380cb01a9d01bd1f0ec7dd7d7a9f5774",
+      "bytes": 13289423,
+      "durationSeconds": 48.875,
       "width": 1280,
       "height": 720,
       "fps": 24,
       "videoCodec": "h264",
       "audioCodec": "aac",
-      "narration": {
-        "taskId": "51ff6d81-21a6-4c1c-9f70-3a823ce376d7",
-        "expressiveVoice": "Benjamin",
-        "transcriptVerifiedComplete": true
-      },
+      "lockedHeroElement": "fd9cf0ec-e103-46b5-a263-13b461bdf1d3",
+      "lockedEnvironmentElement": "eb818fef-4317-40d0-8108-38734b88fc06",
+      "narrationTaskId": "51ff6d81-21a6-4c1c-9f70-3a823ce376d7",
       "scoreTaskId": "93d06d0d-cb32-43a2-b51f-825cb2505a7f",
       "handoffJobId": "e95a0222-3a02-40c1-bfe1-6e1fc764cd14",
-      "automatedReview": {
-        "id": "f9c57274-d3bc-4d29-b8d2-4f82ed718351",
-        "status": "PASS",
-        "findings": [
-          "same locked rough-sleeping location across reflective beats",
-          "cool damp dawn presentation remains consistent",
-          "hero stands and walks away leaving cardboard/blanket behind",
-          "separate transcript verifies final line 'First, find work.'"
-        ]
+      "reviewEvidence": {
+        "priorSceneAnalysisId": "eb79f66d-069d-471f-8159-2afa1d96f0e1",
+        "v6Change": "1.5s cloned-tail hold only",
+        "transcriptFinalLine": "First, find work.",
+        "transcriptFinalLineEndSeconds": 47.34
       },
-      "automatedReviewStatus": "CANDIDATE_PASS_OWNER_VISUAL_REVIEW_PENDING"
+      "automatedReview": "CANDIDATE_PASS_OWNER_VISUAL_REVIEW_PENDING_V6"
     },
     "female": {
       "heroPresentationId": "hero-sex:female",
@@ -48,33 +42,26 @@
       "fps": 24,
       "videoCodec": "h264",
       "audioCodec": "aac",
-      "narration": {
-        "taskId": "e21122cd-37fb-4e08-ba6a-f0a2dbc2ae32",
-        "expressiveVoice": "Ella",
-        "transcriptVerifiedComplete": true
-      },
+      "lockedHeroElement": "3a2ebb82-3c27-4269-942d-3b43f30c6d5a",
+      "lockedEnvironmentElement": "eb818fef-4317-40d0-8108-38734b88fc06",
+      "narrationTaskId": "e21122cd-37fb-4e08-ba6a-f0a2dbc2ae32",
       "scoreTaskId": "93d06d0d-cb32-43a2-b51f-825cb2505a7f",
       "handoffJobId": "3fbcc78e-ddfe-48fc-b73c-9f96f4f2d3e0",
-      "automatedReview": {
-        "id": "e7f338c0-7ebc-44a0-ac8f-5b1d0ab1d08d",
-        "status": "PASS",
-        "findings": [
-          "same locked rough-sleeping location across reflective beats",
-          "cool damp dawn presentation remains consistent",
-          "hero stands and walks toward the distant city in the same scene",
-          "separate transcript verifies final line 'First, find work.'"
-        ]
+      "reviewEvidence": {
+        "sceneAnalysisId": "02cd4d7a-7a3d-4cd2-8527-8ec4ebbe4b7f",
+        "transcriptFinalLine": "First, find work.",
+        "continuity": "locked environment across recovery stills; handoff shot generated from final locked-environment frame"
       },
-      "automatedReviewStatus": "CANDIDATE_PASS_OWNER_VISUAL_REVIEW_PENDING"
+      "automatedReview": "CANDIDATE_PASS_OWNER_VISUAL_REVIEW_PENDING_V5"
     }
   },
-  "runtimeIntegrated": true,
+  "runtimeIntegrated": false,
   "ownerVisualAcceptance": "PENDING",
   "releaseCleared": false,
   "environment": {
     "elementId": "eb818fef-4317-40d0-8108-38734b88fc06",
     "name": "dropi-recovery-sleeping-place",
-    "status": "LOCKED_REVIEW_ENVIRONMENT",
-    "referenceJobId": "08ad36db-00fb-446f-93b4-b27cac798af8"
+    "reviewReelAnalysisId": "77d19e36-ec4d-4bc9-8f53-0454450989e5",
+    "status": "LOCKED_CANDIDATE_OWNER_REVIEW_PENDING"
   }
 }
