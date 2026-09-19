@@ -116,6 +116,7 @@ expo.android = {
   ...expo.android,
   package: EVALUATION_PACKAGE,
   versionCode: androidVersionCode,
+  allowBackup: false,
 }
 
 if (expo.extra?.eas) {
@@ -151,7 +152,7 @@ await replaceExactly('src/bundledRuntime.ts', [
 await replaceExactly('App.tsx', [
   ['  startBundledPhaserRuntime,', '  startBundledEvaluationRuntime,'],
   ['await startBundledPhaserRuntime()', 'await startBundledEvaluationRuntime()'],
-  ['source={{ uri: gameUrl }}', 'source={{ uri: `${gameUrl}?startupCinematic=1` }}'],
+  ['source={{ uri: gameUrl }}', 'source={{ uri: `${gameUrl}?startupCinematic=1&recoveryOpening=1` }}'],
   [
     'The installed Phaser runtime could not start. This is a local app-asset failure, not a Railway/network outage.',
     'The installed Babylon evaluation runtime could not start. This APK has no remote gameplay fallback.',
