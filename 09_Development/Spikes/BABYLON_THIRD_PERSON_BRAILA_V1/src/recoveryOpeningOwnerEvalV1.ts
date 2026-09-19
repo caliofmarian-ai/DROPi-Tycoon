@@ -1,9 +1,18 @@
 export {}
 
 type HeroPresentation = 'male' | 'female'
+type AccessMode = 'guest' | 'account'
+type GuestProfile = {
+  guestId: string
+  createdAt: string
+  heroPresentation: HeroPresentation | null
+  mode: 'guest-local-eval'
+}
 type RecoveryEvalPhase =
   | 'BYPASSED'
   | 'WAITING_FOR_CITY'
+  | 'ACCESS_CHOICE'
+  | 'ACCOUNT_NOT_ENABLED'
   | 'CHOOSE_PRESENTATION'
   | 'PLAYING_FILM_1'
   | 'FILM_1_FAILED'
@@ -16,6 +25,8 @@ declare global {
       phase: RecoveryEvalPhase
       requested: boolean
       heroPresentation: HeroPresentation | null
+      accessMode: AccessMode | null
+      guestProfileId: string | null
       filmSrc: string | null
       filmSeen: boolean
       noPhone: true
@@ -39,6 +50,7 @@ const FILMS: Record<HeroPresentation, string> = {
 }
 
 const PRESENTATION_KEY = 'dropi:presentation:recovery-hero-sex:v1'
+const GUEST_PROFILE_KEY = 'dropi:guest-profile:v1'
 const seenKey = (hero: HeroPresentation): string => `dropi:story:recovery-rise:v1:${hero}`
 
 const setCinematicAudio = (active: boolean): void => {
@@ -62,7 +74,48 @@ const writeStorage = (key: string, value: string): void => {
   }
 }
 
-const storedHero = readStorage(PRESENTATION_KEY)
+const readGuestProfile = (): GuestProfile | null => {
+  const raw = readStorage(GUEST_PROFILE_KEY)
+  if (!raw) return null
+  try {
+    const value = JSON.parse(raw) as Partial<GuestProfile>
+    if (value.mode !== 'guest-local-eval' || typeof value.guestId !== 'string' || typeof value.createdAt !== 'string') return null
+    const hero = value.heroPresentation === 'male' || value.heroPresentation === 'female'
+      ? value.heroPresentation
+      : null
+    return { guestId: value.guestId, createdAt: value.createdAt, heroPresentation: hero, mode: 'guest-local-eval' }
+  } catch {
+    return null
+  }
+}
+
+const createGuestId = (): string => {
+  const cryptoId = globalThis.crypto?.randomUUID?.()
+  return cryptoId ? `guest:${cryptoId}` : `guest:${Date.now()}:${Math.random().toString(36).slice(2)}`
+}
+
+const ensureGuestProfile = (): GuestProfile => {
+  const existing = readGuestProfile()
+  if (existing) return existing
+  const created: GuestProfile = {
+    guestId: createGuestId(),
+    createdAt: new Date().toISOString(),
+    heroPresentation: null,
+    mode: 'guest-local-eval',
+  }
+  writeStorage(GUEST_PROFILE_KEY, JSON.stringify(created))
+  return created
+}
+
+const saveGuestHero = (hero: HeroPresentation): GuestProfile => {
+  const guest = ensureGuestProfile()
+  const updated: GuestProfile = { ...guest, heroPresentation: hero }
+  writeStorage(GUEST_PROFILE_KEY, JSON.stringify(updated))
+  return updated
+}
+
+const existingGuest = readGuestProfile()
+const storedHero = existingGuest?.heroPresentation ?? readStorage(PRESENTATION_KEY)
 const initialHero: HeroPresentation | null =
   storedHero === 'male' || storedHero === 'female' ? storedHero : null
 
@@ -71,6 +124,8 @@ const state: NonNullable<Window['__DROPiRecoveryOpeningOwnerEvalV1']> = {
   phase: requested ? 'WAITING_FOR_CITY' : 'BYPASSED',
   requested,
   heroPresentation: initialHero,
+  accessMode: null,
+  guestProfileId: existingGuest?.guestId ?? null,
   filmSrc: initialHero ? FILMS[initialHero] : null,
   filmSeen: initialHero ? readStorage(seenKey(initialHero)) === '1' : false,
   noPhone: true,
