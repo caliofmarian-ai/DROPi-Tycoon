@@ -41,7 +41,10 @@ const ISSUE = 759 as const
 const OBJECTIVE = 'Walk the streets and look for work opportunities.'
 const query = new URLSearchParams(window.location.search)
 const mode = query.get('recoveryOpening')
-const requested = mode === '1' || mode === 'force'
+const ownerEvalLoopback =
+  window.location.hostname === '127.0.0.1' &&
+  window.location.port === '17832'
+const requested = ownerEvalLoopback || mode === '1' || mode === 'force'
 const forceReplay = mode === 'force'
 
 const FILMS: Record<HeroPresentation, string> = {
@@ -51,7 +54,7 @@ const FILMS: Record<HeroPresentation, string> = {
 
 const PRESENTATION_KEY = 'dropi:presentation:recovery-hero-sex:v1'
 const GUEST_PROFILE_KEY = 'dropi:guest-profile:v1'
-const seenKey = (hero: HeroPresentation): string => `dropi:story:recovery-rise:v1:${hero}`
+const seenKey = (hero: HeroPresentation): string => `dropi:story:recovery-rise:v2:${hero}`
 
 const setCinematicAudio = (active: boolean): void => {
   document.documentElement.dataset.cinematicAudio = active ? 'active' : 'gameplay'
