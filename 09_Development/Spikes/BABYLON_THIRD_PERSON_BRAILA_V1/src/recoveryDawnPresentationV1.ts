@@ -12,8 +12,13 @@ import {
 
 const ISSUE = 759
 const query = new URLSearchParams(window.location.search)
+const ownerEvalLoopback =
+  window.location.hostname === '127.0.0.1' &&
+  window.location.port === '17832'
 const recovery =
-  query.get('recoveryOpening') === '1' || query.get('recoveryOpening') === 'force'
+  ownerEvalLoopback ||
+  query.get('recoveryOpening') === '1' ||
+  query.get('recoveryOpening') === 'force'
 
 type RecoveryDawnDebug = {
   issue: number
