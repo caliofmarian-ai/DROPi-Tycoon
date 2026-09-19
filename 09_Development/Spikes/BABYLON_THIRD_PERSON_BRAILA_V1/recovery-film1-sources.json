@@ -7,10 +7,10 @@
   "candidates": {
     "male": {
       "heroPresentationId": "hero-sex:male",
-      "sourceMediaId": "67332fa5-e072-47fe-b963-4d77b6953a8f",
-      "sourceUrl": "https://d2ol7oe51mr4n9.cloudfront.net/user_3JCeOwtDa203yO6LGJxCX8lkQgM/67332fa5-e072-47fe-b963-4d77b6953a8f.mp4",
-      "sha256": "a5d96a0df5e76f676ed09db50f0bcbd9380cb01a9d01bd1f0ec7dd7d7a9f5774",
-      "bytes": 13289423,
+      "sourceMediaId": "f6d84a2b-cac3-4ca8-b40d-97b0876ad828",
+      "sourceUrl": "https://d2ol7oe51mr4n9.cloudfront.net/user_3JCeOwtDa203yO6LGJxCX8lkQgM/f6d84a2b-cac3-4ca8-b40d-97b0876ad828.mp4",
+      "sha256": "f28960edb364fc6d54009b396a11cdbd09b3b2eaa0773a39dabdf3ac893a5a00",
+      "bytes": 14453735,
       "durationSeconds": 48.875,
       "width": 1280,
       "height": 720,
@@ -23,19 +23,19 @@
       "scoreTaskId": "93d06d0d-cb32-43a2-b51f-825cb2505a7f",
       "handoffJobId": "e95a0222-3a02-40c1-bfe1-6e1fc764cd14",
       "reviewEvidence": {
-        "priorSceneAnalysisId": "eb79f66d-069d-471f-8159-2afa1d96f0e1",
-        "v6Change": "1.5s cloned-tail hold only",
-        "transcriptFinalLine": "First, find work.",
-        "transcriptFinalLineEndSeconds": 47.34
+        "lockedEnvironmentReview": "77d19e36-ec4d-4bc9-8f53-0454450989e5",
+        "handoffAnalysis": "9e53fbbc-8d92-4f36-84e0-850a67cb09a5",
+        "v7Change": "removed final xfade; direct cut into same-frame handoff to eliminate ghost/double exposure",
+        "transcriptFinalLine": "First, find work."
       },
-      "automatedReview": "CANDIDATE_PASS_OWNER_VISUAL_REVIEW_PENDING_V6"
+      "automatedReview": "CANDIDATE_OWNER_REVIEW_PENDING_FINAL_ANALYZER_QUEUE"
     },
     "female": {
       "heroPresentationId": "hero-sex:female",
-      "sourceMediaId": "cc7b6711-48c3-430b-a539-c1bfcbc6d3a7",
-      "sourceUrl": "https://d2ol7oe51mr4n9.cloudfront.net/user_3JCeOwtDa203yO6LGJxCX8lkQgM/cc7b6711-48c3-430b-a539-c1bfcbc6d3a7.mp4",
-      "sha256": "1844e8d2e69bb6ae3610ae81157d4f85f7675fef877d5ead97d12bb964ae41f4",
-      "bytes": 17434029,
+      "sourceMediaId": "87d1126b-b371-4394-ba59-c7d178687d23",
+      "sourceUrl": "https://d2ol7oe51mr4n9.cloudfront.net/user_3JCeOwtDa203yO6LGJxCX8lkQgM/87d1126b-b371-4394-ba59-c7d178687d23.mp4",
+      "sha256": "427955cef9195113a57de3e905e9b0aea8b6994afb17a047c4037ba5aa5e8175",
+      "bytes": 18035482,
       "durationSeconds": 54.584,
       "width": 1280,
       "height": 720,
@@ -48,11 +48,12 @@
       "scoreTaskId": "93d06d0d-cb32-43a2-b51f-825cb2505a7f",
       "handoffJobId": "3fbcc78e-ddfe-48fc-b73c-9f96f4f2d3e0",
       "reviewEvidence": {
-        "sceneAnalysisId": "02cd4d7a-7a3d-4cd2-8527-8ec4ebbe4b7f",
-        "transcriptFinalLine": "First, find work.",
-        "continuity": "locked environment across recovery stills; handoff shot generated from final locked-environment frame"
+        "lockedEnvironmentReview": "77d19e36-ec4d-4bc9-8f53-0454450989e5",
+        "handoffAnalysis": "8b46badc-e17d-4d22-8d98-a56c70a10dd6",
+        "v6Change": "removed final xfade; direct cut into same-frame handoff",
+        "transcriptFinalLine": "First, find work."
       },
-      "automatedReview": "CANDIDATE_PASS_OWNER_VISUAL_REVIEW_PENDING_V5"
+      "automatedReview": "CANDIDATE_OWNER_REVIEW_PENDING_FINAL_ANALYZER_QUEUE"
     }
   },
   "runtimeIntegrated": false,
