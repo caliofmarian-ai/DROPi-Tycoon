@@ -2,10 +2,11 @@ import assert from 'node:assert/strict'
 import { createHash } from 'node:crypto'
 import { readFile } from 'node:fs/promises'
 
-const [main, navigation, recovery, immersiveAudio, surfaceFinish, stage, config, male, female] = await Promise.all([
+const [main, navigation, recovery, recoveryDawn, immersiveAudio, surfaceFinish, stage, config, male, female] = await Promise.all([
   readFile('src/main.ts', 'utf8'),
   readFile('src/navigationAssist.ts', 'utf8'),
   readFile('src/recoveryOpeningOwnerEvalV1.ts', 'utf8'),
+  readFile('src/recoveryDawnPresentationV1.ts', 'utf8'),
   readFile('src/immersiveAudioV1.ts', 'utf8'),
   readFile('src/surfaceFinish.ts', 'utf8'),
   readFile('scripts/prepareAndroidEvaluationStage.mjs', 'utf8'),
@@ -43,12 +44,20 @@ assert.match(immersiveAudio, /applyMasterMix/)
 assert.match(stage, /allowBackup: false/)
 assert.match(recovery, /dropi:story:recovery-rise:v1:/)
 assert.match(recovery, /dropi:recovery-work-search-start/)
+assert.match(recoveryDawn, /RECOVERY_PREDAWN_PRESENTATION/)
+assert.match(recoveryDawn, /PRESENTATION_ONLY_NOT_WORLD_CLOCK/)
+assert.match(recoveryDawn, /recovery-sleeping-cardboard/)
+assert.match(recoveryDawn, /recovery-sleeping-blanket/)
+assert.match(recoveryDawn, /recovery-overhang-canopy/)
 assert.match(recovery, /Walk the streets and look for work opportunities\./)
 
 assert.equal(createHash('sha256').update(male).digest('hex'), config.candidates.male.sha256)
 assert.equal(male.length, config.candidates.male.bytes)
 assert.equal(createHash('sha256').update(female).digest('hex'), config.candidates.female.sha256)
 assert.equal(female.length, config.candidates.female.bytes)
+assert.equal(config.candidates.male.durationSeconds >= 40, true, 'Male Recovery Film 1 must be at least 40 seconds')
+assert.equal(config.candidates.female.durationSeconds >= 40, true, 'Female Recovery Film 1 must be at least 40 seconds')
+assert.equal(config.environment?.elementId, 'eb818fef-4317-40d0-8108-38734b88fc06')
 
 assert.equal(config.beatId, 'beat:recovery:origin:rise')
 assert.equal(config.canonicalFactId, 'fact:recovery:prologue-seen')
