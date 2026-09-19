@@ -429,6 +429,10 @@ if (requested) {
   }
 
   const startWorkSearch = (): void => {
+    if (state.accessMode !== 'guest') {
+      console.warn('[DROPi recovery] blocked WORK_SEARCH without explicit Guest access')
+      return
+    }
     if (!state.heroPresentation) return
     writeStorage(PRESENTATION_KEY, state.heroPresentation)
     writeStorage(seenKey(state.heroPresentation), '1')
@@ -545,16 +549,40 @@ if (requested) {
     publish()
   })
 
-  const timer = window.setInterval(() => {
-    if (!cityReady() || !startupFinished()) return
-    window.clearInterval(timer)
+  let startupGatePassed = startupFinished()
+  let accessMaterialized = false
 
+  const materializeAccessChoice = (): void => {
+    if (accessMaterialized) return
+    if (!cityReady() || !startupGatePassed) return
+    if (state.phase !== 'WAITING_FOR_CITY') return
+
+    accessMaterialized = true
     state.phase = 'ACCESS_CHOICE'
     state.accessMode = null
     setCinematicAudio(true)
     access.style.display = 'flex'
+    access.setAttribute('aria-hidden', 'false')
+    document.documentElement.dataset.recoveryAccess = 'guest-or-account'
     publish()
+    window.dispatchEvent(new CustomEvent('dropi:recovery-access-choice-visible'))
+  }
+
+  const onStartupDismissed = (): void => {
+    startupGatePassed = true
+    materializeAccessChoice()
+  }
+
+  window.addEventListener('dropi:startup-cinematic-dismissed', onStartupDismissed)
+
+  const timer = window.setInterval(() => {
+    if (startupFinished()) startupGatePassed = true
+    materializeAccessChoice()
+    if (accessMaterialized) window.clearInterval(timer)
   }, 200)
 
-  window.addEventListener('pagehide', () => window.clearInterval(timer), { once: true })
+  window.addEventListener('pagehide', () => {
+    window.clearInterval(timer)
+    window.removeEventListener('dropi:startup-cinematic-dismissed', onStartupDismissed)
+  }, { once: true })
 }
