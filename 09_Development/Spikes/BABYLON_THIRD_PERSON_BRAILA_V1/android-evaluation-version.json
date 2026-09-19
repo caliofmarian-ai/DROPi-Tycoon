@@ -1,10 +1,10 @@
 {
   "schemaVersion": 1,
   "packageId": "com.dropi.tycoon.babyloneval",
-  "versionCode": 2026091901,
-  "referenceInstalledVersionCode": 2026091802,
-  "upgradeProbeVersionCode": 2026091802,
-  "referenceInstalledApkSha256": "26dfcedef542f0f86bdd8bfc61d0b59d8f0cf641e03c199001b12023232890cc",
+  "versionCode": 2026091902,
+  "referenceInstalledVersionCode": 2026091901,
+  "upgradeProbeVersionCode": 2026091901,
+  "referenceInstalledApkSha256": "5466321ce2dd1d2fa4bcbebf44e82f6b277974d3911f0054565c74cb60bfe120",
   "referenceSignerSha256": "fac61745dc0903786fb9ede62a962b399f7348f0bb6f899b8332667591033b9c",
   "classification": "INTERNAL OWNER EVALUATION ONLY; explicit release counter, never a per-workflow run number"
 }
