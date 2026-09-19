@@ -147,6 +147,7 @@ publish()
 if (requested) {
   const style = document.createElement('style')
   style.textContent = `
+    #dropi-access-choice,
     #dropi-recovery-choice,
     #dropi-recovery-film {
       position: fixed;
@@ -155,6 +156,7 @@ if (requested) {
       font-family: system-ui, sans-serif;
       color: #f5fbff;
     }
+    #dropi-access-choice,
     #dropi-recovery-choice {
       display: none;
       align-items: center;
@@ -163,6 +165,7 @@ if (requested) {
         radial-gradient(circle at 50% 28%, rgba(67,99,116,.18), transparent 32%),
         linear-gradient(180deg, #071522, #0c1c28);
     }
+    #dropi-access-choice .panel,
     #dropi-recovery-choice .panel {
       width: min(680px, 88vw);
       padding: 26px;
@@ -172,15 +175,18 @@ if (requested) {
       box-shadow: 0 24px 70px rgba(0,0,0,.45);
       text-align: center;
     }
+    #dropi-access-choice .eyebrow,
     #dropi-recovery-choice .eyebrow {
       font-size: 10px;
       letter-spacing: .16em;
       opacity: .72;
     }
+    #dropi-access-choice h2,
     #dropi-recovery-choice h2 {
       margin: 8px 0 8px;
       font-size: clamp(22px, 4vw, 38px);
     }
+    #dropi-access-choice p,
     #dropi-recovery-choice p {
       margin: 0 auto 18px;
       max-width: 560px;
@@ -188,12 +194,14 @@ if (requested) {
       font-size: 13px;
       line-height: 1.45;
     }
+    #dropi-access-choice .actions,
     #dropi-recovery-choice .actions {
       display: flex;
       gap: 14px;
       justify-content: center;
       flex-wrap: wrap;
     }
+    #dropi-access-choice button,
     #dropi-recovery-choice button,
     #dropi-recovery-film button {
       min-width: 142px;
@@ -205,6 +213,25 @@ if (requested) {
       color: white;
       font: 800 13px/1 system-ui;
       letter-spacing: .05em;
+    }
+    #dropi-access-choice .secondary {
+      display: block;
+      margin-top: 12px;
+      color: rgba(207,224,232,.72);
+      font-size: 11px;
+      line-height: 1.4;
+    }
+    #dropi-access-choice .account-note {
+      display: none;
+      margin: 16px auto 0;
+      max-width: 560px;
+      padding: 12px 14px;
+      border-radius: 12px;
+      border: 1px solid rgba(246,205,98,.3);
+      background: rgba(61,44,11,.3);
+      color: #f3df9f;
+      font-size: 11px;
+      line-height: 1.45;
     }
     #dropi-recovery-film {
       display: none;
@@ -258,6 +285,28 @@ if (requested) {
     }
   `
   document.head.append(style)
+
+  const access = document.createElement('section')
+  access.id = 'dropi-access-choice'
+  const hasGuestProgress = Boolean(existingGuest)
+  access.innerHTML = `
+    <div class="panel">
+      <div class="eyebrow">DROPi TYCOON · PLAYER ACCESS</div>
+      <h2>Choose how you want to start</h2>
+      <p>You can experience the recovery opening as a Guest without creating an online account first.</p>
+      <div class="actions">
+        <button type="button" data-access="guest">${hasGuestProgress ? 'CONTINUE AS GUEST' : 'CONTINUE AS GUEST'}</button>
+        <button type="button" data-access="account">SIGN IN / CREATE ACCOUNT</button>
+      </div>
+      <span class="secondary">${hasGuestProgress
+        ? 'Local Guest progress found on this device. Continuing will keep that progress.'
+        : 'Guest progress is saved locally on this device and can be claimed into a registered account later.'}</span>
+      <div class="account-note" data-account-note>
+        Online Google/email authentication is not enabled in this owner-evaluation build yet. Continue as Guest to test the real opening. Production account creation is tracked under #772.
+      </div>
+    </div>
+  `
+  document.body.append(access)
 
   const choice = document.createElement('section')
   choice.id = 'dropi-recovery-choice'
@@ -351,6 +400,31 @@ if (requested) {
     if (objective) objective.textContent = OBJECTIVE
   }
 
+  const showHeroChoice = (): void => {
+    state.phase = 'CHOOSE_PRESENTATION'
+    setCinematicAudio(true)
+    access.style.display = 'none'
+    choice.style.display = 'flex'
+    publish()
+  }
+
+  const continueAsGuest = (): void => {
+    const guest = ensureGuestProfile()
+    state.accessMode = 'guest'
+    state.guestProfileId = guest.guestId
+    state.heroPresentation = guest.heroPresentation ?? initialHero
+    state.filmSrc = state.heroPresentation ? FILMS[state.heroPresentation] : null
+    state.filmSeen = state.heroPresentation ? readStorage(seenKey(state.heroPresentation)) === '1' : false
+    access.style.display = 'none'
+
+    if (state.heroPresentation && state.filmSeen && !forceReplay) {
+      startWorkSearch()
+      return
+    }
+
+    showHeroChoice()
+  }
+
   const startWorkSearch = (): void => {
     if (!state.heroPresentation) return
     writeStorage(PRESENTATION_KEY, state.heroPresentation)
@@ -384,6 +458,10 @@ if (requested) {
     state.filmSrc = FILMS[hero]
     state.filmSeen = readStorage(seenKey(hero)) === '1'
     writeStorage(PRESENTATION_KEY, hero)
+    if (state.accessMode === 'guest') {
+      const guest = saveGuestHero(hero)
+      state.guestProfileId = guest.guestId
+    }
     choice.style.display = 'none'
 
     if (state.filmSeen && !forceReplay && !replay) {
@@ -434,11 +512,25 @@ if (requested) {
     evalControls.style.display = 'none'
     statusBadge.hidden = true
     film.style.display = 'none'
-    state.phase = 'CHOOSE_PRESENTATION'
-    setCinematicAudio(true)
-    choice.style.display = 'flex'
-    publish()
+    showHeroChoice()
   })
+
+  for (const button of access.querySelectorAll<HTMLButtonElement>('[data-access]')) {
+    button.addEventListener('click', () => {
+      const mode = button.dataset.access
+      if (mode === 'guest') {
+        continueAsGuest()
+        return
+      }
+      if (mode === 'account') {
+        state.phase = 'ACCOUNT_NOT_ENABLED'
+        state.accessMode = 'account'
+        const note = access.querySelector<HTMLElement>('[data-account-note]')
+        if (note) note.style.display = 'block'
+        publish()
+      }
+    })
+  }
 
   skipButton.addEventListener('click', startWorkSearch)
   video.addEventListener('ended', startWorkSearch)
@@ -454,15 +546,10 @@ if (requested) {
     if (!cityReady() || !startupFinished()) return
     window.clearInterval(timer)
 
-    if (initialHero && readStorage(seenKey(initialHero)) === '1' && !forceReplay) {
-      state.heroPresentation = initialHero
-      startWorkSearch()
-      return
-    }
-
-    state.phase = 'CHOOSE_PRESENTATION'
+    state.phase = 'ACCESS_CHOICE'
+    state.accessMode = null
     setCinematicAudio(true)
-    choice.style.display = 'flex'
+    access.style.display = 'flex'
     publish()
   }, 200)
 
