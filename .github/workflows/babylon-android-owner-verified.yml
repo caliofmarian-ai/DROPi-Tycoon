@@ -291,28 +291,20 @@ jobs:
           tap_ui_text() {
             local needle="$1"
             dump_ui
-            python3 - "$RUNNER_TEMP/dropi-owner-ui.xml" "$needle" <<'PY'
-import re, subprocess, sys, xml.etree.ElementTree as ET
-path, needle = sys.argv[1], sys.argv[2]
-root = ET.parse(path).getroot()
-for node in root.iter('node'):
-    haystack = ' '.join([
-        node.attrib.get('text',''),
-        node.attrib.get('content-desc',''),
-    ])
-    if needle not in haystack:
-        continue
-    m = re.fullmatch(r'\[(\d+),(\d+)\]\[(\d+),(\d+)\]', node.attrib.get('bounds',''))
-    if not m:
-        continue
-    x1,y1,x2,y2 = map(int,m.groups())
-    x,y = (x1+x2)//2, (y1+y2)//2
-    subprocess.run(['adb','shell','input','tap',str(x),str(y)], check=True)
-    print(f'tapped {needle!r} at {x},{y}')
-    sys.exit(0)
-print(f'No tappable UI node found for {needle!r}', file=sys.stderr)
-sys.exit(1)
-PY
+            local bounds
+            bounds="$(grep -o "text=\"$needle\"[^>]*bounds=\"\[[0-9,]*\]\[[0-9,]*\]\"" "$RUNNER_TEMP/dropi-owner-ui.xml" \
+              | sed -n 's/.*bounds="\[\([0-9]*\),\([0-9]*\)\]\[\([0-9]*\),\([0-9]*\)\]".*/\1 \2 \3 \4/p' \
+              | head -n1)"
+            if [ -z "$bounds" ]; then
+              echo "No tappable UI node found for: $needle" >&2
+              cat "$RUNNER_TEMP/dropi-owner-ui.xml" >&2
+              return 1
+            fi
+            read -r x1 y1 x2 y2 <<< "$bounds"
+            local x=$(( (x1 + x2) / 2 ))
+            local y=$(( (y1 + y2) / 2 ))
+            "$ADB" shell input tap "$x" "$y"
+            echo "Tapped $needle at $x,$y"
           }
 
           # Player-visible owner-flow proof: a launch is not PASS unless the
