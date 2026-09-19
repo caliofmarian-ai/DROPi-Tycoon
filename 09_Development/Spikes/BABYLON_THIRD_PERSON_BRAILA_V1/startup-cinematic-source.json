@@ -16,7 +16,7 @@
     "bytes": 36402622
   },
   "ownerVisualAcceptance": "PENDING",
-  "runtimeIntegrated": false,
+  "runtimeIntegrated": true,
   "releaseCleared": false,
   "automatedSceneAnalysis": {
     "id": "6d271a83-934d-41cb-81bc-353aed5fba6d",
