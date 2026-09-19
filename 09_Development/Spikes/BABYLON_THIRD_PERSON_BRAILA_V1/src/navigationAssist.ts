@@ -20,7 +20,7 @@ type Box2D = { minX: number; maxX: number; minZ: number; maxZ: number; preferred
 
 type NavigationDebug = {
   issue: number
-  mode: 'scene-derived-mission-gps'
+  mode: 'scene-derived-mission-gps' | 'disabled-no-phone'
   getRoute(): Array<{ x: number; z: number }>
   getMapRange(): number
 }
@@ -154,6 +154,24 @@ const addStyles = (): void => {
 }
 
 const boot = (): void => {
+  const query = new URLSearchParams(window.location.search)
+  const ownerEvalLoopback =
+    window.location.hostname === '127.0.0.1' &&
+    window.location.port === '17832'
+  const recoveryOpening =
+    ownerEvalLoopback ||
+    query.get('recoveryOpening') === '1' ||
+    query.get('recoveryOpening') === 'force'
+  if (recoveryOpening) {
+    window.__DROPiNavigationAssist = {
+      issue: ISSUE,
+      mode: 'disabled-no-phone',
+      getRoute: () => [],
+      getMapRange: () => 0,
+    }
+    return
+  }
+
   const scene = EngineStore.LastCreatedScene
   const hero = scene?.getTransformNodeByName('hero')
   const marker = scene?.getMeshByName('objective-marker')

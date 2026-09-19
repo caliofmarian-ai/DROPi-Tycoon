@@ -266,6 +266,67 @@ jobs:
           APP_PID="$("$ADB" shell pidof "$DROPI_PACKAGE_ID" | tr -d '\r')"
           test -n "$APP_PID"
           "$ADB" shell dumpsys activity activities | grep -F "$DROPI_PACKAGE_ID" | sed -n '1,5p'
+
+          dump_ui() {
+            "$ADB" shell uiautomator dump /sdcard/dropi-owner-ui.xml >/dev/null 2>&1 || return 1
+            "$ADB" pull /sdcard/dropi-owner-ui.xml "$RUNNER_TEMP/dropi-owner-ui.xml" >/dev/null 2>&1 || return 1
+          }
+
+          wait_for_ui_text() {
+            local needle="$1"
+            local attempts="$2"
+            for _ in $(seq 1 "$attempts"); do
+              if dump_ui && grep -Fq "$needle" "$RUNNER_TEMP/dropi-owner-ui.xml"; then
+                return 0
+              fi
+              sleep 3
+            done
+            echo "Timed out waiting for owner-eval UI text: $needle" >&2
+            if test -f "$RUNNER_TEMP/dropi-owner-ui.xml"; then
+              cat "$RUNNER_TEMP/dropi-owner-ui.xml" >&2
+            fi
+            return 1
+          }
+
+          tap_ui_text() {
+            local needle="$1"
+            dump_ui
+            local bounds
+            bounds="$(grep -o "text=\"$needle\"[^>]*bounds=\"\[[0-9,]*\]\[[0-9,]*\]\"" "$RUNNER_TEMP/dropi-owner-ui.xml" \
+              | sed -n 's/.*bounds="\[\([0-9]*\),\([0-9]*\)\]\[\([0-9]*\),\([0-9]*\)\]".*/\1 \2 \3 \4/p' \
+              | head -n1)"
+            if [ -z "$bounds" ]; then
+              echo "No tappable UI node found for: $needle" >&2
+              cat "$RUNNER_TEMP/dropi-owner-ui.xml" >&2
+              return 1
+            fi
+            read -r x1 y1 x2 y2 <<< "$bounds"
+            local x=$(( (x1 + x2) / 2 ))
+            local y=$(( (y1 + y2) / 2 ))
+            "$ADB" shell input tap "$x" "$y"
+            echo "Tapped $needle at $x,$y"
+          }
+
+          # Player-visible owner-flow proof: a launch is not PASS unless the
+          # cinematic layer really activates and hands off to Guest access.
+          wait_for_ui_text 'Preparing Brăila' 20
+          wait_for_ui_text 'CONTINUE TO GAME' 40
+          tap_ui_text 'CONTINUE TO GAME'
+          wait_for_ui_text 'CONTINUE AS GUEST' 10
+          tap_ui_text 'CONTINUE AS GUEST'
+          wait_for_ui_text 'MALE' 10
+          wait_for_ui_text 'FEMALE' 10
+          tap_ui_text 'FEMALE'
+          wait_for_ui_text 'SKIP FILM' 10
+          tap_ui_text 'SKIP FILM'
+          wait_for_ui_text 'RECOVERY · ON FOOT · NO PHONE · NO GPS' 10
+          wait_for_ui_text 'Walk the streets and look for work opportunities.' 10
+          echo 'DROPI_OWNER_FLOW_STARTUP_CINEMATIC=PASS' >> "$GITHUB_ENV"
+          echo 'DROPI_OWNER_FLOW_GUEST_ACCESS=PASS' >> "$GITHUB_ENV"
+          echo 'DROPI_OWNER_FLOW_HERO_CHOICE=PASS' >> "$GITHUB_ENV"
+          echo 'DROPI_OWNER_FLOW_STORY_FILM=PASS' >> "$GITHUB_ENV"
+          echo 'DROPI_OWNER_FLOW_RECOVERY_GAMEPLAY=PASS' >> "$GITHUB_ENV"
+
           sleep 7
           STABLE_PID="$("$ADB" shell pidof "$DROPI_PACKAGE_ID" | tr -d '\r')"
           test "$STABLE_PID" = "$APP_PID"
@@ -350,6 +411,11 @@ jobs:
             echo "candidate_version_code=$DROPI_ANDROID_VERSION_CODE"
             echo "lower_version_probe=$DROPI_UPGRADE_PROBE_VERSION"
             echo "emulator_update_mechanics=$DROPI_EMULATOR_UPDATE_PROBE"
+            echo "owner_flow_startup_cinematic=$DROPI_OWNER_FLOW_STARTUP_CINEMATIC"
+            echo "owner_flow_guest_access=$DROPI_OWNER_FLOW_GUEST_ACCESS"
+            echo "owner_flow_hero_choice=$DROPI_OWNER_FLOW_HERO_CHOICE"
+            echo "owner_flow_story_film=$DROPI_OWNER_FLOW_STORY_FILM"
+            echo "owner_flow_recovery_gameplay=$DROPI_OWNER_FLOW_RECOVERY_GAMEPLAY"
             echo 'exact_old_payload_save_migration=UNKNOWN_NOT_TESTED_BY_VERSION_FIXTURE'
             echo "verified_previous_signer_sha256=$DROPI_REFERENCE_SIGNER"
             echo 'final_abi=arm64-v8a'

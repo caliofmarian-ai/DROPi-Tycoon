@@ -33,11 +33,47 @@ declare global {
 
 const ISSUE = 769 as const
 const VIDEO_SRC = '/assets/cinematics/startup-world-presentation-v1.mp4'
-const SEEN_KEY = 'dropi:presentation:startup-world-film:v1'
+const SEEN_KEY = 'dropi:presentation:startup-world-film:v4'
+
+const setCinematicAudio = (active: boolean): void => {
+  document.documentElement.dataset.cinematicAudio = active ? 'active' : 'gameplay'
+  window.dispatchEvent(new CustomEvent('dropi:cinematic-audio-state', { detail: { active } }))
+}
+
+const installReplayButton = (): void => {
+  if (document.querySelector('#dropi-replay-startup-film')) return
+  const button = document.createElement('button')
+  button.id = 'dropi-replay-startup-film'
+  button.type = 'button'
+  button.textContent = 'REPLAY INTRO'
+  Object.assign(button.style, {
+    position: 'fixed',
+    right: '12px',
+    top: '46px',
+    zIndex: '38',
+    minHeight: '34px',
+    padding: '7px 11px',
+    borderRadius: '9px',
+    border: '1px solid rgba(210,239,251,.46)',
+    background: 'rgba(7,36,52,.82)',
+    color: '#eefaff',
+    font: '800 9px/1 system-ui',
+    letterSpacing: '.05em',
+  } satisfies Partial<CSSStyleDeclaration>)
+  button.addEventListener('click', () => {
+    const next = new URL(window.location.href)
+    next.searchParams.set('startupCinematic', 'force')
+    window.location.href = next.toString()
+  })
+  document.body.append(button)
+}
 
 const query = new URLSearchParams(window.location.search)
 const mode = query.get('startupCinematic')
-const requested = mode === '1' || mode === 'force'
+const ownerEvalLoopback =
+  window.location.hostname === '127.0.0.1' &&
+  window.location.port === '17832'
+const requested = ownerEvalLoopback || mode === '1' || mode === 'force'
 const forceReplay = mode === 'force'
 
 const readSeen = (): boolean => {
@@ -81,7 +117,13 @@ if (!requested) {
   publish()
 } else if (seenAtStart && !forceReplay) {
   state.status = 'SKIPPED_SEEN'
+  installReplayButton()
   publish()
+  window.setTimeout(() => {
+    window.dispatchEvent(new CustomEvent('dropi:startup-cinematic-dismissed', {
+      detail: { status: state.status, issue: ISSUE },
+    }))
+  }, 0)
 } else {
   const style = document.createElement('style')
   style.textContent = `
@@ -93,6 +135,12 @@ if (!requested) {
       background: #071522;
       color: #f4fbff;
       font-family: system-ui, sans-serif;
+      opacity: 1;
+      transition: opacity .65s ease;
+    }
+    #dropi-startup-cinematic.handoff {
+      opacity: 0;
+      pointer-events: none;
     }
     #dropi-startup-cinematic video {
       width: 100%;
@@ -211,11 +259,20 @@ if (!requested) {
     state.status = 'DISMISSED'
     writeSeen()
     video.pause()
-    overlay.remove()
+    setCinematicAudio(false)
+    overlay.classList.add('handoff')
     publish()
+    window.dispatchEvent(new CustomEvent('dropi:startup-cinematic-dismissed', {
+      detail: { status: state.status, issue: ISSUE },
+    }))
+    window.setTimeout(() => {
+      overlay.remove()
+      installReplayButton()
+    }, 680)
   }
 
   const attemptPlay = async (): Promise<void> => {
+    setCinematicAudio(true)
     try {
       await video.play()
       playButton.hidden = true
@@ -269,6 +326,7 @@ if (!requested) {
     if (state.gameReadiness === 'FAIL') {
       window.clearInterval(readinessTimer)
       video.pause()
+      setCinematicAudio(false)
       overlay.remove()
       publish()
       return

@@ -1,74 +1,63 @@
-# Install the Babylon Brăila Android evaluation APK
+# Install the Babylon Brăila Android owner-evaluation APK
 
-This path uses an APK built directly by GitHub Actions from the exact draft PR
-head. It does not use Termux, a computer, Railway, EAS or a production signing
-key.
+This APK is an **internal owner-evaluation build** of the Babylon Brăila model-city path.
+It is not a production release and it does not represent the old Phaser/2D presentation.
 
-Truth classification:
+## Expected first-launch flow
 
-`NON-AUTHORITATIVE TECHNICAL SPIKE — NOT AUTHENTIC GAMEPLAY`
+The owner-evaluation APK must visibly follow this order:
 
-Rejected device build:
+1. long DROPi Tycoon game introduction cinematic;
+2. `CONTINUE TO GAME` once the Babylon city is ready;
+3. player access choice:
+   - `CONTINUE AS GUEST`;
+   - `SIGN IN / CREATE ACCOUNT` (shown honestly as not yet enabled in this evaluation build);
+4. Guest path -> choose `MALE` or `FEMALE`;
+5. corresponding Recovery Story Film 1;
+6. dissolve into 3D gameplay;
+7. first objective: `Walk the streets and look for work opportunities.`;
+8. recovery state: `ON FOOT · NO PHONE · NO GPS`.
 
-`364d1e2f0dd15d4721efc0f4f1d49042effa62d3` is `STALE` and must not be used
-for visual evaluation. Owner Android evidence proved that its renderer stopped
-before the first frame. Install only a newer exact-head artifact whose workflow
-completed successfully.
+If the APK launches directly into the technical Babylon map without the cinematic/access flow, that build is **FAIL** for owner review.
+
+## Guest evaluation behavior
+
+- Guest creates a local evaluation profile only.
+- Guest progress remains local on this device.
+- Male/Female selection is protagonist presentation, not a claim about the user's real-world sex/gender.
+- Online Google/email authentication is tracked separately under #772 and is not faked in this APK.
+- Use `REPLAY INTRO`, `REPLAY STORY FILM` and `CHANGE HERO (EVAL)` rather than uninstalling merely to replay cinematics.
 
 ## Install on Android
 
-1. Open the latest successful `Babylon Third-Person Brăila Spike` run attached
-   to draft PR #712.
-2. Under **Artifacts**, download the artifact whose name starts with
-   `dropi-babylon-android-eval-`.
-3. Open the downloaded ZIP in the Android Files application and choose
-   **Extract**.
-4. Tap the extracted `DROPi-Babylon-Eval-<SHA>.apk` once to install it.
-5. If Android asks, allow **Install unknown apps** for the Files application,
-   then return and tap the APK again.
-6. Open the separately installed application named `DROPi Babylon Eval`.
+1. Download the latest successful artifact whose name starts with `dropi-babylon-owner-ready-`.
+2. Extract the ZIP.
+3. Tap `DROPi-Babylon-Eval-<SHA>.apk`.
+4. If Android asks, allow **Install unknown apps** for the Files application and retry.
+5. Open `DROPi Babylon Eval`.
 
-The evaluation package is `com.dropi.tycoon.babyloneval`, so it does not
-replace `com.dropi.tycoon` or its saved data.
+The evaluation package is `com.dropi.tycoon.babyloneval`, separate from the production package.
 
-Do not install an APK when the SHA in its filename, the provenance JSON and the
-workflow run do not agree. The artifact also contains:
+## Controls after the recovery films
 
-- `android-evaluation-provenance.json`;
-- `SHA256SUMS.txt`;
-- this installation guide.
+- on-screen controls: walk/turn;
+- drag: orbit camera;
+- pinch: adjust camera distance;
+- `RECENTER CAMERA`: restore behind-hero view;
+- Android Back: native exit bridge.
 
-## Controls
+Run/sprint, Work Capacity projection and authoritative day/night consumption remain separate active work (#725, #436, #420); do not interpret this APK as final acceptance for those systems.
 
-- on-screen arrows: move and turn;
-- drag the open scene: orbit the camera;
-- pinch: adjust camera distance inside the bounded test range;
-- `RECENTER CAMERA`: restore the behind-hero view;
-- `INTERACT`: complete HQ → Mara pickup → customer handoff.
-- Android Back: reset active controls and exit `DROPi Babylon Eval` through the
-  existing native WebView bridge. A standalone browser does not synthesize a
-  navigation or exit action.
+## Owner evidence requested
 
-## Owner evidence
+Please return a short screen recording showing:
+- intro cinematic;
+- Continue;
+- Guest access;
+- Male/Female choice;
+- Story Film 1;
+- film -> gameplay transition;
+- first recovery objective;
+- any visual/audio defect.
 
-Complete the route at least once and return:
-
-- one landscape screenshot with the HUD build prefix and telemetry visible;
-- the Android device model and Android/System WebView versions;
-- whether the route completed without getting stuck;
-- any player/building or camera/façade clipping location;
-- typical `avg FPS`, `p95` frame time and `slow` percentage after at least two
-  minutes;
-- whether orbit, pinch, recenter, touch movement, Android Back and
-  background/resume behave correctly;
-- optionally, one short landscape screen recording around a building corner.
-
-DT-00 will classify `PRESENCE`, `SCALE`, `CAMERA`, `MOTION`,
-`WORLD READABILITY`, `LIFE` and `POLISH` as `PASS`, `PARTIAL` or `FAIL`.
-
-## Evidence boundary
-
-The APK is debug-signed and exists only for internal owner evaluation. It is
-not eligible for Google Play, production promotion or marketing as authentic
-gameplay. A green GitHub build proves reproducible packaging; only the physical
-Android test supplies device and visual evidence.
+Physical Android review remains the final player-visible acceptance gate.

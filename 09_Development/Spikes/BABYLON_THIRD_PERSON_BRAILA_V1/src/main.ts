@@ -60,6 +60,14 @@ const interactButton = requireElement<HTMLButtonElement>('#interact')
 const recenterButton = requireElement<HTMLButtonElement>('#recenter')
 
 const BUILD_SHA = import.meta.env.VITE_COMMIT_SHA || 'LOCAL'
+const runtimeQuery = new URLSearchParams(window.location.search)
+const OWNER_EVAL_LOOPBACK =
+  window.location.hostname === '127.0.0.1' &&
+  window.location.port === '17832'
+const RECOVERY_OWNER_EVAL =
+  OWNER_EVAL_LOOPBACK ||
+  runtimeQuery.get('recoveryOpening') === '1' ||
+  runtimeQuery.get('recoveryOpening') === 'force'
 const NATIVE_BACK_EVENT = 'dropi:native-back'
 const NATIVE_EXIT_GAME_MESSAGE = 'dropi:exit-game'
 const FIRST_FRAME_TIMEOUT_MS = 15_000
@@ -283,8 +291,8 @@ const createBuilding = (
   return building
 }
 
-createBuilding('dropi-hq', 29, 15, 18, 12, 14, buildingMaterials[4], { text: 'DROPi HQ', accent: '#009fd4' })
-createBuilding('maras-market', -27, -13, 14, 10, 9, buildingMaterials[0], { text: "MARA'S MARKET", accent: '#c98425' })
+createBuilding('dropi-hq', 29, 15, 18, 12, 14, buildingMaterials[4], RECOVERY_OWNER_EVAL ? undefined : { text: 'DROPi HQ', accent: '#009fd4' })
+createBuilding('maras-market', -27, -13, 14, 10, 9, buildingMaterials[0], RECOVERY_OWNER_EVAL ? undefined : { text: "MARA'S MARKET", accent: '#c98425' })
 createBuilding('customer-block', 34, -23, 17, 12, 16, buildingMaterials[2], { text: 'RESIDENCES', accent: '#52765a' })
 
 const genericBuildings: Array<[number, number, number, number, number]> = [
@@ -444,16 +452,20 @@ const createMarker = (name: string, position: Vector3, material: StandardMateria
   return marker
 }
 
-const waypoints: Waypoint[] = [
+const waypoints: Waypoint[] = RECOVERY_OWNER_EVAL ? [] : [
   { label: 'DROPi HQ', position: new Vector3(29, 0, 8) },
   { label: "Mara's Market", position: new Vector3(-27, 0, -19) },
   { label: 'Customer', position: new Vector3(34, 0, -30) },
 ]
 
 const firstWaypoint = waypoints[0]
-if (!firstWaypoint) throw new Error('Spike route has no starting waypoint')
-const marker = createMarker('objective-marker', firstWaypoint.position, dropiMat)
-let phase = 0
+const marker = createMarker(
+  'objective-marker',
+  firstWaypoint?.position ?? HERO_START,
+  dropiMat,
+)
+if (RECOVERY_OWNER_EVAL) marker.setEnabled(false)
+let phase = RECOVERY_OWNER_EVAL ? -1 : 0
 
 const npcMat: [StandardMaterial, StandardMaterial, StandardMaterial] = [
   mat('npc-blue', '#496b86'),
@@ -561,6 +573,7 @@ let interactionFeedback = ''
 let interactionFeedbackUntil = 0
 
 function objectiveText(): string {
+  if (RECOVERY_OWNER_EVAL) return 'Walk the streets and look for work opportunities.'
   if (phase === 0) return 'Approach DROPi HQ and interact.'
   if (phase === 1) return "Travel to Mara's Market and pick up the parcel."
   if (phase === 2) return 'Carry the parcel to the customer and hand it over.'
@@ -568,11 +581,22 @@ function objectiveText(): string {
 }
 
 function activeWaypoint(): Waypoint | null {
+  if (RECOVERY_OWNER_EVAL) return null
   if (phase > 2) return null
   return waypoints[phase] ?? null
 }
 
 function updateObjective(): void {
+  if (RECOVERY_OWNER_EVAL) {
+    marker.setEnabled(false)
+    parcel.setEnabled(false)
+    interactButton.hidden = true
+    interactButton.classList.remove('ready')
+    interactButton.dataset.ready = 'false'
+    objectiveEl.textContent = 'Walk the streets and look for work opportunities.'
+    return
+  }
+
   const target = activeWaypoint()
   if (target) marker.position.copyFrom(target.position)
   marker.setEnabled(Boolean(target))
@@ -593,6 +617,7 @@ function updateObjective(): void {
 
 function tryInteract(): void {
   if (rendererFailed) return
+  if (RECOVERY_OWNER_EVAL) return
   if (phase > 2) {
     phase = 0
     parcel.setEnabled(false)
@@ -692,6 +717,17 @@ const getPerformanceSample = (): PerformanceSample => {
 let walkPhase = 0
 let telemetryAccumulator = 0
 let currentSpeed = 0
+
+;(window as unknown as { __DROPiRecoveryWorldEvalV1?: unknown }).__DROPiRecoveryWorldEvalV1 = {
+  enabled: RECOVERY_OWNER_EVAL,
+  issue: 759,
+  noPhone: RECOVERY_OWNER_EVAL,
+  noGps: RECOVERY_OWNER_EVAL,
+  legacyRouteEnabled: !RECOVERY_OWNER_EVAL,
+  objective: RECOVERY_OWNER_EVAL
+    ? 'Walk the streets and look for work opportunities.'
+    : objectiveText(),
+}
 
 scene.onBeforeRenderObservable.add(() => {
   const rawFrameMs = engine.getDeltaTime()

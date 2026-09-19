@@ -1,0 +1,68 @@
+{
+  "schemaVersion": 1,
+  "issue": 759,
+  "classification": "CINEMATIC / NON-GAMEPLAY — INTERNAL OWNER REVIEW CANDIDATES",
+  "beatId": "beat:recovery:origin:rise",
+  "canonicalFactId": "fact:recovery:prologue-seen",
+  "candidates": {
+    "male": {
+      "heroPresentationId": "hero-sex:male",
+      "sourceMediaId": "f6d84a2b-cac3-4ca8-b40d-97b0876ad828",
+      "sourceUrl": "https://d2ol7oe51mr4n9.cloudfront.net/user_3JCeOwtDa203yO6LGJxCX8lkQgM/f6d84a2b-cac3-4ca8-b40d-97b0876ad828.mp4",
+      "sha256": "f28960edb364fc6d54009b396a11cdbd09b3b2eaa0773a39dabdf3ac893a5a00",
+      "bytes": 14453735,
+      "durationSeconds": 48.875,
+      "width": 1280,
+      "height": 720,
+      "fps": 24,
+      "videoCodec": "h264",
+      "audioCodec": "aac",
+      "lockedHeroElement": "fd9cf0ec-e103-46b5-a263-13b461bdf1d3",
+      "lockedEnvironmentElement": "eb818fef-4317-40d0-8108-38734b88fc06",
+      "narrationTaskId": "51ff6d81-21a6-4c1c-9f70-3a823ce376d7",
+      "scoreTaskId": "93d06d0d-cb32-43a2-b51f-825cb2505a7f",
+      "handoffJobId": "e95a0222-3a02-40c1-bfe1-6e1fc764cd14",
+      "reviewEvidence": {
+        "lockedEnvironmentReview": "77d19e36-ec4d-4bc9-8f53-0454450989e5",
+        "handoffAnalysis": "9e53fbbc-8d92-4f36-84e0-850a67cb09a5",
+        "v7Change": "removed final xfade; direct cut into same-frame handoff to eliminate ghost/double exposure",
+        "transcriptFinalLine": "First, find work."
+      },
+      "automatedReview": "CANDIDATE_OWNER_REVIEW_PENDING_FINAL_ANALYZER_QUEUE"
+    },
+    "female": {
+      "heroPresentationId": "hero-sex:female",
+      "sourceMediaId": "87d1126b-b371-4394-ba59-c7d178687d23",
+      "sourceUrl": "https://d2ol7oe51mr4n9.cloudfront.net/user_3JCeOwtDa203yO6LGJxCX8lkQgM/87d1126b-b371-4394-ba59-c7d178687d23.mp4",
+      "sha256": "427955cef9195113a57de3e905e9b0aea8b6994afb17a047c4037ba5aa5e8175",
+      "bytes": 18035482,
+      "durationSeconds": 54.584,
+      "width": 1280,
+      "height": 720,
+      "fps": 24,
+      "videoCodec": "h264",
+      "audioCodec": "aac",
+      "lockedHeroElement": "3a2ebb82-3c27-4269-942d-3b43f30c6d5a",
+      "lockedEnvironmentElement": "eb818fef-4317-40d0-8108-38734b88fc06",
+      "narrationTaskId": "e21122cd-37fb-4e08-ba6a-f0a2dbc2ae32",
+      "scoreTaskId": "93d06d0d-cb32-43a2-b51f-825cb2505a7f",
+      "handoffJobId": "3fbcc78e-ddfe-48fc-b73c-9f96f4f2d3e0",
+      "reviewEvidence": {
+        "lockedEnvironmentReview": "77d19e36-ec4d-4bc9-8f53-0454450989e5",
+        "handoffAnalysis": "8b46badc-e17d-4d22-8d98-a56c70a10dd6",
+        "v6Change": "removed final xfade; direct cut into same-frame handoff",
+        "transcriptFinalLine": "First, find work."
+      },
+      "automatedReview": "CANDIDATE_OWNER_REVIEW_PENDING_FINAL_ANALYZER_QUEUE"
+    }
+  },
+  "runtimeIntegrated": false,
+  "ownerVisualAcceptance": "PENDING",
+  "releaseCleared": false,
+  "environment": {
+    "elementId": "eb818fef-4317-40d0-8108-38734b88fc06",
+    "name": "dropi-recovery-sleeping-place",
+    "reviewReelAnalysisId": "77d19e36-ec4d-4bc9-8f53-0454450989e5",
+    "status": "LOCKED_CANDIDATE_OWNER_REVIEW_PENDING"
+  }
+}
