@@ -7,10 +7,10 @@ import { spawnSync } from 'node:child_process'
 import { fileURLToPath } from 'node:url'
 import { release, validateRelease, prepareProbe, parseSignerSha256 } from './evaluationReleaseIdentity.mjs'
 test('explicit evaluation release advances beyond the approved owner APK',()=>{
-  assert.equal(release.versionCode,2026091901)
-  assert.equal(release.referenceInstalledVersionCode,2026091802)
-  assert.equal(release.upgradeProbeVersionCode,2026091802)
-  assert.equal(release.referenceInstalledApkSha256,'26dfcedef542f0f86bdd8bfc61d0b59d8f0cf641e03c199001b12023232890cc')
+  assert.equal(release.versionCode,2026091902)
+  assert.equal(release.referenceInstalledVersionCode,2026091901)
+  assert.equal(release.upgradeProbeVersionCode,2026091901)
+  assert.equal(release.referenceInstalledApkSha256,'5466321ce2dd1d2fa4bcbebf44e82f6b277974d3911f0054565c74cb60bfe120')
   assert.equal(release.referenceSignerSha256,'fac61745dc0903786fb9ede62a962b399f7348f0bb6f899b8332667591033b9c')
 })
 test('reject invalid, downgraded or misbound release identities',()=>{
