@@ -33,7 +33,7 @@ declare global {
 
 const ISSUE = 769 as const
 const VIDEO_SRC = '/assets/cinematics/startup-world-presentation-v1.mp4'
-const SEEN_KEY = 'dropi:presentation:startup-world-film:v1'
+const SEEN_KEY = 'dropi:presentation:startup-world-film:v4'
 
 const setCinematicAudio = (active: boolean): void => {
   document.documentElement.dataset.cinematicAudio = active ? 'active' : 'gameplay'
@@ -70,7 +70,10 @@ const installReplayButton = (): void => {
 
 const query = new URLSearchParams(window.location.search)
 const mode = query.get('startupCinematic')
-const requested = mode === '1' || mode === 'force'
+const ownerEvalLoopback =
+  window.location.hostname === '127.0.0.1' &&
+  window.location.port === '17832'
+const requested = ownerEvalLoopback || mode === '1' || mode === 'force'
 const forceReplay = mode === 'force'
 
 const readSeen = (): boolean => {
